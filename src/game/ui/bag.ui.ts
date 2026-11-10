@@ -77,6 +77,8 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
   // ---- the tooltip: the name, what it is for, and what the item says of itself. It lives in the stage, outside the panel's zoom.
   const tip = h('div', { class: 'gu-tip', id: 'gu-tip', role: 'tooltip', hidden: true });
   let tipFor = -1;
+  /** The focus shows a tooltip only once the keys are in use here, so the slot focused as the bag opens shows none. */
+  let keyed = false;
   const showTip = (index: number, anchor: HTMLElement): void => {
     const stack = inventory.slots[index];
     const stage = body.closest<HTMLElement>('.gu-stage');
@@ -173,7 +175,7 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
       onclick: (event: MouseEvent) => click(index, event.shiftKey),
       onpointerenter: (event: PointerEvent) => { if (event.pointerType !== 'touch') showTip(index, event.currentTarget as HTMLElement); },
       onpointerleave: () => hideTip(),
-      onfocus: (event: FocusEvent) => { cursor = index; showTip(index, event.currentTarget as HTMLElement); },
+      onfocus: (event: FocusEvent) => { cursor = index; if (keyed) showTip(index, event.currentTarget as HTMLElement); },
       onblur: () => hideTip(),
     },
       def && stack ? picture(ctx.options.icon(def.icon), def.name, 48) : null,
@@ -196,6 +198,7 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
   };
 
   body.addEventListener('keydown', (event) => {
+    keyed = true;
     if (!(event.target instanceof HTMLElement) || !event.target.matches('.gu-slot')) return;
     const grid = body.querySelector<HTMLElement>('.gu-slots');
     const columns = grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').length : QUICK;
