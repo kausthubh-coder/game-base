@@ -659,7 +659,19 @@ const QUESTS = {
       // and set its foot down at h.z + 1 so its pillow is at h.z, under the roof to come.
       await walkTo({ x: h.x + 0.5, y: g, z: h.z + 3.5 }, { within: 0.3, seconds: 30 });
       // Far enough back that the body is clear of the bed's foot at h.z + 1, which ends at h.z + 2.
-      await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.7 }, { within: 0.2, seconds: 30, soft: true });
+      // With the free and first-person cameras the hero takes one more short step north below, so start further back.
+      await walkTo({ x: h.x + 0.5, y: g, z: h.z + (LOOK ? 2.95 : 2.7) }, { within: 0.2, seconds: 30, soft: true });
+      if (LOOK) {
+        // The free camera lets the hero face the way they last walked, which the route may have left on a
+        // diagonal: look north and take a short step, so the bed is set down facing north.
+        await game(() => {
+          const g = window.__game;
+          g.look(0, g.state().camera.pitch);
+          g.key('w', true); g.advance(0.05); g.key('w', false); g.advance(0.3);
+        });
+        const facing = (await state()).player.facing;
+        must(Math.abs(Math.atan2(Math.sin(facing), Math.cos(facing))) < Math.PI / 4, `the hero faces ${facing.toFixed(2)}, not north`);
+      }
       const stand = (await state()).player.z;
       must(stand - 0.3 >= h.z + 2, `the hero stopped at z ${stand.toFixed(2)}, on the cell the bed's foot needs`);
       await hold('bed');
@@ -778,14 +790,15 @@ const QUESTS = {
     });
     if (!args.includes('--no-continue')) {
       await step('bread', 'reload the page mid-quest and Continue from the title', async () => {
-        const before = await state();
-        await game(() => window.__game.save());
+        // The clock is read with the save and again as soon as the game is back, since time runs while the land loads.
+        const before = await game(() => { window.__game.save(); return window.__game.state(); });
         await openGame();
         await page.click('[data-key="title:continue"]');
         await page.waitForFunction(() => window.__game.started);
+        const back = (await state()).clock;
         await game(() => window.__game.settle());
         const after = await state();
-        must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
+        must(back.day === before.clock.day && Math.abs(back.seconds - before.clock.seconds) < 2, `the clock came back as ${back.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
         must(after.flags['pet.leaftail.bonded'] === true && after.tracked === 'bread', 'the quests or the pet did not come back');
         const f = await field();
