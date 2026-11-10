@@ -41,11 +41,11 @@ def flower(m,x,y,h,tone):
 def build(kind,v):
     r=start(300+v);m=Mesh()
     if kind in ['grassTuft','tallGrass','reeds']:
-        n= [5,7,9][v] if kind=='grassTuft' else 7
+        n= [3,4,5][v] if kind=='grassTuft' else 7
         H=([.32,.43,.55][v] if kind=='grassTuft' else 1.0 if kind=='tallGrass' else 1.5)
         for k in range(n):
             a=k*2.4;x=math.cos(a)*.16;y=math.sin(a)*.16;h=H*r.uniform(.65,1)
-            blade(m,x,y,h,.035 if kind=='grassTuft' else .045,a,GREEN[k%3])
+            blade(m,x,y,h,.052 if kind=='grassTuft' else .045,a,GREEN[k%3])
             if kind=='reeds' and v==1 and k%2==0:sphere(m,(x+h*.3*math.cos(a),y+h*.3*math.sin(a),h*.85),(.055,.055,.17),'815940',5,2)
     elif kind in ['flower','wildflowers']:
         tones=['fff0cf','eeca76','d67c59','e7bcb5','925d79','6d96b6']

@@ -1287,16 +1287,16 @@
     "env-grasstuft-0": {
       "file": "models/env-grasstuft-0.glb",
       "seed": 300,
-      "triangles": 50,
+      "triangles": 30,
       "budget": 300,
-      "bytes": 6888
+      "bytes": 4648
     },
     "env-grasstuft-1": {
       "file": "models/env-grasstuft-1.glb",
       "seed": 301,
-      "triangles": 70,
+      "triangles": 40,
       "budget": 300,
-      "bytes": 9124
+      "bytes": 5776
     },
     "env-lilypad-1": {
       "file": "models/env-lilypad-1.glb",
@@ -1308,9 +1308,9 @@
     "env-grasstuft-2": {
       "file": "models/env-grasstuft-2.glb",
       "seed": 302,
-      "triangles": 90,
+      "triangles": 50,
       "budget": 300,
-      "bytes": 11356
+      "bytes": 6892
     }
   }
 }

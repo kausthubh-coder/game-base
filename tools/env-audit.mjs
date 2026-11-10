@@ -5,8 +5,8 @@ const out=process.argv[2]||'.artifacts/env/audit'; mkdirSync(out,{recursive:true
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--enable-unsafe-swiftshader','--use-angle=swiftshader']});
 const page=await browser.newPage({viewport:{width:1000,height:720}});
 await page.goto((process.env.ENV_URL||'http://127.0.0.1:5388/')+'?hold=1&quality=high'); await page.waitForFunction(()=>window.__game);await page.evaluate(()=>{let g=window.__game;g.newGame();g.manual(true);g.teleport(46,-219);});
-const kinds=PROP_KINDS.filter(k=>PROPS[k].group!=='tree');
-if(process.env.ENV_MODE==='after')for(const crop of ['wheat','turnip','carrot'])for(let stage=0;stage<4;stage++)kinds.push('crop'+crop+'-'+stage);
+const kinds=PROP_KINDS.filter(k=>PROPS[k].group!=='tree'&&(!process.env.ENV_ONLY||k===process.env.ENV_ONLY));
+if(process.env.ENV_MODE==='after'&&!process.env.ENV_ONLY)for(const crop of ['wheat','turnip','carrot'])for(let stage=0;stage<4;stage++)kinds.push('crop'+crop+'-'+stage);
 await page.evaluate(async()=>{window.__game.advance(.2);await window.__game.settle();await window.__game.frames(4);});
 const {buildProp}=await import('../src/features/props/build.ts');
 const inventory=[];

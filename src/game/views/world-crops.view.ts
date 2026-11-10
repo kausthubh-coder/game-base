@@ -1,6 +1,6 @@
 import { loadEnvironmentModels } from '../../features/props/models.view.ts';
-// Draws the crops: every crop of `game.systems.crops.all()` stands on its soil block as two crossed quads
-// with the tile of its stage from the manifest's `crops` sheet, and wet soil gets a dark patch.
+// Draws each crop's solid Blender model on its soil block. The sheet coordinates identify its stage;
+// no crop texture is sampled. Wet soil gets a dark patch.
 // Two draw calls: one for all plants, one for all wet patches.
 //
 // No event tells a view that a crop is gone or that a save was loaded, so each frame the list is compared
