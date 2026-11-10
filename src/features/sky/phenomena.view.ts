@@ -75,7 +75,7 @@ void main() {
     float hue = (1.0 - band) * 0.78;
     vec3 spectrum = clamp(abs(fract(hue + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);
     float arc = sin(band * 3.14159) * step(0.8, r) * step(r, 0.98);
-    color = mix(spectrum, vec3(0.65), 0.4) * arc * smoothstep(0.0, 0.25, vUv.y) * uRainbow * 0.12;
+    color = mix(spectrum, vec3(0.65), 0.4) * arc * smoothstep(0.0, 0.25, vUv.y) * uRainbow * 0.30;
   } else {
     float across = 1.0 - vUv.x * vUv.x;
     float along = smoothstep(0.0, 0.12, vUv.y) * pow(1.0 - vUv.y, 0.8);
