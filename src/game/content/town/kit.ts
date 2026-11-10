@@ -94,12 +94,13 @@ export function townEdges(fills: Fill[], places: PlanPlace[], props: PlanProp[])
 }
 
 /**
- * A lantern prop with its light: a block of lantern light where the lantern's glass is, so the ground
- * around it is lit at night as a lamp block would light it. `variant` is the lantern's (post, double, ground).
+ * A lantern prop with its light: a block of lantern light at the lantern, so the ground around it is lit at
+ * night as a lamp block would light it. A post's light sits at head height, a block under its glass, so the
+ * pool on the paving is as bright as a lamp's. `variant` is the lantern's (post, double, ground).
  */
 export function lanternAt(fills: Fill[], props: PlanProp[], x: number, z: number, variant = 0, rotation = 0): void {
   props.push(townProp('lantern', x, z, rotation, variant));
-  const y = variant === 2 ? TOWN_GROUND : TOWN_GROUND + 2;
+  const y = variant === 2 ? TOWN_GROUND : TOWN_GROUND + 1;
   // A double lantern hangs its two lights from an arm along its own x.
   if (variant === 1) {
     const along = Math.abs(Math.cos(rotation)) > 0.5;
