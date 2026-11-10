@@ -31,7 +31,7 @@ export const STYLES = /* css */ `
   --scrim: oklch(0.18 0.02 60 / 0.45);
   --shadow: oklch(0.18 0.03 60 / 0.28);
   --lift: 0 1px 2px oklch(0.18 0.03 60 / 0.14), 0 12px 32px oklch(0.18 0.03 60 / 0.24);
-  --glass: oklch(0.21 0.018 62 / 0.62);
+  --glass: oklch(0.21 0.018 62 / 0.7);
   --glass-2: oklch(1 0 0 / 0.1);
   --glass-ink: oklch(0.985 0.008 88);
   --glass-ink-2: oklch(0.87 0.014 86);
@@ -145,7 +145,7 @@ export const STYLES = /* css */ `
 .gu-quick { background: var(--paper-3); }
 .gu-quick:hover, .gu-quick.gu-slot-empty:hover { background: var(--paper-4); }
 .gu-picked, .gu-picked:hover { background: var(--paper-light); box-shadow: inset 0 0 0 2px var(--accent); }
-.gu-slot-key { position: absolute; z-index: 1; left: 6px; top: 3px; font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--ink-2); }
+.gu-slot-key { position: absolute; z-index: 1; left: 6px; top: 3px; font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--ink-2); text-shadow: 0 0 2px var(--paper-3), 0 0 2px var(--paper-3); }
 .gu-slot-count, .gu-ghost-count { position: absolute; z-index: 1; right: 3px; bottom: 3px; min-width: 20px; padding: 0 5px; font-size: 13px; font-weight: 700; line-height: 18px; text-align: center; color: var(--ink); background: var(--paper-light); border-radius: var(--radius-sm); }
 /* A drag: the stack it came from fades, the slot under the pointer lights up, and a refused slot says no. */
 .gu-slot.is-drag-from > .gu-pic, .gu-slot.is-drag-from > .gu-slot-count { opacity: 0.3; }
@@ -279,7 +279,9 @@ export const STYLES = /* css */ `
 .gu-over { position: absolute; inset: 0; }
 .gu-over kbd { box-shadow: 0 1px 0 oklch(0.12 0.02 60 / 0.4); }
 .gu-card { display: flex; align-items: center; gap: var(--s3); padding: 6px 6px 6px var(--s4); color: var(--glass-ink); background: var(--glass); border: 0; border-radius: var(--radius); box-shadow: var(--glass-shadow); pointer-events: auto; zoom: var(--gu-size); }
-.gu-card .gu-close { width: 36px; height: 36px; margin: 0; font-size: 22px; color: var(--glass-ink-2); }
+.gu-card .gu-close { position: relative; width: 36px; height: 36px; margin: 0; font-size: 22px; color: var(--glass-ink-2); }
+/* It looks 36px, and answers across 44px. */
+.gu-card .gu-close::after { content: ''; position: absolute; inset: -4px; }
 .gu-card .gu-close:hover { color: var(--glass-ink); background: var(--glass-2); }
 .gu-card .gu-close:active { background: oklch(1 0 0 / 0.16); }
 .gu-top { position: absolute; left: 50%; top: var(--s4); display: grid; justify-items: center; gap: var(--s2); width: min(460px, 100% - 32px); transform: translateX(-50%); }
