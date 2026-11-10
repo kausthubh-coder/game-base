@@ -104,6 +104,8 @@ The calls in `docs/play/act1.md`, and a few more for tests:
 
 Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hold a quality level and `?perf=1` to show the meter. `advance` does nothing before a game has started.
 
+`bun tools/play-act1.mjs --port 5364 --dist dist-trees-act1` runs the five-quest browser check with its own port and build folder. Its save check compares standing and felled trees, the bonded pet, the bag and the tracked quest after Continue.
+
 `bun tools/play-smoke.mjs` builds the game, serves `dist` on port 5330 and plays through the door. It writes screenshots and `smoke.json` to `.artifacts/play/`.
 
 ## What to know about the world

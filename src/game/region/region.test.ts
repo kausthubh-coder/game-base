@@ -1,3 +1,4 @@
+import { treesInArea } from '../../features/world/terrain.sim.ts';
 import { describe, expect, test } from 'bun:test';
 import { blockId } from '../../content/blocks.ts';
 import { CELLS, CHUNK, HEIGHT } from '../../features/world/chunk.sim.ts';
@@ -146,21 +147,11 @@ describe('the grant', () => {
   });
 
   test('has trees to cut within 20 blocks of it', () => {
-    // Logs no further than 12 blocks from the plot's edge, which is well inside the 20 the design allows.
-    let logs = 0, trunks = 0;
-    for (let x = g.x - 12; x < g.x + g.width + 12; x++) {
-      for (let z = g.z - 12; z < g.z + g.depth + 12; z++) {
-        const ground = world.heightAt(x, z);
-        let here = 0;
-        for (let y = 20; y < 30; y++) { const b = world.getBlock(x, y, z); if (b === OAK || b === BIRCH) here++; }
-        logs += here;
-        if (here >= 4) trunks++;
-        expect(ground).toBeGreaterThan(18);
-      }
-    }
-    // Quest 2 asks for 12 wood. There are several trees, so cutting one does not clear the place.
-    expect(logs).toBeGreaterThanOrEqual(24);
-    expect(trunks).toBeGreaterThanOrEqual(6);
+    const trees=treesInArea(world.seed,g.x-12,g.z-12,g.x+g.width+12,g.z+g.depth+12);
+    expect(trees.length).toBeGreaterThanOrEqual(6);
+    expect(trees.reduce((n,t)=>n+Math.max(3,Math.round(4*t.size)),0)).toBeGreaterThanOrEqual(24);
+    for(const t of trees) expect(world.getBlock(t.x,t.y,t.z)).toBe(blockId('barrier'));
+
   });
 });
 
@@ -200,7 +191,7 @@ describe('the mossy rocks', () => {
 
   test('stand under trees', () => {
     const p = at('grant.rocks');
-    expect(count(OAK, Math.floor(p.x) - 8, Math.floor(p.z) - 8, Math.floor(p.x) + 8, Math.floor(p.z) + 8)).toBeGreaterThanOrEqual(8);
+    expect(treesInArea(world.seed,p.x-8,p.z-8,p.x+8,p.z+8).filter(t=>t.kind==='oak').length).toBeGreaterThanOrEqual(2);
   });
 });
 

@@ -18,6 +18,7 @@ export const SYSTEM_ORDER: readonly string[] = [
   'items',
   'inventory',
   'region', // not written yet on 2026-11-10 00:15: until it lands the player starts at the world's spawnPoint()
+  'trees',
   'time',
   'interact',
   'actions',

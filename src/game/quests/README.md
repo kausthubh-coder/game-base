@@ -49,3 +49,5 @@ quests.skipTo('bread');                    // the debug door
 It reads `region`, `people`, `inventory`, `almanac`, `placeables`, `pets` and `crops`. A missing one reads as empty. A check that throws is logged once and tried again, so the shell never switches quests off.
 
 Save holds each quest's state and the id of its open step. The flags are saved by the kernel.
+
+Loading a save rebuilds `all()` and `tracked()` immediately. Continue can read them before the first simulation step; quest marker synchronization still runs on the next check.

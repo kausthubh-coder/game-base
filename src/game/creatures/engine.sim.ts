@@ -263,7 +263,7 @@ export function createCreatures(game: Game, kinds: readonly CreatureKind[] = CRE
       }
       if (liquid(world.getBlock(x, y, z))) return false;
     }
-    const light = world.lightAt(x, y, z);
+    const light = world.lightAt(x,y,z);
     if (light < def.appears.light[0] || light > def.appears.light[1]) return false;
     if (crowded(x + 0.5, z + 0.5)) return false;
     spot.x = x + 0.5; spot.y = y; spot.z = z + 0.5;

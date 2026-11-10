@@ -251,6 +251,9 @@ function create(view: GameView): WorldProps {
   };
 
   view.onFrame((dt) => {
+    props.setShadowOverride(view.settings.graphics.shadows === 'preset' ? null : view.settings.graphics.shadows !== 'off');
+    props.setReduceMotion(view.settings.graphics.reduceMotion);
+    props.setPlantDensity(view.settings.graphics.plantDensity);
     props.update(dt, view.ctx);
     api.stats();
   });

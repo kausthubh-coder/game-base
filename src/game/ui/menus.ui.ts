@@ -92,6 +92,30 @@ function choices<T extends string | number>(name: string, legend: string, values
   return set;
 }
 
+function graphicsControls(ctx: UiContext): HTMLElement {
+  const section = h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Graphics'));
+  section.append(choices('quality', 'Picture quality', QUALITIES, QUALITIES.map(q => QUALITY_NAMES[q]), ctx.settings.quality, value => ctx.setSetting('quality', value)));
+  const api = ctx.options.graphics;
+  if (!api) return section;
+  const g = api.get();
+  section.append(choices('shadows', 'Shadows', ['preset','off','soft','sharp'], ['Preset','Off','Soft','Sharp'], g.shadows, value => api.set({shadows: value as typeof g.shadows})));
+  for (const [key,label,min,max,step,fallback] of [
+    ['shadowDistance','Shadow distance',20,90,5,40],
+    ['plantDensity','Grass and flowers density',0,1,.1,1],
+    ['viewDistance','View distance',.5,1.5,.1,1],
+  ] as const) {
+    const id = 'gu-' + key;
+    const output = h('output', {class:'gu-num',for:id}, g[key] === null ? 'Preset' : String(g[key]));
+    section.append(h('div',{class:'gu-slider'}, h('label',{for:id},label), h('input',{id,type:'range',min,max,step,value:g[key] ?? fallback,oninput:(event: Event) => {const value = Number((event.target as HTMLInputElement).value);api.set({[key]:value});output.textContent=String(value);}}),output));
+  }
+  for (const [key,label] of [['bloom','Bloom'],['cloudShadows','Cloud shadows'],['weatherParticles','Weather particles']] as const) {
+    section.append(choices(key,label,['preset','on','off'],['Preset','On','Off'],g[key] === null ? 'preset' : g[key] ? 'on' : 'off', value => api.set({[key]:value === 'preset' ? null : value === 'on'})));
+  }
+  section.append(choices('reduceMotion','Reduce motion',['off','on'],['Off','On'],g.reduceMotion ? 'on' : 'off',value => api.set({reduceMotion:value === 'on'})));
+  section.append(button('Reset graphics overrides',()=>{api.set({shadows:'preset',shadowDistance:null,plantDensity:null,viewDistance:null,bloom:null,cloudShadows:null,weatherParticles:null,reduceMotion:false});section.replaceWith(graphicsControls(ctx));}));
+  return section;
+}
+
 export function settingsPanel(ctx: UiContext): PanelView {
   const body = h('div', { class: 'gu-settings' });
   return {
@@ -123,7 +147,7 @@ export function settingsPanel(ctx: UiContext): PanelView {
       for (const hint of ctx.options.keys ?? DEFAULT_KEYS) keys.append(h('dt', null, hint.action), h('dd', null, keycaps(hint.keys, hint.action === 'Move' ? '' : 'or')));
       body.replaceChildren(
         h('div', null,
-          choices('quality', 'Picture quality', QUALITIES, QUALITIES.map((q) => QUALITY_NAMES[q]), ctx.settings.quality, (value) => ctx.setSetting('quality', value)),
+          graphicsControls(ctx),
           sound,
           choices('size', 'Interface size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value)),
         ),

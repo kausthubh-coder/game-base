@@ -26,6 +26,7 @@ export interface EffectsSky {
 
 export interface Effects extends ViewSystem {
   /** Particles alive now. Never more than `capacity`. */
+  setWeatherEnabled(enabled: boolean): void;
   readonly live: number;
   readonly capacity: number;
   /** Starts an entry from content/effects.ts at a point. */
@@ -42,6 +43,7 @@ export interface Effects extends ViewSystem {
 const VERTEX = /* glsl */ `
 attribute vec4 aOrigin, aVelocity, aColor0, aColor1, aMotion, aLook, aFade;
 uniform float uTime;
+uniform float uWeather;
 uniform vec3 uLight;
 varying vec2 vUv;
 varying vec4 vColor;
@@ -65,6 +67,8 @@ void main() {
   float facing = floor(aLook.x / 16.0);
   vShape = aLook.x - facing * 16.0;
   float flags = aFade.z;
+  float weather = step(8.0, flags);
+  flags -= weather * 8.0;
   float add = step(4.0, flags);
   flags -= add * 4.0;
   float blink = step(2.0, flags);
@@ -84,7 +88,9 @@ void main() {
   float size = mix(aMotion.x, aMotion.y, f);
   vec4 color = mix(aColor0, aColor1, f);
   float alpha = color.a * clamp(f / max(aFade.x, 1e-4), 0.0, 1.0) * clamp((1.0 - f) / max(aFade.y, 1e-4), 0.0, 1.0);
+  alpha *= mix(1.0, uWeather, weather);
   alpha *= mix(1.0, smoothstep(0.1, 0.9, 0.5 + 0.5 * sin(age * 2.3 + seed * 40.0)), blink);
+  if (vShape > 2.5 && vShape < 3.5 && facing > 0.5 && facing < 1.5) alpha *= smoothstep(4.0, 18.0, distance(center, cameraPosition));
   vColor = vec4(color.rgb * mix(vec3(1.0), uLight, lit), alpha);
 
   vec3 camRight = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
@@ -173,6 +179,7 @@ export function createEffects(ctx: ViewContext, options: EffectsOptions = {}): E
 
   const uniforms = {
     uTime: { value: 0 },
+    uWeather: { value: 1 },
     uLight: { value: new THREE.Color(1, 1, 1) },
   };
   const material = new THREE.ShaderMaterial({
@@ -206,9 +213,10 @@ export function createEffects(ctx: ViewContext, options: EffectsOptions = {}): E
 
   const focus: Vec3 = { x: 0, y: 0, z: 0 };
   let light: THREE.Color | null = null;
-  let motes = 0;
+  let motes = 0, weatherEnabled = true;
 
   const effects: Effects = {
+    setWeatherEnabled(enabled) { weatherEnabled = enabled; uniforms.uWeather.value = enabled ? 1 : 0; },
     capacity: store.capacity,
     get live() {
       return store.live;
@@ -243,7 +251,7 @@ export function createEffects(ctx: ViewContext, options: EffectsOptions = {}): E
     update(dt, view) {
       world = view.world;
       store.advance(dt);
-      weather.update(dt, view.ambient, view.world, focus, motes);
+      if (weatherEnabled) weather.update(dt, view.ambient, view.world, focus, motes);
 
       if (store.dirtyFrom < store.dirtyTo) {
         pendingFrom = Math.min(pendingFrom, store.dirtyFrom);

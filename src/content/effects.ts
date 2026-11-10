@@ -76,8 +76,8 @@ export const effects = {
   trail: { shape: 'spark', blend: 'add', count: 14, life: [0.5, 0.9], radius: 0.2, speed: [1.2, 2.4], aim: { up: 1, any: 0.25 }, gravity: -1.5, drag: 1.5, wobble: [0.18, 1.4], size: [0.24, 0.05], color: [0xfff0a0, 0x7df0d0], glow: 2.6, fade: [0.05, 0.4] },
 
   // ---- weather. `count` is particles a second at full strength.
-  rain: { shape: 'streak', blend: 'normal', facing: 'motion', count: 1300, life: [0.6, 0.9], radius: 1.2, speed: [15, 19], aim: { up: -1 }, gravity: 0, wind: 0.75, stretch: 30, size: [0.07, 0.07], color: [0xd4e4f8, 0xd4e4f8], alpha: [0.8, 0.8], glow: 1.5, fade: [0.05, 0.05], weather: true },
-  rainSplash: { shape: 'ring', blend: 'normal', facing: 'ground', count: 1, life: [0.25, 0.35], speed: [0, 0], gravity: 0, size: [0.08, 0.55], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.7, 0], fade: [0, 0.3], weather: true },
+  rain: { shape: 'streak', blend: 'normal', facing: 'motion', count: 1300, life: [0.6, 0.9], radius: 1.2, speed: [15, 19], aim: { up: -1 }, gravity: 0, wind: 0.75, stretch: 18, size: [0.018, 0.018], color: [0xd4e4f8, 0xd4e4f8], alpha: [0.23, 0.16], glow: 1, fade: [0.05, 0.05], weather: true },
+  rainSplash: { shape: 'ring', blend: 'normal', facing: 'ground', count: 1, life: [0.25, 0.35], speed: [0, 0], gravity: 0, size: [0.06, 0.32], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.3, 0], fade: [0, 0.3], weather: true },
   rainDrop: { shape: 'puff', blend: 'normal', count: 1, life: [0.22, 0.32], speed: [1.2, 2.2], aim: { up: 1, any: 0.5 }, gravity: 9, size: [0.07, 0.03], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.8, 0.3], weather: true },
   leaf: { shape: 'leaf', blend: 'normal', count: 4, life: [6, 10], speed: [0.7, 1.1], aim: { up: -1 }, gravity: 0, wind: 0.6, wobble: [0.4, 0.34], spin: 0.4, size: [0.2, 0.2], color: [0x7cc24e, 0xe0b84a], pickColor: true, fade: [0.05, 0.1], lands: true, weather: true },
   windLine: { shape: 'streak', blend: 'normal', facing: 'motion', count: 12, life: [0.7, 1.1], speed: [10, 16], gravity: 0, wobble: [0.15, 0.5], stretch: 70, size: [0.045, 0.045], color: [0xffffff, 0xffffff], alpha: [0.3, 0.3], fade: [0.3, 0.4], weather: true },
