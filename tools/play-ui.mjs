@@ -22,7 +22,8 @@ const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i 
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play');
 const site = resolve(out, 'ui-site');
-const PORT = 5332;
+// PLAY_PORT moves it, so several worktrees can run their checks at once.
+const PORT = Number(process.env.PLAY_PORT) || 5332;
 const BASE = `http://127.0.0.1:${PORT}/`;
 const quality = opt('quality', 'high');
 const only = opt('only', '');

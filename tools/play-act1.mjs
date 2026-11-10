@@ -21,7 +21,8 @@ const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play/act1');
-const PORT = 5340;
+// PLAY_PORT moves it, so several worktrees can run their checks at once.
+const PORT = Number(process.env.PLAY_PORT) || 5340;
 const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}`;
 const SHOTS = args.includes('--shots');
 const PATH = REGION.paths[0].points.map(([x, z]) => ({ x, z }));

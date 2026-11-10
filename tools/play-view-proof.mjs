@@ -8,7 +8,8 @@ import { resolve } from 'node:path';
 import { chromium } from 'playwright-core';
 
 const root = resolve(import.meta.dirname, '..');
-const PORT = 5330;
+// PLAY_PORT moves it, so several worktrees can run their checks at once.
+const PORT = Number(process.env.PLAY_PORT) || 5330;
 const good = resolve(root, 'src/game/views/zz-proof.view.ts');
 const bad = resolve(root, 'src/game/views/zz-proof-throws.view.ts');
 const build = () => spawnSync('bun', ['run', 'build'], { cwd: root, stdio: ['ignore', 'ignore', 'inherit'] }).status === 0;
