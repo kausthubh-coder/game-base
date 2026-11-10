@@ -110,13 +110,13 @@ try {
 
   const planks = async () => (await state()).bag.find((s) => s.id === 'plank')?.count ?? 0;
 
-  /** Where on the page the top of the ground two blocks beside the hero is, and that cell. */
+  /** Where on the page the top of the ground two blocks beside the hero is, and that cell. Never under the HUD. */
   const groundSpot = () => game(() => {
     const g = window.__game, p = g.state().player;
-    for (const [dx, dz] of [[2, 0], [0, 2], [-2, 0], [0, -2], [2, 2], [-2, -2]]) {
+    for (const [dx, dz] of [[2, 0], [0, 2], [-2, 0], [0, -2], [2, 2], [-2, -2], [3, 0], [0, 3], [-3, 0], [0, -3]]) {
       const x = Math.floor(p.x) + dx, z = Math.floor(p.z) + dz, y = g.view.world.sim.heightAt(x, z) - 1;
       const at = g.view.project(x + 0.5, y + 1, z + 0.5);
-      if (at) return { x, y, z, at };
+      if (at && at.y > 120 && at.y < 740 && at.x > 100 && at.x < 1200) return { x, y, z, at };
     }
     return null;
   });
@@ -141,10 +141,13 @@ try {
     await frames(2);
   }
 
-  /** The drag and the click in the camera that is on now. */
-  async function dragAndClick(label, place, dx, dy) {
+  /**
+   * The drag and the click in the camera that is on now. `placing` is false where the rules refuse to build (the
+   * town square), so only the drag is checked there.
+   */
+  async function dragAndClick(label, place, dx, dy, placing = true) {
     await standAt(place);
-    const spot = await groundSpot();
+    const spot = placing ? await groundSpot() : { at: { x: 640, y: 420 } };
     check(`${label} at ${place}: the ground beside the hero is on screen`, spot, JSON.stringify(spot));
     if (!spot) return;
     const before = await state();
@@ -164,7 +167,7 @@ try {
       `planks ${planksBefore} to ${await planks()}, blocks ${before.stats.blocks} to ${after.stats.blocks}, cursor "${cursorAfter}"`);
 
     // A plain click, then one with a little jitter, each set a plank down on the ground the pointer is on.
-    for (const jitter of [0, 3]) {
+    for (const jitter of placing ? [0, 3] : []) {
       const target = await groundSpot();
       const cell = await game(([s]) => window.__game.block(s.x, s.y + 1, s.z).key, [target]);
       const had = await planks();
@@ -180,7 +183,7 @@ try {
   // ---- the 2.5D camera
   check('the game opens on the 2.5D camera with the mouse pointing', (await state()).camera.mode === 'tilt' && (await state()).camera.mouse === 'point');
   await dragAndClick('2.5D', 'spawn', 300, 0);
-  await dragAndClick('2.5D', 'town.square', -260, 0);
+  await dragAndClick('2.5D', 'town.square', -260, 0, false);
 
   // Q and R from an angle between two quarters come to rest on a quarter.
   const between = await state();
@@ -204,26 +207,25 @@ try {
   const free = await state();
   check('Free: the mouse drags to turn by default, with no lock and no crosshair', free.camera.mouse === 'drag' && !free.camera.locked && (await game(() => document.querySelector('.core-crosshair')?.hidden ?? true)), JSON.stringify(free.camera));
   // A left click in the world acts at once: no click is spent taking the mouse.
-  await game(() => window.__game.look(0, 30, 6));
-  await dragAndClick('Free', 'spawn', 320, 110);
-  await game(() => window.__game.look(90, 25, 7));
-  await dragAndClick('Free', 'town.square', -280, 90);
-  // The free camera aims at the cursor, not the middle.
-  const aimed = await game(async () => {
-    const g = window.__game, p = g.state().player;
-    const x = Math.floor(p.x) + 2, z = Math.floor(p.z), y = g.view.world.sim.heightAt(x, z) - 1;
-    return { cell: { x, y, z }, at: g.view.project(x + 0.5, y + 1, z + 0.5) };
-  });
-  if (aimed.at) {
+  await game(() => window.__game.look(0, 24, 8));
+  await dragAndClick('Free', 'spawn', 320, 50);
+  // The free camera aims at the cursor, not the middle of the screen.
+  const aimed = await groundSpot();
+  check('Free: a block off the middle of the screen is in view', aimed && Math.hypot(aimed.at.x - 720, aimed.at.y - 450) > 40, JSON.stringify(aimed));
+  if (aimed) {
     await page.mouse.move(aimed.at.x, aimed.at.y);
     await frames(2);
     const aim = (await state()).aim;
-    check('Free: the cursor aims where it is', aim && aim.x === aimed.cell.x && aim.z === aimed.cell.z, `${JSON.stringify(aim)} for ${JSON.stringify(aimed.cell)}`);
+    check('Free: the cursor aims where it is', aim && aim.x === aimed.x && aim.z === aimed.z, `${JSON.stringify(aim)} for ${JSON.stringify(aimed)}`);
   }
+  await game(() => window.__game.look(90, 22, 8));
+  await dragAndClick('Free', 'town.square', -280, 40, false);
 
   // ---- the Mouse setting, in Settings
+  await page.mouse.move(720, 300);
   await page.keyboard.press('Escape');
-  await page.click('.gu-panel-pause button:nth-child(2)');
+  await page.waitForSelector('.gu-panel-pause');
+  await page.locator('.gu-panel-pause button', { hasText: 'Settings' }).click();
   await page.waitForSelector('input[name="gu-mouse"]');
   const rows = await game(() => [...document.querySelectorAll('.gu-settings-view legend')].map((e) => e.textContent));
   check('Settings: the View section has Camera, Mouse and Characters', rows.join() === 'Camera,Mouse,Characters', rows.join(', '));
