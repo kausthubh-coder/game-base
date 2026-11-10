@@ -46,7 +46,8 @@ const browser = await chromium.launch({
   headless: true,
   args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
 });
-const VW = 1200, VH = 800, C = 300;
+// Each motion frame is a 150 px square around the subject, scaled up to 300 so the figure is big enough to judge.
+const VW = 1200, VH = 800, CROP = 150, C = 300;
 const page = await (await browser.newContext({ viewport: { width: VW, height: VH } })).newPage();
 page.setDefaultTimeout(300000);
 const errors = [];
@@ -89,11 +90,13 @@ async function crop(file, id = 'player') {
   const at = await game((id) => {
     const g = window.__game;
     const p = id === 'player' ? g.view.playerPosition : g.view.game.actors.get(id)?.pos;
-    return p ? g.view.project(p.x, p.y + 0.9, p.z) : null;
+    // People are aimed at their middle, creatures lower, since they stand about half a metre tall.
+    return p ? g.view.project(p.x, p.y + (/^(pet|creature)/.test(id) ? 0.35 : 0.9), p.z) : null;
   }, id);
   if (!at) throw new Error(`nothing called ${id} to shoot`);
-  const x = Math.max(0, Math.min(VW - C, Math.round(at.x - C / 2))), y = Math.max(0, Math.min(VH - C, Math.round(at.y - C / 2)));
-  await page.screenshot({ path: file, clip: { x, y, width: C, height: C } });
+  const x = Math.max(0, Math.min(VW - CROP, Math.round(at.x - CROP / 2))), y = Math.max(0, Math.min(VH - CROP, Math.round(at.y - CROP / 2)));
+  const shot = await page.screenshot({ clip: { x, y, width: CROP, height: CROP } });
+  await sharp(shot).resize(C, C, { kernel: 'nearest' }).png().toFile(file);
 }
 
 const clips = {};
