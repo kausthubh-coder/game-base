@@ -109,7 +109,7 @@ export const QUESTS: readonly QuestDef[] = [
     ],
     skip: [
       { flag: 'met.tamsin' }, { flag: 'plot.met' }, { flag: 'plot.told' }, { flag: 'has.almanac' },
-      { give: 'almanac' }, { give: 'axe' }, { learn: 'mossling' }, { learn: 'tamsin', fact: 'gives' },
+      { give: 'axe' }, { learn: 'mossling' }, { learn: 'tamsin', fact: 'gives' },
     ],
   },
   {

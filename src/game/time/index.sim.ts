@@ -37,8 +37,22 @@ interface TimeSave {
   weather: { kind: WeatherKind; held: boolean; seed: number; elapsed: number };
 }
 
+/**
+ * Covers the screen while the player falls asleep. `sleep()` hands it `wake`, and it calls `wake` once,
+ * when the screen is dark. Until then the clock does not jump and `canSleep()` is false.
+ */
+export type SleepCurtain = (wake: () => void) => void;
+
+/** `TimeApi` and what the sleep card needs. The real system is always this. */
+export interface TimeWithCurtain extends TimeApi {
+  /** Hands `sleep()` to a curtain. Null, the default, sleeps at once, as the tests and a server do. */
+  setSleepCurtain(curtain: SleepCurtain | null): void;
+  /** True between `sleep()` and the curtain's `wake`. */
+  readonly fallingAsleep: boolean;
+}
+
 export interface Time {
-  api: TimeApi;
+  api: TimeWithCurtain;
   system: SimSystem;
 }
 
@@ -136,10 +150,26 @@ export function createTime(game: Game): Time {
     return false;
   }
 
-  const api: TimeApi = {
+  let curtain: SleepCurtain | null = null;
+  let fallingAsleep = false;
+
+  function sleepNow(): void {
+    const wake = secondAt(MORNING);
+    seconds += DAY_LENGTH - daySecond + wake;
+    day += 1;
+    daySecond = wake;
+    // Tonight's dusk is skipped, and tomorrow's is still to come.
+    nightAnnounced = day - 1;
+    writeClock();
+    announce();
+    events.emit('slept', { day });
+  }
+
+  const api: TimeWithCurtain = {
     dayLength: DAY_LENGTH,
 
     canSleep() {
+      if (fallingAsleep) return false;
       const time = clock.timeOfDay;
       if (time < EVENING && time >= DAWN) return false;
       const at = game.player.pos;
@@ -150,16 +180,22 @@ export function createTime(game: Game): Time {
     },
 
     sleep() {
-      const wake = secondAt(MORNING);
-      seconds += DAY_LENGTH - daySecond + wake;
-      day += 1;
-      daySecond = wake;
-      // Tonight's dusk is skipped, and tomorrow's is still to come.
-      nightAnnounced = day - 1;
-      writeClock();
-      announce();
-      events.emit('slept', { day });
+      if (fallingAsleep) return;
+      if (!curtain) return sleepNow();
+      fallingAsleep = true;
+      let woken = false;
+      curtain(() => {
+        if (woken) return;
+        woken = true;
+        fallingAsleep = false;
+        sleepNow();
+      });
     },
+
+    setSleepCurtain(next) {
+      curtain = next;
+    },
+    get fallingAsleep() { return fallingAsleep; },
 
     setWeather(kind, now) {
       forced = kind;

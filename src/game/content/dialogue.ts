@@ -84,11 +84,13 @@ export const CONVERSATIONS: readonly Conversation[] = [
     lines: [
       'Twelve people have asked me for this plot.',
       'You are the first who looked at the ground before the view.',
+      // The book is not a thing in the bag. The flag gives it, and the interface shows it being handed over.
       {
         text: 'Take the book. It has been blank for forty years.',
-        effects: [{ give: 'almanac' }, { flag: 'has.almanac' }],
+        effects: [{ flag: 'has.almanac' }],
       },
       'I only ever looked at things to price them.',
+      narrator('She puts it in your hands. The cover is soft with use. Every page is empty.'),
       'Mosslings keep the rocks by the pond. Sit near one and write down what you see.',
       'Two columns. What it needs, and what it gives. Fill both.',
       {

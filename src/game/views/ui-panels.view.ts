@@ -1,5 +1,5 @@
-// The panels on their keys: I or B the bag, Tab the Almanac, J the quest log, M the map, and Esc, which
-// closes what is open or opens the pause menu. The list of keys is src/game/uiview/keys.ts.
+// The panels on their keys: I or B the bag, Tab the Almanac once Tamsin has given it, J the quest log,
+// M the map, and Esc, which closes what is open or opens the pause menu. The list of keys is src/game/uiview/keys.ts.
 //
 // `createGameUi` has its own key handling switched off (`hotkeys: false`), so one place decides what a
 // key does when the full map, a panel and the pause menu could all want it. It still closes its own
@@ -7,6 +7,7 @@
 //
 // A workbench opens the Make panel. Nothing in the rules sends `ui.open` for it, so this view listens
 // to `placeables.onUse`, which is also what makes "E: Craft" show at a workbench.
+import { ALMANAC_BOOK } from '../content/almanac.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
 import { PANEL_KEYS } from '../uiview/keys.ts';
@@ -51,6 +52,11 @@ export function install(view: GameView): void {
       return;
     }
 
+    // Before Tamsin gives the book, Tab does nothing at all, not even move the focus.
+    if (target === 'almanac' && !view.game.flags.is(ALMANAC_BOOK.flag) && panel === null) {
+      take(event);
+      return;
+    }
     if (typing(event.target) || !view.started || book.menuOpen || talking) return;
     // Inside the bag, the Make panel and the quest log, Tab moves the focus. In the Almanac it is the key that opened the book.
     if (event.code === 'Tab' && panel !== null && panel !== 'almanac') return;

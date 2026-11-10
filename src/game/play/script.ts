@@ -260,9 +260,14 @@ export const STEPS: readonly Step[] = [
       expectStep(p, 'plot.meet');
       // The game opens two blocks from her: the prompt is there without a step taken.
       must(p, p.prompt() === 'Talk to Tamsin', `a new game should open on "Talk to Tamsin" and shows "${String(p.prompt())}"`);
+      // Before she speaks the book is not the player's. It is never a thing in the bag.
+      must(p, !p.game.flags.is('has.almanac') && p.count('almanac') === 0, 'the player has the Almanac before Tamsin gives it');
       const lines = talkTo(p, 'tamsin');
       must(p, lines[0] === 'Twelve people have asked me for this plot.', `Tamsin's first line is "${lines[0]}"`);
-      must(p, p.count('almanac') === 1 && p.count('axe') === 1, 'Tamsin should have given the Almanac and an axe');
+      must(p, lines.some((line) => line.startsWith('Take the book.')), 'Tamsin did not hand over the book in her first talk');
+      must(p, p.game.flags.is('has.almanac') && p.count('axe') === 1, 'Tamsin should have given the Almanac and an axe');
+      must(p, p.sys.inventory.slots.every((slot) => slot?.id !== 'almanac'), 'the Almanac takes a slot in the bag');
+      must(p, !p.sys.inventory.remove('almanac', 1) && p.game.flags.is('has.almanac'), 'the Almanac can be taken from the player');
       expectStep(p, 'plot.watch');
     },
   },

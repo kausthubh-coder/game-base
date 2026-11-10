@@ -141,3 +141,35 @@ test('save then load gives the same bag, and drops an item that no longer exists
   expect(second.inventory.slots[0]).toBeNull();
   expect(second.inventory.count('wheat')).toBe(120);
 });
+
+test('the Almanac is never a thing in the bag: adding it gives the book, and it cannot be removed', () => {
+  const { kernel, inventory, named } = bag();
+  const flags = kernel.game.flags;
+  expect(inventory.count('almanac')).toBe(0);
+  expect(inventory.add('almanac', 3)).toBe(0);
+  expect(flags.is('has.almanac')).toBe(true);
+  expect(inventory.slots.every((slot) => slot === null)).toBe(true);
+  expect(inventory.count('almanac')).toBe(1);
+  expect(inventory.remove('almanac', 1)).toBe(false);
+  expect(flags.is('has.almanac')).toBe(true);
+  expect(named('item.gained')).toEqual([]);
+});
+
+test('an old save with the Almanac in a slot loads with the book given and the slot free', () => {
+  const { kernel, inventory } = bag();
+  kernel.load({
+    version: 1,
+    flags: [['met.tamsin', true]],
+    player: { x: 0, y: 0, z: 0, facing: 0 },
+    clock: { day: 1, timeOfDay: 0.3, seconds: 40 },
+    systems: { inventory: { selected: 1, slots: [{ id: 'almanac', count: 1 }, { id: 'axe', count: 1 }] } },
+  });
+  expect(kernel.game.flags.is('has.almanac')).toBe(true);
+  expect(inventory.slots[0]).toBeNull();
+  expect(inventory.slots[1]).toEqual({ id: 'axe', count: 1 });
+  expect(inventory.count('almanac')).toBe(1);
+  // And it is saved: the flag is in the next save, and no slot holds the book.
+  const save = kernel.save();
+  expect(save.flags).toContainEqual(['has.almanac', true]);
+  expect(JSON.stringify(save.systems.inventory)).not.toContain('almanac');
+});

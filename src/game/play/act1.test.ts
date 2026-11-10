@@ -307,7 +307,8 @@ describe('the joins', () => {
     expect(p.sys.quests.tracked()?.id).toBe(quest);
     expect(p.sys.quests.all().map((view) => view.state)).toEqual(QUEST_ORDER.map((_, i) => (i < at ? 'done' : i === at ? 'active' : 'hidden')));
     // A quest that was passed over leaves what finishing it would have: the tools, and the leaftail at the player's side.
-    if (at >= 1) expect([p.count('almanac'), p.count('axe')]).toEqual([1, 1]);
+    if (at >= 1) expect([p.game.flags.is('has.almanac'), p.count('axe')]).toEqual([true, 1]);
+    expect(p.sys.inventory.slots.some((slot) => slot?.id === 'almanac')).toBe(false);
     const pet = p.sys.pets.all()[0];
     expect(pet.bonded).toBe(at >= 3);
     if (at >= 3) {

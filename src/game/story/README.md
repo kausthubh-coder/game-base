@@ -27,6 +27,8 @@ The director: the scripted moments of the first part, the rules that keep the pl
 | Lost leaftail | A bonded leaftail more than 24 blocks from a player who stands inside `region.grant()` is put beside them, with a toast. |
 | Hints | Each entry of `src/game/content/hints.ts` goes out once as `hint { id, text }` the first time its condition holds: never in a conversation, 4 seconds apart. The flag `hint.<id>` remembers it. |
 
+The opening scene on a new game, the sleep card and the Almanac card are drawn by the `story-*` views in `src/game/views/`, not by the director. The opening sets the flag `story.opening` as it starts, so it is saved and never plays again for that game.
+
 Tamsin's last scene ends with "Go on. Float your lamp." after the player has floated Odo's. So her last line hands over a second `river_lamp`, and the player can float it after the end card.
 
 ## Events it sends

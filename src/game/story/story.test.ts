@@ -78,7 +78,8 @@ test('a full run of all five quests, through talk, events and flags, reaches act
   const meeting = s.talk('tamsin');
   expect(s.lastConversation()).toBe('tamsin.meet');
   expect(meeting[0]).toBe('Twelve people have asked me for this plot.');
-  expect([s.bag.get('almanac'), s.bag.get('axe')]).toEqual([1, 1]);
+  expect([s.game.flags.is('has.almanac'), s.bag.get('axe')]).toEqual([true, 1]);
+  expect(s.bag.get('almanac')).toBeUndefined();
   s.run(0.1);
   expect(step(s, 'plot')).toBe('watch');
   s.talk('tamsin');
@@ -506,7 +507,9 @@ test('never stuck: a gift that does not fit in the bag is handed over when there
   s.talk('tamsin');
   expect(s.bag.get('axe')).toBeUndefined();
   expect(s.game.flags.get('owed.axe')).toBe(1);
-  expect(s.game.flags.get('owed.almanac')).toBe(1);
+  // The book is a flag, never a thing in the bag, so a full bag cannot hold it back.
+  expect(s.game.flags.is('has.almanac')).toBe(true);
+  expect(s.game.flags.get('owed.almanac')).toBeUndefined();
   s.run(1);
   expect(toasts(s)).toContain('Your bag is full. Make room for what you were given.');
   // She does not hand out a second axe while the first is still owed.
@@ -514,7 +517,7 @@ test('never stuck: a gift that does not fit in the bag is handed over when there
   expect(s.lastConversation()).toBe('tamsin.watch');
   s.bagFull = false;
   s.run(1);
-  expect([s.bag.get('axe'), s.bag.get('almanac')]).toEqual([1, 1]);
+  expect(s.bag.get('axe')).toBe(1);
   expect(s.game.flags.get('owed.axe')).toBe(0);
 });
 

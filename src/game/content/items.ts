@@ -41,7 +41,7 @@ export const ITEMS: readonly ItemDef[] = [
   { id: 'stone_brick', name: 'Stone brick', icon: 'stone', stack: STACK, description: 'Cut stone, laid square.', block: blockId('stone_brick') },
   { id: 'sand', name: 'Sand', icon: 'stone', stack: STACK, description: 'A block of river sand.', block: blockId('sand') },
 
-  // story
+  // story. The Almanac has a name and an icon for the interface, but the bag never holds it: see src/game/inventory.
   { id: 'almanac', name: 'Almanac', icon: 'book', stack: 1, description: 'Blank for forty years. It fills when you look closely.' },
   { id: 'river_lamp', name: 'River lamp', icon: 'lantern', stack: 1, description: 'A paper lamp to float on the Mere.' },
 ];

@@ -486,6 +486,12 @@ const QUESTS = {
       await shot('00-title.png');
       await page.click('[data-key="title:new"]');
       await page.waitForFunction(() => window.__game.started);
+      // The opening scene plays before control. It is skipped with its real Skip button.
+      await page.waitForSelector('.st-cinema:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
+      await shot('00-opening.png');
+      await page.click('[data-key="opening:skip"]');
+      await page.waitForSelector('.st-cinema', { state: 'hidden', timeout: 60000 });
+      must(!(await game(() => window.__game.view.game.player.busy)), 'the player is still held after the opening was skipped');
       await game(() => window.__game.settle());
       await game(() => window.__game.advance(0.5));
       const s = await state();
@@ -497,7 +503,8 @@ const QUESTS = {
       await expectStep('plot.meet');
       const lines = await talkTo('tamsin');
       must(lines[0] === 'Twelve people have asked me for this plot.', `her first line is "${lines[0]}"`);
-      must((await p.count('almanac')) === 1 && (await p.count('axe')) === 1, 'no Almanac and axe');
+      must((await p.flag('has.almanac')) === true && (await p.count('axe')) === 1, 'no Almanac and axe');
+      must(await game(() => !document.querySelector('.ui-bookbtn').hidden), 'the Almanac button is not on the HUD after Tamsin gave the book');
       await expectStep('plot.watch');
       return `${lines.length} lines`;
     });

@@ -58,3 +58,14 @@ kernel.game.systems.time.onThunder?.((at) => sound.thunder(at));
 It calls `game.systems.placeables.near('bed', player.pos, 4)`, `placeables.all()`, `placeables.defs()` and `game.world.openSky`, all inside `canSleep()`. Installing it draws one number from `game.random()` for the weather seed.
 
 The save holds the day, the seconds since dawn, `clock.seconds`, which days were announced, the forced kind and the machine's kind. The machine cannot restart in the middle of a front, so a load settles the saved kind at once: full rain and soaked ground if it rained, dry ground if not.
+
+## The sleep curtain
+
+`createTime` returns a `TimeWithCurtain`, a `TimeApi` with two more members, for the sleep card in `src/game/views/story-sleep.view.ts`:
+
+| Member | What it does |
+|---|---|
+| `setSleepCurtain(curtain)` | With a curtain, `sleep()` calls `curtain(wake)` and returns. The clock jumps, and `day.started` and `slept` go out, when the curtain calls `wake`, once the screen is dark. `null`, the default, sleeps at once. |
+| `fallingAsleep` | True between `sleep()` and `wake`. `canSleep()` is false and `sleep()` does nothing meanwhile. |
+
+Tests and a server set no curtain, so `sleep()` there is what the table above says. `TimeApi` in `api.sim.ts` does not have these two, so a view reads them with `'setSleepCurtain' in time`.

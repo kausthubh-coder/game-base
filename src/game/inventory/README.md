@@ -39,3 +39,7 @@ bag.add('axe', 1);                              // window.__game.give
 ```
 
 The save holds the slots and the selected slot. A load drops any item whose id is no longer in the table.
+
+## The Almanac
+
+The book is never a thing in the bag: Kausthubh asked that it not act as an item, since the game needs it. `add('almanac')` sets the flag `has.almanac` (`ALMANAC_BOOK` in `src/game/content/almanac.ts`), takes no slot and sends no `item.gained`. `count('almanac')` is 1 once the flag is set, so `{ bag: 'almanac' }` conditions still hold. `remove('almanac')` is always false. A save from before this, with the book in a slot, loads with the flag set and the slot empty.

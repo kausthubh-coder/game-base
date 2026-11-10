@@ -6,6 +6,7 @@
 // has no option to leave them out, so the stylesheet here hides them.
 import { createHud, type HudSlot } from '../../features/hud/index.ts';
 import type { QuestStepView, QuestView } from '../api.sim.ts';
+import { ALMANAC_BOOK } from '../content/almanac.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
 import { addStyle } from '../uiview/theme.ts';
@@ -51,6 +52,27 @@ const STYLE = /* css */ `
 .ui-book .gb-hud-quest li:first-child:not(.is-done), .ui-book .gb-hud-quest li.is-done + li:not(.is-done) { color: var(--ui-ink); font-weight: 600; }
 .ui-book .gb-hud-quest li:first-child:not(.is-done)::before, .ui-book .gb-hud-quest li.is-done + li:not(.is-done)::before { border-color: var(--ui-ink); }
 .ui-count { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+
+/* ---- the Almanac: a button of its own at the left of the quick slots, never a slot. It shows once Tamsin has given the book. */
+.ui-bookbtn { position: absolute; right: 100%; bottom: 0; margin-right: 8px; padding: 6px; pointer-events: auto; }
+.ui-bookbtn[hidden] { display: none; }
+.ui-bookbtn button {
+  position: relative; display: block; width: max(2.9em, 44px); height: max(2.9em, 44px); margin: 0; padding: 0;
+  font: inherit; color: var(--ui-ink); background: var(--ui-paper-3); border: 0; border-radius: 2px; cursor: pointer;
+}
+.ui-bookbtn button:hover { background: var(--ui-paper-4); }
+.ui-bookbtn button:active { background: var(--ui-paper-2); }
+.ui-bookbtn button[aria-expanded='true'] { background: var(--ui-paper-light); box-shadow: inset 0 0 0 2px var(--ui-accent); }
+.ui-bookbtn button:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
+.ui-bookbtn .ui-bookbtn-icon { position: absolute; inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
+.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 2px; left: 2px; padding: 0 3px; font-size: 11px; line-height: 1.3; color: var(--ui-ink-2); background: inherit; border-radius: 2px; }
+/* The first time it shows, it glows twice so the eye finds it. */
+.ui-bookbtn.is-new button { animation: ui-book-glow 1.1s var(--ui-ease) 2; }
+@keyframes ui-book-glow { 0% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 0 oklch(0.76 0.112 82 / 0.7); } 100% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 10px oklch(0.76 0.112 82 / 0); } }
+@media (prefers-reduced-motion: reduce) { .ui-bookbtn.is-new button { animation: none; box-shadow: inset 0 0 0 2px var(--ui-brass); } }
+@media (max-width: 560px) {
+  .ui-bookbtn { right: auto; left: 0; bottom: 100%; margin: 0 0 8px; }
+}
 
 /* While someone talks the dialogue box has the bottom of the screen. */
 .ui-book.ui-talking .gb-hud-slots { visibility: hidden; }
@@ -165,6 +187,45 @@ export function install(view: GameView): void {
   game.events.on('quest.step', soon);
   game.events.on('quest.completed', soon);
   book.onStart(soon);
+
+  // ---- the Almanac's button. The book is the flag `has.almanac`, never a quick slot. Tab opens it too.
+  const bookBox = document.createElement('div');
+  bookBox.className = 'ui-bookbtn gb-panel';
+  bookBox.hidden = true;
+  const bookButton = document.createElement('button');
+  bookButton.type = 'button';
+  bookButton.dataset.key = 'hud:almanac';
+  bookButton.setAttribute('aria-label', 'Almanac (Tab)');
+  bookButton.setAttribute('aria-expanded', 'false');
+  bookButton.title = 'Almanac (Tab)';
+  const bookKey = document.createElement('span');
+  bookKey.className = 'ui-bookbtn-key';
+  bookKey.textContent = 'Tab';
+  const bookIcon = art.iconElement('book') ?? letters('Almanac');
+  bookIcon.classList.add('ui-bookbtn-icon');
+  bookButton.append(bookKey, bookIcon);
+  bookBox.append(bookButton);
+  hud.element.querySelector('.gb-hud-slots')?.append(bookBox);
+  bookButton.addEventListener('click', () => {
+    if (!view.started || !game.flags.is(ALMANAC_BOOK.flag) || book.menuOpen || (sys.talk?.active ?? false)) return;
+    book.ui.toggle('almanac');
+  });
+  book.onPanel((panel) => bookButton.setAttribute('aria-expanded', String(panel === 'almanac')));
+  let bookShown = false;
+  const drawBook = (): void => {
+    const has = game.flags.is(ALMANAC_BOOK.flag);
+    if (has === bookShown) return;
+    bookShown = has;
+    bookBox.hidden = !has;
+  };
+  game.events.on('flag.changed', ({ flag, value }) => {
+    if (flag !== ALMANAC_BOOK.flag) return;
+    // Handed over in play, it glows. A loaded game simply has it.
+    if (value === true && view.started) bookBox.classList.add('is-new');
+    drawBook();
+  });
+  book.onPanel((panel) => { if (panel === 'almanac') bookBox.classList.remove('is-new'); });
+  book.onStart(drawBook);
 
   // ---- the room the quick slots take, so the prompt and the toasts sit clear of them
   const bar = hud.element.querySelector<HTMLElement>('.gb-hud-slots');

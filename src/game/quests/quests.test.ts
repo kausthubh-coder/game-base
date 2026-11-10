@@ -206,7 +206,7 @@ test('skipTo(\'bread\') gives a state the bread quest can finish from', () => {
     expect(s.game.flags.is(flag)).toBe(true);
   }
   expect(s.game.flags.is('quest.bread.done')).toBe(false);
-  expect(s.bag.get('almanac')).toBe(1);
+  expect(s.bag.get('almanac')).toBeUndefined();
   expect(s.bag.get('axe')).toBe(1);
   expect(s.game.systems.almanac.page('mossling')!.complete).toBe(true);
   // The leaftail quest was passed over, so the leaftail is bonded.

@@ -6,6 +6,7 @@ import type { GameView } from '../shell/view.ts';
 import { createGameUi, type GameUi, type PanelName } from '../ui/index.ui.ts';
 import { createUiArt, type UiArt } from './art.ts';
 import { KEY_LIST } from './keys.ts';
+import { markNewGame } from './opening.ts';
 import { TOKENS, addStyle } from './theme.ts';
 
 /** Panels that stop the rules while they are up. The bag, the Make panel, the Almanac and the quest log do not. */
@@ -88,7 +89,11 @@ function createBook(view: GameView): Book {
     stats: () => view.stats(),
     // A game in progress can always be gone back to, saved or not.
     hasSave: () => view.started || view.hasSave(),
-    newGame: () => view.newGame(),
+    // The title's New game is the one start that plays the opening scene. See ./opening.ts.
+    newGame() {
+      markNewGame();
+      view.newGame();
+    },
     continueGame() {
       // Back at the title from the pause menu, the game is still here: Continue picks it up without a reload.
       if (view.started) return;

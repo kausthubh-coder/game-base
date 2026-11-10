@@ -129,6 +129,10 @@ async function open(browser, width, height, query = '') {
 /** Starts a new game from the title with a real click and waits for the land. */
 async function newGame(t) {
   await t.page.click('[data-key="title:new"]');
+  // The opening scene plays first. It is skipped with its real Skip button.
+  await t.page.waitForSelector('.st-cinema:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
+  await t.page.click('[data-key="opening:skip"]');
+  await t.page.waitForSelector('.st-cinema', { state: 'hidden', timeout: 60000 });
   await t.page.waitForFunction(() => window.__game.started);
   await t.game(() => window.__game.settle());
   await t.frames(3);
@@ -294,7 +298,8 @@ async function desktop(browser) {
   }
   const after = await state();
   check('Enter carries the conversation to its end', after.talk === null && after.player.busy === false && !(await visible('.gb-dialogue')), `${presses} presses`);
-  check('Tamsin gave the Almanac and the axe', after.bag.some((s) => s.id === 'almanac') && after.bag.some((s) => s.id === 'axe'), after.bag.map((s) => s.id).join(', '));
+  // The Almanac is a key item: a flag, never a thing in the bag.
+  check('Tamsin gave the Almanac and the axe', after.flags['has.almanac'] === true && !after.bag.some((s) => s.id === 'almanac') && after.bag.some((s) => s.id === 'axe'), `book ${after.flags['has.almanac']}, bag ${after.bag.map((s) => s.id).join(', ')}`);
   await frames(2);
 
   // A line with choices: Maren asks for the wheat.

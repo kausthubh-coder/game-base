@@ -10,6 +10,7 @@ import { BLOCKS } from '../../content/blocks.ts';
 import { createMap, type MapMarker, type PinKind } from '../../features/map/index.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
+import { clearOfPanels, type MarkBox } from '../uiview/clear.ts';
 import { addStyle, frame } from '../uiview/theme.ts';
 
 /** Within this many blocks of a named place, it gets its pin. */
@@ -305,5 +306,62 @@ export function install(view: GameView): void {
     syncMarkers();
     map.setPlayer(p.x, p.z, game.player.facing);
     map.update(dt, view.ctx);
+    keepArrowClear(dt);
   });
+
+  // ---------------------------------------------------------------- the edge arrow, clear of the HUD
+  // The map feature puts the arrow for a waypoint off screen a margin inside the edge, and knows nothing
+  // of the HUD there: off to the right it lay over the quest tracker. After the map has placed it, it is
+  // slid along its edge until it touches no panel. The panels are measured four times a second.
+  const beacon = root.querySelector<HTMLElement>('.gb-beacon');
+  const PANELS = ['.gb-hud-quest', '.gb-hud-minimap', '.gb-hud-sky', '.gb-hud-slots', '.ui-bookbtn'];
+  const rects = new Float64Array(PANELS.length * 4);
+  let rectCount = 0, sinceMeasure = LOOK_EVERY;
+  /** The arrow's reach around its point: the 46-pixel arrow, and the "19 blocks" chip under it or over it. */
+  const BELOW: MarkBox = { left: 48, up: 25, right: 48, down: 52 };
+  const ABOVE: MarkBox = { left: 48, up: 52, right: 48, down: 25 };
+  /** The margin the map feature keeps from the screen's edge, and the room kept around a panel. */
+  const EDGE = 72, GAP = 10;
+  const moved = { x: 0, y: 0 };
+  let written = '';
+  /** The point the map gave the arrow, before it was slid. */
+  let pointX = 0, pointY = 0;
+
+  function measure(): void {
+    rectCount = 0;
+    const origin = root.getBoundingClientRect();
+    for (const selector of PANELS) {
+      const element = root.querySelector<HTMLElement>(selector);
+      if (!element || element.closest('[hidden]') || getComputedStyle(element).visibility === 'hidden') continue;
+      const box = element.getBoundingClientRect();
+      if (box.width === 0 || box.height === 0) continue;
+      const i = rectCount++ * 4;
+      rects[i] = box.left - origin.left; rects[i + 1] = box.top - origin.top;
+      rects[i + 2] = box.right - origin.left; rects[i + 3] = box.bottom - origin.top;
+    }
+  }
+
+  function keepArrowClear(dt: number): void {
+    if (!beacon || beacon.hidden) return;
+    sinceMeasure += dt;
+    const transform = beacon.style.transform;
+    // The map rewrites the transform only when its point moves. A transform this view wrote is still right,
+    // until the panels are measured again.
+    if (transform === written && sinceMeasure < LOOK_EVERY) return;
+    if (sinceMeasure >= LOOK_EVERY) {
+      sinceMeasure = 0;
+      measure();
+    }
+    if (!beacon.classList.contains('is-off')) return;
+    const at = /translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/.exec(transform);
+    if (!at) return;
+    // Its own point, from the map, unless this view moved it last.
+    if (transform !== written) { pointX = Number(at[1]); pointY = Number(at[2]); }
+    const width = root.clientWidth, height = root.clientHeight;
+    const onSide = Math.abs(pointX - EDGE) < 2 || Math.abs(pointX - (width - EDGE)) < 2;
+    clearOfPanels(pointX, pointY, beacon.classList.contains('is-above') ? ABOVE : BELOW, onSide, rects, rectCount, width, height, GAP, moved);
+    const next = `translate(${Math.round(moved.x)}px, ${Math.round(moved.y)}px)`;
+    if (next !== transform) beacon.style.transform = next;
+    written = beacon.style.transform;
+  }
 }
