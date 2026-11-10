@@ -266,8 +266,8 @@ describe('the props system', () => {
     const ctx = headless();
     const props = createProps(ctx);
     for (let i = 0; i < 10; i++) {
-      props.place('rock', 1, { x: 5 + i, y: 0, z: 5 });
-      props.place('rock', 1, { x: 1000 + i, y: 0, z: 1000 });
+      props.place('rock', 1, { x: 1 + i * 0.5, y: 0, z: 5 });
+      props.place('rock', 1, { x: 1001 + i * 0.5, y: 0, z: 1000 });
     }
     lookDownAt(ctx, 10, 5, 60);
     props.update(1 / 60, ctx);
@@ -324,12 +324,12 @@ describe('the props system', () => {
     for (const size of sizes) expect(Math.abs(size - 1)).toBeLessThanOrEqual(PROPS.oak.vary.size + 1e-4);
     expect(new Set(sizes.map((s) => s.toFixed(3))).size).toBeGreaterThan(3);
     // A door must line up with its wall: it is never turned or resized.
-    props.place('door', 0, { x: 0.5, y: 0, z: 20 }, Math.PI / 2);
+    props.place('door', 0, { x: 0.5, y: 0, z: 4 }, Math.PI / 2);
     props.update(1 / 60, ctx);
     const door = props.group.children.find((c) => c.name === 'props:door:0') as THREE.InstancedMesh;
     const matrix = new THREE.Matrix4();
     door.getMatrixAt(0, matrix);
-    const expected = new THREE.Matrix4().makeRotationY(Math.PI / 2).setPosition(0.5, 0, 20);
+    const expected = new THREE.Matrix4().makeRotationY(Math.PI / 2).setPosition(0.5, 0, 4);
     matrix.elements.forEach((v, i) => expect(v).toBeCloseTo(expected.elements[i], 5));
     props.dispose();
   });

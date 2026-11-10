@@ -3,9 +3,13 @@
 //
 // How it stays cheap:
 // - Every copy of one kind and variant is one instanced mesh, however many cells its copies stand in.
-// - Props are kept in cells of 32 by 32 blocks. Each cell holds its copies as ready-made rows of numbers.
+// - Props are kept in cells of 8 by 8 blocks. Each cell holds its copies as ready-made rows of numbers.
 //   When the set of cells in view changes, the rows of the cells in view are copied into the meshes.
-//   Nothing is copied or allocated on a frame where the view holds the same cells.
+//   Nothing is copied or allocated on a frame where the view holds the same cells. Small cells matter:
+//   the view's frustum test passes any box near its corners, and a field of 32-block cells drew three
+//   times the grass that was on screen.
+// - A cell's props are drawn when the cell's own box is in view. Its shadow casters are drawn when a box
+//   wider by the length of a long shadow is in view, so a bush just off screen still drops its shadow on it.
 // - A prop casts shadow through a few stretched balls and boxes its builder listed, not through its own
 //   triangles. Every ball in the world is one draw call and every box is another. They live on a layer
 //   only the sun's shadow camera sees.
@@ -21,8 +25,8 @@ import { createPropMaterial } from './material.view.ts';
 import type { ShapeExtras } from './shape.ts';
 
 /** The side of a cell, in blocks. */
-export const CELL = 32;
-/** A cell counts as in view this far past its edge, so a tree just off screen still drops its shadow on screen. */
+export const CELL = 8;
+/** A cell's shadow casters count as in view this far past its edge, so a shadow from off screen still falls on screen. */
 const MARGIN = 8;
 
 export interface PropsOptions {
@@ -108,6 +112,8 @@ interface Model {
   def: PropDef;
   extras: ShapeExtras;
   height: number;
+  /** How far it reaches from where it stands, along the ground, at scale 1. */
+  radius: number;
   batch: Batch;
 }
 
@@ -137,12 +143,16 @@ interface Rows {
 
 interface Cell {
   key: number;
+  /** Around its props. */
   box: THREE.Box3;
+  /** Around their shadows too. */
+  shadowBox: THREE.Box3;
   props: Map<number, Placed>;
   rows: Rows[];
   /** Its props changed since its rows were made. */
   stale: boolean;
   inView: boolean;
+  shadowInView: boolean;
 }
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -233,8 +243,11 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     if (!model) {
       const def = propDef(kind);
       const geometry = buildProp(kind, variant);
-      const height = geometry.boundingBox ? geometry.boundingBox.max.y : 1;
-      model = { kind, def, extras: propExtras(geometry), height, batch: makeBatch(geometry, `props:${key}`, false) };
+      if (!geometry.boundingBox) geometry.computeBoundingBox();
+      const box = geometry.boundingBox!;
+      const height = box.max.y;
+      const radius = Math.hypot(Math.max(-box.min.x, box.max.x), Math.max(-box.min.z, box.max.z));
+      model = { kind, def, extras: propExtras(geometry), height, radius, batch: makeBatch(geometry, `props:${key}`, false) };
       models.set(key, model);
     }
     return model;
@@ -245,8 +258,9 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     const key = (cx + 32768) * 65536 + (cz + 32768);
     let cell = cells.get(key);
     if (!cell) {
-      const box = new THREE.Box3(new THREE.Vector3(cx * CELL - MARGIN, Infinity, cz * CELL - MARGIN), new THREE.Vector3((cx + 1) * CELL + MARGIN, -Infinity, (cz + 1) * CELL + MARGIN));
-      cell = { key, box, props: new Map(), rows: [], stale: true, inView: false };
+      const box = new THREE.Box3();
+      const shadowBox = new THREE.Box3(new THREE.Vector3(cx * CELL - MARGIN, Infinity, cz * CELL - MARGIN), new THREE.Vector3((cx + 1) * CELL + MARGIN, -Infinity, (cz + 1) * CELL + MARGIN));
+      cell = { key, box, shadowBox, props: new Map(), rows: [], stale: true, inView: false, shadowInView: false };
       cells.set(key, cell);
       cellList.push(cell);
     }
@@ -300,18 +314,18 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   function fill(): void {
     for (const batch of batches) batch.wanted = 0;
     for (const cell of cellList) {
-      if (!cell.inView) continue;
+      if (!cell.inView && !cell.shadowInView) continue;
       if (cell.stale) remake(cell);
-      for (const rows of cell.rows) rows.batch.wanted += rows.count;
+      for (const rows of cell.rows) if (rows.batch.shadow ? cell.shadowInView : cell.inView) rows.batch.wanted += rows.count;
     }
     for (const batch of batches) {
       if (batch.wanted > batch.capacity) grow(batch, batch.wanted);
       batch.count = 0;
     }
     for (const cell of cellList) {
-      if (!cell.inView) continue;
+      if (!cell.inView && !cell.shadowInView) continue;
       for (const rows of cell.rows) {
-        if (rows.count === 0) continue;
+        if (rows.count === 0 || !(rows.batch.shadow ? cell.shadowInView : cell.inView)) continue;
         const { batch } = rows;
         batch.mesh.instanceMatrix.array.set(rows.matrices.subarray(0, rows.count * 16), batch.count * 16);
         if (rows.colors && batch.mesh.instanceColor) batch.mesh.instanceColor.array.set(rows.colors.subarray(0, rows.count * 3), batch.count * 3);
@@ -379,10 +393,15 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       const p: Placed = { handle, model, x, y, z, rotation: rotation + jitter.turn, scale: scale * jitter.size, r: jitter.r, g: jitter.g, b: jitter.b, rank: hash3(x, y, z, 5), cell };
       placed.set(handle, p);
       cell.props.set(handle, p);
-      cell.box.min.y = Math.min(cell.box.min.y, y - 1);
-      cell.box.max.y = Math.max(cell.box.max.y, y + model.height * p.scale + 1);
+      // The box takes in the whole prop, and sways and turns a little more.
+      const reach = model.radius * p.scale + 0.5;
+      const { box, shadowBox } = cell;
+      box.min.set(Math.min(box.min.x, x - reach), Math.min(box.min.y, y - 1), Math.min(box.min.z, z - reach));
+      box.max.set(Math.max(box.max.x, x + reach), Math.max(box.max.y, y + model.height * p.scale + 1), Math.max(box.max.z, z + reach));
+      shadowBox.min.y = box.min.y;
+      shadowBox.max.y = box.max.y;
       cell.stale = true;
-      if (cell.inView) refill = true;
+      if (cell.inView || cell.shadowInView) refill = true;
       if (model.def.light > 0) lightList = null;
       return handle;
     },
@@ -391,9 +410,16 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       const p = placed.get(handle);
       if (!p) return;
       placed.delete(handle);
-      p.cell.props.delete(handle);
-      p.cell.stale = true;
-      if (p.cell.inView) refill = true;
+      const { cell } = p;
+      cell.props.delete(handle);
+      cell.stale = true;
+      if (cell.inView || cell.shadowInView) refill = true;
+      // An empty cell goes, so walking far does not leave a trail of cells to test every frame.
+      if (cell.props.size === 0) {
+        cells.delete(cell.key);
+        const at = cellList.indexOf(cell), last = cellList.pop()!;
+        if (last !== cell) cellList[at] = last;
+      }
       if (p.model.def.light > 0) lightList = null;
     },
 
@@ -439,12 +465,15 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       const camera = frame.camera;
       camera.updateMatrixWorld();
       frustum.setFromProjectionMatrix(_matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+      const shadows = shadowOverride ?? LEVELS[quality].shadows;
       let inView = 0;
       for (let i = 0; i < cellList.length; i++) {
         const cell = cellList[i];
         const seen = cell.props.size > 0 && frustum.intersectsBox(cell.box);
-        if (seen !== cell.inView) {
+        const shade = shadows && cell.props.size > 0 && (seen || frustum.intersectsBox(cell.shadowBox));
+        if (seen !== cell.inView || shade !== cell.shadowInView) {
           cell.inView = seen;
+          cell.shadowInView = shade;
           refill = true;
         }
         if (seen) inView++;
