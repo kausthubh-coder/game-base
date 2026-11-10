@@ -162,12 +162,12 @@ export function createKeys(canvas: HTMLElement): Keys {
   let wheel = 0, lastStep = 0;
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
-    // With Shift down some browsers report the wheel sideways.
     if (look && !e.shiftKey) {
       // The free camera zooms smoothly: a notch of a mouse wheel is one step, a trackpad's swipe a few.
       send({ kind: 'zoom', steps: Math.max(-3, Math.min(3, (e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY) / 100)) });
       return;
     }
+    // With Shift down some browsers report the wheel sideways.
     wheel += e.deltaY || e.deltaX;
     if (Math.abs(wheel) < 40 || e.timeStamp - lastStep < (e.shiftKey ? 90 : 220)) return;
     const step = wheel > 0 ? 1 : -1;

@@ -36,6 +36,8 @@ const BODY_STEPS = Math.round(STEP / HERO_STEP);
 const SAVE_EVERY = 60;
 /** The eyes are this far above the feet. Reach is measured from them, as the actions system does. */
 const EYE_HEIGHT = 1.6;
+/** A swimming hero floats with little more than the hair out of the water. In first person the eyes rise this much, to just over the surface. */
+const SWIM_EYE = 0.55;
 /** Radians the free and first-person view turns for each pixel the mouse moves. */
 const LOOK_SPEED = 0.0024;
 /** The camera modes in the order V goes through them. */
@@ -429,7 +431,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     if (camera.mode !== 'tilt' && (mouse.x !== 0 || mouse.y !== 0)) camera.look(-mouse.x * LOOK_SPEED, mouse.y * LOOK_SPEED);
 
     const p = player.position;
-    camera.follow(p.x, p.y, p.z);
+    camera.follow(p.x, p.y + (camera.mode === 'first' && player.body.swimming ? SWIM_EYE : 0), p.z);
     camera.update(Math.min(dt, 0.1), ctx);
     world.setFocus(p.x, p.z);
     world.setCutaway(camera.cutaway);

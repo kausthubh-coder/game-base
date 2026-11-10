@@ -32,9 +32,10 @@ export interface OrbitOptions {
 }
 
 export const FREE_ORBIT: OrbitOptions = {
-  minPitch: -35 * DEG, maxPitch: 72 * DEG, pitch: 24 * DEG,
+  minPitch: -35 * DEG, maxPitch: 72 * DEG, pitch: 27 * DEG,
   distance: 6, minDistance: 2.2, maxDistance: 12,
-  lift: 1.7, shoulder: 0.6, followRate: 14, radius: 0.3, outRate: 3,
+  // Over the head, so the top of a block at head height is in sight to build on.
+  lift: 2.1, shoulder: 0.6, followRate: 14, radius: 0.3, outRate: 3,
 };
 
 export const FIRST_PERSON: OrbitOptions = {
@@ -136,12 +137,14 @@ export class OrbitRig {
    * so it settles over a few rounds. Leaves the distance alone.
    */
   aimAt(x: number, y: number, z: number, blocks?: BlockProbe): void {
-    for (let round = 0; round < 8; round++) {
+    for (let round = 0; round < 40; round++) {
       const dx = x - this.position.x, dy = y - this.position.y, dz = z - this.position.z;
       const flat = Math.hypot(dx, dz);
       if (flat + Math.abs(dy) < 1e-6) return;
+      const yaw = this.yaw, pitch = this.pitch;
       this.set(Math.atan2(-dx, -dz), Math.atan2(-dy, flat));
       this.place(blocks, 0);
+      if (Math.abs(wrap(this.yaw - yaw)) + Math.abs(this.pitch - pitch) < 1e-7) return;
     }
   }
 
