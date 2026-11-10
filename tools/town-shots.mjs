@@ -4,7 +4,7 @@
 // zoom steps in, and the square two zoom steps in.
 // It writes <name>-<view>-<time>.png and adds the renderer's counts to shots.json in the out folder.
 //   bun tools/town-shots.mjs --town a [--url http://127.0.0.1:5391/] [--out .artifacts/town] [--views far,approach,square]
-//     [--times noon,dusk,night] [--w 1440] [--h 900] [--quality high]
+//     [--times noon,dusk,night] [--w 1440] [--h 900] [--quality high] [--frames 60]
 // It fails on a console error. This Mac draws WebGL in software, so it reads draw calls and triangles, never frames a second.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -18,6 +18,8 @@ const town = opt('town', 'now');
 const out = resolve(root, opt('out', '.artifacts/town'));
 const width = Number(opt('w', 1440)), height = Number(opt('h', 900));
 const quality = opt('quality', 'high');
+/** Frames drawn after each move before the shot. */
+const settleFrames = Number(opt('frames', 60));
 mkdirSync(out, { recursive: true });
 
 /** The views. `at` is a column or a place, `quarter` the camera's quarter turn (0 looks north-west), `zoom` the steps in from the default. */
@@ -67,7 +69,7 @@ try {
     const view = { ...VIEWS[key] };
     if (at) { const [x, z, q] = at.split(',').map(Number); view.at = [x, z]; view.quarter = q; }
     for (const time of times) {
-      const counts = await game(async ({ view, t, home }) => {
+      const counts = await game(async ({ view, t, home, frames }) => {
         const g = window.__game;
         const cam = g.view.camera;
         let spot = typeof view.at === 'string' ? g.teleport(view.at) : g.teleport(view.at[0], view.at[1]);
@@ -82,11 +84,12 @@ try {
         for (let i = 0; i < view.zoom; i++) cam.zoomBy(-1);
         g.setTime(t);
         g.advance(0.1);
-        await g.frames(14);
+        // The land is dressed a chunk or so a frame, and this Mac draws slowly, so it waits for the meadow's grass too.
+        await g.frames(frames);
         await g.settle();
         await g.frames(4);
         return { spot, camera: g.state().camera, ...g.counters() };
-      }, { view, t: TIMES[time], home });
+      }, { view, t: TIMES[time], home, frames: settleFrames });
       const name = `${town}-${key}-${time}`;
       await page.screenshot({ path: resolve(out, `${name}.png`) });
       results[name] = { town, view: key, time, drawCalls: counts.drawCalls, triangles: counts.triangles, chunks: counts.chunks, sprites: counts.sprites, quality: counts.quality, zoom: counts.camera.zoom, quarter: counts.camera.quarter };
