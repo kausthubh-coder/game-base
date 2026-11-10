@@ -11,6 +11,8 @@ your task.
 - Your style lives behind `?style=<slug>`. Without it the game must look and behave exactly as on
   `style/lab`. Within your branch you may change any file, `src/engine` and `src/main.ts` included, as long as
   that holds.
+- The lab's own tools may get fixes on `style/lab` while you work. Run `git merge style/lab` before your
+  final shoot.
 - If `node_modules` is missing, run `bun install` in your worktree. Never add a dependency; if you need one,
   say so in your report and work around it.
 - Put assets in `public/assets/styles/<slug>/`, raw images and prompts in `assets-src/styles/<slug>/`, notes and
