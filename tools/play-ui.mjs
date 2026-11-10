@@ -577,9 +577,11 @@ async function dragAndDrop(t) {
   const from = hudBefore.findIndex((s, i) => i < 9 && s !== '');
   const to = hudBefore.findIndex((s, i) => i < 9 && i !== from && s === '');
   if (from >= 0 && to >= 0) {
+    const target = await center(`.gb-hud-slots .gb-slot[data-slot="${to}"]`);
+    const under = await game((at) => document.elementsFromPoint(at.x, at.y).slice(0, 3).map((e) => e.className || e.tagName).join(' > '), target);
     await drag(`.gb-hud-slots .gb-slot[data-slot="${from}"]`, `.gb-hud-slots .gb-slot[data-slot="${to}"]`);
     now = await slots();
-    check('drag: a stack moves from one quick slot at the bottom of the screen to another', now[from] === '' && now[to] === hudBefore[from], `${hudBefore[from]} from ${from + 1} to ${to + 1}`);
+    check('drag: a stack moves from one quick slot at the bottom of the screen to another', now[from] === '' && now[to] === hudBefore[from], `${hudBefore[from]} from ${from + 1} to ${to + 1}, under the pointer: ${under}`);
     await drag(`.gb-hud-slots .gb-slot[data-slot="${to}"]`, `.gb-hud-slots .gb-slot[data-slot="${from}"]`);
   } else {
     check('drag: the quick slots have a stack and an empty slot to try', false, hudBefore.slice(0, 9).join(' | '));

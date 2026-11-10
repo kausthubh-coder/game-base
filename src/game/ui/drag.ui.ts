@@ -37,6 +37,21 @@ export interface SlotDrag {
 }
 
 const slotOf = (element: Element | null): HTMLElement | null => element?.closest<HTMLElement>('[data-slot-drop]') ?? null;
+/** Surfaces a drop never reaches through: a slot behind one of them is not under the pointer. */
+const SOLID = '.gu-panel, .gu-stage, .gb-dialogue, .gb-map';
+
+/**
+ * The slot under a point. Something drawn over the slots without being a surface, such as the waypoint's arrow
+ * or a tooltip, is looked through, so it cannot swallow a drop.
+ */
+function slotAt(x: number, y: number): HTMLElement | null {
+  for (const element of document.elementsFromPoint(x, y)) {
+    const slot = slotOf(element);
+    if (slot) return slot;
+    if (element.matches(SOLID)) return null;
+  }
+  return null;
+}
 const indexOf = (element: HTMLElement): number => Number(element.dataset.slotDrop);
 
 /** True when `count` of the stack in `from` can go into `to`: a part only onto an empty slot or the same item. */
@@ -157,13 +172,12 @@ export function createSlotDrag(options: SlotDragOptions): SlotDrag {
       if (!dragging) return;
     }
     place(event.clientX, event.clientY);
-    // The ghost takes no pointer, so the element under the pointer is the slot or the space between.
-    light(slotOf(document.elementFromPoint(event.clientX, event.clientY)));
+    light(slotAt(event.clientX, event.clientY));
   }, { signal });
 
   area.addEventListener('pointerup', (event) => {
     if (!press || event.pointerId !== press.pointerId) return;
-    end(dragging ? slotOf(document.elementFromPoint(event.clientX, event.clientY)) : null);
+    end(dragging ? slotAt(event.clientX, event.clientY) : null);
   }, { signal });
   area.addEventListener('pointercancel', () => end(null), { signal });
   // The slot was drawn again under the drag, or the browser took the pointer: the stack goes back.
