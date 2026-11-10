@@ -716,13 +716,18 @@ const QUESTS = {
     });
     if (!args.includes('--no-continue')) {
       await step('bread', 'reload the page mid-quest and Continue from the title', async () => {
+        // The rules are held still from the save to the read after Continue. Otherwise the clock runs on while the
+        // page reloads (the shell saves again as it closes) and while the land loads, which on a busy machine is seconds.
+        await game(() => window.__game.manual(true));
         const before = await state();
         await game(() => window.__game.save());
         await openGame();
         await page.click('[data-key="title:continue"]');
         await page.waitForFunction(() => window.__game.started);
+        await game(() => window.__game.manual(true));
         await game(() => window.__game.settle());
         const after = await state();
+        await game(() => window.__game.manual(false));
         must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
         must(after.flags['pet.leaftail.bonded'] === true && after.tracked === 'bread', 'the quests or the pet did not come back');
