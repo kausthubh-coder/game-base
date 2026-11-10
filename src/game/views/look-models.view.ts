@@ -1,6 +1,5 @@
 // Optional visual experiment. No world blocks, collisions, or felling rules are changed.
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import type { GameView } from '../shell/view.ts';
 
 const PLACEMENTS: Record<string, readonly (readonly [number, number, number, number])[]> = {
@@ -14,6 +13,7 @@ const PLACEMENTS: Record<string, readonly (readonly [number, number, number, num
 
 export async function install(view: GameView): Promise<void> {
   if (new URLSearchParams(location.search).get('models') !== '1') return;
+  const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
   const loader = new GLTFLoader();
   const clock = { value: 0 };
   const group = new THREE.Group(); group.name = 'Blender model look test';
@@ -55,5 +55,23 @@ export async function install(view: GameView): Promise<void> {
     mesh.geometry.dispose(); original.dispose();
   }
   view.scene.add(group);
-  view.onFrame(dt => { clock.value += dt; });
+  // Views install before newGame generates the land. Ground the fixture once that land exists.
+  let grounded = false;
+  const transform = new THREE.Object3D();
+  view.onFrame(dt => {
+    clock.value += dt;
+    if (!view.started || grounded) return;
+    for (const child of group.children) {
+      const instances = child as THREE.InstancedMesh;
+      const positions = PLACEMENTS[child.name];
+      for (let i = 0; i < positions.length; i++) {
+        const [x,z,scale,yaw] = positions[i];
+        transform.position.set(x,view.world.sim.heightAt(x,z),z);
+        transform.rotation.y=yaw; transform.scale.setScalar(scale); transform.updateMatrix();
+        instances.setMatrixAt(i,transform.matrix);
+      }
+      instances.instanceMatrix.needsUpdate=true; instances.computeBoundingSphere();
+    }
+    grounded=true;
+  });
 }

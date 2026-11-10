@@ -11,9 +11,10 @@ for seed in [11,37]:
     for v in obj.data.vertices: v.co*=r.uniform(.94,1.06)
     low=min(v.co.z for v in obj.data.vertices)
     for v in obj.data.vertices: v.co.z-=low
+    obj.data.update()
     m=Mesh()
     for p in obj.data.polygons:
         pts=[obj.data.vertices[i].co.copy() for i in p.vertices]; top=sum(v.z for v in pts)/len(pts)/1.3
-        m.face(pts,(.26+.18*top,.29+.17*top,.26+.16*top,1))
+        m.face(pts,(.26+.18*top,.29+.17*top,.26+.16*top,1),normals=[tuple(obj.data.vertices[i].normal) for i in p.vertices])
     bpy.data.objects.remove(obj,do_unlink=True)
     finish(m.object('weathered rock'),f'rock-{seed}')
