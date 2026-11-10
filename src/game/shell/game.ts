@@ -475,6 +475,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   function applyGraphics(): void {
     const g = settings.graphics;
     sky.sun.castShadow = g.shadows !== 'off';
+    sky.sun.shadow.radius = g.shadows === 'sharp' ? 0 : 3;
     sprites.setShadowsEnabled(g.shadows !== 'off');
     const type = g.shadows === 'sharp' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
     if (renderer.shadowMap.type !== type) {
