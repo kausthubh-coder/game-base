@@ -11,5 +11,7 @@
     "nessa": "NESSA the grandmother: round elderly fair-skinned woman, large silver hair bun, rust-red shawl around shoulders, dark olive dress, cream collar, brown boots, walking cane held close to body. No hat.",
     "roan": "ROAN the farmhand: lanky teenage boy with warm tan skin, very short blond hair, no hat, cream tunic with rolled sleeves, rust-red neckerchief, moss-green dungarees, brown boots. No tools, no straw hat.",
     "pip": "PIP the apprentice: young child age nine, dark skin and two short black hair puffs, ochre cap worn backward, muted violet short tunic, cream shorts, rust socks and brown shoes, small brown cross-body satchel. Shorter body and visibly childlike face, same large head scale as reference."
-  }
+  },
+  "basePrompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, large head and small feet, matching the reference villager. Transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT rectangular uniform grid FOUR columns SIX rows, 24 equal cells. Every cell contains exactly one whole character with ample transparent padding. Rows 1-3 idle: front, back (no face), right profile; all four columns repeat idle variations. Rows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing. Same character, clothes, accessories and proportions throughout. Feet baseline equal in each cell. Full body visible including head and shoes, nothing crosses cell boundaries. Reference shows existing approved style only; generate a NEW character.",
+  "suffix": "No teal. Match approved human head/body ratio exactly."
 }

@@ -64,3 +64,5 @@ It needs `region`, `nav`, `interact` and `talk` to be installed before the first
 Save holds each person's position, facing, place, friendship, mark, hold, the place they were sent to with its offset, and their wander timer. A load before the first step is kept and applied on that step.
 
 People pause their routes for two seconds when they first enter talking range of the player on the same level. They face the player during that pause, then resume even if the player stays. Leaving talk range resets the greeting. This gives the player time to use a moving person's prompt without keeping that person from their routine.
+
+Background residents have `crowd: true`. On creation the people system shuffles the ten `CROWD_SPRITES` once using the world seed, then deals without replacement. Named cast sprites stay fixed. Saves include the assigned sprite; older saves receive the seeded assignment. Job barks in `JOB_BARKS` follow the sprite, and weather and festival lines take priority.

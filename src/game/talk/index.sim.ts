@@ -8,6 +8,7 @@
 import type { Game, NpcId, SimSystem, TalkApi, TalkLine } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { CONVERSATIONS, SPEAKERS, VILLAGER_LINES, type Choice, type Conversation, type Line } from '../content/dialogue.ts';
+import { JOB_BARKS } from '../content/people.ts';
 import type { Effect } from '../content/quests.ts';
 import { apply, holds } from '../quests/rules.sim.ts';
 
@@ -54,7 +55,10 @@ export function createTalk(game: Game, conversations: readonly Conversation[] = 
   function villagerLine(npc: NpcId): Conversation {
     const fitting = VILLAGER_LINES.filter((v) => v.when && holds(game, v.when));
     const pool = fitting.length ? fitting : VILLAGER_LINES.filter((v) => !v.when);
-    const pick = pool[(hash(npc) + game.clock.day) % pool.length];
+    const job = JOB_BARKS[game.systems.people?.get(npc)?.sprite ?? ''];
+    const pick = !fitting.length && job
+      ? { id: 'job.' + npc, text: job }
+      : pool[(hash(npc) + game.clock.day) % pool.length];
     return { id: pick.id, npc, lines: [pick.text] };
   }
 
