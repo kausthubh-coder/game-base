@@ -21,6 +21,35 @@ describe('the camera rig', () => {
     expect(rig.look.y).toBeCloseTo(21, 5);
   });
 
+  test('an aim below the pitch looks past the target toward the horizon', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0, pitch: 20 * deg, aim: 8 * deg, distances: [20], zoom: 0 });
+    run(rig, 1, 0, 10, 0);
+    const toTarget = Math.atan2(rig.position.y - rig.look.y, rig.position.z - rig.look.z) / deg;
+    const toGaze = Math.atan2(rig.position.y - rig.gaze.y, rig.position.z - rig.gaze.z) / deg;
+    expect(toTarget).toBeCloseTo(20, 5);
+    expect(toGaze).toBeCloseTo(8, 5);
+    // The gaze lies north of the target, the way the camera looks.
+    expect(rig.gaze.z).toBeLessThan(rig.look.z);
+  });
+
+  test('a pitch given per zoom step glides with the distance', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0, pitch: [10 * deg, 30 * deg], distances: [10, 30], zoom: 0 });
+    run(rig, 1);
+    expect(rig.pitch / deg).toBeCloseTo(10, 5);
+    rig.zoomBy(1);
+    rig.update(0.05, 0, 0, 0);
+    // Partway out, the pitch is partway up, in step with the distance.
+    const t = (rig.distance - 10) / 20;
+    expect(t).toBeGreaterThan(0.1);
+    expect(t).toBeLessThan(0.9);
+    expect(rig.pitch / deg).toBeCloseTo(10 + 20 * t, 5);
+    run(rig, 2);
+    expect(rig.pitch / deg).toBeCloseTo(30, 3);
+    expect(Math.hypot(rig.position.z - rig.look.z, rig.position.y - rig.look.y)).toBeCloseTo(30, 2);
+  });
+
   test('a quarter turn takes 0.3 seconds and lands exactly', () => {
     const rig = new CameraRig({ baseYaw: 0 });
     run(rig, 0.1);

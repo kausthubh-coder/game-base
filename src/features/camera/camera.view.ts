@@ -1,8 +1,9 @@
-// The camera: a long lens looking down at about 35 degrees. It follows a point, turns in quarter
-// turns with Q and E, zooms in three steps with the wheel, and works out the cutaway.
+// The camera: by default a long lens looking down at about 35 degrees. It follows a point, turns in
+// quarter turns with Q and E, zooms in steps with the wheel, and works out the cutaway. `profiles.ts`
+// holds other places to put it.
 import type * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
-import { CameraRig, type RigOptions } from './rig.sim.ts';
+import { CameraRig, type PerStep, type RigOptions } from './rig.sim.ts';
 import { CutawayRule, type BlockProbe, type CutawayOptions, type CutawayState } from './cutaway.sim.ts';
 
 export interface CameraOptions {
@@ -10,8 +11,8 @@ export interface CameraOptions {
   blocks?: BlockProbe;
   /** Listen for Q, E and the wheel. Pass false when another feature owns input, and call `turn` and `zoomBy`. */
   input?: boolean;
-  /** The lens: the vertical field of view in degrees. Small is long. */
-  fov?: number;
+  /** The lens: the vertical field of view in degrees. Small is long. One per zoom step glides with the zoom. */
+  fov?: PerStep;
   rig?: Partial<RigOptions>;
   cutaway?: Partial<CutawayOptions>;
 }
@@ -30,6 +31,10 @@ export interface CameraView extends ViewSystem {
   /** The yaw right now in radians, -PI to PI. 0 looks north. It glides during a turn. */
   readonly yaw: number;
   readonly zoom: number;
+  /** How far the view looks down right now, in radians. 0 is level. */
+  readonly aim: number;
+  /** A value given per zoom step, at the zoom right now: it glides between steps as the zoom does. */
+  stepped(value: PerStep): number;
   /** What to hide so the hero stays in view. Hand it to the world. */
   readonly cutaway: CutawayState;
   /** True when the cutaway hides this block. Hand it to a ray cast so clicks pass through hidden blocks. */
@@ -74,6 +79,8 @@ export function createCamera(ctx: ViewContext, options: CameraOptions = {}): Cam
     get quarter() { return rig.quarter; },
     get yaw() { return rig.yaw; },
     get zoom() { return rig.zoom; },
+    get aim() { return rig.aim; },
+    stepped: (value) => rig.step(value),
     cutaway: rule.state,
     hides: (x, y, z) => rule.hides(x, y, z),
 
@@ -81,15 +88,16 @@ export function createCamera(ctx: ViewContext, options: CameraOptions = {}): Cam
       rig.update(dt, target.x, target.y, target.z);
       const camera = frame.camera;
       camera.position.set(rig.position.x, rig.position.y, rig.position.z);
-      camera.lookAt(rig.look.x, rig.look.y, rig.look.z);
+      camera.lookAt(rig.gaze.x, rig.gaze.y, rig.gaze.z);
+      const lens = rig.step(fov);
       camera.near = Math.max(1, rig.distance - 70);
       camera.far = rig.distance + 220;
       if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
-        (camera as THREE.PerspectiveCamera).fov = fov;
+        (camera as THREE.PerspectiveCamera).fov = lens;
       } else {
         // An orthographic camera shows the same height of world as the long lens does at this distance.
         const ortho = camera as THREE.OrthographicCamera;
-        const half = Math.tan((fov * Math.PI) / 360) * rig.distance;
+        const half = Math.tan((lens * Math.PI) / 360) * rig.distance;
         const aspect = (ortho.right - ortho.left) / (ortho.top - ortho.bottom) || 1;
         ortho.top = half; ortho.bottom = -half; ortho.left = -half * aspect; ortho.right = half * aspect;
       }
