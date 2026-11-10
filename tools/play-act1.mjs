@@ -418,6 +418,12 @@ async function talkTo(id, attempt = 0) {
   }
   const npc = await p.npc(id);
   const prompt = (await state()).prompt;
+  if (prompt !== `Talk to ${npc.name}` && prompt !== null && attempt < 3) {
+    // Someone else stands nearer, as Wren does by Odo late in the festival: let people move, and come again.
+    note(`approaching ${id} again after "${prompt}" was the nearer prompt`);
+    await game(() => window.__game.advance(4));
+    return talkTo(id, attempt + 1);
+  }
   must(prompt === `Talk to ${npc.name}`, `beside ${id} the prompt is "${prompt}"`);
   await frames(1);
   const promptOnScreen = await game(() => document.querySelector('.gu-prompt')?.textContent ?? '');
