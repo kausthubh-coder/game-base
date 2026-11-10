@@ -351,9 +351,9 @@ export function createCleanUniforms(soft: THREE.DataArrayTexture, ground: THREE.
     uGround: { value: ground },
     uKind: { value: kinds },
     uDirtLayer: { value: dirtLayer },
-    uGrassCool: { value: new THREE.Color(0x4a9848) },
-    uGrassMid: { value: new THREE.Color(0x80c04e) },
-    uGrassWarm: { value: new THREE.Color(0xaccf58) },
+    uGrassCool: { value: new THREE.Color(0x4f9446) },
+    uGrassMid: { value: new THREE.Color(0x88bd52) },
+    uGrassWarm: { value: new THREE.Color(0xbccd62) },
     uRockPale: { value: new THREE.Color(0xb4b0a4) },
   };
 }

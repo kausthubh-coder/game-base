@@ -176,7 +176,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const post = createPost(ctx);
   const sprites = makeSprites(ctx, art.assets);
   water.setSky(sky.look);
-  post.setSky(sky.look);
   effects.setSky(sky.look);
   sprites.setSky(sky.look);
   basePostScale = post.settings.renderScale;
@@ -523,9 +522,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   function applyGraphics(): void {
     const g = settings.graphics;
     sky.sun.castShadow = g.shadows !== 'off';
-    // Soft and Sharp are one shadow filter with a wider or no radius, so switching recompiles nothing.
-    sky.setSoftShadows(g.shadows === 'soft' ? true : g.shadows === 'sharp' ? false : null);
+    sky.sun.shadow.radius = g.shadows === 'sharp' ? 0 : 3;
     sprites.setShadowsEnabled(g.shadows !== 'off');
+    const type = g.shadows === 'sharp' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+    if (renderer.shadowMap.type !== type) {
+      renderer.shadowMap.type = type;
+      scene.traverse((object) => { const m = (object as THREE.Mesh).material; if (m) { if (Array.isArray(m)) m.forEach(x => x.needsUpdate = true); else m.needsUpdate = true; } });
+    }
     sky.setCloudShadows(g.cloudShadows);
     effects.setWeatherEnabled(g.weatherParticles ?? true);
     post.set({ bloom: g.bloom ?? ctx.quality !== 'low' });
