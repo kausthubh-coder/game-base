@@ -1,6 +1,6 @@
 // The browser play of the first part: builds the game into dist-play, serves it on port 5340, opens it in
 // headless Chrome and plays all five quests of docs/play/act1.md from the title to the end card.
-//   bun tools/play-act1.mjs [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
+//   bun tools/play-act1.mjs [--port 5340] [--dist dist-play] [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
 //
 // It plays the way src/game/play/act1.test.ts plays the rules, but through the real page: a real click on
 // New game, the hero's real body steered by held game keys along a nav route, real E presses, real
@@ -21,7 +21,8 @@ const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play/act1');
-const PORT = 5340;
+const PORT = Number(opt('port', '5340'));
+const dist = opt('dist', 'dist-play');
 const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}`;
 const SHOTS = args.includes('--shots');
 const PATH = REGION.paths[0].points.map(([x, z]) => ({ x, z }));
@@ -29,12 +30,12 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 if (!args.includes('--no-build')) {
-  const build = spawnSync('bun', ['x', 'vite', 'build', '--outDir', 'dist-play', '--emptyOutDir', '--logLevel', 'warn'], { cwd: root, stdio: 'inherit' });
+  const build = spawnSync('bun', ['x', 'vite', 'build', '--outDir', dist, '--emptyOutDir', '--logLevel', 'warn'], { cwd: root, stdio: 'inherit' });
   if (build.status !== 0) { console.error('FAIL: the build into dist-play'); process.exit(1); }
 }
 
 // The server prints its pid, and it is stopped by that pid, never by port.
-const server = spawn('bun', ['tools/serve.mjs', 'dist-play', String(PORT)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
+const server = spawn('bun', ['tools/serve.mjs', dist, String(PORT)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
 const serverPid = await new Promise((done, fail) => {
   let text = '';
   server.stdout.on('data', (chunk) => {
@@ -44,7 +45,7 @@ const serverPid = await new Promise((done, fail) => {
   });
   server.on('exit', (code) => fail(new Error(`the server stopped with code ${code}. Is port ${PORT} taken?`)));
 });
-console.log(`serving dist-play on ${BASE}  pid ${serverPid}`);
+console.log(`serving ${dist} on ${BASE}  pid ${serverPid}`);
 
 const errors = [];
 const log = [];
@@ -706,7 +707,14 @@ const QUESTS = {
     if (!args.includes('--no-continue')) {
       await step('bread', 'reload the page mid-quest and Continue from the title', async () => {
         const before = await game(() => { const g=window.__game; g.manual(true); g.save(); return g.state(); });
+        const beforeTrees = await game(() => {
+          const g=window.__game;
+          return { trees:g.view.game.systems.trees.all(), felled:g.view.kernel.save().systems.trees, pet:g.view.game.systems.pets.all() };
+        });
+        must(beforeTrees.trees.some(t=>!t.standing) && beforeTrees.trees.some(t=>t.standing), 'the reload fixture needs both felled and standing trees');
         await openGame();
+        // Freeze after Continue's click handler, before a live frame can move the pet.
+        await game(() => document.querySelector('[data-key="title:continue"]').addEventListener('click', () => queueMicrotask(() => window.__game.manual(true)), { once: true }));
         await page.click('[data-key="title:continue"]');
         await page.waitForFunction(() => window.__game.started);
         await game(() => {window.__game.manual(true); return window.__game.settle();});
@@ -714,6 +722,13 @@ const QUESTS = {
         must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
         must(after.flags['pet.leaftail.bonded'] === true && after.tracked === 'bread', 'the quests or the pet did not come back');
+        const afterTrees = await game(() => {
+          const g=window.__game;
+          return { trees:g.view.game.systems.trees.all(), felled:g.view.kernel.save().systems.trees, pet:g.view.game.systems.pets.all() };
+        });
+        must(JSON.stringify(afterTrees.trees)===JSON.stringify(beforeTrees.trees), 'felled or standing trees did not come back');
+        must(JSON.stringify(afterTrees.felled)===JSON.stringify(beforeTrees.felled), 'the felled tree save did not come back');
+        must(JSON.stringify(afterTrees.pet)===JSON.stringify(beforeTrees.pet), 'the bonded pet state did not come back');
         const f = await field();
         must((await p.crop(f.cells[0].x, f.cells[0].y, f.cells[0].z)) !== null, 'the crops did not come back');
         await shot('31-continued.png');

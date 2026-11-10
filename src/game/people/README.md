@@ -62,3 +62,5 @@ It needs `region`, `nav`, `interact` and `talk` to be installed before the first
 `Place.at` may be the block to stand on or the feet above it. Both work.
 
 Save holds each person's position, facing, place, friendship, mark, hold, the place they were sent to with its offset, and their wander timer. A load before the first step is kept and applied on that step.
+
+People pause their routes for two seconds when they first enter talking range of the player on the same level. They face the player during that pause, then resume even if the player stays. Leaving talk range resets the greeting. This gives the player time to use a moving person's prompt without keeping that person from their routine.
