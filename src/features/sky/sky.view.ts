@@ -10,6 +10,7 @@ import type { Quality, Vec3 } from '../../engine/types.ts';
 import { cloudNoise } from './noise.ts';
 import { arcDirection, dull, emptySkyKey, moonArc, moonLit, sampleSky, sunArc, SUN_DOWN, SUN_UP } from './palette.ts';
 import { createPhenomena, type PhenomenaFrame } from './phenomena.view.ts';
+import { softenShadowChunk } from './soft-shadows.ts';
 
 export interface SkyOptions {
   /** Half the width of the square the shadow covers around its target, in meters. */
@@ -26,8 +27,21 @@ export interface SkyLook {
   /** From the ground toward the sun by day and the moon at night. */
   readonly sunDirection: THREE.Vector3;
   readonly zenith: THREE.Color;
+  /** The sky a little above the horizon, between `horizon` and `zenith`. */
+  readonly middle: THREE.Color;
   readonly horizon: THREE.Color;
   readonly fog: THREE.Color;
+  /** Where the sun is drawn in the sky. Unlike `sunDirection` it goes down to the horizon and below. */
+  readonly sunInSky: THREE.Vector3;
+  /** The warm glow the sky has around the sun, 0 when the sun is down or hidden. */
+  readonly glow: THREE.Color;
+  /** Meters from the camera, along its view, where the fog starts and where it is whole. */
+  fogNear: number;
+  fogFar: number;
+  /** 0 to 1: low mist that pools in hollows, thickest at dawn, dusk and in fog. */
+  mist: number;
+  /** The height the mist lies under. */
+  mistLevel: number;
   /** The sun or moon light: its color times its strength. */
   readonly sun: THREE.Color;
   /** The fill light from the sky. */
@@ -42,6 +56,8 @@ export interface SkyLook {
 
 export interface Sky extends ViewSystem {
   setCloudShadows(enabled: boolean | null): void;
+  /** Soft or sharp shadow edges. Null takes the quality level's choice: sharp at low, soft above. */
+  setSoftShadows(soft: boolean | null): void;
   readonly look: SkyLook;
   /** The same vector as `look.sunDirection`. */
   readonly sunDirection: THREE.Vector3;
@@ -63,11 +79,14 @@ export interface Sky extends ViewSystem {
   strike(at: Vec3): void;
 }
 
-const LEVELS: Record<Quality, { shadowMap: number; shadowEvery: number; cloudShadows: boolean; shafts: boolean }> = {
-  low: { shadowMap: 1024, shadowEvery: 2, cloudShadows: false, shafts: false },
-  medium: { shadowMap: 1536, shadowEvery: 1, cloudShadows: true, shafts: false },
-  high: { shadowMap: 2048, shadowEvery: 1, cloudShadows: true, shafts: true },
+const LEVELS: Record<Quality, { shadowMap: number; shadowEvery: number; cloudShadows: boolean; shafts: boolean; soft: boolean }> = {
+  low: { shadowMap: 1024, shadowEvery: 2, cloudShadows: false, shafts: false, soft: false },
+  medium: { shadowMap: 1536, shadowEvery: 1, cloudShadows: true, shafts: false, soft: true },
+  high: { shadowMap: 2048, shadowEvery: 1, cloudShadows: true, shafts: true, soft: true },
 };
+
+/** Meters over which a soft shadow's edge fades, as a tree's shadow does on a sunny day. */
+const PENUMBRA = 0.32;
 
 /** How far the light sits from the shadow target. */
 const LIGHT_DISTANCE = 120;
@@ -83,6 +102,21 @@ void main() {
   gl_Position = vec4(position.xy, 1.0, 1.0);
 }`;
 
+// The clear sky in one direction: the gradient from the horizon up, the warm glow around the sun, and at the
+// horizon the color of the haze. Post-processing paints far land with the same function, so land at the end
+// of the fog is the color of the sky behind it. Keep the two copies the same (post.view.ts, HAZE).
+const SKY_CLEAR = /* glsl */ `
+vec3 skyClear(vec3 d) {
+  float h = d.y;
+  vec3 color = mix(uBot, uMid, smoothstep(0.0, 0.25, h));
+  color = mix(color, uTop, smoothstep(0.18, 0.9, h));
+  float s = max(dot(d, uSunDir), 0.0);
+  // The sun warms its side of the sky, most of all low down.
+  vec3 glow = uSunColor * uSunShow * (0.16 * pow(s, 3.0) * (1.0 - 0.6 * smoothstep(0.0, 0.5, h)) + 0.22 * pow(s, 24.0));
+  vec3 haze = uFog + glow * 0.8;
+  return mix(haze, color + glow, smoothstep(-0.12, 0.08, h));
+}`;
+
 const SKY_FRAGMENT = /* glsl */ `
 precision highp float;
 varying vec3 vDir;
@@ -93,17 +127,17 @@ uniform vec4 uScroll;
 uniform sampler2D uNoise;
 
 float hash21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+${SKY_CLEAR}
 
-// The low layer: big shapes with finer ones on top.
+// Cloud density: big soft shapes, mid shapes that bulge them, and a little fine detail on the rims.
 float cumulus(vec2 p) {
-  return texture2D(uNoise, p).r * 0.62 + texture2D(uNoise, p * 3.0 + 0.37).g * 0.38;
+  return texture2D(uNoise, p).r * 0.56 + texture2D(uNoise, p * 2.7 + 0.37).g * 0.3 + texture2D(uNoise, p * 7.1 + 0.71).b * 0.14;
 }
 
 void main() {
   vec3 d = normalize(vDir);
   float h = d.y;
-  vec3 color = mix(uBot, uMid, smoothstep(0.0, 0.22, h));
-  color = mix(color, uTop, smoothstep(0.15, 0.85, h));
+  vec3 color = skyClear(d);
 
   if (uStars > 0.01 && h > 0.0) {
     vec2 grid = d.xz / (h + 0.35) * 46.0;
@@ -113,8 +147,9 @@ void main() {
     color += vec3(0.85, 0.92, 1.0) * star * uStars * smoothstep(0.03, 0.3, h) * 1.25;
   }
 
+  // The sun: a bright disc with a soft rim, then a close halo. It is far brighter than anything lit, so it blooms.
   float toSun = sqrt(max(0.0, 2.0 - 2.0 * dot(d, uSunDir)));
-  color += uSunColor * (smoothstep(0.05, 0.043, toSun) * 2.4 + 0.45 * exp(-toSun * 8.0) + 0.22 * exp(-toSun * 2.4)) * uSunShow;
+  color += uSunColor * (smoothstep(0.048, 0.04, toSun) * 4.0 + 0.5 * exp(-toSun * 14.0)) * uSunShow;
 
   // The moon: a disc with its lit part cut by the phase.
   if (uMoonShow > 0.01 && dot(d, uMoonDir) > 0.9) {
@@ -130,25 +165,32 @@ void main() {
     color += uMoonColor * (disc * (0.06 + 1.55 * lit * seas) + 0.16 * full * exp(-r * 0.5)) * uMoonShow;
   }
 
-  float sky = smoothstep(0.0, 0.14, h);
+  float sky = smoothstep(0.0, 0.16, h);
   if (sky > 0.0) {
-    // Both layers lie on flat sheets overhead. The low one is shaded in three flat tones, lit from the sun's side.
+    // Both layers lie on flat sheets overhead. The low one is soft cumulus: a lit top, a cool shaded base, and
+    // a bright rim where it thins in front of the sun.
     vec2 p = d.xz / (h + 0.18);
     vec2 pa = p * 0.16 + uScroll.xy;
     float density = cumulus(pa);
-    float edge = mix(0.66, 0.16, uCover);
-    float cover = smoothstep(edge, edge + 0.09, density) * sky;
-    float towards = cumulus(pa + normalize(uSunDir.xz + vec2(1e-4)) * 0.03);
-    float lit = clamp((density - towards) * 3.2 + 0.55, 0.0, 1.0);
-    lit = floor(lit * 3.0 + 0.5) / 3.0;
-    color = mix(color, mix(uCloudShade, uCloudLit, lit), cover * 0.94);
+    float edge = mix(0.64, 0.14, uCover);
+    float cover = smoothstep(edge, edge + 0.2, density) * sky;
+    vec2 sunward = normalize(uSunDir.xz + vec2(1e-4)) * 0.035;
+    float towards = cumulus(pa + sunward);
+    float lit = clamp((density - towards) * 2.6 + 0.6, 0.0, 1.0);
+    // Thick middles are shaded, thin rims are lit.
+    float body = smoothstep(edge + 0.05, edge + 0.4, density);
+    lit = clamp(lit * (1.0 - 0.45 * body) + 0.15, 0.0, 1.0);
+    vec3 cloud = mix(uCloudShade, uCloudLit, lit);
+    float s = max(dot(d, uSunDir), 0.0);
+    cloud += uSunColor * uSunShow * pow(s, 10.0) * (1.0 - body) * 0.9;
+    // Far clouds sink into the haze.
+    cloud = mix(color, cloud, 0.35 + 0.65 * smoothstep(0.02, 0.3, h));
+    color = mix(color, cloud, cover * 0.95);
 
-    float streaks = smoothstep(0.5, 0.72, texture2D(uNoise, p * vec2(0.05, 0.15) + uScroll.zw).b) * sky * (0.3 + 0.6 * uCover);
-    color = mix(color, uCloudLit, streaks * 0.5 * (1.0 - cover));
+    float streaks = smoothstep(0.48, 0.75, texture2D(uNoise, p * vec2(0.05, 0.15) + uScroll.zw).b) * sky * (0.3 + 0.6 * uCover);
+    color = mix(color, uCloudLit, streaks * 0.35 * (1.0 - cover));
   }
 
-  // At the horizon and below it the sky is the fog color, so far land fades into it without a line.
-  color = mix(uFog, color, smoothstep(-0.1, 0.06, h));
   color += vec3(0.75, 0.8, 1.0) * uFlash * 0.5;
 
   gl_FragColor = vec4(color, 1.0);
@@ -220,10 +262,11 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const sun = new THREE.DirectionalLight(0xffffff, 1);
   sun.name = 'sun';
   sun.castShadow = true;
-  sun.shadow.bias = -0.0003;
-  sun.shadow.radius = 3;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-  sun.shadow.normalBias = 0.035;
+  sun.shadow.bias = -0.0004;
+  // PCF is the only filter Three keeps. soft-shadows.ts gives it enough taps to blur an edge.
+  softenShadowChunk();
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  sun.shadow.normalBias = 0.04;
   sun.shadow.camera.layers.enable(shadowLayer);
   const fill = new THREE.HemisphereLight(0xffffff, 0x888888, 1);
   fill.name = 'sky-fill';
@@ -250,8 +293,15 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const look: SkyLook = {
     sunDirection: new THREE.Vector3(0.3, 0.8, 0.5).normalize(),
     zenith: new THREE.Color(),
+    middle: new THREE.Color(),
     horizon: new THREE.Color(),
     fog: new THREE.Color(),
+    sunInSky: new THREE.Vector3(0, 1, 0),
+    glow: new THREE.Color(),
+    fogNear: 60,
+    fogFar: 200,
+    mist: 0,
+    mistLevel: 0,
     sun: new THREE.Color(),
     ambient: new THREE.Color(),
     light: new THREE.Color(1, 1, 1),
@@ -271,7 +321,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const sunColor = new THREE.Color();
   const cloudScroll = new THREE.Vector2();
   const showing: PhenomenaFrame = { time: 0, target, sunDirection: look.sunDirection, sunColor, rainbow: 0, rainbowCenter: new THREE.Vector3(), rainbowRadius: 35, rainbowRight: new THREE.Vector3(1,0,0), shafts: 0 };
-  let rainbow = 0, rainbowAge = 0, rainbowFade = 0, cloudOverride: boolean | null = null;
+  let rainbow = 0, rainbowAge = 0, rainbowFade = 0, cloudOverride: boolean | null = null, softOverride: boolean | null = null;
   const rainbowAnchor = new THREE.Vector3();
   const forward = new THREE.Vector3();
   let frame = 0;
@@ -290,6 +340,8 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       sun.shadow.map?.dispose();
       sun.shadow.map = null;
     }
+    // The filter's radius is in texels of the shadow map, so the edge stays the same width in meters.
+    sun.shadow.radius = (softOverride ?? level.soft) ? (PENUMBRA * level.shadowMap) / (shadowRange * 2) : 0;
     sun.shadow.autoUpdate = level.shadowEvery === 1;
     sun.shadow.needsUpdate = true;
     sheet.visible = cloudOverride ?? level.cloudShadows;
@@ -345,6 +397,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
 
   const sky: Sky = {
     setCloudShadows(enabled) { cloudOverride = enabled; sheet.visible = enabled ?? level.cloudShadows; },
+    setSoftShadows(soft) { softOverride = soft; applyShadowSettings(); },
     look,
     sunDirection: look.sunDirection,
     sun,
@@ -442,7 +495,8 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       const thick = Math.max(a.fog, a.rain * 0.3);
       const reach = view.camera.position.distanceTo(target);
       fog.color.setRGB(key.fog[0], key.fog[1], key.fog[2]);
-      fog.near = reach + mix(fogStart, -6, thick);
+      // On a clear day the air stays clear through the middle distance and closes quickly toward the end.
+      fog.near = reach + mix(Math.max(fogStart, fogEnd * 0.5), -6, thick);
       fog.far = reach + mix(fogEnd, 22, thick);
 
       // ---- the sky
@@ -486,8 +540,17 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
 
       // ---- what other features read
       look.zenith.copy(uniforms.uTop.value);
+      look.middle.copy(uniforms.uMid.value);
       look.horizon.copy(uniforms.uBot.value);
       look.fog.copy(fog.color);
+      look.sunInSky.copy(sunPlace);
+      look.glow.copy(sunColor).multiplyScalar(uniforms.uSunShow.value);
+      look.fogNear = fog.near;
+      look.fogFar = fog.far;
+      // Mist lies a couple of meters under the hero's feet, so it gathers over rivers and in the hollows below.
+      const lowSun = smoothstep(0.2, 0.26, time) * (1 - smoothstep(0.32, 0.4, time)) + smoothstep(0.68, 0.76, time) * (1 - smoothstep(0.84, 0.9, time));
+      look.mist = Math.min(1, 0.2 + 0.35 * lowSun + 0.25 * key.night + a.fog * 0.8 + a.rain * 0.3);
+      look.mistLevel = target.y - 1.5;
       look.sun.copy(sunColor).multiplyScalar(strength);
       look.ambient.copy(fill.color).lerp(fill.groundColor, 0.3).multiplyScalar(fill.intensity / Math.PI);
       look.light.copy(sunColor).multiplyScalar((strength * 0.62) / Math.PI).add(look.ambient);
