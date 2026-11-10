@@ -121,7 +121,7 @@ export function townB(): TownPlan {
 
   // ---- life on the green: the market on its east side, benches under the oak, flowers at the doors
   modelAt(models, 'stall.east1', 'market-stall-b', 186.5, -152.5, 3);
-  modelAt(models, 'stall.east2', 'market-stall-a', 186.5, -147.5, 3);
+  modelAt(models, 'stall.east2', 'market-stall-a', 186.5, -146.5, 3);
   modelAt(models, 'planter.lodge', 'flower-planter', 165.5, -162);
   modelAt(models, 'planter.bakery', 'flower-planter', 177.5, -162);
   modelAt(models, 'bench.quay1', 'bench', 153.5, -133);

@@ -86,7 +86,8 @@ export function townA(): TownPlan {
   }
 
   // ---- the market rows down both sides of the court, under strings of lanterns, with the harvest piled up
-  for (const [i, z] of [-156.5, -151.5, -146.5, -141.5].entries()) {
+  // Three blocks between stalls: the walkers keep a block of room round each, so a narrower gap is a wall to them.
+  for (const [i, z] of [-156.5, -150.5, -144.5].entries()) {
     modelAt(models, `stall.west${i}`, i % 2 ? 'market-stall-b' : 'market-stall-a', 159.5, z, 1);
     modelAt(models, `stall.east${i}`, i % 2 ? 'market-stall-a' : 'market-stall-b', 186.5, z, 3);
   }
