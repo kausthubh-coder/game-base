@@ -259,6 +259,39 @@ test('rain falls for 90 seconds on the afternoon after the first planting, once'
   expect(s.weather).toEqual(['rain', null]);
 });
 
+test('the 90 seconds are seconds of rain: the cloud and wind that come first do not count', () => {
+  const s = stage();
+  s.game.clock.timeOfDay = 0.55;
+  s.run(1);
+  s.game.events.emit('crop.planted', { x: 1, y: 1, z: 1, crop: 'wheat' });
+  for (let i = 0; i < 600 && s.weather.length === 0; i++) s.run(0.05);
+  expect(s.weather).toEqual(['rain']);
+  // The real weather brings rain in as a front: none falls for the first 45 seconds or so.
+  s.game.ambient.rain = 0;
+  s.run(45);
+  expect(s.game.flags.is('story.raining')).toBe(true);
+  s.game.ambient.rain = 0.6;
+  s.run(RAIN_SECONDS - 2);
+  expect(s.weather).toEqual(['rain']);
+  s.run(2.5);
+  expect(s.weather).toEqual(['rain', null]);
+  expect(s.game.flags.is('story.rain.done')).toBe(true);
+});
+
+test('a shower whose rain never comes still ends', () => {
+  const s = stage();
+  s.game.clock.timeOfDay = 0.55;
+  s.run(1);
+  s.game.events.emit('crop.planted', { x: 1, y: 1, z: 1, crop: 'wheat' });
+  for (let i = 0; i < 600 && s.weather.length === 0; i++) s.run(0.05);
+  expect(s.weather).toEqual(['rain']);
+  s.game.ambient.rain = 0;
+  s.run(RAIN_SECONDS + 60);
+  expect(s.weather).toEqual(['rain']);
+  s.run(30);
+  expect(s.weather).toEqual(['rain', null]);
+});
+
 test('wheat planted in the evening gets its rain the next afternoon, and a save in the shower keeps the time left', () => {
   const s = stage();
   s.game.clock.timeOfDay = 0.8;
@@ -305,6 +338,22 @@ test('the festival starts at the dusk after the delivery: clear sky, everyone se
   s.run(5);
   expect(s.sent.filter((e) => e.npc === 'odo' && e.place === 'town.square')).toHaveLength(1);
   expect(s.events('festival.started')).toHaveLength(1);
+  // Nobody shares a spot: each is sent a few blocks from the next, and Odo to the place itself.
+  const spots = s.sent.filter((e) => e.place === 'town.square' || e.place === 'river.bank').slice(-s.people.size);
+  expect(spots.find((e) => e.npc === 'odo')).toMatchObject({ offset: { x: 0, z: 0 } });
+  for (const a of spots) {
+    for (const b of spots) {
+      if (a === b || a.place !== b.place) continue;
+      expect(Math.hypot(a.offset!.x - b.offset!.x, a.offset!.z - b.offset!.z), `${a.npc} and ${b.npc}`).toBeGreaterThanOrEqual(3);
+    }
+  }
+  // The lamp comes from Odo, and the step that asks for it names nobody: he carries the quest mark until he gave it.
+  expect(s.marks.get('odo')).toBe('quest');
+  s.talk('odo');
+  expect(s.lastConversation()).toBe('odo.lamp');
+  s.run(1);
+  expect(s.marks.get('odo')).toBe('');
+  expect(s.bag.get('river_lamp')).toBe(1);
 
   // Morning lets everyone go and hands the weather back.
   s.game.clock.timeOfDay = 0.3;
@@ -313,8 +362,6 @@ test('the festival starts at the dusk after the delivery: clear sky, everyone se
   expect(s.holding.size).toBe(0);
   expect(s.weather.at(-1)).toBeNull();
   // The lamp and the last talk still work the day after.
-  s.talk('odo');
-  expect(s.lastConversation()).toBe('odo.lamp');
   s.moveTo('river.bank');
   expect(s.use('river_lamp')).toBe(true);
   s.run(0.1);
@@ -395,6 +442,9 @@ test('never stuck: Gus gives 4 more seeds when seed, wheat and crops together ca
   s.run(1);
   expect(s.bag.get('wheat_seeds')).toBe(12);
   expect(s.marks.get('gus')).toBe('');
+  // The skip bonded the leaftail and it came along, so Gus has his one line about it first.
+  s.talk('gus');
+  expect(s.lastConversation()).toBe('gus.pet');
   s.talk('gus');
   expect(s.lastConversation()).toBe('gus.grow');
 

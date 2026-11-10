@@ -125,5 +125,7 @@ export function apply(game: Game, effect: Effect): void {
   else if ('learn' in effect) {
     if (effect.fact !== undefined) systems.almanac?.learn(effect.learn, effect.fact);
     else for (const fact of systems.almanac?.page(effect.learn)?.facts ?? []) systems.almanac.learn(effect.learn, fact.id);
+  } else if ('bond' in effect) {
+    for (const pet of systems.pets?.all() ?? []) if (pet.kind === effect.bond && !pet.bonded) systems.pets.bond?.(pet.id);
   } else game.events.emit(effect.emit, (effect.data ?? {}) as GameEvents[EventName] as never);
 }

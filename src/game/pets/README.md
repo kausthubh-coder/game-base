@@ -24,6 +24,7 @@ The leaftail: wild at the dead garden, then a companion. It implements `PetsApi`
 - The pet eats when the player has stood still for 1 second and it is not wary. If that is already so, it eats on the click. If not, a toast says what it waits for, and it eats as soon as both hold. Walking more than 3 blocks away or startling it takes the offer back.
 - Eating removes one treat, raises trust by 1 and takes 3 seconds. It takes nothing more until it is done.
 - At trust 3 it bonds and the flag `pet.leaftail.bonded` is set.
+- `bond(petId)` bonds a wild pet without a berry. Trust goes to 3, the flag is set, `pet.bonded` goes out, and the pet appears beside the player when it is more than 3 blocks away. It returns false for an id it does not know and for a pet that has bonded. `quests.skipTo` calls it for a game that skips the leaftail quest. No `pet.fed` is sent.
 - The Interactable `Offer a berry` (radius 3) shows while the pet is wild and the player has a berry in the hand or the bag. It does the same as the click.
 - A treat is the item `berry`, or any item whose `ItemDef.treat` is true.
 
@@ -39,7 +40,7 @@ The leaftail: wild at the dead garden, then a companion. It implements `PetsApi`
 |---|---|
 | `pet.startled { pet }` | Once each time it is startled |
 | `pet.fed { pet, trust }` | Each time it eats. `trust` is the new value, 1 to 3. |
-| `pet.bonded { pet }` | Once, right after the third `pet.fed` |
+| `pet.bonded { pet }` | Once, right after the third `pet.fed`, or from `bond()` |
 | `toast { text }` | A seed found, and the reason a treat was not taken yet |
 | `flag.changed` | Through `flags.set('pet.leaftail.bonded', true)` |
 
@@ -56,7 +57,12 @@ installPets(kernel);                     // any order among the systems
 // On its first step or first api call it reads region and nav, makes the pet,
 // adds its prompt to interact and its click handler to actions.
 kernel.game.systems.pets.feed('pet:leaftail:1');   // true when it ate
+kernel.game.systems.pets.bond?.('pet:leaftail:1'); // true when it bonded now
 ```
+
+## Contract change
+
+`PetsApi.bond?` is new. It is optional in the type so that a fake without it still fits. The real system always has it.
 
 It needs `region` (with the place `dead.garden`), `nav`, `inventory`, `interact` and `actions` before the first step. `items` is optional. Each step it reads how far `game.player.pos` moved since its last step.
 

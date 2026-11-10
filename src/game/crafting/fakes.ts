@@ -69,8 +69,9 @@ export function fakePlaceables(): FakePlaceables {
     stand(station, at) {
       standing.push({ station, at });
     },
-    defs: () => [],
-    all: () => [],
+    // Each station that was stood is a placed thing one block in size, so a system that asks where the beds are gets an answer.
+    defs: () => [...new Set(standing.map((s) => s.station))].map((station) => ({ kind: station, name: station, prop: station, size: [1, 1, 1], prompt: null, station })),
+    all: () => standing.map((s, i) => ({ id: `${s.station}:${i + 1}`, kind: s.station, x: Math.floor(s.at.x), y: Math.floor(s.at.y), z: Math.floor(s.at.z), quarterTurns: 0 })),
     place: () => null,
     remove() {},
     at: () => null,

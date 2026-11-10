@@ -47,7 +47,7 @@ export interface Stage {
   people: Map<NpcId, NpcState>;
   marks: Map<NpcId, string>;
   holding: Set<NpcId>;
-  sent: { npc: NpcId; place: string }[];
+  sent: { npc: NpcId; place: string; offset?: { x: number; z: number } }[];
   placed: Placed[];
   pet: PetState;
   crops: { x: number; y: number; z: number; state: { crop: string; stage: number; wet: number; ripe: boolean } }[];
@@ -129,10 +129,10 @@ export function stage(options: { story?: boolean } = {}): Stage {
     people: {
       all: () => [...people.values()],
       get: (id) => people.get(id),
-      send(id, place) {
+      send(id, place, offset) {
         const npc = people.get(id);
         if (!npc) return;
-        sent.push({ npc: id, place });
+        sent.push(offset ? { npc: id, place, offset } : { npc: id, place });
         npc.place = place;
         Object.assign(npc.pos, at(place));
       },
@@ -201,6 +201,14 @@ export function stage(options: { story?: boolean } = {}): Stage {
       all: () => [pet],
       companion: () => (pet.bonded ? pet : null),
       feed: () => false,
+      bond(id) {
+        if (id !== pet.id || pet.bonded) return false;
+        pet.trust = 3;
+        pet.bonded = true;
+        game.events.emit('pet.bonded', { pet: pet.id });
+        game.flags.set('pet.leaftail.bonded', true);
+        return true;
+      },
     },
     crops: {
       defs: () => [],

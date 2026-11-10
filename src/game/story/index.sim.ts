@@ -1,7 +1,7 @@
 // The director: the scripted moments of the first part, the rules that keep the player from getting
 // stuck, and the hints. It is not in `game.systems`. Install it with the others and the kernel steps it.
 //
-//   - Rain for 90 seconds on the afternoon after the first wheat is planted.
+//   - 90 seconds of rain on the afternoon after the first wheat is planted.
 //   - The festival: the dusk after the wheat is delivered starts it, and the next morning ends it.
 //   - A river lamp used within 6 blocks of the river bank floats.
 //   - `act.ended` after the last talk with Tamsin.
@@ -17,8 +17,15 @@ import { HINTS } from '../content/hints.ts';
 import { QUESTS, WHEAT_SHORT, type Condition, type Effect } from '../content/quests.ts';
 import { DAWN, DUSK, holds, isDark, owedFlag, petOf, placeAt } from '../quests/rules.sim.ts';
 
-/** Seconds the scripted shower lasts. */
+/** Seconds of rain the scripted shower brings. */
 export const RAIN_SECONDS = 90;
+/** `ambient.rain` above this is rain falling. The crops system waters open soil from the same level. */
+const RAIN_FALLS = 0.05;
+/**
+ * The weather brings rain in as a front, cloud and wind first, about 45 seconds ahead of the first drop.
+ * The shower's seconds count only while rain falls. Should no rain come in this long, they count anyway.
+ */
+const RAIN_LEAD = 75;
 /** The shower waits this long after the planting, so the player sees dry soil first. */
 const RAIN_DELAY = 20;
 /** The afternoon, as times of day. The shower starts inside it and dusk is still a while off. */
@@ -31,12 +38,37 @@ const PET_LOST = 24;
 const HINT_GAP = 4, TOAST_GAP = 30;
 const TICK = 0.5;
 
-/** Who stands on the river bank at the festival. Everyone else is in the square. */
-const ON_THE_BANK: ReadonlySet<NpcId> = new Set(['tamsin', 'brack']);
-const festivalPlace = (npc: NpcId): string => (ON_THE_BANK.has(npc) ? 'river.bank' : 'town.square');
+/** Where someone stands at the festival: a named place, and blocks east and south of it. */
+interface FestivalSpot {
+  place: string;
+  x: number;
+  z: number;
+}
+
+/**
+ * The festival, laid out. Tamsin and Brack are on the river bank, everyone else in the square, a few
+ * blocks apart, so the town reads as a crowd and "E" beside someone still names that person. Odo stands on
+ * the place itself, where the quest's waypoint brings the player. The well is six blocks north of it.
+ */
+const FESTIVAL_SPOTS: Readonly<Record<NpcId, FestivalSpot>> = {
+  tamsin: { place: 'river.bank', x: 0, z: 0 },
+  brack: { place: 'river.bank', x: 7, z: 0 },
+  odo: { place: 'town.square', x: 0, z: 0 },
+  maren: { place: 'town.square', x: -4, z: -1 },
+  gus: { place: 'town.square', x: 9, z: 2 },
+  mira: { place: 'town.square', x: -7, z: 2 },
+  wren: { place: 'town.square', x: 4, z: -2 },
+  juniper: { place: 'town.square', x: 2, z: 3 },
+};
+/** Spots in the square for everyone without one of their own, taken in the order people are listed. */
+const CROWD_SPOTS: readonly (readonly [x: number, z: number])[] = [[-10, -1], [7, -4], [-3, 4], [6, 4], [-8, -5], [11, -2], [-5, -6], [-11, 4]];
 
 const AXE_LOST: Condition = { all: [{ flag: 'plot.met' }, { not: { bag: 'axe' } }, { not: { flag: 'owed.axe' } }] };
 const SEEDS_SHORT: Condition = { all: [{ flag: 'bread.seeds' }, { not: { flag: 'bread.delivered' } }, WHEAT_SHORT] };
+/** Odo has a river lamp to hand over: the festival has begun, the player's lamp is not on the water and none is in the bag. */
+const LAMP_WAITS: Condition = {
+  all: [{ quest: 'festival' }, { flag: 'festival.started' }, { not: { flag: 'festival.lamp' } }, { not: { bag: 'river_lamp' } }, { not: { flag: 'owed.river_lamp' } }],
+};
 
 /** Every item a conversation or a skipped quest can give, so a gift that did not fit can be found again. */
 function giftItems(): ItemId[] {
@@ -75,12 +107,14 @@ export function createDirector(game: Game): Director {
   let sinceTick = TICK;
   /** Seconds of the scripted shower still to fall. */
   let rainLeft = 0;
+  /** Seconds the shower has been asked for with no rain falling yet. */
+  let rainLead = 0;
   let sinceHint = HINT_GAP;
   let lastBagToast = -TOAST_GAP, lastBankToast = -TOAST_GAP, lastPetCall = -TOAST_GAP;
   /** People this director holds for the festival. Empty again after a load, so they are sent once more. */
   const held = new Set<NpcId>();
   /** Marks this director set, so it takes off only its own. */
-  let axeMark = false, seedMark = false;
+  let axeMark = false, seedMark = false, lampMark = false;
 
   const festivalOn = (): boolean => flags.is('festival.started') && !flags.is('festival.over');
 
@@ -116,7 +150,8 @@ export function createDirector(game: Game): Director {
 
   function stepRain(dt: number): void {
     if (flags.is('story.raining')) {
-      rainLeft -= dt;
+      if (game.ambient.rain > RAIN_FALLS || rainLead >= RAIN_LEAD) rainLeft -= dt;
+      else rainLead += dt;
       if (rainLeft <= 0) endRain();
       return;
     }
@@ -125,6 +160,7 @@ export function createDirector(game: Game): Director {
     if (time < AFTERNOON_FROM || time >= AFTERNOON_TO) return;
     if (clock.seconds - Number(flags.get('story.rain.planted') ?? 0) < RAIN_DELAY) return;
     rainLeft = RAIN_SECONDS;
+    rainLead = 0;
     flags.set('story.raining', true);
     game.systems.time?.setWeather('rain');
   }
@@ -138,9 +174,11 @@ export function createDirector(game: Game): Director {
     if (!festivalOn()) game.systems.time?.setWeather(null);
   }
 
-  function startFestival(): void {
+  /** `skipped` is true when the afternoon was waited out: the weather of that afternoon is gone with it. */
+  function startFestival(skipped: boolean): void {
     if (flags.is('story.raining')) endRain();
-    game.systems.time?.setWeather('clear');
+    // A shower leaves as a front, over a quarter of a minute. After a skipped afternoon the sky is clear at once.
+    game.systems.time?.setWeather('clear', skipped);
     flags.set('festival.started', true);
     gather();
     events.emit('festival.started', {});
@@ -150,9 +188,14 @@ export function createDirector(game: Game): Director {
   /** Sends everyone to the festival and holds them. Someone sent and then held finishes the walk and stays. */
   function gather(): void {
     const people = game.systems.people;
+    let crowd = 0;
     for (const npc of people?.all() ?? []) {
+      // The spot goes by the person's place in the list, so it is the same one after a load.
+      const spare = CROWD_SPOTS[crowd % CROWD_SPOTS.length];
+      const spot = FESTIVAL_SPOTS[npc.id] ?? { place: 'town.square', x: spare[0], z: spare[1] };
+      if (!FESTIVAL_SPOTS[npc.id]) crowd++;
       if (held.has(npc.id)) continue;
-      people.send(npc.id, festivalPlace(npc.id));
+      people.send(npc.id, spot.place, { x: spot.x, z: spot.z });
       people.hold(npc.id, true);
       held.add(npc.id);
     }
@@ -177,12 +220,12 @@ export function createDirector(game: Game): Director {
     if (!flags.is('bread.delivered') || player.busy) return;
     if (isDark(clock.timeOfDay)) {
       flags.set('festival.wait', false);
-      startFestival();
+      startFestival(false);
     } else if (flags.is('festival.wait')) {
       // The player chose to wait with Maren: the afternoon passes.
       flags.set('festival.wait', false);
       game.systems.time?.setTimeOfDay(DUSK + 0.005);
-      startFestival();
+      startFestival(true);
     }
   }
 
@@ -198,6 +241,11 @@ export function createDirector(game: Game): Director {
     if (seeds) people.setMark('gus', 'quest');
     else if (seedMark) people.setMark('gus', '');
     seedMark = seeds;
+    // The step "float a lamp" names nobody, and the lamp comes from Odo: he carries the mark until he has given it.
+    const lamp = holds(game, LAMP_WAITS);
+    if (lamp) people.setMark('odo', 'quest');
+    else if (lampMark) people.setMark('odo', '');
+    lampMark = lamp;
   }
 
   /** Hands over gifts that did not fit in the bag when they were given. */
@@ -285,9 +333,12 @@ export function createDirector(game: Game): Director {
       rainLeft = Number((data as Partial<DirectorSave> | null)?.rainLeft ?? 0);
       // A shower that was falling goes on for at least a moment, so its end is still scripted.
       if (flags.is('story.raining') && !(rainLeft > 0)) rainLeft = 1;
+      // The time system settles a loaded shower at full rain at once, so its seconds count from the first step.
+      rainLead = RAIN_LEAD;
       held.clear();
       axeMark = false;
       seedMark = false;
+      lampMark = false;
     },
   };
 

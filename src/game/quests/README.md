@@ -18,7 +18,7 @@ The five quests of the first part. It implements `QuestsApi`. The quests are dat
 - `tracked()` is the first quest that is active, or null. `all()` is every quest with its state. Both return the same objects until the next check, so the HUD may read them every frame. `all()` is empty before the first step.
 - Only the open step has `at`. It is the nearest person to talk to, or the pet, or the named place from `region.place(name)`. `have` and `need` are set on steps that count.
 - The person the open step sends the player to carries the mark `quest`, through `people.setMark`. It is set again at every check and cleared when the step is done.
-- `skipTo(id)` marks every earlier quest done without sending its events, gives what they would have given (Almanac, axe, hoe, watering can, the mossling page, the flags), resets `id` and the later quests, sends Tamsin to the lodge (or the grant stone for `plot`) and starts `id`. It cannot bond the leaftail, because the pets system has no call for that.
+- `skipTo(id)` marks every earlier quest done without sending its events, gives what they would have given (Almanac, axe, hoe, watering can, the mossling page, the flags), resets `id` and the later quests, sends Tamsin to the lodge (or the grant stone for `plot`) and starts `id`. A skip past the leaftail quest bonds the leaftail through `pets.bond`, so it stands beside the player, and fills its Almanac page.
 
 ## Flags it keeps
 

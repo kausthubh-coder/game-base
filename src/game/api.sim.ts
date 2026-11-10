@@ -352,12 +352,15 @@ export interface CropsApi {
 export interface TimeApi {
   /** Seconds of real time one game day lasts. */
   readonly dayLength: number;
-  /** True when the player may sleep: it is evening or night, and they are indoors by a bed. */
+  /** True when the player may sleep: it is evening or night, and a bed is in reach with a roof over it or over the player. */
   canSleep(): boolean;
   /** Skips to the next morning. Crops, creatures and people catch up. */
   sleep(): void;
-  /** Forces the weather for a scripted moment, or `null` to let it run. */
-  setWeather(kind: 'clear' | 'breezy' | 'overcast' | 'rain' | 'storm' | 'fog' | null): void;
+  /**
+   * Forces the weather for a scripted moment, or `null` to let it run. The weather comes in as a front, over
+   * most of a minute. `now` settles a kind at once with no front, for a moment that skips time.
+   */
+  setWeather(kind: 'clear' | 'breezy' | 'overcast' | 'rain' | 'storm' | 'fog' | null, now?: boolean): void;
   /** Jumps the clock. For the festival and for tests. */
   setTimeOfDay(timeOfDay: number): void;
   /**
@@ -429,6 +432,12 @@ export interface PetsApi {
   companion(): PetState | null;
   /** Offers the held treat to the nearest wild pet in reach. */
   feed(petId: string): boolean;
+  /**
+   * Bonds a wild pet now, without feeding it: full trust, its flag, `pet.bonded`, and it comes to the player's
+   * side. For `quests.skipTo` and the debug door. False when there is no such pet or it has bonded already.
+   * It is optional so that a fake without it still fits. The real system always has it.
+   */
+  bond?(petId: string): boolean;
 }
 
 export interface NavApi {
@@ -468,8 +477,11 @@ export interface NpcState {
 export interface PeopleApi {
   all(): readonly NpcState[];
   get(id: NpcId): NpcState | undefined;
-  /** Sends someone to a named place now, ahead of their routine. For story moments. */
-  send(id: NpcId, place: string): void;
+  /**
+   * Sends someone to a named place now, ahead of their routine. For story moments. `offset` is blocks east
+   * and south of the place to stand at, so a crowd sent to one place does not stand on one spot.
+   */
+  send(id: NpcId, place: string, offset?: { x: number; z: number }): void;
   /** Holds someone in place and out of their routine until released. */
   hold(id: NpcId, held: boolean): void;
   befriend(id: NpcId, amount: number): void;
@@ -548,4 +560,64 @@ export interface RegionApi {
   grant(): { x: number; z: number; width: number; depth: number };
   /** True inside a town or another place the player may not change. */
   isProtected(x: number, y: number, z: number): boolean;
+
+  // ---- added by the region system. Each is optional so that a fake without it still fits. The real system always has them.
+  /** Every berry bush, the same objects on every call: `ripe` changes when one is picked and when it regrows. */
+  berryBushes?(): readonly BerryBush[];
+  /** The props of the stamped buildings (doors, windows, signs, furniture) and of the town, for a view to draw. */
+  props?(): readonly RegionProp[];
+  /** How the wild props are scattered over the region. */
+  scatter?(): RegionScatter;
+  /** The middle of the town and how far it reaches. The sound plays the town arrangement inside it. */
+  townCenter?(): { x: number; z: number; radius: number };
+  /** The way a new hero faces at `spawn()`, in radians like `Player.facing`. */
+  spawnFacing?(): number;
+}
+
+// ---------------------------------------------------------------------------------------- the region's own data
+
+export interface BerryBush {
+  /** `bush:0` and up. It is also the id of its target in the interact system. */
+  id: string;
+  /** The middle of its block, at the height of the ground. */
+  x: number;
+  y: number;
+  z: number;
+  /** True while it has berries to pick. */
+  ripe: boolean;
+}
+
+/** A prop the region wants drawn. The fields from `kind` to `scale` are the arguments of the props feature's `place`. */
+export interface RegionProp {
+  /** A prop kind from src/content/props.ts. */
+  kind: string;
+  variant: number;
+  /** Meters. `y` is the height of its foot. */
+  x: number;
+  y: number;
+  z: number;
+  /** Radians around y. At 0 its front faces south. A building's turn is already in it. */
+  rotation: number;
+  scale: number;
+  /** The quarter turns of the building it belongs to, counter-clockwise seen from above. 0 for a prop that stands alone. */
+  quarterTurns: number;
+  /** The id of its building in the region plan, or an empty string. */
+  building: string;
+}
+
+export interface RegionScatter {
+  /** 1 is the usual amount of everything. */
+  density: number;
+  /**
+   * True where nothing may be scattered: the grant, the path, the town, the dead garden's beds, and the
+   * spots where the region put its own trees, bushes and rocks. Around those sites it is also true for
+   * the one column in nine where the scatter rules would stand a tree, so the land there keeps its
+   * grass and grows no tree between the camera and the hero.
+   */
+  blocked(x: number, z: number): boolean;
+  /**
+   * How much forest a place is, 0 for open meadow to 1 for deep forest. It follows the woods the terrain
+   * grew as blocks, and is 0 around the grant, the dead garden, the town and the path, so they stay in view.
+   */
+  forest(x: number, z: number): number;
 }

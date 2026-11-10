@@ -12,7 +12,6 @@ export const PROMPT_RADIUS = 2;
 
 export const NO_ROOF_TOAST = 'The bed needs a roof over it.';
 export const TOO_EARLY_TOAST = 'It is not evening yet.';
-export const STAND_INSIDE_TOAST = 'Come in under the roof to sleep.';
 
 /** An unseen solid block that fills the cells of a placed thing, when the block table has one. */
 const BARRIER: number | null = BLOCKS.find((block) => block.key === 'barrier')?.id ?? null;
@@ -69,10 +68,11 @@ export function install(kernel: Kernel): void {
       time.sleep();
       return;
     }
-    // Why not: the time system wants evening and a roof over the player. The bed's own roof is checked first.
+    // Why not: the time system wants evening, and a roof over the bed or over the player. The bed fills its
+    // block, so nobody can stand under the block that covers it: a roof over the bed alone is enough.
     const p = e.placed, at = game.player.pos;
-    const text = world.openSky(p.x, p.y + e.sy, p.z) ? NO_ROOF_TOAST : world.openSky(at.x, at.y + 0.5, at.z) ? STAND_INSIDE_TOAST : TOO_EARLY_TOAST;
-    events.emit('toast', { text });
+    const roofless = world.openSky(p.x, p.y + e.sy, p.z) && world.openSky(at.x, at.y + 0.5, at.z);
+    events.emit('toast', { text: roofless ? NO_ROOF_TOAST : TOO_EARLY_TOAST });
   }
 
   function use(e: Entry): void {

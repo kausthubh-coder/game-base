@@ -2,7 +2,7 @@ import { expect, test } from 'bun:test';
 import { blockId } from '../../content/blocks.ts';
 import type { Placed } from '../api.sim.ts';
 import { makeStage, type Stage } from '../actions/stage.ts';
-import { NO_ROOF_TOAST, STAND_INSIDE_TOAST, TOO_EARLY_TOAST } from './index.sim.ts';
+import { NO_ROOF_TOAST, TOO_EARLY_TOAST } from './index.sim.ts';
 
 const STONE = blockId('stone');
 
@@ -56,12 +56,16 @@ test('the bed shows "Sleep", sleeps when the time system allows it, and says why
 
   expect(interact.act()).toBe(true);
   expect(s.toasts()).toEqual([NO_ROOF_TOAST]);
+  // One block over the bed is a roof, with the player beside it in the open: the bed fills its block,
+  // so nobody can stand under that block. The only reason left is the hour.
   s.world.setBlock(6, g + 1, 5, STONE);
   interact.act();
-  expect(s.toasts()).toEqual([NO_ROOF_TOAST, STAND_INSIDE_TOAST]);
+  expect(s.toasts()).toEqual([NO_ROOF_TOAST, TOO_EARLY_TOAST]);
+  // A roof over the player alone is a roof too.
+  s.world.setBlock(6, g + 1, 5, 0);
   s.world.setBlock(5, g + 2, 5, STONE);
   interact.act();
-  expect(s.toasts()).toEqual([NO_ROOF_TOAST, STAND_INSIDE_TOAST, TOO_EARLY_TOAST]);
+  expect(s.toasts()).toEqual([NO_ROOF_TOAST, TOO_EARLY_TOAST, TOO_EARLY_TOAST]);
   expect(s.time.slept).toBe(0);
 
   s.time.canSleep = true;

@@ -55,7 +55,7 @@ interface PersonSave {
   friendship: number;
   held: boolean;
   mark: Actor['mark'];
-  sent: { place: string; day: number } | null;
+  sent: { place: string; day: number; offset?: { x: number; z: number } } | null;
   wander: [index: number, timer: number];
   at: string | null;
 }
@@ -306,7 +306,7 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
       p.state.friendship = clamp(Number(s.friendship) || 0, 0, 5);
       p.state.place = s.place;
       p.held = Boolean(s.held);
-      p.sent = s.sent ? { stop: { place: s.sent.place }, day: s.sent.day } : null;
+      p.sent = s.sent ? { stop: s.sent.offset ? { place: s.sent.place, offset: { x: s.sent.offset.x, z: s.sent.offset.z } } : { place: s.sent.place }, day: s.sent.day } : null;
       if (p.wanderStops.length > 0 && Array.isArray(s.wander)) {
         p.wanderIndex = clamp(Math.floor(s.wander[0]) || 0, 0, p.wanderStops.length - 1);
         p.wanderTimer = Number(s.wander[1]) || 0;
@@ -346,11 +346,11 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
       ready();
       return byId.get(id)?.state;
     },
-    send(id, place) {
+    send(id, place, offset) {
       if (!ready()) return;
       const p = byId.get(id);
       if (!p || !placeAt(place)) return;
-      p.sent = { stop: { place }, day: clock.day };
+      p.sent = { stop: offset ? { place, offset: { x: offset.x, z: offset.z } } : { place }, day: clock.day };
       setGoal(p, p.sent.stop);
     },
     hold(id, held) {
@@ -416,7 +416,7 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
           friendship: p.state.friendship,
           held: p.held,
           mark: p.actor.mark ?? '',
-          sent: p.sent ? { place: p.sent.stop.place, day: p.sent.day } : null,
+          sent: p.sent ? { place: p.sent.stop.place, day: p.sent.day, ...(p.sent.stop.offset ? { offset: p.sent.stop.offset } : {}) } : null,
           wander: [p.wanderIndex, p.wanderTimer],
           at: p.at,
         })),

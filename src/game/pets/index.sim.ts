@@ -285,14 +285,23 @@ export function createPets(game: Game, defs: readonly PetDef[] = PETS): Pets {
     pet.timer = def.feed.eats;
     pet.path = null;
     events.emit('pet.fed', { pet: state.id, trust: state.trust });
-    if (state.trust >= def.trustToBond) {
-      state.bonded = true;
-      pet.doing = 'follow';
-      pet.find = nextFind(def);
-      events.emit('pet.bonded', { pet: state.id });
-      flags.set(def.bondedFlag, true);
-    }
+    if (state.trust >= def.trustToBond) becomeCompanion(pet);
     return true;
+  }
+
+  /** The moment a pet bonds: it follows from here on, the event goes out and the flag is set. */
+  function becomeCompanion(pet: Pet): void {
+    const def = pet.def, state = pet.state;
+    state.trust = def.trustToBond;
+    state.bonded = true;
+    state.startled = false;
+    pet.wary = 0;
+    pet.offered = null;
+    pet.path = null;
+    pet.doing = 'follow';
+    pet.find = nextFind(def);
+    events.emit('pet.bonded', { pet: state.id });
+    flags.set(def.bondedFlag, true);
   }
 
   // ------------------------------------------------------------------------------------ bonded
@@ -461,6 +470,17 @@ export function createPets(game: Game, defs: readonly PetDef[] = PETS): Pets {
       if (!pet) return false;
       const treat = treatFor(pet.def);
       return treat !== null && offer(pet, treat);
+    },
+    bond(petId) {
+      if (!ready()) return false;
+      const pet = byId.get(petId);
+      if (!pet || pet.state.bonded) return false;
+      becomeCompanion(pet);
+      pet.heart = pet.def.feed.eats;
+      pet.actor.mark = 'heart';
+      // It may be at its home, a long way off. It comes to the player's side at once when there is room.
+      if (distance2d(pet.state.pos, player.pos) > pet.def.follow.within) beside(pet);
+      return true;
     },
   };
 

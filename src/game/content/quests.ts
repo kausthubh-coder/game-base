@@ -54,6 +54,8 @@ export type Effect =
   | { befriend: NpcId; amount?: number }
   /** Teaches one Almanac fact, or every fact on the page when `fact` is left out. */
   | { learn: string; fact?: string }
+  /** Bonds the wild pet of this kind without feeding it, through `PetsApi.bond`. For a quest that skipTo passes over. */
+  | { bond: string }
   | { emit: EventName; data?: Record<string, FlagValue> };
 
 export interface StepDef {
@@ -131,7 +133,7 @@ export const QUESTS: readonly QuestDef[] = [
       { id: 'trust', text: 'Feed the leaftail three times without startling it', done: { bonded: 'leaftail' }, pet: 'leaftail', count: { trust: 'leaftail', need: 3 } },
       { id: 'show', text: 'Show the leaftail to Tamsin, or to Wren in town', done: { flag: 'leaftail.shown' }, gate: true, npc: ['tamsin', 'wren'] },
     ],
-    skip: [{ flag: 'leaftail.shown' }, { flag: 'met.wren' }],
+    skip: [{ bond: 'leaftail' }, { learn: 'leaftail' }, { flag: 'leaftail.shown' }, { flag: 'met.wren' }],
   },
   {
     id: 'bread',

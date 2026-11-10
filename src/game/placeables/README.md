@@ -5,7 +5,7 @@ Stations and furniture the player sets down. It implements `PlaceablesApi`.
 ## What it exports
 
 - `install(kernel)` from `index.sim.ts`. It adds `game.systems.placeables`.
-- `PROMPT_RADIUS` (2) and the bed's toast texts: `NO_ROOF_TOAST`, `STAND_INSIDE_TOAST`, `TOO_EARLY_TOAST`.
+- `PROMPT_RADIUS` (2) and the bed's toast texts: `NO_ROOF_TOAST` and `TOO_EARLY_TOAST`.
 - `defs()` returns the three kinds from `src/game/content/placeables.ts`:
 
 | Kind | Station | Prompt | Size |
@@ -25,12 +25,12 @@ Stations and furniture the player sets down. It implements `PlaceablesApi`.
 
 Each one adds an `Interactable` called `placeable:<id>` at its middle, with a radius of 2 blocks. "E" beside it and the secondary button on it both use it.
 
-- The bed calls `game.systems.time.sleep()` when `canSleep()` is true. Otherwise it toasts one reason: "The bed needs a roof over it.", "Come in under the roof to sleep." or "It is not evening yet."
+- The bed calls `game.systems.time.sleep()` when `canSleep()` is true. Otherwise it toasts one reason. "The bed needs a roof over it." shows when no block is over the bed and none is over the player. With a roof over either, the reason is "It is not evening yet."
 - The workbench and the chest only tell the `onUse` listeners and send `ui.sound`. Their prompts stay hidden until something listens, so no prompt leads nowhere. The chest holds no items yet.
 
 Holding the primary button on a station for 0.6 seconds puts it back in the bag. The actions system does that.
 
-Each station fills its cells with the block whose key is `barrier` in `src/content/blocks.ts`. That block does not exist today, so the cells stay empty: the player can walk through a station, and the pointer hits the ground behind it. The click code allows for that. It treats the open cell the ray crossed last as the station.
+Each station fills its cells with the block whose key is `barrier` in `src/content/blocks.ts`. It is solid and draws nothing, so the player cannot walk through a station or stand in a bed's block, and the pointer stops at it. The click code also treats the open cell the ray crossed last as the station, for a build without that block.
 
 ## Events
 

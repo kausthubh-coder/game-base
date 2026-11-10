@@ -209,6 +209,9 @@ test('skipTo(\'bread\') gives a state the bread quest can finish from', () => {
   expect(s.bag.get('almanac')).toBe(1);
   expect(s.bag.get('axe')).toBe(1);
   expect(s.game.systems.almanac.page('mossling')!.complete).toBe(true);
+  // The leaftail quest was passed over, so the leaftail is bonded.
+  expect(s.pet).toMatchObject({ trust: 3, bonded: true });
+  expect(s.game.flags.is('pet.leaftail.bonded')).toBe(true);
   // Tamsin has left the grant stone for the lodge.
   expect(s.sent).toContainEqual({ npc: 'tamsin', place: 'lodge' });
   // Skipping sends no quest events for the quests it passed over.

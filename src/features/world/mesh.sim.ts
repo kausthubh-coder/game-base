@@ -55,9 +55,14 @@ const ids = new Uint8Array(PAD * PAD * TALL);
 const lit = new Uint8Array(PAD * PAD * TALL);
 const OPQ = new Uint8Array(256);
 const GLOW = new Uint8Array(256);
+/** 1 for a block with no tile on any face, such as the barrier inside a station. It is skipped like air. */
+const UNSEEN = new Uint8Array(256);
 OPQ.set(OPAQUE);
 OPQ[WALL] = 1;
-for (const b of BLOCKS) GLOW[b.id] = b.glows ? 1 : 0;
+for (const b of BLOCKS) {
+  GLOW[b.id] = b.glows ? 1 : 0;
+  UNSEEN[b.id] = b.id !== 0 && !b.tiles.top && !b.tiles.side && !b.tiles.bottom ? 1 : 0;
+}
 
 const STRIDE = [SX, SY, SZ];
 const SIZE = [CHUNK, HEIGHT, CHUNK];
@@ -203,7 +208,7 @@ export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTabl
           const i = BASE + s * sn + u * su + v * sv, m = v * nu + u;
           const b = ids[i];
           let key = 0;
-          if (b !== 0) {
+          if (b !== 0 && !UNSEEN[b]) {
             const f = i + step, nb = ids[f];
             if (LIQUID[b]) {
               if (nb !== b && !OPQ[nb]) {

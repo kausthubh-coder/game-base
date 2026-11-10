@@ -1,8 +1,11 @@
 // Terrain from a seed: meadow, low hills, a river, ponds, forest and caves. The same seed always gives
-// the same land, chunk by chunk, in any order. The start site (a small house and a cave mouth next to
-// the spawn point) is stamped at the origin so a new world shows the cutaway at once.
+// the same land, chunk by chunk, in any order. On that land it lays the plan of the game's first region
+// (src/game/content/region.ts): level ground for the grant, the dead garden and the town, the path
+// between them, and their blocks. The plan is plain data, so the page and the worker make the same chunk.
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
+import { REGION } from '../../game/content/region.ts';
+import { built, chunkInBounds, inBounds, onPath, shapeGround, shaped, stampStructures, treeAllowed } from '../../game/region/land.sim.ts';
 import { CHUNK, HEIGHT, cellIndex } from './chunk.sim.ts';
 import { clamp, fbm2, hash2, hash3, noise3, smoothstep } from './noise.sim.ts';
 
@@ -10,44 +13,51 @@ import { clamp, fbm2, hash2, hash3, noise3, smoothstep } from './noise.sim.ts';
 export const WATER_LEVEL = 18;
 
 const B = {
-  grass: blockId('grass'), dirt: blockId('dirt'), tilled: blockId('tilled_soil'), path: blockId('path'),
-  sand: blockId('sand'), clay: blockId('clay'), stone: blockId('stone'), mossy: blockId('mossy_stone'),
-  cobble: blockId('cobble'), brick: blockId('stone_brick'), oakLog: blockId('oak_log'), plank: blockId('oak_plank'),
-  birchLog: blockId('birch_log'), pineLog: blockId('pine_log'), thatch: blockId('thatch'), plaster: blockId('plaster'),
-  glass: blockId('glass'), leaves: blockId('oak_leaves'), needles: blockId('pine_needles'), water: blockId('water'),
-  lume: blockId('lume_crystal'), lamp: blockId('lamp'),
+  grass: blockId('grass'), dirt: blockId('dirt'), path: blockId('path'), sand: blockId('sand'), clay: blockId('clay'),
+  stone: blockId('stone'), mossy: blockId('mossy_stone'), oakLog: blockId('oak_log'), plank: blockId('oak_plank'),
+  birchLog: blockId('birch_log'), pineLog: blockId('pine_log'), leaves: blockId('oak_leaves'),
+  needles: blockId('pine_needles'), water: blockId('water'), lume: blockId('lume_crystal'),
 };
 
-// The start site. Everything is in block coordinates.
-const SITE = {
-  x: 2, z: -8, flat: 24, blend: 38, ground: 20,
-  hill: { x: 16.5, z: -11.5, radius: 14, core: 4, rise: 12 },
-  pond: { x: -8, z: 7, radius: 6.5 },
-  house: { x0: -10, x1: -4, z0: -13, z1: -8, door: -7 },
-  tunnel: { x0: 5, x1: 12, z0: -10, z1: -8, y0: 20, y1: 22 },
-  chamber: { x0: 13, x1: 20, z0: -15, z1: -8, y0: 20, y1: 23 },
-};
+/** A path that meets water crosses it on planks at this y, level with the banks. */
+const BRIDGE_Y = WATER_LEVEL + 1;
 
-/** Where a new hero stands: on the path in front of the house door. */
+const feetAt = (x: number, y: number, z: number): Vec3 => ({ x: x + 0.5, y, z: z + 0.5 });
+
+function placeOf(name: string): Vec3 {
+  const p = REGION.places.find((q) => q.name === name);
+  if (!p) throw new Error(`the region plan has no place called ${name}`);
+  return feetAt(p.x, p.y, p.z);
+}
+
+/** Where a new hero stands: two blocks north of the grant's standing stone, facing it. */
 export function spawnPoint(): Vec3 {
-  return { x: SITE.house.door + 0.5, y: SITE.ground, z: SITE.house.z1 + 3.5 };
+  return feetAt(REGION.spawn.x, REGION.spawn.y, REGION.spawn.z);
 }
 
-/** Places to stand that a demo or a test can jump to. */
+/** One block west of the lamp that hangs in the middle of the lodge. */
+function insideLodge(): Vec3 {
+  const lodge = built().find((b) => b.plan.id === 'lodge');
+  if (!lodge) throw new Error('the region plan has no lodge');
+  return feetAt(lodge.x0 + ((lodge.x1 - lodge.x0 + 1) >> 1) - 1, REGION.townGround, lodge.z0 + ((lodge.z1 - lodge.z0 + 1) >> 1));
+}
+
+/**
+ * Places to stand that a demo or a test can jump to. `house`, `cave`, `caveMouth` and `pond` are the
+ * names the first start site had: they now lead inside the lodge, under the oaks over the mossy rocks,
+ * to the open ground in front of those rocks, and onto the ferry dock over the river.
+ */
 export const LANDMARKS = {
-  house: { x: -6.5, y: SITE.ground, z: -10.5 },
-  cave: { x: 16.5, y: SITE.ground, z: -11.5 },
-  caveMouth: { x: 3.5, y: SITE.ground, z: -8.5 },
-  pond: { x: -8.5, y: WATER_LEVEL, z: 7.5 },
+  house: insideLodge(),
+  cave: feetAt(7, REGION.spawn.y, -231),
+  caveMouth: placeOf('grant.rocks'),
+  pond: placeOf('ferry'),
+  grant: placeOf('grant.center'),
+  garden: placeOf('dead.garden'),
+  gate: placeOf('town.gate'),
+  square: placeOf('town.square'),
+  bank: placeOf('river.bank'),
 } as const;
-
-const siteWeight = (x: number, z: number): number => smoothstep(SITE.blend, SITE.flat, Math.hypot(x - SITE.x, z - SITE.z));
-
-function siteHeight(x: number, z: number): number {
-  const hill = SITE.hill.rise * smoothstep(SITE.hill.radius, SITE.hill.core, Math.hypot(x - SITE.hill.x, z - SITE.hill.z));
-  const pond = smoothstep(SITE.pond.radius, SITE.pond.radius * 0.45, Math.hypot(x - SITE.pond.x, z - SITE.pond.z));
-  return SITE.ground + hill + (15.2 - SITE.ground) * pond;
-}
 
 const hillMask = (seed: number, x: number, z: number): number => smoothstep(0.57, 0.72, fbm2(x / 170, z / 170, seed + 23, 2));
 
@@ -70,16 +80,16 @@ function naturalHeight(seed: number, x: number, z: number, hills: number): numbe
 
 /** How many blocks of ground a column has. The ground's top face is at this y. */
 export function groundHeight(seed: number, x: number, z: number): number {
-  const w = siteWeight(x, z);
-  const natural = w < 1 ? naturalHeight(seed, x, z, hillMask(seed, x, z)) : 0;
-  const h = natural + (siteHeight(x, z) - natural) * w;
+  let h = naturalHeight(seed, x, z, hillMask(seed, x, z));
+  if (inBounds(x, z)) h = shapeGround(x, z, h);
   return clamp(Math.floor(h + 0.5), 2, HEIGHT - 14);
 }
 
-function topBlock(seed: number, x: number, z: number, h: number, hills: number): number {
+/** `plain` is true where the region plan shaped the ground: there it is grass, never bare rock. */
+function topBlock(seed: number, x: number, z: number, h: number, hills: number, plain: boolean): number {
   if (h <= WATER_LEVEL) return hash2(x >> 2, z >> 2, seed + 71) > 0.62 ? B.clay : B.sand;
   if (h <= WATER_LEVEL + 1) return B.sand;
-  if (hills > 0.4 && siteWeight(x, z) === 0) {
+  if (hills > 0.4 && !plain) {
     const rocky = fbm2(x / 9, z / 9, seed + 73, 2);
     if (h >= 30 || rocky > 0.7) return hash2(x, z, seed + 74) < 0.3 ? B.mossy : B.stone;
   }
@@ -92,17 +102,22 @@ function isCave(seed: number, x: number, y: number, z: number): boolean {
   return y < 15 && noise3(x / 30, y / 16, z / 30, seed + 97) > 0.8;
 }
 
+/** How much forest a place is, from 0 for open meadow to 1 for deep forest. */
+export function forestAt(seed: number, x: number, z: number): number {
+  return smoothstep(0.5, 0.64, fbm2(x / 130, z / 130, seed + 103, 2));
+}
+
 type TreeKind = 0 | 1 | 2; // oak, birch, pine
 
 /** The tree that grows in this 5 by 5 cell of the tree grid, or -1. It writes the trunk position to `at`. */
 function treeInCell(seed: number, gx: number, gz: number, at: { x: number; z: number; h: number }): TreeKind | -1 {
   const x = gx * 5 + Math.floor(hash2(gx, gz, seed + 101) * 5), z = gz * 5 + Math.floor(hash2(gx, gz, seed + 102) * 5);
-  if (Math.hypot(x - SITE.x, z - SITE.z) < SITE.flat + 2) return -1;
-  const forest = smoothstep(0.5, 0.64, fbm2(x / 130, z / 130, seed + 103, 2));
+  if (!treeAllowed(x, z)) return -1;
+  const forest = forestAt(seed, x, z);
   if (hash2(gx, gz, seed + 104) > 0.03 + 0.5 * forest) return -1;
   const h = groundHeight(seed, x, z);
   const hills = hillMask(seed, x, z);
-  if (h <= WATER_LEVEL + 1 || topBlock(seed, x, z, h, hills) !== B.grass) return -1;
+  if (h <= WATER_LEVEL + 1 || topBlock(seed, x, z, h, hills, shaped(x, z)) !== B.grass) return -1;
   if (hills > 0.45 && isCave(seed, x, h - 1, z)) return -1;
   at.x = x; at.z = z; at.h = h;
   if (h >= 27) return 2;
@@ -115,21 +130,27 @@ function treeInCell(seed: number, gx: number, gz: number, at: { x: number; z: nu
 export function generateChunk(seed: number, cx: number, cz: number, blocks: Uint8Array): void {
   const ox = cx * CHUNK, oz = cz * CHUNK;
   blocks.fill(0);
+  // Most chunks lie outside the region plan and never ask it anything.
+  const region = chunkInBounds(ox, oz, CHUNK);
 
   for (let lx = 0; lx < CHUNK; lx++) {
     for (let lz = 0; lz < CHUNK; lz++) {
       const x = ox + lx, z = oz + lz;
       const h = groundHeight(seed, x, z);
       const hills = hillMask(seed, x, z);
-      const top = topBlock(seed, x, z, h, hills);
-      const under = top === B.grass ? B.dirt : top;
+      const plain = region && shaped(x, z);
+      const path = region && onPath(x, z);
+      // A path is dirt on dry land. Where the land dips to the water line it is a plank bridge instead.
+      const top = path && h > BRIDGE_Y ? B.path : topBlock(seed, x, z, h, hills, plain);
+      const under = top === B.grass || top === B.path ? B.dirt : top;
       const base = cellIndex(lx, 0, lz);
       for (let y = 0; y < h; y++) blocks[base + y] = y === h - 1 ? top : y >= h - 4 ? under : B.stone;
       for (let y = h; y < WATER_LEVEL; y++) blocks[base + y] = B.water;
+      if (path && h <= BRIDGE_Y) blocks[base + BRIDGE_Y] = B.plank;
 
-      // Caves run under the hills only, away from water and from the start site. Where the hill is
-      // high they may break the surface, which makes a cave mouth.
-      if (hills > 0.25 && h > WATER_LEVEL + 2 && siteWeight(x, z) === 0) {
+      // Caves run under the hills only, away from water and from ground the region plan shaped. Where
+      // the hill is high they may break the surface, which makes a cave mouth.
+      if (hills > 0.25 && h > WATER_LEVEL + 2 && !plain) {
         const roof = hills > 0.45 && h > 24 ? h - 1 : h - 4;
         let wasOpen = false;
         for (let y = 3; y <= roof; y++) {
@@ -148,10 +169,6 @@ export function generateChunk(seed: number, cx: number, cz: number, blocks: Uint
     if (!onlyAir || blocks[i] === 0) blocks[i] = id;
   };
 
-  if (ox < SITE.x + SITE.blend && ox + CHUNK > SITE.x - SITE.blend && oz < SITE.z + SITE.blend && oz + CHUNK > SITE.z - SITE.blend) {
-    stampSite(put);
-  }
-
   // Trees. A canopy reaches three blocks out, so trees rooted in the cells around the chunk count too.
   const at = { x: 0, z: 0, h: 0 };
   const g0x = Math.floor((ox - 3) / 5), g1x = Math.floor((ox + CHUNK + 2) / 5);
@@ -160,6 +177,16 @@ export function generateChunk(seed: number, cx: number, cz: number, blocks: Uint
     for (let gz = g0z; gz <= g1z; gz++) {
       const kind = treeInCell(seed, gx, gz, at);
       if (kind >= 0) stampTree(put, kind as TreeKind, at.x, at.h, at.z, hash2(gx, gz, seed + 106));
+    }
+  }
+
+  // The region plan: its blocks and buildings replace whatever the land put there, then its own trees
+  // grow. A tree stands on the ground it finds, so it needs no height in the plan.
+  if (region) {
+    stampStructures(ox, oz, CHUNK, put);
+    for (const t of REGION.trees) {
+      if (t.x < ox - 3 || t.x > ox + CHUNK + 2 || t.z < oz - 3 || t.z > oz + CHUNK + 2) continue;
+      stampTree(put, t.kind === 'birch' ? 1 : 0, t.x, groundHeight(seed, t.x, t.z), t.z, t.size);
     }
   }
 }
@@ -195,53 +222,4 @@ function stampTree(put: Put, kind: TreeKind, x: number, y: number, z: number, r:
       }
     }
   }
-}
-
-function stampSite(put: Put): void {
-  const g = SITE.ground;
-  const { x0, x1, z0, z1, door } = SITE.house;
-
-  // The house: cobble footing, plank floor, plaster walls with log corners, glass, a thatch gable roof.
-  for (let x = x0; x <= x1; x++) {
-    for (let z = z0; z <= z1; z++) {
-      const edgeX = x === x0 || x === x1, edgeZ = z === z0 || z === z1;
-      put(x, g - 1, z, edgeX || edgeZ ? B.cobble : B.plank);
-      if (!edgeX && !edgeZ) continue;
-      for (let y = g; y < g + 3; y++) {
-        let id = edgeX && edgeZ ? B.oakLog : B.plaster;
-        const pane = y === g + 1 && ((edgeZ && (x === x0 + 2 || x === x1 - 1)) || (edgeX && (z === z0 + 2 || z === z0 + 3)));
-        if (pane) id = B.glass;
-        if (z === z1 && x === door && y < g + 2) id = 0;
-        put(x, y, z, id);
-      }
-    }
-  }
-  for (let k = 0; k < 4; k++) {
-    const y = g + 3 + k, za = z0 - 1 + k, zb = z1 + 1 - k;
-    for (let x = x0 - 1; x <= x1 + 1; x++) { put(x, y, za, B.thatch); put(x, y, zb, B.thatch); }
-    for (let z = za + 1; z < zb; z++) { put(x0, y, z, B.plaster); put(x1, y, z, B.plaster); }
-  }
-  put(x0 + 1, g, z0 + 1, B.lamp);
-
-  // A lamp post by the door, a path to the cave, a patch of tilled soil.
-  put(door + 2, g, z1 + 1, B.oakLog); put(door + 2, g + 1, z1 + 1, B.oakLog); put(door + 2, g + 2, z1 + 1, B.lamp);
-  for (let z = z1 + 1; z <= z1 + 4; z++) put(door, g - 1, z, B.path);
-  for (let x = door; x <= 3; x++) put(x, g - 1, z1 + 4, B.path);
-  for (let z = z1 - 1; z <= z1 + 4; z++) { put(3, g - 1, z, B.path); put(4, g - 1, z, B.path); }
-  for (let x = -2; x <= 1; x++) for (let z = -13; z <= -11; z++) put(x, g - 1, z, B.tilled);
-
-  // The cave: a stone brick arch, a tunnel into the hill, a chamber with lume crystals.
-  const t = SITE.tunnel, c = SITE.chamber;
-  for (let x = t.x0; x <= t.x1; x++) for (let z = t.z0; z <= t.z1; z++) for (let y = t.y0; y <= t.y1; y++) put(x, y, z, 0);
-  for (let x = c.x0; x <= c.x1; x++) for (let z = c.z0; z <= c.z1; z++) for (let y = c.y0; y <= c.y1; y++) put(x, y, z, 0);
-  for (let x = t.x0 + 1; x <= t.x1; x++) for (let z = t.z0; z <= t.z1; z++) put(x, g - 1, z, B.stone);
-  for (let x = c.x0; x <= c.x1; x++) for (let z = c.z0; z <= c.z1; z++) put(x, g - 1, z, B.stone);
-  for (let y = t.y0; y <= t.y1 + 1; y++) { put(t.x0, y, t.z0 - 1, B.brick); put(t.x0, y, t.z1 + 1, B.brick); }
-  for (let z = t.z0 - 1; z <= t.z1 + 1; z++) put(t.x0, t.y1 + 1, z, B.brick);
-  put(c.x0 + 1, c.y0, c.z0 + 1, B.lume); put(c.x1 - 1, c.y0, c.z1 - 2, B.lume); put(c.x1, c.y0 + 2, c.z0 + 3, B.lume);
-  put(c.x0 + 3, c.y1 + 1, c.z0 + 4, B.lume);
-
-  // Two trees for shade.
-  stampTree(put, 0, -15, g, -12, 0.7);
-  stampTree(put, 1, 0, g, 3, 0.2);
 }

@@ -144,6 +144,25 @@ test('setWeather() forces a kind, and null lets the weather go', () => {
   expect(t.game.ambient.cloud).toBeCloseTo(weatherTable.clear.cloud, 5);
 });
 
+test('setWeather(kind, true) settles the kind at once, with no front', () => {
+  const t = setup();
+  t.time.setWeather('rain');
+  run(t.kernel, 120);
+  expect(t.game.ambient.rain).toBeCloseTo(weatherTable.rain.rain, 5);
+
+  // A scripted moment that skipped the afternoon: the rain is gone on the spot, and stays gone.
+  t.time.setWeather('clear', true);
+  expect(t.game.ambient.rain).toBe(0);
+  expect(t.game.ambient.cloud).toBeCloseTo(weatherTable.clear.cloud, 5);
+  run(t.kernel, 60, () => expect(t.game.ambient.rain).toBe(0));
+
+  // And the other way: rain at once.
+  t.time.setWeather('rain', true);
+  expect(t.game.ambient.rain).toBeCloseTo(weatherTable.rain.rain, 5);
+  run(t.kernel, 30);
+  expect(t.game.ambient.rain).toBeCloseTo(weatherTable.rain.rain, 5);
+});
+
 test('on day 1 letting the weather go brings clear back and keeps it', () => {
   const t = setup();
   t.time.setWeather('fog');
@@ -192,6 +211,26 @@ test('canSleep() needs the evening or the night, a bed within 4 blocks and a roo
   t.game.player.pos.x = 5.5;
   expect(t.time.canSleep()).toBe(false);
   t.game.player.pos.x = 4.5;
+  expect(t.time.canSleep()).toBe(true);
+});
+
+test('canSleep() takes one block over the bed as the roof, with the player beside the bed in the open', () => {
+  const t = setup();
+  t.placeables.stand('bed', { x: 6, y: FLOOR + 1, z: 4 });
+  t.time.setTimeOfDay(0.8);
+  // No roof over the bed and none over the player.
+  expect(t.time.canSleep()).toBe(false);
+  // The bed fills its block, so nobody can stand under the block that covers it.
+  t.world.setBlock(6, FLOOR + 2, 4, blockId('oak_plank'));
+  expect(t.time.canSleep()).toBe(true);
+  // The hour still counts.
+  t.time.setTimeOfDay(0.5);
+  expect(t.time.canSleep()).toBe(false);
+  t.time.setTimeOfDay(0.8);
+  // And so does the distance: a roofed bed more than 4 blocks away is not in reach.
+  t.game.player.pos.x = 0.5;
+  expect(t.time.canSleep()).toBe(false);
+  t.game.player.pos.x = 2.5;
   expect(t.time.canSleep()).toBe(true);
 });
 

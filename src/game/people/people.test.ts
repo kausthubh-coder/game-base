@@ -244,6 +244,24 @@ test('someone sent and held goes there and stays, whatever the day', () => {
   expect(at(pos, [28, 28])).toBe(true);
 });
 
+test('send() with an offset stands them that many blocks east and south of the place, and a load keeps it', () => {
+  const stage = town([ann, bo]);
+  const people = stage.kernel.game.systems.people;
+  stage.run(0.05);
+  people.send('ann', 'far', { x: -3, z: 2 });
+  people.send('bo', 'far', { x: 2, z: -4 });
+  expect(people.get('ann')!.place).toBe('far');
+  stage.run(30);
+  expect(at(people.get('ann')!.pos, [25, 30])).toBe(true);
+  expect(at(people.get('bo')!.pos, [30, 24])).toBe(true);
+
+  // Sent again after a load, as the festival does, they are already there.
+  const again = town([ann, bo], JSON.parse(JSON.stringify(stage.kernel.save())) as GameSave);
+  again.run(1);
+  expect(at(again.kernel.game.systems.people.get('ann')!.pos, [25, 30])).toBe(true);
+  expect(at(again.kernel.game.systems.people.get('bo')!.pos, [30, 24])).toBe(true);
+});
+
 test('two people at one place stand on different blocks', () => {
   const stage = town([ann, bo]);
   const people = stage.kernel.game.systems.people;

@@ -4,6 +4,7 @@
 import { calmNoon, type Vec3 } from '../../engine/types.ts';
 import type { WeatherKind } from '../../content/weather.ts';
 import { DAY_SECONDS, dayPartAt, daySecondAt, timeOfDayAt } from '../../features/weather/clock.sim.ts';
+import { footprint } from '../content/placeables.ts';
 import { createWeather, type Weather } from '../../features/weather/weather.sim.ts';
 import type { Game, SimSystem, TimeApi } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
@@ -118,6 +119,23 @@ export function createTime(game: Game): Time {
     }
   }
 
+  /** True when a bed within reach of the player has a block over it. */
+  function roofedBedNear(): boolean {
+    const placeables = game.systems.placeables, at = game.player.pos;
+    const defs = placeables.defs();
+    for (const placed of placeables.all()) {
+      const def = defs.find((d) => d.kind === placed.kind);
+      if (!def || def.station !== 'bed') continue;
+      const [sx, sy, sz] = footprint(def.size, placed.quarterTurns);
+      const dx = at.x < placed.x ? placed.x - at.x : at.x > placed.x + sx ? at.x - placed.x - sx : 0;
+      const dy = at.y < placed.y ? placed.y - at.y : at.y > placed.y + sy ? at.y - placed.y - sy : 0;
+      const dz = at.z < placed.z ? placed.z - at.z : at.z > placed.z + sz ? at.z - placed.z - sz : 0;
+      if (dx * dx + dy * dy + dz * dz > BED_REACH * BED_REACH) continue;
+      if (!game.world.openSky(placed.x, placed.y + sy, placed.z)) return true;
+    }
+    return false;
+  }
+
   const api: TimeApi = {
     dayLength: DAY_LENGTH,
 
@@ -125,8 +143,10 @@ export function createTime(game: Game): Time {
       const time = clock.timeOfDay;
       if (time < EVENING && time >= DAWN) return false;
       const at = game.player.pos;
-      if (game.world.openSky(at.x, at.y + 0.5, at.z)) return false;
-      return game.systems.placeables.near('bed', at, BED_REACH);
+      if (!game.systems.placeables.near('bed', at, BED_REACH)) return false;
+      // A roof over the player, or over a bed in reach. A bed fills its block, so nobody can stand under
+      // the one block that covers it, and that one block is all the roof quest asks for.
+      return !game.world.openSky(at.x, at.y + 0.5, at.z) || roofedBedNear();
     },
 
     sleep() {
@@ -141,8 +161,14 @@ export function createTime(game: Game): Time {
       events.emit('slept', { day });
     },
 
-    setWeather(kind) {
+    setWeather(kind, now) {
       forced = kind;
+      if (now && kind) {
+        // No front: the kind is there at once, and the ground with it. For a moment that skips time.
+        weather.set(kind, { hold: true, instant: true });
+        weather.step(0, game.player.pos);
+        writeAmbient();
+      }
       steerWeather();
     },
 

@@ -34,7 +34,7 @@ For the eight named people the sprite, the portrait and the voice are the id. Th
 
 ## The api
 
-- `send(id, place)` walks someone to a place now. They stay there until the day number changes, then follow their routine again. A place the region does not have is ignored.
+- `send(id, place, offset?)` walks someone to a place now. They stay there until the day number changes, then follow their routine again. A place the region does not have is ignored. `offset` is `{ x, z }` in blocks east and south of the place. The festival uses it to stand fourteen people a few blocks apart. It is new in the contract.
 - `hold(id, true)` stops someone where they are and keeps them out of their routine. Someone who was sent first still finishes that walk and then stays, whatever the day. `hold(id, false)` returns them to the routine.
 - `befriend(id, amount)` keeps friendship between 0 and 5.
 - `setMark(id, mark)` sets the actor's mark.
@@ -61,4 +61,4 @@ It needs `region`, `nav`, `interact` and `talk` to be installed before the first
 
 `Place.at` may be the block to stand on or the feet above it. Both work.
 
-Save holds each person's position, facing, place, friendship, mark, hold, the place they were sent to and their wander timer. A load before the first step is kept and applied on that step.
+Save holds each person's position, facing, place, friendship, mark, hold, the place they were sent to with its offset, and their wander timer. A load before the first step is kept and applied on that step.

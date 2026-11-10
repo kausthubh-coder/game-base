@@ -17,9 +17,9 @@ The API:
 | Call | What it does |
 |---|---|
 | `dayLength` | 720 seconds of real time. |
-| `canSleep()` | True when the time of day is 0.66 or later, or before 0.23, a `bed` station stands within 4 blocks of the player, and the player is not under open sky. |
+| `canSleep()` | True when the time of day is 0.66 or later, or before 0.23, a `bed` station stands within 4 blocks of the player, and a block is over the player or over that bed. A bed fills its block, so the player stands beside it. One block over the bed is the whole roof the quest asks for. |
 | `sleep()` | Jumps to 0.27 of the next day, then sends `day.started` and `slept`. It does not ask `canSleep()` first. The caller does. |
-| `setWeather(kind)` | Holds a kind of weather until the next call. `null` hands the weather back. |
+| `setWeather(kind, now?)` | Holds a kind of weather until the next call. `null` hands the weather back. With `now` set to true the kind is there at once with no front, and the ground with it: soaked in rain, dry otherwise. The festival uses it after the player waits out the afternoon. `now` is new in the contract. |
 | `setTimeOfDay(t)` | Moves the dial to `t` on the same day. Use `sleep()` to reach the next morning. |
 | `onThunder(listener)` | Calls the listener with the place of each lightning strike, later for a far strike. It returns a function that stops it. This is new in the contract. |
 
@@ -55,6 +55,6 @@ installTime(kernel); // before crops and anything else that reads game.ambient i
 kernel.game.systems.time.onThunder?.((at) => sound.thunder(at));
 ```
 
-It calls `game.systems.placeables.near('bed', player.pos, 4)` and `game.world.openSky`, both inside `canSleep()`. Installing it draws one number from `game.random()` for the weather seed.
+It calls `game.systems.placeables.near('bed', player.pos, 4)`, `placeables.all()`, `placeables.defs()` and `game.world.openSky`, all inside `canSleep()`. Installing it draws one number from `game.random()` for the weather seed.
 
 The save holds the day, the seconds since dawn, `clock.seconds`, which days were announced, the forced kind and the machine's kind. The machine cannot restart in the middle of a front, so a load settles the saved kind at once: full rain and soaked ground if it rained, dry ground if not.

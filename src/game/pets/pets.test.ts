@@ -300,6 +300,33 @@ test('it finds nothing while the player stands on stone, and a wild one finds no
   expect(wild.bag.get('wheat_seeds')).toBeUndefined();
 });
 
+test('bond() bonds a wild pet without a berry: it comes to the player, follows, and is saved as bonded', () => {
+  const stage = meadow();
+  stage.run(0.05);
+  const game = stage.kernel.game, pets = game.systems.pets;
+  expect(pets.bond?.('pet:nobody:1')).toBe(false);
+  // The player is not beside it, as after a skip to a later quest.
+  expect(apart(stage)).toBeGreaterThan(8);
+
+  expect(pets.bond?.(ID)).toBe(true);
+  expect(pet(stage)).toMatchObject({ trust: 3, bonded: true, startled: false });
+  expect(pets.companion()?.id).toBe(ID);
+  expect(game.flags.is('pet.leaftail.bonded')).toBe(true);
+  expect(stage.heard.filter((e) => e.name === 'pet.bonded').map((e) => e.data)).toEqual([{ pet: ID }]);
+  // No berry was eaten.
+  expect(stage.count('pet.fed')).toBe(0);
+  // It is beside the player at once, and keeps up.
+  expect(apart(stage)).toBeLessThanOrEqual(3);
+  stage.walkPlayer(1, 0, 4.4, 3);
+  expect(apart(stage)).toBeLessThanOrEqual(3);
+  // A second call changes nothing.
+  expect(pets.bond?.(ID)).toBe(false);
+  expect(stage.count('pet.bonded')).toBe(1);
+
+  const again = meadow({ save: JSON.parse(JSON.stringify(stage.kernel.save())) as GameSave });
+  expect(again.kernel.game.systems.pets.companion()).toMatchObject({ id: ID, trust: 3, bonded: true });
+});
+
 test('save then load keeps trust', () => {
   const stage = meadow();
   stage.run(0.05);
