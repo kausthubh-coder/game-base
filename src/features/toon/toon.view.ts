@@ -430,8 +430,8 @@ varying float vToonGlow;`)
           // A soft rim of sun on the edges that face it, the way toon games pick a body out of the field.
           #if NUM_DIR_LIGHTS > 0
             float edge = 1.0 - saturate(dot(normal, normalize(vViewPosition)));
-            float toSun = saturate(dot(normal, directionalLights[0].direction) * 0.5 + 0.5);
-            outgoingLight += diffuseColor.rgb * uRim * smoothstep(0.55, 0.8, edge) * toSun * sky;
+            float toSun = saturate(dot(normal, directionalLights[0].direction) + 0.2);
+            outgoingLight += diffuseColor.rgb * uRim * smoothstep(0.62, 0.9, edge) * toSun * sky;
           #endif
           outgoingLight += vToon * vToonGlow * 1.6;
           #include <opaque_fragment>`);
@@ -539,6 +539,17 @@ varying float vToonGlow;`)
   }
 
   const colour = new THREE.Color();
+  // For leaving out characters the camera cannot see: an instanced mesh is one box to three.js, so it cannot.
+  const frustum = new THREE.Frustum();
+  const viewProjection = new THREE.Matrix4();
+  const sphere = new THREE.Sphere();
+
+  /** True when a character's box, with room for its shadow at the edge, is in view. */
+  function inView(c: Character): boolean {
+    sphere.center.set(c.x, c.y + c.scale, c.z);
+    sphere.radius = 1.6 * c.scale + 1;
+    return frustum.intersectsSphere(sphere);
+  }
 
   return {
     stats,
@@ -622,13 +633,16 @@ varying float vToonGlow;`)
         if (cursor >= all.length) cursor = 0;
         readLight(all[cursor++]);
       }
-      if (sun) shared.uRim.value.copy(sun.color).multiplyScalar(sun.intensity * 0.35);
+      if (sun) shared.uRim.value.copy(sun.color).multiplyScalar(sun.intensity * 0.2);
+      frame.camera.updateMatrixWorld();
+      viewProjection.multiplyMatrices(frame.camera.projectionMatrix, frame.camera.matrixWorldInverse);
+      frustum.setFromProjectionMatrix(viewProjection);
       for (const body of bodies.values()) {
         while (body.members.length > body.capacity) grow(body);
         let count = 0;
         for (const c of body.members) {
           c.step(dt);
-          if (!c.visible || !c.current.clip) continue;
+          if (!c.visible || !c.current.clip || !inView(c)) continue;
           const cellX = Math.floor(c.x), cellY = Math.floor(c.y + 0.5), cellZ = Math.floor(c.z);
           if (cellX !== c.cellX || cellY !== c.cellY || cellZ !== c.cellZ) {
             c.cellX = cellX; c.cellY = cellY; c.cellZ = cellZ;
