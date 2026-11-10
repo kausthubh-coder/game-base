@@ -1,3 +1,22 @@
-// The game's entry. It wires the features together. Until the features land it only says so.
-const app = document.querySelector<HTMLDivElement>('#app');
-if (app) app.textContent = 'Game base: the features are being built. See demos/.';
+// The game's entry: the page's canvas and overlay go to boot, which wires everything else.
+import { boot } from './game/boot.ts';
+
+const canvas = document.querySelector<HTMLCanvasElement>('#view');
+const root = document.querySelector<HTMLElement>('#ui');
+const loading = document.querySelector<HTMLElement>('#loading');
+
+if (canvas && root) {
+  boot({
+    canvas,
+    root,
+    onProgress(done) {
+      if (loading) loading.textContent = `Loading ${Math.round(done * 100)}%`;
+    },
+  }).then(
+    () => loading?.remove(),
+    (error: unknown) => {
+      console.error('[game] the game did not start:', error);
+      if (loading) loading.textContent = `The game did not start. ${error instanceof Error ? error.message : String(error)}`;
+    },
+  );
+}
