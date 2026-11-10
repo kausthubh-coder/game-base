@@ -226,6 +226,13 @@ export interface ActionsApi {
    */
   use(context: UseContext): boolean;
   addHandler(handler: (context: UseContext) => boolean): void;
+  /**
+   * The player is holding the primary button on a block. Call it every step while they do.
+   * Breaking takes time, so this fills a meter and breaks the block when it is full. Returns true when it broke.
+   */
+  hold(context: UseContext, dt: number): boolean;
+  /** The block being broken right now and how far along it is, 0 to 1, or null. */
+  breaking(): { x: number; y: number; z: number; progress: number } | null;
   /** How far the player reaches, in blocks. */
   readonly reach: number;
 }
@@ -440,6 +447,20 @@ export interface PeopleApi {
   /** Holds someone in place and out of their routine until released. */
   hold(id: NpcId, held: boolean): void;
   befriend(id: NpcId, amount: number): void;
+  /** The symbol floating over someone's head. The quest system sets it. */
+  setMark(id: NpcId, mark: Actor['mark']): void;
+}
+
+/** The line on screen right now. The dialogue box draws exactly this. */
+export interface TalkLine {
+  npc: NpcId | null;
+  /** The speaker's name, portrait and voice id. Empty strings for the narrator. */
+  name: string;
+  portrait: string;
+  voice: string;
+  text: string;
+  /** Up to three choices. Empty when the line just continues. */
+  choices: string[];
 }
 
 export interface TalkApi {
@@ -448,6 +469,12 @@ export interface TalkApi {
   /** Starts a named conversation, with or without a speaker in the world. */
   start(conversation: string, npc?: NpcId): void;
   readonly active: boolean;
+  /** The line showing now, or null when nobody is talking. */
+  current(): TalkLine | null;
+  /** Moves to the next line. Ends the conversation after the last one. */
+  advance(): void;
+  /** Picks a choice by its index and moves on. */
+  choose(index: number): void;
 }
 
 export interface QuestStepView {

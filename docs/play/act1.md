@@ -108,7 +108,7 @@ Step ids are for the quest system. A step is done when its condition holds.
 - **Berries.** Berry bushes near the dead garden and the path. Use one to pick 1 to 2 berries. It regrows in 2 minutes.
 - **Tools.** The axe cuts logs 3 times faster. Hands can break grass, leaves, dirt and placed blocks. Nothing breaks.
 - **Blocks you place stay** inside your grant. Town blocks cannot be changed.
-- **Recipes.** By hand: 1 oak log makes 4 planks. Workbench (by hand): 4 planks. Bed (workbench): 6 planks and 3 fiber. Chest (workbench): 8 planks. Lamp (workbench): 1 plank and 1 moss tuft. Fence (workbench): 2 planks make 2. Fiber comes from tall grass.
+- **Recipes.** By hand: 1 oak log makes 4 planks. Workbench (by hand): 4 planks. Bed (workbench): 6 planks and 3 fiber. Chest (workbench): 8 planks. Lamp (workbench): 1 plank and 1 moss tuft. River lamp (given by Odo at the festival). Fiber comes from breaking leaves (one time in two) and grass (one time in five).
 - **Weather.** Day 1 is clear. Light rain falls for 90 seconds in the afternoon of the day the wheat is planted, so the player sees rain water a field. The festival evening is clear.
 - **Never stuck.** If the player has no axe, Tamsin gives another. If they have fewer seeds than they need, Gus gives 4 more. If the leaftail is lost, it comes back when called from the plot.
 
