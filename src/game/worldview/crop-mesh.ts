@@ -22,7 +22,6 @@ uniform vec3 uSky;
 uniform vec3 uLamp;
 attribute vec3 color;
 attribute vec2 aCrop;
-attribute vec3 normal;
 attribute vec4 aPlace;
 attribute vec4 aTile;
 attribute vec2 aLight;
@@ -137,7 +136,7 @@ export interface CropMeshes {
 export function createCropMeshes(sheet: THREE.Texture, tileU: number, tileV: number): CropMeshes {
   const corners: number[] = [], colors: number[] = [], normals: number[] = [], cropTags: number[] = [], uvs: number[] = [], index: number[] = [];
   for (const [row, crop] of ['wheat','turnip','carrot'].entries()) {
-    for (let stage=0;stage<4;stage++) {
+    for (let stage=0;stage<(crop==='carrot'?5:4);stage++) {
       const source = environmentGeometry('crop'+crop,stage);
       if (!source) throw new Error(`Crop model missing: ${crop} ${stage}`);
       const g = source.index ? source.toNonIndexed() : source;

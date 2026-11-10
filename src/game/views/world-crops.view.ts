@@ -123,9 +123,9 @@ export async function install(view: GameView): Promise<void> {
       if (!same || (seenWet[i] > 0) !== (state.wet > 0)) wetChanged = true;
       if (!same || seenStage[i] !== state.stage) {
         const cells = tilesOf(state.crop);
-        const stage = Math.min(Math.max(state.stage, 0), cells.length / 2 - 1);
+        const stage = Math.max(state.stage, 0);
         data[row] = crop.x + 0.5; data[row + 1] = crop.y + 1; data[row + 2] = crop.z + 0.5; data[row + 3] = own(crop.x, crop.z);
-        data[row + 4] = cells[stage * 2]; data[row + 5] = cells[stage * 2 + 1];
+        data[row + 4] = stage * sheet.tile / sheet.pixels.width; data[row + 5] = cells[1] ?? 0;
         // It pops only when the plant that stood here grew. A plant that just came into the list does not.
         data[row + 6] = same && state.stage > seenStage[i] ? now : NEVER;
         data[row + 7] = 0;

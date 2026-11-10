@@ -1353,6 +1353,13 @@
       "triangles": 50,
       "budget": 300,
       "bytes": 6892
+    },
+    "env-cropcarrot-4": {
+      "file": "models/env-cropcarrot-4.glb",
+      "seed": 304,
+      "triangles": 66,
+      "budget": 300,
+      "bytes": 9612
     }
   }
 }

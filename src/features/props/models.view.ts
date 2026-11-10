@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { PROPS, type PropKind } from '../../content/props.ts';
-const counts: Record<string, number> = { grassTuft:3,tallGrass:1,flower:6,wildflowers:1,reeds:2,bush:3,berryBush:1,rock:4,mossStump:1,lilyPad:2,mushroom:3,cropwheat:4,cropturnip:4,cropcarrot:4 };
+const counts: Record<string, number> = { grassTuft:3,tallGrass:1,flower:6,wildflowers:1,reeds:2,bush:3,berryBush:1,rock:4,mossStump:1,lilyPad:2,mushroom:3,cropwheat:4,cropturnip:4,cropcarrot:5 };
 const geometries = new Map<string, THREE.BufferGeometry>();
 let pending: Promise<void> | undefined;
 export function environmentGeometry(kind: string, variant: number): THREE.BufferGeometry | undefined { return geometries.get(`${kind}:${variant}`); }

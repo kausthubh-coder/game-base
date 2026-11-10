@@ -73,17 +73,17 @@ def build(kind,v):
     elif kind=='mushroom':
         sphere(m,(0,0,.14),(.06,.06,.14),'eae6cd',6,2);sphere(m,(0,0,.29),(.22,.2,.12),['ab5e4e','a27151','e7bcb5'][v],7,3)
     elif kind.startswith('crop'):
-        crop=kind[4:];h=[.16,.36,.62,.88][v]
+        crop=kind[4:];h=[.16,.36,.62,.88,.98][v]
         for k in range(3):
             a=k*2.4;x=math.cos(a)*.16;y=math.sin(a)*.16
             blade(m,x,y,h,.025,a,STRAW[1] if v==3 and crop=='wheat' else GREEN[1])
             if crop=='wheat' and v>=2:
                 for j in range(3):sphere(m,(x+h*.3*math.cos(a),y+h*.3*math.sin(a),h*.7+j*.065),(.055,.045,.07),STRAW[j] if v==3 else GREEN[j],4,2)
-            elif crop!='wheat' and v>=2:sphere(m,(x,y,.1),(.11,.11,.1),'fff0cf' if crop=='turnip' else 'd67c59',6,2)
+            elif crop!='wheat' and v>=2:sphere(m,(x,y,.1),(.14 if v==4 else .11,.14 if v==4 else .11,.12 if v==4 else .1),'fff0cf' if crop=='turnip' else 'd67c59',6,2)
     obj=m.object(f'env-{kind}-{v}')
     obj.data.materials.clear();mat=bpy.data.materials.new('opaque painted palette');mat.use_nodes=True;p=mat.node_tree.nodes.get('Principled BSDF');p.inputs['Roughness'].default_value=.95;c=mat.node_tree.nodes.new('ShaderNodeVertexColor');c.layer_name='Color';mat.node_tree.links.new(c.outputs['Color'],p.inputs['Base Color']);obj.data.materials.append(mat)
     bottom=min(vertex.co.z for vertex in obj.data.vertices)
     for vertex in obj.data.vertices: vertex.co.z-=bottom
     finish(obj,f'env-{kind.lower()}-{v}')
-for kind,n in {'grassTuft':3,'tallGrass':1,'flower':6,'wildflowers':1,'reeds':2,'bush':3,'berryBush':1,'rock':4,'mossStump':1,'lilyPad':2,'mushroom':3,'cropwheat':4,'cropturnip':4,'cropcarrot':4}.items():
+for kind,n in {'grassTuft':3,'tallGrass':1,'flower':6,'wildflowers':1,'reeds':2,'bush':3,'berryBush':1,'rock':4,'mossStump':1,'lilyPad':2,'mushroom':3,'cropwheat':4,'cropturnip':4,'cropcarrot':5}.items():
     for v in range(n):build(kind,v)
