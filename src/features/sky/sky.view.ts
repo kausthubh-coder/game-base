@@ -16,6 +16,9 @@ export interface SkyOptions {
   shadowRange?: number;
   /** A layer no other feature uses. The cloud-shadow sheet lives on it so only the shadow pass draws it. */
   shadowLayer?: number;
+  /** Meters past the shadow target where the fog starts on a clear day, and where it is whole. 30 and 170 by default. */
+  fogStart?: number;
+  fogEnd?: number;
 }
 
 /** The sky as other features see it. The same objects are updated in place every frame, so keep the reference. */
@@ -46,6 +49,11 @@ export interface Sky extends ViewSystem {
   /** The shadow and the fog follow this point, usually the hero. */
   setShadowTarget(position: Vec3): void;
   setShadowRange(range: number): void;
+  /**
+   * Meters past the shadow target where clear-day fog starts and where it is whole. A camera that sees the
+   * horizon wants the fog whole before the loaded land ends, so the land fades into the sky with no edge.
+   */
+  setFogReach(start: number, end: number): void;
   /** 0 to 7. Ambient has no moon yet, so the clock's phase comes in here. */
   setMoonPhase(phase: number): void;
   /** 0 to 1. The weather decides when there is a rainbow. */
@@ -157,6 +165,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const { scene, renderer } = ctx;
   const shadowLayer = options.shadowLayer ?? 30;
   let shadowRange = options.shadowRange ?? 40;
+  let fogStart = options.fogStart ?? 30, fogEnd = options.fogEnd ?? 170;
   let level = LEVELS[ctx.quality];
 
   // ---- the noise image shared by the clouds and their shadows
@@ -345,6 +354,11 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       applyShadowSettings();
     },
 
+    setFogReach(start, end) {
+      fogStart = start;
+      fogEnd = end;
+    },
+
     setMoonPhase(phase) {
       look.moonPhase = ((Math.round(phase) % 8) + 8) % 8;
     },
@@ -407,8 +421,8 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       const thick = Math.max(a.fog, a.rain * 0.3);
       const reach = view.camera.position.distanceTo(target);
       fog.color.setRGB(key.fog[0], key.fog[1], key.fog[2]);
-      fog.near = reach + mix(30, -6, thick);
-      fog.far = reach + mix(170, 22, thick);
+      fog.near = reach + mix(fogStart, -6, thick);
+      fog.far = reach + mix(fogEnd, 22, thick);
 
       // ---- the sky
       const camera = view.camera;

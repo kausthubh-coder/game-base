@@ -9,7 +9,7 @@ import type { ViewContext } from '../../engine/system.ts';
 import { calmNoon, type Quality } from '../../engine/types.ts';
 import { flatWorld } from '../../engine/world-query.ts';
 import type { BusName } from '../../features/audio/index.ts';
-import { createCamera } from '../../features/camera/index.ts';
+import { cameraProfile, createCamera } from '../../features/camera/index.ts';
 import { createEffects } from '../../features/effects/index.ts';
 import { createPerf } from '../../features/perf/index.ts';
 import { createPost } from '../../features/post/index.ts';
@@ -132,7 +132,10 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
   });
 
-  const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress });
+  // `?cam=horizon` and the others in the camera's profiles.ts stand the camera somewhere else, to compare.
+  const cam = cameraProfile(params.get('cam'));
+
+  const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress * (cam?.load ?? 1) });
   ctx.world = world.query;
   const kernel = createKernel(world.sim, Number(params.get('seed')) || 7);
   const game = kernel.game;
@@ -142,7 +145,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const sys = game.systems as Partial<Systems>;
 
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
-  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: { distances: CAMERA_DISTANCES, zoom: 0 } });
+  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov });
   const sky = createSky(ctx, { shadowRange: 40 });
   const water = createWaterMaterial(ctx);
   const effects = createEffects(ctx);
@@ -367,7 +370,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     lens.aspect = size.width / size.height;
   });
 
-  let last = performance.now(), frameCount = 0, quiet = 0, lastZoom = -1;
+  let last = performance.now(), frameCount = 0, quiet = 0, lastZoom = -1, lastRange = -1;
   const waiters: { until: () => boolean; done: () => void }[] = [];
   const until = (test: () => boolean): Promise<void> => new Promise((done) => waiters.push({ until: test, done }));
 
@@ -399,7 +402,11 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
     // Everything follows the hero. The sky gets what Ambient does not carry: the moon, a rainbow after rain.
     const a = game.ambient;
-    if (camera.zoom !== lastZoom) {
+    if (cam) {
+      const range = Math.round(camera.stepped(cam.shadowRange));
+      if (range !== lastRange) sky.setShadowRange((lastRange = range));
+      sky.setFogReach(camera.stepped(cam.fogStart), camera.stepped(cam.fogEnd));
+    } else if (camera.zoom !== lastZoom) {
       lastZoom = camera.zoom;
       sky.setShadowRange(30 + 14 * camera.zoom);
     }
