@@ -8,6 +8,10 @@
 //   Nothing is copied or allocated on a frame where the view holds the same cells. Small cells matter:
 //   the view's frustum test passes any box near its corners, and a field of 32-block cells drew three
 //   times the grass that was on screen.
+// - Small plants thin out where they are small on screen: a cell keeps all of them while a meter there is
+//   48 pixels tall or more, and fewer as it shrinks, down to 30% at 12 pixels. A cell's rows are kept in the
+//   order of each prop's rank, so thinning copies fewer rows and builds nothing. The plants that stay are the
+//   ones the quality level and the density setting keep first.
 // - A cell's props are drawn when the cell's own box is in view. Its shadow casters are drawn when a box
 //   wider by the length of a long shadow is in view, so a bush just off screen still drops its shadow on it.
 // - A prop casts shadow through a few stretched balls and boxes its builder listed, not through its own
@@ -28,6 +32,12 @@ import type { ShapeExtras } from './shape.ts';
 export const CELL = 8;
 /** A cell's shadow casters count as in view this far past its edge, so a shadow from off screen still falls on screen. */
 const MARGIN = 8;
+/** Pixels a meter is tall on screen where a cell keeps all its small plants, and where it keeps the fewest. */
+const THIN_FROM = 48, THIN_TO = 12;
+/** The share of small plants a cell keeps at THIN_TO and below. */
+const THIN_KEEP = 0.3;
+/** Steps the share moves in, so a cell's rows are copied again only when it changes by one. */
+const THIN_STEPS = 16;
 
 export interface PropsOptions {
   /**
@@ -37,6 +47,8 @@ export interface PropsOptions {
   shadowLayer?: number;
   /** False places every copy exactly as asked, with no turn, size or tint of its own. For previews and contact sheets. */
   vary?: boolean;
+  /** False draws every small plant however small it is on screen. For previews, contact sheets and counts. Default true. */
+  thin?: boolean;
 }
 
 /** A light a placed prop gives, for the world to light the blocks around it. */
@@ -138,6 +150,8 @@ interface Rows {
   batch: Batch;
   matrices: Float32Array;
   colors: Float32Array | null;
+  /** The rank of the prop each row belongs to, rising. -1 for a prop that is never thinned. */
+  ranks: Float32Array;
   count: number;
 }
 
@@ -153,14 +167,20 @@ interface Cell {
   stale: boolean;
   inView: boolean;
   shadowInView: boolean;
+  /** The share of its small plants drawn, from how large it is on screen. */
+  keep: number;
 }
 
 const UP = new THREE.Vector3(0, 1, 0);
+const byRank = (a: Placed, b: Placed): number => a.rank - b.rank;
+/** The rank a row is thinned by: its prop's, or -1 for anything but a plant. */
+const thinRank = (p: Placed): number => (p.model.def.group === 'plant' ? p.rank : -1);
 const SAME: Jitter = { turn: 0, size: 1, r: 1, g: 1, b: 1 };
 
 export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props {
   const shadowLayer = options.shadowLayer ?? 30;
   const vary = options.vary ?? true;
+  const thin = options.thin ?? true;
   const { material, uniforms } = createPropMaterial();
   const shadowMaterial = new THREE.MeshBasicMaterial();
   const group = new THREE.Group();
@@ -191,6 +211,8 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   const _scale = new THREE.Vector3();
   const _turn = new THREE.Quaternion();
   const _jitter: Jitter = { turn: 0, size: 1, r: 1, g: 1, b: 1 };
+  const _order: Placed[] = [];
+  const _drawn = new THREE.Vector2();
 
   function makeMesh(geometry: THREE.BufferGeometry, capacity: number, shadow: boolean): THREE.InstancedMesh {
     const mesh = new THREE.InstancedMesh(geometry, shadow ? shadowMaterial : material, capacity);
@@ -260,7 +282,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     if (!cell) {
       const box = new THREE.Box3();
       const shadowBox = new THREE.Box3(new THREE.Vector3(cx * CELL - MARGIN, Infinity, cz * CELL - MARGIN), new THREE.Vector3((cx + 1) * CELL + MARGIN, -Infinity, (cz + 1) * CELL + MARGIN));
-      cell = { key, box, shadowBox, props: new Map(), rows: [], stale: true, inView: false, shadowInView: false };
+      cell = { key, box, shadowBox, props: new Map(), rows: [], stale: true, inView: false, shadowInView: false, keep: 1 };
       cells.set(key, cell);
       cellList.push(cell);
     }
@@ -269,16 +291,19 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
 
   function rowsFor(cell: Cell, batch: Batch): Rows {
     for (const rows of cell.rows) if (rows.batch === batch) return rows;
-    const rows: Rows = { batch, matrices: new Float32Array(16 * 8), colors: batch.shadow ? null : new Float32Array(3 * 8), count: 0 };
+    const rows: Rows = { batch, matrices: new Float32Array(16 * 8), colors: batch.shadow ? null : new Float32Array(3 * 8), ranks: new Float32Array(8), count: 0 };
     cell.rows.push(rows);
     return rows;
   }
 
-  function addRow(rows: Rows, matrix: THREE.Matrix4, r: number, g: number, b: number): void {
+  function addRow(rows: Rows, matrix: THREE.Matrix4, r: number, g: number, b: number, rank: number): void {
     if ((rows.count + 1) * 16 > rows.matrices.length) {
       const matrices = new Float32Array(rows.matrices.length * 2);
       matrices.set(rows.matrices);
       rows.matrices = matrices;
+      const ranks = new Float32Array(rows.ranks.length * 2);
+      ranks.set(rows.ranks);
+      rows.ranks = ranks;
       if (rows.colors) {
         const colors = new Float32Array(rows.colors.length * 2);
         colors.set(rows.colors);
@@ -286,6 +311,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       }
     }
     rows.matrices.set(matrix.elements, rows.count * 16);
+    rows.ranks[rows.count] = rank;
     if (rows.colors) {
       rows.colors[rows.count * 3] = r;
       rows.colors[rows.count * 3 + 1] = g;
@@ -298,16 +324,30 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   function remake(cell: Cell): void {
     const level = LEVELS[quality];
     for (const rows of cell.rows) rows.count = 0;
-    for (const p of cell.props.values()) {
+    _order.length = 0;
+    for (const p of cell.props.values()) _order.push(p);
+    _order.sort(byRank);
+    for (const p of _order) {
       if (p.model.def.group === 'plant' && p.rank >= (plantDensity ?? level.plants)) continue;
+      const rank = thinRank(p);
       _matrix.compose(_position.set(p.x, p.y, p.z), _turn.setFromAxisAngle(UP, p.rotation), _scale.set(p.scale, p.scale, p.scale));
-      addRow(rowsFor(cell, p.model.batch), _matrix, p.r, p.g, p.b);
+      addRow(rowsFor(cell, p.model.batch), _matrix, p.r, p.g, p.b, rank);
       if (!(shadowOverride ?? level.shadows)) continue;
       const { blobs, boxes: boxList } = p.model.extras;
-      for (let i = 0; i < blobs.length; i += 16) addRow(rowsFor(cell, balls), _part.fromArray(blobs, i).premultiply(_matrix), 1, 1, 1);
-      for (let i = 0; i < boxList.length; i += 16) addRow(rowsFor(cell, boxes), _part.fromArray(boxList, i).premultiply(_matrix), 1, 1, 1);
+      for (let i = 0; i < blobs.length; i += 16) addRow(rowsFor(cell, balls), _part.fromArray(blobs, i).premultiply(_matrix), 1, 1, 1, rank);
+      for (let i = 0; i < boxList.length; i += 16) addRow(rowsFor(cell, boxes), _part.fromArray(boxList, i).premultiply(_matrix), 1, 1, 1, rank);
     }
+    _order.length = 0;
     cell.stale = false;
+  }
+
+  /** How many of a cell's rows its share of small plants keeps. They are in rank order, so it is the first ones. */
+  function kept(rows: Rows, cell: Cell): number {
+    if (cell.keep >= 1) return rows.count;
+    const limit = cell.keep * (plantDensity ?? LEVELS[quality].plants);
+    let n = rows.count;
+    while (n > 0 && rows.ranks[n - 1] >= limit) n--;
+    return n;
   }
 
   /** Copies the rows of every cell in view into the meshes. */
@@ -316,7 +356,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     for (const cell of cellList) {
       if (!cell.inView && !cell.shadowInView) continue;
       if (cell.stale) remake(cell);
-      for (const rows of cell.rows) if (rows.batch.shadow ? cell.shadowInView : cell.inView) rows.batch.wanted += rows.count;
+      for (const rows of cell.rows) if (rows.batch.shadow ? cell.shadowInView : cell.inView) rows.batch.wanted += kept(rows, cell);
     }
     for (const batch of batches) {
       if (batch.wanted > batch.capacity) grow(batch, batch.wanted);
@@ -325,11 +365,12 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     for (const cell of cellList) {
       if (!cell.inView && !cell.shadowInView) continue;
       for (const rows of cell.rows) {
-        if (rows.count === 0 || !(rows.batch.shadow ? cell.shadowInView : cell.inView)) continue;
+        const count = kept(rows, cell);
+        if (count === 0 || !(rows.batch.shadow ? cell.shadowInView : cell.inView)) continue;
         const { batch } = rows;
-        batch.mesh.instanceMatrix.array.set(rows.matrices.subarray(0, rows.count * 16), batch.count * 16);
-        if (rows.colors && batch.mesh.instanceColor) batch.mesh.instanceColor.array.set(rows.colors.subarray(0, rows.count * 3), batch.count * 3);
-        batch.count += rows.count;
+        batch.mesh.instanceMatrix.array.set(rows.matrices.subarray(0, count * 16), batch.count * 16);
+        if (rows.colors && batch.mesh.instanceColor) batch.mesh.instanceColor.array.set(rows.colors.subarray(0, count * 3), batch.count * 3);
+        batch.count += count;
       }
     }
     stats.drawn = stats.drawCalls = stats.shadowCalls = stats.triangles = stats.shadowTriangles = 0;
@@ -466,14 +507,27 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       camera.updateMatrixWorld();
       frustum.setFromProjectionMatrix(_matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
       const shadows = shadowOverride ?? LEVELS[quality].shadows;
+      // Pixels a meter is tall on screen at one meter from the camera, or anywhere for a flat projection.
+      const half = frame.renderer ? frame.renderer.getDrawingBufferSize(_drawn).y / 2 : 450;
+      const perMeter = camera.projectionMatrix.elements[5] * half;
+      const flat = camera.projectionMatrix.elements[15] === 1;
+      const eye = camera.matrixWorld.elements;
       let inView = 0;
       for (let i = 0; i < cellList.length; i++) {
         const cell = cellList[i];
         const seen = cell.props.size > 0 && frustum.intersectsBox(cell.box);
         const shade = shadows && cell.props.size > 0 && (seen || frustum.intersectsBox(cell.shadowBox));
-        if (seen !== cell.inView || shade !== cell.shadowInView) {
+        let keep = cell.keep;
+        if (seen && thin) {
+          const { min, max } = cell.box;
+          const pixels = flat ? perMeter : perMeter / Math.max(1e-3, Math.hypot((min.x + max.x) / 2 - eye[12], min.y - eye[13], (min.z + max.z) / 2 - eye[14]));
+          const share = THIN_KEEP + (1 - THIN_KEEP) * Math.min(1, Math.max(0, (pixels - THIN_TO) / (THIN_FROM - THIN_TO)));
+          keep = Math.ceil(share * THIN_STEPS) / THIN_STEPS;
+        }
+        if (seen !== cell.inView || shade !== cell.shadowInView || keep !== cell.keep) {
           cell.inView = seen;
           cell.shadowInView = shade;
+          cell.keep = keep;
           refill = true;
         }
         if (seen) inView++;

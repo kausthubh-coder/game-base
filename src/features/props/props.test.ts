@@ -244,7 +244,7 @@ function lookDownAt(ctx: ViewContext, x: number, z: number, distance: number): v
 describe('the props system', () => {
   test('a forest of 2,000 props costs 40 draw calls or fewer, shadows included', () => {
     const ctx = headless();
-    const props = createProps(ctx);
+    const props = createProps(ctx, { thin: false });
     const forest = scatter(11, flatWorld, { area: { x0: 0, z0: 0, x1: 80, z1: 80 }, forest: () => 0.8 }).props;
     expect(forest.length).toBeGreaterThanOrEqual(2000);
     for (const p of forest.slice(0, 2000)) props.place(p.kind, p.variant, p, p.rotation, p.scale);
@@ -380,7 +380,7 @@ describe('the props system', () => {
 
   test('low quality thins the small plants and drops the shadows, and trees stay', () => {
     const ctx = headless();
-    const props = createProps(ctx);
+    const props = createProps(ctx, { thin: false });
     lookDownAt(ctx, 16, 16, 200);
     for (let i = 0; i < 200; i++) props.place('grassTuft', i % 3, { x: (i % 20) + 0.5, y: 0, z: Math.floor(i / 20) + 0.5 });
     for (let i = 0; i < 10; i++) props.place('pine', 0, { x: i * 3, y: 0, z: 20 });
@@ -395,6 +395,32 @@ describe('the props system', () => {
     ctx.quality = 'high';
     props.update(1 / 60, ctx);
     expect(props.stats().drawn).toBe(210);
+    props.dispose();
+  });
+
+  test('small plants thin out where they are small on screen, the rest stay, and the density setting still counts', () => {
+    const ctx = headless();
+    const props = createProps(ctx);
+    for (let i = 0; i < 400; i++) props.place('grassTuft', 0, { x: (i % 20) * 0.7 + 0.5, y: 0, z: Math.floor(i / 20) * 0.7 + 0.5 });
+    for (let i = 0; i < 4; i++) props.place('rock', 1, { x: i * 2 + 0.5, y: 0, z: 0.5 });
+    // Close: a meter is far more than 48 pixels tall, so every plant is drawn.
+    lookDownAt(ctx, 7, 7, 30);
+    props.update(1 / 60, ctx);
+    expect(props.stats().drawn).toBe(404);
+    // Far: a meter is a few pixels tall. 30% of the plants stay, and every rock.
+    lookDownAt(ctx, 7, 7, 500);
+    props.update(1 / 60, ctx);
+    const far = props.stats().drawn - 4;
+    expect(far).toBeGreaterThan(400 * 0.2);
+    expect(far).toBeLessThan(400 * 0.4);
+    // The density setting halves what is left: the plants kept are the ones the setting keeps first.
+    props.setPlantDensity(0.5);
+    props.update(1 / 60, ctx);
+    expect(props.stats().drawn - 4).toBeLessThan(far);
+    lookDownAt(ctx, 7, 7, 30);
+    props.update(1 / 60, ctx);
+    expect(props.stats().drawn - 4).toBeGreaterThan(400 * 0.4);
+    expect(props.stats().drawn - 4).toBeLessThan(400 * 0.6);
     props.dispose();
   });
 });
