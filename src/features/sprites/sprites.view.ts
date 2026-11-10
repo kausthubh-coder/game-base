@@ -82,6 +82,7 @@ export interface SpriteHandle {
 
 /** The part of the sky the sprites need. `createSky(...).look` fits. */
 export interface SpritesSky {
+  readonly sunDirection?: THREE.Vector3;
   /** Multiply an unlit color by this and it sits in the scene. */
   readonly light: THREE.Color;
 }
@@ -798,6 +799,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
         light.g = daylight[1];
         light.b = daylight[2];
       }
+      if (sky?.sunDirection) shadowUniforms.uSunDirection.value.copy(sky.sunDirection);
       // Shadows are strongest under a bright sky.
       const bright = Math.min(1, light.r * 0.3 + light.g * 0.5 + light.b * 0.2);
       shadowUniforms.uStrength.value = shadowsEnabled ? 0.2 + 0.25 * bright : 0;

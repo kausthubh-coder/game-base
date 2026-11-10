@@ -22,7 +22,7 @@ const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i 
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play');
 const site = resolve(out, 'ui-site');
-const PORT = 5332;
+const PORT = Number(opt('port', '5332'));
 const BASE = `http://127.0.0.1:${PORT}/`;
 const quality = opt('quality', 'high');
 const only = opt('only', '');
@@ -185,6 +185,23 @@ async function desktop(browser) {
   check('Settings opens from the title', (await panel()) === 'settings');
   const keyList = await game(() => [...document.querySelectorAll('.gu-keylist dt')].map((e) => e.textContent));
   check('Settings lists the map and the camera keys', keyList.includes('Map') && keyList.includes('Turn the camera'), keyList.join(', '));
+  for (const quality of ['low','medium','high','auto']) {
+    await page.locator(`input[name="gu-quality"][value="${quality}"]`).check();
+    check(`Graphics quality ${quality} applies`, (await game(() => window.__game.view.settings.quality)) === quality);
+  }
+  await page.locator('input[name="gu-quality"][value="high"]').check();
+  for (const [name,value] of [['shadows','off'],['shadows','sharp'],['shadows','soft'],['bloom','off'],['cloudShadows','off'],['weatherParticles','off'],['reduceMotion','on']]) {
+    await page.locator(`input[name="gu-${name}"][value="${value}"]`).check();
+    const actual = await game(([name]) => window.__game.view.settings.graphics[name], [name]);
+    check(`Graphics ${name} applies ${value}`, actual === (value === 'on' ? true : value === 'off' && name !== 'shadows' ? false : value));
+  }
+  check('Graphics shadows reach the light', await game(() => window.__game.view.sky.sun.castShadow));
+  check('Graphics bloom reaches post processing', !(await game(() => window.__game.view.post.settings.bloom)));
+  for (const [name,value] of [['shadowDistance',60],['plantDensity',.3],['viewDistance',.7]]) {
+    await page.locator(`#gu-${name}`).evaluate((el,value) => {el.value=String(value);el.dispatchEvent(new Event('input',{bubbles:true}));},value);
+    check(`Graphics ${name} applies`, (await game(name => window.__game.view.settings.graphics[name],name)) === value);
+  }
+  await page.getByRole('button',{name:'Reset graphics overrides',exact:true}).click();
   await shot('ui-02-settings.png');
   await key('Escape');
   check('Esc goes back from Settings to the title', (await panel()) === 'title');

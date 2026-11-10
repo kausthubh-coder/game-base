@@ -65,6 +65,7 @@ export interface PropsStats {
 
 export interface Props extends ViewSystem {
   /** Everything this system draws hangs under this group. */
+  setShadowOverride(value: boolean | null): void;
   setReduceMotion(value: boolean): void;
   setPlantDensity(value: number | null): void;
   readonly group: THREE.Group;
@@ -164,6 +165,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   const placed = new Map<number, Placed>();
   let nextHandle = 1;
   let quality = ctx.quality;
+  let shadowOverride: boolean | null = null;
   let reduceMotion = false;
   let plantDensity: number | null = null;
   let glow = darkness(ctx.ambient.timeOfDay);
@@ -286,7 +288,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       if (p.model.def.group === 'plant' && p.rank >= (plantDensity ?? level.plants)) continue;
       _matrix.compose(_position.set(p.x, p.y, p.z), _turn.setFromAxisAngle(UP, p.rotation), _scale.set(p.scale, p.scale, p.scale));
       addRow(rowsFor(cell, p.model.batch), _matrix, p.r, p.g, p.b);
-      if (!level.shadows) continue;
+      if (!(shadowOverride ?? level.shadows)) continue;
       const { blobs, boxes: boxList } = p.model.extras;
       for (let i = 0; i < blobs.length; i += 16) addRow(rowsFor(cell, balls), _part.fromArray(blobs, i).premultiply(_matrix), 1, 1, 1);
       for (let i = 0; i < boxList.length; i += 16) addRow(rowsFor(cell, boxes), _part.fromArray(boxList, i).premultiply(_matrix), 1, 1, 1);
@@ -350,6 +352,12 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   }
 
   return {
+    setShadowOverride(value) {
+      if (shadowOverride === value) return;
+      shadowOverride = value;
+      for (const cell of cellList) cell.stale = true;
+      refill = true;
+    },
     setReduceMotion(value) { reduceMotion = value; },
     setPlantDensity(value: number | null) {
       if (plantDensity === value) return;

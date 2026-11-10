@@ -403,7 +403,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     const p = player.position;
     camera.follow(p.x, p.y, p.z);
     if (settings.graphics.reduceMotion) camera.snap();
-    camera.update(Math.min(dt, 0.1), ctx);
+    camera.update(settings.graphics.reduceMotion ? 1 : Math.min(dt, 0.1), ctx);
     world.setFocus(p.x, p.z);
     world.setCutaway(camera.cutaway);
     world.update(dt, ctx);

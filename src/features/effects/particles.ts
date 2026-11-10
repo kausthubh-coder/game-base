@@ -241,7 +241,7 @@ export function createParticleStore(options: ParticleStoreOptions = {}): Particl
     data[o + LOOK + 3] = random();
     data[o + FADE] = entry.fade?.[0] ?? 0;
     data[o + FADE + 1] = entry.fade?.[1] ?? 0.3;
-    data[o + FADE + 2] = c.flags;
+    data[o + FADE + 2] = c.flags + (c.weather ? 8 : 0);
     data[o + FADE + 3] = c.wobbleRate;
     return true;
   }
