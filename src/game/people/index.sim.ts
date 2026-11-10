@@ -303,7 +303,16 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
         id: p.actor.id,
         pos: () => p.state.pos,
         radius: TALK_RANGE,
-        prompt: () => prompt,
+        prompt: () => {
+          // A festival passer can cross directly through a guest who is handing over a quest.
+          // Yield only when the player is already within one step of that marked guest.
+          if (p.actor.mark !== 'quest' && p.held && p.sent && (p.plan || p.path !== null)) {
+            for (const guest of people) {
+              if (guest.actor.mark === 'quest' && distance2d(guest.state.pos, player.pos) <= 1 && Math.abs(guest.state.pos.y - player.pos.y) < 2) return null;
+            }
+          }
+          return prompt;
+        },
         act: () => game.systems.talk.talkTo(def.id),
       });
     });

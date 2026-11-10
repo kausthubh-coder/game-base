@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test';
 import type { Vec3 } from '../../engine/types.ts';
 import { PEOPLE, type PersonDef } from '../content/people.ts';
 import type { GameSave, Kernel } from '../kernel.sim.ts';
+import { install as installInteract } from '../interact/index.sim.ts';
 import { install as installNav } from '../nav/index.sim.ts';
 import { FEET, makeStage, wall, type Stage } from '../nav/stage.testkit.ts';
 import { createPeople, install } from './index.sim.ts';
@@ -441,4 +442,24 @@ test('the background crowd has distinct faces that survive a reload', () => {
   for (const p of reload.kernel.game.systems.people.all()) {
     expect(reload.kernel.game.actors.get('npc:' + p.id)!.sprite).toBe(p.sprite);
   }
+});
+
+
+test('a festival passer yields to a quest guest within one step of the player', () => {
+  const stage = makeStage({places:{home:HOME,shop:SHOP},install:[installNav,installInteract,withPeople([ann,bo])]});
+  stage.kernel.game.clock.timeOfDay = 8 / 24;
+  stage.player(24,6);
+  stage.run(.05);
+  const {people,interact} = stage.kernel.game.systems;
+  people.send('ann','shop',{x:4,z:0});
+  people.hold('ann',true);
+  const passing = people.get('ann')!.pos;
+  Object.assign(passing, stage.kernel.game.player.pos);
+  // Bo is beside the player. Ann is crossing directly through the player.
+  people.get('bo')!.pos.x += .3;
+  people.setMark('bo','quest');
+  expect(interact.nearest()?.id).toBe('npc:bo');
+  // Travelling does not stop a person offering Talk when no quest guest is close.
+  people.setMark('bo','');
+  expect(interact.nearest()?.id).toBe('npc:ann');
 });
