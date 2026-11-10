@@ -1,0 +1,83 @@
+[
+ {
+  "id": "tamsin",
+  "n": 1,
+  "generatedVoiceId": "CXUUgsQbzABmcMGdBxih",
+  "file": "tamsin-1.mp3",
+  "seconds": 16.04,
+  "pitchHz": 168,
+  "wordsPerSecond": 2.43
+ },
+ {
+  "id": "tamsin",
+  "n": 2,
+  "generatedVoiceId": "30hqoTJF3dS5trqljOct",
+  "file": "tamsin-2.mp3",
+  "seconds": 16.59,
+  "pitchHz": 143,
+  "wordsPerSecond": 2.35
+ },
+ {
+  "id": "tamsin",
+  "n": 3,
+  "generatedVoiceId": "kweqZmZUk77PejB4ZHKo",
+  "file": "tamsin-3.mp3",
+  "seconds": 21.89,
+  "pitchHz": 155,
+  "wordsPerSecond": 1.78
+ },
+ {
+  "id": "maren",
+  "n": 1,
+  "generatedVoiceId": "4K8o383uft8dwZ8Rc0Yx",
+  "file": "maren-1.mp3",
+  "seconds": 13.48,
+  "pitchHz": 242,
+  "wordsPerSecond": 2.37
+ },
+ {
+  "id": "maren",
+  "n": 2,
+  "generatedVoiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "maren-2.mp3",
+  "seconds": 12.28,
+  "pitchHz": 208,
+  "wordsPerSecond": 2.61
+ },
+ {
+  "id": "maren",
+  "n": 3,
+  "generatedVoiceId": "sZIIH6zKh9ksbNSp5uBB",
+  "file": "maren-3.mp3",
+  "seconds": 14.68,
+  "pitchHz": 211,
+  "wordsPerSecond": 2.18
+ },
+ {
+  "id": "gus",
+  "n": 1,
+  "generatedVoiceId": "AiGez5WAEDH76M43aagV",
+  "file": "gus-1.mp3",
+  "seconds": 22.99,
+  "pitchHz": 96,
+  "wordsPerSecond": 1.26
+ },
+ {
+  "id": "gus",
+  "n": 2,
+  "generatedVoiceId": "VAmop9jKbd3fw7i7BY4S",
+  "file": "gus-2.mp3",
+  "seconds": 21.71,
+  "pitchHz": 87,
+  "wordsPerSecond": 1.34
+ },
+ {
+  "id": "gus",
+  "n": 3,
+  "generatedVoiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "file": "gus-3.mp3",
+  "seconds": 24.11,
+  "pitchHz": 100,
+  "wordsPerSecond": 1.2
+ }
+]
