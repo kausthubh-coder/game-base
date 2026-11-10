@@ -6,7 +6,7 @@ for seed in [11,37]:
     r=start(seed)
     bpy.ops.mesh.primitive_cube_add(size=2,location=(0,0,0)); obj=bpy.context.object
     obj.scale=(1,.75,.65); bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
-    bevel=obj.modifiers.new('soft weathered edges','BEVEL'); bevel.width=.38; bevel.segments=3
+    bevel=obj.modifiers.new('soft weathered edges','BEVEL'); bevel.width=.20; bevel.segments=1
     bpy.context.view_layer.objects.active=obj; bpy.ops.object.modifier_apply(modifier=bevel.name)
     for v in obj.data.vertices: v.co*=r.uniform(.94,1.06)
     low=min(v.co.z for v in obj.data.vertices)
@@ -15,6 +15,8 @@ for seed in [11,37]:
     m=Mesh()
     for p in obj.data.polygons:
         pts=[obj.data.vertices[i].co.copy() for i in p.vertices]; top=sum(v.z for v in pts)/len(pts)/1.3
-        m.face(pts,(.26+.18*top,.29+.17*top,.26+.16*top,1),normals=[tuple(obj.data.vertices[i].normal) for i in p.vertices])
+        shade=r.uniform(.88,1.12)
+        col=(.22*shade,.32*shade,.12*shade,1) if p.normal.z>.45 else (.30*shade,.32*shade,.29*shade,1)
+        m.face(pts,col)
     bpy.data.objects.remove(obj,do_unlink=True)
     finish(m.object('weathered rock'),f'rock-{seed}')

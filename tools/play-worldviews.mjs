@@ -457,10 +457,11 @@ try {
     for (let x = Math.floor(at.x) - 30; x <= Math.floor(at.x) + 30; x++) for (let z = Math.floor(at.z) - 30; z <= Math.floor(at.z) + 30; z++) {
       for (let y = Math.floor(at.y) - 4; y <= Math.floor(at.y) + 4; y++) if (/_log$/.test(g.block(x, y, z).key)) { blockTrees++; break; }
     }
-    return { at, blockTrees, propTrees: propTrees.map((m) => `${m.name} x${m.count}`), calls: await wv.propCalls() };
+    const modelTrees=g.view.game.systems.trees.all().filter(t=>t.standing&&Math.hypot(t.x-at.x,t.z-at.z)<30).length;
+    return { at, modelTrees, blockTrees, propTrees: propTrees.map((m) => `${m.name} x${m.count}`), calls: await wv.propCalls() };
   });
   numbers.wide = wide.calls;
-  check('block trees stand near the start, and no prop tree', wide.blockTrees >= 5 && wide.propTrees.length === 0, `${wide.blockTrees} block trees within 30 blocks; prop trees: ${wide.propTrees.join(', ') || 'none'}`);
+  check('model trees stand near the start, without block trees', wide.modelTrees >= 5 && wide.blockTrees === 0 && wide.propTrees.length === 0, `${wide.modelTrees} model trees; ${wide.blockTrees} block trees within 30 blocks`);
   check('the props stay inside 40 draw calls', wide.calls.props <= 40 && wide.calls.counted.drawCalls + wide.calls.counted.shadowCalls <= 40,
     `the renderer drew ${wide.calls.props} calls for props of ${wide.calls.frame} in the frame. Counted: ${wide.calls.counted.drawCalls} kinds and ${wide.calls.counted.shadowCalls} for shadows, ${wide.calls.counted.drawn} props in view`);
   console.log(`     triangles: ${wide.calls.triangles} in the frame, ${wide.calls.counted.triangles} of them props and their shadows. Heaviest: ${wide.calls.heaviest.join('; ')}`);

@@ -192,20 +192,7 @@ function installHelpers() {
     /** Every tree within 40 blocks the player may cut, nearest first, away from the mossy rocks' shade. */
     trunks() {
       const sim = g.view.world.sim, rocks = sys.region.place('grant.rocks').at;
-      const log = (x, y, z) => /_log$/.test(g.block(x, y, z).key);
-      const found = [];
-      for (let x = Math.floor(P.pos.x) - 40; x <= Math.floor(P.pos.x) + 40; x++) {
-        for (let z = Math.floor(P.pos.z) - 40; z <= Math.floor(P.pos.z) + 40; z++) {
-          for (let y = sim.heightAt(x, z) - 1; y > 1; y--) {
-            if (!log(x, y, z) || log(x, y - 1, z)) continue;
-            let logs = 0;
-            while (log(x, y + logs, z)) logs++;
-            const under = g.block(x, y - 1, z).key;
-            if (logs >= 3 && !/leaves|needles|air/.test(under) && under !== '' && !sys.region.isProtected(x, y, z)) found.push({ x, y, z, logs });
-            break;
-          }
-        }
-      }
+      const found = sys.trees.all().filter(t => t.standing && !sys.region.isProtected(t.x,t.y,t.z)).map(t => ({ ...t, logs: Math.max(3,Math.round(4*t.size)) }));
       return found.filter((t) => Math.hypot(t.x + 0.5 - rocks.x, t.z + 0.5 - rocks.z) > 12)
         .sort((a, b) => Math.hypot(a.x - P.pos.x, a.z - P.pos.z) - Math.hypot(b.x - P.pos.x, b.z - P.pos.z));
     },
