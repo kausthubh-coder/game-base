@@ -87,6 +87,10 @@ try {
   await page.evaluate(() => {
     const g = window.__game, v = g.view, sys = v.game.systems, P = v.game.player, w = window.__walk;
     g.manual(true);
+    // Each render stops on a 128-sample boundary. Steps count from a running target, never from where the last
+    // one stopped, so rounding never adds up and the sound keeps time with the pictures.
+    w.target = 0;
+    w.step = (seconds) => { w.target += seconds; return w.renderTo(w.target); };
     w.renderTo = (t) => new Promise((done) => {
       // A suspension lands on a render quantum: ask for the one at or after t.
       const q = Math.ceil((t * w.ctx.sampleRate) / 128) * 128 / w.ctx.sampleRate;
@@ -144,7 +148,7 @@ try {
         g.advance(FRAME / SUB);
         // The views that listen to frames are not called between pictures, so the engine is called here.
         g.view.audio.update(FRAME / SUB);
-        await w.renderTo(w.at + FRAME / SUB);
+        await w.step(FRAME / SUB);
       }
       return { ...w.state(), left };
     }, { drive, FRAME, SUB });
@@ -168,7 +172,7 @@ try {
   // A sunny morning, at the grant stone.
   await page.evaluate(() => { const g = window.__game; g.setTime(9.4 / 24); g.teleport(-12, -236); });
   await page.evaluate(() => window.__game.settle());
-  await page.evaluate(() => window.__walk.renderTo(0.06));
+  await page.evaluate(() => window.__walk.step(0.06));
 
   // The thickest stand on the way is the row of oaks and birches north of the grant and the three oaks over the
   // mossy rocks (src/game/content/region.ts). Wild trees near the path stand too far apart to walk under.
@@ -272,7 +276,7 @@ try {
     a.setVolume('music', 0);
     a.setVolume('ambience', 0);
     // Let the music and the air fall away.
-    for (let k = 0; k < 40; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
+    for (let k = 0; k < 40; k++) { a.update(0.05); await w.step(0.05); }
     const at = { x: 0, y: 0, z: 0 };
     a.setListener(at, 0);
     a.setState({ indoors: 0, stone: 0, trees: 0, town: 0 });
@@ -283,11 +287,11 @@ try {
         for (let t = 0; t < seconds; t += 0.05) {
           if (Math.floor((t + 0.05) / rate) > Math.floor(t / rate)) a.emit({ type: 'footstep', surface: 'grass', at, material, gait, cloth: 0.35 });
           a.update(0.05);
-          await w.renderTo(w.at + 0.05);
+          await w.step(0.05);
         }
       }
       a.emit({ type: 'land', surface: 'grass', at, material });
-      for (let k = 0; k < 16; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
+      for (let k = 0; k < 16; k++) { a.update(0.05); await w.step(0.05); }
       out.push({ name: `steps-${material}`, start, end: w.at });
     }
     a.setVolume('effects', 0);
@@ -297,9 +301,9 @@ try {
     a.followAmbient({ ...window.__game.view.game.ambient, wind: 0, rain: 0 });
     for (const bed of beds) {
       for (const other of beds) a.setBed(other, other === bed ? 1 : 0, null);
-      for (let k = 0; k < 30; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
+      for (let k = 0; k < 30; k++) { a.update(0.05); await w.step(0.05); }
       const start = w.at;
-      for (let k = 0; k < 200; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
+      for (let k = 0; k < 200; k++) { a.update(0.05); await w.step(0.05); }
       out.push({ name: bed.replace(/^bed\./, 'bed-').replace(/\./g, '-'), start, end: w.at });
     }
     return out;
@@ -346,7 +350,8 @@ try {
   writeFileSync(resolve(OUT, 'timeline.json'), JSON.stringify({ frame: FRAME, walkEnd, pieces, timeline }, null, 1));
 
   // The pictures at five a second, and the sound under them.
-  const mux = spawnSync(FFMPEG, ['-v', 'error', '-y', '-framerate', String(Math.round(1 / FRAME)), '-i', resolve(frames, '%05d.jpg'), '-i', resolve(OUT, 'walk.wav'),
+  // The pictures' rate from the sound's length, so the video ends with the sound whatever the rounding did.
+  const mux = spawnSync(FFMPEG, ['-v', 'error', '-y', '-framerate', String(shots / walkEnd), '-i', resolve(frames, '%05d.jpg'), '-i', resolve(OUT, 'walk.wav'),
     '-c:v', 'libx264', '-crf', '26', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '192k', '-shortest', resolve(OUT, 'walk.mp4')], { stdio: 'inherit' });
   if (mux.status !== 0) throw new Error('ffmpeg could not make the video');
   // The pictures are in the video now. The disk this runs on is shared and small.
