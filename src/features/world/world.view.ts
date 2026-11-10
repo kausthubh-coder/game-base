@@ -68,6 +68,7 @@ export interface WorldView extends ViewSystem {
   /** The atlas in use, for block swatches in a panel. */
   readonly atlas: AtlasSource;
   /** Chunks load around this point. Call it with the hero's position. */
+  setViewDistance(scale: number): void;
   setFocus(x: number, z: number): void;
   setCutaway(cutaway: Cutaway | null): void;
   setBlock(x: number, y: number, z: number, id: number): boolean;
@@ -136,7 +137,8 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
   const post = (message: WorkerRequest, transfer: Transferable[] = []): void => worker.postMessage(message, transfer);
   post({ type: 'tiles', tiles: textures.table });
 
-  const viewScale = options.viewScale ?? 1;
+  let viewScale = options.viewScale ?? 1;
+  let quality = ctx.quality;
   const budget = options.budgetMs ?? 3;
   const shown = new Map<number, Shown>();
   const made: Extract<WorkerReply, { type: 'made' }>[] = [];
@@ -458,6 +460,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
     stats,
     atlas: textures.source,
 
+    setViewDistance(scale) { viewScale = scale; setRadius(RADIUS[quality] * viewScale); },
     setFocus(x, z) {
       focusX = x; focusZ = z;
     },
@@ -541,7 +544,8 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
       ground?.upload();
     },
 
-    setQuality(quality) {
+    setQuality(next) {
+      quality = next;
       setRadius(RADIUS[quality] * viewScale);
     },
 

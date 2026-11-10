@@ -36,7 +36,7 @@ export function install(view: GameView): void {
     const id = view.world.sim.getBlock(aim.x, aim.y, aim.z);
     if (aim.x !== last.x || aim.y !== last.y || aim.z !== last.z || id !== last.id || axe !== last.axe) {
       last.x = aim.x; last.y = aim.y; last.z = aim.z; last.id = id; last.axe = axe;
-      tree = LOG[id] || (axe && LEAF[id]) ? findTree(view.world.sim, aim.x, aim.y, aim.z, RULES)?.box ?? null : null;
+      tree = game.systems.trees?.at(aim.x,aim.y,aim.z)?.box ?? (LOG[id] || (axe && LEAF[id]) ? findTree(view.world.sim, aim.x, aim.y, aim.z, RULES)?.box ?? null : null);
     }
     const breaking = game.systems.actions?.breaking() ?? null;
     let progress = 0;

@@ -308,8 +308,8 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
       marked.clear();
       resync = true;
       dirty = true;
-      views = [];
-      tracked = null;
+      // Continue exposes the restored quest immediately, even before the first step.
+      refresh();
     },
   };
 
