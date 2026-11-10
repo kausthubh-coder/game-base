@@ -171,3 +171,12 @@ The optional `models` object maps a model name to `file` relative to assets,
 The build command writes actual counts. The verifier reads each GLB and checks
 the declared counts, byte size, one triangle primitive and the 1500/300 caps.
 They are loaded only by the optional `?models=1` look view.
+
+## The cast
+
+The optional `cast` object lists the characters drawn when Characters is "3D models": one GLB each under
+`public/assets/models/cast-<name>.glb`, exported from a hand-made Blender source in `assets-src/cast/sources/` by
+`bun tools/models/cast/build.mjs` (also run by `tools/models/build.mjs`). Each entry has `file`, `source`, `triangles`,
+`budget` (4000 for a person, 2000 for a creature) and `bytes`. For example,
+`"hero": {"file":"models/cast-hero.glb","source":"assets-src/cast/sources/hero.blend","triangles":3400,"budget":4000,"bytes":149716}`.
+The verifier reads each GLB and checks the counts, the byte size and that the source exists.

@@ -442,7 +442,8 @@ varying float vToonGlow;`)
           #include <opaque_fragment>`);
     };
 
-    const outlineMaterial = new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: true, name: `toon-outline-${name}` });
+    // A file painted by vertex colours darkens them for its outline too, not the white of its one slot.
+    const outlineMaterial = new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: true, name: `toon-outline-${name}`, vertexColors: spec.vertexColours ?? false });
     outlineMaterial.onBeforeCompile = (shader) => {
       // Pushed out along the normal by a width in blocks, whatever the character's scale.
       poseVertices(shader, { ...uniforms, ...shared }, 'position',

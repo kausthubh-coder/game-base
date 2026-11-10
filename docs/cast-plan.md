@@ -1,5 +1,7 @@
 # Our own cast, built by Blender scripts
 
+> **Done (2026-11-10).** Kausthubh's own cast arrived from his Blender bot and replaced the CC0 stand-ins: sources in `assets-src/cast/`, exported by `bun tools/models/cast/build.mjs`, wired in `src/game/content/cast.ts`. The plan below is kept for its notes.
+
 Today the 3D cast is CC0 stand-ins from KayKit's Adventurers pack, recoloured per person (`public/assets/stand-ins/kaykit`, rebuilt by `tools/models/cast/stand-ins.mjs`). They read well, but they are generic adventurers with stern faces, and every person shares one of three bodies. This plan replaces them with our own people: chibi, about 2 blocks tall, rigged and animated by script, so the rule "no model a script does not rebuild" holds with no exception.
 
 ## Dropping a new cast in

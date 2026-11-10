@@ -235,7 +235,7 @@ export async function loadCastModels(ctx: ViewContext, sun: THREE.DirectionalLig
       return cast.add(bodyKey(look), {
         x: o.x, y: o.y, z: o.z, facing: o.facing, visible: o.visible, animation: o.animation,
         palette: paletteOf(body.slots, body.colours, look.colours, CAST_BY_ID[id]), parts: look.parts, partsWhile: look.partsWhile,
-        scale: look.height / body.top,
+        scale: look.scale ?? look.height / body.top,
       });
     },
     markHeight(sprite) {

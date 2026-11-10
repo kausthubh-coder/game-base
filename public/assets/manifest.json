@@ -1082,25 +1082,104 @@
       "bytes": 29236
     }
   },
-  "standIns": {
-    "kaykit-cast": {
-      "file": "stand-ins/kaykit/cast.glb",
-      "license": "CC0 1.0",
-      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
-      "build": "bun tools/models/cast/stand-ins.mjs",
-      "bodies": [
-        "slim",
-        "dress",
-        "stout"
-      ],
-      "clips": [
-        "Idle",
-        "Walk",
-        "Run",
-        "Tool",
-        "Talk"
-      ],
-      "bytes": 552616
+  "cast": {
+    "hero": {
+      "file": "models/cast-hero.glb",
+      "source": "assets-src/cast/sources/hero.blend",
+      "triangles": 3400,
+      "budget": 4000,
+      "bytes": 149716
+    },
+    "tamsin": {
+      "file": "models/cast-tamsin.glb",
+      "source": "assets-src/cast/sources/tamsin.blend",
+      "triangles": 3292,
+      "budget": 4000,
+      "bytes": 146672
+    },
+    "maren": {
+      "file": "models/cast-maren.glb",
+      "source": "assets-src/cast/sources/maren.blend",
+      "triangles": 3112,
+      "budget": 4000,
+      "bytes": 138252
+    },
+    "odo": {
+      "file": "models/cast-odo.glb",
+      "source": "assets-src/cast/sources/odo.blend",
+      "triangles": 2878,
+      "budget": 4000,
+      "bytes": 126512
+    },
+    "gus": {
+      "file": "models/cast-gus.glb",
+      "source": "assets-src/cast/sources/gus.blend",
+      "triangles": 2764,
+      "budget": 4000,
+      "bytes": 126428
+    },
+    "mira": {
+      "file": "models/cast-mira.glb",
+      "source": "assets-src/cast/sources/mira.blend",
+      "triangles": 2750,
+      "budget": 4000,
+      "bytes": 126604
+    },
+    "wren": {
+      "file": "models/cast-wren.glb",
+      "source": "assets-src/cast/sources/wren.blend",
+      "triangles": 3006,
+      "budget": 4000,
+      "bytes": 135180
+    },
+    "juniper": {
+      "file": "models/cast-juniper.glb",
+      "source": "assets-src/cast/sources/juniper.blend",
+      "triangles": 2866,
+      "budget": 4000,
+      "bytes": 129984
+    },
+    "brack": {
+      "file": "models/cast-brack.glb",
+      "source": "assets-src/cast/sources/brack.blend",
+      "triangles": 3084,
+      "budget": 4000,
+      "bytes": 137536
+    },
+    "villager-a": {
+      "file": "models/cast-villager-a.glb",
+      "source": "assets-src/cast/sources/villager-a.blend",
+      "triangles": 2798,
+      "budget": 4000,
+      "bytes": 126864
+    },
+    "villager-b": {
+      "file": "models/cast-villager-b.glb",
+      "source": "assets-src/cast/sources/villager-b.blend",
+      "triangles": 2894,
+      "budget": 4000,
+      "bytes": 131052
+    },
+    "leaftail": {
+      "file": "models/cast-leaftail.glb",
+      "source": "assets-src/cast/sources/leaftail.blend",
+      "triangles": 1808,
+      "budget": 2000,
+      "bytes": 80548
+    },
+    "mossling": {
+      "file": "models/cast-mossling.glb",
+      "source": "assets-src/cast/sources/mossling.blend",
+      "triangles": 1468,
+      "budget": 2000,
+      "bytes": 66548
+    },
+    "lanternfly": {
+      "file": "models/cast-lanternfly.glb",
+      "source": "assets-src/cast/sources/lanternfly.blend",
+      "triangles": 1560,
+      "budget": 2000,
+      "bytes": 72408
     }
   }
 }

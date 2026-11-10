@@ -8,12 +8,8 @@ import { CREATURES } from './creatures.ts';
 import { PEOPLE } from './people.ts';
 import { PETS } from './pets.ts';
 
-/** The optional parts each mesh has in its file (tools/models/cast/stand-ins.mjs), by model and mesh. */
-const FILE_PARTS: Record<string, readonly string[]> = {
-  'kaykit/slim': ['cape'],
-  'kaykit/dress': [],
-  'kaykit/stout': ['beard'],
-};
+/** The optional parts each mesh has in its file, by model and mesh. The cast's files have none. */
+const FILE_PARTS: Record<string, readonly string[]> = {};
 
 test('every character the game draws has a 3D look: the hero, the people, the pets and the creatures', () => {
   const sprites = new Set(['hero', 'hero-swing', ...PEOPLE.map((p) => p.sprite), ...PETS.map((p) => p.sprite), ...CREATURES.map((c) => c.sprite)]);
