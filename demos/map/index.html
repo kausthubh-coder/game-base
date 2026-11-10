@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <!-- viewport-fit=cover lets the HUD read the phone's notch and home bar. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+    <title>Map demo · game base</title>
+    <style>
+      :root { color-scheme: dark; }
+      html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: #10141a; color: #e8eaee; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+      canvas#view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+
+      /* The demo's own controls. Plain and dark, so they do not pass for part of the game's HUD. */
+      #demo { position: fixed; z-index: 15; left: max(12px, env(safe-area-inset-left, 0px)); top: calc(max(12px, env(safe-area-inset-top, 0px)) + 104px); width: 208px; display: grid; gap: 6px; }
+      #demo button { font: inherit; color: inherit; min-height: 30px; padding: 3px 10px; background: rgba(16, 20, 26, 0.82); border: 1px solid rgba(255, 255, 255, 0.22); border-radius: 5px; cursor: pointer; }
+      #demo button:hover { background: rgba(40, 48, 60, 0.9); }
+      #demo button:focus-visible { outline: 2px solid #7fd4ff; outline-offset: 1px; }
+      #demo > #turn { min-height: 44px; font-weight: 600; }
+      #demo details { background: rgba(16, 20, 26, 0.82); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; padding: 6px 8px; }
+      #demo summary { cursor: pointer; color: rgba(232, 234, 238, 0.8); min-height: 20px; }
+      #demo .row { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+      #demo .row button { flex: 1 1 auto; }
+      #readout, #help { margin: 6px 0 0; color: rgba(232, 234, 238, 0.74); font-size: 12px; font-variant-numeric: tabular-nums; }
+      #help b { color: #e8eaee; font-weight: 600; }
+
+      #prompt { position: fixed; z-index: 12; left: 50%; bottom: calc(max(12px, env(safe-area-inset-bottom, 0px)) + var(--gb-hud-bottom, 0px) + 76px); transform: translateX(-50%); padding: 5px 14px; border-radius: 16px; background: rgba(16, 20, 26, 0.84); border: 1px solid rgba(255, 255, 255, 0.22); white-space: nowrap; pointer-events: none; }
+      #prompt[hidden] { display: none; }
+      #prompt kbd { display: inline-block; min-width: 1.4em; margin-right: 6px; padding: 0 5px; text-align: center; font: inherit; font-weight: 700; color: #10141a; background: #e8eaee; border-radius: 4px; }
+
+      #keys { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; background: rgba(8, 10, 14, 0.6); }
+      #keys[hidden] { display: none; }
+      #keys .sheet { width: min(460px, calc(100% - 24px)); max-height: calc(100% - 24px); overflow: auto; box-sizing: border-box; padding: 14px 16px; background: #161b23; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; }
+      #keys h2 { margin: 0 0 4px; font-size: 16px; }
+      #keys p { margin: 0 0 10px; color: rgba(232, 234, 238, 0.74); }
+      #keys table { width: 100%; border-collapse: collapse; }
+      #keys td { padding: 3px 0; }
+      #keys td:last-child { text-align: right; }
+      #keys button { font: inherit; color: inherit; min-width: 84px; min-height: 28px; margin-left: 4px; padding: 2px 8px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 4px; cursor: pointer; }
+      #keys button.is-waiting { background: #f0b85a; color: #10141a; }
+      #keys button:focus-visible { outline: 2px solid #7fd4ff; outline-offset: 1px; }
+      #keys .foot { display: flex; justify-content: flex-end; gap: 6px; margin-top: 12px; }
+
+      @media (max-width: 700px), (max-height: 500px) {
+        #demo { top: calc(max(8px, env(safe-area-inset-top, 0px)) + 96px); width: 150px; }
+      }
+      /* A phone on its side has no room for the rest of the demo's controls. */
+      @media (max-height: 500px) {
+        #more { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="demo">
+      <button id="turn" type="button">Turn the camera</button>
+      <details id="more" open>
+        <summary>Demo controls</summary>
+        <div class="row">
+          <button id="weather" type="button">Weather</button>
+          <button id="hour" type="button">+1 hour</button>
+        </div>
+        <div class="row">
+          <button id="smaller" type="button">HUD −</button>
+          <button id="bigger" type="button">HUD +</button>
+          <button id="touch" type="button">Touch</button>
+        </div>
+        <div class="row">
+          <button id="rebind" type="button">Keys</button>
+          <button id="dig" type="button">Dig a pond</button>
+          <button id="fresh" type="button">New map</button>
+        </div>
+        <p id="readout"></p>
+        <p id="help">
+          <b>WASD</b> walk · <b>F</b> talk · <b>M</b> map · <b>Q</b> <b>E</b> turn · <b>wheel</b> zoom · <b>click</b> ping ·
+          <b>right click</b> pin where you stand · <b>1</b> to <b>9</b> slots
+        </p>
+      </details>
+    </div>
+    <div id="prompt" hidden></div>
+    <div id="keys" hidden></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
