@@ -4,7 +4,7 @@
 // zoom steps in, and the square two zoom steps in.
 // It writes <name>-<view>-<time>.png and adds the renderer's counts to shots.json in the out folder.
 //   bun tools/town-shots.mjs --town a [--url http://127.0.0.1:5391/] [--out .artifacts/town] [--views far,approach,square]
-//     [--times noon,dusk,night] [--w 1440] [--h 900] [--quality high] [--frames 60]
+//     [--times noon,dusk,night] [--w 1440] [--h 900] [--quality high] [--frames 60] [--no-kit]
 // It fails on a console error. This Mac draws WebGL in software, so it reads draw calls and triangles, never frames a second.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -52,6 +52,8 @@ try {
   page.setDefaultTimeout(600000);
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
+  // `--no-kit` keeps the town kit from loading, to see the stand-ins drawn until it arrives.
+  if (args.includes('--no-kit')) await page.route('**/models/town/**', (route) => route.abort());
   const game = (js, arg) => page.evaluate(js, arg);
   await page.goto(`${url}?hold=1&quality=${quality}&town=${town}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__game !== undefined);

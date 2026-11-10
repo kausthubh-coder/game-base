@@ -13,7 +13,10 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 const MB = 1024 * 1024;
-export const LIMITS = { png: 1 * MB, folder: 12 * MB };
+// The folder was 12 MB. It is 24 MB since the Hollowmere town kit (models/town/, about 0.5 MB with Draco) came on
+// top of 11.5 MB of sprites, tiles and voiced lines: the voice keeps growing, and the town's models are fetched
+// only as the hero nears the town, so the folder is no longer what a first load costs.
+export const LIMITS = { png: 1 * MB, folder: 24 * MB };
 
 // A palette that leaves a layer out on purpose, with the reason. Anything else missing is a failure.
 export const LAYER_EXEMPT = {

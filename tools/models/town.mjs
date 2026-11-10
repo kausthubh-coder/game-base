@@ -1,9 +1,11 @@
 // The Hollowmere town kit: 27 Blender models by Dot (assets-src/models/town/, with its own README). This
 // tool brings them into the game. With --rebuild it first re-exports every GLB from its .blend source with
-// Blender, through the kit's own scripts. Then it copies the GLBs to public/assets/models/town/, lists each
+// Blender, through the kit's own scripts, into assets-src/models/town/models/. Then Blender writes each GLB
+// again, Draco-compressed, to public/assets/models/town/ (tools/models/town_draco.py), and the tool lists each
 // in public/assets/manifest.json under `models` as `town-<name>`, and writes src/content/town-kit.ts: each
-// model's size, its footprint and the cells a body cannot walk through.
-//   bun tools/models/town.mjs [--rebuild] [--grids]
+// model's size, its footprint and the cells a body cannot walk through, sampled from the uncompressed GLB.
+// The game decodes the Draco with Three's own decoder, which the bundler ships beside the code.
+//   bun tools/models/town.mjs [--rebuild] [--no-compress] [--grids]
 //
 // A cell is solid when the model has surface in it between ankle and head height (0.25 to 1.8 m), so walls,
 // posts and counters block, and steps, roofs and eaves do not, and so is every cell walled in from the edge.
@@ -15,14 +17,16 @@ import { inspectGlb } from './inspect.mjs';
 
 const root = resolve(import.meta.dirname, '../..');
 const kit = resolve(root, 'assets-src/models/town');
-const out = resolve(root, 'public/assets/models/town');
 const args = process.argv.slice(2);
+const BLENDER = process.env.BLENDER ?? '/Applications/Blender.app/Contents/MacOS/Blender';
 
 if (args.includes('--rebuild')) {
-  const run = spawnSync('sh', ['scripts/rebuild.sh', '--no-renders'], { cwd: kit, stdio: 'inherit', env: { ...process.env, BLENDER: process.env.BLENDER ?? '/Applications/Blender.app/Contents/MacOS/Blender' } });
+  const run = spawnSync('sh', ['scripts/rebuild.sh', '--no-renders'], { cwd: kit, stdio: 'inherit', env: { ...process.env, BLENDER } });
   if (run.status !== 0) process.exit(run.status ?? 1);
-  fs.mkdirSync(out, { recursive: true });
-  for (const file of fs.readdirSync(resolve(kit, 'models'))) if (file.endsWith('.glb')) fs.copyFileSync(resolve(kit, 'models', file), resolve(out, file));
+}
+if (!args.includes('--no-compress')) {
+  const run = spawnSync(BLENDER, ['--background', '--factory-startup', '--python-exit-code', '1', '--python', 'tools/models/town_draco.py'], { cwd: root, stdio: 'inherit' });
+  if (run.status !== 0) process.exit(run.status ?? 1);
 }
 
 const LOW = 0.25, HIGH = 1.8, STEP = 0.08;
@@ -64,9 +68,11 @@ const entries = [];
 for (const source of sources) {
   const { name, footprint: [w, d], dimensions: [sx, sy, sz], budget, category } = source;
   const file = `models/town/${name}.glb`;
-  const buffer = fs.readFileSync(resolve(root, 'public/assets', file));
-  const { triangles } = inspectGlb(buffer, { primitives: 2 });
-  manifest.models[`town-${name}`] = { file, triangles, budget, bytes: buffer.length };
+  const shipped = fs.readFileSync(resolve(root, 'public/assets', file));
+  const { triangles } = inspectGlb(shipped, { primitives: 2 });
+  manifest.models[`town-${name}`] = { file, triangles, budget, bytes: shipped.length };
+  // The cells are sampled from the uncompressed GLB, whose positions can be read without a Draco decoder.
+  const buffer = fs.readFileSync(resolve(kit, 'models', `${name}.glb`));
 
   // Cells of the footprint, x from its west edge and z from its north edge, with the model's middle at (w / 2, d / 2).
   const hits = new Uint32Array(w * d);
