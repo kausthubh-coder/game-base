@@ -6,9 +6,13 @@ import type { Rng } from './rng.sim.ts';
 export type BusId = 'music' | 'ambience' | 'effects' | 'voice';
 
 /** At most this many voices sound at once. A voice is one note, one hit or one continuous bed. */
-export const VOICE_LIMIT = 48;
-/** Each bus has its own share, and the shares add up to the limit. */
-export const BUS_CAPS: Record<BusId, number> = { music: 30, ambience: 10, effects: 6, voice: 2 };
+export const VOICE_LIMIT = 64;
+/**
+ * Each bus has its own share, and the shares add up to the limit. A recorded sound is one buffer through a
+ * gain and a filter, far cheaper than a synthesized note, which is why the ambience and the effects have
+ * room for townsfolk's feet and the town's spot sounds.
+ */
+export const BUS_CAPS: Record<BusId, number> = { music: 30, ambience: 18, effects: 12, voice: 4 };
 /** Low-priority sounds stop being admitted this many voices before a bus is full, per priority step below 2. */
 const HEADROOM: Record<BusId, number> = { music: 3, ambience: 1, effects: 1, voice: 0 };
 
@@ -85,6 +89,16 @@ export class Build {
     return o;
   }
 
+  /** One stretch of a recorded sound, from `offset` in its file. `rate` above 1 plays it higher and shorter. */
+  sample(buffer: AudioBuffer, offset: number, rate = 1): AudioBufferSourceNode {
+    const s = this.rig.ctx.createBufferSource();
+    s.buffer = buffer;
+    s.playbackRate.value = rate;
+    this.nodes.push(s);
+    this.sources.push({ node: s, offset: Math.max(0, offset) });
+    return s;
+  }
+
   /** Looping noise that starts somewhere random in the buffer, so no two bursts are the same. */
   noise(color: 'white' | 'pink' | 'brown', rate = 1): AudioBufferSourceNode {
     const s = this.rig.ctx.createBufferSource();
@@ -144,6 +158,8 @@ export class Rig {
   /** Continuous beds that are audible now. Each one counts as an ambience voice. */
   beds = 0;
   private readonly voices: Voice[] = [];
+  /** Nodes of a bed's stretches: counted and let go like a voice's, but the bed itself is the voice. */
+  private readonly tracked: { end: number; nodes: AudioNode[] }[] = [];
   private readonly waves = new Map<WaveName, PeriodicWave>();
 
   constructor(readonly ctx: BaseAudioContext, readonly rng: Rng) {
@@ -195,7 +211,7 @@ export class Rig {
   }
 
   /**
-   * Asks for room for one sound. Returns null when the bus is full, which is how the 48-voice limit holds:
+   * Asks for room for one sound. Returns null when the bus is full, which is how the voice limit holds:
    * a sound that would break it is never made. Less important sounds are refused a little earlier.
    */
   begin(bus: BusId, priority: Priority, start: number, end: number): Build | null {
@@ -216,8 +232,23 @@ export class Rig {
     this.voiceNodes += voice.nodes.length;
   }
 
+  /** Counts nodes that belong to a bed, and lets them go once `end` has passed. */
+  track(nodes: AudioNode[], end: number): void {
+    this.tracked.push({ end, nodes });
+    this.voiceNodes += nodes.length;
+  }
+
   /** Lets go of every sound that has ended: its nodes are disconnected and no longer counted. */
   sweep(now: number): void {
+    const tracked = this.tracked;
+    for (let i = tracked.length - 1; i >= 0; i--) {
+      const t = tracked[i] as { end: number; nodes: AudioNode[] };
+      if (t.end + 0.06 > now) continue;
+      for (const node of t.nodes) node.disconnect();
+      this.voiceNodes -= t.nodes.length;
+      tracked[i] = tracked[tracked.length - 1] as { end: number; nodes: AudioNode[] };
+      tracked.pop();
+    }
     const voices = this.voices;
     for (let i = voices.length - 1; i >= 0; i--) {
       const v = voices[i] as Voice;
@@ -238,6 +269,8 @@ export class Rig {
 
   releaseAll(): void {
     for (const v of this.voices) for (const node of v.nodes) node.disconnect();
+    for (const t of this.tracked) for (const node of t.nodes) node.disconnect();
+    this.tracked.length = 0;
     this.voices.length = 0;
     this.voiceNodes = 0;
   }

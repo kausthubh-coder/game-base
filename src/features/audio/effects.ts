@@ -1,11 +1,14 @@
 import { treeSounds } from '../../content/tree-sounds.ts';
 import { treeSoundScale } from './tree.sim.ts';
-// One-shot sounds: feet, blocks, hits, spells, the interface, speech blips and the pet. Each is a few
-// bursts of filtered noise and a sine or two. Every call draws fresh random numbers, so no two are alike.
+// One-shot sounds: feet, blocks, hits, spells, the interface, speech blips and the pet. Feet, tools and the
+// things a hand does play recorded slices from the sample bank when it has them, retuned and releveled each
+// time. Everything else, and every sound whose file has not loaded, is a few bursts of filtered noise and a
+// sine or two. Every call draws fresh random numbers, so no two are alike.
 import type { Surface } from '../../engine/types.ts';
 import { midiToHz } from './blend.sim.ts';
 import type { Mixer } from './mixer.ts';
 import { connect, strike, type Build, type Priority, type Rig } from './rig.ts';
+import type { SampleBank } from './samples.ts';
 
 export type Element = 'bloom' | 'flame' | 'tide' | 'spark' | 'gale' | 'stone';
 export type PetMood = 'happy' | 'curious' | 'sad' | 'alert';
@@ -19,13 +22,58 @@ export interface VoiceSpec {
   bright?: number;
 }
 
-/** Where a sound sits for the listener: -1 left to 1 right, and how loud after distance. */
+/** Where a sound sits for the listener: -1 left to 1 right, how loud after distance, and how dark. */
 export interface Place {
   pan: number;
   gain: number;
+  /** A low-pass in Hz. Distance and walls between take the top off a sound. 20000 leaves it clear. */
+  tone: number;
 }
 
-const HERE: Place = { pan: 0, gain: 1 };
+const HERE: Place = { pan: 0, gain: 1, tone: 20000 };
+
+/** What a foot is on, finer than a block's surface: a path is not a field, a floor is not a bridge. */
+export type StepMaterial = 'grass' | 'dirt' | 'path' | 'cobble' | 'stone' | 'wood' | 'floor' | 'sand' | 'water' | 'leaves';
+export type Gait = 'soft' | 'walk' | 'run';
+
+/** How each gait changes a step: level, pitch in semitones, and the brightest it gets. */
+const GAIT: Record<Gait, { gain: number; semis: number; tone: number }> = {
+  soft: { gain: 0.5, semis: -0.8, tone: 3800 },
+  walk: { gain: 1, semis: 0, tone: 20000 },
+  run: { gain: 1.3, semis: 1.1, tone: 20000 },
+};
+
+/** How loud each material's recorded steps sit against each other once leveled to one peak. */
+const STEP_LEVEL: Record<StepMaterial, number> = {
+  grass: 0.55, dirt: 0.6, path: 0.62, cobble: 0.5, stone: 0.5, wood: 0.55, floor: 0.5, sand: 0.5, water: 0.6, leaves: 0.55,
+};
+
+/** The material a block's surface gives when the game says nothing finer. */
+export function materialOf(surface: Surface): StepMaterial | null {
+  switch (surface) {
+    case 'grass': case 'tallGrass': return 'grass';
+    case 'dirt': return 'dirt';
+    case 'stone': return 'stone';
+    case 'wood': return 'wood';
+    case 'sand': return 'sand';
+    case 'water': return 'water';
+    case 'leaves': return 'leaves';
+    default: return null;
+  }
+}
+
+/** Options for one recorded sound. */
+export interface SampleOptions {
+  gain?: number;
+  /** Semitones to shift it by. */
+  semis?: number;
+  /** How far each play may wander from that, in semitones either way. 1 by default. */
+  jitter?: number;
+  bus?: 'effects' | 'ambience';
+  priority?: Priority;
+  /** For a grain: how long a window to play. */
+  seconds?: number;
+}
 
 /** The band of noise that gives each surface its character. Breaking a block reuses it. */
 const BAND: Record<Surface, { type: BiquadFilterType; freq: number; q: number }> = {
@@ -44,7 +92,65 @@ const BAND: Record<Surface, { type: BiquadFilterType; freq: number; q: number }>
 const VOWELS = 'aeiouAEIOU';
 
 export class Effects {
-  constructor(private readonly rig: Rig, private readonly mixer: Mixer) {}
+  constructor(private readonly rig: Rig, private readonly mixer: Mixer, private readonly bank: SampleBank) {}
+
+  has(id: string): boolean {
+    return this.bank.has(id);
+  }
+
+  /**
+   * Plays the next slice of a recorded sound, placed in the world. Each play is retuned by up to `jitter`
+   * semitones and releveled by about a decibel. False when the file is not loaded or the bus is full.
+   */
+  sample(id: string, time: number, place: Place, o: SampleOptions = {}): boolean {
+    const pick = this.bank.pick(id, o.seconds);
+    if (!pick) return false;
+    const r = this.rig.rng;
+    const rate = 2 ** (((o.semis ?? 0) + (r() * 2 - 1) * (o.jitter ?? 1)) / 12);
+    const seconds = pick.length / rate;
+    const bus = o.bus ?? 'effects';
+    const b = this.rig.begin(bus, o.priority ?? 1, time, time + seconds + 0.02);
+    if (!b) return false;
+    const source = b.sample(pick.buffer, pick.start, rate);
+    const level = (o.gain ?? 1) * place.gain * (0.87 + r() * 0.26);
+    const amp = b.gain(level);
+    // A window cut from a rustle needs its own fades. A slice already has them.
+    if (o.seconds !== undefined) {
+      amp.gain.setValueAtTime(0, time);
+      amp.gain.linearRampToValueAtTime(level, time + Math.min(0.04, seconds / 4));
+      amp.gain.setValueAtTime(level, time + seconds * 0.7);
+      amp.gain.linearRampToValueAtTime(0, time + seconds);
+    }
+    const out = b.pan(place.pan);
+    if (place.tone < 15000) connect(source, b.filter('lowpass', place.tone, 0.6), amp, out);
+    else connect(source, amp, out);
+    if (bus === 'ambience') {
+      out.connect(this.mixer.ambience);
+      out.connect(this.mixer.ambienceSpace);
+    } else out.connect(this.mixer.effects);
+    b.commit(time, time + seconds);
+    return true;
+  }
+
+  /**
+   * A recorded footstep. `litter` (0 to 1) lays dry leaves under grass, for the floor under trees. `cloth` is
+   * the chance of a rustle of clothes and satchel with it. False when there is no take of this material.
+   */
+  stepSample(time: number, material: StepMaterial, gait: Gait, place: Place, o: { weight?: number; wet?: number; litter?: number; cloth?: number } = {}): boolean {
+    const id = `step.${material}`;
+    if (!this.bank.has(id)) return false;
+    const g = GAIT[gait];
+    const weight = o.weight ?? 1;
+    const at: Place = { pan: place.pan, gain: place.gain, tone: Math.min(place.tone, g.tone) };
+    const level = STEP_LEVEL[material] * g.gain * weight;
+    const semis = g.semis - (weight > 1.2 ? 1.5 : 0);
+    if (!this.sample(id, time, at, { gain: level, semis, jitter: 0.9, priority: weight > 1.2 ? 2 : 1 })) return false;
+    const r = this.rig.rng;
+    if ((o.litter ?? 0) > 0.1 && material !== 'leaves') this.sample('step.leaves', time + 0.012, at, { gain: 0.5 * level * (o.litter as number), semis, jitter: 1.5, priority: 0 });
+    if ((o.wet ?? 0) > 0.3 && material !== 'water') this.sample('step.water', time + 0.01, at, { gain: 0.22 * level * (o.wet as number), semis: semis + 3, jitter: 1, priority: 0 });
+    if ((o.cloth ?? 0) > 0 && r() < (o.cloth as number)) this.sample('move.cloth', time + 0.02 + r() * 0.05, at, { gain: 0.6 * Math.min(1.4, g.gain * weight), seconds: 0.22 + r() * 0.16, jitter: 1.5, priority: 0 });
+    return true;
+  }
 
   /** A burst of noise through one filter. `sweep` slides the filter there while it sounds. */
   private grain(b: Build, out: AudioNode, time: number, color: 'white' | 'pink' | 'brown', type: BiquadFilterType, freq: number, q: number, level: number, attack: number, decay: number, sweep?: number): void {
@@ -72,7 +178,10 @@ export class Effects {
     const b = this.rig.begin(bus, priority, time, time + seconds);
     if (!b) return null;
     const out = b.gain(level * place.gain);
-    connect(out, b.pan(place.pan), bus === 'voice' ? this.mixer.voice : this.mixer.effects);
+    const pan = b.pan(place.pan);
+    if (place.tone < 15000) connect(out, b.filter('lowpass', place.tone, 0.6), pan);
+    else out.connect(pan);
+    pan.connect(bus === 'voice' ? this.mixer.voice : this.mixer.effects);
     return { b, out };
   }
 
@@ -170,18 +279,18 @@ export class Effects {
   }
 
   /** Placing is one firm knock. Breaking is the same material coming apart in falling pieces. */
-  block(time: number, surface: Surface, broken: boolean, place: Place): void {
+  block(time: number, surface: Surface, broken: boolean, place: Place, level = 1): void {
     const band = BAND[surface];
     const r = this.rig.rng;
     if (!broken) {
-      const o = this.open(1, time, 0.36, place, 0.9);
+      const o = this.open(1, time, 0.36, place, 0.9 * level);
       if (!o) return;
       this.step(o.b, o.out, time, surface, 1.1, 0);
       this.tone(o.b, o.out, time, 260, 170, 0.04, 0.3, 0.06);
       o.b.commit(time, time + 0.36);
       return;
     }
-    const o = this.open(1, time, 0.42, place, 1.3);
+    const o = this.open(1, time, 0.42, place, 1.3 * level);
     if (!o) return;
     const fall = [1, 0.85, 0.72, 0.6, 0.52];
     for (let i = 0; i < fall.length; i++) {
@@ -191,9 +300,9 @@ export class Effects {
     o.b.commit(time, time + 0.42);
   }
 
-  tree(time: number, kind: 'chop' | 'fall', logs: number, place: Place): void {
+  tree(time: number, kind: 'chop' | 'fall', logs: number, place: Place, level = 1): void {
     const spec = treeSounds[kind];
-    const o = this.open(kind === 'fall' ? 2 : 1, time, spec.seconds, place, spec.gain * (kind === 'fall' ? treeSoundScale(logs) : 1));
+    const o = this.open(kind === 'fall' ? 2 : 1, time, spec.seconds, place, level * spec.gain * (kind === 'fall' ? treeSoundScale(logs) : 1));
     if (!o) return;
     const tuning = 0.94 + this.rig.rng() * 0.12;
     for (const layer of spec.layers) {

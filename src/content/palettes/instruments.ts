@@ -40,3 +40,9 @@ export const tensionPad: Patch = { kind: 'pad', wave: 'reed', voices: 2, detune:
 export const bossBrass: Patch = { kind: 'pad', wave: 'sawtooth', voices: 2, detune: 7, cutoff: 950, attack: 0.05, release: 0.3 };
 export const stingerBell: Patch = { kind: 'bell', ratio: 2, index: 1.0, decay: 1.6 };
 export const pickupBell: Patch = { kind: 'bell', ratio: 3, index: 0.9, decay: 0.5 };
+
+// Hollowmere's band
+/** A tin whistle: a soft tone with a quick, lively vibrato. Bright, never a horn. */
+export const whistle: Patch = { kind: 'wind', wave: 'soft', breath: 0.07, vibrato: 14, attack: 0.03, release: 0.12, cutoff: 4200 };
+/** A strummed lute, warmer and shorter than the harp. */
+export const strumLute: Patch = { kind: 'pluck', wave: 'lute', decay: 1.1, bright: 5, attack: 0.004, detune: 4 };

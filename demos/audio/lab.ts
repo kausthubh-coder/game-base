@@ -44,7 +44,7 @@ export interface LabResult {
 
 type Scene = Pick<OfflineScene, 'seconds' | 'setup' | 'frame'> & { marks?: { t: number; label: string }[]; events?: { t: number; label: string }[]; decimate?: number; pause?: number[] };
 
-const calm: AudioState = { regions: { meadow: 1 }, town: 0, indoors: 0, danger: 0, fight: 0, boss: 0, timeOfDay: 0.5, rain: 0, wind: 0.2, nearWater: 0, trees: 0.3 };
+const calm: AudioState = { regions: { meadow: 1 }, town: 0, indoors: 0, danger: 0, fight: 0, boss: 0, timeOfDay: 0.5, rain: 0, wind: 0.2, nearWater: 0, trees: 0.3, stone: 0 };
 const SURFACES: Surface[] = ['grass', 'tallGrass', 'dirt', 'stone', 'wood', 'sand', 'water', 'snow', 'leaves', 'metal'];
 const ELEMENTS: Element[] = ['bloom', 'flame', 'tide', 'spark', 'gale', 'stone'];
 const MOODS: PetMood[] = ['happy', 'curious', 'sad', 'alert'];

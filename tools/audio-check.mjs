@@ -275,7 +275,7 @@ try {
     keep(r);
     const most = Math.max(...r.log.map((s) => s.voices));
     numbers.stress = { sampledPeak: most, enginePeak: r.voicePeak, refused: r.dropped };
-    line(most <= 48 && r.voicePeak <= 48, '5. stress: never more than 48 voices',
+    line(most <= 64 && r.voicePeak <= 64, '5. stress: never more than 64 voices',
       `boss fight in a town on a border in a storm, with machines, talk, pickups, steps, spells, hits, blocks, a pet: ` +
       `most voices at any update ${most}, the engine's own peak ${r.voicePeak} (it counts sounds scheduled ahead at the moment they play), ` +
       `${r.dropped} sounds refused for lack of room (${Object.entries(r.refused).map(([b, n]) => `${b} ${n}`).join(', ')}); peak sample ${f2(peakOf(r.audio.channels))}, ${f1(rmsDb(r.audio.channels))} dBFS RMS`);

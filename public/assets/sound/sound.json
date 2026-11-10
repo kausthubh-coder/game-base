@@ -1,0 +1,1092 @@
+{
+  "version": 1,
+  "model": "eleven_text_to_sound_v3",
+  "sounds": {
+    "bed.town.murmur": {
+      "file": "sound/bed.town.murmur.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -30,
+      "peak": -14.2
+    },
+    "bed.town.square": {
+      "file": "sound/bed.town.square.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -33.7,
+      "peak": -1.5
+    },
+    "bed.town.birds": {
+      "file": "sound/bed.town.birds.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -33,
+      "peak": -14
+    },
+    "bed.town.water": {
+      "file": "sound/bed.town.water.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -30,
+      "peak": -2.2
+    },
+    "bed.town.workshop": {
+      "file": "sound/bed.town.workshop.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -33,
+      "peak": -14.1
+    },
+    "bed.town.night": {
+      "file": "sound/bed.town.night.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -32,
+      "peak": -19.4
+    },
+    "bed.town.lantern": {
+      "file": "sound/bed.town.lantern.mp3",
+      "kind": "bed",
+      "seconds": 14.5,
+      "channels": 1,
+      "lufs": -40,
+      "peak": -16.6
+    },
+    "bed.meadow.day": {
+      "file": "sound/bed.meadow.day.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -31,
+      "peak": -19.7
+    },
+    "bed.forest.day": {
+      "file": "sound/bed.forest.day.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -31,
+      "peak": -19
+    },
+    "bed.meadow.night": {
+      "file": "sound/bed.meadow.night.mp3",
+      "kind": "bed",
+      "seconds": 22.5,
+      "channels": 2,
+      "lufs": -32,
+      "peak": -19.4
+    },
+    "spot.well": {
+      "file": "sound/spot.well.mp3",
+      "kind": "shot",
+      "seconds": 8.5739,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          4.1945
+        ],
+        [
+          4.3545,
+          4.1394
+        ]
+      ],
+      "lufs": -27.5,
+      "peak": -9
+    },
+    "spot.dog": {
+      "file": "sound/spot.dog.mp3",
+      "kind": "shot",
+      "seconds": 7.3353,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          2.48
+        ],
+        [
+          2.64,
+          2.3253
+        ],
+        [
+          5.0453,
+          2.21
+        ]
+      ],
+      "lufs": -28.7,
+      "peak": -12
+    },
+    "spot.children": {
+      "file": "sound/spot.children.mp3",
+      "kind": "shot",
+      "seconds": 8.24,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          4
+        ],
+        [
+          4.16,
+          4
+        ]
+      ],
+      "lufs": -32.4,
+      "peak": -14
+    },
+    "spot.door": {
+      "file": "sound/spot.door.mp3",
+      "kind": "shot",
+      "seconds": 5.2,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          2.48
+        ],
+        [
+          2.64,
+          2.48
+        ]
+      ],
+      "lufs": -34.8,
+      "peak": -10
+    },
+    "spot.cart": {
+      "file": "sound/spot.cart.mp3",
+      "kind": "shot",
+      "seconds": 12.22,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          6
+        ],
+        [
+          6.16,
+          5.98
+        ]
+      ],
+      "lufs": -34.4,
+      "peak": -12
+    },
+    "spot.stall": {
+      "file": "sound/spot.stall.mp3",
+      "kind": "shot",
+      "seconds": 4.2295,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          2
+        ],
+        [
+          2.16,
+          1.9895
+        ]
+      ],
+      "lufs": -31.3,
+      "peak": -10
+    },
+    "spot.boat": {
+      "file": "sound/spot.boat.mp3",
+      "kind": "shot",
+      "seconds": 7.6978,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          3.8346
+        ],
+        [
+          3.9946,
+          3.6232
+        ]
+      ],
+      "lufs": -35.3,
+      "peak": -12
+    },
+    "spot.bird": {
+      "file": "sound/spot.bird.mp3",
+      "kind": "shot",
+      "seconds": 8.5969,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          3
+        ],
+        [
+          3.16,
+          2.4054
+        ],
+        [
+          5.6454,
+          2.8715
+        ]
+      ],
+      "lufs": -26.4,
+      "peak": -12
+    },
+    "step.grass": {
+      "file": "sound/step.grass.mp3",
+      "kind": "steps",
+      "seconds": 4.8236,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.3207
+        ],
+        [
+          0.4807,
+          0.3207
+        ],
+        [
+          0.8815,
+          0.3207
+        ],
+        [
+          1.2822,
+          0.3207
+        ],
+        [
+          1.6829,
+          0.3207
+        ],
+        [
+          2.0836,
+          0.3207
+        ],
+        [
+          2.4844,
+          0.3207
+        ],
+        [
+          2.8851,
+          0.3207
+        ],
+        [
+          3.2858,
+          0.3207
+        ],
+        [
+          3.6865,
+          0.3207
+        ],
+        [
+          4.0873,
+          0.2556
+        ],
+        [
+          4.4228,
+          0.3207
+        ]
+      ],
+      "lufs": -22,
+      "peak": -6
+    },
+    "step.dirt": {
+      "file": "sound/step.dirt.mp3",
+      "kind": "steps",
+      "seconds": 3.8159,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.2856
+        ],
+        [
+          0.4456,
+          0.1503
+        ],
+        [
+          0.676,
+          0.1403
+        ],
+        [
+          0.8963,
+          0.1403
+        ],
+        [
+          1.1166,
+          0.1804
+        ],
+        [
+          1.377,
+          0.1403
+        ],
+        [
+          1.5973,
+          0.1954
+        ],
+        [
+          1.8728,
+          0.1353
+        ],
+        [
+          2.0881,
+          0.1203
+        ],
+        [
+          2.2884,
+          0.2405
+        ],
+        [
+          2.6089,
+          0.3057
+        ],
+        [
+          2.9946,
+          0.1203
+        ],
+        [
+          3.1949,
+          0.3207
+        ],
+        [
+          3.5956,
+          0.1403
+        ]
+      ],
+      "lufs": -26.1,
+      "peak": -6
+    },
+    "step.path": {
+      "file": "sound/step.path.mp3",
+      "kind": "steps",
+      "seconds": 4.1315,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.3057
+        ],
+        [
+          0.4657,
+          0.1102
+        ],
+        [
+          0.6559,
+          0.3007
+        ],
+        [
+          1.0366,
+          0.1453
+        ],
+        [
+          1.262,
+          0.0802
+        ],
+        [
+          1.4221,
+          0.1604
+        ],
+        [
+          1.6625,
+          0.3207
+        ],
+        [
+          2.0632,
+          0.2706
+        ],
+        [
+          2.4138,
+          0.1153
+        ],
+        [
+          2.6091,
+          0.1804
+        ],
+        [
+          2.8695,
+          0.1554
+        ],
+        [
+          3.1049,
+          0.1804
+        ],
+        [
+          3.3653,
+          0.3207
+        ],
+        [
+          3.766,
+          0.1002
+        ],
+        [
+          3.9462,
+          0.1052
+        ]
+      ],
+      "lufs": -25.7,
+      "peak": -6
+    },
+    "step.cobble": {
+      "file": "sound/step.cobble.mp3",
+      "kind": "steps",
+      "seconds": 1.9875,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1052
+        ],
+        [
+          0.2652,
+          0.0852
+        ],
+        [
+          0.4304,
+          0.1153
+        ],
+        [
+          0.6257,
+          0.0651
+        ],
+        [
+          0.7708,
+          0.0852
+        ],
+        [
+          0.936,
+          0.1203
+        ],
+        [
+          1.1363,
+          0.1804
+        ],
+        [
+          1.3967,
+          0.1554
+        ],
+        [
+          1.6321,
+          0.1153
+        ],
+        [
+          1.8273,
+          0.0802
+        ]
+      ],
+      "lufs": -25.8,
+      "peak": -6
+    },
+    "step.stone": {
+      "file": "sound/step.stone.mp3",
+      "kind": "steps",
+      "seconds": 2.6188,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.2105
+        ],
+        [
+          0.3705,
+          0.1353
+        ],
+        [
+          0.5858,
+          0.0952
+        ],
+        [
+          0.761,
+          0.1954
+        ],
+        [
+          1.0364,
+          0.2656
+        ],
+        [
+          1.382,
+          0.1754
+        ],
+        [
+          1.6374,
+          0.1403
+        ],
+        [
+          1.8578,
+          0.1754
+        ],
+        [
+          2.1132,
+          0.0752
+        ],
+        [
+          2.2683,
+          0.1102
+        ],
+        [
+          2.4586,
+          0.0802
+        ]
+      ],
+      "lufs": -24.1,
+      "peak": -6
+    },
+    "step.wood": {
+      "file": "sound/step.wood.mp3",
+      "kind": "steps",
+      "seconds": 1.5318,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1002
+        ],
+        [
+          0.2602,
+          0.0952
+        ],
+        [
+          0.4354,
+          0.0952
+        ],
+        [
+          0.6107,
+          0.1102
+        ],
+        [
+          0.8009,
+          0.1102
+        ],
+        [
+          0.9912,
+          0.0802
+        ],
+        [
+          1.1513,
+          0.1203
+        ],
+        [
+          1.3516,
+          0.1002
+        ]
+      ],
+      "lufs": -24.5,
+      "peak": -6
+    },
+    "step.floor": {
+      "file": "sound/step.floor.mp3",
+      "kind": "steps",
+      "seconds": 2.043,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1904
+        ],
+        [
+          0.3504,
+          0.1554
+        ],
+        [
+          0.5858,
+          0.1804
+        ],
+        [
+          0.8462,
+          0.1654
+        ],
+        [
+          1.0916,
+          0.1503
+        ],
+        [
+          1.3219,
+          0.1403
+        ],
+        [
+          1.5422,
+          0.1904
+        ],
+        [
+          1.8127,
+          0.1503
+        ]
+      ],
+      "lufs": -24,
+      "peak": -6
+    },
+    "step.sand": {
+      "file": "sound/step.sand.mp3",
+      "kind": "steps",
+      "seconds": 6.9424,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.3107
+        ],
+        [
+          0.4707,
+          0.3408
+        ],
+        [
+          0.8915,
+          0.3408
+        ],
+        [
+          1.3122,
+          0.2907
+        ],
+        [
+          1.6829,
+          0.3408
+        ],
+        [
+          2.1037,
+          0.2556
+        ],
+        [
+          2.4393,
+          0.3408
+        ],
+        [
+          2.86,
+          0.2756
+        ],
+        [
+          3.2156,
+          0.3408
+        ],
+        [
+          3.6364,
+          0.3408
+        ],
+        [
+          4.0572,
+          0.3408
+        ],
+        [
+          4.478,
+          0.3408
+        ],
+        [
+          4.8987,
+          0.3408
+        ],
+        [
+          5.3195,
+          0.3408
+        ],
+        [
+          5.7403,
+          0.3408
+        ],
+        [
+          6.161,
+          0.3408
+        ],
+        [
+          6.5818,
+          0.2806
+        ]
+      ],
+      "lufs": -20.7,
+      "peak": -6
+    },
+    "step.water": {
+      "file": "sound/step.water.mp3",
+      "kind": "steps",
+      "seconds": 5.3897,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1654
+        ],
+        [
+          0.3254,
+          0.451
+        ],
+        [
+          0.8564,
+          0.1353
+        ],
+        [
+          1.0717,
+          0.2456
+        ],
+        [
+          1.3973,
+          0.4059
+        ],
+        [
+          1.8832,
+          0.2656
+        ],
+        [
+          2.2288,
+          0.451
+        ],
+        [
+          2.7598,
+          0.1854
+        ],
+        [
+          3.0252,
+          0.2456
+        ],
+        [
+          3.3508,
+          0.451
+        ],
+        [
+          3.8818,
+          0.3658
+        ],
+        [
+          4.3276,
+          0.451
+        ],
+        [
+          4.8586,
+          0.451
+        ]
+      ],
+      "lufs": -21,
+      "peak": -6
+    },
+    "step.leaves": {
+      "file": "sound/step.leaves.mp3",
+      "kind": "steps",
+      "seconds": 2.569,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.2155
+        ],
+        [
+          0.3755,
+          0.1253
+        ],
+        [
+          0.5808,
+          0.3157
+        ],
+        [
+          0.9765,
+          0.1303
+        ],
+        [
+          1.1868,
+          0.1153
+        ],
+        [
+          1.382,
+          0.2856
+        ],
+        [
+          1.7477,
+          0.2405
+        ],
+        [
+          2.0682,
+          0.1153
+        ],
+        [
+          2.2635,
+          0.2255
+        ]
+      ],
+      "lufs": -23.6,
+      "peak": -6
+    },
+    "move.cloth": {
+      "file": "sound/move.cloth.mp3",
+      "kind": "grain",
+      "seconds": 5.9298,
+      "channels": 1,
+      "lufs": -46.2,
+      "peak": -16
+    },
+    "hit.chop": {
+      "file": "sound/hit.chop.mp3",
+      "kind": "hits",
+      "seconds": 1.3115,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1203
+        ],
+        [
+          0.2803,
+          0.1052
+        ],
+        [
+          0.4655,
+          0.0952
+        ],
+        [
+          0.6407,
+          0.0902
+        ],
+        [
+          0.8109,
+          0.0902
+        ],
+        [
+          0.9811,
+          0.0752
+        ],
+        [
+          1.1363,
+          0.0952
+        ]
+      ],
+      "lufs": -24.4,
+      "peak": -4
+    },
+    "hit.pick": {
+      "file": "sound/hit.pick.mp3",
+      "kind": "hits",
+      "seconds": 1.3715,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1002
+        ],
+        [
+          0.2602,
+          0.1253
+        ],
+        [
+          0.4655,
+          0.0702
+        ],
+        [
+          0.6157,
+          0.0601
+        ],
+        [
+          0.7558,
+          0.0902
+        ],
+        [
+          0.926,
+          0.0752
+        ],
+        [
+          1.0812,
+          0.0702
+        ],
+        [
+          1.2313,
+          0.0601
+        ]
+      ],
+      "lufs": -25.1,
+      "peak": -5
+    },
+    "hit.dig": {
+      "file": "sound/hit.dig.mp3",
+      "kind": "hits",
+      "seconds": 1.2516,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1052
+        ],
+        [
+          0.2652,
+          0.0852
+        ],
+        [
+          0.4304,
+          0.0651
+        ],
+        [
+          0.5756,
+          0.1754
+        ],
+        [
+          0.831,
+          0.1353
+        ],
+        [
+          1.0463,
+          0.1253
+        ]
+      ],
+      "lufs": -21.8,
+      "peak": -6
+    },
+    "hit.hoe": {
+      "file": "sound/hit.hoe.mp3",
+      "kind": "hits",
+      "seconds": 0.5856,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1002
+        ],
+        [
+          0.2602,
+          0.0902
+        ],
+        [
+          0.4304,
+          0.0752
+        ]
+      ],
+      "lufs": -25.4,
+      "peak": -6
+    },
+    "hit.plank": {
+      "file": "sound/hit.plank.mp3",
+      "kind": "hits",
+      "seconds": 0.761,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1403
+        ],
+        [
+          0.3003,
+          0.0702
+        ],
+        [
+          0.4505,
+          0.2305
+        ]
+      ],
+      "lufs": -24.1,
+      "peak": -5
+    },
+    "hit.stone": {
+      "file": "sound/hit.stone.mp3",
+      "kind": "hits",
+      "seconds": 1.0463,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          0.1203
+        ],
+        [
+          0.2803,
+          0.0802
+        ],
+        [
+          0.4405,
+          0.1804
+        ],
+        [
+          0.7009,
+          0.0752
+        ],
+        [
+          0.856,
+          0.1102
+        ]
+      ],
+      "lufs": -24.6,
+      "peak": -5
+    },
+    "shot.page": {
+      "file": "sound/shot.page.mp3",
+      "kind": "shot",
+      "seconds": 3.6344,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          1.0346
+        ],
+        [
+          1.1946,
+          1.0998
+        ],
+        [
+          2.3744,
+          1.18
+        ]
+      ],
+      "lufs": -31,
+      "peak": -10
+    },
+    "shot.pour": {
+      "file": "sound/shot.pour.mp3",
+      "kind": "shot",
+      "seconds": 4.8655,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          2.2701
+        ],
+        [
+          2.4301,
+          2.3553
+        ]
+      ],
+      "lufs": -26.7,
+      "peak": -9
+    },
+    "shot.harvest": {
+      "file": "sound/shot.harvest.mp3",
+      "kind": "shot",
+      "seconds": 3.0096,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          1.3898
+        ],
+        [
+          1.5498,
+          1.3798
+        ]
+      ],
+      "lufs": -32.7,
+      "peak": -8
+    },
+    "shot.bag": {
+      "file": "sound/shot.bag.mp3",
+      "kind": "shot",
+      "seconds": 2.4546,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          1.0948
+        ],
+        [
+          1.2548,
+          1.1198
+        ]
+      ],
+      "lufs": -31.4,
+      "peak": -10
+    },
+    "shot.treefall": {
+      "file": "sound/shot.treefall.mp3",
+      "kind": "shot",
+      "seconds": 3.4524,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          3.2924
+        ]
+      ],
+      "lufs": -29.6,
+      "peak": -5
+    }
+  }
+}

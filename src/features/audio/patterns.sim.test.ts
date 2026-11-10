@@ -21,9 +21,9 @@ function notes(p: Palette, mode: Mode, bars: number, layer?: NoteEvent['layer'])
   return out;
 }
 
-test('there are seven palettes, named by land, in the brief order', () => {
-  expect(palettes.map((p) => p.id)).toEqual(['meadow', 'desert', 'coast', 'rainvalley', 'highlands', 'forge', 'center']);
-  expect(palettes.map((p) => p.tempo)).toEqual([84, 96, 72, 100, 120, 80, 60]);
+test('there are seven palettes, named by land, in the brief order, and the town of Hollowmere after them', () => {
+  expect(palettes.map((p) => p.id)).toEqual(['meadow', 'desert', 'coast', 'rainvalley', 'highlands', 'forge', 'center', 'town']);
+  expect(palettes.map((p) => p.tempo)).toEqual([84, 96, 72, 100, 120, 80, 60, 92]);
 });
 
 test('every palette is well formed', () => {
