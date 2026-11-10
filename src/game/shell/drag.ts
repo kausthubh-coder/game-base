@@ -7,7 +7,7 @@
 /** How far the pointer may wander, in CSS pixels, and the press still be a click. */
 export const DRAG_PIXELS = 6;
 /** How long a press may last, in milliseconds, and still be a click. */
-export const CLICK_MS = 400;
+export const CLICK_MS = 500;
 
 /** What a press was when it came up. */
 export type DragEnd = 'click' | 'drag' | 'none';

@@ -259,7 +259,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     // A locked mouse aims from the middle of the screen, where the crosshair is. A free cursor aims where it is.
     const centre = keys.mouse === 'lock';
     const pointer = keys.pointer;
-    if (!centre && !pointer.over) return;
+    // A drag turning the camera aims at nothing, so no box or ghost sweeps over the land while it turns.
+    if (!centre && (!pointer.over || keys.dragging)) return;
     origin.copy(lens.position);
     ray.set(centre ? 0 : pointer.x, centre ? 0 : pointer.y, 0.5).unproject(lens).sub(origin);
     // The ray skips what the cutaway hides, so a click goes through a hidden roof to the floor.

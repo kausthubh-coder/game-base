@@ -37,6 +37,22 @@ const serverPid = await new Promise((done, fail) => {
 });
 console.log(`serving ${dist} on http://127.0.0.1:${PORT}/  pid ${serverPid}`);
 
+/**
+ * A right click as a hand makes it: the press and the release 60 ms apart by the events' own clocks. The game
+ * counts a right press as a click only when it comes up soon (src/game/shell/drag.ts), and page.mouse waits for
+ * each event to be handled, which takes a whole frame on this Mac's software WebGL. These are the same input
+ * events page.mouse sends, with the time a hand would take written on them.
+ */
+async function handClick(page, x, y, jitter = 0) {
+  const cdp = (page.__cdp ??= await page.context().newCDPSession(page));
+  const t0 = Date.now() / 1000;
+  const send = (type, px, py, at, buttons) => cdp.send('Input.dispatchMouseEvent', { type, x: px, y: py, button: type === 'mouseMoved' ? 'none' : 'right', buttons, clickCount: type === 'mouseMoved' ? 0 : 1, timestamp: t0 + at });
+  await send('mouseMoved', x, y, 0, 0);
+  await send('mousePressed', x, y, 0.01, 2);
+  if (jitter) { await send('mouseMoved', x + jitter, y - 1, 0.03, 2); await send('mouseMoved', x - 1, y + jitter, 0.05, 2); }
+  await send('mouseReleased', jitter ? x - 1 : x, jitter ? y + jitter : y, 0.07, 0);
+}
+
 const checks = [];
 const check = (name, pass, detail = '') => {
   checks.push({ name, pass: Boolean(pass) });
@@ -106,13 +122,13 @@ try {
   });
 
   /** A real right-button drag from `from` by dx, dy pixels in `steps` moves. `mid` runs with the button still down. */
-  async function rightDrag(from, dx, dy, steps = 12, mid) {
+  async function rightDrag(from, dx, dy, steps = 6, mid) {
     await page.mouse.move(from.x, from.y);
     await frames(1);
     await page.mouse.down({ button: 'right' });
     for (let i = 1; i <= steps; i++) await page.mouse.move(from.x + (dx * i) / steps, from.y + (dy * i) / steps);
     await frames(2);
-    const during = await game(() => ({ dragging: window.__game.state().camera.dragging, cursor: window.__game.view.canvas.style.cursor }));
+    const during = await game(() => ({ dragging: window.__game.state().camera.dragging, cursor: window.__game.view.canvas.style.cursor, aim: window.__game.state().aim }));
     if (mid) await mid();
     await page.mouse.up({ button: 'right' });
     await frames(2);
@@ -121,11 +137,7 @@ try {
 
   /** A real right click, with the hand wandering `jitter` pixels between the press and the release. */
   async function rightClick(at, jitter = 0) {
-    await page.mouse.move(at.x, at.y);
-    await frames(1);
-    await page.mouse.down({ button: 'right' });
-    if (jitter) { await page.mouse.move(at.x + jitter, at.y - 1); await page.mouse.move(at.x - 1, at.y + jitter); }
-    await page.mouse.up({ button: 'right' });
+    await handClick(page, at.x, at.y, jitter);
     await frames(2);
   }
 
@@ -139,14 +151,14 @@ try {
     const planksBefore = await planks();
     const slug = `${label.replace(/\W+/g, '-').toLowerCase()}-${place.replace(/\W+/g, '-')}`;
     await shot(`${slug}-1-before.png`);
-    const during = await rightDrag(spot.at, dx, dy, 12, () => shot(`${slug}-2-mid-drag.png`));
+    const during = await rightDrag(spot.at, dx, dy, 6, () => shot(`${slug}-2-mid-drag.png`));
     const after = await state();
     await shot(`${slug}-3-after.png`);
     const yaw = turned(before.camera.yaw, after.camera.yaw);
     check(`${label} at ${place}: a right drag turns the camera with the hand`, Math.abs(yaw - -dx * SPEED * DEG) < 1.5, `yaw ${before.camera.yaw} to ${after.camera.yaw}, turned ${yaw.toFixed(2)} for ${(-dx * SPEED * DEG).toFixed(2)} asked`);
     if (dy) check(`${label} at ${place}: dragging down looks further down`, after.camera.pitch > before.camera.pitch + 3, `pitch ${before.camera.pitch} to ${after.camera.pitch}`);
     else check(`${label} at ${place}: the 2.5D drag keeps the pitch and the zoom`, Math.abs(after.camera.pitch - before.camera.pitch) < 0.01 && after.camera.zoom === before.camera.zoom, `pitch ${before.camera.pitch} to ${after.camera.pitch}`);
-    check(`${label} at ${place}: during the drag the cursor hides and the mouse is not locked`, during.dragging && during.cursor === 'none' && !after.camera.locked, JSON.stringify(during));
+    check(`${label} at ${place}: during the drag the cursor hides, the mouse is not locked and nothing is aimed at`, during.dragging && during.cursor === 'none' && during.aim === null && !after.camera.locked, JSON.stringify(during));
     const cursorAfter = await game(() => window.__game.view.canvas.style.cursor);
     check(`${label} at ${place}: the drag places nothing, and the cursor comes back`, (await planks()) === planksBefore && after.stats.blocks === before.stats.blocks && !after.camera.dragging && cursorAfter === '',
       `planks ${planksBefore} to ${await planks()}, blocks ${before.stats.blocks} to ${after.stats.blocks}, cursor "${cursorAfter}"`);
@@ -159,7 +171,7 @@ try {
       await rightClick(target.at, jitter);
       await game(() => window.__game.advance(0.1));
       const now = await game(([s]) => window.__game.block(s.x, s.y + 1, s.z).key, [target]);
-      check(`${label} at ${place}: a right click${jitter ? ` with ${jitter} pixels of jitter` : ''} still places`, (await planks()) === had - 1 && now === 'plank', `cell ${cell} to ${now}, planks ${had} to ${await planks()}`);
+      check(`${label} at ${place}: a right click${jitter ? ` with ${jitter} pixels of jitter` : ''} still places`, (await planks()) === had - 1 && now === 'oak_plank', `cell ${cell} to ${now}, planks ${had} to ${await planks()}`);
       // Take it away again, so the next check has open ground.
       await game(([s]) => { const g = window.__game; g.view.world.sim.setBlock(s.x, s.y + 1, s.z, 0); }, [target]);
     }
