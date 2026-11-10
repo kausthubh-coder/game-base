@@ -98,6 +98,8 @@ export interface GameEvents {
   toast: { text: string; icon?: string };
   hint: { id: string; text: string };
   'ui.sound': { sound: 'click' | 'open' | 'close' };
+  /** Asks the interface to open a panel: `make` from a workbench, `bag`, `almanac` (detail is a page id), `quests`. */
+  'ui.open': { panel: string; detail?: string };
   'festival.started': Record<string, never>;
   'act.ended': { act: number };
 }
@@ -202,8 +204,8 @@ export interface InventoryApi {
   /** The selected quick slot, 0 to 8. */
   selected: number;
   held(): Stack | null;
-  /** Returns how many did not fit. */
-  add(id: ItemId, count: number): number;
+  /** Returns how many did not fit. `at` is where in the world it came from, and `item.gained` carries it. */
+  add(id: ItemId, count: number, at?: Vec3): number;
   /** Removes only if all of them are there. */
   remove(id: ItemId, count: number): boolean;
   count(id: ItemId): number;
@@ -289,6 +291,12 @@ export interface PlaceablesApi {
   at(x: number, y: number, z: number): Placed | null;
   /** True when a station of this name stands within `radius` blocks of the point. */
   near(station: string, at: Vec3, radius: number): boolean;
+  /**
+   * Hears every use of a placed thing, by "E" or by the secondary button. The interface opens its panel here.
+   * A workbench and a chest show their prompt only while somebody listens. Returns a function that stops listening.
+   * It is optional so that a fake without it still fits. The real system always has it.
+   */
+  onUse?(listener: (placed: Placed) => void): () => void;
 }
 
 export interface Recipe {
@@ -352,6 +360,12 @@ export interface TimeApi {
   setWeather(kind: 'clear' | 'breezy' | 'overcast' | 'rain' | 'storm' | 'fog' | null): void;
   /** Jumps the clock. For the festival and for tests. */
   setTimeOfDay(timeOfDay: number): void;
+  /**
+   * Hears each clap of thunder in a storm, with the place the lightning struck. The clap comes later the
+   * farther the strike. Returns a function that stops listening.
+   * It is optional so that a fake without it still fits. The real system always has it.
+   */
+  onThunder?(listener: (at: Vec3) => void): () => void;
 }
 
 // ---------------------------------------------------------------------------------------- living things
@@ -422,6 +436,18 @@ export interface NavApi {
   path(from: Vec3, to: Vec3, limit?: number): Vec3[] | null;
   /** True when something can stand at this block: solid below, two blocks of air. */
   standable(x: number, y: number, z: number): boolean;
+  /**
+   * Like `path`, but when the goal cannot be reached it returns the route to the closest point it found.
+   * Null only when there is nowhere to stand at `from`.
+   */
+  toward(from: Vec3, to: Vec3, limit?: number): Vec3[] | null;
+  /** The route between two named places of the region, kept until a block on it changes. Do not change the array. */
+  route(from: string, to: string): readonly Vec3[] | null;
+  /**
+   * The center of the nearest block to stand on within `radius` blocks of a point, or null.
+   * `skip` rejects blocks, for example the ones somebody else stands on.
+   */
+  near(at: Vec3, radius: number, skip?: (x: number, z: number) => boolean): Vec3 | null;
 }
 
 export interface NpcState {
