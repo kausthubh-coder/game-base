@@ -31,10 +31,10 @@ test('a repeated toast becomes one line with a count and a fresh three seconds',
   expect(lines.map((line) => line.text)).toEqual(['Oak log']);
 });
 
-test('only four toasts show, and the oldest leaves first', () => {
+test('only three toasts show, and the oldest leaves first', () => {
   const lines: ToastLine[] = [];
   for (const text of ['a', 'b', 'c', 'd', 'e']) addToast(lines, text, undefined, 0);
-  expect(lines.map((line) => line.text)).toEqual(['b', 'c', 'd', 'e']);
+  expect(lines.map((line) => line.text)).toEqual(['c', 'd', 'e']);
 });
 
 const page = (id: string, kind: AlmanacPage['kind'], seen: boolean): AlmanacPage => ({ id, title: id, picture: id, kind, facts: [], complete: false, seen });
