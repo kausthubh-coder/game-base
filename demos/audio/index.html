@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sound engine demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #10141a;
+        --panel: #171c24;
+        --line: #2a313c;
+        --text: #e8eaee;
+        --muted: #98a1ae;
+        --accent: #7fc8a9;
+        --warn: #e58f6a;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px/1.45 ui-sans-serif, system-ui, sans-serif; }
+      #app { display: flex; height: 100%; }
+      #stage { position: relative; flex: 1 1 auto; min-width: 0; min-height: 280px; }
+      #map { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+      #panel { flex: 0 0 328px; overflow-y: auto; background: var(--panel); border-left: 1px solid var(--line); padding: 12px 14px 24px; }
+      h2 { margin: 16px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+      h2:first-child { margin-top: 0; }
+      .grid { display: grid; grid-template-columns: 84px 1fr; gap: 2px 10px; font-variant-numeric: tabular-nums; }
+      .grid dt { color: var(--muted); }
+      .grid dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+      .bars { display: grid; grid-template-columns: 84px 1fr 34px; gap: 3px 8px; align-items: center; font-variant-numeric: tabular-nums; }
+      .bar { height: 6px; border-radius: 3px; background: #232a35; overflow: hidden; }
+      .bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+      .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+      .chip { padding: 1px 7px; border-radius: 9px; border: 1px solid var(--line); color: #5d6673; }
+      .chip.on { color: #0e1512; background: var(--accent); border-color: var(--accent); }
+      label.row { display: grid; grid-template-columns: 84px 1fr 34px; gap: 8px; align-items: center; margin: 3px 0; font-variant-numeric: tabular-nums; }
+      input[type='range'] { width: 100%; accent-color: var(--accent); }
+      .buttons { display: flex; flex-wrap: wrap; gap: 5px; }
+      button { font: inherit; color: var(--text); background: #222a35; border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; cursor: pointer; }
+      button:hover { background: #2b3542; }
+      button:active { background: #36414f; }
+      button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+      button.toggle.on { background: var(--warn); border-color: var(--warn); color: #1a0f0a; }
+      #keys { position: absolute; left: 10px; bottom: 10px; padding: 6px 9px; border-radius: 6px; background: rgb(16 20 26 / 0.78); color: var(--muted); pointer-events: none; max-width: calc(100% - 20px); }
+      #keys b { color: var(--text); font-weight: 600; }
+      #where { position: absolute; left: 10px; top: 10px; padding: 5px 9px; border-radius: 6px; background: rgb(16 20 26 / 0.78); }
+      #talk { position: absolute; left: 50%; bottom: 54px; transform: translateX(-50%); width: min(560px, calc(100% - 24px)); padding: 10px 14px; border-radius: 8px; background: rgb(16 20 26 / 0.92); border: 1px solid var(--line); display: none; }
+      #talk .who { color: var(--accent); font-weight: 600; margin-bottom: 2px; }
+      #talk .line { min-height: 2.9em; font-size: 15px; }
+      #start { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(10 13 18 / 0.86); cursor: pointer; text-align: center; border: 0; border-radius: 0; width: 100%; color: var(--text); }
+      #start:hover { background: rgb(10 13 18 / 0.86); }
+      #start strong { display: block; font-size: 24px; margin-bottom: 8px; }
+      #start span { color: var(--muted); max-width: 30em; display: block; }
+      @media (max-width: 860px) {
+        #app { flex-direction: column; height: auto; min-height: 100%; }
+        #stage { flex: 0 0 auto; height: 56vh; }
+        #panel { flex: 1 1 auto; border-left: 0; border-top: 1px solid var(--line); overflow: visible; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="stage">
+        <canvas id="map"></canvas>
+        <div id="where"></div>
+        <div id="keys">
+          <b>WASD</b> or arrows walk · <b>Shift</b> run · <b>Space</b> jump · <b>E</b> talk · <b>F</b> fight · <b>Q</b> quest ·
+          <b>B</b> place · <b>N</b> break · <b>1 to 6</b> spells · <b>H</b> hit
+        </div>
+        <div id="talk"><div class="who"></div><div class="line"></div></div>
+        <button id="start" type="button">
+          <div><strong>Click to start</strong><span>Every sound is made by code as you play. Headphones help. Nothing plays until you click.</span></div>
+        </button>
+      </div>
+      <aside id="panel"></aside>
+    </div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
