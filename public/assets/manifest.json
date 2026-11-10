@@ -476,6 +476,29 @@
           }
         }
       }
+    },
+    "hero-swing": {
+      "sheet": "sprites/hero-swing.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "tool": {
+          "frames": 3,
+          "fps": 9,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
     }
   },
   "blocks": {
@@ -962,5 +985,15 @@
     "panel": "ui/panel.png",
     "button": "ui/button.png",
     "title": "ui/title.png"
+  },
+  "materials": {
+    "tile": 32,
+    "sheet": "blocks/oak-boards.png",
+    "names": {
+      "oak_boards": [
+        0,
+        0
+      ]
+    }
   }
 }
