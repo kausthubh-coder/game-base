@@ -49,6 +49,8 @@ export interface AudioState {
 /** One-shot sounds. `at` places a sound in the world. Without it the sound is at the listener. */
 export type AudioEvent =
   | { type: 'footstep'; surface: Surface; at?: Vec3 }
+  | { type: 'treeChop'; at?: Vec3 }
+  | { type: 'treeFell'; logs: number; at?: Vec3 }
   | { type: 'jump'; at?: Vec3 }
   | { type: 'land'; surface: Surface; at?: Vec3 }
   | { type: 'pickup'; at?: Vec3 }
@@ -69,6 +71,8 @@ export type AudioEvent =
 /** The conductor's state, for a debug panel and for the checks. The same object is returned every call. */
 export interface AudioDebug {
   running: boolean;
+  /** Current world inputs, shared and reused for inspection. */
+  ambience: Readonly<AudioState>;
   time: number;
   bpm: number;
   /** The tempo of the land or blend of lands, before fights and night. */
@@ -146,7 +150,7 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
   const target: number[] = ids.map((_, i) => (i === 0 ? 1 : 0));
   const weights = target.slice();
   const input: MusicInput = { weights, intensity: 0.5, fight: 0, night: 0, town: 0, rain: 0, danger: 0, boss: 0 };
-  const air: Air = { wind: 0.2, windDir: 0, rain: 0, trees: 0, nearWater: 0, day: 1, indoors: 0, cloud: 0.2, weights };
+  const air: Air = { wind: 0.2, windDir: 0, rain: 0, trees: 0, nearWater: 0, day: 1, indoors: 0, cloud: 0.2, town: 0, weights };
   const mood: Mood = { town: 0, danger: 0, fight: 0, boss: 0, night: 0, rain: 0 };
   const listener: Vec3 = { x: 0, y: 0, z: 0 };
   const place: Place = { pan: 0, gain: 1 };
@@ -156,7 +160,7 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
   let lastPickup = -10;
 
   const report: AudioDebug = {
-    running: false, time: 0, bpm: 0, baseBpm: 0, targetBpm: 0, bar: 0, beat: 0, key: '', scale: '', chord: '', notes: '', lead: '',
+    running: false, ambience: state, time: 0, bpm: 0, baseBpm: 0, targetBpm: 0, bar: 0, beat: 0, key: '', scale: '', chord: '', notes: '', lead: '',
     weights: {}, intensity: 0, layers: {} as AudioDebug['layers'], fight: false, resolving: false, voices: 0, voicePeak: 0, dropped: 0, refused: rig.refused,
     nodes: 0, fixedNodes: 0, notesByPalette: {}, ducking: 1,
   };
@@ -201,6 +205,7 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
     air.windDir = sky.windDir;
     air.rain = state.rain;
     air.trees = state.trees;
+    air.town = state.town;
     air.nearWater = state.nearWater;
     air.day = day;
     air.indoors = state.indoors;
@@ -268,6 +273,12 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
           playNote(rig, mixer.effects, pickupBell, t, midi, 0.2, 0.34 * where.gain, { bus: 'effects', priority: 2, pan: where.pan });
           break;
         }
+        case 'treeChop':
+          effects.tree(t, 'chop', 1, locate(event.at));
+          break;
+        case 'treeFell':
+          effects.tree(t, 'fall', event.logs, locate(event.at));
+          break;
         case 'blockPlaced':
           effects.block(t, event.surface, false, locate(event.at));
           break;

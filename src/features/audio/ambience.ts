@@ -1,9 +1,10 @@
+import { outdoorSound as sound } from '../../content/ambience.ts';
 // The world's air, all made from noise and sine waves: wind with gusts, leaves, water, rain, one bed that
 // belongs to each land, and the creatures that call over them. Beds are continuous and live as long as
 // the engine. Calls are single voices that come and go.
 import { chime, glassBell } from '../../content/palettes/instruments.ts';
 import type { Palette, SignatureBed } from '../../content/palettes/types.ts';
-import { gust, lifeRates, nextGap, noise1, type LifeRates } from './ambience.sim.ts';
+import { ambientLayers, windLevel, gust, lifeRates, nextGap, noise1, type LifeRates } from './ambience.sim.ts';
 import { playDrum, playNote } from './instruments.ts';
 import { Glide, type Mixer } from './mixer.ts';
 import { degreeSemis } from './patterns.sim.ts';
@@ -20,6 +21,7 @@ export interface Air {
   day: number;
   indoors: number;
   cloud: number;
+  town: number;
   /** One weight per palette, in the order the engine was given them. */
   weights: readonly number[];
 }
@@ -49,10 +51,21 @@ export class Ambience {
   private readonly rain: Bed;
   private readonly signature: { index: number; kind: SignatureBed; bed?: Bed; tune?: Glide; extra?: Bed }[] = [];
   private readonly rates: LifeRates = { birds: 0, crickets: 0, frogs: 0 };
+  private readonly habitat = { birds: 0, owl: 0, town: 0, water: 0, rain: 0, leaves: 0 };
+  private readonly longNoise: AudioBuffer;
   private surfNext = 0;
   private surf?: { gain: AudioParam; tone: AudioParam };
 
   constructor(private readonly rig: Rig, mixer: Mixer, private readonly palettes: readonly Palette[]) {
+    // Shared mono noise is generated once, never downloaded. Every bed has a different offset/rate.
+    this.longNoise = rig.ctx.createBuffer(1, Math.ceil(sound.noiseSeconds * rig.ctx.sampleRate), rig.ctx.sampleRate);
+    const samples = this.longNoise.getChannelData(0);
+    for (let i = 0; i < samples.length; i++) samples[i] = rig.rng() * 2 - 1;
+    const fade = Math.floor(rig.ctx.sampleRate * 0.015);
+    for (let i = 0; i < fade; i++) {
+      samples[i] *= i / fade;
+      samples[samples.length - 1 - i] *= i / fade;
+    }
     this.near = this.gain(1);
     this.near.connect(mixer.ambience);
     this.far = this.gain(1);
@@ -65,9 +78,9 @@ export class Ambience {
     const band: Glide[] = [];
     const side: Glide[] = [];
     for (const pan of [-0.7, 0.7]) {
-      const filter = this.filter('bandpass', 400, 0.55);
+      const filter = this.filter('bandpass', sound.wind.center, 0.45);
       const trim = this.gain(1);
-      connect(this.noise('pink', pan < 0 ? 0.92 : 1.07), filter, trim, this.panner(pan), windBed);
+      connect(this.noise('pink', pan < 0 ? 0.92 : 1.07), this.filter('highpass', sound.wind.highpass, 0.5), filter, trim, this.panner(pan), windBed);
       band.push(new Glide(filter.frequency));
       side.push(new Glide(trim.gain));
     }
@@ -157,9 +170,11 @@ export class Ambience {
     const life = (air: Air, key: 'birds' | 'crickets' | 'frogs'): number => {
       let m = 0;
       for (let i = 0; i < palettes.length; i++) m += (air.weights[i] as number) * (palettes[i] as Palette).life[key];
+      if (key === 'birds') return m * 0.5 * this.habitat.birds * (1 - 0.4 * air.cloud);
       return m * lifeRates(air.day, air.rain, air.trees, air.nearWater, air.indoors, air.cloud, this.rates)[key];
     };
     this.callers.push(
+      ...(['owl', 'murmur', 'bucket', 'stone'] as const).map((kind) => ({ next: 0, rate: () => sound[kind].rate * this.habitat[kind === 'owl' ? 'owl' : 'town'], fire: (t: number) => this.habitatCall(t, kind) })),
       { next: 0, rate: (air) => life(air, 'birds'), fire: (t) => this.bird(t) },
       { next: 0, rate: (air) => life(air, 'crickets'), fire: (t) => this.cricket(t) },
       { next: 0, rate: (air) => life(air, 'frogs'), fire: (t) => this.frog(t) },
@@ -195,7 +210,7 @@ export class Ambience {
 
   private noise(color: 'white' | 'pink' | 'brown', rate: number): AudioBufferSourceNode {
     const node = this.rig.keep(this.rig.ctx.createBufferSource());
-    node.buffer = this.rig.noise[color];
+    node.buffer = color === 'brown' ? this.rig.noise.brown : this.longNoise;
     node.loop = true;
     node.playbackRate.value = rate;
     node.start(0, this.rig.rng() * (node.buffer.duration - 0.01));
@@ -209,36 +224,37 @@ export class Ambience {
     return bed;
   }
 
-  private setBed(bed: Bed, level: number, now: number, seconds = 0.2): void {
+  private setBed(bed: Bed, level: number, now: number, seconds = 0.8): void {
     bed.now = level;
     bed.level.to(level, now, seconds);
   }
 
   /** Moves every bed toward what the air asks for, and tells the budget how many can be heard. */
   control(now: number, air: Air): void {
-    const out = 1 - 0.3 * air.indoors;
+    const out = 1 - 0.85 * air.indoors;
+    ambientLayers(air.day, air.rain, air.town, air.trees, air.nearWater, air.indoors, this.habitat);
     const g1 = gust(now, 11);
     const g2 = gust(now * 1.7, 23);
     const blow = air.wind * g1;
 
-    this.setBed(this.wind.bed, (0.02 + 0.65 * air.wind ** 1.5 * g1) * out, now);
+    this.setBed(this.wind.bed, windLevel(air.wind, g1) * out, now, sound.wind.fade);
     // The wind comes from one side: the ear it blows toward is quieter.
     const lean = Math.cos(air.windDir) * 0.3;
     for (let i = 0; i < 2; i++) {
-      (this.wind.band[i] as Glide).to(260 + 620 * blow + (i === 0 ? 0 : 70), now, 0.3);
+      (this.wind.band[i] as Glide).to(sound.wind.center + sound.wind.sweep * blow + (i === 0 ? 0 : 70), now, 0.3);
       (this.wind.side[i] as Glide).to(1 + (i === 0 ? lean : -lean), now, 0.5);
     }
-    this.setBed(this.leaves, air.trees * (0.015 + 0.38 * air.wind * g2) * out, now, 0.12);
-    this.setBed(this.water.bed, 0.5 * air.nearWater ** 1.6 * out, now);
+    this.setBed(this.leaves, this.habitat.leaves * (sound.leaves.floor + sound.leaves.gain * air.wind * Math.max(0, g2 - 0.3)), now, sound.leaves.fade);
+    this.setBed(this.water.bed, sound.water.gain * this.habitat.water ** 1.6 * (0.75 + 0.25 * g2), now, sound.water.fade);
     this.water.tone.to(700 + 5200 * air.nearWater, now, 0.3);
-    this.setBed(this.rain, 0.26 * air.rain ** 1.3, now, 0.4);
+    this.setBed(this.rain, sound.rain.gain * this.habitat.rain ** 1.3 * (0.85 + 0.15 * g2), now, sound.rain.fade);
 
     for (const s of this.signature) {
       const w = air.weights[s.index] as number;
       if (!s.bed) continue;
       switch (s.kind) {
         case 'meadowBreeze':
-          this.setBed(s.bed, w * (0.02 + 0.06 * noise1(now * 0.09, 41)) * out, now, 0.5);
+          this.setBed(s.bed, w * 0.008 * air.wind * Math.max(0, g2 - 0.4) * out, now, 0.5);
           break;
         case 'desertWind':
           this.setBed(s.bed, w * (0.07 + 0.26 * g2) * (0.7 + 0.6 * air.wind) * out, now, 0.3);
@@ -330,11 +346,35 @@ export class Ambience {
     b.commit(time, time + seconds);
   }
 
+  /** Sparse distant phrases; the content entry controls pitch, length and level. */
+  private habitatCall(time: number, kind: 'owl' | 'murmur' | 'bucket' | 'stone'): void {
+    const spec = sound[kind], rig = this.rig;
+    const level = spec.gain * this.habitat[kind === 'owl' ? 'owl' : 'town'];
+    const seconds = spec.seconds;
+    const b = rig.begin('ambience', 0, time, time + seconds);
+    if (!b) return;
+    const pitch = spec.pitch + rig.rng() * spec.spread;
+    const amp = b.gain(), pan = b.pan(rig.rng() * 1.6 - 0.8);
+    const source = kind === 'stone' ? b.noise('white') : b.osc(kind === 'murmur' ? 'sawtooth' : 'sine', pitch);
+    const filter = b.filter('bandpass', kind === 'murmur' ? 650 : pitch, kind === 'bucket' ? 3 : 0.8);
+    const pulses = kind === 'murmur' ? 6 : 2;
+    for (let i = 0; i < pulses; i++) {
+      const t = time + i * seconds / pulses;
+      strike(amp.gain, t, kind === 'stone' ? 0.012 : 0.06, level * (0.7 + rig.rng() * 0.3), seconds / pulses * 0.8);
+    }
+    if (source instanceof OscillatorNode) {
+      source.frequency.setValueAtTime(pitch, time);
+      source.frequency.exponentialRampToValueAtTime(pitch * (kind === 'owl' ? 0.78 : 0.94), time + seconds);
+    }
+    connect(source, filter, amp, pan, this.far);
+    b.commit(time, time + seconds);
+  }
+
   private bird(time: number): void {
     const rig = this.rig;
     const r = rig.rng;
     const kind = Math.floor(r() * 4);
-    const level = 0.06 + r() * 0.08;
+    const level = sound.bird.gain + r() * sound.bird.variation;
     const base = 2500 + r() * 1400;
     // Each call is a list of syllables: start, length, pitch from, pitch to.
     const parts: [number, number, number, number][] = [];
@@ -378,7 +418,7 @@ export class Ambience {
     if (!b) return;
     const o = b.osc('sine', 4200 + r() * 700);
     const amp = b.gain();
-    const level = 0.04 + r() * 0.03;
+    const level = sound.cricket.gain + r() * sound.cricket.variation;
     for (let c = 0; c < chirps; c++) {
       for (let p = 0; p < 3; p++) {
         const s = time + c * every + p * 0.024;

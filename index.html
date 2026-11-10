@@ -4,14 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Game base</title>
+    <title>A plot of your own</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #10141a; color: #e8eaee; font-family: ui-sans-serif, system-ui, sans-serif; }
-      #app { position: fixed; inset: 0; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #10141a; color: #e8eaee; font-family: ui-sans-serif, system-ui, sans-serif; }
+      #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; outline: none; touch-action: none; }
+      /* Views put their HTML here. It lets clicks through to the world: a child that takes clicks sets pointer-events: auto. */
+      #ui { position: fixed; inset: 0; overflow: hidden; pointer-events: none; user-select: none; }
+      #loading { position: fixed; inset: 0; display: grid; place-items: center; background: #10141a; font-size: 15px; letter-spacing: 0.02em; }
     </style>
   </head>
   <body>
-    <div id="app"></div>
+    <canvas id="view"></canvas>
+    <div id="ui"></div>
+    <div id="loading" role="status">Loading</div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

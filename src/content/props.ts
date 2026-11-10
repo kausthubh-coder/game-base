@@ -46,6 +46,13 @@ const SNUG: PropVary = { turn: 0, size: 0, tint: 0.04 };
 const still = { wind: false, light: 0 } as const;
 
 export const PROPS = {
+  pastureFence: { name: 'Pasture fence', group: 'town', builder: 'pastureFence', variants: ['valley'], triangles: 130, wind: false, light: 0, vary: SNUG },
+  footbridge: { name: 'Wooden footbridge', group: 'town', builder: 'footbridge', variants: ['valley'], triangles: 240, wind: false, light: 0, vary: SNUG },
+  mossStump: { name: 'Mossy stump', group: 'ground', builder: 'mossStump', variants: ['valley'], triangles: 120, wind: false, light: 0, vary: WILD },
+  wildflowers: { name: 'Wildflower clump', group: 'plant', builder: 'wildflowers', variants: ['valley'], triangles: 150, wind: true, light: 0, vary: WILD },
+  hayBale: { name: 'Bound hay bale', group: 'clutter', builder: 'hayBale', variants: ['valley'], triangles: 200, wind: false, light: 0, vary: LOOSE },
+  harvestStall: { name: 'Harvest stall', group: 'town', builder: 'harvestStall', variants: ['valley'], triangles: 230, wind: true, light: 0, vary: SNUG },
+
   // ---- trees
   oak: {
     name: 'Oak', group: 'tree', builder: 'oak', variants: ['round', 'broad', 'tall'], triangles: 260, wind: true, light: 0, vary: WILD,

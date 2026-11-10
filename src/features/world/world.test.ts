@@ -176,12 +176,15 @@ describe('light', () => {
     for (const [key, chunk] of a.chunks) expect(b.chunks.get(key)!.light).toEqual(chunk.light);
   });
 
-  test('the start house is lit by its lamp and the cave by its crystals', () => {
-    const world = worldAround(1, 0, -1, 2);
-    expect(world.openSky(LANDMARKS.house.x, LANDMARKS.house.y + 1, LANDMARKS.house.z)).toBe(false);
-    expect(world.blockLightAt(LANDMARKS.house.x, LANDMARKS.house.y + 1, LANDMARKS.house.z)).toBeGreaterThan(8);
-    expect(world.skyLightAt(LANDMARKS.cave.x, LANDMARKS.cave.y + 1, LANDMARKS.cave.z)).toBeLessThan(6);
-    expect(world.blockLightAt(LANDMARKS.cave.x, LANDMARKS.cave.y + 1, LANDMARKS.cave.z)).toBeGreaterThan(3);
+  test('the lodge is lit by its lamp, and the mossy rocks lie in the shade of their oaks', () => {
+    const house = LANDMARKS.house, rocks = LANDMARKS.cave;
+    const town = worldAround(1, Math.floor(house.x) >> 4, Math.floor(house.z) >> 4, 1);
+    expect(town.openSky(house.x, house.y + 1, house.z)).toBe(false);
+    expect(town.blockLightAt(house.x, house.y + 1, house.z)).toBeGreaterThan(8);
+    const grant = worldAround(1, Math.floor(rocks.x) >> 4, Math.floor(rocks.z) >> 4, 1);
+    expect(grant.openSky(rocks.x, rocks.y + 1, rocks.z)).toBe(false);
+    expect(grant.skyLightAt(rocks.x, rocks.y, rocks.z)).toBeLessThan(15);
+    expect(grant.skyLightAt(rocks.x, rocks.y, rocks.z)).toBeGreaterThan(8);
   });
 });
 
@@ -232,12 +235,16 @@ describe('terrain', () => {
     expect(caves).toBeGreaterThan(200);
   });
 
-  test('the hero spawns on open ground next to the house', () => {
-    const world = worldAround(1, 0, -1, 1);
+  test('the hero spawns on open ground two blocks north of the grant stone', () => {
     const s = spawnPoint();
+    const world = worldAround(1, Math.floor(s.x) >> 4, Math.floor(s.z) >> 4, 1);
+    const x = Math.floor(s.x), z = Math.floor(s.z);
     expect(world.heightAt(s.x, s.z)).toBe(s.y);
-    expect(world.getBlock(Math.floor(s.x), s.y, Math.floor(s.z))).toBe(0);
-    expect(world.getBlock(Math.floor(s.x), s.y + 1, Math.floor(s.z))).toBe(0);
+    expect(world.getBlock(x, s.y, z)).toBe(0);
+    expect(world.getBlock(x, s.y + 1, z)).toBe(0);
+    expect(world.getBlock(x, s.y, z + 1)).toBe(0);
+    for (let y = s.y; y < s.y + 3; y++) expect(world.getBlock(x, y, z + 2)).not.toBe(0);
+    expect(world.getBlock(x, s.y + 3, z + 2)).toBe(0);
   });
 });
 

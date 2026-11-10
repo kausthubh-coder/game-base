@@ -8,7 +8,7 @@ const label=(s,w=900,h=24)=>Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg"
 const canvas=(w,h,bg='#414751')=>sharp({create:{width:w,height:h,channels:4,background:bg}});
 const outputs=[];
 async function save(name,w,h,layers,bg){await canvas(w,h,bg).composite(layers).png().toFile(out+name);outputs.push(name);}
-for(const [name,s]of Object.entries(m.sprites)){
+for(const [name,s]of Object.entries(m.sprites).filter(([n])=>sprites[n])){
  const c=sprites[name],p=await pixels('public/assets/'+s.sheet),fw=c.size,band=fw+28,layers=[];
  for(const [an,a]of Object.entries(s.animations))for(const [dir,row]of Object.entries(a.rows)){
  layers.push({input:label(`${name} ${an} ${an==='tool'?'right profile (front key)':dir}`,c.cols*fw),left:0,top:row*band});
@@ -22,7 +22,7 @@ for(let page=0;page<Math.ceil(tileNames.length/4);page++){
 }
 const ip=await pixels('public/assets/'+m.icons.sheet),il=[];for(let i=0;i<icons.length;i++){const q=await cell(ip,...m.icons.names[icons[i]],4,4),x=(i%4)*144,y=Math.floor(i/4)*94;il.push({input:label(icons[i],144),left:x,top:y});il.push({input:await sharp(await png(q.data,32,32)).resize(64,64,{kernel:'nearest'}).png().toBuffer(),left:x+32,top:y+24});}await save('icons.png',576,376,il);
 const all=[{input:label('All assets / locked palette / grass-green ground',1152),left:0,top:0}];let i=0;
-for(const [name,s]of Object.entries(m.sprites)){const p=await pixels('public/assets/'+s.sheet),c=sprites[name];all.push({input:label(name,210),left:i*220,top:32});for(let d=0;d<3;d++){const q=await cell(p,0,d,c.cols,c.rows);all.push({input:await sharp(await png(q.data,q.w,q.h)).resize(Math.round(q.w/2),Math.round(q.h/2),{kernel:'nearest'}).png().toBuffer(),left:i*220+d*70,top:92});}i++;}
+for(const [name,s]of Object.entries(m.sprites).filter(([n])=>sprites[n])){const p=await pixels('public/assets/'+s.sheet),c=sprites[name];all.push({input:label(name,210),left:i*220,top:32});for(let d=0;d<3;d++){const q=await cell(p,0,d,c.cols,c.rows);all.push({input:await sharp(await png(q.data,q.w,q.h)).resize(Math.round(q.w/2),Math.round(q.h/2),{kernel:'nearest'}).png().toBuffer(),left:i*220+d*70,top:92});}i++;}
 for(let j=0;j<tileNames.length;j++){const t=tileNames[j],x=(j%8)*142,y=212+Math.floor(j/8)*108,q=await cell(bp,...t.xy,8,bp.h/32);all.push({input:label(t.name,142),left:x,top:y});all.push({input:await sharp(await png(q.data,32,32)).resize(64,64,{kernel:'nearest'}).png().toBuffer(),left:x+10,top:y+26});}
 for(let j=0;j<icons.length;j++){const x=(j%8)*142,y=224+Math.ceil(tileNames.length/8)*108+Math.floor(j/8)*80,q=await cell(ip,...m.icons.names[icons[j]],4,4);all.push({input:label(icons[j],142),left:x,top:y});all.push({input:await png(q.data,32,32),left:x+20,top:y+28});}await save('side-by-side.png',1152,224+Math.ceil(tileNames.length/8)*108+168,all,'#647e46');
 await fs.writeFile(out+'preview-index.json',JSON.stringify(outputs,null,2)+'\n');console.log('Wrote '+outputs.length+' previews');

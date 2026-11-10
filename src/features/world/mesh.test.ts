@@ -75,6 +75,18 @@ describe('meshing', () => {
     expect(meshChunk(blocks, light, tiles).faces).toBe(5);
   });
 
+  test('a block with no tiles draws nothing and hides nothing', () => {
+    const { blocks, light } = empty();
+    blocks[padIndex(5, 30, 5)] = STONE;
+    const alone = meshChunk(blocks, light, tiles);
+    blocks[padIndex(5, 31, 5)] = blockId('barrier');
+    const under = meshChunk(blocks, light, tiles);
+    // The barrier adds no face, and the stone under it keeps its top.
+    expect(under.faces).toBe(alone.faces);
+    expect(under.solid!.quads).toBe(6);
+    expect(under.maxY).toBe(31);
+  });
+
   test('water is its own mesh, and glass next to glass hides the face between', () => {
     const { blocks, light } = empty();
     for (let x = 2; x < 6; x++) for (let z = 2; z < 6; z++) { blocks[padIndex(x, 9, z)] = STONE; blocks[padIndex(x, 10, z)] = WATER; }

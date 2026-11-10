@@ -63,6 +63,9 @@ const rows: Row[] = [
   ['water', 'Water', 'water', all('water'), 0x3f86c8, { solid: false, opaque: false, liquid: true }],
   ['lume_crystal', 'Lume crystal', 'stone', all('lume_crystal'), 0x4fe0c8, { light: 10, glows: true }],
   ['lamp', 'Lamp', 'metal', capped('lamp_top', 'lamp_side'), 0xffd890, { light: 14, glows: true }],
+  // Fills the cells of a placed station, so a body and a click stop at it. It has no tiles, so the mesher draws
+  // nothing for it, and light passes through. The station's prop is what the player sees.
+  ['barrier', 'Barrier', 'wood', all(''), 0x9a6b3e, { opaque: false }],
 ];
 
 export const BLOCKS: readonly BlockDef[] = rows.map(([key, name, surface, tiles, color, extra], id) => ({

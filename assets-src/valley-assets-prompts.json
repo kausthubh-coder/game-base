@@ -1,0 +1,21 @@
+{
+  "tool": "image_gen.imagegen built-in",
+  "date": "2026-11-10",
+  "attempts": [
+    {
+      "name": "hero-swing",
+      "attempt": 1,
+      "reference": "public/assets/sprites/hero.png",
+      "raw": "assets-src/raw/hero-swing-3.png",
+      "selected": true,
+      "prompt": "Create a NEW pixel-art game sprite sheet using attached hero.png as identity and style reference only. Exact same small brown-haired boy, golden ochre short cape, cream scarf, dark brown trousers, boots and belt pouch; same head, same youthful face, same slender proportions and pixel cluster sizes as its first six rows. Disregard the last tool row. Sheet has EXACTLY 3 equal columns and 3 equal rows, on transparent background, no labels. Each cell a full body hero holding a small axe: columns are windup, downward strike, recovery. Rows: front facing viewer; back facing away with NO face visible; side facing RIGHT. Fixed camera per row even when swinging. No pose enlarged, same body height in all nine cells, same head size and costume as reference. Frame proportions 128 square; character height about 106 pixels, head including hair about 42 pixels, width head about 50 pixels. One to two pixel tinted plum-brown outline #302529 and #493335, warm top-left highlights, shadows #65453a, cape #d4aa58 #eeca76, boots #493335. Hard pixel edges, no antialiasing glow, no shadows on floor, no ground, no white fringe. 9 separate figures evenly spaced, tools fit fully inside each cell, no overlapping cells."
+    },
+    {
+      "name": "oak_boards",
+      "attempt": 1,
+      "raw": "assets-src/raw/oak-boards-2.png",
+      "selected": true,
+      "prompt": "A square seamless repeating pixel-art texture of sawn oak floor boards for a warm handmade cozy anime farming RPG. Flat orthographic face-on material only, fills the entire image. Intended to reduce to 32 by 32 pixels. Three broad parallel honey brown boards with clear dark brown narrow joints, occasional staggered end joints. Sparse long wood grain following the boards, NO knots, NO pink orange speckled noise, NO perspective, NO border. Low contrast painted interior, clear board seams, simple broad pixel clusters. Palette wood dark #916534, mid #9b6f3e, light #b78b5a, edge #b28655, shadows #664930. Warm light upper left, subtle bevel on board edges. All four opposite edges should match when tiled. No objects no text. Make the boards read instantly at 32 px."
+    }
+  ]
+}
