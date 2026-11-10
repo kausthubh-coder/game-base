@@ -499,6 +499,38 @@
           }
         }
       }
+    },
+    "town-pell": {
+      "sheet": "sprites/town-pell.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 2,
+          "fps": 4,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        },
+        "walk": {
+          "frames": 4,
+          "fps": 10,
+          "rows": {
+            "front": 3,
+            "back": 4,
+            "side": 5
+          }
+        }
+      }
     }
   },
   "blocks": {

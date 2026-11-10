@@ -1,0 +1,15 @@
+{
+  "tool": "image_gen.imagegen",
+  "reference": ".artifacts/sprites/side-by-side-3.png",
+  "attempts": 1,
+  "subjects": {
+    "pell": "PELL the fisher: lean middle aged dark-skinned woman, short silver curls, navy knitted beanie, ochre fishing vest, cream sleeves, muted blue trousers, brown boots, wicker creel on hip. No rod.",
+    "corin": "CORIN the market seller: broad cheerful adult man with dark skin, bald head, round ochre ear studs, rust-red short waistcoat, cream rolled sleeves, olive green apron, brown trousers, brown shoes. No hat, no moustache.",
+    "hesper": "HESPER the washer: sturdy older woman with warm brown skin, cream cloth wrapped high over hair, muted blue rolled-sleeve blouse, rust skirt, cream sash and brown ankle boots. No apron, no headscarf like villager-a.",
+    "dunn": "DUNN the town guard: tall stout adult woman with fair skin, short straight black bob, round dull steel kettle helmet, ochre padded tunic, muted slate-blue shoulder cape, rust trousers, dark boots. Empty hands, no weapon.",
+    "isolde": "ISOLDE the scholar: slight elderly dark-skinned man, bald crown and white side hair, tiny round brass spectacles, long muted violet robe, cream scarf hanging in two straight ends, brown shoes. No hat, no beard.",
+    "nessa": "NESSA the grandmother: round elderly fair-skinned woman, large silver hair bun, rust-red shawl around shoulders, dark olive dress, cream collar, brown boots, walking cane held close to body. No hat.",
+    "roan": "ROAN the farmhand: lanky teenage boy with warm tan skin, very short blond hair, no hat, cream tunic with rolled sleeves, rust-red neckerchief, moss-green dungarees, brown boots. No tools, no straw hat.",
+    "pip": "PIP the apprentice: young child age nine, dark skin and two short black hair puffs, ochre cap worn backward, muted violet short tunic, cream shorts, rust socks and brown shoes, small brown cross-body satchel. Shorter body and visibly childlike face, same large head scale as reference."
+  }
+}
