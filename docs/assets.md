@@ -156,7 +156,7 @@ Additional manifest sections use the same PNG contract:
 - `portraits` has `tile:128`, `sheet`, and `names`.
 - `crops` has `tile:32`, `sheet`, and `names`, with a list of cells per crop's stages.
 - `ui` maps image names to PNG paths.
-- `materials` has `tile:32`, `sheet`, and `names`. `materials.names.oak_boards` is a standalone replacement candidate. The generic asset loader can read this sheet; world block rendering still uses `blocks.atlas`. A coordinator must extend world material resolution before pointing `oak_plank` at it. Preserve the frozen atlas and baseline entries.
+- `materials` has `tile:32`, `sheet`, and `names`. A material is drawn over a frozen tile of `blocks.atlas` when the game loads: `MATERIALS` in `src/game/shell/art.ts` maps the tile to the material (today `oak_plank` to `oak_boards`). The atlas file and its baseline stay as they were approved.
 
 `sprites.hero-swing` is a separate action sheet. Its `tool` animation uses rows 0 front,
 1 back and 2 right-facing side, three frames at 9 fps, frame 128-square, anchor `[64,120]`,
