@@ -442,3 +442,15 @@ test('the background crowd has distinct faces that survive a reload', () => {
     expect(reload.kernel.game.actors.get('npc:' + p.id)!.sprite).toBe(p.sprite);
   }
 });
+
+test('a held festival traveller offers Talk on arrival, so a passer cannot steal another guest prompt', () => {
+  const stage = town();
+  stage.run(.05);
+  const people = stage.kernel.game.systems.people;
+  people.send('ann', 'shop');
+  people.hold('ann', true);
+  expect(stage.prompts.get('npc:ann')!.prompt()).toBeNull();
+  stage.run(20);
+  expect(at(people.get('ann')!.pos, SHOP)).toBe(true);
+  expect(stage.prompts.get('npc:ann')!.prompt()).toBe('Talk to Ann');
+});

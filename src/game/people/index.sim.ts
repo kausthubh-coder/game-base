@@ -303,7 +303,9 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
         id: p.actor.id,
         pos: () => p.state.pos,
         radius: TALK_RANGE,
-        prompt: () => prompt,
+        // Festival guests finish taking their places before offering Talk. A passer must not
+        // steal Odo's lamp handoff while crossing the square beside him.
+        prompt: () => p.held && p.sent && (p.plan || p.path !== null) ? null : prompt,
         act: () => game.systems.talk.talkTo(def.id),
       });
     });
