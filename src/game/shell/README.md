@@ -18,7 +18,9 @@ The shell starts the game. It makes the renderer, the block world, the kernel wi
 | `save.ts` | The save in `localStorage` |
 | `door.ts` | `window.__game` |
 | `../views/core-actors.view.ts` | Actors to sprites, and the marks over their heads |
-| `../views/core-aim.view.ts` | The box around the block under the pointer |
+| `../views/core-aim.view.ts` | The box around the block, tree or station a click would act on |
+| `../views/core-crosshair.view.ts` | The crosshair of the free and first-person cameras |
+| `../views/core-ghost.view.ts` | A see-through copy of what the right button would place |
 | `../views/core-sound.view.ts` | Game events to sounds and particles |
 
 ## Adding a view
@@ -69,13 +71,18 @@ A new game while a game is running reloads the page, because systems keep their 
 | W A S D, arrows | Walk, relative to the camera |
 | Shift | Walk at 2 blocks a second |
 | Space | Jump |
-| Q, R | Turn the camera a quarter turn |
-| Wheel | Zoom |
+| V | The next camera: 2.5D, free, first person |
+| Q, R | Turn the 2.5D camera a quarter turn |
+| Mouse | Free and first person: look around, once a click in the world has taken the mouse |
+| Alt, Esc | Give the cursor back |
+| Wheel | Zoom: in steps in 2.5D, smoothly in free |
 | 1 to 9, Shift and wheel | Pick a quick slot |
 | E | `interact.act()` |
-| Left button | `actions.use` with `primary`, then `actions.hold` every step while it is down |
+| Left button | `actions.use` with `primary`, then `actions.hold` every step while it is down. A break needs a hold of 0.4 seconds or more |
 | Right button | `actions.use` with `secondary` |
 | F3 | The performance meter |
+
+In 2.5D the buttons act on the block under the pointer. In free and first person they act on the block under the crosshair, in the middle of the screen. Either way reach is measured from the hero's eyes. The click that takes the mouse acts on nothing, and anything that holds the player (a panel, the map, a conversation, the title) gives the cursor back.
 
 E does nothing while `game.player.busy` is true. The dialogue view advances its own lines: hear `{ kind: 'interact' }` from `view.keys.onPress` and call `talk.advance()`.
 
@@ -99,6 +106,9 @@ The calls in `docs/play/act1.md`, and a few more for tests:
 | `click(button, x, y, z, face)` | `face` is the side clicked, as a step out of the block. The top by default. |
 | `newGame()`, `continueGame()`, `save()`, `hasSave()`, `started` | The game's life |
 | `setTime(t)`, `turn(1)`, `block(x, y, z)` | The clock, the camera, a block's id and key |
+| `setCamera(mode)` | `tilt` (2.5D), `free` or `first`, as the View setting and V pick it |
+| `look(yaw, pitch, distance?)` | Free and first person: the view in degrees. Yaw 0 looks north and 90 west, pitch is how far it looks down. `distance` is the free camera's |
+| `aimAt(x, y, z)` | Free and first person: turns the view so the crosshair falls on that point |
 | `frames(n)`, `settle()` | Promises: n frames drawn, the land in view loaded and drawn |
 | `view` | The `GameView` |
 

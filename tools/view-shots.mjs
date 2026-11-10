@@ -3,6 +3,10 @@
 // It opens an already served build once per variant, starts a game through the debug door, and for each
 // place sets the clock and weather, teleports, turns the camera, lets the place come alive and shoots.
 // It writes <variant>-<place>.png and shots.json, and sheet.png with one column per variant.
+//
+// A variant with `camera=free` or `camera=first` shoots each place from the ground instead: the hero stands
+// `back` meters from the place, on the side the 2.5D camera looks from, and the camera looks the same way. The
+// free camera stands behind the hero with the place beyond them; first person looks at the place.
 //   bun tools/view-shots.mjs --url http://127.0.0.1:5381/ [--out .artifacts/view-shots]
 //     [--variants sprites=chars=sprites,models=chars=models] [--places spawn,rocks,garden,town,meadow,river]
 //     [--quality high] [--w 1440] [--h 900]
@@ -23,14 +27,16 @@ const quality = opt('quality', 'high');
 mkdirSync(out, { recursive: true });
 
 // The places every comparison shoots. `time` is the time of day, 0.5 noon. `wait` is game seconds to let
-// people walk in and creatures appear before the shot. `zoom` is steps in from the opening zoom.
+// people walk in and creatures appear before the shot. `zoom` is steps in from the opening zoom. `back` is how
+// far from the place the hero stands for the free and first-person shots, and `pitch` how far the free camera
+// looks down there, in degrees.
 const PLACES = {
-  spawn: { at: 'grant.stone', quarter: 0, zoom: 1, time: 10 / 24, wait: 1, name: 'Grant stone, Tamsin and the hero' },
-  rocks: { at: 'grant.rocks', quarter: 0, zoom: 1, time: 15 / 24, wait: 8, name: 'Mossy rocks, mosslings' },
-  garden: { at: 'dead.garden', quarter: 1, zoom: 1, time: 11 / 24, wait: 4, name: 'Dead garden, the leaftail' },
-  town: { at: 'town.square', quarter: 3, zoom: 0, time: 10 / 24, wait: 4, name: 'Town square, people' },
-  meadow: { at: [46, -219], quarter: 0, zoom: 0, time: 16 / 24, wait: 1, name: 'Meadow, grass and flowers' },
-  river: { at: 'river.bank', quarter: 2, zoom: 1, time: 19.6 / 24, wait: 8, name: 'River bank at dusk, lanternflies' },
+  spawn: { at: 'grant.stone', quarter: 0, zoom: 1, time: 10 / 24, wait: 1, back: 6, pitch: 16, name: 'Grant stone, Tamsin and the hero' },
+  rocks: { at: 'grant.rocks', quarter: 0, zoom: 1, time: 15 / 24, wait: 8, back: 7, pitch: 18, name: 'Mossy rocks, mosslings' },
+  garden: { at: 'dead.garden', quarter: 1, zoom: 1, time: 11 / 24, wait: 4, back: 7, pitch: 18, name: 'Dead garden, the leaftail' },
+  town: { at: 'town.square', quarter: 3, zoom: 0, time: 10 / 24, wait: 4, back: 8, pitch: 12, name: 'Town square, people' },
+  meadow: { at: [46, -219], quarter: 0, zoom: 0, time: 16 / 24, wait: 1, back: 5, pitch: 8, name: 'Meadow, grass and flowers' },
+  river: { at: 'river.bank', quarter: 2, zoom: 1, time: 19.6 / 24, wait: 8, back: 5, pitch: 14, name: 'River bank at dusk, lanternflies' },
 };
 
 const variants = opt('variants', 'sprites=chars=sprites,models=chars=models').split(',').map((pair) => {
@@ -74,6 +80,20 @@ async function run(variant) {
       g.advance(place.wait);
       g.setTime(place.time);
       g.teleport(at.x, at.z);
+      const mode = g.state().camera.mode;
+      if (mode === 'free' || mode === 'first') {
+        // Stand on the side the 2.5D camera would look from, and look the way it would. Yaw 0 looks north.
+        const yaw = 45 + 90 * place.quarter, rad = (yaw * Math.PI) / 180;
+        const stand = g.teleport(at.x + Math.sin(rad) * place.back, at.z + Math.cos(rad) * place.back);
+        g.advance(0.1);
+        if (mode === 'free') g.look(yaw, place.pitch, 6.5);
+        else g.aimAt(at.x, at.y + 1, at.z);
+        await g.frames(14);
+        await g.settle();
+        await g.frames(4);
+        const s = g.state();
+        return { at, stand, camera: s.camera, characters: s.characters, ...g.counters() };
+      }
       const now = g.state().camera.quarter;
       const left = (place.quarter - now + 4) % 4;
       if (left === 3) g.turn(1);

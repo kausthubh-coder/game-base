@@ -16,13 +16,13 @@ Clicking on the world. It implements `ActionsApi`.
 - Secondary button. A held block item places its block on the face that was hit. A held station item places the station there through `PlaceablesApi`, turned to face the player, and only on solid ground. Both take one from the bag.
 - Primary button. It starts a break and returns true when there is something to break. It does not break anything by itself.
 
-`hold(context, dt)` does the breaking. Call it on every step while the primary button is down, with the block under the pointer. It fills a meter and returns true on the step the block breaks. `breaking()` gives the block and the progress from 0 to 1 for the crack overlay, or null.
+`hold(context, dt)` does the breaking. Every press starts the meter from nothing, and no break is quicker than `HOLD_TO_BREAK` (0.4 seconds), so a click, or a few quick clicks, never breaks anything. Call it on every step while the primary button is down, with the block under the pointer. It fills a meter and returns true on the step the block breaks. `breaking()` gives the block and the progress from 0 to 1 for the crack overlay, or null.
 
 Seconds to break, from `src/game/content/drops.ts`:
 
 | Block | By hand | With the tool |
 |---|---|---|
-| grass, leaves | 0.25 | |
+| grass, leaves | 0.25, held for 0.4 | |
 | dirt, sand, path, clay, tilled soil | 0.5 | |
 | logs | 1.5 | axe 0.5 |
 | planks and every other placed block | 0.6 | |

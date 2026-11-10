@@ -2,8 +2,11 @@
 // that look the same merge into large quads, corners are shaded where blocks meet, and light is baked
 // per vertex. Water goes to its own mesh because it is see-through.
 //
-// A vertex is 9 bytes: position (3), info (4: face and flags, tile layer, variant count, corner
-// shade 0 to 3) and light (2: sky and block, 0 to 255).
+// A vertex is 9 bytes: position (3), info (4: face and flags, tile layer, variant count, and the
+// shade byte) and light (2: sky and block, 0 to 255). The shade byte holds the corner shade (0 to 3)
+// in its low two bits, then four bits for the face's edges that the land drops away from, then the
+// corner's place on the face, u and v, 0 or 1. The material lights a thin lip along those edges, so a
+// step of one block reads from above.
 import { BLOCKS } from '../../content/blocks.ts';
 import { CHUNK, HEIGHT, LIQUID, OPAQUE, PAD } from './chunk.sim.ts';
 
@@ -69,6 +72,10 @@ const SIZE = [CHUNK, HEIGHT, CHUNK];
 // One slice of faces waiting to be merged: what the face looks like, and the light of its four corners.
 const mask = new Int32Array(CHUNK * HEIGHT), maskSky = new Int32Array(CHUNK * HEIGHT), maskBlk = new Int32Array(CHUNK * HEIGHT);
 const ALONG_U = 1 << 11, ALONG_V = 1 << 12, WATER = 1 << 21;
+/** The edge bits sit above everything else in a merge key. */
+const EDGE_SHIFT = 22;
+/** Edge bits: the face's edge at its low u, high u, low v and high v. */
+export const EDGE_LOW_U = 1, EDGE_HIGH_U = 2, EDGE_LOW_V = 4, EDGE_HIGH_V = 8;
 const cAo = new Uint8Array(4), cSky = new Uint8Array(4), cBlk = new Uint8Array(4);
 const p = [0, 0, 0];
 
@@ -95,7 +102,7 @@ class Builder {
   }
 
   /** One quad on the plane `plane` of the face direction `d`, from (u0, v0) with size (w, h). Corner values come from cAo, cSky, cBlk. */
-  quad(d: number, plane: number, u0: number, v0: number, w: number, h: number, layer: number, variants: number, flags: number, topFlags: number): void {
+  quad(d: number, plane: number, u0: number, v0: number, w: number, h: number, layer: number, variants: number, flags: number, topFlags: number, edges = 0): void {
     if ((this.verts + 4) * 3 > this.pos.length) {
       const grow = (a: Uint8Array): Uint8Array<ArrayBuffer> => {
         const bigger = new Uint8Array(a.length * 2);
@@ -121,7 +128,8 @@ class Builder {
       p[an] = plane; p[au] = u0 + cu * w; p[av] = v0 + cv * h;
       const v = this.verts++;
       this.pos[v * 3] = p[0]; this.pos[v * 3 + 1] = p[1]; this.pos[v * 3 + 2] = p[2];
-      this.info[v * 4] = d + 8 * (cv ? topFlags : flags); this.info[v * 4 + 1] = layer; this.info[v * 4 + 2] = variants; this.info[v * 4 + 3] = cAo[c];
+      this.info[v * 4] = d + 8 * (cv ? topFlags : flags); this.info[v * 4 + 1] = layer; this.info[v * 4 + 2] = variants;
+      this.info[v * 4 + 3] = cAo[c] | (edges << 2) | (cu << 6) | (cv << 7);
       this.light[v * 2] = cSky[c]; this.light[v * 2 + 1] = cBlk[c];
       if (p[1] < low) low = p[1];
       if (p[1] > this.high) this.high = p[1];
@@ -180,6 +188,22 @@ function corner(c: number, f: number, ou: number, ov: number): void {
 }
 
 /**
+ * The edges of a face where the land drops away: the block beside it along the face is open, and so is the
+ * cell in front of that one. Top faces have all four; a side has only its top edge, where a wall or a step
+ * ends. `i` is the block, `f` the cell in front of the face.
+ */
+function dropEdges(d: number, i: number, f: number, su: number, sv: number): number {
+  if (d === 3) return 0;
+  if (d !== 2) return !OPQ[ids[i + SY]] && !OPQ[ids[f + SY]] ? EDGE_HIGH_V : 0;
+  let edges = 0;
+  if (!OPQ[ids[i - su]] && !OPQ[ids[f - su]]) edges |= EDGE_LOW_U;
+  if (!OPQ[ids[i + su]] && !OPQ[ids[f + su]]) edges |= EDGE_HIGH_U;
+  if (!OPQ[ids[i - sv]] && !OPQ[ids[f - sv]]) edges |= EDGE_LOW_V;
+  if (!OPQ[ids[i + sv]] && !OPQ[ids[f + sv]]) edges |= EDGE_HIGH_V;
+  return edges;
+}
+
+/**
  * Meshes one chunk. `blocks` and `light` are the padded copies from `World.snapshot`.
  */
 export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTable): ChunkMesh {
@@ -227,17 +251,20 @@ export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTabl
               faces++;
               corner(0, f, -su, -sv); corner(1, f, su, -sv); corner(2, f, su, sv); corner(3, f, -su, sv);
               const layer = tiles[b * 6 + group], variants = tiles[b * 6 + group + 1], glow = GLOW[b];
+              // Only an opaque block gets edges: then a face with an edge never merges along that edge's
+              // direction, so the corner's u and v say exactly how far a point is from the edge.
+              const edges = OPQ[b] ? dropEdges(d, i, f, su, sv) : 0;
               // A face may join its neighbor along one direction when its shade and light do not
               // change along that direction: then one long quad draws exactly the same picture.
               const alongU = cAo[0] === cAo[1] && cAo[3] === cAo[2] && cSky[0] === cSky[1] && cSky[3] === cSky[2] && cBlk[0] === cBlk[1] && cBlk[3] === cBlk[2];
               const alongV = cAo[0] === cAo[3] && cAo[1] === cAo[2] && cSky[0] === cSky[3] && cSky[1] === cSky[2] && cBlk[0] === cBlk[3] && cBlk[1] === cBlk[2];
               if (alongU || alongV) {
                 key = layer | (variants << 8) | (glow << 10) | (alongU ? ALONG_U : 0) | (alongV ? ALONG_V : 0)
-                  | (cAo[0] << 13) | (cAo[1] << 15) | (cAo[2] << 17) | (cAo[3] << 19);
+                  | (cAo[0] << 13) | (cAo[1] << 15) | (cAo[2] << 17) | (cAo[3] << 19) | (edges << EDGE_SHIFT);
                 maskSky[m] = cSky[0] | (cSky[1] << 8) | (cSky[2] << 16) | (cSky[3] << 24);
                 maskBlk[m] = cBlk[0] | (cBlk[1] << 8) | (cBlk[2] << 16) | (cBlk[3] << 24);
               } else {
-                solid.quad(d, plane, u, v, 1, 1, layer, variants, glow, glow);
+                solid.quad(d, plane, u, v, 1, 1, layer, variants, glow, glow, edges);
               }
             }
           }
@@ -264,7 +291,7 @@ export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTabl
           for (let j = 0; j < h; j++) for (let k = 0; k < w; k++) mask[m + j * nu + k] = 0;
           for (let c = 0; c < 4; c++) { cAo[c] = (key >> (13 + c * 2)) & 3; cSky[c] = (sky >> (c * 8)) & 255; cBlk[c] = (blk >> (c * 8)) & 255; }
           if (key & WATER) water.quad(d, plane, u, v, w, h, key & 255, 1, FLAG_WATER_TOP, FLAG_WATER_TOP);
-          else solid.quad(d, plane, u, v, w, h, key & 255, (key >> 8) & 3, (key >> 10) & 1, (key >> 10) & 1);
+          else solid.quad(d, plane, u, v, w, h, key & 255, (key >> 8) & 3, (key >> 10) & 1, (key >> 10) & 1, (key >> EDGE_SHIFT) & 15);
           u += w;
         }
       }
