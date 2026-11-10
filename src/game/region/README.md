@@ -4,7 +4,7 @@ The land of the first part: the grant, the mossy rocks, the dead garden, the pat
 
 ## How the land is made
 
-The plan is data in `src/game/content/region.ts`: level ground, a river basin, the path, boxes of blocks, buildings, trees, bushes, places. The terrain (`src/features/world/terrain.sim.ts`) reads that plan while it makes each chunk, so the page and the worker make the same blocks. This system writes no blocks. It answers questions about them and runs the berry bushes.
+The plan is data in `src/game/content/region.ts`: level ground, a river basin, the path, boxes of blocks, buildings, trees, bushes, places. The terrain (`src/features/world/terrain.sim.ts`) reads that plan while it makes each chunk, so the page and the worker make the same blocks. Trees are model entities owned by `src/game/trees`; terrain stamps only their invisible root barriers. This system writes no blocks. It answers questions about them and runs the berry bushes.
 
 The plan is laid out on the land of world seed 1, which is the seed the game uses. Another seed gets the same plan at the same coordinates on its own land. Every place can still be stood on, but the river and the hills are somewhere else.
 
@@ -35,7 +35,7 @@ To move something, change its numbers in `content/region.ts`, then run `bun tool
 - `props()` returns every prop to draw as `{ kind, variant, x, y, z, rotation, scale, quarterTurns, building }`. The first seven fields are the arguments of the props feature's `place`. The list holds the doors, windows, signs and furniture of the ten buildings, then a signpost, a gate, two benches and two stalls that stand alone.
 - `scatter()` returns `{ density: 1, blocked(x, z), forest(x, z) }`, the options of the props feature's `scatter`.
   - `blocked` is true where nothing is scattered: the whole grant, the path and one block either side of it, the town, the dead garden's beds and ruin, and where the plan put a tree, a bush or a rock.
-  - Around the sites `blocked` is also true for one column in nine: the column of each 3 by 3 square where the scatter would stand a tree. So no scattered tree grows within 10 blocks south or east of the grant, around the garden, by the town or within 6 blocks of the path, and the grass and flowers stay. Scattered trees cannot be cut and the camera does not see through them, which is why. `tree-spots.sim.ts` holds a copy of the scatter's hash for this, and the region test runs the real scatter to check that the copy still matches.
+  - Around the sites `blocked` is also true for one column in nine: the column of each 3 by 3 square where the scatter would stand a tree. So no scattered tree grows within 10 blocks south or east of the grant, around the garden, by the town or within 6 blocks of the path, and the grass and flowers stay. The props scatter omits its tree shapes; cuttable model trees use the terrain distribution instead. `tree-spots.sim.ts` holds a copy of the scatter's hash for this, and the region test runs the real scatter to check that the copy still matches.
   - `forest` says the same in the scatter's own terms: the terrain's forest (`forestAt` in `terrain.sim.ts`), falling to 0 around the sites. The dressing view does not pass it to the scatter today. If it did, scattered woods would stand where the block woods stand.
 - `townCenter()` is `{ x: 170, z: -158, radius: 46 }`.
 

@@ -1,4 +1,5 @@
 import { test, expect } from 'bun:test';
+import { emptyHit } from '../../features/world/world.sim.ts';
 import { blockId } from '../../content/blocks.ts';
 import { newPlay, loadPlay } from '../play/harness.sim.ts';
 
@@ -11,7 +12,10 @@ test('model tree roots collide; a held axe fells the whole tree and saves the cl
   p.sys.inventory.add('axe',1);
   const slot=p.sys.inventory.slots.findIndex(s=>s?.id==='axe');
   p.sys.inventory.selected=slot;
-  expect(p.dig(t.x,t.y,t.z)).toBe(true);
+  const hit=emptyHit();
+  expect(p.sys.trees.raycast({x:t.x+.5,y:t.box.y1+2,z:t.z+.5},{x:0,y:-1,z:0},20,hit)).toBe(true);
+  expect({x:hit.x,y:hit.y,z:hit.z}).toEqual({x:t.x,y:t.y,z:t.z});
+  expect(p.dig(t.x,t.y+4,t.z)).toBe(true);
   expect(p.sys.trees.all().find(q=>q.x===t.x&&q.z===t.z)?.standing).toBe(false);
   expect(p.count('oak_log')).toBeGreaterThanOrEqual(3);
   expect(p.count('fiber')).toBeGreaterThanOrEqual(1);

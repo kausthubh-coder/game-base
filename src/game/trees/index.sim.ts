@@ -22,11 +22,17 @@ export function install(kernel: Kernel): void {
     const x = Math.floor(game.player.pos.x / 16), z = Math.floor(game.player.pos.z / 16);
     if (x === cx && z === cz) return;
     cx=x; cz=z;
-    list=treesInArea(world.seed,(x-4)*16,(z-4)*16,(x+5)*16,(z+5)*16).map(t => ({...t,standing:!felled.has(key(t.x,t.z)),protected:Math.hypot(t.x+.5-8,t.z+.5+228)<12 || (game.systems.region?.isProtected(t.x,t.y,t.z)??false),box:{x0:t.x+.5-2.2*t.size,y0:t.y,z0:t.z+.5-2.2*t.size,x1:t.x+.5+2.2*t.size,y1:t.y+6.6*t.size,z1:t.z+.5+2.2*t.size}}));
+    const rocks=game.systems.region?.place('grant.rocks').at;
+    list=treesInArea(world.seed,(x-4)*16,(z-4)*16,(x+5)*16,(z+5)*16).map(t => ({...t,standing:!felled.has(key(t.x,t.z)),protected:(rocks !== undefined && Math.hypot(t.x+.5-rocks.x,t.z+.5-rocks.z)<12) || (game.systems.region?.isProtected(t.x,t.y,t.z)??false),box:{x0:t.x+.5-2.2*t.size,y0:t.y,z0:t.z+.5-2.2*t.size,x1:t.x+.5+2.2*t.size,y1:t.y+6.6*t.size,z1:t.z+.5+2.2*t.size}}));
   }
   const api: TreesApi = {
     all() { sync(); return list; },
-    at(x,y,z) { sync(); return list.find(t=>t.standing&&t.x===x&&t.z===z&&y>=t.y&&y<t.box.y1) ?? list.find(t => t.standing && x >= t.box.x0 && x < t.box.x1 && y >= t.y && y < t.box.y1 && z >= t.box.z0 && z < t.box.z1) ?? null; },
+    at(x,y,z) {
+      sync();
+      for (const t of list) if(t.standing && t.x===x && t.z===z && y>=t.y && y<t.box.y1) return t;
+      for (const t of list) if(t.standing && x>=t.box.x0 && x<t.box.x1 && y>=t.y && y<t.box.y1 && z>=t.box.z0 && z<t.box.z1) return t;
+      return null;
+    },
     fell(x,y,z) {
       const t=api.at(x,y,z);
       if (!t || t.protected) return false;

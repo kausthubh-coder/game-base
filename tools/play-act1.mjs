@@ -364,7 +364,7 @@ async function talkThrough() {
 }
 
 /** Walks up to someone until the prompt names them, presses the real E and talks it through. */
-async function talkTo(id) {
+async function talkTo(id, attempt = 0) {
   for (const within of [1.7, 1.2, 0.8, 0.4]) {
     const npc = await p.npc(id);
     must(npc, `nobody is called ${id}`);
@@ -378,7 +378,9 @@ async function talkTo(id) {
   const promptOnScreen = await game(() => document.querySelector('.gu-prompt')?.textContent ?? '');
   await page.keyboard.press('KeyE');
   await page.waitForFunction(() => { const e = document.querySelector('.gb-dialogue'); return e && !e.hidden; }, null, { timeout: 30000 });
+  const speaker=(await state()).talk?.npc;
   const lines = await talkThrough();
+  if(speaker!==id){must(attempt<3,`wanted ${id}, spoke to ${speaker}`);note(`approaching ${id} again after ${speaker} crossed the prompt`);return talkTo(id,attempt+1);}
   const after = await state();
   // The last talk of the act opens the end card, which holds the player until Keep playing.
   must((!after.player.busy || after.flags['act1.ended'] === true) && after.talk === null, `the conversation with ${id} left the player busy`);
@@ -703,12 +705,11 @@ const QUESTS = {
     });
     if (!args.includes('--no-continue')) {
       await step('bread', 'reload the page mid-quest and Continue from the title', async () => {
-        const before = await state();
-        await game(() => window.__game.save());
+        const before = await game(() => { const g=window.__game; g.manual(true); g.save(); return g.state(); });
         await openGame();
         await page.click('[data-key="title:continue"]');
         await page.waitForFunction(() => window.__game.started);
-        await game(() => window.__game.settle());
+        await game(() => {window.__game.manual(true); return window.__game.settle();});
         const after = await state();
         must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
@@ -716,6 +717,7 @@ const QUESTS = {
         const f = await field();
         must((await p.crop(f.cells[0].x, f.cells[0].y, f.cells[0].z)) !== null, 'the crops did not come back');
         await shot('31-continued.png');
+        await game(()=>window.__game.manual(false));
         return `${after.bag.length} stacks in the bag`;
       });
     }

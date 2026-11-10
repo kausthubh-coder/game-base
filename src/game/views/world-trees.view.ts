@@ -1,5 +1,5 @@
 export interface RockModels {place(x:number,y:number,z:number,rotation:number,scale:number,variant:number):number;remove(id:number):void}
-// Optional visual experiment. No world blocks, collisions, or felling rules are changed.
+// One instanced draw per model variant. Rules own the placements and standing state.
 import * as THREE from 'three';
 import type { GameView } from '../shell/view.ts';
 
@@ -8,7 +8,7 @@ export async function install(view: GameView): Promise<void> {
   const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
   const loader = new GLTFLoader();
   const clock = { value: 0 };
-  const group = new THREE.Group(); group.name = 'Blender model look test';
+  const group = new THREE.Group(); group.name = 'model trees and rocks';
   const manifest = await (await fetch('/assets/manifest.json')).json();
   // Load everything before changing the scene, so a failed request leaves no half-installed fixture.
   const loaded = await Promise.all(['tree-17','tree-41','tree-83','birch-17','birch-41','birch-83','pine-17','pine-41','pine-83','rock-11','rock-37'].map(async name => ({ name, gltf: await loader.loadAsync(`/assets/${manifest.models[name].file}`) })));

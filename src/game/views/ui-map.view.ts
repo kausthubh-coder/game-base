@@ -133,7 +133,7 @@ export function install(view: GameView): void {
     if (kept !== 0) return kept - 1;
     if (!sim.chunkAt(cx, cz)) return BLANK;
     if (!tile) tiles.set(key, (tile = new Uint32Array(256)));
-    const canopy=game.systems.trees?.at(bx,sim.heightAt(bx,bz)+2,bz);
+    const canopy=sim.canopyAt(bx,sim.heightAt(bx,bz)+2,bz);
     const color = canopy ? 0x516b3c : readColumn(bx, bz);
     tile[at] = color + 1;
     return color;
