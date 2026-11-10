@@ -1,3 +1,4 @@
+import { loadEnvironmentModels } from '../../features/props/models.view.ts';
 // Dresses the land with props: the region's building props and berry bushes, and trees, grass, flowers,
 // rocks and reeds from the props feature's scatter rules.
 //
@@ -62,7 +63,8 @@ interface ShownBush {
   handle: number;
 }
 
-export function install(view: GameView): void {
+export async function install(view: GameView): Promise<void> {
+  await loadEnvironmentModels();
   const { game } = view;
   const sim = view.world.sim;
   const props = worldProps(view);

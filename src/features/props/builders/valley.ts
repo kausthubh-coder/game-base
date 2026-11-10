@@ -1,11 +1,11 @@
+import { TownShape } from './town-shape.ts';
 // Pastoral valley pieces. All geometry merges into the shared instanced prop material.
 import type * as THREE from 'three';
 import { P, RAMP } from '../palette.ts';
-import { Shape } from '../shape.ts';
 
 /** Two-block fence section, with broad rails visible above meadow grass. */
 export function pastureFence(): THREE.BufferGeometry {
-  const s = new Shape(1301);
+  const s = new TownShape(1301);
   for (const x of [-1, 1]) {
     s.box(x, 0, 0, .2, 1.12, .2, P.timber, { bevel: .025, skip: '-y' });
     s.cone(x, 1.12, 0, .15, .12, 4, P.plankLight, { turn: Math.PI / 4 });
@@ -18,7 +18,7 @@ export function pastureFence(): THREE.BufferGeometry {
 
 /** A three-block stream span. Deck runs along z; caller provides collision. */
 export function footbridge(): THREE.BufferGeometry {
-  const s = new Shape(1303);
+  const s = new TownShape(1303);
   for (const x of [-.6, .6]) s.box(x, 0, 0, .16, .24, 3.2, P.timber);
   for (let i = 0; i < 8; i++) s.box(0, .24, -1.4 + i * .4, 1.5, .12, .38, i % 2 ? P.plank : P.plankLight);
   for (const x of [-.7, .7]) {
@@ -31,7 +31,7 @@ export function footbridge(): THREE.BufferGeometry {
 
 /** A cut oak with roots and an uneven moss cap, rather than a smooth cylinder. */
 export function mossStump(): THREE.BufferGeometry {
-  const s = new Shape(1307);
+  const s = new TownShape(1307);
   s.cyl(0, 0, 0, .48, .34, .62, 7, RAMP.bark, { capTone: P.plankLight, flat: true });
   s.disc(0, .625, 0, .23, 7, P.plank);
   s.disc(0, .63, 0, .12, 7, P.plankPale);
@@ -46,7 +46,7 @@ export function mossStump(): THREE.BufferGeometry {
 
 /** Five warm meadow blooms, with grounded leaves and swaying flower heads. */
 export function wildflowers(): THREE.BufferGeometry {
-  const s = new Shape(1311);
+  const s = new TownShape(1311);
   for (let i = 0; i < 5; i++) {
     const a = i * 2.4, x = Math.cos(a) * .32, z = Math.sin(a) * .32, h = .32 + i * .045;
     s.tube([[x, 0, z], [x + .03, h, z]], [.025, .018], 4, P.moss, { cap: 'none', sways: [0, .3] });
@@ -59,7 +59,7 @@ export function wildflowers(): THREE.BufferGeometry {
 
 /** Bound square hay with broad top strands and two rope straps. */
 export function hayBale(): THREE.BufferGeometry {
-  const s = new Shape(1319);
+  const s = new TownShape(1319);
   s.box(0, 0, 0, 1.15, .7, .8, RAMP.hay, { bevel: .07, skip: '-y' });
   for (const x of [-.33, .33]) {
     s.box(x, .7, 0, .055, .035, .81, P.burlap);
@@ -72,7 +72,7 @@ export function hayBale(): THREE.BufferGeometry {
 
 /** A low produce stand for the square; saffron canopy leaves the seller visible. */
 export function harvestStall(): THREE.BufferGeometry {
-  const s = new Shape(1321);
+  const s = new TownShape(1321);
   s.box(0, .68, 0, 1.9, .14, .85, P.plankLight, { bevel: .025 });
   for (const x of [-.84, .84]) for (const z of [-.33, .33]) s.box(x, 0, z, .12, 2.05, .12, P.timber, { skip: '-y' });
   for (let i = 0; i < 5; i++) {

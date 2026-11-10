@@ -49,9 +49,9 @@ export const PROPS = {
   pastureFence: { name: 'Pasture fence', group: 'town', builder: 'pastureFence', variants: ['valley'], triangles: 130, wind: false, light: 0, vary: SNUG },
   footbridge: { name: 'Wooden footbridge', group: 'town', builder: 'footbridge', variants: ['valley'], triangles: 240, wind: false, light: 0, vary: SNUG },
   mossStump: { name: 'Mossy stump', group: 'ground', builder: 'mossStump', variants: ['valley'], triangles: 120, wind: false, light: 0, vary: WILD },
-  wildflowers: { name: 'Wildflower clump', group: 'plant', builder: 'wildflowers', variants: ['valley'], triangles: 150, wind: true, light: 0, vary: WILD },
+  wildflowers: { name: 'Wildflower clump', group: 'plant', builder: 'wildflowers', variants: ['valley'], triangles: 220, wind: true, light: 0, vary: WILD },
   hayBale: { name: 'Bound hay bale', group: 'clutter', builder: 'hayBale', variants: ['valley'], triangles: 200, wind: false, light: 0, vary: LOOSE },
-  harvestStall: { name: 'Harvest stall', group: 'town', builder: 'harvestStall', variants: ['valley'], triangles: 230, wind: true, light: 0, vary: SNUG },
+  harvestStall: { name: 'Harvest stall', group: 'town', builder: 'harvestStall', variants: ['valley'], triangles: 230, wind: false, light: 0, vary: SNUG },
 
   // ---- trees
   oak: {
@@ -68,14 +68,14 @@ export const PROPS = {
   },
 
   // ---- small plants
-  grassTuft: { name: 'Grass tuft', group: 'plant', builder: 'grassTuft', variants: ['short', 'mid', 'full'], triangles: 40, wind: true, light: 0, vary: WILD },
+  grassTuft: { name: 'Grass tuft', group: 'plant', builder: 'grassTuft', variants: ['short', 'mid', 'full'], triangles: 100, wind: true, light: 0, vary: WILD },
   tallGrass: { name: 'Tall grass', group: 'plant', builder: 'tallGrass', variants: ['clump'], triangles: 70, wind: true, light: 0, vary: WILD },
-  flower: { name: 'Flower', group: 'plant', builder: 'flower', variants: ['white', 'yellow', 'red', 'pink', 'purple', 'blue'], triangles: 60, wind: true, light: 0, vary: WILD },
-  reeds: { name: 'Reeds', group: 'plant', builder: 'reeds', variants: ['thin', 'cattails'], triangles: 80, wind: true, light: 0, vary: WILD },
-  lilyPad: { name: 'Lily pad', group: 'plant', builder: 'lilyPad', variants: ['plain', 'bloom'], triangles: 50, ...still, vary: WILD },
+  flower: { name: 'Flower', group: 'plant', builder: 'flower', variants: ['white', 'yellow', 'red', 'pink', 'purple', 'blue'], triangles: 150, wind: true, light: 0, vary: WILD },
+  reeds: { name: 'Reeds', group: 'plant', builder: 'reeds', variants: ['thin', 'cattails'], triangles: 120, wind: true, light: 0, vary: WILD },
+  lilyPad: { name: 'Lily pad', group: 'plant', builder: 'lilyPad', variants: ['plain', 'bloom'], triangles: 100, ...still, vary: WILD },
   mushroom: { name: 'Mushroom', group: 'plant', builder: 'mushroom', variants: ['red', 'brown', 'pale'], triangles: 90, ...still, vary: WILD },
-  bush: { name: 'Bush', group: 'plant', builder: 'bush', variants: ['round', 'wide', 'blossom'], triangles: 120, wind: true, light: 0, vary: WILD },
-  berryBush: { name: 'Berry bush', group: 'plant', builder: 'berryBush', variants: ['ripe'], triangles: 150, wind: true, light: 0, vary: WILD },
+  bush: { name: 'Bush', group: 'plant', builder: 'bush', variants: ['round', 'wide', 'blossom'], triangles: 200, wind: true, light: 0, vary: WILD },
+  berryBush: { name: 'Berry bush', group: 'plant', builder: 'berryBush', variants: ['ripe'], triangles: 200, wind: true, light: 0, vary: WILD },
 
   // ---- ground
   rock: { name: 'Rock', group: 'ground', builder: 'rock', variants: ['pebbles', 'stone', 'boulder', 'slab'], triangles: 70, ...still, vary: WILD },
@@ -87,7 +87,7 @@ export const PROPS = {
   window: { name: 'Window', group: 'town', builder: 'window', variants: ['plain', 'shutters', 'flowerbox'], triangles: 150, wind: false, light: 9, vary: SNUG },
   chimney: { name: 'Chimney', group: 'town', builder: 'chimney', variants: ['brick'], triangles: 120, ...still, vary: SNUG },
   sign: { name: 'Shop sign', group: 'town', builder: 'sign', variants: ['hammer', 'loaf', 'flask'], triangles: 140, ...still, vary: SNUG },
-  awning: { name: 'Awning', group: 'town', builder: 'awning', variants: ['teal', 'red'], triangles: 80, wind: true, light: 0, vary: SNUG },
+  awning: { name: 'Awning', group: 'town', builder: 'awning', variants: ['teal', 'red'], triangles: 80, wind: false, light: 0, vary: SNUG },
   stall: { name: 'Market stall', group: 'town', builder: 'stall', variants: ['produce', 'bread', 'cloth'], triangles: 240, ...still, vary: SNUG },
   well: { name: 'Well', group: 'town', builder: 'well', variants: ['roofed'], triangles: 200, ...still, vary: SNUG },
   fence: { name: 'Fence', group: 'town', builder: 'fence', variants: ['run', 'post'], triangles: 40, ...still, vary: SNUG },

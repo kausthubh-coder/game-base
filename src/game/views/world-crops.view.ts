@@ -1,3 +1,4 @@
+import { loadEnvironmentModels } from '../../features/props/models.view.ts';
 // Draws the crops: every crop of `game.systems.crops.all()` stands on its soil block as two crossed quads
 // with the tile of its stage from the manifest's `crops` sheet, and wet soil gets a dark patch.
 // Two draw calls: one for all plants, one for all wet patches.
@@ -24,7 +25,8 @@ function own(x: number, z: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-export function install(view: GameView): void {
+export async function install(view: GameView): Promise<void> {
+  await loadEnvironmentModels();
   const { game, assets } = view;
   if (!assets.sheetNames().includes('crops')) {
     console.warn('[crops] the manifest lists no crops sheet, so crops are not drawn.');
