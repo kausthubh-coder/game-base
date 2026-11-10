@@ -1,0 +1,63 @@
+/* The frame around the voice pages: a full-screen scene with the game's book cards over it.
+   Colors come from the play build's tokens (TOKENS in src/game/uiview/theme.ts, put on .stage by useBook). */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: #1d1a14; color: #f4ead6; font-family: ui-serif, 'Iowan Old Style', Palatino, Georgia, serif; }
+button { font: inherit; }
+
+.stage { position: fixed; inset: 0; overflow: hidden; color: var(--ui-ink); font-family: var(--ui-font); -webkit-font-smoothing: antialiased; }
+.backdrop { position: absolute; inset: 0; background: #2a3a1c center / cover no-repeat; transition: background-image 300ms var(--ui-ease); }
+.backdrop::after { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 40%, transparent 50%, oklch(0.15 0.03 60 / 0.55)); }
+
+.ui-book .ui-card { border: 2px solid var(--ui-ink); border-radius: 2px; background: var(--ui-paper); box-shadow: 0 4px 14px var(--ui-shadow); }
+
+.bar { position: absolute; top: 16px; left: 16px; right: 16px; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 10px 14px; }
+.bar-title { display: grid; line-height: 1.25; }
+.bar-title strong { font-size: 17px; font-weight: 600; }
+.bar-title span { font-size: 13px; color: var(--ui-ink-2); }
+.scenes { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.bar-tools { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 4px 12px; color: var(--ui-ink); background: var(--ui-plate); border: 2px solid var(--ui-ink); border-radius: 2px; cursor: pointer; font-size: 15px; transition: transform 80ms var(--ui-ease); }
+.btn:hover, .btn:focus-visible { background: var(--ui-paper-light); }
+.btn:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
+.btn:active { transform: translateY(1px); background: var(--ui-paper-2); }
+.btn[aria-pressed='true'], .btn.is-on { background: var(--ui-ink); color: var(--ui-paper); }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.btn-big { min-height: 48px; padding: 6px 22px; font-size: 18px; font-weight: 600; }
+kbd { display: inline-grid; place-items: center; min-width: 24px; height: 22px; padding: 0 5px; font: 600 12px var(--ui-font); color: var(--ui-ink); background: var(--ui-paper); border: 1px solid var(--ui-line-strong); border-bottom-width: 2px; border-radius: 3px; }
+.btn.is-on kbd { color: var(--ui-ink); }
+.check { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; cursor: pointer; }
+.check input { width: 18px; height: 18px; accent-color: var(--ui-ink); }
+.meta { font-size: 13px; color: var(--ui-ink-2); font-variant-numeric: tabular-nums; }
+
+.keys { position: absolute; right: 16px; bottom: calc(var(--box-h, 220px) + 12px); z-index: 4; display: flex; align-items: center; gap: 8px; padding: 8px; }
+
+.start { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: oklch(0.2 0.03 60 / 0.45); }
+.start[hidden] { display: none; }
+.start-card { max-width: 460px; padding: 28px 30px; text-align: left; }
+.start-card h1 { margin: 2px 0 10px; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.15; }
+.start-card p { margin: 0 0 18px; color: var(--ui-ink-2); line-height: 1.45; }
+.start-kicker { margin: 0 !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.compare { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: oklch(0.2 0.03 60 / 0.5); }
+.compare[hidden] { display: none; }
+.compare-panel { width: min(880px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 22px 26px; background: var(--ui-paper); border: 2px solid var(--ui-ink); border-radius: 2px; box-shadow: 0 16px 48px var(--ui-shadow); }
+.compare-panel header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.compare-panel h2 { margin: 0; font-size: 22px; font-weight: 600; }
+.compare-note { margin: 8px 0 16px; color: var(--ui-ink-2); font-size: 14px; line-height: 1.45; }
+.compare-row { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; padding: 14px 0; border-top: 1px solid var(--ui-line); }
+.compare-row .face { width: 56px; height: 56px; background: var(--ui-paper-2); }
+.compare-row p { margin: 0 0 8px; line-height: 1.4; }
+.compare-row .who { font-weight: 600; }
+.compare-row .models { display: flex; flex-wrap: wrap; gap: 6px; }
+.compare-row .models .btn { font-size: 14px; min-height: 32px; }
+.compare-row .models .btn small { font-variant-numeric: tabular-nums; opacity: 0.75; }
+
+@media (max-width: 720px) {
+  .bar { top: 8px; left: 8px; right: 8px; padding: 8px 10px; }
+  .bar-title span { display: none; }
+  .scenes { flex-wrap: nowrap; overflow-x: auto; flex-basis: 100%; order: 3; }
+  .scenes .btn { flex: none; }
+  .keys { right: 8px; }
+}
