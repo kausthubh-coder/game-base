@@ -1,8 +1,9 @@
 // Hollowmere A: the Queen's Granary. A farming kingdom is ruled from its granary, so the seat of power is a
 // hall of grain: Dot's granary-hall, with its arcade and lantern cupola, closes the north side of the
-// Harvest Court. A broad stone way runs from the hall's doors across the court to the Rootworks gate on the
-// river, where the old realm's bronze roots and waterwheel drink the Mere: the town lives on what it takes
-// from the river, and builds its square around the taking. Market rows line the court for the harvest.
+// Harvest Court. A broad stone way runs from the hall's doors across the court, past the town well, to the
+// river. Beside it on the quay stands the Rootworks gate, where the old realm's bronze roots and waterwheel
+// drink the Mere: the town lives on what it takes from the river, and builds its square beside the taking.
+// Market rows line the court for the harvest.
 //
 // The buildings and street pieces are the Hollowmere town kit (src/content/town-kit.ts). Blocks are the
 // paving, the gatehouse and its walls. At dusk the windows glow, braziers burn at the hall's doors, lamps
@@ -46,8 +47,10 @@ export function townA(): TownPlan {
   // The west side, doors to the east: Mira's workshop and a house.
   modelAt(models, 'carpenter', 'workshop', 151, -155, 1, { name: 'carpenter', label: 'Carpenter', at: 'outside' });
   modelAt(models, 'house.river', 'house-b', 151, -145.5, 1);
-  // The Rootworks gate over the stone way at the river, its arch open on the way, and the ferry keeper's house.
-  modelAt(models, 'rootworks', 'rootworks-gate', 172, -135);
+  // The Rootworks gate on the quay west of the way, the town well on the way, and the ferry keeper's house.
+  // The gate's arch is two blocks wide, too narrow for the walkers, so the way to the river goes past it.
+  modelAt(models, 'rootworks', 'rootworks-gate', 159, -135);
+  modelAt(models, 'well', 'town-well', 172, -136);
   modelAt(models, 'ferry.house', 'ferry-house', 198, -136.5);
   porchLights(fills, models);
 
@@ -89,13 +92,12 @@ export function townA(): TownPlan {
   }
   stringLightsAt(fills, models, 'lights.west', 164, -153, 1);
   stringLightsAt(fills, models, 'lights.east', 182, -153, 1);
-  modelAt(models, 'crates.west', 'barrels-crates', 159.5, -137);
+  modelAt(models, 'crates.west', 'barrels-crates', 182.5, -138);
   modelAt(models, 'cart.court', 'cart', 180.5, -158, 1);
 
   // ---- lamps round the court and along the quay, benches and flowers by the river
-  for (const [i, [x, z]] of ([[158.5, -137], [186.5, -137], [166.5, -151], [177.5, -151]] as const).entries()) lampPostAt(fills, models, `lamp.court${i}`, x, z);
-  for (const [i, x] of [141.5, 149.5, 157.5, 163.5, 180.5, 186.5].entries()) lampPostAt(fills, models, `lamp.quay${i}`, x, -133);
-  modelAt(models, 'bench.quay1', 'bench', 153.5, -133);
+  for (const [i, [x, z]] of ([[150.5, -137], [186.5, -137], [166.5, -151], [177.5, -151]] as const).entries()) lampPostAt(fills, models, `lamp.court${i}`, x, z);
+  for (const [i, x] of [141.5, 167.5, 177.5, 186.5].entries()) lampPostAt(fills, models, `lamp.quay${i}`, x, -133);
   modelAt(models, 'bench.quay2', 'bench', 145.5, -133);
   modelAt(models, 'planter.lodge', 'flower-planter', 159.5, -162);
   modelAt(models, 'planter.bakery', 'flower-planter', 181.5, -160);
@@ -112,7 +114,7 @@ export function townA(): TownPlan {
       { x: 175, z: -190, kind: 'oak', size: 0.4 },
       { x: 186, z: -189, kind: 'birch', size: 0.7 },
       { x: 141, z: -138, kind: 'oak', size: 0.8 },
-      { x: 155, z: -137, kind: 'oak', size: 0.6 },
+      { x: 146, z: -138, kind: 'oak', size: 0.6 },
     ],
     // The ground under the gatehouse's walls and the statue, and under the kennel keeper's cottage.
     levels: [
