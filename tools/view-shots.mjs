@@ -8,7 +8,7 @@
 // `back` meters from the place, on the side the 2.5D camera looks from, and the camera looks the same way. The
 // free camera stands behind the hero with the place beyond them; first person looks at the place.
 //   bun tools/view-shots.mjs --url http://127.0.0.1:5381/ [--out .artifacts/view-shots]
-//     [--variants sprites=chars=sprites,models=chars=models] [--places spawn,rocks,garden,town,meadow,river]
+//     [--variants sprites=chars=sprites,models=chars=models,near=camera=tilt&zoomstep=0] [--places spawn,rocks,garden,town,meadow,river]
 //     [--quality high] [--w 1440] [--h 900]
 // Build and serve first: `bun x vite build --outDir dist-<name>` and `bun tools/serve.mjs dist-<name> <port>`.
 // It fails on a console error. This Mac draws WebGL in software: counts only, never frames a second.
@@ -98,8 +98,10 @@ async function run(variant) {
       const left = (place.quarter - now + 4) % 4;
       if (left === 3) g.turn(1);
       else for (let i = 0; i < left; i++) g.turn(-1);
-      // The opening zoom is step 2, and each step in is one less.
-      const camera = g.view.camera, want = Math.max(0, 2 - place.zoom);
+      // The opening zoom is step 2, and each step in is one less. `zoomstep=<n>` in a variant sets the 2.5D step for
+      // every place: 0 is closest and low toward the horizon, 3 is far out.
+      const step = new URLSearchParams(location.search).get('zoomstep');
+      const camera = g.view.camera, want = step !== null ? Number(step) : Math.max(0, 2 - place.zoom);
       for (let i = 0; i < 8 && g.state().camera.zoom !== want; i++) camera.zoomBy(g.state().camera.zoom > want ? -1 : 1);
       g.advance(0.1);
       await g.frames(14);
