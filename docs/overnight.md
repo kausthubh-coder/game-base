@@ -41,3 +41,28 @@ Never more than three Claude agents at once: the Mac mini and the laptop share o
 5. Write `.agents/skills/make-sprite/SKILL.md` (load `writing-for-agents` first) from what the asset agent built.
 6. Add a chapter "The base" to the handbook (`~/dev/sandbox/game-look-test/design/16-base.md`) with what exists, how to run each demo, the numbers, and what is not proven. Update `14-v1.md`'s experiment table. Rebuild with `node build.mjs`.
 7. Leave a short morning note as the last message.
+- 22:36 Sprite assets finished (ISSUES): characters hold from three sides, icons good, several block textures band. Committed. Started a second Sol run to fix the textures and add tile names the block data uses.
+- 22:50 Second Sol run fixed colors and names but flattened every tile to noise. Coordinator added compose-blocks.mjs to bring the first run's shapes back on correct color ramps. Check passes, committed.
+- 23:11 Sky, weather, water, effects, post finished (PASS). Reran type checks and 32 tests, looked at the day sheet. Adds 9 draw calls and 4,641 triangles at high. Committed. Started the sprites agent.
+- 23:27 Sound engine finished (PASS, 23 check lines). Reran type check and 43 tests, built the demo, looked at the crossing spectrogram: no gap at either border. Nobody has heard it. Committed. Started the props agent.
+
+## New goal at 23:35: a playable first part of the story by 6 am
+
+Kausthubh asked for a polished, playable first part of the story by about 6 am, built in a worktree so it
+can stay a reference if he does not like it, checked with verification skills and improved in rounds
+toward 8 or 9 out of 10. He also asked for a skill that verifies every asset, skills for making sprites
+and 3D assets, and for Astra to make 3D props too, to compare. Ultracode is on, so Workflow is allowed.
+
+- **Worktree:** `/Users/dabot/dev/sandbox/game-base-play`, branch `play/greenhollow`. The base stays on `main` here.
+- **Design:** `docs/play/act1.md` there (five quests, 20 to 30 minutes, ends at the harvest festival).
+- **Contract:** `src/game/api.sim.ts`, `kernel.sim.ts`, `move.sim.ts` there.
+- **Provisional copies:** the worktree holds uncommitted copies of world, camera, hero, perf, sprites, assets and blocks.ts (listed in its `PROVISIONAL.txt`). Delete them, then `git merge main`, once those features are committed on main.
+
+| Stage | What | State |
+|---|---|---|
+| Base, still running on main | world (Fable), sprites runtime (Fable), props (Fable), map/HUD/input/dialogue (Fable), story art (Sol), props second take (Astra) | running |
+| 1 | Workflow `play-stage-1-systems` (run `wf_bf74a342-2b3`): items, farm, creatures, people, story, ui, skills. Seven agents in the worktree. | running |
+| 2 | Commit stage 1. When base features are committed on main: delete provisional copies, merge main into the branch. Then a Workflow for: the shell (boot, loop, every feature wired, actors to sprites, save, the `window.__game` debug door), the region (Greenhollow slice, town from blueprints, named places), views (crops, placeables as props, audio, effects, HUD, minimap, dialogue box). `src/game/boot.ts` loads `src/game/views/*.view.ts` by glob so agents do not share a file. | waiting |
+| 3 | A scripted play of all five quests through the debug door. Write `.agents/skills/verify-greenhollow` with `create-verification-skill`. | waiting |
+| 4 | Hill climb: judges score the ten lines in act1.md from screenshots and the script's log, fixers take the lowest lines, repeat until 8 or time runs out. Stop new work at 05:30. | waiting |
+| 5 | Compare the two prop sets. Update the handbook (`16-base.md`, `14-v1.md`). Morning note. | waiting |
