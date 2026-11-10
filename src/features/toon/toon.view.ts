@@ -8,7 +8,8 @@
 // them, colours each vertex from its slot, and lights it in steps with a soft rim of sun.
 //
 // A body's geometry needs `skinIndex`, `skinWeight` (four bones each, in the rig's order) and `tone`: the colour
-// slot (0 to 9), the shade (0 to 255 for 0 to 2), the part (0 is always worn), and a glow (0 to 255).
+// slot (0 to 9), the shade (0 to 255 for 0 to 2), the part (0 is always worn), and a glow (0 to 255). A body from a
+// file may also bring a texture (`uv`) and vertex colours (`color`), which multiply its slot colours.
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
@@ -46,6 +47,10 @@ export interface ToonBodySpec {
    * does not draw every triangle of every character again. Without it the body casts its own.
    */
   shadow?: THREE.BufferGeometry;
+  /** A texture that multiplies the slot colours, read through the geometry's `uv`. */
+  map?: THREE.Texture | null;
+  /** True to multiply the slot colours by the geometry's `color`. */
+  vertexColours?: boolean;
 }
 
 export interface ToonAddOptions {
@@ -410,7 +415,7 @@ export function createToonCast(ctx: ViewContext, options: ToonOptions = {}): Too
       uInstances: { value: texture },
     };
 
-    const material = new THREE.MeshToonMaterial({ gradientMap: ramp, name: `toon-${name}` });
+    const material = new THREE.MeshToonMaterial({ gradientMap: ramp, name: `toon-${name}`, map: spec.map ?? null, vertexColors: spec.vertexColours ?? false });
     material.onBeforeCompile = (shader) => {
       poseVertices(shader, { ...uniforms, ...shared }, 'normal');
       shader.fragmentShader = shader.fragmentShader

@@ -1,20 +1,39 @@
 // Building toon geometry by code: simple shapes hung on bones, painted with a colour slot, and merged into one
 // body. A hat, an apron or a whole mossling is a list of pieces.
 import * as THREE from 'three';
-import { SLOT, type SlotName } from './toon.view.ts';
+import { SLOT, SLOTS, type SlotName } from './toon.view.ts';
 
-/** A body's geometry in plain arrays: four bones and a tone (slot, shade x 127.5, part, glow x 255) per vertex. */
+/**
+ * A body's geometry in plain arrays: four bones and a tone (slot, shade x 127.5, part, glow x 255) per vertex, and
+ * the texture place and vertex colour a model from a file may bring (0, 0 and white for shapes built here).
+ */
 export interface Pieces {
+  /** The colour slots by name, in order. A palette gives a colour for each. */
+  slots: string[];
   position: number[];
   normal: number[];
   skinIndex: number[];
   skinWeight: number[];
   tone: number[];
+  uv: number[];
+  colour: number[];
   index: number[];
 }
 
-export function emptyPieces(): Pieces {
-  return { position: [], normal: [], skinIndex: [], skinWeight: [], tone: [], index: [] };
+/** Starts a body. Its slots are the ten named in `SLOT`, unless it brings its own (a file's materials, say). */
+export function emptyPieces(slots: readonly string[] = Object.keys(SLOT)): Pieces {
+  return { slots: [...slots], position: [], normal: [], skinIndex: [], skinWeight: [], tone: [], uv: [], colour: [], index: [] };
+}
+
+/** A slot's number in this body, added at the end when the body has no slot of that name. */
+export function slotIndex(into: Pieces, name: string): number {
+  let i = into.slots.indexOf(name);
+  if (i < 0) {
+    if (into.slots.length >= SLOTS) throw new Error(`toon: a body has room for ${SLOTS} colour slots, and "${name}" would be one more`);
+    into.slots.push(name);
+    i = into.slots.length - 1;
+  }
+  return i;
 }
 
 export interface PieceOptions {
@@ -36,12 +55,15 @@ export function addPiece(into: Pieces, geometry: THREE.BufferGeometry, options: 
   if (options.matrix) g.applyMatrix4(options.matrix);
   const position = g.getAttribute('position'), normal = g.getAttribute('normal');
   const base = into.position.length / 3;
+  const slot = slotIndex(into, options.slot);
   for (let i = 0; i < position.count; i++) {
     into.position.push(position.getX(i), position.getY(i), position.getZ(i));
     into.normal.push(normal.getX(i), normal.getY(i), normal.getZ(i));
     into.skinIndex.push(options.bone, 0, 0, 0);
     into.skinWeight.push(1, 0, 0, 0);
-    into.tone.push(SLOT[options.slot], Math.round((options.shade ?? 1) * 127.5), options.part ?? 0, Math.round((options.glow ?? 0) * 255));
+    into.tone.push(slot, Math.round((options.shade ?? 1) * 127.5), options.part ?? 0, Math.round((options.glow ?? 0) * 255));
+    into.uv.push(0, 0);
+    into.colour.push(1, 1, 1);
   }
   if (g.index) for (let i = 0; i < g.index.count; i++) into.index.push(base + g.index.getX(i));
   else for (let i = 0; i < position.count; i++) into.index.push(base + i);
@@ -56,28 +78,47 @@ export function piecesGeometry(pieces: Pieces): THREE.BufferGeometry {
   geometry.setAttribute('skinIndex', new THREE.Float32BufferAttribute(pieces.skinIndex, 4));
   geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(pieces.skinWeight, 4));
   geometry.setAttribute('tone', new THREE.Float32BufferAttribute(pieces.tone, 4));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(pieces.uv, 2));
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(pieces.colour, 3));
   geometry.setIndex(pieces.position.length / 3 > 65535 ? new THREE.Uint32BufferAttribute(pieces.index, 1) : new THREE.Uint16BufferAttribute(pieces.index, 1));
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   return geometry;
 }
 
-/** A body read from a file, as pieces, so more can be added to it. */
-export function geometryPieces(geometry: THREE.BufferGeometry): Pieces {
-  const out = emptyPieces();
-  const read = (name: string, size: number, to: number[]): void => {
+export interface FromGeometry {
+  /** The geometry's bone numbers to the body's. Default: the same. */
+  bones?: readonly number[];
+  /** Without a `tone` attribute: the slot every vertex takes, and the part. */
+  slot?: number;
+  part?: number;
+}
+
+/** Adds a skinned geometry from a file to `into`, so more can be added to it. */
+export function addGeometry(into: Pieces, geometry: THREE.BufferGeometry, options: FromGeometry = {}): void {
+  const base = into.position.length / 3;
+  const count = geometry.getAttribute('position').count;
+  const read = (name: string, size: number, to: number[], fallback: readonly number[], map?: (v: number) => number): void => {
     const a = geometry.getAttribute(name);
-    for (let i = 0; i < a.count; i++) for (let k = 0; k < size; k++) to.push(a.getComponent(i, k));
+    for (let i = 0; i < count; i++) {
+      for (let k = 0; k < size; k++) {
+        const v = a ? a.getComponent(i, k) : fallback[k];
+        to.push(map ? map(v) : v);
+      }
+    }
   };
-  read('position', 3, out.position);
-  read('normal', 3, out.normal);
-  read('skinIndex', 4, out.skinIndex);
-  read('skinWeight', 4, out.skinWeight);
+  read('position', 3, into.position, [0, 0, 0]);
+  read('normal', 3, into.normal, [0, 1, 0]);
+  const bones = options.bones;
+  read('skinIndex', 4, into.skinIndex, [0, 0, 0, 0], bones ? (b) => bones[b] ?? 0 : undefined);
+  read('skinWeight', 4, into.skinWeight, [1, 0, 0, 0]);
   // A file's tone is in bytes as they were written, and getComponent does not scale a byte that is not normalized.
-  read('tone', 4, out.tone);
-  const index = geometry.getIndex()!;
-  for (let i = 0; i < index.count; i++) out.index.push(index.getX(i));
-  return out;
+  read('tone', 4, into.tone, [options.slot ?? 0, 127.5, options.part ?? 0, 0]);
+  read('uv', 2, into.uv, [0, 0]);
+  read('color', 3, into.colour, [1, 1, 1]);
+  const index = geometry.getIndex();
+  if (index) for (let i = 0; i < index.count; i++) into.index.push(base + index.getX(i));
+  else for (let i = 0; i < count; i++) into.index.push(base + i);
 }
 
 /** The box of the vertices of one part. */
@@ -119,6 +160,7 @@ export function addShell(into: Pieces, body: Pieces, options: ShellOptions): voi
   const sign = options.side === 'back' ? -1 : 1;
   const count = body.position.length / 3;
   const base = into.position.length / 3;
+  const slot = slotIndex(into, options.slot);
   for (let r = 0; r <= rows; r++) {
     const v = r / rows;
     const y = options.y[0] + (options.y[1] - options.y[0]) * v;
@@ -151,7 +193,9 @@ export function addShell(into: Pieces, body: Pieces, options: ShellOptions): voi
         into.skinIndex.push(body.skinIndex[best * 4 + k]);
         into.skinWeight.push(body.skinWeight[best * 4 + k]);
       }
-      into.tone.push(SLOT[options.slot], Math.round((options.shade ?? 1) * 127.5), options.part, 0);
+      into.tone.push(slot, Math.round((options.shade ?? 1) * 127.5), options.part, 0);
+      into.uv.push(0, 0);
+      into.colour.push(1, 1, 1);
     }
   }
   const firstIndex = into.index.length;
