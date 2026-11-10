@@ -26,13 +26,27 @@ export type SpriteView = typeof VIEW_FRONT | typeof VIEW_BACK | typeof VIEW_SIDE
  */
 const FRONT_ARC = Math.cos(Math.PI / 4) + 1e-4;
 
-export function pickView(facing: number, cameraYaw: number): SpriteView {
-  // 0 when the character looks straight at the camera, growing as it turns to the left of the screen.
-  const turned = facing + cameraYaw - Math.PI;
+/**
+ * How far past the edge between two drawings a character or the camera must turn before the drawing changes,
+ * once one is showing. Without it a character at 45 degrees to a camera that orbits freely would flip between
+ * its front and its side at every small sway.
+ */
+export const VIEW_HOLD = 0.14;
+
+function viewAt(turned: number): SpriteView {
   const toward = Math.cos(turned);
   if (toward > FRONT_ARC) return VIEW_FRONT;
   if (toward < -FRONT_ARC) return VIEW_BACK;
   return Math.sin(turned) > 0 ? VIEW_SIDE_LEFT : VIEW_SIDE_RIGHT;
+}
+
+/** The drawing to show. Pass the one showing now as `current` and it holds until the turn is `VIEW_HOLD` past the edge. */
+export function pickView(facing: number, cameraYaw: number, current?: SpriteView): SpriteView {
+  // 0 when the character looks straight at the camera, growing as it turns to the left of the screen.
+  const turned = facing + cameraYaw - Math.PI;
+  const view = viewAt(turned);
+  if (current === undefined || view === current) return view;
+  return viewAt(turned - VIEW_HOLD) === current || viewAt(turned + VIEW_HOLD) === current ? current : view;
 }
 
 /**

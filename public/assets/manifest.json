@@ -1081,5 +1081,26 @@
       "budget": 300,
       "bytes": 29236
     }
+  },
+  "standIns": {
+    "kaykit-cast": {
+      "file": "stand-ins/kaykit/cast.glb",
+      "license": "CC0 1.0",
+      "source": "https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0",
+      "build": "bun tools/models/cast/stand-ins.mjs",
+      "bodies": [
+        "slim",
+        "dress",
+        "stout"
+      ],
+      "clips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Tool",
+        "Talk"
+      ],
+      "bytes": 552616
+    }
   }
 }
