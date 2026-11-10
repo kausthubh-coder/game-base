@@ -22,7 +22,14 @@ export interface WaterSky {
   readonly light: THREE.Color;
   readonly horizon: THREE.Color;
   readonly zenith: THREE.Color;
+  /** The sun or moon light: its color times its strength. */
   readonly sun: THREE.Color;
+  /** Toward the light: the sun by day, the moon at night. */
+  readonly sunDirection: THREE.Vector3;
+  /** Where the sun is in the sky, and the glow around it. The glow is 0 when the sun is down. */
+  readonly sunInSky: THREE.Vector3;
+  readonly glow: THREE.Color;
+  readonly night: number;
 }
 
 export interface Water extends ViewSystem {
@@ -56,8 +63,8 @@ void main() {
 
 const FRAGMENT = /* glsl */ `
 precision highp float;
-uniform float uTime, uRain, uFlash, uLandSize;
-uniform vec3 uLight, uSkyColor, uSunColor, uShallow, uDeep, uFocus;
+uniform float uTime, uRain, uFlash, uLandSize, uNight;
+uniform vec3 uLight, uZenith, uHorizon, uGlow, uSunPlace, uMoonDir, uMoonColor, uShallow, uDeep, uFocus;
 uniform sampler2D uLand;
 uniform vec4 uRipples[${RIPPLES}];
 varying vec3 vWorld;
@@ -70,49 +77,72 @@ float vnoise(vec2 p) {
   f = f * f * (3.0 - 2.0 * f);
   return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x), mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y);
 }
+// Value noise and its slope along x and y.
+vec3 vnoised(vec2 p) {
+  vec2 i = floor(p), f = fract(p);
+  vec2 u = f * f * (3.0 - 2.0 * f), du = 6.0 * f * (1.0 - f);
+  float a = hash21(i), b = hash21(i + vec2(1.0, 0.0)), c = hash21(i + vec2(0.0, 1.0)), d = hash21(i + vec2(1.0, 1.0));
+  return vec3(a + (b - a) * u.x + (c - a) * u.y + (a - b - c + d) * u.x * u.y,
+              du * (vec2(b - a, c - a) + (a - b - c + d) * u.yx));
+}
 
 void main() {
-  // Everything is worked out on a grid of 16 steps a block, so the water is pixel art like the land.
-  const float PIX = 16.0;
   vec3 facing = normalize(cross(dFdx(vWorld), dFdy(vWorld)));
   bool side = abs(facing.y) < 0.5;
   vec2 p = side ? vec2(vWorld.x + vWorld.z, vWorld.y) : vWorld.xz;
-  vec2 q = (floor(p * PIX) + 0.5) / PIX;
   float t = uTime;
   // The side of a water block is falling water.
   vec2 flow = side ? vec2(0.0, 2.4) : vFlow;
 
   // Depth and shoreline from the picture of the land.
-  vec2 column = side ? vWorld.xz : q;
+  vec2 column = side ? vWorld.xz : p;
   vec2 land = texture2D(uLand, column / uLandSize).rg;
   float reach = uLandSize * 0.5;
   float beyond = smoothstep(reach - 10.0, reach - 2.0, max(abs(column.x - uFocus.x), abs(column.y - uFocus.z)));
   float depth = mix(max(vWorld.y - land.r, 0.0), 2.5, beyond);
   float shore = side ? 0.0 : land.g * (1.0 - beyond);
 
-  float n1 = vnoise(q * 1.6 - flow * t * 1.2 + vec2(t * 0.12, t * 0.05));
-  float n2 = vnoise(q * 3.1 - flow * t * 1.8 - vec2(t * 0.1, -t * 0.08) + 7.0);
-  float n = n1 * 0.6 + n2 * 0.4;
-  // Bright ripple lines along the contours of the noise.
-  float lines = smoothstep(0.035, 0.0, abs(n - 0.5)) + 0.6 * smoothstep(0.02, 0.0, abs(n - 0.68));
-  float sparkle = step(0.994, hash21(floor(p * PIX) + floor(t * 3.0) * 17.0)) * step(0.55, n);
+  // Two layers of slow swell crossing each other, and the river's flow carrying them.
+  vec3 w1 = vnoised(p * 0.9 - flow * t * 0.9 + vec2(t * 0.11, t * 0.05));
+  vec3 w2 = vnoised(p * 2.3 - flow * t * 1.5 - vec2(t * 0.09, -t * 0.13) + 7.0);
+  float n = w1.x * 0.6 + w2.x * 0.4;
+  vec2 slope = w1.yz * 0.9 * 0.6 + w2.yz * 2.3 * 0.4;
+  vec3 normal = side ? facing : normalize(vec3(-slope.x * 0.12, 1.0, -slope.y * 0.12));
 
-  // Deeper is darker, with a hint of the sky.
-  vec3 color = mix(uShallow, uDeep, smoothstep(0.1, 3.0, depth));
-  color = mix(color, uSkyColor, 0.14);
-  color += vec3(0.75, 0.95, 1.0) * lines * 0.3;
+  vec3 toEye = normalize(cameraPosition - vWorld);
+  float facingEye = max(dot(normal, toEye), 0.0);
+  // Fresnel, a little stronger than real water so the sky shows from the high camera too.
+  float fresnel = 0.06 + 0.94 * pow(1.0 - facingEye, 4.0);
+  vec3 bounce = reflect(-toEye, normal);
+  bounce.y = abs(bounce.y);
+  float toSun = max(dot(bounce, uSunPlace), 0.0);
+  vec3 sky = mix(uHorizon, uZenith, smoothstep(0.0, 0.6, bounce.y)) + uGlow * (0.25 * pow(toSun, 6.0));
+
+  // The water itself: clear and bright in the shallows, deep blue-green further out, lit by the sky.
+  vec3 body = mix(uShallow, uDeep, smoothstep(0.15, 2.8, depth)) * uLight;
+  // Soft bright lines where the swell crests, like light caught on the ridges.
+  float lines = smoothstep(0.05, 0.0, abs(n - 0.52)) * 0.5 + smoothstep(0.03, 0.0, abs(n - 0.7)) * 0.3;
+  body += uLight * vec3(0.55, 0.8, 0.85) * lines * 0.22;
+  vec3 color = mix(body, sky, fresnel * 0.85);
+
+  // Glints: a tight hot spot where the sun's reflection lands, and glitter scattered around it. They are far
+  // brighter than the rest of the picture, so they bloom.
+  float glitter = step(0.93, hash21(floor(p * 12.0) + floor(t * 4.0) * 13.0));
+  vec3 glint = uGlow * (pow(toSun, 600.0) * 18.0 + pow(toSun, 90.0) * glitter * 6.0);
+  glint += uMoonColor * uNight * pow(max(dot(bounce, uMoonDir), 0.0), 200.0) * glitter * 4.0;
 
   // Foam where the water meets land, and a thin line lapping a little way out.
-  float foam = smoothstep(0.2, 0.27, shore + (n - 0.5) * 0.5);
-  float lap = 0.1 + 0.04 * sin(t * 1.3 + q.x * 2.0 + q.y * 1.7);
-  foam = max(foam, 0.6 * smoothstep(0.035, 0.0, abs(shore + (n - 0.5) * 0.12 - lap)));
-  color = mix(color, vec3(0.92, 0.98, 1.0), foam * 0.85);
+  float foam = smoothstep(0.16, 0.34, shore + (n - 0.5) * 0.4);
+  float lap = 0.1 + 0.05 * sin(t * 1.1 + p.x * 1.4 + p.y * 1.1);
+  foam = max(foam, 0.5 * smoothstep(0.05, 0.0, abs(shore + (n - 0.5) * 0.12 - lap)));
+  vec3 foamColor = vec3(0.9, 0.96, 1.0) * (uLight * 0.85 + 0.15 * uGlow);
+  color = mix(color, foamColor, foam * 0.8);
 
   // Rings where rain lands: in each cell of two grids a ring grows from a new point, over and over.
   float rings = 0.0;
   if (uRain > 0.01 && !side) {
     for (int i = 0; i < RAIN_GRIDS; i++) {
-      vec2 g = q * (i == 0 ? 1.3 : 2.1) + float(i) * 13.7;
+      vec2 g = p * (i == 0 ? 1.3 : 2.1) + float(i) * 13.7;
       vec2 cell = floor(g);
       float pick = hash21(cell + float(i) * 3.1);
       float clock = t * (0.9 + pick * 0.6) + pick * 7.0;
@@ -129,19 +159,20 @@ void main() {
       vec4 ripple = uRipples[i];
       float age = t - ripple.z;
       if (ripple.w > 0.0 && age >= 0.0 && age < 1.6) {
-        float d = length(q - ripple.xy);
+        float d = length(p - ripple.xy);
         float fade = (1.0 - age / 1.6) * ripple.w;
         rings += smoothstep(0.09, 0.0, abs(d - (0.15 + age * 1.3))) * fade * 1.2;
         rings += smoothstep(0.07, 0.0, abs(d - age * 0.8)) * fade * 0.6;
       }
     }
   }
-  color += rings * 0.6;
+  color += rings * 0.45 * (uLight + sky * 0.5);
 
-  vec3 lit = color * uLight + uSunColor * sparkle * 0.7 + uFlash * 0.25;
-  float alpha = max(mix(0.8, 0.93, smoothstep(0.0, 2.0, depth)), foam);
+  vec3 lit = color + glint * (1.0 - foam) + uFlash * 0.25;
+  // See-through in the shallows, so the bed shows, and nearly opaque where it reflects the sky.
+  float alpha = max(max(mix(0.62, 0.93, smoothstep(0.0, 2.2, depth)), fresnel * 0.95), foam);
   if (side) {
-    lit *= 0.85;
+    lit = body * 0.95 + sky * 0.15 + lines * 0.1;
     alpha = 0.86;
   }
   gl_FragColor = vec4(lit, alpha);
@@ -171,11 +202,16 @@ export function createWaterMaterial(ctx: ViewContext, options: WaterOptions = {}
     uRain: { value: 0 },
     uFlash: { value: 0 },
     uLandSize: { value: size },
+    uNight: { value: 0 },
     uLight: { value: new THREE.Color(1, 1, 1) },
-    uSkyColor: { value: new THREE.Color(0.6, 0.8, 0.95) },
-    uSunColor: { value: new THREE.Color(1, 0.95, 0.85) },
-    uShallow: { value: new THREE.Color(0.22, 0.8, 0.8) },
-    uDeep: { value: new THREE.Color(0.03, 0.34, 0.62) },
+    uZenith: { value: new THREE.Color(0.3, 0.55, 0.9) },
+    uHorizon: { value: new THREE.Color(0.7, 0.85, 0.95) },
+    uGlow: { value: new THREE.Color(1, 0.95, 0.85) },
+    uSunPlace: { value: new THREE.Vector3(0.3, 0.8, 0.5) },
+    uMoonDir: { value: new THREE.Vector3(0, 1, 0) },
+    uMoonColor: { value: new THREE.Color() },
+    uShallow: { value: new THREE.Color(0.2, 0.62, 0.6) },
+    uDeep: { value: new THREE.Color(0.025, 0.2, 0.36) },
     uFocus: { value: new THREE.Vector3() },
     uLand: { value: land },
     uRipples: { value: Array.from({ length: RIPPLES }, () => new THREE.Vector4(0, 0, 0, 0)) },
@@ -262,8 +298,13 @@ export function createWaterMaterial(ctx: ViewContext, options: WaterOptions = {}
       uniforms.uFlash.value = view.ambient.flash;
       if (sky) {
         uniforms.uLight.value.copy(sky.light);
-        uniforms.uSkyColor.value.copy(sky.horizon).lerp(sky.zenith, 0.5);
-        uniforms.uSunColor.value.copy(sky.sun);
+        uniforms.uZenith.value.copy(sky.zenith);
+        uniforms.uHorizon.value.copy(sky.horizon);
+        uniforms.uGlow.value.copy(sky.glow);
+        uniforms.uSunPlace.value.copy(sky.sunInSky);
+        uniforms.uMoonDir.value.copy(sky.sunDirection);
+        uniforms.uMoonColor.value.copy(sky.sun);
+        uniforms.uNight.value = sky.night;
       }
 
       let changed = false;

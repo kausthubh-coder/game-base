@@ -1,7 +1,8 @@
 // The look of the sky at each hour. No Three.js here: plain numbers in, plain numbers out.
 // The colors come from the earlier test scene, re-timed so sunrise is at 0.25 and sunset at 0.75. From mid
 // morning to late afternoon the haze is a pale blue, so far land fades into the sky the way it does in Genshin's
-// fields; sunrise and sunset stay warm.
+// fields; sunrise and sunset stay warm. The day haze is a clear pale blue, never milk, and the fill is strong
+// enough that shade stays light and cool, as it does in Genshin's fields.
 
 export type Rgb = [number, number, number];
 
@@ -44,7 +45,7 @@ type Row = [time: number, top: number, mid: number, bot: number, sun: number, su
 
 // Night is dark blue, never black: the fill light stays up and the moon is a soft blue.
 // The world is seen from above, where a low sun reaches little of the ground, so the fill is stronger at dawn and dusk.
-const NIGHT: Row = [0, 0x0a0f2e, 0x1a2254, 0x363c78, 0x9fb6ff, 1.15, 0x5870c0, 0x2b2548, 1.6, 0x232a5c, 0x5d6cb0, 0x232850, 1, 1];
+const NIGHT: Row = [0, 0x0a0f2e, 0x16244f, 0x2e4072, 0x9fb6ff, 1.15, 0x5870c0, 0x2b2548, 1.6, 0x1f2c58, 0x5d6cb0, 0x232850, 1, 1];
 const at = (time: number, row: Row): Row => [time, ...(row.slice(1) as number[])] as Row;
 
 const ROWS: Row[] = [
@@ -52,12 +53,12 @@ const ROWS: Row[] = [
   at(0.18, NIGHT),
   [SUN_UP, 0x2a3878, 0x8a6aa0, 0xe89a90, 0xffa070, 0, 0x8080c0, 0x4a3a58, 1.6, 0x9a7aa0, 0xf0a8a0, 0x6a5088, 0.4, 0.7],
   [0.262, 0x4a66b8, 0xe8a0b0, 0xffd2a0, 0xffc088, 2.1, 0xc0b4de, 0x70525e, 1.85, 0xecb8b0, 0xffd6b8, 0xa0709c, 0, 0.25],
-  [0.35, 0x3d8de0, 0x8ccaf2, 0xdcf2f8, 0xfff0d8, 1.95, 0xc4e2ff, 0x8c7c5c, 1.2, 0xc4def2, 0xffffff, 0xb4c6e2, 0, 0],
-  [0.5, 0x2f7fe0, 0x76bcf0, 0xd4ecf8, 0xfff6e2, 2.1, 0xc4e2ff, 0x908060, 1.25, 0xbcd8f0, 0xffffff, 0xb8cce8, 0, 0],
-  [0.65, 0x3a82dc, 0x8cc2ee, 0xe2eef4, 0xffe8bc, 2.05, 0xcadcf8, 0x947a5c, 1.2, 0xc2d8ec, 0xfff8ec, 0xb4c0dc, 0, 0],
-  [0.715, 0x5a60c2, 0xdc92c0, 0xffca92, 0xffc078, 2.2, 0xd2bce8, 0x84546c, 1.4, 0xf0b8a8, 0xffcca4, 0xa672b2, 0, 0.15],
-  [0.762, 0x38388e, 0xc06aa0, 0xff9a62, 0xffa468, 2.1, 0xb0a4dc, 0x62425c, 1.9, 0xb07898, 0xff9c82, 0x6a4a92, 0.25, 0.6],
-  [SUN_DOWN, 0x1c2460, 0x5c4690, 0xb46a8c, 0xff8048, 0, 0x6a68b8, 0x3a2e50, 1.6, 0x584a80, 0x9068a8, 0x3a3068, 0.7, 0.9],
+  [0.35, 0x3a88e0, 0x7cc0f0, 0xc8e6f6, 0xfff0d8, 1.95, 0xc4e2ff, 0x8c7c5c, 1.4, 0xaed2ee, 0xffffff, 0xb4c6e2, 0, 0],
+  [0.5, 0x2a78de, 0x68b2ee, 0xc0e0f6, 0xfff6e2, 2.1, 0xc4e2ff, 0x908060, 1.45, 0xa8ccec, 0xffffff, 0xb8cce8, 0, 0],
+  [0.65, 0x3680dc, 0x7cbaee, 0xd2e6f2, 0xffe8bc, 2.05, 0xcadcf8, 0x947a5c, 1.4, 0xb2d0ea, 0xfff8ec, 0xb4c0dc, 0, 0],
+  [0.715, 0x5268c4, 0xd6a0b4, 0xffcc96, 0xffc078, 2.2, 0xd2bce8, 0x84546c, 1.4, 0xf0b8a8, 0xffcca4, 0xa672b2, 0, 0.15],
+  [0.762, 0x3a4290, 0xc08a9a, 0xffa868, 0xffa468, 2.1, 0xb0a4dc, 0x62425c, 1.9, 0xc0907e, 0xffaa82, 0x6e5890, 0.25, 0.6],
+  [SUN_DOWN, 0x1c2662, 0x56508e, 0xc07a72, 0xff8048, 0, 0x6a68b8, 0x3a2e50, 1.6, 0x5a5480, 0x9a74a0, 0x3a3468, 0.7, 0.9],
   at(0.83, NIGHT),
   at(1, NIGHT),
 ];
