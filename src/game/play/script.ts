@@ -7,7 +7,6 @@
 
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
-import { SOLID } from '../../features/world/chunk.sim.ts';
 import type { NpcId, PetState } from '../api.sim.ts';
 import { REGION } from '../content/region.ts';
 import { distance2d } from '../move.sim.ts';
@@ -23,7 +22,6 @@ export interface Step {
 }
 
 const LOGS = new Set([blockId('oak_log'), blockId('birch_log'), blockId('pine_log')]);
-const LEAVES = new Set([blockId('oak_leaves'), blockId('pine_needles')]);
 const GRASS = blockId('grass');
 const TILLED = blockId('tilled_soil');
 const PLANK = blockId('oak_plank');
@@ -110,22 +108,9 @@ interface Trunk { x: number; y: number; z: number; logs: number }
 
 /** Every tree the player may cut within 44 blocks: a log column of 3 or more on natural ground, outside the town. */
 function trunks(p: Play): Trunk[] {
-  const { world } = p, at = p.game.player.pos;
+  const at = p.game.player.pos;
   const rocks = p.sys.region.place('grant.rocks').at;
-  const found: Trunk[] = [];
-  for (let x = Math.floor(at.x) - 44; x <= Math.floor(at.x) + 44; x++) {
-    for (let z = Math.floor(at.z) - 44; z <= Math.floor(at.z) + 44; z++) {
-      if (!world.isLoaded(x, z)) continue;
-      for (let y = world.heightAt(x, z) - 1; y > 1; y--) {
-        if (!LOGS.has(world.getBlock(x, y, z)) || LOGS.has(world.getBlock(x, y - 1, z))) continue;
-        let logs = 0;
-        while (LOGS.has(world.getBlock(x, y + logs, z))) logs++;
-        const under = world.getBlock(x, y - 1, z);
-        if (logs >= 3 && SOLID[under] && !LEAVES.has(under) && !p.sys.region.isProtected(x, y, z)) found.push({ x, y, z, logs });
-        break;
-      }
-    }
-  }
+  const found = p.sys.trees.all().filter(t => t.standing && !p.sys.region.isProtected(t.x,t.y,t.z)).map(t => ({ ...t, logs: Math.max(3,Math.round(4*t.size)) }));
   // The oaks over the mossy rocks are the mosslings' shade. A player leaves them standing.
   return found
     .filter((t) => Math.hypot(t.x + 0.5 - rocks.x, t.z + 0.5 - rocks.z) > 12)

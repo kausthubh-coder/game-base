@@ -1,6 +1,6 @@
 // The browser play of the first part: builds the game into dist-play, serves it on port 5340, opens it in
 // headless Chrome and plays all five quests of docs/play/act1.md from the title to the end card.
-//   bun tools/play-act1.mjs [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
+//   bun tools/play-act1.mjs [--port 5340] [--dist dist-play] [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
 //
 // It plays the way src/game/play/act1.test.ts plays the rules, but through the real page: a real click on
 // New game, the hero's real body steered by held game keys along a nav route, real E presses, real
@@ -21,7 +21,8 @@ const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play/act1');
-const PORT = 5340;
+const PORT = Number(opt('port', '5340'));
+const dist = opt('dist', 'dist-play');
 const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}`;
 const SHOTS = args.includes('--shots');
 const PATH = REGION.paths[0].points.map(([x, z]) => ({ x, z }));
@@ -29,12 +30,12 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 if (!args.includes('--no-build')) {
-  const build = spawnSync('bun', ['x', 'vite', 'build', '--outDir', 'dist-play', '--emptyOutDir', '--logLevel', 'warn'], { cwd: root, stdio: 'inherit' });
+  const build = spawnSync('bun', ['x', 'vite', 'build', '--outDir', dist, '--emptyOutDir', '--logLevel', 'warn'], { cwd: root, stdio: 'inherit' });
   if (build.status !== 0) { console.error('FAIL: the build into dist-play'); process.exit(1); }
 }
 
 // The server prints its pid, and it is stopped by that pid, never by port.
-const server = spawn('bun', ['tools/serve.mjs', 'dist-play', String(PORT)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
+const server = spawn('bun', ['tools/serve.mjs', dist, String(PORT)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
 const serverPid = await new Promise((done, fail) => {
   let text = '';
   server.stdout.on('data', (chunk) => {
@@ -44,7 +45,7 @@ const serverPid = await new Promise((done, fail) => {
   });
   server.on('exit', (code) => fail(new Error(`the server stopped with code ${code}. Is port ${PORT} taken?`)));
 });
-console.log(`serving dist-play on ${BASE}  pid ${serverPid}`);
+console.log(`serving ${dist} on ${BASE}  pid ${serverPid}`);
 
 const errors = [];
 const log = [];
@@ -192,20 +193,7 @@ function installHelpers() {
     /** Every tree within 40 blocks the player may cut, nearest first, away from the mossy rocks' shade. */
     trunks() {
       const sim = g.view.world.sim, rocks = sys.region.place('grant.rocks').at;
-      const log = (x, y, z) => /_log$/.test(g.block(x, y, z).key);
-      const found = [];
-      for (let x = Math.floor(P.pos.x) - 40; x <= Math.floor(P.pos.x) + 40; x++) {
-        for (let z = Math.floor(P.pos.z) - 40; z <= Math.floor(P.pos.z) + 40; z++) {
-          for (let y = sim.heightAt(x, z) - 1; y > 1; y--) {
-            if (!log(x, y, z) || log(x, y - 1, z)) continue;
-            let logs = 0;
-            while (log(x, y + logs, z)) logs++;
-            const under = g.block(x, y - 1, z).key;
-            if (logs >= 3 && !/leaves|needles|air/.test(under) && under !== '' && !sys.region.isProtected(x, y, z)) found.push({ x, y, z, logs });
-            break;
-          }
-        }
-      }
+      const found = sys.trees.all().filter(t => t.standing && !sys.region.isProtected(t.x,t.y,t.z)).map(t => ({ ...t, logs: Math.max(3,Math.round(4*t.size)) }));
       return found.filter((t) => Math.hypot(t.x + 0.5 - rocks.x, t.z + 0.5 - rocks.z) > 12)
         .sort((a, b) => Math.hypot(a.x - P.pos.x, a.z - P.pos.z) - Math.hypot(b.x - P.pos.x, b.z - P.pos.z));
     },
@@ -377,7 +365,7 @@ async function talkThrough() {
 }
 
 /** Walks up to someone until the prompt names them, presses the real E and talks it through. */
-async function talkTo(id) {
+async function talkTo(id, attempt = 0) {
   for (const within of [1.7, 1.2, 0.8, 0.4]) {
     const npc = await p.npc(id);
     must(npc, `nobody is called ${id}`);
@@ -391,7 +379,9 @@ async function talkTo(id) {
   const promptOnScreen = await game(() => document.querySelector('.gu-prompt')?.textContent ?? '');
   await page.keyboard.press('KeyE');
   await page.waitForFunction(() => { const e = document.querySelector('.gb-dialogue'); return e && !e.hidden; }, null, { timeout: 30000 });
+  const speaker=(await state()).talk?.npc;
   const lines = await talkThrough();
+  if(speaker!==id){must(attempt<3,`wanted ${id}, spoke to ${speaker}`);note(`approaching ${id} again after ${speaker} crossed the prompt`);return talkTo(id,attempt+1);}
   const after = await state();
   // The last talk of the act opens the end card, which holds the player until Keep playing.
   must((!after.player.busy || after.flags['act1.ended'] === true) && after.talk === null, `the conversation with ${id} left the player busy`);
@@ -716,19 +706,33 @@ const QUESTS = {
     });
     if (!args.includes('--no-continue')) {
       await step('bread', 'reload the page mid-quest and Continue from the title', async () => {
-        const before = await state();
-        await game(() => window.__game.save());
+        const before = await game(() => { const g=window.__game; g.manual(true); g.save(); return g.state(); });
+        const beforeTrees = await game(() => {
+          const g=window.__game;
+          return { trees:g.view.game.systems.trees.all(), felled:g.view.kernel.save().systems.trees, pet:g.view.game.systems.pets.all() };
+        });
+        must(beforeTrees.trees.some(t=>!t.standing) && beforeTrees.trees.some(t=>t.standing), 'the reload fixture needs both felled and standing trees');
         await openGame();
+        // Freeze after Continue's click handler, before a live frame can move the pet.
+        await game(() => document.querySelector('[data-key="title:continue"]').addEventListener('click', () => queueMicrotask(() => window.__game.manual(true)), { once: true }));
         await page.click('[data-key="title:continue"]');
         await page.waitForFunction(() => window.__game.started);
-        await game(() => window.__game.settle());
+        await game(() => {window.__game.manual(true); return window.__game.settle();});
         const after = await state();
         must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
         must(after.flags['pet.leaftail.bonded'] === true && after.tracked === 'bread', 'the quests or the pet did not come back');
+        const afterTrees = await game(() => {
+          const g=window.__game;
+          return { trees:g.view.game.systems.trees.all(), felled:g.view.kernel.save().systems.trees, pet:g.view.game.systems.pets.all() };
+        });
+        must(JSON.stringify(afterTrees.trees)===JSON.stringify(beforeTrees.trees), 'felled or standing trees did not come back');
+        must(JSON.stringify(afterTrees.felled)===JSON.stringify(beforeTrees.felled), 'the felled tree save did not come back');
+        must(JSON.stringify(afterTrees.pet)===JSON.stringify(beforeTrees.pet), 'the bonded pet state did not come back');
         const f = await field();
         must((await p.crop(f.cells[0].x, f.cells[0].y, f.cells[0].z)) !== null, 'the crops did not come back');
         await shot('31-continued.png');
+        await game(()=>window.__game.manual(false));
         return `${after.bag.length} stacks in the bag`;
       });
     }

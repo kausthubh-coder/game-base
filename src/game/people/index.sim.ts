@@ -24,6 +24,8 @@ interface Person {
   wanderIndex: number;
   /** Seconds left to stand here before walking to the next place. */
   wanderTimer: number;
+  /** One brief greeting on entering talk range; null again after the player leaves. */
+  greeting: number | null;
   /** The stop they walk to or stand at. Null makes the next step pick one. */
   goal: Stop | null;
   /** The exact spot for the goal: a block center with the height of its floor. */
@@ -220,6 +222,18 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
   function move(p: Person, dt: number): void {
     const pos = p.state.pos;
     if (p.talking || (p.held && !p.sent)) { stand(p); return; }
+    // Give the player time to use the talk prompt, then carry on with the routine.
+    // People resume after the greeting even when the player lingers.
+    const nearby = distance2d(pos, player.pos) <= TALK_RANGE && Math.abs(pos.y - player.pos.y) < 2;
+    if (!nearby) p.greeting = null;
+    else {
+      p.greeting ??= 2;
+      if (p.greeting > 0) {
+        p.greeting = Math.max(0, p.greeting - dt);
+        stand(p);
+        return;
+      }
+    }
     if (!p.plan && p.path === null) {
       // Standing on their spot.
       stand(p);
@@ -256,6 +270,7 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
       wanderStops: wander ? wander.places.map((place) => ({ place })) : [],
       wanderIndex: wander ? n % wander.places.length : 0,
       wanderTimer: wander ? wander.every * (0.25 + 0.75 * game.random()) : 0,
+      greeting: null,
       goal: null, target: { x: 0, y: 0, z: 0 }, settled: false,
       path: null, next: 0, partial: false, plan: false, at: null,
       held: false, sent: null, talking: false, blocked: 0, fails: 0, check: 0,

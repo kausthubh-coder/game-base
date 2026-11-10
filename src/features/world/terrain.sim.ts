@@ -110,7 +110,7 @@ export function forestAt(seed: number, x: number, z: number): number {
 type TreeKind = 0 | 1 | 2; // oak, birch, pine
 
 /** The tree that grows in this 5 by 5 cell of the tree grid, or -1. It writes the trunk position to `at`. */
-function treeInCell(seed: number, gx: number, gz: number, at: { x: number; z: number; h: number }): TreeKind | -1 {
+export function treeInCell(seed: number, gx: number, gz: number, at: { x: number; z: number; h: number }): TreeKind | -1 {
   const x = gx * 5 + Math.floor(hash2(gx, gz, seed + 101) * 5), z = gz * 5 + Math.floor(hash2(gx, gz, seed + 102) * 5);
   if (!treeAllowed(x, z)) return -1;
   const forest = forestAt(seed, x, z);
@@ -169,57 +169,24 @@ export function generateChunk(seed: number, cx: number, cz: number, blocks: Uint
     if (!onlyAir || blocks[i] === 0) blocks[i] = id;
   };
 
-  // Trees. A canopy reaches three blocks out, so trees rooted in the cells around the chunk count too.
-  const at = { x: 0, z: 0, h: 0 };
-  const g0x = Math.floor((ox - 3) / 5), g1x = Math.floor((ox + CHUNK + 2) / 5);
-  const g0z = Math.floor((oz - 3) / 5), g1z = Math.floor((oz + CHUNK + 2) / 5);
-  for (let gx = g0x; gx <= g1x; gx++) {
-    for (let gz = g0z; gz <= g1z; gz++) {
-      const kind = treeInCell(seed, gx, gz, at);
-      if (kind >= 0) stampTree(put, kind as TreeKind, at.x, at.h, at.z, hash2(gx, gz, seed + 106));
-    }
+  // Collision roots use the same deterministic placements as the tree system.
+  for (const t of treesInArea(seed, ox, oz, ox + CHUNK, oz + CHUNK)) {
+    put(t.x, t.y, t.z, blockId('barrier'));
+    put(t.x, t.y + 1, t.z, blockId('barrier'));
   }
-
-  // The region plan: its blocks and buildings replace whatever the land put there, then its own trees
-  // grow. A tree stands on the ground it finds, so it needs no height in the plan.
-  if (region) {
-    stampStructures(ox, oz, CHUNK, put);
-    for (const t of REGION.trees) {
-      if (t.x < ox - 3 || t.x > ox + CHUNK + 2 || t.z < oz - 3 || t.z > oz + CHUNK + 2) continue;
-      stampTree(put, t.kind === 'birch' ? 1 : 0, t.x, groundHeight(seed, t.x, t.z), t.z, t.size);
-    }
-  }
+  if (region) stampStructures(ox, oz, CHUNK, put);
 }
 
-type Put = (x: number, y: number, z: number, id: number, onlyAir?: boolean) => void;
-
-function stampTree(put: Put, kind: TreeKind, x: number, y: number, z: number, r: number): void {
-  if (kind === 2) {
-    const trunk = 6 + Math.floor(r * 3);
-    for (let i = 0; i < trunk; i++) put(x, y + i, z, B.pineLog);
-    for (let i = 2; i <= trunk + 1; i++) {
-      const fromTop = trunk + 1 - i;
-      const radius = fromTop === 0 ? 0 : fromTop <= 3 ? 1 : 2;
-      for (let dx = -radius; dx <= radius; dx++) {
-        for (let dz = -radius; dz <= radius; dz++) {
-          if (radius === 2 && Math.abs(dx) === 2 && Math.abs(dz) === 2) continue;
-          put(x + dx, y + i, z + dz, B.needles, true);
-        }
-      }
-    }
-    return;
+export interface TreePlacement { x: number; y: number; z: number; kind: 'oak' | 'birch' | 'pine'; size: number; variant: number }
+export function treesInArea(seed: number, x0: number, z0: number, x1: number, z1: number): TreePlacement[] {
+  const result: TreePlacement[] = [];
+  const at = { x: 0, z: 0, h: 0 };
+  for (let gx = Math.floor(x0 / 5); gx <= Math.floor((x1 - 1) / 5); gx++) for (let gz = Math.floor(z0 / 5); gz <= Math.floor((z1 - 1) / 5); gz++) {
+    const kind = treeInCell(seed, gx, gz, at);
+    if (kind < 0 || at.x < x0 || at.x >= x1 || at.z < z0 || at.z >= z1) continue;
+    const r = hash2(gx, gz, seed + 106);
+    result.push({ x: at.x, y: at.h, z: at.z, kind: kind === 2 ? 'pine' : kind === 1 ? 'birch' : 'oak', size: .85 + r * .3, variant: Math.floor(r * 3) });
   }
-  const trunk = (kind === 1 ? 5 : 4) + Math.floor(r * 2);
-  for (let i = 0; i < trunk; i++) put(x, y + i, z, kind === 1 ? B.birchLog : B.oakLog);
-  const wide = kind === 1 ? 1 : 2;
-  for (let i = trunk - 2; i <= trunk + 1; i++) {
-    const radius = i >= trunk ? 1 : wide + (kind === 1 && i === trunk - 1 ? 1 : 0);
-    for (let dx = -radius; dx <= radius; dx++) {
-      for (let dz = -radius; dz <= radius; dz++) {
-        const corner = Math.abs(dx) === radius && Math.abs(dz) === radius;
-        if (corner && (radius === 1 ? i > trunk : hash3(x + dx, y + i, z + dz, 7) < 0.6)) continue;
-        put(x + dx, y + i, z + dz, B.leaves, true);
-      }
-    }
-  }
+  for (const t of REGION.trees) if (t.x >= x0 && t.x < x1 && t.z >= z0 && t.z < z1) result.push({ x: t.x, y: groundHeight(seed,t.x,t.z), z: t.z, kind: t.kind, size: .85 + t.size * .3, variant: Math.min(2,Math.floor(t.size * 3)) });
+  return result;
 }

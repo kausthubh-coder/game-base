@@ -25,6 +25,7 @@ Path finding for anything that walks. It implements `NavApi`.
 - A step goes to one of the eight neighbors.
 - A step goes up or down one block at most. A step up needs head room above the block the walker leaves.
 - A diagonal step stays level, and the two blocks beside it must both be free. No corner is cut.
+- Interior route points leave one cell of clearance around invisible barriers, including tree trunks. This gives the hero room to turn before reaching a cell center. The start and goal may be beside a barrier so chopping and station use remain reachable. `near` and `standable` still describe the actual free cells.
 - Water is not walkable.
 - Land that is not loaded is air, so no path crosses it.
 - The search stops after `limit` blocks and `path` returns null.

@@ -16,6 +16,7 @@ import { createPost } from '../../features/post/index.ts';
 import { createSky } from '../../features/sky/index.ts';
 import { createWaterMaterial } from '../../features/water/index.ts';
 import { createWorld, emptyHit, spawnPoint } from '../../features/world/index.ts';
+import { reachDistance } from '../actions/index.sim.ts';
 import type { Systems, UseContext } from '../api.sim.ts';
 import { STEP, createKernel } from '../kernel.sim.ts';
 import { installSystems, type Installed } from '../systems.ts';
@@ -215,10 +216,14 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     origin.copy(lens.position);
     ray.set(pointer.x, pointer.y, 0.5).unproject(lens).sub(origin);
     // The ray skips what the cutaway hides, so a click goes through a hidden roof to the floor.
-    if (!world.sim.raycast(origin.x, origin.y, origin.z, ray.x, ray.y, ray.z, 500, hit, camera.hides)) return;
+    ray.normalize();
+    const blockHit = world.sim.raycast(origin.x, origin.y, origin.z, ray.x, ray.y, ray.z, 500, hit, camera.hides);
+    const treeHit = sys.trees?.raycast(origin, ray, blockHit ? hit.distance : 500, hit);
+    if (!blockHit && !treeHit) return;
     const p = game.player.pos, eye = p.y + EYE_HEIGHT;
     const dx = Math.max(hit.x - p.x, 0, p.x - hit.x - 1), dy = Math.max(hit.y - eye, 0, eye - hit.y - 1), dz = Math.max(hit.z - p.z, 0, p.z - hit.z - 1);
-    aimed = Math.hypot(dx, dy, dz) <= (sys.actions?.reach ?? 5);
+    const tree=sys.trees?.at(hit.x,hit.y,hit.z);
+    aimed = tree ? reachDistance(game.player,tree.box.x0,tree.box.y0,tree.box.z0,tree.box.x1,tree.box.y1,tree.box.z1) <= (sys.actions?.reach ?? 5) : Math.hypot(dx, dy, dz) <= (sys.actions?.reach ?? 5);
   }
 
   const using: UseContext = { hit: null, held: null, button: 'primary' };

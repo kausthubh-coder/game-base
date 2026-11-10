@@ -1,6 +1,7 @@
+import { treesInArea, type TreePlacement } from './terrain.sim.ts';
 // The world as rules: chunks of blocks, light, the height cache, ray casts and saves. No drawing here.
 // It answers `WorldQuery` for every other feature.
-import { BLOCKS } from '../../content/blocks.ts';
+import { BLOCKS, blockId } from '../../content/blocks.ts';
 import type { Surface } from '../../engine/types.ts';
 import type { WorldQuery } from '../../engine/world-query.ts';
 import {
@@ -229,8 +230,17 @@ export class World implements WorldQuery {
     return h > 0 ? BLOCKS[this.getBlock(fx, h - 1, fz)].surface : 'grass';
   }
 
+  private canopyChunks = new Map<string, TreePlacement[]>();
+  canopyAt(x:number,y:number,z:number): boolean {
+    const cx=Math.floor(x/16),cz=Math.floor(z/16),key=`${cx},${cz}`;
+    let trees=this.canopyChunks.get(key);
+    if(!trees){trees=treesInArea(this.seed,cx*16-4,cz*16-4,cx*16+20,cz*16+20);this.canopyChunks.set(key,trees);}
+    for(const t of trees) if(y>=t.y && y<t.y+6*t.size && Math.abs(x-t.x-.5)<=2.2*t.size && Math.abs(z-t.z-.5)<=2.2*t.size && this.getBlock(t.x,t.y,t.z)===blockId('barrier')) return true;
+    return false;
+  }
+
   openSky(x: number, y: number, z: number): boolean {
-    return y >= this.heightAt(x, z);
+    return y >= this.heightAt(x, z) && !this.canopyAt(x,y,z);
   }
 
   lightAt(x: number, y: number, z: number): number {
@@ -245,7 +255,8 @@ export class World implements WorldQuery {
     if (fy < 0) return 0;
     const fx = Math.floor(x), fz = Math.floor(z);
     const c = this.chunkAt(fx >> 4, fz >> 4);
-    return c ? c.light[cellIndex(fx & 15, fy, fz & 15)] >> 4 : 15;
+    const light = c ? c.light[cellIndex(fx & 15, fy, fz & 15)] >> 4 : 15;
+    return light > 12 && this.canopyAt(x,y,z) ? 12 : light;
   }
 
   /** Light from lamps and crystals at a point, 0 to 15. */
@@ -274,6 +285,7 @@ export class World implements WorldQuery {
   restore(save: WorldSave): void {
     if (save.version !== 1) throw new Error(`cannot read a world save of version ${String(save.version)}`);
     this.seed = save.seed;
+    this.canopyChunks.clear();
     this.chunks.clear();
     this.last = undefined;
     this.dirty.length = 0;

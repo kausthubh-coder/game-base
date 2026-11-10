@@ -995,5 +995,91 @@
         0
       ]
     }
+  },
+  "models": {
+    "tree-17": {
+      "file": "models/tree-17.glb",
+      "seed": 17,
+      "triangles": 1464,
+      "budget": 1500,
+      "bytes": 140560
+    },
+    "tree-41": {
+      "file": "models/tree-41.glb",
+      "seed": 41,
+      "triangles": 1464,
+      "budget": 1500,
+      "bytes": 140572
+    },
+    "tree-83": {
+      "file": "models/tree-83.glb",
+      "seed": 83,
+      "triangles": 1464,
+      "budget": 1500,
+      "bytes": 140568
+    },
+    "birch-17": {
+      "file": "models/birch-17.glb",
+      "seed": 17,
+      "triangles": 1258,
+      "budget": 1500,
+      "bytes": 121184
+    },
+    "birch-41": {
+      "file": "models/birch-41.glb",
+      "seed": 41,
+      "triangles": 1258,
+      "budget": 1500,
+      "bytes": 121196
+    },
+    "birch-83": {
+      "file": "models/birch-83.glb",
+      "seed": 83,
+      "triangles": 1258,
+      "budget": 1500,
+      "bytes": 121196
+    },
+    "pine-17": {
+      "file": "models/pine-17.glb",
+      "seed": 17,
+      "triangles": 1272,
+      "budget": 1500,
+      "bytes": 122468
+    },
+    "pine-41": {
+      "file": "models/pine-41.glb",
+      "seed": 41,
+      "triangles": 1272,
+      "budget": 1500,
+      "bytes": 122480
+    },
+    "pine-83": {
+      "file": "models/pine-83.glb",
+      "seed": 83,
+      "triangles": 1272,
+      "budget": 1500,
+      "bytes": 122476
+    },
+    "rock-11": {
+      "file": "models/rock-11.glb",
+      "seed": 11,
+      "triangles": 44,
+      "budget": 300,
+      "bytes": 7384
+    },
+    "rock-37": {
+      "file": "models/rock-37.glb",
+      "seed": 37,
+      "triangles": 44,
+      "budget": 300,
+      "bytes": 7396
+    },
+    "bush-29": {
+      "file": "models/bush-29.glb",
+      "seed": 29,
+      "triangles": 280,
+      "budget": 300,
+      "bytes": 29236
+    }
   }
 }
