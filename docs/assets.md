@@ -161,3 +161,13 @@ Additional manifest sections use the same PNG contract:
 `sprites.hero-swing` is a separate action sheet. Its `tool` animation uses rows 0 front,
 1 back and 2 right-facing side, three frames at 9 fps, frame 128-square, anchor `[64,120]`,
 world height 2. `sprites.hero` remains approved and unchanged.
+
+## Optional Blender models
+
+The look test permits code-generated GLB files under `public/assets/models/`.
+The optional `models` object maps a model name to `file` relative to assets,
+`seed`, `triangles`, `budget` and `bytes`. For example,
+`"tree-17": {"file":"models/tree-17.glb","seed":17,"triangles":1464,"budget":1500,"bytes":140560}`.
+The build command writes actual counts. The verifier reads each GLB and checks
+the declared counts, byte size, one triangle primitive and the 1500/300 caps.
+They are loaded only by the optional `?models=1` look view.
