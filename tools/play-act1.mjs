@@ -649,10 +649,12 @@ const QUESTS = {
       // The bed is two blocks long and goes on the way the player faces: step back and come up facing north,
       // and set its foot down at h.z + 1 so its pillow is at h.z, under the roof to come.
       await walkTo({ x: h.x + 0.5, y: g, z: h.z + 3.5 }, { within: 0.3, seconds: 30 });
-      // Far enough back that the body is clear of the bed's foot at h.z + 1, which ends at h.z + 2.
-      // With the free and first-person cameras the hero takes one more short step north below, so start further back.
-      await walkTo({ x: h.x + 0.5, y: g, z: h.z + (LOOK ? 2.95 : 2.7) }, { within: 0.2, seconds: 30, soft: true });
-      if (LOOK) {
+      if (!LOOK) {
+        await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 30 });
+      } else {
+        // Far enough back that the body stays clear of the bed's foot at h.z + 1, which ends at h.z + 2, after
+        // the short step north below.
+        await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.95 }, { within: 0.2, seconds: 30, soft: true });
         // The free camera lets the hero face the way they last walked, which the route may have left on a
         // diagonal: look north and take a short step, so the bed is set down facing north.
         await game(() => {
@@ -662,9 +664,9 @@ const QUESTS = {
         });
         const facing = (await state()).player.facing;
         must(Math.abs(Math.atan2(Math.sin(facing), Math.cos(facing))) < Math.PI / 4, `the hero faces ${facing.toFixed(2)}, not north`);
+        const stand = (await state()).player.z;
+        must(stand - 0.3 >= h.z + 2, `the hero stopped at z ${stand.toFixed(2)}, on the cell the bed's foot needs`);
       }
-      const stand = (await state()).player.z;
-      must(stand - 0.3 >= h.z + 2, `the hero stopped at z ${stand.toFixed(2)}, on the cell the bed's foot needs`);
       await hold('bed');
       await use(h.x, g - 1, h.z + 1);
       must((await p.placed(h.x, g, h.z)) === 'bed' && (await p.placed(h.x, g, h.z + 1)) === 'bed', 'no bed two blocks long stands where it was set down');
