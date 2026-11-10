@@ -1,7 +1,11 @@
-// The book look for everything that is not inside createGameUi: the HUD, the minimap, the full map and
-// the dialogue box. src/game/ui/styles.ui.ts sets the look (parchment, ink, brass corners, one serif),
-// but its tokens live on `.gu-root`, where the features cannot read them. So the same values are named
-// here on the views' root, and handed to the features through the `--book-*` names they read.
+// The look for everything that is not inside createGameUi: the HUD, the minimap, the full map, the dialogue
+// box and the story cards. src/game/ui/styles.ui.ts sets the same look for the panels, but its tokens live on
+// `.gu-root`, where the features cannot read them. So the same values are named here on the views' root, and
+// handed to the features through the `--book-*` names they read.
+//
+// Two grounds, from the handbook's direction (design/.critly/direction.md): warm near-white paper for panels
+// and cards, and dark glass for what sits over the world while walking. One sans family from the system,
+// one teal accent from the lume crystal, green for done, amber for new. 10px corners, 1px lines, space first.
 //
 // Each view adds its own rules with `addStyle`. The rules start with `.ui-book`, so they outrank the
 // feature's own stylesheet whatever order the two are loaded in.
@@ -9,23 +13,36 @@
 export const TOKENS = /* css */ `
 .ui-book {
   /* The same values as .gu-root in src/game/ui/styles.ui.ts. */
-  --ui-paper: oklch(0.886 0.076 76);
-  --ui-paper-2: oklch(0.845 0.072 78);
-  --ui-paper-3: oklch(0.795 0.078 76);
-  --ui-paper-4: oklch(0.76 0.08 75);
-  --ui-paper-light: oklch(0.909 0.089 85);
-  --ui-plate: oklch(0.921 0.032 87);
-  --ui-ink: oklch(0.27 0.025 40);
-  --ui-ink-2: oklch(0.38 0.04 55);
-  --ui-line: oklch(0.27 0.025 40 / 0.28);
-  --ui-line-strong: oklch(0.402 0.055 61);
-  --ui-brass: oklch(0.76 0.112 82);
-  --ui-brass-dark: oklch(0.6 0.105 76);
-  --ui-accent: oklch(0.46 0.15 32);
-  --ui-done: oklch(0.42 0.075 165);
-  --ui-scrim: oklch(0.2 0.03 60 / 0.5);
-  --ui-shadow: oklch(0.15 0.03 60 / 0.4);
-  --ui-font: ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  --ui-paper: oklch(0.975 0.014 88);
+  --ui-paper-2: oklch(0.945 0.02 86);
+  --ui-paper-3: oklch(0.91 0.026 84);
+  --ui-paper-4: oklch(0.88 0.03 82);
+  --ui-paper-light: oklch(0.99 0.008 90);
+  --ui-plate: oklch(0.99 0.008 90);
+  --ui-ink: oklch(0.29 0.022 62);
+  --ui-ink-2: oklch(0.47 0.022 68);
+  --ui-line: oklch(0.29 0.022 62 / 0.12);
+  --ui-line-strong: oklch(0.29 0.022 62 / 0.28);
+  --ui-brass: oklch(0.8 0.13 78);
+  --ui-brass-dark: oklch(0.62 0.13 68);
+  --ui-accent: oklch(0.53 0.095 192);
+  --ui-accent-soft: oklch(0.53 0.095 192 / 0.16);
+  --ui-done: oklch(0.56 0.12 150);
+  --ui-new: oklch(0.72 0.15 68);
+  --ui-scrim: oklch(0.18 0.02 60 / 0.55);
+  --ui-shadow: oklch(0.18 0.03 60 / 0.28);
+  --ui-lift: 0 1px 2px oklch(0.18 0.03 60 / 0.14), 0 12px 32px oklch(0.18 0.03 60 / 0.24);
+  /* Dark glass over the world: no blur, so it costs nothing to draw. */
+  --ui-glass: oklch(0.21 0.018 62 / 0.7);
+  --ui-glass-2: oklch(1 0 0 / 0.1);
+  --ui-glass-line: oklch(1 0 0 / 0.14);
+  --ui-glass-ink: oklch(0.985 0.008 88);
+  --ui-glass-ink-2: oklch(0.9 0.012 86);
+  --ui-glass-shadow: 0 2px 10px oklch(0.12 0.02 60 / 0.22);
+  --ui-text-shadow: 0 1px 2px oklch(0.12 0.02 60 / 0.6);
+  --ui-radius: 10px;
+  --ui-radius-sm: 6px;
+  --ui-font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   --ui-ease: cubic-bezier(0.23, 1, 0.32, 1);
   /* Pixels kept clear at the bottom: the quick slots (the HUD view measures them), or the dialogue box while someone talks (the talk view does). */
   --ui-hud-clear: 96px;
@@ -52,38 +69,34 @@ export const TOKENS = /* css */ `
 .ui-cell { display: block; width: 100%; height: 100%; background-repeat: no-repeat; image-rendering: pixelated; }
 .ui-letters { display: grid; place-items: center; width: 100%; height: 100%; font-size: 13px; font-weight: 600; line-height: 1; color: var(--ui-ink-2); }
 
-/*
- * A large panel: the frame is ui/panel.png cut at its corner ornaments, as createGameUi's panels are.
- * The picture's middle has a stain that smears when stretched, so one layer of flat paper is laid over
- * everything inside the frame lines (the ui-sheet elements that frame() adds): a tall sheet, a wide sheet
- * and a middle one, which leave only the four ornaments showing. --u is one picture pixel. The 2px is the panel's own border.
- */
-.ui-book.ui-art .ui-frame {
-  --u: 2px;
+/* A large panel: warm paper, 10px corners, one soft shadow. The ui-sheet elements frame() adds are kept for the old nine-slice frame and draw nothing now. */
+.ui-book .ui-frame {
   position: relative; isolation: isolate;
-  border: 2px solid transparent; border-radius: 0; outline: 0;
-  border-image: var(--ui-panel-art) 28 / calc(28 * var(--u)) stretch;
-  background: var(--ui-paper); background-clip: padding-box;
-  image-rendering: pixelated;
-  box-shadow: 0 16px 48px var(--ui-shadow);
+  border: 0; border-radius: var(--ui-radius); outline: 0;
+  background: var(--ui-paper);
+  box-shadow: var(--ui-lift);
 }
-.ui-book.ui-art .ui-frame > * { image-rendering: auto; }
 .ui-sheet { display: none; }
-.ui-book.ui-art .ui-frame > .ui-sheet { display: block; position: absolute; z-index: -1; pointer-events: none; background: var(--ui-paper); }
-.ui-book.ui-art .ui-frame > .ui-sheet-tall { inset: calc(10 * var(--u) - 2px) calc(28 * var(--u) - 2px); }
-.ui-book.ui-art .ui-frame > .ui-sheet-wide { inset: calc(28 * var(--u) - 2px) calc(10 * var(--u) - 2px); }
-.ui-book.ui-art .ui-frame > .ui-sheet-middle { inset: calc(16 * var(--u) - 2px); }
-/* Without the picture: the same frame in lines, as createGameUi's fallback draws it. */
-.ui-book:not(.ui-art) .ui-frame {
-  border: 2px solid var(--ui-ink); border-radius: 2px; outline: 0;
-  background: var(--ui-paper);
-  box-shadow: inset 0 0 0 2px var(--ui-paper-light), inset 0 0 0 4px var(--ui-paper), inset 0 0 0 6px var(--ui-line-strong), 0 16px 48px var(--ui-shadow);
-}
-/* A small card over the game: the prompt, a toast and a hint are drawn this way by createGameUi. */
+/* A small card over the game, on paper: the Almanac's gift card. */
 .ui-book .ui-card {
-  border: 2px solid var(--ui-ink); border-radius: 2px; outline: 0;
+  border: 0; border-radius: var(--ui-radius); outline: 0;
   background: var(--ui-paper);
-  box-shadow: 0 4px 14px var(--ui-shadow);
+  box-shadow: var(--ui-lift);
+}
+/* A strip of dark glass over the world: the tracker, the clock, the quick slots. */
+.ui-book .ui-glass {
+  color: var(--ui-glass-ink);
+  background: var(--ui-glass);
+  border: 0; border-radius: var(--ui-radius); outline: 0;
+  box-shadow: var(--ui-glass-shadow);
+}
+/* The stack under the pointer while it is dragged, here and in the bag. */
+.ui-book .gu-ghost, .gu-root .gu-ghost {
+  position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center;
+  width: 52px; height: 52px; pointer-events: none;
+  background: var(--ui-paper, oklch(0.975 0.014 88)); border-radius: var(--ui-radius, 10px);
+  box-shadow: 0 0 0 2px oklch(0.53 0.095 192), 0 10px 24px oklch(0.18 0.03 60 / 0.35);
+  will-change: transform;
 }
 `;
 

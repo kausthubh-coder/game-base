@@ -1,6 +1,6 @@
 // The parts of the interface that are plain data in, plain data out. No page here, so tests can run them.
 
-import type { AlmanacPage, Recipe } from '../api.sim.ts';
+import type { AlmanacPage, ItemDef, Recipe } from '../api.sim.ts';
 import type { KeyHint, Quality, Settings } from './types.ui.ts';
 
 export const DEFAULT_SETTINGS: Settings = { quality: 'auto', music: 0.7, ambience: 0.7, effects: 0.8, voice: 0.8, size: 1 };
@@ -68,7 +68,8 @@ export interface ToastLine {
 }
 
 export const TOAST_LIFE = 3000;
-export const TOAST_MAX = 4;
+/** At most this many toasts show. Three lines are read at a glance; a fourth pushes the oldest out. */
+export const TOAST_MAX = 3;
 let toastKey = 0;
 
 /** Adds a toast. A repeat of a line still showing raises its count and restarts its time. Returns the line. */
@@ -131,4 +132,54 @@ export function gridMove(index: number, key: string, columns: number, total: num
   if (key === 'Home') return index - column;
   if (key === 'End') return Math.min(total - 1, index - column + columns - 1);
   return index;
+}
+
+/** The quick row and the rest of the bag, each laid out on its own grid of the same number of columns. */
+export const QUICK_COUNT = 9;
+
+/**
+ * Where an arrow key moves the focus in the bag: the 9 quick slots and the 27 slots after them, each block on its own
+ * grid of `columns`. Down from the quick row's last line goes into the bag, up from the bag's first line comes back.
+ */
+export function slotMove(index: number, key: string, columns: number, total: number): number {
+  const quick = Math.min(QUICK_COUNT, total);
+  const inQuick = index < quick;
+  const start = inQuick ? 0 : quick, size = inQuick ? quick : total - quick;
+  const local = index - start;
+  const row = Math.floor(local / columns), column = local % columns;
+  const rows = Math.ceil(size / columns);
+  const at = (blockStart: number, blockSize: number, r: number, c: number): number => blockStart + Math.min(blockSize - 1, r * columns + c);
+  if (key === 'ArrowLeft') return column > 0 ? index - 1 : index;
+  if (key === 'ArrowRight') return column < columns - 1 && local + 1 < size ? index + 1 : index;
+  if (key === 'Home') return index - column;
+  if (key === 'End') return start + Math.min(size - 1, row * columns + columns - 1);
+  if (key === 'ArrowDown') {
+    if (row + 1 < rows) return at(start, size, row + 1, column);
+    return inQuick && total > quick ? at(quick, total - quick, 0, column) : index;
+  }
+  if (key === 'ArrowUp') {
+    if (row > 0) return at(start, size, row - 1, column);
+    return !inQuick ? at(0, quick, Math.ceil(quick / columns) - 1, column) : index;
+  }
+  return index;
+}
+
+/** How many a split takes: the bigger half, so a stack of one moves whole. */
+export const half = (count: number): number => Math.ceil(count / 2);
+
+/** What an item is for, in one line for its tooltip, or null when its description says it all. */
+export function itemUse(def: ItemDef): string | null {
+  switch (def.tool?.kind) {
+    case 'axe': return 'Tool. Hold the left button on a tree to fell it.';
+    case 'pickaxe': return 'Tool. Hold the left button on stone to break it.';
+    case 'hoe': return 'Tool. The right button tills grass or dirt.';
+    case 'can': return 'Tool. The right button waters tilled soil.';
+    case 'shovel': return 'Tool. Digs dirt and sand faster.';
+    case 'hammer': return 'Tool. Takes down what you built.';
+  }
+  if (def.seed) return 'The right button plants it in tilled soil.';
+  if (def.placeable) return 'The right button sets it down.';
+  if (def.block !== undefined) return 'The right button builds with it.';
+  if (def.treat) return 'Pets like it. Hold it out with the right button.';
+  return null;
 }

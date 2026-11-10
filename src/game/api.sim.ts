@@ -215,7 +215,11 @@ export interface InventoryApi {
   /** Removes only if all of them are there. */
   remove(id: ItemId, count: number): boolean;
   count(id: ItemId): number;
-  move(from: number, to: number): void;
+  /**
+   * Moves the stack in `from` to `to`: onto the same item it merges up to the stack size, onto another it swaps.
+   * With `count`, only that many go, onto an empty slot or the same item. Nothing moves when they would have to swap.
+   */
+  move(from: number, to: number, count?: number): void;
 }
 
 /** What the player points at when they click. */

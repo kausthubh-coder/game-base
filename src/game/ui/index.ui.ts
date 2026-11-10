@@ -80,7 +80,6 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
       view = build(name, detail);
       const framed = view.framed !== false;
       panel = h('div', { class: `gu-panel ${view.className ?? ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': view.title, tabindex: -1 },
-        h('i', { class: 'gu-corner' }), h('i', { class: 'gu-corner' }), h('i', { class: 'gu-corner' }), h('i', { class: 'gu-corner' }),
         framed
           ? h('header', { class: 'gu-panel-head' },
               h('h2', { class: 'gu-panel-title' }, view.title),
@@ -119,6 +118,10 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
     },
     isOpen: (name) => (name ? current === name : current !== null),
     settings: () => ({ ...settings }),
+    notices: {
+      hold: (on) => overlay.hold(on),
+      skip: (id) => overlay.skip(id),
+    },
     dispose() {
       cancelAnimationFrame(frame);
       window.removeEventListener('keydown', onKey);

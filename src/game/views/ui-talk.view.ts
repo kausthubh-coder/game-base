@@ -36,19 +36,19 @@ const STYLE = /* css */ `
 /* It moves but never fades, so the first line is readable from its first frame. */
 @keyframes ui-talk-in { from { transform: translateY(8px); } }
 /* A portrait is 128 pixels of pixel art, so it is drawn at exactly that, on a darker tile of paper as the Almanac's pictures are. */
-.ui-book .gb-dialogue-portrait { width: 128px; height: 128px; border: 0; border-radius: 2px; background: var(--ui-paper-2); box-shadow: none; }
+.ui-book .gb-dialogue-portrait { width: 128px; height: 128px; border: 0; border-radius: 12px; background: var(--ui-paper-2); box-shadow: none; }
 .ui-book .gb-dialogue-portrait > .gb-dialogue-initial { font-size: 56px; font-weight: 600; color: var(--ui-ink-2); }
 .ui-book .gb-dialogue-body { gap: 8px; }
-.ui-book .gb-dialogue-name { padding-bottom: 8px; font-size: 20px; font-weight: 600; letter-spacing: -0.01em; border-bottom: 1px solid var(--ui-line); }
+.ui-book .gb-dialogue-name { padding-bottom: 8px; font-size: 20px; font-weight: 650; letter-spacing: -0.015em; color: var(--ui-ink); border-bottom: 1px solid var(--ui-line); }
 /* Room for three rows, so the box keeps its height from line to line. */
 .ui-book .gb-dialogue-text { margin: 0; min-height: 4.35em; max-width: 58ch; text-wrap: pretty; }
 .ui-book .gb-dialogue-choices { margin: 4px 0 0; gap: 8px; }
-.ui-book .gb-dialogue-choices button { min-height: 44px; gap: 12px; padding: 4px 16px 4px 10px; color: var(--ui-ink); background: var(--ui-plate); border: 2px solid var(--ui-ink); border-radius: 2px; box-shadow: none; transition: transform 80ms var(--ui-ease); }
-.ui-book .gb-dialogue-choices button:hover, .ui-book .gb-dialogue-choices button:focus-visible { background: var(--ui-paper-light); }
-.ui-book .gb-dialogue-choices button:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
-.ui-book .gb-dialogue-choices button:active { background: var(--ui-paper-2); transform: translateY(1px); box-shadow: none; }
+.ui-book .gb-dialogue-choices button { min-height: 44px; gap: 12px; padding: 4px 16px 4px 8px; color: var(--ui-ink); background: var(--ui-paper-2); border: 0; border-radius: var(--ui-radius); box-shadow: none; transition: transform 80ms var(--ui-ease); }
+.ui-book .gb-dialogue-choices button:hover, .ui-book .gb-dialogue-choices button:focus-visible { background: var(--ui-paper-3); }
+.ui-book .gb-dialogue-choices button:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+.ui-book .gb-dialogue-choices button:active { background: var(--ui-paper-4); transform: scale(0.99); box-shadow: none; }
 /* The number of a choice, as a key cap. */
-.ui-book .gb-dialogue-key { width: 26px; height: 26px; font-size: 14px; font-weight: 600; color: var(--ui-ink); background: var(--ui-paper); border: 1px solid var(--ui-line-strong); border-bottom-width: 2px; border-radius: 3px; }
+.ui-book .gb-dialogue-key { width: 26px; height: 26px; font-size: 14px; font-weight: 600; color: var(--ui-ink); background: var(--ui-paper-light); border: 0; border-radius: var(--ui-radius-sm); box-shadow: inset 0 0 0 1px var(--ui-line-strong), inset 0 -2px 0 var(--ui-line); }
 .ui-book .gb-dialogue-more { right: 0; bottom: 0; border-top-color: var(--ui-ink-2); }
 /* A line nobody says: no portrait and no name. */
 .ui-book .gb-dialogue.is-narrator .gb-dialogue-box { grid-template-columns: minmax(0, 1fr); }
@@ -57,7 +57,6 @@ const STYLE = /* css */ `
 
 @media (max-width: 560px) {
   .ui-book .gb-dialogue { padding: 0 8px max(8px, env(safe-area-inset-bottom, 0px)); font-size: 16px; }
-  .ui-book.ui-art .gb-dialogue-box { --u: 1px; }
   .ui-book .gb-dialogue-box { gap: 14px; padding: 18px 20px; zoom: 1; }
   .ui-book .gb-dialogue-portrait { width: 64px; height: 64px; }
   .ui-book .gb-dialogue-portrait > * { image-rendering: auto; }

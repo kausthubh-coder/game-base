@@ -1,41 +1,56 @@
-// The look: a book. Parchment panels, ink lines, small brass corners, one serif from the system.
+// The look: warm paper panels with 10px corners and one soft shadow, dark glass over the world, one sans face from
+// the system and one teal accent. The direction is the handbook's (design/.critly/direction.md).
 // Every size answers to the root's own width (a container query), not the window's.
 
 export const STYLES = /* css */ `
 .gu-root {
-  /* paper and ink */
-  /* The paper, the rule and the brass are the colors of ui/panel.png and ui/button.png, so the fallback matches the art. */
-  --paper: oklch(0.886 0.076 76);
-  --paper-2: oklch(0.845 0.072 78);
-  --paper-3: oklch(0.795 0.078 76);
-  --paper-light: oklch(0.909 0.089 85);
-  --plate: oklch(0.921 0.032 87);
-  --ink: oklch(0.27 0.025 40);
-  --ink-2: oklch(0.38 0.04 55);
-  --ink-3: oklch(0.43 0.04 58);
-  --line: oklch(0.27 0.025 40 / 0.28);
-  --line-strong: oklch(0.402 0.055 61);
-  --brass: oklch(0.76 0.112 82);
-  --brass-dark: oklch(0.6 0.105 76);
-  /* the one accent: the next action and the thing picked */
-  --accent: oklch(0.46 0.15 32);
-  --accent-press: oklch(0.4 0.14 32);
-  --accent-ink: oklch(0.97 0.02 85);
-  /* a finished thing */
-  --done: oklch(0.42 0.075 165);
-  --scrim: oklch(0.2 0.03 60 / 0.5);
-  --shadow: oklch(0.15 0.03 60 / 0.4);
+  /* Warm paper for panels, and dark glass for what sits over the world. The same values as .ui-book in src/game/uiview/theme.ts. */
+  --paper: oklch(0.975 0.014 88);
+  --paper-2: oklch(0.945 0.02 86);
+  --paper-3: oklch(0.91 0.026 84);
+  --paper-4: oklch(0.88 0.03 82);
+  --paper-light: oklch(0.99 0.008 90);
+  --plate: var(--paper-light);
+  --ink: oklch(0.29 0.022 62);
+  --ink-2: oklch(0.47 0.022 68);
+  --ink-3: oklch(0.6 0.018 70);
+  --line: oklch(0.29 0.022 62 / 0.12);
+  --line-strong: oklch(0.29 0.022 62 / 0.28);
+  --brass: oklch(0.8 0.13 78);
+  --brass-dark: oklch(0.62 0.13 68);
+  /* the one accent, teal from the lume crystal: the next action, the thing picked, the slot a stack will land in */
+  --accent: oklch(0.53 0.095 192);
+  --accent-press: oklch(0.47 0.09 192);
+  --accent-soft: oklch(0.53 0.095 192 / 0.16);
+  --accent-ink: oklch(0.99 0.01 192);
+  --accent-light: oklch(0.89 0.07 188);
+  /* a finished thing, and a new one */
+  --done: oklch(0.52 0.12 150);
+  --new: oklch(0.6 0.15 62);
+  --new-light: oklch(0.85 0.12 78);
+  --scrim: oklch(0.18 0.02 60 / 0.55);
+  --shadow: oklch(0.18 0.03 60 / 0.28);
+  --lift: 0 1px 2px oklch(0.18 0.03 60 / 0.14), 0 12px 32px oklch(0.18 0.03 60 / 0.24);
+  --glass: oklch(0.21 0.018 62 / 0.7);
+  --glass-2: oklch(1 0 0 / 0.1);
+  --glass-ink: oklch(0.985 0.008 88);
+  --glass-ink-2: oklch(0.9 0.012 86);
+  --glass-shadow: 0 2px 10px oklch(0.12 0.02 60 / 0.22);
+  --tip: oklch(0.26 0.02 62);
+  --radius: 10px;
+  --radius-sm: 6px;
   /* spacing: 4 8 12 16 24 32 48 */
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
   --ease: cubic-bezier(0.23, 1, 0.32, 1);
   --target: 40px;
+  --slot: 64px;
   --gu-size: 1;
 
   position: absolute; inset: 0; z-index: 20; overflow: hidden;
   container: gu / size;
   pointer-events: none; user-select: none; -webkit-user-select: none;
   color: var(--ink); color-scheme: light;
-  font: 16px/1.45 ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   font-variant-numeric: lining-nums;
 }
@@ -46,156 +61,162 @@ export const STYLES = /* css */ `
 .gu-root :where(ul) { list-style: none; }
 .gu-root :where(h1, h2, h3) { font-size: inherit; font-weight: 600; }
 .gu-root button, .gu-root input { font: inherit; color: inherit; }
-.gu-root button { cursor: pointer; touch-action: manipulation; }
-.gu-root :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.gu-root button { cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.gu-root :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .gu-num { font-variant-numeric: tabular-nums lining-nums; }
 .gu-quiet { color: var(--ink-2); font-weight: 400; }
-.gu-label { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-2); }
+.gu-label { font-size: 12px; font-weight: 600; line-height: 1.3; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
 .gu-empty { color: var(--ink-2); max-width: 44ch; text-wrap: pretty; }
 
 /* ---- pictures and keys ---- */
 .gu-pic { position: relative; display: block; flex: none; overflow: hidden; }
 .gu-pic-cell { position: absolute; left: 0; top: 0; transform-origin: 0 0; background-repeat: no-repeat; image-rendering: pixelated; }
 .gu-pic-small .gu-pic-cell { image-rendering: auto; }
-.gu-pic-plain { display: grid; place-items: center; background: var(--paper-3); color: var(--ink-2); font-weight: 600; line-height: 1; border-radius: 2px; }
+.gu-pic-plain { display: grid; place-items: center; background: var(--paper-3); color: var(--ink-2); font-weight: 600; line-height: 1; border-radius: var(--radius-sm); }
 .gu-keys { display: inline-flex; align-items: center; gap: var(--s1); flex: none; }
-.gu-keys-join { color: var(--ink-2); font-size: 14px; }
+.gu-keys-join { color: var(--ink-2); font-size: 13px; }
 .gu-root kbd {
-  display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 6px;
-  font: inherit; font-size: 14px; font-weight: 600; line-height: 1; white-space: nowrap;
-  background: var(--plate); border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 3px;
+  display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 6px;
+  font: inherit; font-size: 13px; font-weight: 600; line-height: 1; white-space: nowrap; color: var(--ink);
+  background: var(--paper-light); border: 0; border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px var(--line-strong), inset 0 -2px 0 var(--line);
 }
 
 /* ---- buttons ---- */
 .gu-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
   min-height: var(--target); padding: 0 18px;
-  background-color: var(--plate); border: 2px solid var(--ink); border-radius: 2px;
+  color: var(--ink); background-color: var(--paper-2); border: 0; border-radius: var(--radius);
   font-weight: 600; white-space: nowrap;
   transition: transform 80ms var(--ease);
 }
-.gu-btn:hover { background-color: var(--paper-light); }
-.gu-btn:active { background-color: var(--paper-2); transform: translateY(1px); }
+.gu-btn:hover { background-color: var(--paper-3); }
+.gu-btn:active { background-color: var(--paper-4); transform: scale(0.98); }
 .gu-btn.gu-primary { background-color: var(--accent); color: var(--accent-ink); }
 .gu-btn.gu-primary:hover, .gu-btn.gu-primary:active { background-color: var(--accent-press); }
-.gu-btn:disabled, .gu-btn[aria-disabled='true'] { background-color: transparent; border-color: var(--line); color: var(--ink-3); cursor: default; transform: none; }
-/* The button picture is the frame. The fill stays a color, so hover, press and the accent still show. */
-.gu-art-button .gu-btn { border-color: transparent; border-radius: 0; border-image: var(--gu-button-art) var(--gu-button-slice) / var(--gu-button-width) stretch; background-clip: padding-box; image-rendering: pixelated; }
-.gu-art-button .gu-btn:disabled, .gu-art-button .gu-btn[aria-disabled='true'] { background-color: var(--plate); opacity: 0.55; }
+.gu-btn:disabled, .gu-btn[aria-disabled='true'] { background-color: transparent; box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-3); cursor: default; transform: none; }
 .gu-close {
-  display: grid; place-items: center; flex: none; width: var(--target); height: var(--target); margin-left: auto;
-  background: none; border: 0; border-radius: 2px; font-size: 24px; line-height: 1; color: var(--ink-2);
+  display: grid; place-items: center; flex: none; width: var(--target); height: var(--target); margin: -6px -8px -6px auto;
+  background: none; border: 0; border-radius: var(--radius); font-size: 24px; font-weight: 400; line-height: 1; color: var(--ink-2);
 }
 .gu-close:hover { background: var(--paper-2); color: var(--ink); }
 .gu-close:active { background: var(--paper-3); }
 
-/* ---- the stage and the panel frame ---- */
+/* ---- the stage and the panel ---- */
 .gu-stage { position: absolute; inset: 0; display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; padding: var(--s4); background: var(--scrim); pointer-events: auto; }
 .gu-panel {
   position: relative; display: flex; flex-direction: column; min-width: 0; max-width: 100%; max-height: 100%;
-  padding: 32px 36px 36px;
-  background-color: var(--paper); border: 2px solid var(--ink); border-radius: 2px;
-  box-shadow: inset 0 0 0 2px var(--paper-light), inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--line-strong), 0 16px 48px var(--shadow);
+  padding: 24px 28px 28px;
+  background-color: var(--paper); border: 0; border-radius: 14px;
+  box-shadow: var(--lift);
   zoom: var(--gu-size);
-  animation: gu-in 120ms var(--ease);
+  animation: gu-in 140ms var(--ease);
 }
 .gu-panel:focus-visible { outline: none; }
-/*
- * The panel picture is the frame: a border image cut at its corner ornaments. The picture's middle has a stain
- * that smears when stretched, so three of the corner elements become sheets of flat paper laid over everything
- * inside the frame lines: a tall one, a wide one and a middle one, which together leave only the four ornaments
- * showing. --u is one picture pixel. The 2px is the panel's own border.
- */
-.gu-art-panel .gu-panel {
-  --u: var(--gu-panel-unit);
-  isolation: isolate;
-  border-color: transparent; border-radius: 0;
-  border-image: var(--gu-panel-art) var(--gu-panel-slice) / calc(var(--gu-panel-slice) * var(--u)) stretch;
-  background-clip: padding-box; image-rendering: pixelated;
-  box-shadow: 0 16px 48px var(--shadow);
-  padding: 36px 40px 40px;
-}
-.gu-art-panel .gu-panel > * { image-rendering: auto; }
-.gu-art-panel .gu-panel > .gu-corner { z-index: -1; width: auto; height: auto; border: 0; background: var(--paper); }
-.gu-art-panel .gu-panel > .gu-corner:nth-of-type(1) { inset: calc(10 * var(--u) - 2px) calc(28 * var(--u) - 2px); }
-.gu-art-panel .gu-panel > .gu-corner:nth-of-type(2) { inset: calc(28 * var(--u) - 2px) calc(10 * var(--u) - 2px); }
-.gu-art-panel .gu-panel > .gu-corner:nth-of-type(3) { inset: calc(16 * var(--u) - 2px); }
-.gu-art-panel .gu-panel > .gu-corner:nth-of-type(4) { display: none; }
-/* It moves but never fades, so a panel is readable from its first frame. */
-@keyframes gu-in { from { transform: scale(0.97); } }
-.gu-corner { position: absolute; width: 14px; height: 14px; background: linear-gradient(135deg, var(--brass), var(--brass-dark)); border: 2px solid var(--ink); pointer-events: none; }
-.gu-corner:nth-of-type(1) { left: -4px; top: -4px; }
-.gu-corner:nth-of-type(2) { right: -4px; top: -4px; }
-.gu-corner:nth-of-type(3) { right: -4px; bottom: -4px; }
-.gu-corner:nth-of-type(4) { left: -4px; bottom: -4px; }
+/* It grows a little from the middle but never fades, so a panel is readable from its first frame. */
+@keyframes gu-in { from { transform: scale(0.98); } }
+.gu-corner { display: none; }
 .gu-panel-head { display: flex; align-items: center; gap: var(--s5); min-height: var(--target); margin-bottom: var(--s4); }
-.gu-panel-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.gu-panel-title { font-size: 20px; font-weight: 650; letter-spacing: -0.015em; }
 /* The body scrolls. The padding keeps a focus ring at its edge from being cut off. */
 .gu-panel-body { min-height: 0; margin: -4px; padding: 4px; overflow: auto; overscroll-behavior: contain; }
 .gu-section + .gu-section, .gu-choices + .gu-section, .gu-section + .gu-choices { margin-top: var(--s6); }
 .gu-section > .gu-label, .gu-choices > .gu-label { display: block; margin-bottom: var(--s3); }
 
 /* ---- bag ---- */
-.gu-tabs { display: flex; gap: var(--s1); }
-.gu-tab { min-height: var(--target); padding: 0 var(--s3); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--ink-2); }
+.gu-tabs { display: flex; gap: var(--s1); padding: 3px; background: var(--paper-2); border-radius: var(--radius); }
+.gu-tab { position: relative; min-height: calc(var(--target) - 6px); padding: 0 14px; background: none; border: 0; border-radius: 7px; color: var(--ink-2); font-weight: 500; }
+/* The track's padding is part of the target, so a tab answers across the strip's full height. */
+.gu-tab::after { content: ''; position: absolute; inset: -3px 0; }
 .gu-tab:hover { color: var(--ink); }
-.gu-tab[aria-selected='true'] { color: var(--ink); font-weight: 600; border-bottom-color: var(--accent); }
-.gu-bag-things { display: grid; grid-template-columns: auto 240px; gap: var(--s6); align-items: start; }
+.gu-tab[aria-selected='true'] { color: var(--ink); font-weight: 600; background: var(--paper-light); box-shadow: 0 1px 2px var(--line-strong); }
+.gu-bag-things { display: grid; gap: var(--s2); }
+.gu-bag-things > .gu-label:not(:first-child) { margin-top: var(--s4); }
 .gu-bag:not(.gu-bag-things) { width: 560px; max-width: 100%; }
-.gu-slots { display: grid; grid-template-columns: repeat(9, 64px); gap: 6px; }
-.gu-slot { position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; padding: 0; background: var(--paper-2); border: 0; border-radius: 2px; }
+.gu-slots { display: grid; grid-template-columns: repeat(9, var(--slot)); gap: 6px; }
+.gu-slot {
+  position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; padding: 0;
+  background: var(--paper-2); border: 0; border-radius: var(--radius); touch-action: none;
+}
 .gu-slot:hover { background: var(--paper-3); }
-.gu-quick { background: var(--paper-3); margin-bottom: var(--s3); }
-.gu-quick:hover { background: oklch(0.76 0.08 75); }
-.gu-picked { box-shadow: inset 0 0 0 2px var(--accent); }
-.gu-slot-key { position: absolute; z-index: 1; left: 2px; top: 2px; padding: 0 3px; font-size: 12px; line-height: 1.3; color: var(--ink-2); background-color: var(--paper-3); border-radius: 2px; }
-.gu-slot-count { position: absolute; z-index: 1; right: 2px; bottom: 2px; padding: 0 4px; font-size: 13px; font-weight: 600; line-height: 1.3; background: var(--paper); border-radius: 2px; }
-.gu-detail { display: grid; gap: var(--s2); align-content: start; min-height: 200px; }
-.gu-detail-name { margin-top: var(--s2); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
-.gu-detail-text { max-width: 34ch; text-wrap: pretty; }
+.gu-slot:active { background: var(--paper-4); }
+.gu-slot-empty { cursor: default; }
+.gu-slot-empty:hover { background: var(--paper-2); }
+.gu-quick { background: var(--paper-3); }
+.gu-quick:hover, .gu-quick.gu-slot-empty:hover { background: var(--paper-4); }
+.gu-picked, .gu-picked:hover { background: var(--paper-light); box-shadow: inset 0 0 0 2px var(--accent); }
+.gu-slot-key { position: absolute; z-index: 1; left: 6px; top: 3px; font-size: 12px; font-weight: 600; line-height: 1.3; color: var(--ink-2); text-shadow: 0 0 2px var(--paper-3), 0 0 2px var(--paper-3); }
+.gu-slot-count, .gu-ghost-count { position: absolute; z-index: 1; right: 3px; bottom: 3px; min-width: 20px; padding: 0 5px; font-size: 13px; font-weight: 700; line-height: 18px; text-align: center; color: var(--ink); background: var(--paper-light); border-radius: var(--radius-sm); }
+/* A drag: the stack it came from fades, the slot under the pointer lights up, and a refused slot says no. */
+.gu-slot.is-drag-from > .gu-pic, .gu-slot.is-drag-from > .gu-slot-count { opacity: 0.3; }
+.gu-slot.is-split-from { box-shadow: inset 0 0 0 2px var(--line-strong); }
+.gu-slot.is-drop { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+.gu-slot.is-refused { box-shadow: inset 0 0 0 2px var(--new); cursor: not-allowed; }
+.gu-ghost { position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center; width: 52px; height: 52px; pointer-events: none; background: var(--paper-light); border-radius: var(--radius); box-shadow: 0 0 0 2px var(--accent), 0 10px 24px oklch(0.18 0.03 60 / 0.35); will-change: transform; }
+:root.gu-dragging, :root.gu-dragging * { cursor: grabbing !important; }
+.gu-bag-foot { margin-top: var(--s4); font-size: 14px; color: var(--ink-2); text-wrap: pretty; }
+.gu-foot-coarse { display: none; }
+@media (pointer: coarse) { .gu-foot-fine { display: none; } .gu-foot-coarse { display: inline; } }
+.gu-bag-foot kbd { height: 20px; min-width: 20px; font-size: 12px; vertical-align: 1px; }
+/* The tooltip: dark, so it reads over the paper and stands apart from it. It sits in the stage, so it can leave the panel. */
+.gu-tip {
+  position: absolute; left: 0; top: 0; z-index: 50; display: grid; gap: 4px; width: max-content; max-width: 260px; padding: 10px 14px 12px;
+  color: var(--glass-ink); background: var(--tip); border-radius: var(--radius); box-shadow: var(--lift); pointer-events: none;
+  font-size: calc(14px * var(--gu-size)); line-height: 1.4;
+}
+.gu-tip-name { font-size: 1.07em; font-weight: 650; }
+.gu-tip-name .gu-quiet { color: var(--glass-ink-2); }
+.gu-tip-use { color: var(--accent-light); font-weight: 500; }
+.gu-tip-text { color: var(--glass-ink-2); text-wrap: pretty; }
+.gu-tip-note { color: var(--new-light); font-size: 0.93em; }
 
 /* ---- recipes ---- */
-.gu-make { width: 560px; max-width: 100%; }
-.gu-recipes { display: grid; gap: var(--s5); }
-.gu-recipe { display: grid; grid-template-columns: 48px 1fr auto; gap: var(--s4); align-items: start; }
+.gu-make { width: 580px; max-width: 100%; }
+.gu-recipes { display: grid; }
+.gu-recipe { display: grid; grid-template-columns: 56px 1fr auto; gap: var(--s4); align-items: center; padding: var(--s3) 0; }
+.gu-recipe + .gu-recipe { border-top: 1px solid var(--line); }
+.gu-recipe > .gu-pic { width: 56px !important; height: 56px !important; padding: 4px; background: var(--paper-2); border-radius: var(--radius); }
+.gu-recipe > .gu-pic > .gu-pic-cell { left: 4px; top: 4px; }
 .gu-recipe-name { font-weight: 600; }
-.gu-needs { display: flex; flex-wrap: wrap; gap: var(--s1) var(--s4); margin-top: var(--s1); color: var(--ink-2); }
-.gu-need { display: inline-flex; align-items: center; gap: 6px; }
-.gu-short .gu-num { color: var(--ink); font-weight: 600; }
+.gu-needs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; color: var(--ink-2); }
+.gu-need { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px 2px 4px; font-size: 14px; background: var(--paper-2); border-radius: 999px; }
+.gu-short { color: var(--new); }
+.gu-short .gu-num { font-weight: 700; }
 .gu-recipe-act { display: grid; justify-items: end; gap: var(--s1); }
-.gu-why { max-width: 22ch; font-size: 14px; color: var(--ink-2); text-align: right; text-wrap: balance; }
+.gu-recipe-act .gu-btn { min-width: 88px; }
+.gu-why { max-width: 22ch; font-size: 13px; color: var(--ink-2); text-align: right; text-wrap: balance; }
 
 /* ---- almanac ---- */
-.gu-book { display: grid; grid-template-columns: 216px 32px 1fr; width: 820px; max-width: 100%; min-height: 420px; }
+.gu-book { display: grid; grid-template-columns: 216px 1px 1fr; gap: 0 var(--s5); width: 840px; max-width: 100%; min-height: 420px; }
 .gu-book-blank { display: grid; grid-template-columns: 1fr; place-items: center; }
-.gu-index { display: grid; gap: var(--s5); align-content: start; padding-right: var(--s2); }
+.gu-index { display: grid; gap: var(--s5); align-content: start; }
 .gu-index-group { display: grid; gap: 2px; }
 .gu-index-group .gu-label { margin-bottom: var(--s1); padding-left: var(--s3); }
-.gu-page-link { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: var(--target); padding: 0 var(--s3); background: none; border: 0; border-radius: 2px; text-align: left; }
+.gu-page-link { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: var(--target); padding: 0 var(--s3); background: none; border: 0; border-radius: var(--radius); text-align: left; }
 .gu-page-link:hover { background: var(--paper-2); }
-.gu-page-link[aria-current='page'] { background: var(--paper-3); font-weight: 600; }
-.gu-new { font-size: 13px; font-weight: 600; color: var(--accent); }
-/* The spine: a soft shadow down the fold, not a line. */
-.gu-spine { background: linear-gradient(90deg, oklch(0.27 0.025 40 / 0), oklch(0.27 0.025 40 / 0.1) 50%, oklch(0.27 0.025 40 / 0)); }
-.gu-leaf { position: relative; padding-left: var(--s4); }
-.gu-leaf-head { display: flex; align-items: center; gap: var(--s4); padding-bottom: var(--s5); }
-.gu-leaf-head .gu-pic { background-color: var(--paper-2); border-radius: 2px; }
-.gu-leaf-title { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; }
+.gu-page-link[aria-current='page'] { background: var(--paper-2); font-weight: 600; box-shadow: inset 3px 0 0 var(--accent); }
+.gu-new { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--new); }
+.gu-new::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.gu-spine { background: var(--line); }
+.gu-leaf { position: relative; }
+.gu-leaf-head { display: flex; align-items: center; gap: var(--s5); padding-bottom: var(--s5); }
+.gu-leaf-head .gu-pic { background-color: var(--paper-2); border-radius: 14px; }
+.gu-leaf-title { font-size: 30px; font-weight: 700; line-height: 1.15; letter-spacing: -0.025em; text-wrap: balance; }
 .gu-columns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); padding-top: var(--s5); border-top: 1px solid var(--line); }
 .gu-column .gu-label { margin-bottom: var(--s3); }
 .gu-facts { display: grid; gap: var(--s3); }
-.gu-fact { min-height: 1.45em; max-width: 34ch; text-wrap: pretty; }
-.gu-dashes { display: block; width: 78%; height: 0.95em; border-bottom: 2px dashed oklch(0.27 0.025 40 / 0.32); }
+.gu-fact { min-height: 1.5em; max-width: 34ch; text-wrap: pretty; }
+.gu-dashes { display: block; width: 78%; height: 0.95em; border-bottom: 2px dashed var(--line-strong); }
 .gu-inked { display: inline-block; animation: gu-ink 900ms var(--ease) both; }
 @keyframes gu-ink { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.gu-stamp { margin-left: auto; align-self: start; padding: 3px 10px; border: 2px solid var(--done); border-radius: 3px; color: var(--done); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transform: rotate(-6deg); }
-.gu-stamped { animation: gu-stamp 140ms var(--ease) both; }
-@keyframes gu-stamp { from { transform: rotate(-6deg) scale(1.3); } }
+.gu-stamp { margin-left: auto; align-self: start; padding: 4px 12px; border: 1.5px solid var(--done); border-radius: 999px; color: var(--done); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transform: rotate(-4deg); }
+.gu-stamped { animation: gu-stamp 160ms var(--ease) both; }
+@keyframes gu-stamp { from { transform: rotate(-4deg) scale(1.3); } }
 
 /* ---- quests ---- */
-.gu-quests { width: 520px; max-width: 100%; }
+.gu-quests { width: 540px; max-width: 100%; }
 .gu-quest + .gu-quest { margin-top: var(--s6); }
-.gu-quest-title { display: flex; align-items: baseline; gap: var(--s3); font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.gu-quest-title { display: flex; align-items: baseline; gap: var(--s3); font-size: 20px; font-weight: 650; letter-spacing: -0.015em; }
 .gu-quest-summary { margin-top: var(--s1); max-width: 56ch; color: var(--ink-2); text-wrap: pretty; }
 .gu-steps { display: grid; gap: var(--s2); margin-top: var(--s3); }
 .gu-step { display: grid; grid-template-columns: 16px 1fr auto; gap: var(--s3); align-items: baseline; }
@@ -206,29 +227,35 @@ export const STYLES = /* css */ `
 .gu-quest-done .gu-quest-state { color: var(--done); }
 
 /* ---- menus: pause, settings, the end ---- */
-.gu-menu { display: grid; gap: var(--s2); width: 280px; max-width: 100%; }
+.gu-menu { display: grid; gap: var(--s2); width: 300px; max-width: 100%; }
 .gu-menu .gu-btn { min-height: 48px; }
 .gu-menu-note { font-size: 14px; color: var(--ink-2); }
-.gu-settings { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s7); width: 880px; max-width: 100%; }
+/* Settings: what is seen and heard on the left, the keys on the right. The Picture section is first and has room to grow. */
+.gu-settings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s7); width: 880px; max-width: 100%; }
 .gu-settings > .gu-section { margin-top: 0; }
-.gu-strip { display: flex; gap: var(--s1); }
+.gu-settings-side { display: grid; gap: var(--s6); align-content: start; }
+.gu-settings-side > * + * { margin-top: 0 !important; }
+/* A legend inside a section that has its own heading is read, not shown. */
+.gu-settings-side .gu-section .gu-choices > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.gu-strip { display: flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--radius); }
 .gu-choice { position: relative; flex: 1; min-width: 0; }
-.gu-choice input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.gu-choice span { display: grid; place-items: center; min-height: var(--target); padding: 0 var(--s2); background: var(--paper-2); border-radius: 2px; }
-.gu-choice input:hover + span { background: var(--paper-3); }
-.gu-choice input:checked + span { background: var(--ink); color: var(--paper); font-weight: 600; }
-.gu-choice input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+.gu-choice input { position: absolute; inset: -3px 0; width: 100%; height: calc(100% + 6px); margin: 0; opacity: 0; cursor: pointer; }
+.gu-choice span { display: grid; place-items: center; min-height: calc(var(--target) - 6px); padding: 0 var(--s2); border-radius: 7px; color: var(--ink-2); font-weight: 500; white-space: nowrap; }
+.gu-choice input:hover + span { color: var(--ink); background: var(--paper-3); }
+.gu-choice input:checked + span { color: var(--ink); font-weight: 600; background: var(--paper-light); box-shadow: 0 1px 2px var(--line-strong); }
+.gu-choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
 .gu-slider { display: grid; grid-template-columns: 96px 1fr 48px; gap: var(--s4); align-items: center; min-height: var(--target); }
-.gu-slider input { width: 100%; min-width: 0; height: var(--target); margin: 0; accent-color: var(--ink); cursor: pointer; }
+.gu-slider input { width: 100%; min-width: 0; height: var(--target); margin: 0; accent-color: var(--accent); cursor: pointer; }
 .gu-slider output { text-align: right; color: var(--ink-2); }
-.gu-keylist { display: grid; grid-template-columns: 1fr auto; gap: var(--s2) var(--s5); align-items: center; }
+.gu-keylist { display: grid; grid-template-columns: 1fr auto; gap: 10px var(--s5); align-items: center; }
+.gu-keylist dt { color: var(--ink-2); }
 .gu-keylist dd { justify-self: end; }
 .gu-panel-end { padding: var(--s7) var(--s7) var(--s6); }
 .gu-end { display: grid; justify-items: center; gap: var(--s5); width: 440px; max-width: 100%; text-align: center; }
-.gu-end-title { font-size: 28px; font-weight: 600; line-height: 1.15; letter-spacing: -0.02em; text-wrap: balance; }
+.gu-end-title { font-size: 28px; font-weight: 700; line-height: 1.15; letter-spacing: -0.025em; text-wrap: balance; }
 .gu-stats { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5) var(--s6); width: 100%; padding: var(--s2) 0; }
 .gu-stat { display: flex; flex-direction: column-reverse; }
-.gu-stat dd { font-size: 40px; font-weight: 600; line-height: 1.1; letter-spacing: -0.02em; }
+.gu-stat dd { font-size: 40px; font-weight: 700; line-height: 1.1; letter-spacing: -0.03em; }
 .gu-stat dt { color: var(--ink-2); }
 .gu-end-line { max-width: 40ch; color: var(--ink-2); text-wrap: balance; }
 .gu-end .gu-btn { min-height: 48px; min-width: 200px; }
@@ -245,55 +272,61 @@ export const STYLES = /* css */ `
 .gu-art-title .gu-stage-title { background: var(--gu-title-art) center / cover no-repeat, oklch(0.3 0.06 155); image-rendering: pixelated; }
 .gu-panel-plate { padding: var(--s6); }
 .gu-plate { display: grid; gap: var(--s6); width: 320px; max-width: 100%; }
-.gu-chapter { font-size: 40px; font-weight: 600; line-height: 1.08; letter-spacing: -0.025em; text-wrap: balance; }
+.gu-chapter { font-size: 40px; font-weight: 700; line-height: 1.05; letter-spacing: -0.035em; text-wrap: balance; }
 .gu-plate .gu-menu { width: 100%; }
 
-/* ---- over the game: prompt, hints, toasts, the ring ---- */
+/* ---- over the game: prompt, hints, toasts, the ring. Dark glass, so the world shows around them. ---- */
 .gu-over { position: absolute; inset: 0; }
-.gu-card { display: flex; align-items: center; gap: var(--s3); padding: var(--s2) var(--s2) var(--s2) var(--s4); background: var(--paper); border: 2px solid var(--ink); border-radius: 2px; box-shadow: 0 6px 20px var(--shadow); pointer-events: auto; zoom: var(--gu-size); }
-.gu-top { position: absolute; left: 50%; top: var(--s4); display: grid; justify-items: center; gap: var(--s2); width: min(440px, 100% - 32px); transform: translateX(-50%); }
-.gu-hint { width: 100%; animation: gu-drop 140ms var(--ease); }
-.gu-hint-text { flex: 1; max-width: 46ch; padding: var(--s1) 0; text-wrap: pretty; }
-.gu-note { min-height: 44px; padding-right: var(--s3); font-weight: 600; animation: gu-drop 140ms var(--ease); }
-.gu-note:hover { background: var(--paper-2); }
+.gu-over kbd { box-shadow: 0 1px 0 oklch(0.12 0.02 60 / 0.4); }
+.gu-card { display: flex; align-items: center; gap: var(--s3); padding: 6px 6px 6px var(--s4); color: var(--glass-ink); background: var(--glass); border: 0; border-radius: var(--radius); box-shadow: var(--glass-shadow); pointer-events: auto; zoom: var(--gu-size); }
+.gu-card .gu-close { position: relative; width: 36px; height: 36px; margin: 0; font-size: 22px; color: var(--glass-ink-2); }
+/* It looks 36px, and answers across 44px. */
+.gu-card .gu-close::after { content: ''; position: absolute; inset: -4px; }
+.gu-card .gu-close:hover { color: var(--glass-ink); background: var(--glass-2); }
+.gu-card .gu-close:active { background: oklch(1 0 0 / 0.16); }
+.gu-top { position: absolute; left: 50%; top: var(--s4); display: grid; justify-items: center; gap: var(--s2); width: min(460px, 100% - 32px); transform: translateX(-50%); }
+.gu-top.gu-held { visibility: hidden; }
+.gu-hint { width: auto; max-width: 100%; animation: gu-drop 140ms var(--ease); }
+.gu-hint-text { flex: 1; max-width: 46ch; padding: var(--s1) 0; font-size: 15px; font-weight: 500; text-wrap: pretty; }
+.gu-note { min-height: 44px; padding-right: var(--s2); font-weight: 600; font-size: 15px; animation: gu-drop 140ms var(--ease); }
+.gu-note:hover { background: oklch(0.21 0.018 62 / 0.74); }
+.gu-note::before { content: ''; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--new-light); }
 @keyframes gu-drop { from { transform: translateY(-6px); } }
-.gu-prompt { position: absolute; left: 50%; display: flex; align-items: center; gap: var(--s2); padding: 6px 14px 6px 8px; background: var(--paper); border: 2px solid var(--ink); border-radius: 2px; box-shadow: 0 4px 14px var(--shadow); font-weight: 600; white-space: nowrap; transform: translateX(-50%); zoom: var(--gu-size); }
-.gu-toasts { position: absolute; left: var(--s4); bottom: var(--s4); display: grid; justify-items: start; gap: var(--s1); max-width: calc(100% - 32px); zoom: var(--gu-size); }
-.gu-toast { display: flex; align-items: center; gap: var(--s2); min-height: 36px; padding: 2px var(--s3) 2px var(--s2); background: var(--paper); border: 2px solid var(--ink); border-radius: 2px; box-shadow: 0 3px 10px var(--shadow); animation: gu-rise 140ms var(--ease); }
+.gu-prompt { position: absolute; left: 50%; display: flex; align-items: center; gap: 10px; padding: 6px 16px 6px 6px; color: var(--glass-ink); background: var(--glass); border: 0; border-radius: var(--radius); box-shadow: var(--glass-shadow); font-size: 15px; font-weight: 600; white-space: nowrap; transform: translateX(-50%); zoom: var(--gu-size); }
+.gu-prompt kbd { min-width: 28px; height: 28px; font-size: 14px; }
+.gu-toasts { position: absolute; left: var(--s4); bottom: var(--s4); display: grid; justify-items: start; gap: 6px; max-width: calc(100% - 32px); zoom: var(--gu-size); }
+.gu-toast { display: flex; align-items: center; gap: var(--s2); min-height: 36px; padding: 4px var(--s3) 4px 6px; color: var(--glass-ink); background: var(--glass); border: 0; border-radius: var(--radius); box-shadow: var(--glass-shadow); font-size: 15px; font-weight: 500; animation: gu-rise 160ms var(--ease); }
+.gu-toast > .gu-pic { width: 28px !important; height: 28px !important; }
 .gu-toast-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.gu-toast-count { font-weight: 600; }
+.gu-toast-count { color: var(--accent-light); font-weight: 700; }
 .gu-toast-count:empty { display: none; }
-@keyframes gu-rise { from { transform: translateY(6px); } }
+@keyframes gu-rise { from { transform: translateY(8px); } }
 .gu-ring { position: absolute; left: 0; top: 0; width: 32px; height: 32px; }
 .gu-ring svg { display: block; width: 32px; height: 32px; transform: rotate(-90deg); }
 .gu-ring circle { fill: none; }
 .gu-ring-edge { stroke: oklch(0.2 0.03 60 / 0.55); stroke-width: 6; }
-.gu-ring-track { stroke: oklch(0.886 0.076 76 / 0.35); stroke-width: 3; }
+.gu-ring-track { stroke: oklch(0.975 0.014 88 / 0.35); stroke-width: 3; }
 .gu-ring-arc { stroke: var(--paper-light); stroke-width: 3; stroke-linecap: round; }
 
-/* ---- a root too narrow for the bag's two columns ---- */
+/* ---- a root too narrow for the wide panels ---- */
 @container gu (width < 1040px) {
-  .gu-bag-things { grid-template-columns: 1fr; gap: var(--s4); }
-  .gu-slots { grid-template-columns: repeat(9, minmax(0, 64px)); }
-  .gu-detail { grid-template-columns: 64px 1fr; column-gap: var(--s4); min-height: 132px; }
-  .gu-detail > .gu-pic { grid-row: span 3; }
-  .gu-detail > .gu-empty { grid-column: 1 / -1; }
-  .gu-detail-name { margin-top: 0; }
   .gu-settings { grid-template-columns: 1fr; gap: var(--s6); width: 520px; }
 }
 
-/* ---- a narrow root: bigger targets, one column ---- */
+/* ---- a narrow root: bigger targets, one column, six slots across ---- */
 @container gu (width < 640px) {
   .gu-root > * { --target: 44px; }
   .gu-stage { padding: var(--s2); }
   .gu-panel, .gu-card, .gu-prompt, .gu-toasts { zoom: 1; }
-  .gu-panel { width: 100%; padding: var(--s5) 20px var(--s5); }
-  .gu-art-panel .gu-panel { --u: calc(var(--gu-panel-unit) / 2); padding: var(--s5) 20px var(--s5); }
+  .gu-panel { width: 100%; padding: 20px 16px 20px; border-radius: 12px; }
   .gu-panel-head { gap: var(--s3); }
-  .gu-slots { grid-template-columns: repeat(6, 1fr); gap: 4px; }
-  .gu-quick { margin-bottom: 0; }
+  .gu-panel-title { font-size: 18px; }
+  .gu-slots { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+  .gu-slot .gu-pic { width: 36px !important; height: 36px !important; }
+  .gu-slot .gu-pic-cell { transform: scale(1.125) !important; }
+  .gu-tip { max-width: min(260px, 100% - 16px); }
   .gu-bag:not(.gu-bag-things), .gu-make, .gu-quests, .gu-settings, .gu-book, .gu-end { width: 100%; }
-  .gu-recipe { grid-template-columns: 48px 1fr; }
+  .gu-recipe { grid-template-columns: 56px 1fr; align-items: start; }
   .gu-recipe-act { grid-column: 2; justify-items: start; }
   .gu-why { max-width: none; text-align: left; }
   .gu-book { grid-template-columns: 1fr; min-height: 0; gap: var(--s4); }
@@ -301,8 +334,8 @@ export const STYLES = /* css */ `
   .gu-index-group { display: flex; align-items: center; gap: var(--s1); flex: none; }
   .gu-index-group .gu-label { margin: 0; padding: 0 var(--s1) 0 0; }
   .gu-page-link { background: var(--paper-2); white-space: nowrap; }
-  .gu-leaf { padding-left: 0; }
   .gu-spine { display: none; }
+  .gu-leaf-head { gap: var(--s4); }
   .gu-leaf-head .gu-pic { zoom: 0.667; }
   .gu-leaf-title { font-size: 24px; }
   .gu-columns { grid-template-columns: 1fr; gap: var(--s5); }

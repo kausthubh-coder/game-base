@@ -92,8 +92,9 @@ function choices<T extends string | number>(name: string, legend: string, values
 }
 
 function graphicsControls(ctx: UiContext): HTMLElement {
-  const section = h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Graphics'));
-  section.append(choices('quality', 'Picture quality', QUALITIES, QUALITIES.map(q => QUALITY_NAMES[q]), ctx.settings.quality, value => ctx.setSetting('quality', value)));
+  // The Picture section comes first in settings: quality, then the overrides the graphics settings offer.
+  const section = h('section', { class: 'gu-section gu-settings-picture', 'data-key': 'settings:picture' }, h('h3', { class: 'gu-label' }, 'Picture'));
+  section.append(choices('quality', 'Quality', QUALITIES, QUALITIES.map(q => QUALITY_NAMES[q]), ctx.settings.quality, value => ctx.setSetting('quality', value)));
   const api = ctx.options.graphics;
   if (!api) return section;
   const g = api.get();
@@ -145,10 +146,10 @@ export function settingsPanel(ctx: UiContext): PanelView {
       const keys = h('dl', { class: 'gu-keylist' });
       for (const hint of ctx.options.keys ?? DEFAULT_KEYS) keys.append(h('dt', null, hint.action), h('dd', null, keycaps(hint.keys, hint.action === 'Move' ? '' : 'or')));
       body.replaceChildren(
-        h('div', null,
+        h('div', { class: 'gu-settings-side' },
           graphicsControls(ctx),
           sound,
-          choices('size', 'Interface size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value)),
+          h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Interface'), choices('size', 'Size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value))),
         ),
         h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
       );

@@ -794,6 +794,7 @@ const QUESTS = {
         await page.waitForFunction(() => window.__game.started);
         await game(() => {window.__game.manual(true); return window.__game.settle();});
         const after = await state();
+        await game(() => window.__game.manual(false));
         must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
         must(after.flags['pet.leaftail.bonded'] === true && after.tracked === 'bread', 'the quests or the pet did not come back');
