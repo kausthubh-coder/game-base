@@ -46,7 +46,7 @@ const PIN_OF: Readonly<Record<string, PinKind>> = {
 const STYLE = /* css */ `
 /* ---- the minimap: a ring of warm paper and one soft shadow ---- */
 .ui-book .gb-minimap { border: 3px solid var(--ui-paper); background: var(--ui-paper-3); box-shadow: 0 0 0 1px oklch(0.21 0.018 62 / 0.25), var(--ui-glass-shadow); }
-.ui-book .gb-minimap:focus-visible { outline: 2px solid oklch(0.84 0.08 188); outline-offset: 4px; }
+.ui-book .gb-minimap:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 4px; }
 .ui-book .gb-hud-minimap { padding: 5px; }
 
 /* ---- the active waypoint on the screen. It is drawn over the HUD, so its arrow is never lost behind the quick slots. ---- */

@@ -34,15 +34,15 @@ const STYLE = /* css */ `
 .ui-book .gb-slot { width: 52px; height: 52px; color: var(--ui-glass-ink); background: var(--ui-glass-2); border: 0; border-radius: var(--ui-radius); transition: none; touch-action: none; }
 .ui-book .gb-slot:hover { background: oklch(1 0 0 / 0.18); }
 .ui-book .gb-slot:active { background: oklch(1 0 0 / 0.24); }
-.ui-book .gb-slot[aria-pressed='true'] { background: oklch(1 0 0 / 0.22); transform: none; box-shadow: inset 0 0 0 2px oklch(0.84 0.08 188); }
-.ui-book .gb-slot:focus-visible { outline: 2px solid oklch(0.84 0.08 188); outline-offset: 2px; }
+.ui-book .gb-slot[aria-pressed='true'] { background: oklch(1 0 0 / 0.22); transform: none; box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
+.ui-book .gb-slot:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
 .ui-book .gb-slot-key { z-index: 1; top: 3px; left: 6px; padding: 0; font-size: 11px; font-weight: 600; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
 /* An icon is 32 pixels of pixel art, so it is drawn at exactly that. */
 .ui-book .gb-slot-icon { inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
 .ui-book .gb-slot-count { z-index: 1; right: 4px; bottom: 2px; padding: 0; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
 /* A drag between quick slots: the slot it came from fades and the one under the pointer lights up. */
 .ui-book .gb-slot.is-drag-from .gb-slot-icon, .ui-book .gb-slot.is-drag-from .gb-slot-count { opacity: 0.3; }
-.ui-book .gb-slot.is-drop { background: oklch(0.53 0.095 192 / 0.45); box-shadow: inset 0 0 0 2px oklch(0.84 0.08 188); }
+.ui-book .gb-slot.is-drop { background: oklch(0.53 0.095 192 / 0.45); box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
 .ui-book .gb-slot.is-refused { box-shadow: inset 0 0 0 2px var(--ui-new); }
 .ui-book .gu-ghost-count { position: absolute; right: 3px; bottom: 3px; min-width: 20px; padding: 0 5px; font-size: 13px; font-weight: 700; line-height: 18px; text-align: center; color: var(--ui-ink); background: var(--ui-paper-light); border-radius: var(--ui-radius-sm); }
 :root.gu-dragging, :root.gu-dragging * { cursor: grabbing !important; }
@@ -54,7 +54,7 @@ const STYLE = /* css */ `
 }
 .ui-slot-tip[hidden] { display: none; }
 .ui-slot-tip b { font-weight: 650; }
-.ui-slot-tip span { color: oklch(0.84 0.08 188); }
+.ui-slot-tip span { color: oklch(0.89 0.07 188); }
 
 /* ---- top right: the minimap, then the day and the clock, then the quest ---- */
 .ui-book .gb-hud-right { gap: 8px; }
@@ -67,14 +67,14 @@ const STYLE = /* css */ `
 .ui-book .gb-hud-quest h3 { margin: 0; padding: 0; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ui-glass-ink-2); border: 0; text-wrap: balance; }
 .ui-pips { display: flex; gap: 4px; margin: 8px 0 10px; }
 .ui-pips i { flex: 1; height: 3px; border-radius: 2px; background: oklch(1 0 0 / 0.2); }
-.ui-pips i.is-done { background: oklch(0.84 0.08 188); }
+.ui-pips i.is-done { background: oklch(0.89 0.07 188); }
 .ui-pips i.is-now { background: oklch(1 0 0 / 0.55); }
 .ui-book .gb-hud-quest ul { gap: 0; }
 .ui-book .gb-hud-quest li { display: none; grid-template-columns: 1fr auto; gap: 0 12px; align-items: baseline; padding-left: 0; font-size: 15px; font-weight: 600; color: var(--ui-glass-ink); text-wrap: pretty; text-shadow: var(--ui-text-shadow); }
 .ui-book .gb-hud-quest li::before { content: none; }
 /* The step to do now is the one line shown. */
 .ui-book .gb-hud-quest li:first-child:not(.is-done), .ui-book .gb-hud-quest li.is-done + li:not(.is-done) { display: grid; }
-.ui-count { font-size: 14px; font-weight: 650; color: oklch(0.84 0.08 188); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.ui-count { font-size: 14px; font-weight: 650; color: oklch(0.89 0.07 188); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
 
 /* ---- the Almanac: a button of its own at the left of the quick slots, never a slot. It shows once Tamsin has given the book. */
 .ui-bookbtn { position: absolute; right: 100%; bottom: 0; margin-right: 8px; padding: 6px; pointer-events: auto; border-radius: 14px !important; }
@@ -85,8 +85,8 @@ const STYLE = /* css */ `
 }
 .ui-bookbtn button:hover { background: oklch(1 0 0 / 0.18); }
 .ui-bookbtn button:active { background: oklch(1 0 0 / 0.24); }
-.ui-bookbtn button[aria-expanded='true'] { box-shadow: inset 0 0 0 2px oklch(0.84 0.08 188); }
-.ui-bookbtn button:focus-visible { outline: 2px solid oklch(0.84 0.08 188); outline-offset: 2px; }
+.ui-bookbtn button[aria-expanded='true'] { box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
+.ui-bookbtn button:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
 .ui-bookbtn .ui-bookbtn-icon { position: absolute; inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
 .ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 10px; font-weight: 600; line-height: 1.3; color: var(--ui-glass-ink-2); }
 /* The first time it shows, it glows twice so the eye finds it. */

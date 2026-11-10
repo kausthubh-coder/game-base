@@ -37,7 +37,7 @@ export const TOKENS = /* css */ `
   --ui-glass-2: oklch(1 0 0 / 0.1);
   --ui-glass-line: oklch(1 0 0 / 0.14);
   --ui-glass-ink: oklch(0.985 0.008 88);
-  --ui-glass-ink-2: oklch(0.87 0.014 86);
+  --ui-glass-ink-2: oklch(0.9 0.012 86);
   --ui-glass-shadow: 0 2px 10px oklch(0.12 0.02 60 / 0.22);
   --ui-text-shadow: 0 1px 2px oklch(0.12 0.02 60 / 0.6);
   --ui-radius: 10px;

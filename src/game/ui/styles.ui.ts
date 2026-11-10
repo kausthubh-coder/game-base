@@ -23,7 +23,7 @@ export const STYLES = /* css */ `
   --accent-press: oklch(0.47 0.09 192);
   --accent-soft: oklch(0.53 0.095 192 / 0.16);
   --accent-ink: oklch(0.99 0.01 192);
-  --accent-light: oklch(0.84 0.08 188);
+  --accent-light: oklch(0.89 0.07 188);
   /* a finished thing, and a new one */
   --done: oklch(0.52 0.12 150);
   --new: oklch(0.6 0.15 62);
@@ -34,7 +34,7 @@ export const STYLES = /* css */ `
   --glass: oklch(0.21 0.018 62 / 0.7);
   --glass-2: oklch(1 0 0 / 0.1);
   --glass-ink: oklch(0.985 0.008 88);
-  --glass-ink-2: oklch(0.87 0.014 86);
+  --glass-ink-2: oklch(0.9 0.012 86);
   --glass-shadow: 0 2px 10px oklch(0.12 0.02 60 / 0.22);
   --tip: oklch(0.26 0.02 62);
   --radius: 10px;
