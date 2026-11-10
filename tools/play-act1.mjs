@@ -1,6 +1,6 @@
 // The browser play of the first part: builds the game into dist-play, serves it on port 5340, opens it in
 // headless Chrome and plays all five quests of docs/play/act1.md from the title to the end card.
-//   bun tools/play-act1.mjs [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
+//   bun tools/play-act1.mjs [--port 5340] [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
 //
 // It plays the way src/game/play/act1.test.ts plays the rules, but through the real page: a real click on
 // New game, the hero's real body steered by held game keys along a nav route, real E presses, real
@@ -21,7 +21,7 @@ const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play/act1');
-const PORT = 5340;
+const PORT = Number(opt('port', 5340));
 const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}`;
 const SHOTS = args.includes('--shots');
 const PATH = REGION.paths[0].points.map(([x, z]) => ({ x, z }));

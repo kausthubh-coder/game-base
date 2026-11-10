@@ -1,6 +1,6 @@
 // The game's smoke test: builds it, serves dist on port 5330, opens it in headless Chrome and plays a
 // little through the debug door (window.__game). It fails on any console error or failed check.
-//   bun tools/play-smoke.mjs [--no-build] [--quality low|medium|high] [--w 1280] [--h 800]
+//   bun tools/play-smoke.mjs [--port 5330] [--no-build] [--quality low|medium|high] [--w 1280] [--h 800]
 // Screenshots go to .artifacts/play/: the start, after a camera turn, night. This Mac draws WebGL in
 // software, so it checks what is drawn and what the rules do, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
@@ -12,7 +12,7 @@ const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play');
-const PORT = 5330;
+const PORT = Number(opt('port', 5330));
 mkdirSync(out, { recursive: true });
 
 if (!args.includes('--no-build')) {

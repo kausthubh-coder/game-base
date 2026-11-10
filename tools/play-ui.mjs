@@ -1,7 +1,7 @@
 // The interface check: builds the game, serves it on port 5332, opens it in headless Chrome and walks
 // the interface with real keys and clicks, helped by the debug door (window.__game). It saves a
 // screenshot of every screen to .artifacts/play/ui-*.png and fails on a console error or a failed check.
-//   bun tools/play-ui.mjs [--no-build] [--quality low|medium|high] [--only desktop|phone|world]
+//   bun tools/play-ui.mjs [--port 5332] [--no-build] [--quality low|medium|high] [--only desktop|phone|world]
 //
 // The pictures are 1440 by 900: the title, Settings, the first seconds of a new game with the HUD, a
 // hint, a toast, every panel, a conversation mid-line and at a choice, the map, pause and the end card.
@@ -22,7 +22,7 @@ const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i 
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play');
 const site = resolve(out, 'ui-site');
-const PORT = 5332;
+const PORT = Number(opt('port', 5332));
 const BASE = `http://127.0.0.1:${PORT}/`;
 const quality = opt('quality', 'high');
 const only = opt('only', '');

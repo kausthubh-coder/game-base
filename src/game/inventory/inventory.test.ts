@@ -120,6 +120,37 @@ test('move swaps two slots, merges equal items and leaves the rest behind', () =
   expect(inventory.count('fiber')).toBe(110);
 });
 
+test('move with a count splits a stack onto an empty slot or the same item, and never swaps', () => {
+  const { inventory, named } = bag();
+  inventory.add('plank', 9);
+  inventory.add('axe', 1);
+  inventory.move(0, 10, 5);
+  expect(inventory.slots[0]).toEqual({ id: 'plank', count: 4 });
+  expect(inventory.slots[10]).toEqual({ id: 'plank', count: 5 });
+  inventory.move(10, 0, 2);
+  expect(inventory.slots[0]).toEqual({ id: 'plank', count: 6 });
+  expect(inventory.slots[10]).toEqual({ id: 'plank', count: 3 });
+  // Onto another item a part of a stack stays where it was.
+  const changes = named('inventory.changed').length;
+  inventory.move(0, 1, 3);
+  expect(inventory.slots[0]).toEqual({ id: 'plank', count: 6 });
+  expect(inventory.slots[1]).toEqual({ id: 'axe', count: 1 });
+  inventory.move(0, 11, 0);
+  expect(named('inventory.changed').length).toBe(changes);
+  // A count of the whole stack, or more, is a plain move.
+  inventory.move(10, 1, 3);
+  expect(inventory.slots[1]).toEqual({ id: 'plank', count: 3 });
+  expect(inventory.slots[10]).toEqual({ id: 'axe', count: 1 });
+  // Onto a full stack of the same item nothing fits.
+  inventory.add('fiber', 99);
+  inventory.add('fiber', 10);
+  const full = inventory.slots.findIndex((s) => s?.id === 'fiber' && s.count === 99);
+  const rest = inventory.slots.findIndex((s) => s?.id === 'fiber' && s.count === 10);
+  inventory.move(rest, full, 5);
+  expect(inventory.slots[rest]).toEqual({ id: 'fiber', count: 10 });
+  expect(inventory.count('plank')).toBe(9);
+});
+
 test('save then load gives the same bag, and drops an item that no longer exists', () => {
   const first = bag();
   first.inventory.add('axe', 1);
