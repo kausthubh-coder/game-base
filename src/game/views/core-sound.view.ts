@@ -65,9 +65,10 @@ export function install(view: GameView): void {
   }
 
   // ---- the body
-  const sim = world.sim;
+  /** A block's id. The world is read when asked, so a view without one still installs. */
+  const blockAt = (x: number, y: number, z: number): number => world.sim.getBlock(Math.floor(x), Math.floor(y), Math.floor(z));
   /** The block a foot at `at` stands on, by key. */
-  const blockUnder = (at: Vec3): string => BLOCKS[sim.getBlock(Math.floor(at.x), Math.floor(at.y - 0.5), Math.floor(at.z))]?.key ?? '';
+  const blockUnder = (at: Vec3): string => BLOCKS[blockAt(at.x, at.y - 0.5, at.z)]?.key ?? '';
   const materialAt = (at: Vec3, surface: Surface) => stepMaterial(blockUnder(at), surface, !world.query.openSky(at.x, at.y + 1.5, at.z));
   let speed = 0;
   game.events.on('footstep', (e) => {
@@ -112,7 +113,7 @@ export function install(view: GameView): void {
       seen.walked -= FOLK_STEPS.stride;
       if (Math.hypot(p.x - me.x, p.z - me.z) > FOLK_STEPS.reach) continue;
       folkAt.x = p.x; folkAt.y = p.y; folkAt.z = p.z;
-      const surface = BLOCKS[sim.getBlock(Math.floor(p.x), Math.floor(p.y - 0.5), Math.floor(p.z))]?.surface ?? 'grass';
+      const surface = BLOCKS[blockAt(p.x, p.y - 0.5, p.z)]?.surface ?? 'grass';
       audio.emit({ type: 'footstep', surface, at: folkAt, material: materialAt(folkAt, surface) ?? undefined, gait: 'walk', quiet: FOLK_STEPS.quiet, muffle: muffleTo(folkAt) });
     }
   });
@@ -252,7 +253,7 @@ export function install(view: GameView): void {
     let solid = 0;
     for (let i = 1; i < steps; i++) {
       const t = i / steps;
-      const block = BLOCKS[sim.getBlock(Math.floor(ax + dx * t), Math.floor(ay + dy * t), Math.floor(az + dz * t))];
+      const block = BLOCKS[blockAt(ax + dx * t, ay + dy * t, az + dz * t)];
       if (block?.solid && block.opaque) solid++;
     }
     return Math.min(1, solid / 2.5);
