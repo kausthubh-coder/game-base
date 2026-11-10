@@ -252,6 +252,23 @@ async function desktop(browser) {
     audio.emit = (event) => { if (event.type === 'talk') window.__blips.push(event.char); return emit(event); };
     return true;
   });
+  // Every drawn frame from the moment the line opens notes how much of it is typed. On a slow machine one frame
+  // can last longer than the whole line, and then typing cannot be seen at all, which is not the game's fault.
+  await game(() => {
+    const seen = (window.__typing = { partial: false, frames: 0, opened: 0, full: 0 });
+    const tick = () => {
+      const typed = document.querySelector('.gb-dialogue-typed')?.textContent ?? '';
+      const rest = document.querySelector('.gb-dialogue-untyped')?.textContent ?? '';
+      if (typed.length + rest.length > 0) {
+        if (!seen.opened) seen.opened = performance.now();
+        seen.frames++;
+        if (typed.length > 0 && rest.length > 0) seen.partial = true;
+        if (rest.length === 0 && !seen.full) seen.full = performance.now();
+      }
+      if (seen.frames < 400) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
   const beside = await talkToTamsin(t);
   if (!beside) note('The people are not in the game yet, so the conversation was started by its id and not with E beside Tamsin.');
   await frames(3);
@@ -265,12 +282,15 @@ async function desktop(browser) {
   }));
   check('the box shows the talk system\'s line, with the name', mid.name === 'Tamsin' && mid.whole === mid.line, `${mid.name}: ${mid.whole}`);
   check('the portrait comes from the manifest\'s portraits sheet', mid.portrait.includes('portraits/portraits.png'), mid.portrait.slice(0, 80));
-  check('the line types out a letter at a time', mid.typed.length > 0 && mid.typed.length < mid.whole.length, `${mid.typed.length} of ${mid.whole.length} letters after 3 frames`);
+  const typing = await game(() => window.__typing);
+  if (typing.partial || typing.frames > 2) check('the line types out a letter at a time', typing.partial, `partly typed in some frame: ${typing.partial}; ${typing.frames} frames until now`);
+  else note(`Typing could not be seen: the whole line showed within ${typing.frames} drawn frame(s) (${Math.round(typing.full - typing.opened)} ms), so this machine is too slow to watch it.`);
   check('the player is busy while a line shows', mid.busy === true);
   // A voiced person's line plays their recorded clip and types in time with it, with no blips. Anyone else blips.
   if (sound) {
     const said = await game((text) => ({ blips: window.__blips.length, clip: (window.__voice?.log ?? []).find((r) => r.key.endsWith('|' + text))?.status ?? null }), mid.line);
-    check('the line speaks: a recorded clip, or a voice blip for each typed letter', said.blips > 0 || said.clip === 'loading' || said.clip === 'playing', `${said.blips} blips, clip ${said.clip ?? 'none'} for "${mid.typed}"`);
+    // A clip that already played to its end has spoken too: on a slow machine it can be over in a few frames.
+    check('the line speaks: a recorded clip, or a voice blip for each typed letter', said.blips > 0 || ['loading', 'playing', 'ended'].includes(said.clip), `${said.blips} blips, clip ${said.clip ?? 'none'} for "${mid.typed}"`);
   }
   else note('The sound engine had not started, so the voice blips were not counted.');
   await shot('ui-05-talk.png');
