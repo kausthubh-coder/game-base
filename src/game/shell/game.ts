@@ -405,7 +405,9 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     if (cam) {
       const range = Math.round(camera.stepped(cam.shadowRange));
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
-      sky.setFogReach(camera.stepped(cam.fogStart), camera.stepped(cam.fogEnd));
+      // The fog is whole before the loaded land ends, which is nearer at a lower quality.
+      const edge = world.stats.radius * 16 - 8;
+      sky.setFogReach(Math.min(camera.stepped(cam.fogStart), edge * 0.45), Math.min(camera.stepped(cam.fogEnd), edge));
     } else if (camera.zoom !== lastZoom) {
       lastZoom = camera.zoom;
       sky.setShadowRange(30 + 14 * camera.zoom);
