@@ -39,26 +39,26 @@ const DRY = 'close-up foley recording, dry, no music, no voices, no background n
 
 export const SAMPLES: readonly SampleSpec[] = [
   // ---- beds: the town
-  { id: 'bed.town.murmur', kind: 'bed', stereo: true, seconds: 24, level: -30, influence: 0.45,
+  { id: 'bed.town.murmur', kind: 'bed', stereo: true, seconds: 24, level: -26, influence: 0.45,
     prompt: 'Soft distant murmur of a small friendly crowd in a cozy lakeside village square, many people chatting quietly far away, warm and wordless, no clear words, no music, calm afternoon' },
-  { id: 'bed.town.square', kind: 'bed', stereo: true, seconds: 24, level: -32, influence: 0.45,
+  { id: 'bed.town.square', kind: 'bed', stereo: true, seconds: 24, level: -28, influence: 0.45,
     prompt: 'Gentle everyday activity in a small cobblestone village market square heard from the middle: occasional footsteps on stone, a wooden crate set down, a wicker basket creaking, soft clink of pottery, relaxed and sparse, no voices, no music' },
-  { id: 'bed.town.birds', kind: 'bed', stereo: true, seconds: 24, level: -33, influence: 0.4,
+  { id: 'bed.town.birds', kind: 'bed', stereo: true, seconds: 24, level: -29, influence: 0.4,
     prompt: 'Sparrows and small songbirds chirping on the rooftops of a quiet village on a sunny morning, light and sparse, no wind, no voices, no music' },
-  { id: 'bed.town.water', kind: 'bed', stereo: true, seconds: 24, level: -30, influence: 0.45,
+  { id: 'bed.town.water', kind: 'bed', stereo: true, seconds: 24, level: -28, influence: 0.45,
     prompt: 'Small gentle waves lapping against a stone quay on a calm lake, a moored wooden boat creaking softly, quiet and close, no wind, no voices, no music' },
-  { id: 'bed.town.workshop', kind: 'bed', stereo: true, seconds: 24, level: -33, influence: 0.45,
+  { id: 'bed.town.workshop', kind: 'bed', stereo: true, seconds: 24, level: -29, influence: 0.45,
     prompt: 'A carpenter at work in a small village workshop, heard from the lane outside: slow hand saw strokes, a few light mallet taps on wood, a plane shaving a board, unhurried, no voices, no music, no power tools' },
-  { id: 'bed.town.night', kind: 'bed', stereo: true, seconds: 24, level: -32, influence: 0.4,
+  { id: 'bed.town.night', kind: 'bed', stereo: true, seconds: 24, level: -29, influence: 0.4,
     prompt: 'Warm summer night in a sleeping village by a lake: crickets chirping steadily, a few frogs far off by the water, very calm, no wind, no voices, no music' },
-  { id: 'bed.town.lantern', kind: 'bed', stereo: false, seconds: 16, level: -40, influence: 0.5,
+  { id: 'bed.town.lantern', kind: 'bed', stereo: false, seconds: 16, level: -37, influence: 0.5,
     prompt: 'The faint warm hum and soft crackle of a small oil lantern flame burning close by at night, very quiet and steady, no wind, no music' },
   // ---- beds: the land around it
-  { id: 'bed.meadow.day', kind: 'bed', stereo: true, seconds: 24, level: -31, influence: 0.4,
+  { id: 'bed.meadow.day', kind: 'bed', stereo: true, seconds: 24, level: -29, influence: 0.4,
     prompt: 'Open green meadow on a calm sunny day: a soft breeze through long grass, songbirds singing far apart in the distance, faint insects, peaceful, no voices, no music' },
-  { id: 'bed.forest.day', kind: 'bed', stereo: true, seconds: 24, level: -31, influence: 0.4,
+  { id: 'bed.forest.day', kind: 'bed', stereo: true, seconds: 24, level: -28, influence: 0.4,
     prompt: 'Inside a quiet broadleaf forest on a bright day: leaves rustling softly overhead in a light breeze, a woodpecker far off, small birds calling here and there, peaceful, no voices, no music' },
-  { id: 'bed.meadow.night', kind: 'bed', stereo: true, seconds: 24, level: -32, influence: 0.4,
+  { id: 'bed.meadow.night', kind: 'bed', stereo: true, seconds: 24, level: -30, influence: 0.4,
     prompt: 'A grassy meadow at night: crickets and katydids chirping in the long grass, a very light breeze, peaceful and warm, no voices, no music' },
 
   // ---- spot sounds, placed in the world by src/game/content/soundscape.ts

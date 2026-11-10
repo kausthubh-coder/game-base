@@ -8,8 +8,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -30,
-    "peak": -14.2
+    "lufs": -26,
+    "peak": -10.2
   },
   "bed.town.square": {
     "prompt": "Gentle everyday activity in a small cobblestone village market square heard from the middle: occasional footsteps on stone, a wooden crate set down, a wicker basket creaking, soft clink of pottery, relaxed and sparse, no voices, no music",
@@ -20,7 +20,7 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -33.7,
+    "lufs": -28.7,
     "peak": -1.5
   },
   "bed.town.birds": {
@@ -32,8 +32,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -33,
-    "peak": -14
+    "lufs": -29,
+    "peak": -10
   },
   "bed.town.water": {
     "prompt": "Small gentle waves lapping against a stone quay on a calm lake, a moored wooden boat creaking softly, quiet and close, no wind, no voices, no music",
@@ -44,8 +44,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -30,
-    "peak": -2.2
+    "lufs": -28.2,
+    "peak": -1.5
   },
   "bed.town.workshop": {
     "prompt": "A carpenter at work in a small village workshop, heard from the lane outside: slow hand saw strokes, a few light mallet taps on wood, a plane shaving a board, unhurried, no voices, no music, no power tools",
@@ -56,8 +56,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -33,
-    "peak": -14.1
+    "lufs": -29,
+    "peak": -10.1
   },
   "bed.town.night": {
     "prompt": "Warm summer night in a sleeping village by a lake: crickets chirping steadily, a few frogs far off by the water, very calm, no wind, no voices, no music",
@@ -68,8 +68,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -32,
-    "peak": -19.4
+    "lufs": -29,
+    "peak": -16.4
   },
   "bed.town.lantern": {
     "prompt": "The faint warm hum and soft crackle of a small oil lantern flame burning close by at night, very quiet and steady, no wind, no music",
@@ -80,8 +80,8 @@
     "kind": "bed",
     "seconds": 14.5,
     "channels": 1,
-    "lufs": -40,
-    "peak": -16.6
+    "lufs": -37,
+    "peak": -13.6
   },
   "bed.meadow.day": {
     "prompt": "Open green meadow on a calm sunny day: a soft breeze through long grass, songbirds singing far apart in the distance, faint insects, peaceful, no voices, no music",
@@ -92,8 +92,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -31,
-    "peak": -19.7
+    "lufs": -29,
+    "peak": -17.7
   },
   "bed.forest.day": {
     "prompt": "Inside a quiet broadleaf forest on a bright day: leaves rustling softly overhead in a light breeze, a woodpecker far off, small birds calling here and there, peaceful, no voices, no music",
@@ -104,8 +104,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -31,
-    "peak": -19
+    "lufs": -28,
+    "peak": -16
   },
   "bed.meadow.night": {
     "prompt": "A grassy meadow at night: crickets and katydids chirping in the long grass, a very light breeze, peaceful and warm, no voices, no music",
@@ -116,8 +116,8 @@
     "kind": "bed",
     "seconds": 22.5,
     "channels": 2,
-    "lufs": -32,
-    "peak": -19.4
+    "lufs": -30,
+    "peak": -17.4
   },
   "spot.well": {
     "prompt": "A wooden bucket on a creaking rope lowered into a stone village well, then a splash and water dripping, heard from a few meters away, no voices, no music",

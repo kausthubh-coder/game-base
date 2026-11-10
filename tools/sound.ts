@@ -197,6 +197,32 @@ function seamless(chans: Float32Array[], seconds: number): Float32Array[] {
   });
 }
 
+/**
+ * A look-ahead limiter: the gain falls 5 ms before a peak that would pass `ceiling`, and comes back over 120 ms.
+ * Only a bed's few loud moments are touched; the rest passes as it is.
+ */
+function limit(chans: Float32Array[], ceiling: number): void {
+  const n = (chans[0] as Float32Array).length;
+  const ahead = Math.round(RATE * 0.005), back = Math.exp(-1 / (RATE * 0.12));
+  // The gain each sample needs on its own, then the lowest of the next `ahead` samples, then a smooth return.
+  const need = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let p = 0;
+    for (const ch of chans) p = Math.max(p, Math.abs(ch[i] as number));
+    need[i] = p > ceiling ? ceiling / p : 1;
+  }
+  let g = 1;
+  const window: number[] = [];
+  for (let i = n - 1; i >= 0; i--) {
+    // Walking backward, so the gain is already down when the peak arrives.
+    window.push(need[i] as number);
+    if (window.length > ahead) window.shift();
+    const want = Math.min(...window);
+    g = want < g ? want : 1 - (1 - g) * back;
+    for (const ch of chans) ch[i] = (ch[i] as number) * g;
+  }
+}
+
 /** Lays slices end to end with a gap of silence around each, so a decoder's few samples of delay never cut one. */
 function sprite(parts: Float32Array[][], gap: number): { chans: Float32Array[]; slices: [number, number][] } {
   const g = Math.round(gap * RATE);
@@ -232,10 +258,9 @@ function processOne(s: SampleSpec): SoundEntry {
   let slices: [number, number][] | undefined;
   if (s.kind === 'bed') {
     chans = seamless(takes[0] as Float32Array[], 1.5);
-    const lufs = loudness(chans);
-    let g = 10 ** ((s.level - lufs) / 20);
-    g = Math.min(g, 10 ** (-1.5 / 20) / Math.max(1e-6, peakOf(chans)));
-    scale(chans, g);
+    // Brought to its loudness, then the odd loud moment (a crate set down, a splash) is turned down to the ceiling.
+    scale(chans, 10 ** ((s.level - loudness(chans)) / 20));
+    limit(chans, 10 ** (-1.5 / 20));
   } else if (s.kind === 'steps' || s.kind === 'hits') {
     // Every hit of every take is brought to the same peak, then the quiet strays are dropped.
     let parts = takes.flatMap((take) => findHits(take, s.sliceMax ?? 0.4).map(([a, b]) => {

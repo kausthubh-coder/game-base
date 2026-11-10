@@ -43,9 +43,13 @@ const GAIT: Record<Gait, { gain: number; semis: number; tone: number }> = {
   run: { gain: 1.3, semis: 1.1, tone: 20000 },
 };
 
-/** How loud each material's recorded steps sit against each other once leveled to one peak. */
+/**
+ * How loud each material's recorded steps sit against each other. The takes are leveled to one peak, which
+ * leaves a sharp cobble 9 LU under a soft grass step; these bring a walk on each to within about 2 LU (the
+ * footstep pieces of tools/sound-walk.mjs measure it), with water and sand a little forward.
+ */
 const STEP_LEVEL: Record<StepMaterial, number> = {
-  grass: 0.55, dirt: 0.6, path: 0.62, cobble: 0.5, stone: 0.5, wood: 0.55, floor: 0.5, sand: 0.5, water: 0.6, leaves: 0.55,
+  grass: 0.4, dirt: 0.75, path: 0.78, cobble: 0.8, stone: 0.68, wood: 0.72, floor: 0.64, sand: 0.4, water: 0.5, leaves: 0.56,
 };
 
 /** The material a block's surface gives when the game says nothing finer. */
