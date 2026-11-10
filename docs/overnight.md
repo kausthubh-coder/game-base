@@ -66,3 +66,8 @@ and 3D assets, and for Astra to make 3D props too, to compare. Ultracode is on, 
 | 3 | A scripted play of all five quests through the debug door. Write `.agents/skills/verify-greenhollow` with `create-verification-skill`. | waiting |
 | 4 | Hill climb: judges score the ten lines in act1.md from screenshots and the script's log, fixers take the lowest lines, repeat until 8 or time runs out. Stop new work at 05:30. | waiting |
 | 5 | Compare the two prop sets. Update the handbook (`16-base.md`, `14-v1.md`). Morning note. | waiting |
+- 23:52 Astra's props finished (PASS): 49 props, all within budget, a clean low-poly sheet. Committed under experiments/props-astra. Compare with the Fable set when it lands.
+- 00:02 Story art finished (ISSUES, minor): eight people hold from three sides and are distinct, leaftail, lanternfly, crops, 16 icons, panel, button, title. Check exits 0. Committed, merged into the play branch.
+- 00:04 World, camera, hero, perf finished (PASS). Reran type checks and 58 tests, looked at the start view and the house with its roof cut away. 36 draw calls and 146k triangles at the start view on high. Committed. Replaced the provisional copies in the play branch by a merge.
+- 00:06 Started the shell agent in the play worktree (brief: docs/play/brief-shell.md there). It owns boot, the loop, base feature wiring, actors to sprites, saving, the debug door and a smoke test. Views plug in through src/game/views/*.view.ts. Still to start after it and after props and map land: region, crops and stations drawing, HUD and panels wiring.
+- 00:10 Sprites runtime and asset loader finished (PASS). Reran type checks and 80 tests. 2 draw calls for 500 characters. Committed and merged into the play branch.
