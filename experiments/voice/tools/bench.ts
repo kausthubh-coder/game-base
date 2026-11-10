@@ -1,5 +1,5 @@
 // Times the live pipelines end to end in headless Chrome, on the real talk page.
-//   bun experiments/voice/tools/bench.ts <b1|b2> <text|voice> [--model sol-fast] [--tts eleven_flash_v2_5] [--voice sol] [--url http://localhost:5381]
+//   bun experiments/voice/tools/bench.ts <b1|b2> <text|voice> [--model luna-fast] [--tts eleven_flash_v2_5] [--voice sol] [--url http://localhost:5381]
 // The player is a fake mic: macOS `say` reading the questions below over a little room noise (pure
 // digital silence can stall a voice call). Each turn is timed by the page from the end of the player's
 // words (the last loud 20 ms frame of the fake mic, or the moment the text is sent) to the first sound
@@ -21,7 +21,7 @@ if (!['b1', 'b2'].includes(pipe) || !['text', 'voice'].includes(mode)) {
   process.exit(2);
 }
 const BASE = opt('url', 'http://localhost:5381');
-const model = opt('model', 'sol-fast'), tts = opt('tts', 'eleven_flash_v2_5'), voice = opt('voice', 'sol');
+const model = opt('model', 'luna-fast'), tts = opt('tts', 'eleven_flash_v2_5'), voice = opt('voice', 'sol');
 
 export const QUESTIONS = [
   'Hello Tamsin. What should I do first?',
@@ -133,6 +133,7 @@ for (const [i, q] of QUESTIONS.entries()) {
 }
 
 const turns = (await turnsNow()).slice(1);
+if (mode === 'text') turns.forEach((t, i) => (t.question = QUESTIONS[i]));
 await page.screenshot({ path: `.artifacts/voice/talk-${pipe}-${mode}.png` });
 await browser.close();
 

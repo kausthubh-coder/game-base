@@ -1,6 +1,7 @@
 // Pipeline B2: a fast text model through Codex, then ElevenLabs speaking each sentence as soon as it is
 // written. One `TextVoice` per browser tab. It owns a `codex app-server` and one thread with Tamsin's
-// prompt as the base instructions (so none of Codex's coding prompt), and no tools.
+// prompt as the base instructions (so none of Codex's coding prompt), and no tools. GPT-5.6-Luna at low
+// effort on the Fast tier is the default: the quickest of the three measured (README), and it stays in character.
 //
 // A reply streams from the model token by token. Each finished sentence goes to ElevenLabs' streaming
 // endpoint at once, as raw 24 kHz PCM, and the audio is passed on in sentence order. Every step is
@@ -69,8 +70,8 @@ export class TextVoice {
   readonly textModel: TextModel;
   readonly ttsModel: string;
 
-  constructor(textModel = 'sol-fast', ttsModel = 'eleven_flash_v2_5') {
-    this.textModel = TEXT_MODELS[textModel] ?? TEXT_MODELS['sol-fast'];
+  constructor(textModel = 'luna-fast', ttsModel = 'eleven_flash_v2_5') {
+    this.textModel = TEXT_MODELS[textModel] ?? TEXT_MODELS['luna-fast'];
     this.ttsModel = ttsModel;
     this.#codex.on('notification', (n) => {
       if (n.method === 'item/agentMessage/delta') this.#onDelta?.(n.params.delta);

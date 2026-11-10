@@ -120,9 +120,9 @@ function tick(): void {
     } else {
       const m = LINES[key()];
       const reveal = m.reveal;
-      // If the audio has not started 1.5 s in (blocked autoplay, a failed load), the words keep time on their own.
-      const stalled = audio.currentTime === 0 && performance.now() - lineStart > 1500;
-      const t = stalled ? (performance.now() - lineStart) / 1000 - 1.5 : audio.currentTime;
+      // If the audio has not started 3 s in (blocked autoplay, a failed load), the words keep time on their own.
+      const stalled = audio.currentTime === 0 && performance.now() - lineStart > 3000;
+      const t = stalled ? (performance.now() - lineStart) / 1000 - 3 : audio.currentTime;
       if (stalled) meta.textContent = 'The audio did not start. Words only.';
       shown = 0;
       while (shown < body.length && reveal[cue.length + shown] <= t) shown++;
@@ -130,7 +130,7 @@ function tick(): void {
     }
   }
   box.show(cue, body, shown);
-  const hold = l.by === 'narrator' ? 1600 : l.by === 'player' ? 1800 : BEAT * 1000;
+  const hold = l.by === 'narrator' ? 1600 : BEAT * 1000;
   if (whole && auto.checked && endedAt && performance.now() - endedAt > hold) next();
 }
 
@@ -243,7 +243,7 @@ requestAnimationFrame(tick);
 
 /** For checks in headless Chrome. */
 (window as any).__scene = {
-  state: () => ({ scene: scene().id, line: lineAt, whole, playing: !audio.paused, time: audio.currentTime, text: box.text.textContent }),
+  state: () => ({ scene: scene().id, line: lineAt, whole, playing: !audio.paused, time: audio.currentTime, ready: audio.readyState, error: audio.error?.code ?? null, src: audio.src, text: box.text.textContent }),
   go: (s: number, l: number) => (($('start').hidden = true), (started = true), go(s, l)),
   advance,
 };
