@@ -497,7 +497,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     setFacing(radians: number): void {
       if (this.index < 0) return;
       this.facing = radians;
-      const view = pickView(radians, clock.yaw);
+      const view = pickView(radians, clock.yaw, this.view);
       if (view === this.view) return;
       this.view = view;
       writeRow(this);
@@ -774,7 +774,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
         clock.yaw = turned;
         for (let i = 0; i < count; i++) {
           const h = handles[i];
-          const view = pickView(h.facing, clock.yaw);
+          const view = pickView(h.facing, clock.yaw, h.view);
           if (view !== h.view) {
             h.view = view;
             writeRow(h);
