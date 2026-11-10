@@ -49,11 +49,19 @@ export interface EndStats {
 export type QualityMode = 'auto' | Quality;
 
 /**
- * How the camera stands. `tilt` is the 2.5D camera, the default: a fixed pitch with quarter turns and pointer
- * aiming. `free` is third person, orbited with the mouse, aimed from a crosshair. `first` is first person.
+ * How the camera stands. `tilt` is the 2.5D camera, the default: a fixed pitch, turned with a right-button drag or
+ * in quarter turns, and pointer aiming. `free` is third person, orbited with the mouse as `MouseStyle` says.
+ * `first` is first person, aimed from a crosshair.
  */
 export type CameraMode = 'tilt' | 'free' | 'first';
 export const CAMERA_MODES: readonly CameraMode[] = ['tilt', 'free', 'first'];
+/**
+ * How the mouse turns the free camera. `drag` is Roblox's way, the default: the cursor stays free and aims, and a
+ * drag with the right button held turns the camera. `lock` is Genshin's: a click takes the mouse, and from then on
+ * the mouse turns the camera and the crosshair in the middle aims. First person always locks the mouse.
+ */
+export type MouseStyle = 'drag' | 'lock';
+export const MOUSE_STYLES: readonly MouseStyle[] = ['drag', 'lock'];
 /** How people, the pet and the creatures are drawn: pixel-art sprites, the default, or 3D models. */
 export type CharacterLook = 'sprites' | 'models';
 export const CHARACTER_LOOKS: readonly CharacterLook[] = ['sprites', 'models'];
@@ -72,15 +80,19 @@ export interface ViewSettings {
   readonly camera: CameraMode;
   /** Takes effect at once, with no reload, and is stored. */
   setCamera(mode: CameraMode): void;
+  /** `?mouse=lock` in the address holds a style for this visit. */
+  readonly mouse: MouseStyle;
+  /** Takes effect at once, and is stored. */
+  setMouse(style: MouseStyle): void;
   /** `?chars=models` in the address holds a look for this visit. */
   readonly characters: CharacterLook;
   /** Takes effect at once, with no reload, and is stored. */
   setCharacters(look: CharacterLook): void;
-  /** Runs `fn` after the camera mode or the character look changed. Returns a function that stops it. */
-  onChange(fn: (setting: 'camera' | 'characters') => void): () => void;
+  /** Runs `fn` after the camera mode, the mouse style or the character look changed. Returns a function that stops it. */
+  onChange(fn: (setting: 'camera' | 'mouse' | 'characters') => void): () => void;
 }
 
-/** What the aim is on: the block under the pointer when it is in reach, else null. */
+/** What the aim is on: the block under the pointer, or under the crosshair when the mouse is locked, when it is in reach. Else null. */
 export interface Aim {
   x: number; y: number; z: number;
   nx: number; ny: number; nz: number;

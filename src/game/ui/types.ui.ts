@@ -103,10 +103,14 @@ export interface GameUiOptions {
 export interface ViewChoices {
   camera(): ViewCamera;
   setCamera(mode: ViewCamera): void;
+  mouse(): ViewMouse;
+  setMouse(style: ViewMouse): void;
   characters(): ViewCharacters;
   setCharacters(look: ViewCharacters): void;
 }
 export type ViewCamera = 'tilt' | 'free' | 'first';
+/** How the mouse turns the free camera: `drag` with the right button held, as in Roblox, or `lock` it, as in Genshin. */
+export type ViewMouse = 'drag' | 'lock';
 export type ViewCharacters = 'sprites' | 'models';
 
 export interface GameUi {

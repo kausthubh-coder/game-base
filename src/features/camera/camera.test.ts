@@ -93,6 +93,64 @@ describe('the camera rig', () => {
     expect(rig.quarter).toBe(2);
   });
 
+  test('a drag turns the view at once to any angle and keeps the pitch and the zoom', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0 });
+    run(rig, 0.5);
+    const pitch = rig.pitch, distance = rig.distance;
+    rig.spin(30 * deg);
+    expect(rig.yaw / deg).toBeCloseTo(30, 9);
+    expect(rig.turning).toBe(false);
+    run(rig, 0.5);
+    expect(rig.yaw / deg).toBeCloseTo(30, 9);
+    expect(rig.pitch).toBe(pitch);
+    expect(rig.distance).toBeCloseTo(distance, 9);
+    // The camera stands where yaw 30 puts it: south and a little east of the target, still 35 degrees up.
+    const dx = rig.position.x - rig.look.x, dy = rig.position.y - rig.look.y, dz = rig.position.z - rig.look.z;
+    expect(Math.atan2(dx, dz) / deg).toBeCloseTo(30, 6);
+    expect(Math.atan2(dy, Math.hypot(dx, dz)) / deg).toBeCloseTo(35, 6);
+    expect(rig.quarter).toBe(0);
+    rig.spin(20 * deg);
+    expect(rig.quarter).toBe(1);
+  });
+
+  test('between two quarters, Q and R go to the nearer quarter that way, and settle to the nearest', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0 });
+    run(rig, 0.1);
+    rig.spin(30 * deg);
+    rig.turn(1);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(0, 6);
+    rig.spin(30 * deg);
+    rig.turn(-1);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(90, 6);
+    expect(rig.quarter).toBe(1);
+    // A hair off a quarter counts as on it: R makes a whole turn from there.
+    rig.spin(2 * deg);
+    rig.turn(1);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(0, 6);
+    rig.spin(-50 * deg);
+    rig.settle();
+    expect(rig.quarter).toBe(3);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(-90, 6);
+  });
+
+  test('a drag during a quarter turn moves where the turn is headed', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0 });
+    run(rig, 0.1);
+    rig.turn(-1);
+    run(rig, 0.1);
+    rig.spin(10 * deg);
+    expect(rig.turning).toBe(true);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(100, 6);
+  });
+
   test('zoom has three steps and stops at the ends', () => {
     const rig = new CameraRig();
     expect(rig.zoom).toBe(1);
