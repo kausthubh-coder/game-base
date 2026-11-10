@@ -391,7 +391,9 @@ async function talkTo(id) {
   const promptOnScreen = await game(() => document.querySelector('.gu-prompt')?.textContent ?? '');
   await page.keyboard.press('KeyE');
   await page.waitForFunction(() => { const e = document.querySelector('.gb-dialogue'); return e && !e.hidden; }, null, { timeout: 30000 });
+  const speaker = await game(() => document.querySelector('.gb-dialogue-name')?.textContent ?? '');
   const lines = await talkThrough();
+  if (speaker && speaker !== npc.name) note(`E beside ${id} started a talk with ${speaker}`);
   const after = await state();
   // The last talk of the act opens the end card, which holds the player until Keep playing.
   must((!after.player.busy || after.flags['act1.ended'] === true) && after.talk === null, `the conversation with ${id} left the player busy`);
@@ -726,6 +728,8 @@ const QUESTS = {
         await page.waitForFunction(() => window.__game.started);
         await game(() => window.__game.manual(true));
         await game(() => window.__game.settle());
+        // One step of the rules, so a system that sets itself up on its first step (the tracked quest) has run.
+        await game(() => window.__game.advance(0.05));
         const after = await state();
         await game(() => window.__game.manual(false));
         must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
