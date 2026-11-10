@@ -2,7 +2,7 @@
 // two styles can be judged side by side. A style is `?style=<name>` in the address; `base` is the game as it is.
 //
 //   bun tools/style-lab.mjs --style <name> --url http://127.0.0.1:<port>/ [--out .artifacts/style-lab/<name>]
-//     [--query chars=models] [--places spawn,garden,town,meadow] [--quality high] [--skip-places]
+//     [--query chars=models] [--places spawn,garden,town,meadow] [--quality high] [--skip-places] [--fish [sprite]]
 //
 // It writes into the out folder:
 //   places/<place>.png and places/<place>-low.png   the 2.5D camera, and the closest zoom low toward the horizon
@@ -11,8 +11,10 @@
 //   card.png                                         the whole style on one page: reference, places, every strip
 //   counts.json                                      draw calls and triangles at every place
 // The clips: the hero walking, running, swinging a tool, turning through eight directions; Tamsin talking; the
-// nearest creature at the dead garden moving. Motion runs on a fixed clock of 30 frames a second of game time;
-// frames are 2 game frames apart (15 a second), the creature's 3. Build and serve first: `bun x vite build --outDir dist-<name>` and `bun tools/serve.mjs`.
+// nearest creature at the dead garden moving. `--fish` adds the hero casting a rod and holding it, for a style whose
+// hero plays a `fish` animation; give the sprite sheet after it when the style draws fishing from its own sheet
+// (`--fish hero-fish`). Motion runs on a fixed clock of 30 frames a second of game time; frames are 2 game frames
+// apart (15 a second), the creature's 3, fishing's 4. Build and serve first: `bun x vite build --outDir dist-<name>` and `bun tools/serve.mjs`.
 // It fails on a console error. This Mac draws WebGL in software: counts only, never frames a second.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -55,12 +57,19 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push(String(e)));
 const game = (js, arg) => page.evaluate(js, arg);
 // A fixed clock for motion: once `__labFixed(true)` runs, every drawn frame is exactly 1/30 s of game time, however
-// slowly this Mac draws it, so strips sample the clips evenly.
+// slowly this Mac draws it, so strips sample the clips evenly. `__labPause(true)` holds every frame until it is
+// lifted: the game would otherwise keep drawing while a frame is screenshot, so frames meant to be 2 apart were
+// about 15 apart and a short clip played between two of them.
 await page.addInitScript(() => {
   const raf = window.requestAnimationFrame.bind(window);
-  let virtual = null;
+  let virtual = null, paused = false, held = [];
   window.__labFixed = (on) => { virtual = on ? performance.now() : null; };
+  window.__labPause = (on) => {
+    paused = on;
+    if (!on) { const resume = held; held = []; for (const cb of resume) window.requestAnimationFrame(cb); }
+  };
   window.requestAnimationFrame = (cb) => raf((t) => {
+    if (paused) { held.push(cb); return; }
     if (virtual === null) return cb(t);
     virtual += 1000 / 30;
     cb(virtual);
@@ -101,15 +110,17 @@ async function crop(file, id = 'player') {
 
 const clips = {};
 /** Shoots `count` frames of a clip, `gap` drawn frames apart, after `setup` has run in the page. */
-async function clip(name, { count = 8, gap = 2, id = 'player', setup, between }) {
+async function clip(name, { count = 8, gap = 2, id = 'player', setup, setupArg, between }) {
   console.log(`motion/${name}: setting up`);
-  if (setup) await game(setup);
+  if (setup) await game(setup, setupArg);
   const files = [];
   for (let i = 0; i < count; i++) {
     if (between) await game(between, i);
-    await game((n) => window.__game.frames(n), gap);
+    // Hold the frame from the moment the count is reached until it is shot.
+    await game(async (n) => { await window.__game.frames(n); window.__labPause(true); }, gap);
     const file = resolve(out, 'motion', `${name}-${i}.png`);
     await crop(file, id);
+    await game(() => window.__labPause(false));
     files.push(file);
   }
   clips[name] = files;
@@ -140,6 +151,22 @@ await clip('tool', {
     hero.sprite = 'hero-swing'; hero.anim = 'tool';
   },
 });
+const fishAt = args.indexOf('--fish');
+if (fishAt >= 0) {
+  const sheet = args[fishAt + 1] && !args[fishAt + 1].startsWith('--') ? args[fishAt + 1] : 'hero';
+  // A short idle first, then the cast from its first frame; 12 frames 0.13 s apart cover the cast and the hold.
+  await clip('fish', {
+    setup: async (sheet) => {
+      const g = window.__game;
+      const hero = g.view.game.actors.get('player');
+      hero.sprite = 'hero'; hero.anim = 'idle';
+      await g.frames(8);
+      hero.sprite = sheet; hero.anim = 'fish';
+    },
+    setupArg: sheet,
+    count: 12, gap: 4,
+  });
+}
 // Turning: a short step each way, then a frame of the hero facing that way.
 await clip('turn', {
   setup: () => { const g = window.__game; g.manual(false); const h = g.view.game.actors.get('player'); h.sprite = 'hero'; h.anim = 'idle'; },
