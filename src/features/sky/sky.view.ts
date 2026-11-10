@@ -65,8 +65,10 @@ export interface Sky extends ViewSystem {
 
 const LEVELS: Record<Quality, { shadowMap: number; shadowEvery: number; cloudShadows: boolean; shafts: boolean }> = {
   low: { shadowMap: 1024, shadowEvery: 2, cloudShadows: false, shafts: false },
-  medium: { shadowMap: 1536, shadowEvery: 1, cloudShadows: true, shafts: false },
-  high: { shadowMap: 2048, shadowEvery: 1, cloudShadows: true, shafts: true },
+  // Cloud shadows go through the sun's shadow map, so they come out as dark and hard-edged as a tree's: off
+  // unless the Graphics setting turns them on, until they are drawn as a soft tint on the ground instead.
+  medium: { shadowMap: 1536, shadowEvery: 1, cloudShadows: false, shafts: false },
+  high: { shadowMap: 2048, shadowEvery: 1, cloudShadows: false, shafts: true },
 };
 
 /** How far the light sits from the shadow target. */

@@ -92,3 +92,22 @@ test('a camera looking straight down takes its yaw from the top of the screen', 
   expect(NAMES[pickView(facingOf('S'), cameraYawOf(camera.matrixWorld.elements))]).toBe(F);
   expect(NAMES[pickView(facingOf('E'), cameraYawOf(camera.matrixWorld.elements))]).toBe(R);
 });
+
+test('a character walking on the line between two drawings keeps one, however the angle jitters', () => {
+  // Walking diagonally to the camera puts a character exactly on the line between its side and its front or
+  // back. Key timing and camera easing wobble the angle by a hair, and the drawing must not flip each frame.
+  for (const edge of [EIGHTH, 3 * EIGHTH, -EIGHTH, -3 * EIGHTH]) {
+    let view = pickView(Math.PI - EIGHTH + edge, EIGHTH);
+    let flips = 0;
+    for (let i = 0; i < 200; i++) {
+      const wobble = Math.sin(i * 1.7) * ((2 * Math.PI) / 180);
+      const next = pickView(Math.PI - EIGHTH + edge + wobble, EIGHTH, view);
+      if (next !== view) flips++;
+      view = next;
+    }
+    expect({ edge, flips }).toEqual({ edge, flips: 0 });
+  }
+  // A real turn still changes the drawing once it is clearly past the line.
+  const side = pickView(Math.PI - EIGHTH + EIGHTH + 0.3, EIGHTH);
+  expect(pickView(Math.PI - EIGHTH + EIGHTH - 0.3, EIGHTH, side)).not.toBe(side);
+});

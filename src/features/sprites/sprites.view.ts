@@ -264,7 +264,15 @@ void main() {
   // Fainter where little sky reaches, since there is little light to block.
   float open = pow(0.8, 15.0 * (1.0 - max(aLight.x, aLight.y)));
   vAlpha = uStrength * aLight.z * mix(0.5, 1.0, open) / (1.0 + 1.2 * lift);
-  vec4 mvPosition = viewMatrix * vec4(aPlace.x + vDisc.x * radius - uSunDirection.x * radius / max(0.45, uSunDirection.y), aPlace.w + 0.02, aPlace.z + vDisc.y * radius - uSunDirection.z * radius / max(0.45, uSunDirection.y), 1.0);
+  // An oval that starts under the feet and reaches away from the sun, longer as the sun sinks. A disc pushed
+  // away whole would leave the feet and float beside the character.
+  vec2 away = -uSunDirection.xz;
+  float reach = length(away);
+  vec2 along = reach > 1e-3 ? away / reach : vec2(0.0, 1.0);
+  vec2 across = vec2(-along.y, along.x);
+  float stretch = clamp(reach / max(0.45, uSunDirection.y), 0.0, 1.2);
+  vec2 ground = across * (vDisc.x * radius) + along * (vDisc.y * radius * (1.0 + stretch) + radius * stretch);
+  vec4 mvPosition = viewMatrix * vec4(aPlace.x + ground.x, aPlace.w + 0.02, aPlace.z + ground.y, 1.0);
   gl_Position = aFrame.w == 0.0 || vAlpha <= 0.0 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -500,7 +508,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     setFacing(radians: number): void {
       if (this.index < 0) return;
       this.facing = radians;
-      const view = pickView(radians, clock.yaw);
+      const view = pickView(radians, clock.yaw, this.view);
       if (view === this.view) return;
       this.view = view;
       writeRow(this);
@@ -780,7 +788,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
         clock.yaw = turned;
         for (let i = 0; i < count; i++) {
           const h = handles[i];
-          const view = pickView(h.facing, clock.yaw);
+          const view = pickView(h.facing, clock.yaw, h.view);
           if (view !== h.view) {
             h.view = view;
             writeRow(h);

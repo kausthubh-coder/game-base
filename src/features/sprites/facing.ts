@@ -26,9 +26,27 @@ export type SpriteView = typeof VIEW_FRONT | typeof VIEW_BACK | typeof VIEW_SIDE
  */
 const FRONT_ARC = Math.cos(Math.PI / 4) + 1e-4;
 
-export function pickView(facing: number, cameraYaw: number): SpriteView {
+/**
+ * How far past the line between two drawings the angle must go before a character showing one switches to the
+ * other. Walking diagonally to the camera sits right on such a line, and key timing and camera easing wobble the
+ * angle by a hair, which without this flips the drawing every frame: front, side, front, side.
+ */
+const STICK = (10 * Math.PI) / 180;
+
+/**
+ * The drawing for this facing. Pass the drawing showing now as `current`, and it is kept until the angle is
+ * clearly in another drawing's arc.
+ */
+export function pickView(facing: number, cameraYaw: number, current?: SpriteView): SpriteView {
   // 0 when the character looks straight at the camera, growing as it turns to the left of the screen.
   const turned = facing + cameraYaw - Math.PI;
+  const view = viewOf(turned);
+  if (current === undefined || view === current) return view;
+  // Keep the drawing showing now while the angle is within its arc grown by STICK on each side.
+  return viewOf(turned - STICK) === current || viewOf(turned + STICK) === current ? current : view;
+}
+
+function viewOf(turned: number): SpriteView {
   const toward = Math.cos(turned);
   if (toward > FRONT_ARC) return VIEW_FRONT;
   if (toward < -FRONT_ARC) return VIEW_BACK;
