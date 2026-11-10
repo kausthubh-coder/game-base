@@ -82,9 +82,10 @@ export function createSlotDrag(options: SlotDragOptions): SlotDrag {
 
   const place = (x: number, y: number): void => {
     if (!ghost || !press) return;
+    // The pointer holds the ghost near its top left corner, so the lit slot under the pointer still shows around it.
     // Under a finger the ghost rides above it, so the finger does not hide what it carries.
-    const dy = press.touch ? -72 : -28;
-    ghost.style.transform = `translate3d(${Math.round(x - originX - 28)}px, ${Math.round(y - originY + dy)}px, 0)`;
+    const dx = press.touch ? -26 : -12, dy = press.touch ? -76 : -12;
+    ghost.style.transform = `translate3d(${Math.round(x - originX + dx)}px, ${Math.round(y - originY + dy)}px, 0) rotate(-4deg)`;
   };
 
   const begin = (event: PointerEvent): void => {

@@ -12,7 +12,7 @@ The bag. It implements `InventoryApi`.
 - `add(id, count, at?)` fills stacks of the same item first, then the first empty slots. It returns how many did not fit.
 - `remove(id, count)` removes only when the bag has that many, and returns whether it did. It takes from the held slot first, then from the last slot backward.
 - `count(id)` is the total across all slots.
-- `move(from, to)` merges two stacks of the same item up to the stack size, and swaps otherwise.
+- `move(from, to, count?)` merges two stacks of the same item up to the stack size, and swaps otherwise. With `count` (a split: the bag's right-drag takes half) only that many go, onto an empty slot or the same item; onto another item nothing moves, since part of a stack cannot swap.
 
 ## Events
 

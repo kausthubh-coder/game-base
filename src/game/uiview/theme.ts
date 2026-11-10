@@ -93,7 +93,7 @@ export const TOKENS = /* css */ `
 /* The stack under the pointer while it is dragged, here and in the bag. */
 .ui-book .gu-ghost, .gu-root .gu-ghost {
   position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center;
-  width: 56px; height: 56px; pointer-events: none;
+  width: 52px; height: 52px; pointer-events: none;
   background: var(--ui-paper, oklch(0.975 0.014 88)); border-radius: var(--ui-radius, 10px);
   box-shadow: 0 0 0 2px oklch(0.53 0.095 192), 0 10px 24px oklch(0.18 0.03 60 / 0.35);
   will-change: transform;

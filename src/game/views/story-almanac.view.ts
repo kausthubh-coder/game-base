@@ -38,7 +38,8 @@ const STYLE = /* css */ `
   @keyframes st-gift-in { from { opacity: 0; transform: translate(-50%, 0); } to { opacity: 1; transform: translate(-50%, 0); } }
 }
 @media (max-width: 560px) {
-  .st-gift { top: 96px; gap: 2px 14px; padding: 12px 16px 12px 12px; }
+  /* Below the tracker, which has the top right corner here, and above the toasts. */
+  .st-gift { top: 40vh; gap: 2px 14px; padding: 12px 16px 12px 12px; }
   .st-gift-icon { width: 48px; height: 48px; }
   .st-gift-name { font-size: 20px; }
 }

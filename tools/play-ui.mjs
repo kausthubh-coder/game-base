@@ -463,6 +463,8 @@ async function dragAndDrop(t) {
     return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
   };
   const slot = (i) => `[data-key="slot:${i}"]`;
+  // The checks after this one expect the bag as it was, so its layout is put back at the end.
+  const start = await game(() => window.__game.view.game.systems.inventory.slots.map((s) => (s ? { ...s } : null)));
   /** Presses on one slot, moves in steps to another and lets go. `during` runs with the pointer over the target. */
   const drag = async (fromSel, toSel, { button = 'left', shift = false, during } = {}) => {
     const a = await center(fromSel), b = await center(toSel);
@@ -582,6 +584,11 @@ async function dragAndDrop(t) {
   } else {
     check('drag: the quick slots have a stack and an empty slot to try', false, hudBefore.slice(0, 9).join(' | '));
   }
+  await game((kept) => {
+    const sys = window.__game.view.game.systems;
+    kept.forEach((stack, i) => { sys.inventory.slots[i] = stack; });
+    window.__game.view.game.events.emit('inventory.changed', {});
+  }, start);
   await page.keyboard.press('i');
 }
 

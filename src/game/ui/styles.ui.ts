@@ -150,7 +150,7 @@ export const STYLES = /* css */ `
 .gu-slot.is-split-from { box-shadow: inset 0 0 0 2px var(--line-strong); }
 .gu-slot.is-drop { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
 .gu-slot.is-refused { box-shadow: inset 0 0 0 2px var(--new); cursor: not-allowed; }
-.gu-ghost { position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center; width: 56px; height: 56px; pointer-events: none; background: var(--paper-light); border-radius: var(--radius); box-shadow: 0 0 0 2px var(--accent), 0 10px 24px oklch(0.18 0.03 60 / 0.35); will-change: transform; }
+.gu-ghost { position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center; width: 52px; height: 52px; pointer-events: none; background: var(--paper-light); border-radius: var(--radius); box-shadow: 0 0 0 2px var(--accent), 0 10px 24px oklch(0.18 0.03 60 / 0.35); will-change: transform; }
 :root.gu-dragging, :root.gu-dragging * { cursor: grabbing !important; }
 .gu-bag-foot { margin-top: var(--s4); font-size: 14px; color: var(--ink-2); text-wrap: pretty; }
 .gu-foot-coarse { display: none; }
