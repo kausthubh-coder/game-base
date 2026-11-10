@@ -20,8 +20,11 @@ export interface PlayerRig {
   readonly position: Vec3;
   /** The player as an actor, so the sprite layer draws it like everyone else. */
   readonly actor: Actor;
-  /** One step of the body, `HERO_STEP` long. `yaw` is the camera's, so W walks away from the camera. */
-  step(yaw: number): void;
+  /**
+   * One step of the body, `HERO_STEP` long. `yaw` is the camera's, so W walks away from the camera. With
+   * `faceView` the body turns to look where the camera looks, as it does in first person.
+   */
+  step(yaw: number, faceView?: boolean): void;
   /** Sets the drawn position between the last two steps. `blend` is 0 to 1. */
   blend(blend: number): void;
   teleport(x: number, y: number, z: number, facing?: number): void;
@@ -73,7 +76,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3):
     position,
     actor,
 
-    step(yaw) {
+    step(yaw, faceView = false) {
       // The way the camera looks along the ground. Yaw 0 looks north and grows counter-clockwise.
       const fx = -Math.sin(yaw), fz = -Math.cos(yaw);
       const busy = game.player.busy;
@@ -85,6 +88,8 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3):
       input.jump = !busy && keys.jump;
       previous.x = body.x; previous.y = body.y; previous.z = body.z;
       body.step(input);
+      // Facing 0 is north and grows toward the east, the other way round from the camera's yaw.
+      if (faceView) body.facing = -yaw;
       write();
     },
 

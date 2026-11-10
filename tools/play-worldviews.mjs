@@ -20,7 +20,8 @@ const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i 
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play');
 const dist = opt('dist', 'dist');
-const PORT = 5331;
+// PLAY_PORT moves it, so several worktrees can run their checks at once.
+const PORT = Number(process.env.PLAY_PORT) || 5331;
 mkdirSync(out, { recursive: true });
 
 if (!args.includes('--no-build')) {

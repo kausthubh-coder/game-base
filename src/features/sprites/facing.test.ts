@@ -111,3 +111,19 @@ test('a character walking on the line between two drawings keeps one, however th
   const side = pickView(Math.PI - EIGHTH + EIGHTH + 0.3, EIGHTH);
   expect(pickView(Math.PI - EIGHTH + EIGHTH - 0.3, EIGHTH, side)).not.toBe(side);
 });
+
+test('a drawing that is showing holds a little past the edge, so a swaying camera does not flip it', () => {
+  // Facing south-east with the camera due south: 45 degrees, the edge between the front and the side.
+  const facing = facingOf('SE');
+  const edge = 0;
+  const justFront = edge + 0.05, justSide = edge - 0.05;
+  expect(NAMES[pickView(facing, justFront)]).toBe(F);
+  expect(NAMES[pickView(facing, justSide)]).toBe(R);
+  // Showing the front, a sway of a few degrees past the edge keeps the front.
+  expect(NAMES[pickView(facing, justSide, VIEW_FRONT)]).toBe(F);
+  // Further than the hold, the side shows.
+  expect(NAMES[pickView(facing, edge - 0.3, VIEW_FRONT)]).toBe(R);
+  // And back again: the side holds a little past the edge too.
+  expect(NAMES[pickView(facing, justFront, VIEW_SIDE_RIGHT)]).toBe(R);
+  expect(NAMES[pickView(facing, edge + 0.3, VIEW_SIDE_RIGHT)]).toBe(F);
+});

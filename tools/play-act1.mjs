@@ -1,6 +1,13 @@
 // The browser play of the first part: builds the game into dist-play, serves it on port 5340, opens it in
 // headless Chrome and plays all five quests of docs/play/act1.md from the title to the end card.
 //   bun tools/play-act1.mjs [--port 5340] [--dist dist-play] [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
+//     [--camera tilt|free|first] [--mouse drag|lock]
+//
+// `--camera free` plays with the free camera as it comes, Drag to turn: the cursor aims where it is, as in 2.5D,
+// and when a block is out of sight the view is turned onto it with the debug door's `aimAt`, where a player
+// would drag with the right button. `--camera first`, or `free` with `--mouse lock`, locks the mouse: a click in
+// the world takes it first, as a player's would, and every click aims through the crosshair in the middle of the
+// screen. The view is turned onto the block with `aimAt`, where a player would move the mouse.
 //
 // It plays the way src/game/play/act1.test.ts plays the rules, but through the real page: a real click on
 // New game, the hero's real body steered by held game keys along a nav route, real E presses, real
@@ -26,9 +33,18 @@ const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play/act1');
-const PORT = Number(opt('port', '5340'));
+// --port or PLAY_PORT moves it, so several worktrees can run their checks at once.
+const PORT = Number(opt('port', process.env.PLAY_PORT || '5340'));
 const dist = opt('dist', 'dist-play');
-const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}`;
+const CAMERA = opt('camera', 'tilt');
+if (!['tilt', 'free', 'first'].includes(CAMERA)) { console.error(`FAIL: no camera called ${CAMERA}`); process.exit(1); }
+const MOUSE = opt('mouse', 'drag');
+if (!['drag', 'lock'].includes(MOUSE)) { console.error(`FAIL: no mouse called ${MOUSE}`); process.exit(1); }
+/** The free or the first-person camera: the hero faces the way they walk, and the view cannot look straight down. */
+const ORBIT = CAMERA !== 'tilt';
+/** The mouse is locked and the crosshair aims, as the game does in first person and with Lock to turn. */
+const LOCK = CAMERA === 'first' || (CAMERA === 'free' && MOUSE === 'lock');
+const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}&camera=${CAMERA}&mouse=${MOUSE}`;
 const SHOTS = args.includes('--shots');
 const PATH = REGION.paths[0].points.map(([x, z]) => ({ x, z }));
 rmSync(out, { recursive: true, force: true });
@@ -297,8 +313,42 @@ async function hold(item) {
   must(held === item, `the number key ${slot + 1} took ${held} in hand, not ${item}`);
 }
 
+/** The middle of the page, where the crosshair is. */
+const CENTRE = { x: 720, y: 450 };
+
+/** With a locked mouse: clicks the world once to take the mouse, as a player does, when it is not taken. */
+async function takeMouse() {
+  if (!LOCK || (await state()).camera.locked) return;
+  await page.mouse.click(CENTRE.x, CENTRE.y);
+  await frames(2);
+  must((await state()).camera.locked, 'a click in the world did not take the mouse');
+  must((await state()).breaking === null, 'the click that took the mouse started a break');
+}
+
+/** Turns the free or first-person view so the crosshair is on a block's face, and checks the game aims at that block. */
+async function aimThrough(x, y, z, n) {
+  await takeMouse();
+  const close = [undefined, 2.5];
+  for (const distance of CAMERA === 'free' ? close : [undefined]) {
+    for (const inset of [0.49, 0.3, 0.45, 0.2]) {
+      const at = { x: x + 0.5 + n[0] * inset, y: y + 0.5 + n[1] * inset, z: z + 0.5 + n[2] * inset };
+      // Off the face's middle a little, so the crosshair is not on the line between two blocks.
+      const off = 0.13;
+      if (n[0] === 0) at.x += off; if (n[2] === 0) at.z += off; if (n[1] === 0) at.y += off;
+      await game(([d]) => { if (d !== undefined) { const c = window.__game.state().camera; window.__game.look(c.yaw, c.pitch, d); } }, [distance]);
+      await game(([a]) => window.__game.aimAt(a.x, a.y, a.z), [at]);
+      await frames(2);
+      const aim = await p.aim();
+      if (aim && aim.x === x && aim.y === y && aim.z === z) return 0;
+    }
+  }
+  const aim = await p.aim();
+  throw new Error(`the crosshair cannot aim at ${x}, ${y}, ${z} (aims at ${JSON.stringify(aim)}; camera ${JSON.stringify((await state()).camera)})`);
+}
+
 /** Points the real mouse at a block's face, and checks the game aims at that block. Turns the camera if it is hidden. */
 async function point(x, y, z, n = [0, 1, 0]) {
+  if (LOCK) return aimThrough(x, y, z, n);
   for (let tries = 0; tries < 8; tries++) {
     await frames(2);
     const insets = [0.49, 0.3, 0.45];
@@ -310,12 +360,37 @@ async function point(x, y, z, n = [0, 1, 0]) {
       const aim = await p.aim();
       if (aim && aim.x === x && aim.y === y && aim.z === z) return tries;
     }
-    // Something stands in front of it, or it is out of reach of the pointer: turn the camera a quarter.
-    await press('KeyQ');
+    // Something stands in front of it, or it is out of reach of the pointer: turn the 2.5D camera a quarter, or
+    // the free one onto the block, nearer the hero every other try.
+    if (CAMERA === 'tilt') {
+      await press('KeyQ');
+    } else {
+      await game(([a, near]) => {
+        const g = window.__game, c = g.state().camera;
+        if (near) g.look(c.yaw, c.pitch, 2.5);
+        g.aimAt(a.x, a.y, a.z);
+      }, [{ x: x + 0.5 + n[0] * 0.45, y: y + 0.5 + n[1] * 0.45, z: z + 0.5 + n[2] * 0.45 }, tries % 2 === 1]);
+    }
     await frames(6);
   }
   const aim = await p.aim();
   throw new Error(`the pointer cannot aim at ${x}, ${y}, ${z} from any side (aims at ${JSON.stringify(aim)})`);
+}
+
+/**
+ * A right click as a hand makes it: the press and the release 60 ms apart by the events' own clocks. The game
+ * counts a right press as a click only when it comes up soon (src/game/shell/drag.ts), and page.mouse waits for
+ * each event to be handled, which takes a whole frame on this Mac's software WebGL. These are the same input
+ * events page.mouse sends, with the time a hand would take written on them.
+ */
+async function handClick(page, x, y, jitter = 0) {
+  const cdp = (page.__cdp ??= await page.context().newCDPSession(page));
+  const t0 = Date.now() / 1000;
+  const send = (type, px, py, at, buttons) => cdp.send('Input.dispatchMouseEvent', { type, x: px, y: py, button: type === 'mouseMoved' ? 'none' : 'right', buttons, clickCount: type === 'mouseMoved' ? 0 : 1, timestamp: t0 + at });
+  await send('mouseMoved', x, y, 0, 0);
+  await send('mousePressed', x, y, 0.01, 2);
+  if (jitter) { await send('mouseMoved', x + jitter, y - 1, 0.03, 2); await send('mouseMoved', x - 1, y + jitter, 0.05, 2); }
+  await send('mouseReleased', jitter ? x - 1 : x, jitter ? y + jitter : y, 0.07, 0);
 }
 
 let turns = 0;
@@ -332,7 +407,8 @@ async function dig(x, y, z, n = [0, 1, 0], seconds = 6) {
 /** The real right button on a block's face. */
 async function use(x, y, z, n = [0, 1, 0]) {
   turns += await point(x, y, z, n);
-  await page.mouse.click(...Object.values(await p.face(x, y, z, n, 0.45)), { button: 'right' });
+  const at = LOCK ? CENTRE : await p.face(x, y, z, n, 0.45);
+  await handClick(page, at.x, at.y);
   await game(() => window.__game.advance(0.1));
 }
 
@@ -412,6 +488,12 @@ async function talkTo(id, attempt = 0, listen = false) {
   }
   const npc = await p.npc(id);
   const prompt = (await state()).prompt;
+  if (prompt !== `Talk to ${npc.name}` && prompt !== null && attempt < 3) {
+    // Someone else stands nearer, as Wren does by Odo late in the festival: let people move, and come again.
+    note(`approaching ${id} again after "${prompt}" was the nearer prompt`);
+    await game(() => window.__game.advance(4));
+    return talkTo(id, attempt + 1);
+  }
   must(prompt === `Talk to ${npc.name}`, `beside ${id} the prompt is "${prompt}"`);
   await frames(1);
   const promptOnScreen = await game(() => document.querySelector('.gu-prompt')?.textContent ?? '');
@@ -512,8 +594,16 @@ async function feed(byKey) {
       await page.keyboard.press('KeyE');
     } else {
       await hold('berry');
-      const s = (await state()).player;
-      await use(Math.floor(s.x), Math.floor(s.y) - 1, Math.floor(s.z));
+      const now = await state(), s = now.player;
+      if (ORBIT) {
+        // The free camera cannot look straight down past the hero, so hold the treat out over the ground two
+        // blocks ahead. Any block will do: the leaftail takes the click.
+        const yaw = (now.camera.yaw * Math.PI) / 180;
+        const x = Math.floor(s.x - Math.sin(yaw) * 2), z = Math.floor(s.z - Math.cos(yaw) * 2);
+        await use(x, await game(([a, b]) => window.__game.view.world.sim.heightAt(a, b) - 1, [x, z]), z);
+      } else {
+        await use(Math.floor(s.x), Math.floor(s.y) - 1, Math.floor(s.z));
+      }
     }
     if (await until(`sys.pets.all().find((x) => x.kind === 'leaftail').trust > ${before}`, 6, 0.25)) {
       await game(() => window.__game.advance(3.2));
@@ -653,6 +743,14 @@ const QUESTS = {
       must((await p.count('bed')) === 1, 'the Make panel did not make a bed');
       await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 120 });
       await hold('plank');
+      if (ORBIT) {
+        // From the ground the crosshair cannot see the top of a block two high, as a player in first person
+        // cannot: set a plank down as a stool and build the walls from on top of it.
+        await use(h.x + 1, g - 1, h.z + 3);
+        must((await game(([a, b, c]) => window.__game.block(a, b, c).key, [h.x + 1, g, h.z + 3])) === 'oak_plank', 'the stool did not go down');
+        await walkTo({ x: h.x + 1.5, y: g + 1, z: h.z + 3.5 }, { within: 0.3, seconds: 60 });
+        must((await state()).player.y >= g + 1 - 1e-6, 'the hero did not climb onto the stool');
+      }
       for (const [x, z, high] of [[h.x - 1, h.z, 3], [h.x - 1, h.z + 1, 3], [h.x, h.z - 1, 3], [h.x + 1, h.z, 2]]) {
         for (let i = 0; i < high; i++) {
           if (!(await p.slotOf('plank') >= 0 && (await state()).held === 'plank')) await hold('plank');
@@ -664,7 +762,24 @@ const QUESTS = {
       // The bed is two blocks long and goes on the way the player faces: step back and come up facing north,
       // and set its foot down at h.z + 1 so its pillow is at h.z, under the roof to come.
       await walkTo({ x: h.x + 0.5, y: g, z: h.z + 3.5 }, { within: 0.3, seconds: 30 });
-      await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 30 });
+      if (!ORBIT) {
+        await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 30 });
+      } else {
+        // Far enough back that the body stays clear of the bed's foot at h.z + 1, which ends at h.z + 2, after
+        // the short step north below.
+        await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.95 }, { within: 0.2, seconds: 30, soft: true });
+        // The free camera lets the hero face the way they last walked, which the route may have left on a
+        // diagonal: look north and take a short step, so the bed is set down facing north.
+        await game(() => {
+          const g = window.__game;
+          g.look(0, g.state().camera.pitch);
+          g.key('w', true); g.advance(0.05); g.key('w', false); g.advance(0.3);
+        });
+        const facing = (await state()).player.facing;
+        must(Math.abs(Math.atan2(Math.sin(facing), Math.cos(facing))) < Math.PI / 4, `the hero faces ${facing.toFixed(2)}, not north`);
+        const stand = (await state()).player.z;
+        must(stand - 0.3 >= h.z + 2, `the hero stopped at z ${stand.toFixed(2)}, on the cell the bed's foot needs`);
+      }
       await hold('bed');
       await use(h.x, g - 1, h.z + 1);
       must((await p.placed(h.x, g, h.z)) === 'bed' && (await p.placed(h.x, g, h.z + 1)) === 'bed', 'no bed two blocks long stands where it was set down');
@@ -915,9 +1030,9 @@ try {
   process.kill(serverPid);
 }
 
-writeFileSync(resolve(out, 'act1.json'), JSON.stringify({ log, notes, errors, turns, voiced, clips: Object.fromEntries(clipFiles), seconds: (Date.now() - started) / 1000 }, null, 2));
+writeFileSync(resolve(out, 'act1.json'), JSON.stringify({ camera: CAMERA, mouse: MOUSE, log, notes, errors, turns, voiced, clips: Object.fromEntries(clipFiles), seconds: (Date.now() - started) / 1000 }, null, 2));
 if (errors.length) console.log(`FAIL console errors:\n  ${errors.join('\n  ')}`);
 if (failed && !log.some((l) => l.ok === false)) console.log(`FAIL ${failed.stack ?? failed}`);
 const pass = !failed && errors.length === 0;
-console.log(`\n${pass ? 'PASS' : 'FAIL'}: ${log.filter((l) => l.ok).length} steps, ${errors.length} console errors, ${turns} camera turns to aim, ${((Date.now() - started) / 60000).toFixed(1)} minutes`);
+console.log(`\n${pass ? 'PASS' : 'FAIL'}: ${CAMERA} camera${CAMERA === 'free' ? ` (${MOUSE})` : ''}, ${log.filter((l) => l.ok).length} steps, ${errors.length} console errors, ${turns} camera turns to aim, ${((Date.now() - started) / 60000).toFixed(1)} minutes`);
 process.exit(pass ? 0 : 1);

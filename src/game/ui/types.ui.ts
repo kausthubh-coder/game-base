@@ -83,6 +83,8 @@ export interface GameUiOptions {
   setVolume(channel: VolumeChannel, value: number): void;
   /** Called with 0.9, 1 or 1.15 so the HUD can match. The panels scale themselves. */
   setInterfaceSize?(size: number): void;
+  /** The View section of Settings: the camera and how characters are drawn. The game stores both. Left out, there is no View section. */
+  view?: ViewChoices;
   /** Pictures from the manifest's `ui` entry. Each one is optional and has a CSS fallback. */
   art?: { title?: string; panel?: NineSlice; button?: NineSlice };
   /** The list of keys in Settings. Defaults to DEFAULT_KEYS. */
@@ -96,6 +98,24 @@ export interface GameUiOptions {
   /** Called after a panel opens or closes, with the open panel or null. */
   onChange?(panel: PanelName | null): void;
 }
+
+/** The View section's choices. The game owns and stores them; Settings only shows them and passes picks on. */
+export interface ViewChoices {
+  camera(): ViewCamera;
+  setCamera(mode: ViewCamera): void;
+  mouse(): ViewMouse;
+  setMouse(style: ViewMouse): void;
+  tiltTurn(): ViewTiltTurn;
+  setTiltTurn(turn: ViewTiltTurn): void;
+  characters(): ViewCharacters;
+  setCharacters(look: ViewCharacters): void;
+}
+export type ViewCamera = 'tilt' | 'free' | 'first';
+/** How the mouse turns the free camera: `drag` with the right button held, as in Roblox, or `lock` it, as in Genshin. */
+export type ViewMouse = 'drag' | 'lock';
+/** Where the 2.5D camera rests after a drag: on the nearest quarter turn, or where it was let go. */
+export type ViewTiltTurn = 'quarter' | 'smooth';
+export type ViewCharacters = 'sprites' | 'models';
 
 export interface GameUi {
   /** Opens a panel, replacing any open one. `detail` is a page id for the Almanac. */

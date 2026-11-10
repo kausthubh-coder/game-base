@@ -1,6 +1,18 @@
 // Every key, mouse button and wheel the game reads comes through here. The rest of the shell sees only
 // `Keys`: what is held right now, and a `Press` for each thing that happens once. The base's input
 // feature will replace this file, so nothing else listens to the keyboard or the mouse.
+//
+// The mouse works in one of three ways, picked by the camera and the Mouse setting:
+//   `point` (the 2.5D camera) and `drag` (the free camera, Drag to turn) work as Roblox does: the cursor stays
+//   free and aims, and holding the right button and dragging turns the camera. The cursor hides during the drag.
+//   A right click that does not drag (see drag.ts) still uses or places what the hero holds, when it comes up.
+//   `point` zooms in steps, `drag` smoothly.
+//   `lock` (first person, and the free camera with Lock to turn) works as Genshin does on a PC: a click in the
+//   world hides the cursor and from then on the mouse turns the view. That first click does nothing else, so
+//   the click that takes the mouse never breaks a block. Alt or Esc gives the cursor back, and so does anything
+//   that holds the player (a panel, the map, a conversation, the title). The next click in the world takes it again.
+
+import { RightDrag } from './drag.ts';
 
 /** Something that happens once. */
 export type Press =
@@ -13,9 +25,14 @@ export type Press =
   | { kind: 'slot'; index: number }
   /** The next or the previous quick slot. */
   | { kind: 'slotStep'; step: 1 | -1 }
-  /** The left or the right mouse button went down on the world. */
+  /** The left button went down on the world, or the right button clicked it without dragging. */
   | { kind: 'use'; button: 'primary' | 'secondary' }
+  /** V: the next camera mode. */
+  | { kind: 'camera' }
   | { kind: 'perf' };
+
+/** How the mouse turns the camera. See the top of this file. */
+export type MouseMode = 'point' | 'drag' | 'lock';
 
 export interface Keys {
   /** -1 to 1, relative to the camera. */
@@ -38,13 +55,26 @@ export interface Keys {
   tap(name: string): boolean;
   /** Lets go of everything, for when a panel opens or the window loses focus. */
   release(): void;
+  /** How the mouse turns the camera. `point` until told otherwise. */
+  setMouse(mode: MouseMode): void;
+  readonly mouse: MouseMode;
+  /** True while the cursor is locked and the mouse turns the view, in `lock`. */
+  readonly locked: boolean;
+  /** True while a right-button drag turns the camera, in `point` and `drag`. */
+  readonly dragging: boolean;
+  /** Runs `fn` when a right-button drag ends. Returns a function that stops it. */
+  onDragEnd(fn: () => void): () => void;
+  /** With `true` the cursor is given back and no click takes it. Call it every frame with what holds the player. */
+  freeCursor(free: boolean): void;
+  /** Pixels the mouse turned the view by since the last call, right and down, written into `out`: a locked mouse's or a drag's. */
+  takeLook(out: { x: number; y: number }): void;
   dispose(): void;
 }
 
 const NAMES: Record<string, string> = {
   w: 'KeyW', a: 'KeyA', s: 'KeyS', d: 'KeyD', e: 'KeyE', q: 'KeyQ', r: 'KeyR',
   up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
-  shift: 'ShiftLeft', space: 'Space', f3: 'F3',
+  shift: 'ShiftLeft', space: 'Space', f3: 'F3', v: 'KeyV',
 };
 const codeOf = (name: string): string => NAMES[name.toLowerCase()] ?? (/^[1-9]$/.test(name) ? `Digit${name}` : name);
 
@@ -60,7 +90,13 @@ export function createKeys(canvas: HTMLElement): Keys {
   const held = new Set<string>();
   const listeners = new Set<(press: Press) => void>();
   const pointer = { x: 0, y: 0, over: false };
+  const dragEnds = new Set<() => void>();
   let primary = false;
+  let mode: MouseMode = 'point', cursorFree = false, lockFailed = false, lookX = 0, lookY = 0;
+  const right = new RightDrag();
+  const isLocked = (): boolean => document.pointerLockElement === canvas;
+  /** True when a click in the world may take the mouse. */
+  const mayLock = (): boolean => mode === 'lock' && !cursorFree && !lockFailed;
 
   const send = (press: Press): void => {
     for (const listener of [...listeners]) listener(press);
@@ -71,19 +107,65 @@ export function createKeys(canvas: HTMLElement): Keys {
     if (code === 'KeyE') return { kind: 'interact' };
     if (code === 'KeyQ') return { kind: 'turn', direction: -1 };
     if (code === 'KeyR') return { kind: 'turn', direction: 1 };
+    if (code === 'KeyV') return { kind: 'camera' };
     if (code === 'F3') return { kind: 'perf' };
     const digit = /^Digit([1-9])$/.exec(code);
     return digit ? { kind: 'slot', index: Number(digit[1]) - 1 } : null;
   }
 
   function movePointer(e: PointerEvent): void {
+    // While the right button is down the aim stays where it was pressed: a click places on the block it went
+    // down on, and a drag turns the camera without sweeping the aim about.
+    if (right.down) return;
     const box = canvas.getBoundingClientRect();
     pointer.x = ((e.clientX - box.left) / (box.width || 1)) * 2 - 1;
     pointer.y = -(((e.clientY - box.top) / (box.height || 1)) * 2 - 1);
-    pointer.over = true;
+    // A drag let go of outside the canvas leaves the pointer off it.
+    pointer.over = Math.abs(pointer.x) <= 1 && Math.abs(pointer.y) <= 1;
+  }
+
+  /** Ends a right-button press. A click uses; a drag gives the cursor back where the hand left it. */
+  function endRight(e: PointerEvent | null): void {
+    const was = right.dragging;
+    const end = right.release(e ? e.timeStamp : 0);
+    if (was) {
+      canvas.style.cursor = '';
+      if (e) movePointer(e);
+      for (const fn of [...dragEnds]) fn();
+    }
+    if (end === 'click') send({ kind: 'use', button: 'secondary' });
+  }
+  /** Forgets a right-button press without using anything. */
+  function cancelRight(): void {
+    if (!right.down) return;
+    const was = right.dragging;
+    right.cancel();
+    if (!was) return;
+    canvas.style.cursor = '';
+    for (const fn of [...dragEnds]) fn();
+  }
+
+  /** A button went down on the world. */
+  function buttonDown(e: PointerEvent): void {
+    if (e.button === 0) {
+      primary = true;
+      send({ kind: 'use', button: 'primary' });
+    } else if (e.button === 2) {
+      if (mode === 'lock') { send({ kind: 'use', button: 'secondary' }); return; }
+      if (cursorFree) return;
+      right.press(e.clientX, e.clientY, e.timeStamp);
+      // The drag goes on when the hand leaves the canvas, until the button comes up.
+      try { canvas.setPointerCapture(e.pointerId); } catch { /* a synthetic pointer: the window still hears it */ }
+    }
   }
 
   window.addEventListener('keydown', (e) => {
+    // Alt gives the cursor back, as in Genshin.
+    if ((e.code === 'AltLeft' || e.code === 'AltRight') && mode === 'lock') {
+      e.preventDefault();
+      if (isLocked()) document.exitPointerLock();
+      return;
+    }
     if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
     // Space and Enter on a focused button belong to the button, not to the hero's legs.
     if ((e.code === 'Space' || e.code === 'Enter') && e.target instanceof HTMLElement && e.target.closest('button, a, [role="button"]')) return;
@@ -93,27 +175,63 @@ export function createKeys(canvas: HTMLElement): Keys {
     const press = pressOf(e.code);
     if (press) send(press);
   }, on);
-  window.addEventListener('keyup', (e) => held.delete(e.code), on);
-  window.addEventListener('blur', () => { held.clear(); primary = false; }, on);
+  window.addEventListener('keyup', (e) => {
+    held.delete(e.code);
+    // Alt let go on its own would put Windows' focus on the browser's menu.
+    if ((e.code === 'AltLeft' || e.code === 'AltRight') && mode === 'lock') e.preventDefault();
+  }, on);
+  window.addEventListener('blur', () => { held.clear(); primary = false; cancelRight(); }, on);
 
-  canvas.addEventListener('pointermove', movePointer, on);
+  canvas.addEventListener('pointermove', (e) => {
+    // A second button pressed or let go while another is held comes as a move with `button` set.
+    if (e.button === 0 || e.button === 2) {
+      const bit = e.button === 0 ? 1 : 2;
+      if (e.buttons & bit) { if (!(mayLock() && !isLocked())) buttonDown(e); }
+      else if (e.button === 0) primary = false;
+      else endRight(e);
+    }
+    if (right.move(e.clientX, e.clientY)) {
+      if (canvas.style.cursor !== 'none') canvas.style.cursor = 'none';
+      lookX += right.dx;
+      lookY += right.dy;
+    }
+    movePointer(e);
+  }, on);
   canvas.addEventListener('pointerleave', () => { pointer.over = false; primary = false; }, on);
   canvas.addEventListener('contextmenu', (e) => e.preventDefault(), on);
   canvas.addEventListener('pointerdown', (e) => {
     movePointer(e);
-    if (e.button === 0) {
-      primary = true;
-      send({ kind: 'use', button: 'primary' });
-    } else if (e.button === 2) {
-      send({ kind: 'use', button: 'secondary' });
+    if (mayLock() && !isLocked()) {
+      // This click takes the mouse and does nothing else.
+      const asked = canvas.requestPointerLock() as unknown as Promise<void> | undefined;
+      asked?.catch?.(() => { lockFailed = true; });
+      return;
     }
+    buttonDown(e);
   }, on);
-  window.addEventListener('pointerup', (e) => { if (e.button === 0) primary = false; }, on);
+  window.addEventListener('pointerup', (e) => {
+    if (e.button === 0) primary = false;
+    else if (e.button === 2) endRight(e);
+  }, on);
+  window.addEventListener('pointercancel', () => { primary = false; cancelRight(); }, on);
+  document.addEventListener('pointerlockerror', () => { lockFailed = true; }, on);
+  document.addEventListener('pointerlockchange', () => { if (!isLocked()) primary = false; }, on);
+  document.addEventListener('pointermove', (e) => {
+    // Without the lock (a browser that refuses it) the mouse turns the view while it is over the world.
+    if (mode !== 'lock' || cursorFree || !(isLocked() || (lockFailed && e.target === canvas))) return;
+    lookX += e.movementX;
+    lookY += e.movementY;
+  }, on);
 
   // A mouse wheel sends one big step and a trackpad many small ones. Either way one gesture is one step.
   let wheel = 0, lastStep = 0;
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
+    if (mode !== 'point' && !e.shiftKey) {
+      // The free camera zooms smoothly: a notch of a mouse wheel is one step, a trackpad's swipe a few.
+      send({ kind: 'zoom', steps: Math.max(-3, Math.min(3, (e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY) / 100)) });
+      return;
+    }
     // With Shift down some browsers report the wheel sideways.
     wheel += e.deltaY || e.deltaX;
     if (Math.abs(wheel) < 40 || e.timeStamp - lastStep < (e.shiftKey ? 90 : 220)) return;
@@ -153,11 +271,38 @@ export function createKeys(canvas: HTMLElement): Keys {
     release() {
       held.clear();
       primary = false;
+      cancelRight();
+    },
+
+    setMouse(next) {
+      if (next === mode) return;
+      mode = next;
+      lookX = lookY = 0;
+      cancelRight();
+      if (next !== 'lock' && isLocked()) document.exitPointerLock();
+    },
+    get mouse() { return mode; },
+    get locked() { return isLocked(); },
+    get dragging() { return right.dragging; },
+    onDragEnd(fn) {
+      dragEnds.add(fn);
+      return () => dragEnds.delete(fn);
+    },
+    freeCursor(free) {
+      cursorFree = free;
+      if (free) cancelRight();
+      if (free && isLocked()) document.exitPointerLock();
+    },
+    takeLook(out) {
+      out.x = lookX;
+      out.y = lookY;
+      lookX = lookY = 0;
     },
 
     dispose() {
       stop.abort();
       listeners.clear();
+      dragEnds.clear();
     },
   };
 }

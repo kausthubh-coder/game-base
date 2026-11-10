@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { blockId } from '../../content/blocks.ts';
 import { CameraRig } from './rig.sim.ts';
 import { CutawayRule, type BlockProbe } from './cutaway.sim.ts';
+import { FIRST_PERSON, OrbitRig, clearance } from './orbit.sim.ts';
 
 const STONE = blockId('stone'), THATCH = blockId('thatch'), LEAVES = blockId('oak_leaves'), PLASTER = blockId('plaster');
 const DT = 1 / 60;
@@ -90,6 +91,64 @@ describe('the camera rig', () => {
     run(rig, 0.3);
     expect(Math.abs(rig.yaw)).toBeCloseTo(Math.PI, 5);
     expect(rig.quarter).toBe(2);
+  });
+
+  test('a drag turns the view at once to any angle and keeps the pitch and the zoom', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0 });
+    run(rig, 0.5);
+    const pitch = rig.pitch, distance = rig.distance;
+    rig.spin(30 * deg);
+    expect(rig.yaw / deg).toBeCloseTo(30, 9);
+    expect(rig.turning).toBe(false);
+    run(rig, 0.5);
+    expect(rig.yaw / deg).toBeCloseTo(30, 9);
+    expect(rig.pitch).toBe(pitch);
+    expect(rig.distance).toBeCloseTo(distance, 9);
+    // The camera stands where yaw 30 puts it: south and a little east of the target, still 35 degrees up.
+    const dx = rig.position.x - rig.look.x, dy = rig.position.y - rig.look.y, dz = rig.position.z - rig.look.z;
+    expect(Math.atan2(dx, dz) / deg).toBeCloseTo(30, 6);
+    expect(Math.atan2(dy, Math.hypot(dx, dz)) / deg).toBeCloseTo(35, 6);
+    expect(rig.quarter).toBe(0);
+    rig.spin(20 * deg);
+    expect(rig.quarter).toBe(1);
+  });
+
+  test('between two quarters, Q and R go to the nearer quarter that way, and settle to the nearest', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0 });
+    run(rig, 0.1);
+    rig.spin(30 * deg);
+    rig.turn(1);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(0, 6);
+    rig.spin(30 * deg);
+    rig.turn(-1);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(90, 6);
+    expect(rig.quarter).toBe(1);
+    // A hair off a quarter counts as on it: R makes a whole turn from there.
+    rig.spin(2 * deg);
+    rig.turn(1);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(0, 6);
+    rig.spin(-50 * deg);
+    rig.settle();
+    expect(rig.quarter).toBe(3);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(-90, 6);
+  });
+
+  test('a drag during a quarter turn moves where the turn is headed', () => {
+    const deg = Math.PI / 180;
+    const rig = new CameraRig({ baseYaw: 0 });
+    run(rig, 0.1);
+    rig.turn(-1);
+    run(rig, 0.1);
+    rig.spin(10 * deg);
+    expect(rig.turning).toBe(true);
+    run(rig, 0.4);
+    expect(rig.yaw / deg).toBeCloseTo(100, 6);
   });
 
   test('zoom has three steps and stops at the ends', () => {
@@ -216,5 +275,91 @@ describe('the cutaway', () => {
     expect(rule.hides(9, 8, 9)).toBe(false);
     expect(rule.hides(12, 9, 12)).toBe(false);
     expect(rule.hides(16, 10, 9)).toBe(false);
+  });
+});
+
+/** Flat ground with its top at y = 10, and a stone wall at z = 5 and 6 from x = -20 to 20, 8 blocks high. */
+const walled: BlockProbe = {
+  getBlock(x, y, z) {
+    if (y < 10) return STONE;
+    if ((z === 5 || z === 6) && x >= -20 && x <= 20 && y < 18) return STONE;
+    return 0;
+  },
+};
+
+describe('the free camera', () => {
+  const deg = Math.PI / 180;
+
+  test('stands behind the hero the way it looks, over the right shoulder, at the asked distance', () => {
+    const rig = new OrbitRig({ distance: 6, pitch: 20 * deg, shoulder: 0.6, lift: 1.7 });
+    rig.set(0, 20 * deg);
+    for (let i = 0; i < 30; i++) rig.update(DT, 0, 10, 0);
+    // Yaw 0 looks north, so the camera is south of the hero, and right is east.
+    expect(rig.forward.z).toBeLessThan(-0.9);
+    expect(rig.pivot.x).toBeCloseTo(0.6, 5);
+    expect(rig.position.z).toBeCloseTo(6 * Math.cos(20 * deg), 3);
+    expect(rig.position.y).toBeCloseTo(11.7 + 6 * Math.sin(20 * deg), 3);
+    expect(Math.hypot(rig.position.x - rig.pivot.x, rig.position.y - rig.pivot.y, rig.position.z - rig.pivot.z)).toBeCloseTo(6, 3);
+  });
+
+  test('keeps its pitch and distance within limits', () => {
+    const rig = new OrbitRig();
+    rig.turn(0, 10);
+    expect(rig.pitch).toBe(rig.options.maxPitch);
+    rig.turn(0, -10);
+    expect(rig.pitch).toBe(rig.options.minPitch);
+    for (let i = 0; i < 40; i++) rig.zoomBy(1);
+    expect(rig.distance).toBe(rig.options.maxDistance);
+    for (let i = 0; i < 40; i++) rig.zoomBy(-0.5);
+    expect(rig.distance).toBe(rig.options.minDistance);
+    // Yaw wraps into -PI to PI.
+    rig.set(3 * Math.PI, 0);
+    expect(Math.abs(rig.yaw)).toBeCloseTo(Math.PI, 6);
+  });
+
+  test('pulls in at once when a wall stands behind the hero, never inside it, and eases out after', () => {
+    const rig = new OrbitRig({ distance: 8, pitch: 10 * deg });
+    // The hero stands at z = 3.5 with the wall's face at z = 5 behind, and looks north, away from it.
+    rig.set(0, 10 * deg);
+    rig.snap(0.5, 10, 3.5, walled);
+    expect(rig.reach).toBeLessThan(1.5);
+    expect(rig.position.z).toBeLessThan(5 - rig.options.radius + 1e-6);
+    expect(clearance(walled, rig.position.x, rig.position.y, rig.position.z, 0, 0, 1, 1)).toBeGreaterThan(0);
+    // Turned to look along the wall, the camera has room again and glides back out.
+    rig.set(Math.PI / 2, 10 * deg);
+    for (let i = 0; i < 30; i++) rig.update(1 / 60, 0.5, 10, 3.5, walled);
+    const partway = rig.reach;
+    expect(partway).toBeGreaterThan(1.5);
+    expect(partway).toBeLessThan(8);
+    for (let i = 0; i < 300; i++) rig.update(1 / 60, 0.5, 10, 3.5, walled);
+    expect(rig.reach).toBeCloseTo(8, 1);
+  });
+
+  test('looking up from low ground, the camera comes in over the grass instead of going under it', () => {
+    const rig = new OrbitRig({ distance: 8 });
+    rig.set(0, rig.options.minPitch);
+    rig.snap(0.5, 10, 0.5, walled);
+    expect(rig.position.y).toBeGreaterThan(10 + rig.options.radius - 1e-6);
+    expect(rig.reach).toBeLessThan(8);
+  });
+
+  test('aims its middle at a point, and first person looks from the eyes', () => {
+    const free = new OrbitRig();
+    free.snap(0.5, 10, 0.5, walled);
+    free.aimAt(4.5, 10.5, -3.5, walled);
+    const f = free.forward, p = free.position;
+    const t = (4.5 - p.x) / f.x;
+    expect(p.y + f.y * t).toBeCloseTo(10.5, 3);
+    expect(p.z + f.z * t).toBeCloseTo(-3.5, 3);
+
+    const eyes = new OrbitRig(FIRST_PERSON);
+    eyes.snap(0.5, 10, 0.5);
+    expect([eyes.position.x, eyes.position.y, eyes.position.z]).toEqual([0.5, 11.6, 0.5]);
+    eyes.aimAt(0.5, 10.5, -2.5);
+    expect(eyes.yaw).toBeCloseTo(0, 6);
+    expect(eyes.pitch).toBeCloseTo(Math.atan2(1.1, 3), 6);
+    // It follows the hero exactly, with no glide.
+    eyes.update(1 / 60, 3, 12, 4);
+    expect([eyes.position.x, eyes.position.y, eyes.position.z]).toEqual([3, 13.6, 4]);
   });
 });

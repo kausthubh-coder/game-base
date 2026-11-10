@@ -17,9 +17,9 @@ export async function install(view: GameView): Promise<void> {
   const loader = new GLTFLoader();
   const clock = { value: 0 };
   const group = new THREE.Group(); group.name = 'Blender model look test';
-  const manifest = await (await fetch('/assets/manifest.json')).json();
+  const manifest = await (await fetch(`${import.meta.env.BASE_URL}assets/manifest.json`)).json();
   // Load everything before changing the scene, so a failed request leaves no half-installed fixture.
-  const loaded = await Promise.all(Object.keys(PLACEMENTS).map(async name => ({ name, gltf: await loader.loadAsync(`/assets/${manifest.models[name].file}`) })));
+  const loaded = await Promise.all(Object.keys(PLACEMENTS).map(async name => ({ name, gltf: await loader.loadAsync(`${import.meta.env.BASE_URL}assets/${manifest.models[name].file}`) })));
   for (const { name, gltf } of loaded) {
     gltf.scene.updateMatrixWorld(true);
     let source: THREE.Mesh | undefined;

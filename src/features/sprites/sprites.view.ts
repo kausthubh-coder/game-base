@@ -185,6 +185,8 @@ uniform vec2 uAtlasSize;
 uniform vec3 uSky;
 uniform vec3 uLamp;
 uniform float uMinLight;
+// Radians. Past this pitch down a sprite leans back, away from the camera. The 2.5D camera looks down 35 degrees at most.
+const float LEAN_FROM = 0.628;
 attribute vec4 aPlace;
 attribute vec4 aRow;
 attribute vec4 aFrame;
@@ -218,7 +220,12 @@ void main() {
   float across = (position.x * aFrame.x - aAnchor.x) * aAnchor.z * aFrame.w;
   float up = (aAnchor.y - (1.0 - position.y) * aFrame.y) * aAnchor.z;
   vec3 right = normalize(vec3(viewMatrix[0][0], 0.0, viewMatrix[2][0]));
-  vec4 mvPosition = viewMatrix * vec4(aPlace.xyz + right * across + vec3(0.0, up, 0.0), 1.0);
+  // A camera looking down steeper than LEAN_FROM would see an upright quad squashed, so the quad leans back,
+  // away from it, about the feet by the difference, and is always seen as from LEAN_FROM. The 2.5D camera never
+  // looks down that far, so there it stands upright.
+  float lean = max(asin(clamp(viewMatrix[1][2], -1.0, 1.0)) - LEAN_FROM, 0.0);
+  vec3 rise = vec3(right.z * sin(lean), cos(lean), -right.x * sin(lean));
+  vec4 mvPosition = viewMatrix * vec4(aPlace.xyz + right * across + rise * up, 1.0);
   gl_Position = aFrame.w == 0.0 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * mvPosition;
   #include <fog_vertex>
 }

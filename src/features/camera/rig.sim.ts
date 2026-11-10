@@ -1,5 +1,5 @@
-// Where the camera is, as numbers: it orbits a target at a pitch, turns in quarter turns, zooms in steps
-// and follows the target smoothly. No drawing here, so sprites and a server can read it.
+// Where the camera is, as numbers: it orbits a target at a pitch, turns in quarter turns or smoothly to any
+// angle, zooms in steps and follows the target smoothly. No drawing here, so sprites and a server can read it.
 //
 // The pitch, the aim and the lift may each be one number or one per zoom step. Given per step, they glide
 // with the distance as the zoom glides, so a camera can look down from far out and toward the horizon up close.
@@ -44,7 +44,10 @@ const ease = (t: number): number => t * t * (3 - 2 * t);
 
 export class CameraRig {
   readonly options: RigOptions;
-  /** Quarter turns from the base yaw, 0 to 3, counted counter-clockwise seen from above. It changes the moment a turn starts. */
+  /**
+   * The quarter turn nearest where the camera is headed, from the base yaw, 0 to 3, counted counter-clockwise seen
+   * from above. It changes the moment a turn starts.
+   */
   quarter = 0;
   /** The yaw right now, in radians from -PI to PI. It glides during a turn. */
   yaw: number;
@@ -60,7 +63,8 @@ export class CameraRig {
   pitch = 0;
   aim = 0;
 
-  private turns = 0;
+  /** The yaw the camera is headed for, not wrapped, so a turn never takes the long way round. */
+  private goal: number;
   private yawFrom: number;
   private yawNow: number;
   private turnClock = 1;
@@ -70,7 +74,7 @@ export class CameraRig {
     this.options = { ...DEFAULT_RIG, ...options };
     this.zoom = Math.max(0, Math.min(this.options.distances.length - 1, this.options.zoom));
     this.distance = this.options.distances[this.zoom];
-    this.yawNow = this.yawFrom = this.options.baseYaw;
+    this.yawNow = this.yawFrom = this.goal = this.options.baseYaw;
     this.yaw = wrap(this.yawNow);
   }
 
@@ -78,10 +82,35 @@ export class CameraRig {
     return this.turnClock < 1;
   }
 
-  /** Starts a quarter turn. 1 turns the view to the right, -1 to the left. A turn started during a turn takes over from where the camera is. */
+  /**
+   * Starts a turn to the next quarter that way: 1 turns the view to the right, -1 to the left. Between two
+   * quarters it goes to the nearer one that way, so Q and R always come to rest on a quarter. A turn started
+   * during a turn takes over from where the camera is.
+   */
   turn(direction: 1 | -1): void {
-    this.turns -= direction;
-    this.quarter = ((this.turns % 4) + 4) % 4;
+    // Within a few degrees of a quarter counts as on it, so a turn from there is a whole one.
+    const at = (this.goal - this.options.baseYaw) / QUARTER, near = 0.05;
+    this.glideTo(direction === 1 ? Math.ceil(at - near) - 1 : Math.floor(at + near) + 1);
+  }
+
+  /** Glides to the nearest quarter turn, as a turn does. */
+  settle(): void {
+    this.glideTo(Math.round((this.goal - this.options.baseYaw) / QUARTER));
+  }
+
+  /** Turns the view by an angle at once, as a drag does. Positive turns it to the left. A quarter turn under way carries on from the new angle. */
+  spin(radians: number): void {
+    this.goal += radians;
+    this.yawFrom += radians;
+    if (this.turnClock >= 1) this.yawNow = this.goal;
+    this.yaw = wrap(this.yawNow);
+    this.quarter = quarterOf(this.goal - this.options.baseYaw);
+    if (this.started) this.place();
+  }
+
+  private glideTo(quarters: number): void {
+    this.goal = this.options.baseYaw + quarters * QUARTER;
+    this.quarter = quarterOf(quarters * QUARTER);
     this.yawFrom = this.yawNow;
     this.turnClock = 0;
   }
@@ -109,7 +138,7 @@ export class CameraRig {
     this.look.y += (y + this.step(o.lift) - this.look.y) * (1 - Math.exp(-o.followRate * 0.45 * dt));
     this.distance += (o.distances[this.zoom] - this.distance) * (1 - Math.exp(-10 * dt));
 
-    const goal = o.baseYaw + this.turns * QUARTER;
+    const goal = this.goal;
     if (this.turnClock < 1) {
       this.turnClock = Math.min(1, this.turnClock + dt / o.turnTime);
       this.yawNow = this.yawFrom + (goal - this.yawFrom) * ease(this.turnClock);
@@ -154,6 +183,12 @@ export class CameraRig {
     this.gaze.y = this.position.y - Math.sin(aim) * this.distance;
     this.gaze.z = this.position.z - cos * ahead;
   }
+}
+
+/** The quarter, 0 to 3, nearest an angle from the base yaw. */
+function quarterOf(angle: number): number {
+  const turns = Math.round(angle / QUARTER);
+  return ((turns % 4) + 4) % 4;
 }
 
 function wrap(angle: number): number {

@@ -45,8 +45,10 @@ attribute vec2 aLight;
 varying vec3 vWorld;
 varying vec2 vTileUv;
 varying vec4 vShade;
+varying vec2 vEdgeUv;
 flat varying vec3 vTile;
 flat varying vec2 vCellBase;
+flat varying vec4 vEdges;
 #ifdef TERRAIN_CLEAN
   flat varying float vFace;
 #endif
@@ -70,7 +72,11 @@ vec3 tOrigin = modelMatrix[3].xyz;
 if (tFace < 2) { vTileUv = position.zy; vCellBase = tOrigin.zy; }
 else if (tFace < 4) { vTileUv = position.xz; vCellBase = tOrigin.xz; }
 else { vTileUv = position.xy; vCellBase = tOrigin.xy; }
-vShade = vec4(aLight, aInfo.w / 3.0, mod(tFlags, 2.0));
+// The shade byte: corner shade, then the edges the land drops away from, then the corner's u and v on its face.
+float tEdgeBits = floor(aInfo.w / 4.0);
+vShade = vec4(aLight, (aInfo.w - tEdgeBits * 4.0) / 3.0, mod(tFlags, 2.0));
+vEdges = vec4(mod(tEdgeBits, 2.0), mod(floor(tEdgeBits / 2.0), 2.0), mod(floor(tEdgeBits / 4.0), 2.0), mod(floor(tEdgeBits / 8.0), 2.0));
+vEdgeUv = vec2(mod(floor(tEdgeBits / 16.0), 2.0), floor(tEdgeBits / 32.0));
 vTile = vec3(aInfo.y, aInfo.z, tFace == 2 ? 1.0 : 0.0);
 #ifdef TERRAIN_CLEAN
   vFace = float(tFace);
@@ -90,8 +96,25 @@ uniform float uMinLight;
 varying vec3 vWorld;
 varying vec2 vTileUv;
 varying vec4 vShade;
+varying vec2 vEdgeUv;
 flat varying vec3 vTile;
 flat varying vec2 vCellBase;
+flat varying vec4 vEdges;
+
+// A lit lip along every edge the land drops away from, as if each block's edge were a little rounded and caught
+// the light, and a thin dark crease just under it on the side, which is a little darker all over. Together they
+// draw the edge of a one-block step even where the grass of the top and the turf of the side are one green.
+// 1 means no change.
+float tEdgeShade() {
+  float d = 1.0;
+  if (vEdges.x > 0.5) d = min(d, vEdgeUv.x);
+  if (vEdges.y > 0.5) d = min(d, 1.0 - vEdgeUv.x);
+  if (vEdges.z > 0.5) d = min(d, vEdgeUv.y);
+  if (vEdges.w > 0.5) d = min(d, 1.0 - vEdgeUv.y);
+  if (d >= 1.0) return 1.0;
+  if (vTile.z > 0.5) return 1.0 + 0.3 * (1.0 - smoothstep(0.0, 0.13, d));
+  return 0.88 - 0.28 * (1.0 - smoothstep(0.02, 0.07, d));
+}
 
 float tDither() {
   const float bayer[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
@@ -188,7 +211,7 @@ vec4 tTexel = texture(uTiles, vec3(vTileUv, vTile.x + floor(tPick * vTile.y)));
 #ifndef TERRAIN_WATER
   if (tTexel.a < 0.5) discard;
 #endif
-diffuseColor.rgb *= tTexel.rgb;
+diffuseColor.rgb *= tTexel.rgb * tEdgeShade();
 // Rain darkens ground that lies open to the sky.
 diffuseColor.rgb *= 1.0 - 0.45 * uWetness * vTile.z * smoothstep(0.9, 1.0, vShade.x);
 `;
@@ -255,15 +278,7 @@ if (cKind != 0) {
     // Mossy stone wears a cushion of moss on top, broken in a few places.
     if (cKind == 6) cAlbedo = mix(cAlbedo, cGrass(xz) * vec3(0.78, 0.86, 0.7), smoothstep(0.4, 0.5, cNoise(xz * 1.1 + 4.0)) * 0.9);
 
-    // A rounded rim where the top drops away to a lower neighbor.
-    vec3 skip;
-    vec2 here = floor(xz), inCell = fract(xz);
-    float h = vWorld.y - 0.5, rim = 1.0;
-    if (cColumn(here + vec2(1.0, 0.0), skip).x < h) rim = min(rim, 1.0 - inCell.x);
-    if (cColumn(here - vec2(1.0, 0.0), skip).x < h) rim = min(rim, inCell.x);
-    if (cColumn(here + vec2(0.0, 1.0), skip).x < h) rim = min(rim, 1.0 - inCell.y);
-    if (cColumn(here - vec2(0.0, 1.0), skip).x < h) rim = min(rim, inCell.y);
-    cAlbedo *= 1.0 + 0.13 * (1.0 - smoothstep(0.0, 0.14, rim));
+    // The rounded rim where the top drops away is the mesher's edge shade, below.
   } else if (cFace != 3) {
     float fy = fract(vWorld.y), floorY = floor(vWorld.y);
     float along = vWorld.x + vWorld.z;
@@ -291,11 +306,9 @@ if (cKind != 0) {
       float skirt = 0.08 + 0.2 * cNoise(vec2(along * 2.2, floorY + 5.0));
       cAlbedo = mix(cAlbedo, cGrass(xz) * 0.85, 1.0 - smoothstep(skirt - 0.025, skirt + 0.025, fy));
     }
-    // The top edge of the highest block in a column rounds over into the top face.
-    if (top) cAlbedo *= 1.0 + 0.1 * smoothstep(0.86, 1.0, fy);
   }
 }
-diffuseColor.rgb *= cAlbedo;
+diffuseColor.rgb *= cAlbedo * tEdgeShade();
 diffuseColor.rgb *= 1.0 - 0.45 * uWetness * vTile.z * smoothstep(0.9, 1.0, vShade.x);
 `;
 

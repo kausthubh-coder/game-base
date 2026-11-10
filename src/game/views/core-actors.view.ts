@@ -1,12 +1,15 @@
-// Draws everyone: copies `game.actors` to sprites every frame, and floats each actor's mark (a quest
-// mark, a heart, a zzz) over its head as a small HTML element.
+// Draws everyone: copies `game.actors` to sprites, or to 3D models when Settings > View > Characters says so,
+// every frame, and floats each actor's mark (a quest mark, a heart, a zzz) over its head as a small HTML element.
+//
+// The models load the first time they are asked for. Until they have, everyone stays a sprite; then everyone
+// swaps at once. Switching back and forth after that is instant.
 //
 // A creature whose Almanac page is still open stands on a soft pale ring that breathes, so a green
 // mossling on green grass can be found and watched. The ring goes once its page is complete.
 //
 // To restyle a mark from another view, override `.mark` and `.mark-<kind>` in your own style sheet.
 import type { Actor, Systems } from '../api.sim.ts';
-import { createActorSprites, spriteHeight } from '../shell/art.ts';
+import { createActorSprites, loadCastModels, spriteHeight, type CastModels } from '../shell/art.ts';
 import type { GameView, ScreenPoint } from '../shell/view.ts';
 
 type Mark = NonNullable<Actor['mark']>;
@@ -48,8 +51,30 @@ interface Badge {
   seen: number;
 }
 
-export function install(view: GameView): void {
+export async function install(view: GameView): Promise<void> {
   const actors = createActorSprites(view.sprites);
+  let models: CastModels | null = null;
+  let loading: Promise<CastModels | null> | null = null;
+
+  /** Draws the cast the way the setting says, loading the models the first time. */
+  async function apply(): Promise<void> {
+    if (view.settings.characters !== 'models') {
+      actors.setModels(null);
+      return;
+    }
+    loading ??= loadCastModels(view.ctx, view.sky.sun).catch((error: unknown) => {
+      console.warn('The 3D characters did not load, so the sprites stay.', error);
+      return null;
+    });
+    models = await loading;
+    // The setting may have changed back while they loaded.
+    actors.setModels(view.settings.characters === 'models' ? models : null);
+  }
+  view.settings.onChange((setting) => {
+    if (setting === 'characters') void apply();
+  });
+  // A page opened with models shows them from the first frame.
+  await apply();
 
   const style = document.createElement('style');
   style.textContent = STYLE;
@@ -78,14 +103,17 @@ export function install(view: GameView): void {
   }
 
   view.onFrame((dt) => {
+    const line = sys.talk?.current();
+    actors.setSpeaker(line?.npc ? `npc:${line.npc}` : null);
     actors.sync(view.game.actors, dt);
+    models?.cast.update(dt, view.ctx);
 
     pass++;
     for (const actor of view.game.actors.values()) {
       const mark = actor.mark ?? '';
       if (mark === '' || !actor.visible) continue;
       const at = actors.drawnAt(actor.id) ?? actor.pos;
-      const on = view.project(at.x, at.y + heightOf(actor.sprite) + 0.15, at.z, point);
+      const on = view.project(at.x, at.y + (actors.markHeight(actor.id) ?? heightOf(actor.sprite)) + 0.15, at.z, point);
       if (!on) continue;
       let badge = badges.get(actor.id);
       if (!badge) {

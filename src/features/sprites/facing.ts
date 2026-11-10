@@ -27,30 +27,26 @@ export type SpriteView = typeof VIEW_FRONT | typeof VIEW_BACK | typeof VIEW_SIDE
 const FRONT_ARC = Math.cos(Math.PI / 4) + 1e-4;
 
 /**
- * How far past the line between two drawings the angle must go before a character showing one switches to the
- * other. Walking diagonally to the camera sits right on such a line, and key timing and camera easing wobble the
- * angle by a hair, which without this flips the drawing every frame: front, side, front, side.
+ * How far past the edge between two drawings a character or the camera must turn before the drawing changes,
+ * once one is showing. Without it a character at 45 degrees to a camera that orbits freely would flip between
+ * its front and its side at every small sway.
  */
-const STICK = (10 * Math.PI) / 180;
+export const VIEW_HOLD = 0.14;
 
-/**
- * The drawing for this facing. Pass the drawing showing now as `current`, and it is kept until the angle is
- * clearly in another drawing's arc.
- */
-export function pickView(facing: number, cameraYaw: number, current?: SpriteView): SpriteView {
-  // 0 when the character looks straight at the camera, growing as it turns to the left of the screen.
-  const turned = facing + cameraYaw - Math.PI;
-  const view = viewOf(turned);
-  if (current === undefined || view === current) return view;
-  // Keep the drawing showing now while the angle is within its arc grown by STICK on each side.
-  return viewOf(turned - STICK) === current || viewOf(turned + STICK) === current ? current : view;
-}
-
-function viewOf(turned: number): SpriteView {
+function viewAt(turned: number): SpriteView {
   const toward = Math.cos(turned);
   if (toward > FRONT_ARC) return VIEW_FRONT;
   if (toward < -FRONT_ARC) return VIEW_BACK;
   return Math.sin(turned) > 0 ? VIEW_SIDE_LEFT : VIEW_SIDE_RIGHT;
+}
+
+/** The drawing to show. Pass the one showing now as `current` and it holds until the turn is `VIEW_HOLD` past the edge. */
+export function pickView(facing: number, cameraYaw: number, current?: SpriteView): SpriteView {
+  // 0 when the character looks straight at the camera, growing as it turns to the left of the screen.
+  const turned = facing + cameraYaw - Math.PI;
+  const view = viewAt(turned);
+  if (current === undefined || view === current) return view;
+  return viewAt(turned - VIEW_HOLD) === current || viewAt(turned + VIEW_HOLD) === current ? current : view;
 }
 
 /**

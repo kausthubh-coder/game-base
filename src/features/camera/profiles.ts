@@ -66,6 +66,25 @@ export const CAMERA_PROFILES: Readonly<Record<string, CameraProfile>> = {
   },
 };
 
+/** What the free and the first-person camera need from the rest of the picture. Both can look at the horizon. */
+export interface LookProfile {
+  /** The lens, the vertical field of view in degrees. */
+  fov: number;
+  fogStart: number;
+  fogEnd: number;
+  shadowRange: number;
+  /** How near and how far the lens draws, in meters. */
+  near: number;
+  far: number;
+}
+
+export const LOOK_PROFILES: Readonly<Record<'free' | 'first', LookProfile>> = {
+  // A wider lens than the 2.5D camera's, close behind the hero. The fog is whole before the loaded land ends.
+  free: { fov: 55, fogStart: 34, fogEnd: 92, shadowRange: 40, near: 0.15, far: 400 },
+  // Wider still from the eyes, and the near plane close in, so a wall a step away is not cut open.
+  first: { fov: 70, fogStart: 30, fogEnd: 88, shadowRange: 34, near: 0.05, far: 400 },
+};
+
 /** The profile named in `?cam=`, or null for the default camera. `today` is the default by name. */
 export function cameraProfile(name: string | null): CameraProfile | null {
   return name && Object.hasOwn(CAMERA_PROFILES, name) ? CAMERA_PROFILES[name] : null;

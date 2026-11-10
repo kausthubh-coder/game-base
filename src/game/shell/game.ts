@@ -22,11 +22,12 @@ import type { Systems, UseContext } from '../api.sim.ts';
 import { STEP, createKernel } from '../kernel.sim.ts';
 import { installSystems, type Installed } from '../systems.ts';
 import { loadArt, makeSprites } from './art.ts';
-import { createKeys, type Press } from './keys.ts';
+import { HINTS } from '../content/hints.ts';
+import { createKeys, type MouseMode, type Press } from './keys.ts';
 import { HERO_STEP, createPlayer, type PlayerRig } from './player.ts';
 import { clearSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
 import { BUSES, DEFAULT_VOLUMES, createSound } from './sound.ts';
-import type { GameView, QualityMode, ScreenPoint } from './view.ts';
+import { CAMERA_MODES, CHARACTER_LOOKS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type CharacterLook, type GameView, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
 import { dressWater } from './water.ts';
 
 /** The camera's distance at each wheel step, nearest first. A person is about 90 pixels tall at the first on a 900 pixel screen. */
@@ -38,6 +39,12 @@ const BODY_STEPS = Math.round(STEP / HERO_STEP);
 const SAVE_EVERY = 60;
 /** The eyes are this far above the feet. Reach is measured from them, as the actions system does. */
 const EYE_HEIGHT = 1.6;
+/** A swimming hero floats with little more than the hair out of the water. In first person the eyes rise this much, to just over the surface. */
+const SWIM_EYE = 0.55;
+/** Radians the view turns for each pixel the mouse moves, locked or dragging. About 650 pixels make a quarter turn. */
+const LOOK_SPEED = 0.0024;
+/** The camera modes in the order V goes through them. */
+const NEXT_CAMERA: Record<CameraMode, CameraMode> = { tilt: 'free', free: 'first', first: 'tilt' };
 /** Chunks around the player that must exist before the rules run, each way. */
 const READY_REACH = 1;
 /** Chunks loaded on the spot around a teleport or a start, each way, so the rules never see a hole. */
@@ -76,14 +83,22 @@ interface StoredSettings {
   graphics: Graphics;
   quality: QualityMode;
   volumes: Record<BusName, number>;
+  camera: CameraMode;
+  mouse: MouseStyle;
+  tiltTurn: TiltTurn;
+  characters: CharacterLook;
 }
 
 function readSettings(): StoredSettings {
-  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES } };
+  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', mouse: 'drag', tiltTurn: 'quarter', characters: 'sprites' };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
     if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Quality)) settings.quality = stored!.quality as QualityMode;
     settings.graphics = readGraphics(stored?.graphics);
+    if (CAMERA_MODES.includes(stored?.camera as CameraMode)) settings.camera = stored!.camera as CameraMode;
+    if (MOUSE_STYLES.includes(stored?.mouse as MouseStyle)) settings.mouse = stored!.mouse as MouseStyle;
+    if (TILT_TURNS.includes(stored?.tiltTurn as TiltTurn)) settings.tiltTurn = stored!.tiltTurn as TiltTurn;
+    if (CHARACTER_LOOKS.includes(stored?.characters as CharacterLook)) settings.characters = stored!.characters as CharacterLook;
     for (const bus of BUSES) {
       const value = stored?.volumes?.[bus];
       if (typeof value === 'number' && Number.isFinite(value)) settings.volumes[bus] = Math.min(1, Math.max(0, value));
@@ -101,6 +116,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // `?quality=low` holds a level for this visit only. It is how a test gets the same picture every time.
   const asked = LEVELS.find((level) => level === params.get('quality'));
   let mode: QualityMode = asked ?? settings.quality;
+  // `?camera=free`, `?mouse=lock`, `?turn=smooth` and `?chars=models` hold a camera mode, a mouse style, the 2.5D
+  // turning and a character look for this visit, so a test or a comparison shot gets the same picture whatever was stored.
+  let cameraMode: CameraMode = CAMERA_MODES.find((m) => m === params.get('camera')) ?? settings.camera;
+  let mouseStyle: MouseStyle = MOUSE_STYLES.find((m) => m === params.get('mouse')) ?? settings.mouse;
+  let tiltTurn: TiltTurn = TILT_TURNS.find((t) => t === params.get('turn')) ?? settings.tiltTurn;
+  let characterLook: CharacterLook = CHARACTER_LOOKS.find((l) => l === params.get('chars')) ?? settings.characters;
+  const changeListeners: ((setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters') => void)[] = [];
 
   // ---------------------------------------------------------------- the renderer and the scene
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -154,7 +176,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const sys = game.systems as Partial<Systems>;
 
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
-  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov });
+  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov, mode: cameraMode });
   const sky = createSky(ctx, { shadowRange: 40 });
   const water = createWaterMaterial(ctx);
   const effects = createEffects(ctx);
@@ -171,8 +193,32 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   sound.onStart((audio) => audio.setQuality?.(ctx.quality));
 
   const keys = createKeys(canvas);
+  // With Quarter turns the 2.5D camera turns with the hand during a drag and glides to the nearest quarter after it.
+  keys.onDragEnd(() => { if (tiltTurn === 'quarter') camera.settle(); });
   const start = sys.region?.spawn() ?? spawnPoint();
   const player = createPlayer(game, world.sim, keys, start);
+
+  /**
+   * How the mouse works with a camera: the 2.5D camera points and drags, first person locks the mouse, and the free
+   * camera does as the Mouse setting says.
+   */
+  const mouseOf = (mode: CameraMode): MouseMode => (mode === 'tilt' ? 'point' : mode === 'first' || mouseStyle === 'lock' ? 'lock' : 'drag');
+
+  /** Puts the camera mode into effect: the camera, the mouse, and the hero's body hidden in first person. */
+  function applyCamera(next: CameraMode): void {
+    camera.setMode(next);
+    keys.setMouse(mouseOf(next));
+    player.actor.visible = next !== 'first';
+    lastRange = lastZoom = -1;
+  }
+  /** The shadow range and the zoom the sky was last given, so it is told only when they change. */
+  let lastRange = -1, lastZoom = -1;
+
+  // A hint that names camera keys is worded for the mouse in use when it is sent. The shell hears it before any view.
+  game.events.on('hint', (e) => {
+    const worded = HINTS.find((hint) => hint.id === e.id)?.mouse?.[keys.mouse];
+    if (worded) e.text = worded;
+  });
 
   // ---------------------------------------------------------------- the end card's numbers
   let wheat = 0, blocks = 0;
@@ -215,10 +261,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   function takeAim(): void {
     aimed = false;
+    // A locked mouse aims from the middle of the screen, where the crosshair is. A free cursor aims where it is.
+    const centre = keys.mouse === 'lock';
     const pointer = keys.pointer;
-    if (!pointer.over) return;
+    // A drag turning the camera aims at nothing, so no box or ghost sweeps over the land while it turns.
+    if (!centre && (!pointer.over || keys.dragging)) return;
     origin.copy(lens.position);
-    ray.set(pointer.x, pointer.y, 0.5).unproject(lens).sub(origin);
+    ray.set(centre ? 0 : pointer.x, centre ? 0 : pointer.y, 0.5).unproject(lens).sub(origin);
     // The ray skips what the cutaway hides, so a click goes through a hidden roof to the floor.
     ray.normalize();
     const blockHit = world.sim.raycast(origin.x, origin.y, origin.z, ray.x, ray.y, ray.z, 500, hit, camera.hides);
@@ -337,7 +386,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   let carry = 0, bodySteps = 0;
   function bodyStep(): void {
-    player.step(camera.yaw);
+    player.step(camera.yaw, camera.mode === 'first');
     if (++bodySteps < BODY_STEPS) return;
     bodySteps = 0;
     simStep();
@@ -357,6 +406,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     if (press.kind === 'perf') { perfHolder.hidden = !perfHolder.hidden; return; }
     if (press.kind === 'turn') { camera.turn(press.direction); return; }
     if (press.kind === 'zoom') { camera.zoomBy(press.steps); return; }
+    if (press.kind === 'camera') { view.settings.setCamera(NEXT_CAMERA[cameraMode]); return; }
     if (!running()) return;
     if (press.kind === 'slot') {
       if (sys.inventory) sys.inventory.selected = press.index;
@@ -383,7 +433,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     lens.aspect = size.width / size.height;
   });
 
-  let last = performance.now(), frameCount = 0, quiet = 0, lastZoom = -1, lastRange = -1;
+  let last = performance.now(), frameCount = 0, quiet = 0;
+  const mouse = { x: 0, y: 0 };
   const waiters: { until: () => boolean; done: () => void }[] = [];
   const until = (test: () => boolean): Promise<void> => new Promise((done) => waiters.push({ until: test, done }));
 
@@ -405,8 +456,14 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       player.blend(carry / HERO_STEP);
     }
 
+    // A locked mouse or a right-button drag turns the view; the 2.5D camera only along the ground. Anything that
+    // holds the player gives the cursor back and ends a drag.
+    keys.freeCursor(!running() || game.player.busy);
+    keys.takeLook(mouse);
+    if (mouse.x !== 0 || mouse.y !== 0) camera.look(-mouse.x * LOOK_SPEED, camera.mode === 'tilt' ? 0 : mouse.y * LOOK_SPEED);
+
     const p = player.position;
-    camera.follow(p.x, p.y, p.z);
+    camera.follow(p.x, p.y + (camera.mode === 'first' && player.body.swimming ? SWIM_EYE : 0), p.z);
     if (settings.graphics.reduceMotion) camera.snap();
     camera.update(settings.graphics.reduceMotion ? 1 : Math.min(dt, 0.1), ctx);
     world.setFocus(p.x, p.z);
@@ -416,7 +473,15 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
     // Everything follows the hero. The sky gets what Ambient does not carry: the moon, a rainbow after rain.
     const a = game.ambient;
-    if (cam) {
+    const look = camera.profile;
+    if (look) {
+      // The free and first-person cameras see the horizon: the fog reaches as far as the view distance asks and is
+      // whole before the loaded land ends.
+      const range = settings.graphics.shadowDistance ?? look.shadowRange;
+      if (range !== lastRange) sky.setShadowRange((lastRange = range));
+      const edge = world.stats.radius * 16 - 8, far = settings.graphics.viewDistance ?? 1;
+      sky.setFogReach(Math.min(look.fogStart * far, edge * 0.45), Math.min(look.fogEnd * far, edge));
+    } else if (cam) {
       const range = settings.graphics.shadowDistance ?? Math.round(camera.stepped(cam.shadowRange));
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       // The fog is whole before the loaded land ends, which is nearer at a lower quality.
@@ -530,6 +595,48 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
         sound.setVolume(bus, value);
         store();
       },
+      get camera() { return cameraMode; },
+      setCamera(next) {
+        settings.camera = next;
+        store();
+        if (next === cameraMode) return;
+        cameraMode = next;
+        applyCamera(next);
+        for (const fn of [...changeListeners]) fn('camera');
+      },
+      get mouse() { return mouseStyle; },
+      setMouse(next) {
+        settings.mouse = next;
+        store();
+        if (next === mouseStyle) return;
+        mouseStyle = next;
+        keys.setMouse(mouseOf(cameraMode));
+        for (const fn of [...changeListeners]) fn('mouse');
+      },
+      get tiltTurn() { return tiltTurn; },
+      setTiltTurn(next) {
+        settings.tiltTurn = next;
+        store();
+        if (next === tiltTurn) return;
+        tiltTurn = next;
+        if (next === 'quarter') camera.settle();
+        for (const fn of [...changeListeners]) fn('tiltTurn');
+      },
+      get characters() { return characterLook; },
+      setCharacters(next) {
+        settings.characters = next;
+        store();
+        if (next === characterLook) return;
+        characterLook = next;
+        for (const fn of [...changeListeners]) fn('characters');
+      },
+      onChange: (fn) => {
+        changeListeners.push(fn);
+        return () => {
+          const at = changeListeners.indexOf(fn);
+          if (at >= 0) changeListeners.splice(at, 1);
+        };
+      },
     },
 
     get started() { return started; },
@@ -550,6 +657,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // The camera looks at the start from the first frame, behind a title or not. The worker loads the land there.
   place(start.x, start.y, start.z, Math.PI, false);
+  applyCamera(cameraMode);
 
   return {
     view,

@@ -257,7 +257,7 @@ export function checkManifest(root) {
   }
   for (const [section, entry] of Object.entries(manifest)) {
     if (section === 'version') continue;
-    if (doc && doc[section] === undefined && section !== 'models' && section !== 'voice') {
+    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast' && section !== 'voice') {
       warnings.push(`manifest.json has a "${section}" section that docs/assets.md does not describe. Add its shape to docs/assets.md.`);
     }
     if (section === 'models') {
@@ -273,6 +273,21 @@ export function checkManifest(root) {
         } catch (error) { failures.push(`models.${name}: ${error.message}`); }
       }
       summary.push(`${Object.keys(entry).length} models checked against GLB bytes`);
+    } else if (section === 'cast') {
+      // The characters: one file each, exported from its Blender source by tools/models/cast/build.mjs.
+      for (const [name, model] of Object.entries(entry)) {
+        try {
+          if (model.file !== `models/cast-${name}.glb`) throw Error('invalid cast path');
+          if (!fs.existsSync(path.join(root, model.source ?? ''))) throw Error(`no source at ${model.source}`);
+          const data = fs.readFileSync(path.join(assets, model.file));
+          used.add(model.file);
+          const { triangles } = inspectGlb(data);
+          if (model.budget !== 4000 && model.budget !== 2000) throw Error('invalid triangle budget');
+          if (triangles !== model.triangles || triangles > model.budget) throw Error(`${triangles} triangles, declared ${model.triangles}, budget ${model.budget}`);
+          if (data.length !== model.bytes) throw Error(`${data.length} bytes, declared ${model.bytes}`);
+        } catch (error) { failures.push(`cast.${name}: ${error.message}`); }
+      }
+      summary.push(`${Object.keys(entry).length} cast models checked against GLB bytes and their sources`);
     } else if (section === 'voice') {
       // The voiced lines have a list of their own; the voice check reads it. Here its files count as listed.
       try {

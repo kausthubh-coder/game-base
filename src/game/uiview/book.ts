@@ -101,6 +101,16 @@ function createBook(view: GameView): Book {
     },
     graphics: { get: () => view.settings.graphics, set: (next) => view.settings.setGraphics(next) },
     setVolume: (channel, value) => view.settings.setVolume(channel, value),
+    view: {
+      camera: () => view.settings.camera,
+      setCamera: (mode) => view.settings.setCamera(mode),
+      mouse: () => view.settings.mouse,
+      setMouse: (style) => view.settings.setMouse(style),
+      tiltTurn: () => view.settings.tiltTurn,
+      setTiltTurn: (turn) => view.settings.setTiltTurn(turn),
+      characters: () => view.settings.characters,
+      setCharacters: (look) => view.settings.setCharacters(look),
+    },
     setInterfaceSize(next) {
       size = next;
       root.style.setProperty('--ui-size', String(next));

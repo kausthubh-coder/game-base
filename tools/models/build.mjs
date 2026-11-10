@@ -15,3 +15,6 @@ for(const name of ['tree-17','tree-41','tree-83','birch-17','birch-41','birch-83
  console.log(name,manifest.models[name]);
 }
 fs.writeFileSync(`${root}/public/assets/manifest.json`,JSON.stringify(manifest,null,2)+'\n');
+// The cast is exported from its own Blender sources, and lists itself in the manifest's `cast` section.
+const cast=await new Promise((done,reject)=>{ const p=spawn('bun',['tools/models/cast/build.mjs'],{cwd:root,stdio:'inherit'}); p.on('error',reject);p.on('exit',done); });
+if(cast!==0) process.exit(cast??1);
