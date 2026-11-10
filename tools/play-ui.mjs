@@ -617,6 +617,22 @@ async function dragAndDrop(t) {
 }
 
 /** Presses every key a hint names, with the real keyboard and mouse, and checks that it does what the hint says. */
+/**
+ * A right click as a hand makes it: the press and the release 60 ms apart by the events' own clocks. The game
+ * counts a right press as a click only when it comes up soon (src/game/shell/drag.ts), and page.mouse waits for
+ * each event to be handled, which takes a whole frame on this Mac's software WebGL. These are the same input
+ * events page.mouse sends, with the time a hand would take written on them.
+ */
+async function handClick(page, x, y, jitter = 0) {
+  const cdp = (page.__cdp ??= await page.context().newCDPSession(page));
+  const t0 = Date.now() / 1000;
+  const send = (type, px, py, at, buttons) => cdp.send('Input.dispatchMouseEvent', { type, x: px, y: py, button: type === 'mouseMoved' ? 'none' : 'right', buttons, clickCount: type === 'mouseMoved' ? 0 : 1, timestamp: t0 + at });
+  await send('mouseMoved', x, y, 0, 0);
+  await send('mousePressed', x, y, 0.01, 2);
+  if (jitter) { await send('mouseMoved', x + jitter, y - 1, 0.03, 2); await send('mouseMoved', x - 1, y + jitter, 0.05, 2); }
+  await send('mouseReleased', jitter ? x - 1 : x, jitter ? y + jitter : y, 0.07, 0);
+}
+
 async function keysTheHintsName(t) {
   const { page, game, frames, panel, mapOpen, state } = t;
   // "Move with W, A, S and D."
@@ -709,7 +725,7 @@ async function keysTheHintsName(t) {
   await frames(2);
   const planks = (await state()).bag.find((s) => s.id === 'plank')?.count ?? 0;
   const heldNow = (await state()).held;
-  await page.mouse.click(spot.at.x, spot.at.y, { button: 'right' });
+  await handClick(page, spot.at.x, spot.at.y);
   await game(() => window.__game.advance(0.2));
   const planksAfter = (await state()).bag.find((s) => s.id === 'plank')?.count ?? 0;
   check('hint "use": the right button sets down the plank in the hand', heldNow === 'plank' && planksAfter === planks - 1, `held ${heldNow}, planks ${planks} to ${planksAfter}`);

@@ -1,5 +1,6 @@
 // The camera: by default a long lens looking down at about 35 degrees. It follows a point, turns in
-// quarter turns with Q and E, zooms in steps with the wheel, and works out the cutaway. `profiles.ts`
+// quarter turns with Q and E or smoothly to any angle with `look`, zooms in steps with the wheel, and works
+// out the cutaway. `profiles.ts`
 // holds other places to put it.
 //
 // It has three modes. `tilt` is that 2.5D camera. `free` orbits the hero at any yaw with the mouse and pulls in
@@ -37,11 +38,13 @@ export interface CameraView extends ViewSystem {
   follow(x: number, y: number, z: number): void;
   /** Jump to the followed point with no glide. */
   snap(): void;
-  /** 1 turns the view a quarter turn to the right, -1 to the left. */
+  /** 2.5D: turns the view to the next quarter on the right (1) or the left (-1). Between two quarters, the nearer one that way. */
   turn(direction: 1 | -1): void;
+  /** 2.5D: glides to the nearest quarter turn. */
+  settle(): void;
   /** Positive zooms out one step, negative zooms in. */
   zoomBy(steps: number): void;
-  /** Quarter turns from the start, 0 to 3, counter-clockwise seen from above. Sprites pick their facing with it. */
+  /** The quarter turn nearest the camera's heading, from the start, 0 to 3, counter-clockwise seen from above. */
   readonly quarter: number;
   /** The yaw right now in radians, -PI to PI. 0 looks north. It glides during a turn. */
   readonly yaw: number;
@@ -58,7 +61,10 @@ export interface CameraView extends ViewSystem {
   readonly mode: CameraMode;
   /** Changes the mode at once. The free and first-person cameras start looking the way the camera looked. */
   setMode(mode: CameraMode): void;
-  /** Free and first person: turns the view. Positive `yaw` turns to the left, positive `pitch` looks down. Radians. */
+  /**
+   * Turns the view. Positive `yaw` turns to the left, positive `pitch` looks down. Radians. The 2.5D camera turns
+   * by the yaw at once and keeps its pitch.
+   */
   look(yaw: number, pitch: number): void;
   /** Free and first person: sets the view exactly, within its limits. `distance` is the free camera's. */
   setLook(yaw: number, pitch: number, distance?: number): void;
@@ -124,6 +130,9 @@ export function createCamera(ctx: ViewContext, options: CameraOptions = {}): Cam
     turn(direction) {
       if (mode === 'tilt') rig.turn(direction);
     },
+    settle() {
+      if (mode === 'tilt') rig.settle();
+    },
     zoomBy(steps) {
       if (mode === 'tilt') rig.zoomBy(steps);
       else if (mode === 'free') free.zoomBy(steps);
@@ -154,7 +163,8 @@ export function createCamera(ctx: ViewContext, options: CameraOptions = {}): Cam
       snap();
     },
     look(yaw, pitch) {
-      if (mode !== 'tilt') orbit().turn(yaw, pitch);
+      if (mode === 'tilt') rig.spin(yaw);
+      else orbit().turn(yaw, pitch);
     },
     setLook(yaw, pitch, distance) {
       if (mode === 'tilt') return;

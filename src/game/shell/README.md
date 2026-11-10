@@ -11,6 +11,7 @@ The shell starts the game. It makes the renderer, the block world, the kernel wi
 | `game.ts` | The frame, the step, the aim, saving, new game and continue |
 | `view.ts` | `GameView`, the object every view gets |
 | `keys.ts` | All key, mouse and wheel reading |
+| `drag.ts` | Whether a right-button press is a click or a drag |
 | `player.ts` | The hero's body, steered by the keys. It writes `game.player`. |
 | `art.ts` | The only file that uses the assets and sprites features |
 | `sound.ts` | Starts the sound engine on the first click or key |
@@ -19,7 +20,7 @@ The shell starts the game. It makes the renderer, the block world, the kernel wi
 | `door.ts` | `window.__game` |
 | `../views/core-actors.view.ts` | Actors to sprites, and the marks over their heads |
 | `../views/core-aim.view.ts` | The box around the block, tree or station a click would act on |
-| `../views/core-crosshair.view.ts` | The crosshair of the free and first-person cameras |
+| `../views/core-crosshair.view.ts` | The crosshair of a locked mouse: first person, and the free camera with Lock to turn |
 | `../views/core-ghost.view.ts` | A see-through copy of what the right button would place |
 | `../views/core-sound.view.ts` | Game events to sounds and particles |
 
@@ -72,17 +73,22 @@ A new game while a game is running reloads the page, because systems keep their 
 | Shift | Walk at 2 blocks a second |
 | Space | Jump |
 | V | The next camera: 2.5D, free, first person |
-| Q, R | Turn the 2.5D camera a quarter turn |
-| Mouse | Free and first person: look around, once a click in the world has taken the mouse |
-| Alt, Esc | Give the cursor back |
+| Right button, dragged | Turn the camera, as in Roblox: the 2.5D camera smoothly along the ground, keeping its pitch and zoom, and with 2.5D turning on Quarter turns (the default) it glides to the nearest quarter when let go; the free camera all ways (Drag to turn). The cursor hides during the drag |
+| Q, R | Turn the 2.5D camera to the next quarter that way. Between two quarters, the nearer one |
+| Mouse | First person, and the free camera with Lock to turn: look around, once a click in the world has taken the mouse |
+| Alt, Esc | Give the cursor back, when it is locked |
 | Wheel | Zoom: in steps in 2.5D, smoothly in free |
 | 1 to 9, Shift and wheel | Pick a quick slot |
 | E | `interact.act()` |
 | Left button | `actions.use` with `primary`, then `actions.hold` every step while it is down. A break needs a hold of 0.4 seconds or more |
-| Right button | `actions.use` with `secondary` |
+| Right button, clicked | `actions.use` with `secondary`, when it comes up. A press that moves more than 6 pixels or lasts over half a second is not a click, and uses nothing |
 | F3 | The performance meter |
 
-In 2.5D the buttons act on the block under the pointer. In free and first person they act on the block under the crosshair, in the middle of the screen. Either way reach is measured from the hero's eyes. The click that takes the mouse acts on nothing, and anything that holds the player (a panel, the map, a conversation, the title) gives the cursor back.
+The mouse works one of three ways (`MouseMode` in `keys.ts`). In 2.5D (`point`) and in the free camera with Drag to turn (`drag`, the default) the cursor stays free and the buttons act on the block under it; a right click acts on the block it went down on. In first person and with Lock to turn (`lock`) they act on the block under the crosshair, in the middle of the screen. Either way reach is measured from the hero's eyes. The click that takes the mouse acts on nothing, and anything that holds the player (a panel, the map, a conversation, the title) gives the cursor back and ends a drag.
+
+The Mouse setting (`view.settings.mouse`, `drag` or `lock`, `?mouse=lock` for one visit) picks how the free camera turns. First person always locks. The 2.5D turning setting (`view.settings.tiltTurn`, `quarter` or `smooth`, `?turn=smooth` for one visit) picks where the 2.5D camera rests after a drag: Quarter turns because halfway between two quarters the camera looks straight along the grid and the blocks lose their 3D corners. The `move` hint is worded for the mouse in use when it is sent: see `mouse` in `src/game/content/hints.ts`.
+
+The drag does not lock the pointer. Chrome shows its "Press Esc to show your cursor" notice each time a page locks the mouse, and a drag happens too often for that, so the cursor is hidden and the pointer captured instead. When the drag ends, the cursor shows again where the hand left it.
 
 E does nothing while `game.player.busy` is true. The dialogue view advances its own lines: hear `{ kind: 'interact' }` from `view.keys.onPress` and call `talk.advance()`.
 
@@ -107,14 +113,17 @@ The calls in `docs/play/act1.md`, and a few more for tests:
 | `newGame()`, `continueGame()`, `save()`, `hasSave()`, `started` | The game's life |
 | `setTime(t)`, `turn(1)`, `block(x, y, z)` | The clock, the camera, a block's id and key |
 | `setCamera(mode)` | `tilt` (2.5D), `free` or `first`, as the View setting and V pick it |
+| `state().camera` | The mode, quarter, zoom, yaw, pitch and distance, and the mouse: `mouse` (`point`, `drag` or `lock`), `locked`, `dragging`, `tiltTurn` |
 | `look(yaw, pitch, distance?)` | Free and first person: the view in degrees. Yaw 0 looks north and 90 west, pitch is how far it looks down. `distance` is the free camera's |
-| `aimAt(x, y, z)` | Free and first person: turns the view so the crosshair falls on that point |
+| `aimAt(x, y, z)` | Free and first person: turns the view so the middle of the screen falls on that point |
 | `frames(n)`, `settle()` | Promises: n frames drawn, the land in view loaded and drawn |
 | `view` | The `GameView` |
 
 Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hold a quality level and `?perf=1` to show the meter. `advance` does nothing before a game has started.
 
 `bun tools/play-act1.mjs --port 5364 --dist dist-trees-act1` runs the five-quest browser check with its own port and build folder. Its save check compares standing and felled trees, the bonded pet, the bag and the tracked quest after Continue.
+
+`bun tools/play-drag.mjs` drags the 2.5D and the free camera with the real right button, checks a drag places nothing and a click still does, and checks the Mouse setting. `--shots <folder>` writes frames of it.
 
 `bun tools/play-smoke.mjs` builds the game, serves `dist` on port 5330 and plays through the door. It writes screenshots and `smoke.json` to `.artifacts/play/`.
 

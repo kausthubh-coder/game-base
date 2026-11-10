@@ -1,5 +1,5 @@
-// The crosshair of the free and first-person cameras: a small ring in the middle of the screen, where they
-// aim. It fills in when what it is on is within reach, and hides whenever something holds the player.
+// The crosshair of a locked mouse (first person, and the free camera with Lock to turn): a small ring in the
+// middle of the screen, where it aims. A free cursor aims where it is and has no crosshair. It fills in when what it is on is within reach, and hides whenever something holds the player.
 import type { GameView } from '../shell/view.ts';
 
 export function install(view: GameView): void {
@@ -20,7 +20,7 @@ export function install(view: GameView): void {
 
   let shown = false, reach = false;
   view.onFrame(() => {
-    const show = view.settings.camera !== 'tilt' && view.started && !view.paused && !view.game.player.busy;
+    const show = view.keys.mouse === 'lock' && view.started && !view.paused && !view.game.player.busy;
     if (show !== shown) { shown = show; mark.hidden = !show; }
     const near = show && view.aim !== null;
     if (near !== reach) { reach = near; mark.toggleAttribute('data-reach', near); }

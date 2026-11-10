@@ -46,14 +46,14 @@ export interface DebugDoor {
   save(): boolean;
   /** Sets the time of day through the time system: 0 midnight, 0.25 sunrise, 0.5 noon, 0.75 sunset. */
   setTime(timeOfDay: number): void;
-  /** Turns the camera a quarter turn: 1 to the right, -1 to the left. */
+  /** Turns the 2.5D camera to the next quarter: 1 to the right, -1 to the left. */
   turn(direction: 1 | -1): void;
   /** The camera mode, as the View setting picks it: `tilt` (2.5D), `free` or `first`. Stored like the setting. */
   setCamera(mode: CameraMode): void;
   /** How characters are drawn, as the View setting picks it: `sprites` or `models`. Stored like the setting. */
   setCharacters(look: CharacterLook): void;
   /**
-   * Free and first person: sets the view, in degrees. `yaw` 0 looks north and 90 west; `pitch` is how far it looks
+   * Free and first person: sets the view, in degrees. The 2.5D camera ignores it; drag it with the right button. `yaw` 0 looks north and 90 west; `pitch` is how far it looks
    * down, negative up. `distance` is the free camera's, in meters. Returns the camera as `state().camera` has it.
    */
   look(yaw: number, pitch: number, distance?: number): Record<string, unknown>;
@@ -111,7 +111,7 @@ export function createDoor(shell: Shell): DebugDoor {
       mode: view.settings.camera, quarter: c.quarter, zoom: c.zoom,
       yaw: round(c.yaw * DEG), pitch: round(c.pitch * DEG), distance: round(c.distance), reach: round(c.reach),
       at: { x: round(at.x), y: round(at.y), z: round(at.z) },
-      locked: view.keys.locked,
+      mouse: view.keys.mouse, locked: view.keys.locked, dragging: view.keys.dragging, tiltTurn: view.settings.tiltTurn,
     };
   }
 

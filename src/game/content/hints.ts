@@ -6,6 +6,10 @@
 // src/game/shell/keys.ts, Tab and M in src/game/views/ui-panels.view.ts. The list a player sees in
 // Settings is src/game/uiview/keys.ts. tools/play-ui.mjs presses each key and checks what it does, so
 // change a binding, its row in that list and its hint here together.
+//
+// The rules send `text`. A hint that names camera keys has `mouse` too: the shell swaps in the line for how the
+// mouse works when the hint is sent (see MouseMode in src/game/shell/keys.ts). `point` is the 2.5D camera,
+// `drag` the free camera with Drag to turn, `lock` first person and the free camera with Lock to turn.
 
 import { WHEAT_SHORT, type Condition } from './quests.ts';
 
@@ -13,15 +17,23 @@ export interface HintDef {
   id: string;
   text: string;
   when: Condition;
+  /** The line for each way the mouse works, where it differs from `text`. */
+  mouse?: Partial<Record<'point' | 'drag' | 'lock', string>>;
 }
 
 export const HINTS: readonly HintDef[] = [
-  { id: 'move', text: 'Move with W, A, S and D. Q and R turn the camera.', when: { quest: 'plot', step: 'meet' } },
+  {
+    id: 'move', text: 'Move with W, A, S and D. Drag with the right button held, or press Q and R, to turn the camera.', when: { quest: 'plot', step: 'meet' },
+    mouse: {
+      drag: 'Move with W, A, S and D. Drag with the right button held to turn the camera.',
+      lock: 'Move with W, A, S and D. Click the world and the mouse turns the camera. Alt shows the cursor.',
+    },
+  },
   { id: 'talk', text: 'Press E to talk to someone close by.', when: { npcNear: 5 } },
   { id: 'almanac', text: 'Press Tab to open the Almanac.', when: { flag: 'has.almanac' } },
   { id: 'slots', text: 'Keys 1 to 9 pick a quick slot.', when: { bag: 'axe' } },
   { id: 'gather', text: 'Hold the left button on a tree or a block to gather it.', when: { quest: 'roof' } },
-  { id: 'use', text: 'The right button uses or sets down what you hold.', when: { any: [{ bag: 'workbench' }, { bag: 'bed' }, { bag: 'berry' }, { bag: 'wheat_seeds' }] } },
+  { id: 'use', text: 'A click of the right button uses or sets down what you hold.', when: { any: [{ bag: 'workbench' }, { bag: 'bed' }, { bag: 'berry' }, { bag: 'wheat_seeds' }] } },
   { id: 'sleep', text: 'Sleep in a bed to pass the night: press E beside it once evening comes.', when: { placed: 'bed' } },
   { id: 'map', text: 'Press M to open the map.', when: { quest: 'leaftail' } },
   { id: 'soft', text: 'Hold Shift to walk softly near the leaftail.', when: { all: [{ petNear: 'leaftail', within: 14 }, { not: { bonded: 'leaftail' } }] } },

@@ -116,12 +116,17 @@ function graphicsControls(ctx: UiContext): HTMLElement {
   return section;
 }
 
-/** The View section, right after Picture: how the camera stands and how characters are drawn. The game stores both. */
+/**
+ * The View section, right after Picture: how the camera stands, how the mouse turns the free camera, where the 2.5D
+ * camera rests after a drag, and how characters are drawn. The game stores them all.
+ */
 function viewControls(ctx: UiContext): HTMLElement | null {
   const view = ctx.options.view;
   if (!view) return null;
   return h('section', { class: 'gu-section gu-settings-view', 'data-key': 'settings:view' }, h('h3', { class: 'gu-label' }, 'View'),
     choices('camera', 'Camera', ['tilt', 'free', 'first'] as const, ['2.5D', 'Free', 'First person'], view.camera(), (mode) => view.setCamera(mode)),
+    choices('mouse', 'Mouse', ['drag', 'lock'] as const, ['Drag to turn', 'Lock to turn'], view.mouse(), (style) => view.setMouse(style)),
+    choices('tiltTurn', '2.5D turning', ['quarter', 'smooth'] as const, ['Quarter turns', 'Smooth'], view.tiltTurn(), (turn) => view.setTiltTurn(turn)),
     choices('characters', 'Characters', ['sprites', 'models'] as const, ['Sprites', '3D models'], view.characters(), (look) => view.setCharacters(look)),
   );
 }
