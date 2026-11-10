@@ -120,11 +120,16 @@ export function settingsPanel(ctx: UiContext): PanelView {
       }
       const keys = h('dl', { class: 'gu-keylist' });
       for (const hint of ctx.options.keys ?? DEFAULT_KEYS) keys.append(h('dt', null, hint.action), h('dd', null, keycaps(hint.keys, hint.action === 'Move' ? '' : 'or')));
+      // The Picture section comes first and is its own block, so graphics settings can join it without moving the rest.
+      const pictureSection = h('section', { class: 'gu-section gu-settings-picture', 'data-key': 'settings:picture' },
+        h('h3', { class: 'gu-label' }, 'Picture'),
+        choices('quality', 'Quality', QUALITIES, QUALITIES.map((q) => QUALITY_NAMES[q]), ctx.settings.quality, (value) => ctx.setSetting('quality', value)),
+      );
       body.replaceChildren(
-        h('div', null,
-          choices('quality', 'Picture quality', QUALITIES, QUALITIES.map((q) => QUALITY_NAMES[q]), ctx.settings.quality, (value) => ctx.setSetting('quality', value)),
+        h('div', { class: 'gu-settings-side' },
+          pictureSection,
           sound,
-          choices('size', 'Interface size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value)),
+          h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Interface'), choices('size', 'Size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value))),
         ),
         h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
       );

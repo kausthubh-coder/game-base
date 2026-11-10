@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import type { AlmanacPage, Recipe } from '../api.sim.ts';
-import { DEFAULT_SETTINGS, addToast, expireToasts, gridMove, groupPages, initials, missingReason, readSettings, type ToastLine } from './logic.ui.ts';
+import type { ItemDef } from '../api.sim.ts';
+import { DEFAULT_SETTINGS, addToast, expireToasts, gridMove, groupPages, half, initials, itemUse, missingReason, readSettings, slotMove, type ToastLine } from './logic.ui.ts';
 
 const bed: Recipe = { id: 'bed', makes: { id: 'bed', count: 1 }, needs: [{ id: 'planks', count: 6 }, { id: 'fiber', count: 3 }], station: 'workbench' };
 const names: Record<string, string> = { planks: 'Planks', fiber: 'Fiber' };
@@ -69,4 +70,38 @@ test('an item with no icon shows its first two letters', () => {
   expect(initials('Oak planks')).toBe('Oa');
   expect(initials('moss tuft')).toBe('Mo');
   expect(initials('')).toBe('?');
+});
+
+test('arrow keys walk the quick row and the bag as two grids, and cross between them', () => {
+  // 9 columns: one quick row, three bag rows.
+  expect(slotMove(4, 'ArrowDown', 9, 36)).toBe(13);
+  expect(slotMove(13, 'ArrowUp', 9, 36)).toBe(4);
+  expect(slotMove(31, 'ArrowDown', 9, 36)).toBe(31);
+  expect(slotMove(8, 'ArrowRight', 9, 36)).toBe(8);
+  expect(slotMove(9, 'ArrowLeft', 9, 36)).toBe(9);
+  expect(slotMove(20, 'End', 9, 36)).toBe(26);
+  // 6 columns on a phone: the quick row is 6 and 3, the bag 6, 6, 6, 6 and 3.
+  expect(slotMove(2, 'ArrowDown', 6, 36)).toBe(8);
+  expect(slotMove(4, 'ArrowDown', 6, 36)).toBe(8);
+  expect(slotMove(7, 'ArrowDown', 6, 36)).toBe(10);
+  expect(slotMove(8, 'ArrowRight', 6, 36)).toBe(8);
+  expect(slotMove(11, 'ArrowUp', 6, 36)).toBe(8);
+  expect(slotMove(9, 'ArrowUp', 6, 36)).toBe(6);
+  expect(slotMove(29, 'ArrowDown', 6, 36)).toBe(35);
+  expect(slotMove(35, 'ArrowRight', 6, 36)).toBe(35);
+  expect(slotMove(6, 'End', 6, 36)).toBe(8);
+});
+
+test('a split takes the bigger half', () => {
+  expect([1, 2, 7, 14].map(half)).toEqual([1, 1, 4, 7]);
+});
+
+test('an item says what it is for by what it does', () => {
+  const item = (more: Partial<ItemDef>): ItemDef => ({ id: 'x', name: 'X', icon: 'x', stack: 99, description: '', ...more });
+  expect(itemUse(item({ tool: { kind: 'axe', tier: 1 } }))).toBe('Tool. Hold the left button on a tree to fell it.');
+  expect(itemUse(item({ seed: 'wheat' }))).toBe('The right button plants it in tilled soil.');
+  expect(itemUse(item({ placeable: 'bed' }))).toBe('The right button sets it down.');
+  expect(itemUse(item({ block: 4 }))).toBe('The right button builds with it.');
+  expect(itemUse(item({ treat: true }))).toBe('Pets like it. Hold it out with the right button.');
+  expect(itemUse(item({}))).toBeNull();
 });

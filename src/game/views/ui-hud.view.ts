@@ -4,10 +4,16 @@
 //
 // This part of the story has no fights, so there are no health, stamina or mana bars. The hud feature
 // has no option to leave them out, so the stylesheet here hides them.
+//
+// The tracker shows the quest, a pip for each step and only the step to do now; the quest log (J) has the
+// rest. A quick slot shows its item's name and use on hover, and a stack can be dragged from one quick slot
+// to another, as in the bag (src/game/ui/drag.ui.ts).
 import { createHud, type HudSlot } from '../../features/hud/index.ts';
 import type { QuestStepView, QuestView } from '../api.sim.ts';
 import { ALMANAC_BOOK } from '../content/almanac.ts';
 import type { GameView } from '../shell/view.ts';
+import { createSlotDrag } from '../ui/drag.ui.ts';
+import { itemUse } from '../ui/logic.ui.ts';
 import { bookOf } from '../uiview/book.ts';
 import { addStyle } from '../uiview/theme.ts';
 
@@ -18,57 +24,74 @@ const LOOK_EVERY = 0.25;
 const SLOT_GAP = 12;
 
 const STYLE = /* css */ `
-.ui-book .gb-hud { line-height: 1.3; }
+.ui-book .gb-hud { line-height: 1.35; color: var(--ui-glass-ink); }
 .ui-book .gb-hud-vitals { display: none; }
-.ui-book .gb-hud .gb-panel { border: 2px solid var(--ui-ink); border-radius: 2px; outline: 0; background: var(--ui-paper); box-shadow: 0 4px 14px var(--ui-shadow); }
+/* Every HUD piece is a strip of dark glass: the world shows around it, and the text is near-white. */
+.ui-book .gb-hud .gb-panel { color: var(--ui-glass-ink); background: var(--ui-glass); border: 0; border-radius: var(--ui-radius); outline: 0; box-shadow: var(--ui-glass-shadow); }
 
-/* ---- quick slots: the bag's first row, drawn as the bag draws it ---- */
-.ui-book .gb-hud-slots { gap: 4px; padding: 6px; }
-.ui-book .gb-slot { background: var(--ui-paper-3); border: 0; border-radius: 2px; transition: none; }
-.ui-book .gb-slot:hover { background: var(--ui-paper-4); }
-.ui-book .gb-slot:active { background: var(--ui-paper-2); }
-/* The held slot: the accent line the bag puts on the picked slot. */
-.ui-book .gb-slot[aria-pressed='true'] { background: var(--ui-paper-light); transform: none; box-shadow: inset 0 0 0 2px var(--ui-accent); }
-.ui-book .gb-slot:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
-.ui-book .gb-slot-key { z-index: 1; top: 2px; left: 2px; padding: 0 3px; font-size: 12px; line-height: 1.3; color: var(--ui-ink-2); background: inherit; border-radius: 2px; }
+/* ---- quick slots: nine wells on a glass rail. The held one is lit in the lume's teal. ---- */
+.ui-book .gb-hud-slots { gap: 6px; padding: 6px; border-radius: 14px !important; }
+.ui-book .gb-slot { width: 52px; height: 52px; color: var(--ui-glass-ink); background: var(--ui-glass-2); border: 0; border-radius: var(--ui-radius); transition: none; touch-action: none; }
+.ui-book .gb-slot:hover { background: oklch(1 0 0 / 0.18); }
+.ui-book .gb-slot:active { background: oklch(1 0 0 / 0.24); }
+.ui-book .gb-slot[aria-pressed='true'] { background: oklch(1 0 0 / 0.22); transform: none; box-shadow: inset 0 0 0 2px oklch(0.84 0.08 188); }
+.ui-book .gb-slot:focus-visible { outline: 2px solid oklch(0.84 0.08 188); outline-offset: 2px; }
+.ui-book .gb-slot-key { z-index: 1; top: 3px; left: 6px; padding: 0; font-size: 11px; font-weight: 600; line-height: 1.3; color: var(--ui-glass-ink-2); background: none; }
 /* An icon is 32 pixels of pixel art, so it is drawn at exactly that. */
 .ui-book .gb-slot-icon { inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
-.ui-book .gb-slot-count { z-index: 1; right: 2px; bottom: 2px; padding: 0 4px; font-size: 13px; font-weight: 600; line-height: 1.3; background: var(--ui-paper); border-radius: 2px; }
+.ui-book .gb-slot-count { z-index: 1; right: 4px; bottom: 2px; padding: 0; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
+/* A drag between quick slots: the slot it came from fades and the one under the pointer lights up. */
+.ui-book .gb-slot.is-drag-from .gb-slot-icon, .ui-book .gb-slot.is-drag-from .gb-slot-count { opacity: 0.3; }
+.ui-book .gb-slot.is-drop { background: oklch(0.53 0.095 192 / 0.45); box-shadow: inset 0 0 0 2px oklch(0.84 0.08 188); }
+.ui-book .gb-slot.is-refused { box-shadow: inset 0 0 0 2px var(--ui-new); }
+.ui-book .gu-ghost-count { position: absolute; right: 3px; bottom: 3px; min-width: 20px; padding: 0 5px; font-size: 13px; font-weight: 700; line-height: 18px; text-align: center; color: var(--ui-ink); background: var(--ui-paper-light); border-radius: var(--ui-radius-sm); }
+:root.gu-dragging, :root.gu-dragging * { cursor: grabbing !important; }
+/* The name and use of a quick slot's item, above it. */
+.ui-slot-tip {
+  position: absolute; left: 0; top: 0; z-index: 13; display: grid; gap: 2px; width: max-content; max-width: 240px; padding: 8px 12px 10px;
+  font-family: var(--ui-font); font-size: 14px; line-height: 1.4; color: var(--ui-glass-ink); background: oklch(0.26 0.02 62); border-radius: var(--ui-radius);
+  box-shadow: var(--ui-glass-shadow); pointer-events: none;
+}
+.ui-slot-tip[hidden] { display: none; }
+.ui-slot-tip b { font-weight: 650; }
+.ui-slot-tip span { color: oklch(0.84 0.08 188); }
 
 /* ---- top right: the minimap, then the day and the clock, then the quest ---- */
 .ui-book .gb-hud-right { gap: 8px; }
-.ui-book .gb-hud-sky { flex: none; gap: 8px; padding: 4px 12px; white-space: nowrap; }
-.ui-book .gb-hud-weather svg { width: 1.25em; height: 1.25em; }
-.ui-book .gb-hud-clock { font-weight: 600; letter-spacing: 0; }
-.ui-day { white-space: nowrap; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ui-ink-2); }
-.ui-book .gb-hud-quest { width: 17em; margin-top: 0; padding: 12px 16px 14px; }
-.ui-book .gb-hud-quest h3 { margin: 0 0 8px; padding-bottom: 8px; font-size: 1em; font-weight: 600; letter-spacing: -0.01em; border-bottom: 1px solid var(--ui-line); text-wrap: balance; }
-.ui-book .gb-hud-quest ul { gap: 6px; }
-.ui-book .gb-hud-quest li { display: grid; grid-template-columns: 1fr auto; gap: 0 12px; align-items: baseline; padding-left: 20px; font-size: max(0.875em, 13px); color: var(--ui-ink-2); text-wrap: pretty; }
-.ui-book .gb-hud-quest li::before { left: 1px; top: 0.3em; width: 10px; height: 10px; border: 1.5px solid var(--ui-ink-2); border-radius: 50%; }
-.ui-book .gb-hud-quest li.is-done { color: var(--ui-ink-2); text-decoration: none; }
-.ui-book .gb-hud-quest li.is-done::before { background: var(--ui-done); border-color: var(--ui-done); }
-/* The step to do now is the one line in full ink. */
-.ui-book .gb-hud-quest li:first-child:not(.is-done), .ui-book .gb-hud-quest li.is-done + li:not(.is-done) { color: var(--ui-ink); font-weight: 600; }
-.ui-book .gb-hud-quest li:first-child:not(.is-done)::before, .ui-book .gb-hud-quest li.is-done + li:not(.is-done)::before { border-color: var(--ui-ink); }
-.ui-count { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.ui-book .gb-hud-sky { flex: none; gap: 8px; padding: 5px 12px; white-space: nowrap; }
+.ui-book .gb-hud-weather svg { width: 1.2em; height: 1.2em; }
+.ui-book .gb-hud-clock { font-size: 15px; font-weight: 650; letter-spacing: 0; }
+.ui-day { white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--ui-glass-ink-2); }
+/* The tracker: the quest, how far it has come, and only the step to do now. The quest log (J) has the rest. */
+.ui-book .gb-hud-quest { width: 260px; margin-top: 4px; padding: 12px 14px 13px; }
+.ui-book .gb-hud-quest h3 { margin: 0; padding: 0; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ui-glass-ink-2); border: 0; text-wrap: balance; }
+.ui-pips { display: flex; gap: 4px; margin: 8px 0 10px; }
+.ui-pips i { flex: 1; height: 3px; border-radius: 2px; background: oklch(1 0 0 / 0.2); }
+.ui-pips i.is-done { background: oklch(0.84 0.08 188); }
+.ui-pips i.is-now { background: oklch(1 0 0 / 0.55); }
+.ui-book .gb-hud-quest ul { gap: 0; }
+.ui-book .gb-hud-quest li { display: none; grid-template-columns: 1fr auto; gap: 0 12px; align-items: baseline; padding-left: 0; font-size: 15px; font-weight: 600; color: var(--ui-glass-ink); text-wrap: pretty; text-shadow: var(--ui-text-shadow); }
+.ui-book .gb-hud-quest li::before { content: none; }
+/* The step to do now is the one line shown. */
+.ui-book .gb-hud-quest li:first-child:not(.is-done), .ui-book .gb-hud-quest li.is-done + li:not(.is-done) { display: grid; }
+.ui-count { font-size: 14px; font-weight: 650; color: oklch(0.84 0.08 188); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
 
 /* ---- the Almanac: a button of its own at the left of the quick slots, never a slot. It shows once Tamsin has given the book. */
-.ui-bookbtn { position: absolute; right: 100%; bottom: 0; margin-right: 8px; padding: 6px; pointer-events: auto; }
+.ui-bookbtn { position: absolute; right: 100%; bottom: 0; margin-right: 8px; padding: 6px; pointer-events: auto; border-radius: 14px !important; }
 .ui-bookbtn[hidden] { display: none; }
 .ui-bookbtn button {
-  position: relative; display: block; width: max(2.9em, 44px); height: max(2.9em, 44px); margin: 0; padding: 0;
-  font: inherit; color: var(--ui-ink); background: var(--ui-paper-3); border: 0; border-radius: 2px; cursor: pointer;
+  position: relative; display: block; width: 52px; height: 52px; margin: 0; padding: 0;
+  font: inherit; color: var(--ui-glass-ink); background: var(--ui-glass-2); border: 0; border-radius: var(--ui-radius); cursor: pointer;
 }
-.ui-bookbtn button:hover { background: var(--ui-paper-4); }
-.ui-bookbtn button:active { background: var(--ui-paper-2); }
-.ui-bookbtn button[aria-expanded='true'] { background: var(--ui-paper-light); box-shadow: inset 0 0 0 2px var(--ui-accent); }
-.ui-bookbtn button:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
+.ui-bookbtn button:hover { background: oklch(1 0 0 / 0.18); }
+.ui-bookbtn button:active { background: oklch(1 0 0 / 0.24); }
+.ui-bookbtn button[aria-expanded='true'] { box-shadow: inset 0 0 0 2px oklch(0.84 0.08 188); }
+.ui-bookbtn button:focus-visible { outline: 2px solid oklch(0.84 0.08 188); outline-offset: 2px; }
 .ui-bookbtn .ui-bookbtn-icon { position: absolute; inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
-.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 2px; left: 2px; padding: 0 3px; font-size: 11px; line-height: 1.3; color: var(--ui-ink-2); background: inherit; border-radius: 2px; }
+.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 10px; font-weight: 600; line-height: 1.3; color: var(--ui-glass-ink-2); }
 /* The first time it shows, it glows twice so the eye finds it. */
 .ui-bookbtn.is-new button { animation: ui-book-glow 1.1s var(--ui-ease) 2; }
-@keyframes ui-book-glow { 0% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 0 oklch(0.76 0.112 82 / 0.7); } 100% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 10px oklch(0.76 0.112 82 / 0); } }
+@keyframes ui-book-glow { 0% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 0 oklch(0.8 0.13 78 / 0.7); } 100% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 12px oklch(0.8 0.13 78 / 0); } }
 @media (prefers-reduced-motion: reduce) { .ui-bookbtn.is-new button { animation: none; box-shadow: inset 0 0 0 2px var(--ui-brass); } }
 @media (max-width: 560px) {
   .ui-bookbtn { right: auto; left: 0; bottom: 100%; margin: 0 0 8px; }
@@ -77,13 +100,15 @@ const STYLE = /* css */ `
 /* While someone talks the dialogue box has the bottom of the screen. */
 .ui-book.ui-talking .gb-hud-slots { visibility: hidden; }
 
-/* A phone held upright: the corner is narrow, so the tracker shows only the step to do now. */
+/* A phone held upright: the corner is narrow and the slots wrap to five and four. */
 @media (max-width: 560px) {
-  .ui-book .gb-hud-quest { width: 13.5em; padding: 8px 12px 10px; }
-  .ui-book .gb-hud-quest h3 { margin-bottom: 6px; padding-bottom: 6px; }
-  .ui-book .gb-hud-quest li.is-done, .ui-book .gb-hud-quest li:not(.is-done) ~ li:not(.is-done) { display: none; }
+  .ui-book .gb-slot { width: 48px; height: 48px; }
+  .ui-book .gb-hud-slots { width: calc(5 * 48px + 4 * 6px + 12px); }
+  .ui-book .gb-hud-quest { width: 13.5em; padding: 10px 12px 11px; }
+  .ui-book .gb-hud-quest li { font-size: 14px; }
+  .ui-pips { margin: 6px 0 8px; }
   /* The day and the clock are wider than the corner here, so they keep its right edge. */
-  .ui-book .gb-hud-sky { align-self: flex-end; padding: 2px 10px; }
+  .ui-book .gb-hud-sky { align-self: flex-end; padding: 4px 10px; }
 }
 `;
 
@@ -153,8 +178,12 @@ export function install(view: GameView): void {
     }
   }
 
-  // ---- the tracked quest
+  // ---- the tracked quest, with a pip for each step: done, now, or still to come
   let questShown = '';
+  const pips = document.createElement('div');
+  pips.className = 'ui-pips';
+  pips.setAttribute('aria-hidden', 'true');
+  hud.element.querySelector('.gb-hud-quest h3')?.after(pips);
   const stepText = (step: QuestStepView): string => step.text;
   const stepCount = (step: QuestStepView): string => (step.need !== undefined && !step.done ? `${step.have ?? 0}/${step.need}` : '');
 
@@ -166,6 +195,13 @@ export function install(view: GameView): void {
     questShown = signature;
     hud.setQuest(quest ? { title: quest.title, steps: quest.steps.map((step) => ({ text: stepText(step), done: step.done })) } : null);
     if (!quest) return;
+    const now = quest.steps.findIndex((step) => !step.done);
+    pips.replaceChildren(...quest.steps.map((step, i) => {
+      const pip = document.createElement('i');
+      if (step.done) pip.className = 'is-done';
+      else if (i === now) pip.className = 'is-now';
+      return pip;
+    }));
     // A step that counts shows how far it is, at the right of its line.
     const lines = hud.element.querySelectorAll('.gb-hud-quest li');
     if (lines.length !== quest.steps.length) return;
@@ -227,6 +263,67 @@ export function install(view: GameView): void {
   book.onPanel((panel) => { if (panel === 'almanac') bookBox.classList.remove('is-new'); });
   book.onStart(drawBook);
 
+  // ---- a stack dragged from one quick slot to another, and each slot's name and use on hover
+  const slotBar = hud.element.querySelector<HTMLElement>('.gb-hud-slots');
+  const slotButtons = [...(slotBar?.querySelectorAll<HTMLElement>('.gb-slot') ?? [])];
+  slotButtons.forEach((button, i) => { button.dataset.slotDrop = String(i); });
+  const free = (): boolean => view.started && !game.player.busy && !book.covered;
+  if (slotBar && sys.inventory) {
+    const inventory = sys.inventory;
+    createSlotDrag({
+      area: slotBar,
+      layer: () => root,
+      stackAt: (index) => (free() && index < QUICK ? inventory.slots[index] ?? null : null),
+      picture: (stack) => {
+        let icon = stack.id;
+        try { icon = sys.items?.get(stack.id).icon ?? icon; } catch { /* drawn by its letters */ }
+        const element = art.iconElement(icon) ?? letters(stack.id);
+        element.style.width = element.style.height = '32px';
+        return element;
+      },
+      drop(from, to, count) {
+        if (!free()) return;
+        inventory.move(from, to, count);
+        game.events.emit('ui.sound', { sound: 'click' });
+        due = true;
+      },
+      onStart: () => { tip.hidden = true; },
+    });
+  }
+  const tip = document.createElement('div');
+  tip.className = 'ui-slot-tip';
+  tip.setAttribute('role', 'tooltip');
+  tip.hidden = true;
+  root.append(tip);
+  slotButtons.forEach((button, i) => {
+    button.addEventListener('pointerenter', (event) => {
+      const stack = sys.inventory?.slots[i];
+      if (event.pointerType === 'touch' || !stack || document.documentElement.classList.contains('gu-dragging')) return;
+      let name = stack.id, use: string | null = null;
+      try {
+        const def = sys.items?.get(stack.id);
+        if (def) { name = def.name; use = itemUse(def); }
+      } catch {
+        // An item nobody defined still has its id.
+      }
+      const title = document.createElement('b');
+      title.textContent = name;
+      tip.replaceChildren(title);
+      if (use) {
+        const line = document.createElement('span');
+        line.textContent = use;
+        tip.append(line);
+      }
+      tip.hidden = false;
+      const at = button.getBoundingClientRect(), room = root.getBoundingClientRect(), box = tip.getBoundingClientRect();
+      const left = Math.min(Math.max(8, at.left - room.left + at.width / 2 - box.width / 2), room.width - box.width - 8);
+      tip.style.transform = `translate(${Math.round(left)}px, ${Math.round(at.top - room.top - box.height - 10)}px)`;
+    });
+    button.addEventListener('pointerleave', () => { tip.hidden = true; });
+    // The tooltip says more than the browser's own, so that one is not shown too.
+    button.addEventListener('mouseover', () => button.removeAttribute('title'));
+  });
+
   // ---- the room the quick slots take, so the prompt and the toasts sit clear of them
   const bar = hud.element.querySelector<HTMLElement>('.gb-hud-slots');
   const measure = (): void => {
@@ -248,6 +345,7 @@ export function install(view: GameView): void {
       visible = show;
       hud.setVisible(show);
       if (show) measure();
+      else tip.hidden = true;
     }
     if (!show) return;
 

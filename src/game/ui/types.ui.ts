@@ -105,6 +105,13 @@ export interface GameUi {
   isOpen(panel?: PanelName): boolean;
   /** The stored settings. */
   settings(): Settings;
+  /** The hints and the Almanac's note at the top of the screen. */
+  readonly notices: {
+    /** While held they step aside and their time stands still, so a story card can have the top of the screen. */
+    hold(on: boolean): void;
+    /** A hint with this id is never shown, because something else on screen already says it. */
+    skip(id: string): void;
+  };
   /** Removes every element and listener. */
   dispose(): void;
 }

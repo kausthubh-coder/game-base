@@ -17,6 +17,10 @@ export interface Overlay {
   /** Shows "The Almanac wrote something" for a page. */
   note(page: string): void;
   clearNote(): void;
+  /** While held, the hint and the note step aside and their time stands still, so a story card has the top of the screen. */
+  hold(on: boolean): void;
+  /** A hint with this id is never shown, because something else on screen already says it. */
+  skip(id: string): void;
 }
 
 export function createOverlay(ctx: UiContext, now: () => number): Overlay {
@@ -40,16 +44,27 @@ export function createOverlay(ctx: UiContext, now: () => number): Overlay {
   );
   const top = h('div', { class: 'gu-top', role: 'status' }, hintCard, noteButton);
   const hints: { id: string; text: string }[] = [];
+  const skipped = new Set<string>();
   let hintUntil = 0;
   let noteUntil = 0;
   let notePage: string | null = null;
+  /** One card at a time at the top: the hint, then the note once no hint is up. */
+  let noteWaiting = false;
+  let held = false;
+  let lastTime = 0;
 
   const showHint = (): void => {
     const hint = hints[0];
     hintCard.hidden = !hint;
-    if (!hint) return;
-    hintText.textContent = hint.text;
-    hintUntil = now() + HINT_LIFE;
+    if (hint) {
+      hintText.textContent = hint.text;
+      hintUntil = now() + HINT_LIFE;
+      noteButton.hidden = true;
+    } else if (noteWaiting && notePage) {
+      noteWaiting = false;
+      noteButton.hidden = false;
+      noteUntil = now() + NOTE_LIFE;
+    }
   };
   const nextHint = (): void => {
     hints.shift();
@@ -57,6 +72,7 @@ export function createOverlay(ctx: UiContext, now: () => number): Overlay {
   };
   const clearNote = (): void => {
     notePage = null;
+    noteWaiting = false;
     noteButton.hidden = true;
   };
 
@@ -126,12 +142,18 @@ export function createOverlay(ctx: UiContext, now: () => number): Overlay {
         ringProgress = -1;
       }
 
+      // Held, the cards' time stands still.
+      if (held) {
+        hintUntil += time - lastTime;
+        noteUntil += time - lastTime;
+      }
+      lastTime = time;
       if (hints.length && time >= hintUntil) nextHint();
-      if (notePage && time >= noteUntil) clearNote();
+      if (notePage && !noteWaiting && time >= noteUntil) clearNote();
       if (toasts.length && expireToasts(toasts, time)) drawToasts();
     },
     hint(id, text) {
-      if (hints.some((hint) => hint.id === id)) return;
+      if (skipped.has(id) || hints.some((hint) => hint.id === id)) return;
       hints.push({ id, text });
       if (hints.length === 1) showHint();
     },
@@ -141,9 +163,25 @@ export function createOverlay(ctx: UiContext, now: () => number): Overlay {
     },
     note(page) {
       notePage = page;
+      if (hints.length) {
+        noteWaiting = true;
+        return;
+      }
       noteUntil = now() + NOTE_LIFE;
       noteButton.hidden = false;
     },
     clearNote,
+    hold(on) {
+      held = on;
+      top.classList.toggle('gu-held', on);
+    },
+    skip(id) {
+      skipped.add(id);
+      if (hints.some((hint) => hint.id === id)) {
+        const showing = hints[0]?.id === id;
+        hints.splice(hints.findIndex((hint) => hint.id === id), 1);
+        if (showing) showHint();
+      }
+    },
   };
 }
