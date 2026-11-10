@@ -20,6 +20,11 @@ const BODY_HALF = 0.3, BODY_TALL = 1.8;
 const TOAST_GAP = 3;
 /** A break that nobody held for this long starts over. */
 const FORGET_AFTER = 0.5;
+/**
+ * Every break takes at least this long, so a click, however quick the block, breaks nothing. Each press of the
+ * button starts the meter from nothing, so a few quick clicks do not add up to a break either.
+ */
+export const HOLD_TO_BREAK = 0.4;
 
 export const TOWN_TOAST = 'This belongs to the town.';
 export const BAG_FULL_TOAST = 'Your bag is full.';
@@ -155,7 +160,7 @@ export function install(kernel: Kernel): void {
       return false;
     }
     const axe = held !== null && game.systems.items.get(held.id).tool?.kind === 'axe';
-    const seconds = axe ? FELLING.axe : FELLING.hand;
+    const seconds = Math.max(HOLD_TO_BREAK, axe ? FELLING.axe : FELLING.hand);
     if (!active || meter.x !== x || meter.y !== y || meter.z !== z || meter.tree === null) {
       meter.x = x;
       meter.y = y;
@@ -230,7 +235,7 @@ export function install(kernel: Kernel): void {
       meter.progress = 0;
       active = true;
     }
-    meter.progress = Math.min(1, meter.progress + dt / seconds);
+    meter.progress = Math.min(1, meter.progress + dt / Math.max(HOLD_TO_BREAK, seconds));
     // The small margin lets ten steps of 0.05 finish a break of 0.5 seconds.
     if (meter.progress < 1 - 1e-9) return false;
     stop();
@@ -316,7 +321,8 @@ export function install(kernel: Kernel): void {
         return true;
       }
       if (!primary) return place(context);
-      // A click starts the break. Holding the button, through hold(), finishes it.
+      // A click starts the break from nothing. Holding the button, through hold(), finishes it.
+      stop();
       hold(context, 0);
       return active;
     },

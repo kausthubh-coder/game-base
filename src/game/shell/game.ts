@@ -36,6 +36,10 @@ const BODY_STEPS = Math.round(STEP / HERO_STEP);
 const SAVE_EVERY = 60;
 /** The eyes are this far above the feet. Reach is measured from them, as the actions system does. */
 const EYE_HEIGHT = 1.6;
+/** Radians the free and first-person view turns for each pixel the mouse moves. */
+const LOOK_SPEED = 0.0024;
+/** The camera modes in the order V goes through them. */
+const NEXT_CAMERA: Record<CameraMode, CameraMode> = { tilt: 'free', free: 'first', first: 'tilt' };
 /** Chunks around the player that must exist before the rules run, each way. */
 const READY_REACH = 1;
 /** Chunks loaded on the spot around a teleport or a start, each way, so the rules never see a hole. */
@@ -158,7 +162,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const sys = game.systems as Partial<Systems>;
 
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
-  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov });
+  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov, mode: cameraMode });
   const sky = createSky(ctx, { shadowRange: 40 });
   const water = createWaterMaterial(ctx);
   const effects = createEffects(ctx);
@@ -177,6 +181,16 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const keys = createKeys(canvas);
   const start = sys.region?.spawn() ?? spawnPoint();
   const player = createPlayer(game, world.sim, keys, start);
+
+  /** Puts the camera mode into effect: the camera, mouse look, and the hero's body hidden in first person. */
+  function applyCamera(next: CameraMode): void {
+    camera.setMode(next);
+    keys.setLook(next !== 'tilt');
+    player.actor.visible = next !== 'first';
+    lastRange = lastZoom = -1;
+  }
+  /** The shadow range and the zoom the sky was last given, so it is told only when they change. */
+  let lastRange = -1, lastZoom = -1;
 
   // ---------------------------------------------------------------- the end card's numbers
   let wheat = 0, blocks = 0;
@@ -219,10 +233,12 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   function takeAim(): void {
     aimed = false;
+    // The free and first-person cameras aim from the middle of the screen, where the crosshair is.
+    const centre = camera.mode !== 'tilt';
     const pointer = keys.pointer;
-    if (!pointer.over) return;
+    if (!centre && !pointer.over) return;
     origin.copy(lens.position);
-    ray.set(pointer.x, pointer.y, 0.5).unproject(lens).sub(origin);
+    ray.set(centre ? 0 : pointer.x, centre ? 0 : pointer.y, 0.5).unproject(lens).sub(origin);
     // The ray skips what the cutaway hides, so a click goes through a hidden roof to the floor.
     if (!world.sim.raycast(origin.x, origin.y, origin.z, ray.x, ray.y, ray.z, 500, hit, camera.hides)) return;
     const p = game.player.pos, eye = p.y + EYE_HEIGHT;
@@ -337,7 +353,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   let carry = 0, bodySteps = 0;
   function bodyStep(): void {
-    player.step(camera.yaw);
+    player.step(camera.yaw, camera.mode === 'first');
     if (++bodySteps < BODY_STEPS) return;
     bodySteps = 0;
     simStep();
@@ -357,6 +373,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     if (press.kind === 'perf') { perfHolder.hidden = !perfHolder.hidden; return; }
     if (press.kind === 'turn') { camera.turn(press.direction); return; }
     if (press.kind === 'zoom') { camera.zoomBy(press.steps); return; }
+    if (press.kind === 'camera') { view.settings.setCamera(NEXT_CAMERA[cameraMode]); return; }
     if (!running()) return;
     if (press.kind === 'slot') {
       if (sys.inventory) sys.inventory.selected = press.index;
@@ -383,7 +400,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     lens.aspect = size.width / size.height;
   });
 
-  let last = performance.now(), frameCount = 0, quiet = 0, lastZoom = -1, lastRange = -1;
+  let last = performance.now(), frameCount = 0, quiet = 0;
+  const mouse = { x: 0, y: 0 };
   const waiters: { until: () => boolean; done: () => void }[] = [];
   const until = (test: () => boolean): Promise<void> => new Promise((done) => waiters.push({ until: test, done }));
 
@@ -405,6 +423,11 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       player.blend(carry / HERO_STEP);
     }
 
+    // The mouse turns the free and first-person view. Anything that holds the player gives the cursor back.
+    keys.freeCursor(!running() || game.player.busy);
+    keys.takeLook(mouse);
+    if (camera.mode !== 'tilt' && (mouse.x !== 0 || mouse.y !== 0)) camera.look(-mouse.x * LOOK_SPEED, mouse.y * LOOK_SPEED);
+
     const p = player.position;
     camera.follow(p.x, p.y, p.z);
     camera.update(Math.min(dt, 0.1), ctx);
@@ -415,7 +438,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
     // Everything follows the hero. The sky gets what Ambient does not carry: the moon, a rainbow after rain.
     const a = game.ambient;
-    if (cam) {
+    const look = camera.profile;
+    if (look) {
+      // The free and first-person cameras see the horizon: the fog is whole before the loaded land ends.
+      if (look.shadowRange !== lastRange) sky.setShadowRange((lastRange = look.shadowRange));
+      const edge = world.stats.radius * 16 - 8;
+      sky.setFogReach(Math.min(look.fogStart, edge * 0.45), Math.min(look.fogEnd, edge));
+    } else if (cam) {
       const range = Math.round(camera.stepped(cam.shadowRange));
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       // The fog is whole before the loaded land ends, which is nearer at a lower quality.
@@ -518,6 +547,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
         store();
         if (next === cameraMode) return;
         cameraMode = next;
+        applyCamera(next);
         for (const fn of [...changeListeners]) fn('camera');
       },
       get characters() { return characterLook; },
@@ -553,6 +583,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // The camera looks at the start from the first frame, behind a title or not. The worker loads the land there.
   place(start.x, start.y, start.z, Math.PI, false);
+  applyCamera(cameraMode);
 
   return {
     view,

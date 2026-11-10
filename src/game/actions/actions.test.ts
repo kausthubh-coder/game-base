@@ -1,7 +1,9 @@
 import { expect, test } from 'bun:test';
 import { AIR, blockId } from '../../content/blocks.ts';
 import type { UseContext } from '../api.sim.ts';
-import { BAG_FULL_TOAST, NO_GROUND_TOAST, NO_ROOM_TOAST, TOWN_TOAST } from './index.sim.ts';
+import { install as installCrops } from '../crops/index.sim.ts';
+import { BAG_FULL_TOAST, HOLD_TO_BREAK, NO_GROUND_TOAST, NO_ROOM_TOAST, TOWN_TOAST } from './index.sim.ts';
+import { BLOCKS } from '../../content/blocks.ts';
 import { TOWN_X, makeStage, type Stage } from './stage.ts';
 
 const LOG = blockId('oak_log'), STONE = blockId('stone'), GRASS = blockId('grass'), LEAVES = blockId('oak_leaves');
@@ -58,8 +60,10 @@ test('the other blocks take the time the design gives them', () => {
     s.world.setBlock(7, g, 5, blockId(key));
     return holdsToBreak(s, s.context('primary', s.hit(7, g, 5, -1, 0, 0), null)) / 20;
   };
-  expect(seconds('grass')).toBe(0.25);
-  expect(seconds('oak_leaves')).toBe(0.25);
+  // Grass and leaves would go in a quarter of a second, but nothing breaks quicker than a held press.
+  expect(HOLD_TO_BREAK).toBe(0.4);
+  expect(seconds('grass')).toBe(0.4);
+  expect(seconds('oak_leaves')).toBe(0.4);
   expect(seconds('dirt')).toBe(0.5);
   expect(seconds('sand')).toBe(0.5);
   expect(seconds('oak_plank')).toBe(0.6);
@@ -107,7 +111,7 @@ test('grass gives dirt and fiber one time in five, leaves give fiber one time in
   const context = (): UseContext => s.context('primary', s.hit(7, g, 5, -1, 0, 0), null);
   for (let i = 0; i < 200; i++) {
     s.world.setBlock(7, g, 5, GRASS);
-    expect(holdsToBreak(s, context())).toBe(5);
+    expect(holdsToBreak(s, context())).toBe(8);
   }
   expect(inventory.count('dirt')).toBe(200);
   const fromGrass = inventory.count('fiber');
@@ -115,7 +119,7 @@ test('grass gives dirt and fiber one time in five, leaves give fiber one time in
   expect(fromGrass).toBeLessThan(55);
   for (let i = 0; i < 200; i++) {
     s.world.setBlock(7, g, 5, LEAVES);
-    expect(holdsToBreak(s, context())).toBe(5);
+    expect(holdsToBreak(s, context())).toBe(8);
   }
   const fromLeaves = inventory.count('fiber') - fromGrass;
   expect(fromLeaves).toBeGreaterThan(80);
@@ -365,4 +369,52 @@ test('a real ray from the eyes places on the face it hits and then breaks what i
   expect(cobble).toMatchObject({ x: 7, y: g, z: 5 });
   expect(holdsToBreak(s, s.context('primary', cobble))).toBe(12);
   expect(inventory.count('cobble')).toBe(1);
+});
+
+test('a short click breaks nothing, soft blocks and growing crops included, and quick clicks do not add up', () => {
+  const s = makeStage();
+  installCrops(s.kernel);
+  // The crops system adds its click handler on its first step.
+  s.wait(0.05);
+  const g = s.ground, game = s.kernel.game, { actions, inventory, crops } = game.systems;
+  /** One press of the left button as the shell makes it: use(), then hold() on every step the button is down. */
+  const click = (hit: ReturnType<Stage['hit']>, held: UseContext['held'], seconds: number): void => {
+    const context = s.context('primary', hit, held);
+    actions.use(context);
+    for (let t = 0; t < seconds - 1e-9; t += 0.05) {
+      actions.hold(context, 0.05);
+      s.wait(0.05);
+    }
+    s.wait(0.1);
+  };
+  inventory.add('axe', 1);
+  inventory.add('pickaxe', 1);
+  const tools = [null, { id: 'axe', count: 1 }, { id: 'pickaxe', count: 1 }];
+  let tried = 0;
+  for (const block of BLOCKS) {
+    if (!block.solid) continue;
+    for (const held of tools) {
+      s.world.setBlock(7, g, 5, block.id);
+      // Three quick clicks of a third of a second each, as a player who taps at a block.
+      for (let k = 0; k < 3; k++) click(s.hit(7, g, 5, -1, 0, 0), held, 0.35);
+      expect(s.world.getBlock(7, g, 5)).toBe(block.id);
+      tried++;
+    }
+  }
+  expect(tried).toBeGreaterThan(30);
+  expect(named(s, 'block.broken')).toEqual([]);
+
+  // A growing crop: a click on its soil leaves both.
+  s.world.setBlock(7, g, 5, AIR);
+  s.world.setBlock(7, g - 1, 5, DIRT);
+  expect(crops.till(7, g - 1, 5)).toBe(true);
+  expect(crops.plant(7, g - 1, 5, 'wheat_seeds')).toBe(true);
+  for (let k = 0; k < 3; k++) click(s.hit(7, g - 1, 5), null, 0.35);
+  expect(crops.at(7, g - 1, 5)).not.toBeNull();
+  expect(named(s, 'block.broken')).toEqual([]);
+
+  // Held on, the same block does break, once the hold passes the floor.
+  s.world.setBlock(7, g, 5, GRASS);
+  click(s.hit(7, g, 5, -1, 0, 0), null, HOLD_TO_BREAK + 0.05);
+  expect(s.world.getBlock(7, g, 5)).toBe(AIR);
 });

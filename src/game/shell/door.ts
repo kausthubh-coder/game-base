@@ -53,6 +53,13 @@ export interface DebugDoor {
   /** How characters are drawn, as the View setting picks it: `sprites` or `models`. Stored like the setting. */
   setCharacters(look: CharacterLook): void;
   /**
+   * Free and first person: sets the view, in degrees. `yaw` 0 looks north and 90 west; `pitch` is how far it looks
+   * down, negative up. `distance` is the free camera's, in meters. Returns the camera as `state().camera` has it.
+   */
+  look(yaw: number, pitch: number, distance?: number): Record<string, unknown>;
+  /** Free and first person: turns the view so the crosshair falls on this point. Returns the camera. */
+  aimAt(x: number, y: number, z: number): Record<string, unknown>;
+  /**
    * With `true` the frames stop stepping the rules, so only `advance` moves time and a test reads exact numbers.
    * The picture is still drawn. `false` hands time back to the frames.
    */
@@ -96,6 +103,18 @@ export function createDoor(shell: Shell): DebugDoor {
     return (LANDMARKS as Record<string, Vec3>)[place] ?? null;
   }
 
+  const DEG = 180 / Math.PI;
+  const round = (n: number): number => Math.round(n * 1000) / 1000;
+  function cameraState(): Record<string, unknown> {
+    const c = view.camera, at = view.ctx.camera.position;
+    return {
+      mode: view.settings.camera, quarter: c.quarter, zoom: c.zoom,
+      yaw: round(c.yaw * DEG), pitch: round(c.pitch * DEG), distance: round(c.distance), reach: round(c.reach),
+      at: { x: round(at.x), y: round(at.y), z: round(at.z) },
+      locked: view.keys.locked,
+    };
+  }
+
   const solid = (x: number, y: number, z: number): boolean => BLOCKS[sim.getBlock(Math.floor(x), Math.floor(y), Math.floor(z))]?.solid === true;
 
   return {
@@ -134,7 +153,7 @@ export function createDoor(shell: Shell): DebugDoor {
         breaking: sys.actions?.breaking() ?? null,
         aim: view.aim ? { x: view.aim.x, y: view.aim.y, z: view.aim.z, id: view.aim.id } : null,
         stats: view.stats(),
-        camera: { mode: view.settings.camera, quarter: view.camera.quarter, zoom: view.camera.zoom },
+        camera: cameraState(),
         characters: view.settings.characters,
         sound: view.audio ? view.audio.debug().running : false,
         sprites: { count: view.sprites.count, missing: [...view.sprites.missing] },
@@ -243,6 +262,14 @@ export function createDoor(shell: Shell): DebugDoor {
     turn: (direction) => view.camera.turn(direction),
     setCamera: (mode) => view.settings.setCamera(mode),
     setCharacters: (look) => view.settings.setCharacters(look),
+    look(yaw, pitch, distance) {
+      view.camera.setLook(yaw / DEG, pitch / DEG, distance);
+      return cameraState();
+    },
+    aimAt(x, y, z) {
+      view.camera.aimAt(x, y, z);
+      return cameraState();
+    },
     manual: (on = true) => view.setPaused('door', on),
     frames: (count) => shell.frames(count),
     settle: () => shell.settled(),

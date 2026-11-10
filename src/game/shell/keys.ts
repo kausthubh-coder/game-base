@@ -1,6 +1,11 @@
 // Every key, mouse button and wheel the game reads comes through here. The rest of the shell sees only
 // `Keys`: what is held right now, and a `Press` for each thing that happens once. The base's input
 // feature will replace this file, so nothing else listens to the keyboard or the mouse.
+//
+// With mouse look on (the free and first-person cameras) it works as Genshin does on a PC: a click in the
+// world hides the cursor and from then on the mouse turns the view. That first click does nothing else, so
+// the click that takes the mouse never breaks a block. Alt or Esc gives the cursor back, and so does anything
+// that holds the player (a panel, the map, a conversation, the title). The next click in the world takes it again.
 
 /** Something that happens once. */
 export type Press =
@@ -15,6 +20,8 @@ export type Press =
   | { kind: 'slotStep'; step: 1 | -1 }
   /** The left or the right mouse button went down on the world. */
   | { kind: 'use'; button: 'primary' | 'secondary' }
+  /** V: the next camera mode. */
+  | { kind: 'camera' }
   | { kind: 'perf' };
 
 export interface Keys {
@@ -38,13 +45,25 @@ export interface Keys {
   tap(name: string): boolean;
   /** Lets go of everything, for when a panel opens or the window loses focus. */
   release(): void;
+  /**
+   * Mouse look, for the free and first-person cameras: the mouse turns the view once a click has taken it, and
+   * the wheel zooms smoothly instead of in steps.
+   */
+  setLook(on: boolean): void;
+  readonly looking: boolean;
+  /** True while the cursor is hidden and the mouse turns the view. */
+  readonly locked: boolean;
+  /** With `true` the cursor is given back and no click takes it. Call it every frame with what holds the player. */
+  freeCursor(free: boolean): void;
+  /** Pixels the mouse moved since the last call, right and down, written into `out`. */
+  takeLook(out: { x: number; y: number }): void;
   dispose(): void;
 }
 
 const NAMES: Record<string, string> = {
   w: 'KeyW', a: 'KeyA', s: 'KeyS', d: 'KeyD', e: 'KeyE', q: 'KeyQ', r: 'KeyR',
   up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
-  shift: 'ShiftLeft', space: 'Space', f3: 'F3',
+  shift: 'ShiftLeft', space: 'Space', f3: 'F3', v: 'KeyV',
 };
 const codeOf = (name: string): string => NAMES[name.toLowerCase()] ?? (/^[1-9]$/.test(name) ? `Digit${name}` : name);
 
@@ -61,6 +80,10 @@ export function createKeys(canvas: HTMLElement): Keys {
   const listeners = new Set<(press: Press) => void>();
   const pointer = { x: 0, y: 0, over: false };
   let primary = false;
+  let look = false, cursorFree = false, lockFailed = false, lookX = 0, lookY = 0;
+  const isLocked = (): boolean => document.pointerLockElement === canvas;
+  /** True when a click in the world may take the mouse. */
+  const mayLock = (): boolean => look && !cursorFree && !lockFailed;
 
   const send = (press: Press): void => {
     for (const listener of [...listeners]) listener(press);
@@ -71,6 +94,7 @@ export function createKeys(canvas: HTMLElement): Keys {
     if (code === 'KeyE') return { kind: 'interact' };
     if (code === 'KeyQ') return { kind: 'turn', direction: -1 };
     if (code === 'KeyR') return { kind: 'turn', direction: 1 };
+    if (code === 'KeyV') return { kind: 'camera' };
     if (code === 'F3') return { kind: 'perf' };
     const digit = /^Digit([1-9])$/.exec(code);
     return digit ? { kind: 'slot', index: Number(digit[1]) - 1 } : null;
@@ -84,6 +108,12 @@ export function createKeys(canvas: HTMLElement): Keys {
   }
 
   window.addEventListener('keydown', (e) => {
+    // Alt gives the cursor back, as in Genshin.
+    if ((e.code === 'AltLeft' || e.code === 'AltRight') && look) {
+      e.preventDefault();
+      if (isLocked()) document.exitPointerLock();
+      return;
+    }
     if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
     // Space and Enter on a focused button belong to the button, not to the hero's legs.
     if ((e.code === 'Space' || e.code === 'Enter') && e.target instanceof HTMLElement && e.target.closest('button, a, [role="button"]')) return;
@@ -93,7 +123,11 @@ export function createKeys(canvas: HTMLElement): Keys {
     const press = pressOf(e.code);
     if (press) send(press);
   }, on);
-  window.addEventListener('keyup', (e) => held.delete(e.code), on);
+  window.addEventListener('keyup', (e) => {
+    held.delete(e.code);
+    // Alt let go on its own would put Windows' focus on the browser's menu.
+    if ((e.code === 'AltLeft' || e.code === 'AltRight') && look) e.preventDefault();
+  }, on);
   window.addEventListener('blur', () => { held.clear(); primary = false; }, on);
 
   canvas.addEventListener('pointermove', movePointer, on);
@@ -101,6 +135,12 @@ export function createKeys(canvas: HTMLElement): Keys {
   canvas.addEventListener('contextmenu', (e) => e.preventDefault(), on);
   canvas.addEventListener('pointerdown', (e) => {
     movePointer(e);
+    if (mayLock() && !isLocked()) {
+      // This click takes the mouse and does nothing else.
+      const asked = canvas.requestPointerLock() as unknown as Promise<void> | undefined;
+      asked?.catch?.(() => { lockFailed = true; });
+      return;
+    }
     if (e.button === 0) {
       primary = true;
       send({ kind: 'use', button: 'primary' });
@@ -109,12 +149,25 @@ export function createKeys(canvas: HTMLElement): Keys {
     }
   }, on);
   window.addEventListener('pointerup', (e) => { if (e.button === 0) primary = false; }, on);
+  document.addEventListener('pointerlockerror', () => { lockFailed = true; }, on);
+  document.addEventListener('pointerlockchange', () => { if (!isLocked()) primary = false; }, on);
+  document.addEventListener('pointermove', (e) => {
+    // Without the lock (a browser that refuses it) the mouse turns the view while it is over the world.
+    if (!look || cursorFree || !(isLocked() || (lockFailed && e.target === canvas))) return;
+    lookX += e.movementX;
+    lookY += e.movementY;
+  }, on);
 
   // A mouse wheel sends one big step and a trackpad many small ones. Either way one gesture is one step.
   let wheel = 0, lastStep = 0;
   canvas.addEventListener('wheel', (e) => {
     e.preventDefault();
     // With Shift down some browsers report the wheel sideways.
+    if (look && !e.shiftKey) {
+      // The free camera zooms smoothly: a notch of a mouse wheel is one step, a trackpad's swipe a few.
+      send({ kind: 'zoom', steps: Math.max(-3, Math.min(3, (e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY) / 100)) });
+      return;
+    }
     wheel += e.deltaY || e.deltaX;
     if (Math.abs(wheel) < 40 || e.timeStamp - lastStep < (e.shiftKey ? 90 : 220)) return;
     const step = wheel > 0 ? 1 : -1;
@@ -153,6 +206,23 @@ export function createKeys(canvas: HTMLElement): Keys {
     release() {
       held.clear();
       primary = false;
+    },
+
+    setLook(on) {
+      look = on;
+      lookX = lookY = 0;
+      if (!on && isLocked()) document.exitPointerLock();
+    },
+    get looking() { return look; },
+    get locked() { return isLocked(); },
+    freeCursor(free) {
+      cursorFree = free;
+      if (free && isLocked()) document.exitPointerLock();
+    },
+    takeLook(out) {
+      out.x = lookX;
+      out.y = lookY;
+      lookX = lookY = 0;
     },
 
     dispose() {
