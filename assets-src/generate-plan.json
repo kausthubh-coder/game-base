@@ -1,0 +1,7 @@
+{
+  "mode": "built-in image_gen.imagegen",
+  "attempts": {"hero":1,"villager-a":1,"villager-b":1,"pet":1,"critter":1,"blocks":1,"clay":2,"icons":1},
+  "clay": "Initial atlas cell was roof tile; replaced by separately generated clay-2.png.",
+  "palette": "Deterministically sampled from two mood reference images; no generation attempt.",
+  "prompts": ["prompts.json", "clay-prompt.txt"]
+}
