@@ -125,7 +125,9 @@ export const STYLES = /* css */ `
 
 /* ---- bag ---- */
 .gu-tabs { display: flex; gap: var(--s1); padding: 3px; background: var(--paper-2); border-radius: var(--radius); }
-.gu-tab { min-height: 34px; padding: 0 14px; background: none; border: 0; border-radius: 7px; color: var(--ink-2); font-weight: 500; }
+.gu-tab { position: relative; min-height: calc(var(--target) - 6px); padding: 0 14px; background: none; border: 0; border-radius: 7px; color: var(--ink-2); font-weight: 500; }
+/* The track's padding is part of the target, so a tab answers across the strip's full height. */
+.gu-tab::after { content: ''; position: absolute; inset: -3px 0; }
 .gu-tab:hover { color: var(--ink); }
 .gu-tab[aria-selected='true'] { color: var(--ink); font-weight: 600; background: var(--paper-light); box-shadow: 0 1px 2px var(--line-strong); }
 .gu-bag-things { display: grid; gap: var(--s2); }
@@ -237,8 +239,8 @@ export const STYLES = /* css */ `
 .gu-settings-side .gu-section .gu-choices > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .gu-strip { display: flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--radius); }
 .gu-choice { position: relative; flex: 1; min-width: 0; }
-.gu-choice input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
-.gu-choice span { display: grid; place-items: center; min-height: 34px; padding: 0 var(--s2); border-radius: 7px; color: var(--ink-2); font-weight: 500; white-space: nowrap; }
+.gu-choice input { position: absolute; inset: -3px 0; width: 100%; height: calc(100% + 6px); margin: 0; opacity: 0; cursor: pointer; }
+.gu-choice span { display: grid; place-items: center; min-height: calc(var(--target) - 6px); padding: 0 var(--s2); border-radius: 7px; color: var(--ink-2); font-weight: 500; white-space: nowrap; }
 .gu-choice input:hover + span { color: var(--ink); background: var(--paper-3); }
 .gu-choice input:checked + span { color: var(--ink); font-weight: 600; background: var(--paper-light); box-shadow: 0 1px 2px var(--line-strong); }
 .gu-choice input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -337,7 +339,6 @@ export const STYLES = /* css */ `
   .gu-columns { grid-template-columns: 1fr; gap: var(--s5); }
   .gu-slider { grid-template-columns: 80px 1fr 44px; gap: var(--s3); }
   .gu-choice { flex: 1 1 auto; }
-  .gu-choice span { min-height: 38px; }
   .gu-panel-end { padding: var(--s6) var(--s5) var(--s5); }
   .gu-stat dd { font-size: 32px; }
   .gu-stage-title { place-items: end center; padding: var(--s4); }
