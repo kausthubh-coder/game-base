@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ACCESSORIES } from '../../features/toon/accessories.ts';
 import { CREATURES as BUILT } from '../../features/toon/creatures.ts';
-import { CAST, CAST_ALIAS, CAST_BY_ID, CAST_MODELS } from './cast.ts';
+import { CAST, CAST_ALIAS, CAST_BY_ID, CAST_MODELS } from './cast-models.ts';
 import { CREATURES } from './creatures.ts';
 import { PEOPLE } from './people.ts';
 import { PETS } from './pets.ts';

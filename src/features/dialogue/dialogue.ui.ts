@@ -19,6 +19,8 @@ export interface DialogueOptions {
   onCharacter?: (letter: string, voiceId: string) => void;
   /** Called when a line starts. */
   onLine?: (said: Said) => void;
+  /** Called when the player shows the whole line early or moves on: a click, a key, a pad button or a choice. Stop a spoken clip here. */
+  onSkip?: () => void;
   /** Called when a conversation ends, after its last effects. */
   onEnd?: (conversation: Conversation, flags: Flags) => void;
   /** A picture for a speaker: a canvas, an image or any element. Return null for the drawn initial. */
@@ -47,6 +49,13 @@ export interface DialogueView extends ViewSystem {
   choose(offered: number): void;
   /** Ends the conversation where it is. */
   close(): void;
+  /**
+   * Types the line showing now in time with a spoken clip instead of at its speed: letter `i` shows once
+   * `clock()` (seconds into the clip) reaches `times[i]` milliseconds. While `clock()` is below 0 nothing
+   * types, so the line can wait for its clip to load. The letters make no blips: the clip is the voice.
+   * `null` goes back to typing at the speed from where the line is. It lasts until the line changes.
+   */
+  follow(times: readonly number[] | null, clock?: () => number): void;
 }
 
 const DEFAULT_ADVANCE = ['Enter', 'NumpadEnter', 'Space', 'KeyF'];
@@ -89,6 +98,9 @@ export function createDialogue(_ctx: ViewContext, options: DialogueOptions = {})
   let openedAt = 0;
   let shown = -1;
   let returnFocus: HTMLElement | null = null;
+  /** The letter times and clock of a spoken line, or null to type at the speed. */
+  let times: readonly number[] | null = null;
+  let clock: (() => number) | null = null;
 
   const portraitFor = (key: string, speaker: Speaker): HTMLElement => {
     let element = portraits.get(key);
@@ -150,6 +162,8 @@ export function createDialogue(_ctx: ViewContext, options: DialogueOptions = {})
     choices.hidden = true;
     choices.replaceChildren();
     box.classList.remove('is-waiting');
+    times = null;
+    clock = null;
     type.start(said.text, said.speaker.speed ?? options.charsPerSecond ?? 32);
     shown = -1;
     paint();
@@ -172,6 +186,7 @@ export function createDialogue(_ctx: ViewContext, options: DialogueOptions = {})
 
   const advance = (): void => {
     if (!talk) return;
+    options.onSkip?.();
     if (!type.done) {
       type.finish();
       paint();
@@ -189,6 +204,7 @@ export function createDialogue(_ctx: ViewContext, options: DialogueOptions = {})
 
   const choose = (offered: number): void => {
     if (!talk || !type.done || !talk.choose(offered)) return;
+    options.onSkip?.();
     options.bus?.emit({ type: 'ui', sound: 'click' });
     showLine();
   };
@@ -285,12 +301,26 @@ export function createDialogue(_ctx: ViewContext, options: DialogueOptions = {})
     choose,
     close: finish,
 
+    follow(next, nextClock) {
+      const fits = next !== null && nextClock !== undefined && next.length === type.text.length;
+      times = fits ? next : null;
+      clock = fits ? nextClock : null;
+    },
+
     update(dt) {
       if (!talk) return;
       readPad(true);
       if (!talk || type.done) return;
-      // A long frame types a fifth of a second at most, so a stall does not dump the whole line.
-      type.tick(Math.min(dt, 0.2), each);
+      if (times && clock) {
+        // In time with the clip: every letter whose moment has come.
+        const ms = clock() * 1000;
+        let n = type.shown;
+        while (n < times.length && times[n] <= ms) n++;
+        type.shown = n;
+      } else {
+        // A long frame types a fifth of a second at most, so a stall does not dump the whole line.
+        type.tick(Math.min(dt, 0.2), each);
+      }
       paint();
     },
 

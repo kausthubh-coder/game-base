@@ -180,3 +180,26 @@ The optional `cast` object lists the characters drawn when Characters is "3D mod
 `budget` (4000 for a person, 2000 for a creature) and `bytes`. For example,
 `"hero": {"file":"models/cast-hero.glb","source":"assets-src/cast/sources/hero.blend","triangles":3400,"budget":4000,"bytes":149716}`.
 The verifier reads each GLB and checks the counts, the byte size and that the source exists.
+
+## Voiced lines
+
+The only sound files the game ships. `bun --env-file=.env.local tools/voice.ts` makes them ahead of time with
+ElevenLabs. The game never calls ElevenLabs, and the key never leaves `.env.local`.
+
+- **Who speaks.** `src/game/content/cast.ts` lists each voiced person's ElevenLabs voice and settings, the model
+  (`eleven_v4_turbo`) and the format (mono mp3, 64 kbit/s). `DIRECTION` there gives a line audio tags such as
+  `[sighs]`. A stage cue in the text, such as `(waking)`, is never spoken. Narration, the player's choices and
+  anyone not in the cast are not voiced: their lines type and blip as before.
+- **The files.** `public/assets/voice/<speaker>/<hash>.mp3`, one clip a line. The hash is of the words given to
+  the voice, the voice, the model, the settings and the format, so the tool makes a clip again only when one of
+  those changes, and deletes the clip of a line that is gone.
+- **The list.** `manifest.json` has `"voice": { "lines": "voice/voice.json", "model": "eleven_v4_turbo" }`.
+  `voice/voice.json` has `lines`, keyed by `<speaker>|<text as the box shows it>`, each with `file` (relative to
+  `public/assets/`), `seconds` and `reveal`: for each character of the text, the millisecond of the clip it
+  appears at (from ElevenLabs' character timings). `conversations` maps a conversation id to the keys it may
+  play, so the game fetches them when the talk starts.
+- **Kept out of the game.** `assets-src/voice/report.json` (what each clip was made from, its transcript by
+  ElevenLabs Scribe and the share of its words heard) and `assets-src/voice/align/` (the raw character timings).
+- **Cost.** The tool prices a run before it makes anything and stops above 40,000 credits. v4 Turbo bills half a
+  credit a character.
+

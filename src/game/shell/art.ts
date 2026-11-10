@@ -11,7 +11,7 @@ import {
 } from '../../features/toon/index.ts';
 import { loadBlockAtlas, type AtlasSource } from '../../features/world/index.ts';
 import type { Actor } from '../api.sim.ts';
-import { CAST, CAST_ALIAS, CAST_BY_ID, CAST_MODELS, type CastColours, type CastLook, type CastModel } from '../content/cast.ts';
+import { CAST, CAST_ALIAS, CAST_BY_ID, CAST_MODELS, type CastColours, type CastLook, type CastModel } from '../content/cast-models.ts';
 
 export interface Art {
   assets: Assets;

@@ -1,6 +1,6 @@
 # Sound engine notes
 
-Code makes every sound. There are no audio files and no audio library, only the Web Audio API.
+Code makes every sound but spoken dialogue. There is no audio library, only the Web Audio API. The one kind of audio file is a voiced line (`public/assets/voice/`, made by `tools/voice.ts`): `speak(clip)` plays it on the voice bus, and while it plays the music drops to 0.55 and the ambience to 0.75, as for the typed blips.
 The public surface is `index.ts`. The demo is `demos/audio`. The checks are `bun tools/audio-check.mjs`.
 
 Nobody has listened to this yet. The checks measure loudness, gaps, tempo, voices and nodes. They cannot say

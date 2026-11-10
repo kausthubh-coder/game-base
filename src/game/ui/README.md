@@ -22,6 +22,8 @@ separate feature and is not here.
 | `toggle(panel)` | Opens it, or closes it when it is the open one. |
 | `isOpen(panel?)` | True when that panel is open. With no name: true when any is. |
 | `settings()` | A copy of the stored settings. |
+| `notices.hold(on)` | While held, the hint and the Almanac's note at the top step aside and their time stands still. A story card holds them while it shows. |
+| `notices.skip(id)` | A hint with this id is never shown, because something on screen already says it. |
 | `dispose()` | Removes every element and listener. |
 
 While a panel is open `game.player.busy` is true. On close it is set to `game.systems.talk.active`.
@@ -61,7 +63,7 @@ A workbench opens the Make panel by sending an event from its `act()`:
 | `setVolume(channel, value)` | yes | `channel` is `music`, `ambience`, `effects` or `voice`, `value` 0 to 1. Called once per channel at creation, then on every change. |
 | `setInterfaceSize(size)` | no | 0.9, 1 or 1.15, so the HUD can match. The panels scale themselves. Called once at creation, then on change. |
 | `art.title` | no | URL of the title picture. Without it: a plain dawn gradient. |
-| `art.panel` | no | `{ url, slice?, width? }`, a nine-slice frame for panels. Defaults fit the 96 by 96 `ui/panel.png`: corner `slice` 28, drawn at `width` 56. Without it: a CSS frame in the same colors. |
+| `art.panel` | no | Not used by the game since the redesign (the panels are CSS). `{ url, slice?, width? }`, a nine-slice frame for panels. Defaults fit the 96 by 96 `ui/panel.png`: corner `slice` 28, drawn at `width` 56. Without it: a CSS frame in the same colors. |
 | `art.button` | no | `{ url, slice?, width? }`, a nine-slice frame for buttons. Defaults fit the 96 by 32 `ui/button.png`: slice 6, drawn at 6. Without it: a CSS button. |
 | `keys` | no | The list of keys in Settings, `{ action, keys }[]`. Default `DEFAULT_KEYS`. Change it if the movement keys differ. |
 | `hotkeys` | no | `false` stops the interface from handling I, B, J, Tab and Esc itself. Tab-focus and arrow keys inside a panel still work. Default `true`. |
@@ -72,8 +74,32 @@ A workbench opens the Make panel by sending an event from its `act()`:
 ## Keys it handles
 
 I or B: bag. J: quests. Tab: Almanac (Tab also closes it; inside the other panels Tab moves the focus).
-Esc: closes the open panel, or opens Pause when none is open. Arrow keys move through the bag's slots and
+Esc: closes the open panel, or opens Pause when none is open. Arrow keys move through the bag's slots (the quick
+row and the bag are two grids, and Up and Down cross between them) and
 the Almanac's pages. All of these are ignored while `game.systems.talk.active` is true and no panel is open.
+
+## The bag
+
+Two grids: the nine quick slots, then the 27 slots of the bag. A stack moves three ways, all through
+`inventory.move(from, to, count?)`:
+
+- **Drag** (`drag.ui.ts`): press on a stack and move a few pixels. A ghost follows the pointer and the slot under it
+  lights up; a slot that cannot take it is ringed in amber. The left button takes the whole stack, the right button
+  or Shift takes half. Onto the same item it merges, onto another it swaps, onto an empty slot it moves. Esc puts it
+  back. A finger works the same way, with the ghost above the finger. A change to the bag during a drag is drawn
+  when the drag ends.
+- **Click, then click**: a click picks a stack up, a click on another slot puts it there. Shift-click picks up half.
+  Enter does the same from the keyboard. Esc puts it down.
+- The HUD's quick slots take a drag between them too (`src/game/views/ui-hud.view.ts`, the same `createSlotDrag`).
+
+Hovering or focusing a stack shows its tooltip: the name, what it is for (`itemUse` in `logic.ui.ts`, from what the
+item does), its description, and "Put it in a quick slot to hold it" for a tool or a block left in the bag.
+
+## Over the game
+
+The prompt, the hints and the toasts are dark glass, so the world shows around them. One card at a time at the
+top: a hint, and the Almanac's note only once no hint is up. At most three toasts; a repeat of a line still
+showing raises its count instead of adding a line.
 
 ## Events
 
@@ -99,6 +125,7 @@ It sends `ui.sound` with `open`, `close` or `click`.
 | `quests.ui.ts` | The quest list |
 | `menus.ui.ts` | Title, pause, Settings, the end card |
 | `overlay.ui.ts` | The prompt, hints, toasts, the Almanac's note, the breaking ring |
+| `drag.ui.ts` | `createSlotDrag`: a stack dragged from slot to slot, for the bag and the HUD's quick slots |
 | `styles.ui.ts` | All the CSS, as one string. Tokens at the top. |
 | `logic.ui.ts` | The parts with no page in them, tested in `logic.test.ts` |
 | `dom.ui.ts`, `types.ui.ts` | Element helpers and the shared types |

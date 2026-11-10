@@ -100,10 +100,22 @@ export function install(kernel: Kernel): void {
       return true;
     },
     count,
-    move(from, to) {
+    move(from, to, count) {
       if (!validSlot(from) || !validSlot(to) || from === to) return;
       const a = slots[from], b = slots[to];
       if (!a && !b) return;
+      // A part of a stack: half of it dragged with the right button, say. It never swaps.
+      const part = count === undefined ? Infinity : Math.floor(count);
+      if (a && part < a.count) {
+        if (!(part > 0) || (b && b.id !== a.id)) return;
+        const fit = Math.min(part, b ? stackSize(a.id) - b.count : part);
+        if (fit <= 0) return;
+        if (b) b.count += fit;
+        else slots[to] = { id: a.id, count: fit };
+        a.count -= fit;
+        changed();
+        return;
+      }
       if (a && b && a.id === b.id) {
         const fit = Math.min(stackSize(a.id) - b.count, a.count);
         if (fit > 0) {

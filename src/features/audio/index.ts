@@ -1,5 +1,5 @@
 // The sound engine's whole public surface. Every sound in the game is made here from code: there are no
-// audio files. The game hands it numbers every frame (`setState`, or `followAmbient` for the weather) and
+// audio files, except the voiced lines of dialogue, which `speak` plays on the voice bus. The game hands it numbers every frame (`setState`, or `followAmbient` for the weather) and
 // one-shot events (`emit`, or `onEvent` for the base's own GameEvent). It needs only a BaseAudioContext, so
 // the same code renders in an OfflineAudioContext for the checks.
 //
@@ -112,6 +112,18 @@ export interface AudioOptions {
   seed?: number;
 }
 
+/** A spoken clip playing on the voice bus. */
+export interface Speech {
+  /** Its length in seconds. */
+  readonly duration: number;
+  /** Seconds since its first sample on the engine's clock: below 0 before it starts, and it runs on past the end. */
+  elapsed(): number;
+  /** True once it played to its end or was stopped. */
+  readonly ended: boolean;
+  /** Fades it out over a few milliseconds and lets the music back up. Safe to call twice. */
+  stop(): void;
+}
+
 export interface AudioSystem extends ViewSystem {
   /** Starts the music and the ambience. Call it once, after the context is allowed to run. */
   start(): void;
@@ -128,6 +140,15 @@ export interface AudioSystem extends ViewSystem {
   setListener(at: Vec3): void;
   setVolume(bus: BusName, value: number): void;
   getVolume(bus: BusName): number;
+  /** True while the browser lets the engine's clock run. A clip played while it does not would never start. */
+  readonly live: boolean;
+  /** Decodes a compressed clip (an mp3 of a voiced line) for `speak`. */
+  decode(data: ArrayBuffer): Promise<AudioBuffer>;
+  /**
+   * Plays a decoded clip on the voice bus, so the Voice volume sets it, and ducks the music and ambience
+   * under it. Null when the engine is not running. Stop the last one before the next, or they overlap.
+   */
+  speak(clip: AudioBuffer): Speech | null;
   debug(): AudioDebug;
   /** Plays one layer alone, or all of them again with null. For tuning. */
   soloLayer(layer: LayerId | null): void;
@@ -351,6 +372,50 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
 
     getVolume(bus) {
       return mixer.volume(bus);
+    },
+
+    get live() {
+      return running && ctx.state === 'running';
+    },
+
+    decode(data) {
+      return ctx.decodeAudioData(data);
+    },
+
+    speak(clip) {
+      if (!running) return null;
+      const start = ctx.currentTime + 0.03;
+      const source = ctx.createBufferSource();
+      source.buffer = clip;
+      const level = ctx.createGain();
+      source.connect(level).connect(mixer.voice);
+      let ended = false;
+      const end = (): void => {
+        if (ended) return;
+        ended = true;
+        mixer.hush(ctx.currentTime + 0.35);
+      };
+      source.onended = () => {
+        end();
+        source.disconnect();
+        level.disconnect();
+      };
+      source.start(start);
+      mixer.speak(start + clip.duration + 0.35);
+      return {
+        duration: clip.duration,
+        elapsed: () => ctx.currentTime - start,
+        get ended() { return ended; },
+        stop() {
+          if (ended) return;
+          const now = ctx.currentTime;
+          // A short fade, so the cut does not click.
+          level.gain.setValueAtTime(1, now);
+          level.gain.linearRampToValueAtTime(0, now + 0.04);
+          source.stop(now + 0.05);
+          end();
+        },
+      };
     },
 
     setQuality(quality: Quality) {

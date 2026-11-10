@@ -3,7 +3,6 @@
 import { add, h, keycaps } from './dom.ui.ts';
 import { DEFAULT_KEYS, QUALITIES, SIZES } from './logic.ui.ts';
 import type { PanelView, Quality, UiContext, VolumeChannel } from './types.ui.ts';
-import { viewSection } from './view-settings.ui.ts';
 
 const button = (label: string, onclick: () => void, extra: Record<string, string | boolean | null> = {}): HTMLButtonElement =>
   h('button', { class: 'gu-btn', type: 'button', onclick, ...extra }, label);
@@ -93,8 +92,9 @@ function choices<T extends string | number>(name: string, legend: string, values
 }
 
 function graphicsControls(ctx: UiContext): HTMLElement {
-  const section = h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Graphics'));
-  section.append(choices('quality', 'Picture quality', QUALITIES, QUALITIES.map(q => QUALITY_NAMES[q]), ctx.settings.quality, value => ctx.setSetting('quality', value)));
+  // The Picture section comes first in settings: quality, then the overrides the graphics settings offer.
+  const section = h('section', { class: 'gu-section gu-settings-picture', 'data-key': 'settings:picture' }, h('h3', { class: 'gu-label' }, 'Picture'));
+  section.append(choices('quality', 'Quality', QUALITIES, QUALITIES.map(q => QUALITY_NAMES[q]), ctx.settings.quality, value => ctx.setSetting('quality', value)));
   const api = ctx.options.graphics;
   if (!api) return section;
   const g = api.get();
@@ -114,6 +114,16 @@ function graphicsControls(ctx: UiContext): HTMLElement {
   section.append(choices('reduceMotion','Reduce motion',['off','on'],['Off','On'],g.reduceMotion ? 'on' : 'off',value => api.set({reduceMotion:value === 'on'})));
   section.append(button('Reset graphics overrides',()=>{api.set({shadows:'preset',shadowDistance:null,plantDensity:null,viewDistance:null,bloom:null,cloudShadows:null,weatherParticles:null,reduceMotion:false});section.replaceWith(graphicsControls(ctx));}));
   return section;
+}
+
+/** The View section, right after Picture: how the camera stands and how characters are drawn. The game stores both. */
+function viewControls(ctx: UiContext): HTMLElement | null {
+  const view = ctx.options.view;
+  if (!view) return null;
+  return h('section', { class: 'gu-section gu-settings-view', 'data-key': 'settings:view' }, h('h3', { class: 'gu-label' }, 'View'),
+    choices('camera', 'Camera', ['tilt', 'free', 'first'] as const, ['2.5D', 'Free', 'First person'], view.camera(), (mode) => view.setCamera(mode)),
+    choices('characters', 'Characters', ['sprites', 'models'] as const, ['Sprites', '3D models'], view.characters(), (look) => view.setCharacters(look)),
+  );
 }
 
 export function settingsPanel(ctx: UiContext): PanelView {
@@ -146,15 +156,13 @@ export function settingsPanel(ctx: UiContext): PanelView {
       const keys = h('dl', { class: 'gu-keylist' });
       for (const hint of ctx.options.keys ?? DEFAULT_KEYS) keys.append(h('dt', null, hint.action), h('dd', null, keycaps(hint.keys, hint.action === 'Move' ? '' : 'or')));
       body.replaceChildren(
-        h('div', null,
+        h('div', { class: 'gu-settings-side' },
           graphicsControls(ctx),
+          viewControls(ctx),
           sound,
-          choices('size', 'Interface size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value)),
+          h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Interface'), choices('size', 'Size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value))),
         ),
-        h('div', null,
-          ctx.options.view ? viewSection(ctx, ctx.options.view) : null,
-          h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
-        ),
+        h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
       );
     },
   };

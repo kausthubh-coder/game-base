@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Talk to Tamsin</title>
+    <link rel="stylesheet" href="../ui/page.css" />
+    <link rel="stylesheet" href="./talk.css" />
+  </head>
+  <body>
+    <main id="stage" class="stage">
+      <div class="backdrop" id="backdrop"></div>
+      <header class="bar ui-card">
+        <div class="bar-title">
+          <strong>Talk to Tamsin</strong>
+          <span id="subtitle">Experiment B: a live conversation</span>
+        </div>
+        <div class="field">
+          <label for="moment">Moment</label>
+          <select id="moment"></select>
+        </div>
+        <div class="seg" role="group" aria-label="Pipeline">
+          <button type="button" class="btn" data-pipe="b2" aria-pressed="true">B2 · Codex text + ElevenLabs</button>
+          <button type="button" class="btn" data-pipe="b1" aria-pressed="false">B1 · ChatGPT realtime voice</button>
+        </div>
+        <div class="field" data-for="b2">
+          <label for="model">Model</label>
+          <select id="model">
+            <option value="luna-fast">GPT-5.6-Luna, low, Fast</option>
+            <option value="terra-fast">GPT-6.1-Terra, low, Fast</option>
+            <option value="sol-fast">GPT-6.1-Sol, low, Fast</option>
+          </select>
+        </div>
+        <div class="field" data-for="b2">
+          <label for="tts">Voice model</label>
+          <select id="tts">
+            <option value="eleven_flash_v2_5">Flash v2.5</option>
+            <option value="eleven_v4_turbo">v4 Turbo</option>
+          </select>
+        </div>
+        <div class="field" data-for="b2">
+          <label for="stt">Hearing</label>
+          <select id="stt">
+            <option value="scribe">ElevenLabs Scribe</option>
+            <option value="browser">Browser speech</option>
+          </select>
+        </div>
+        <div class="field" data-for="b1" hidden>
+          <label for="voice">Voice</label>
+          <select id="voice"></select>
+        </div>
+      </header>
+
+      <section class="log ui-card" id="log" aria-label="Conversation">
+        <h2>Conversation</h2>
+        <ol id="turns"></ol>
+      </section>
+
+      <form class="say ui-card" id="say">
+        <button type="button" class="btn mic" id="mic" aria-pressed="false" disabled><span class="dot"></span> <span id="mic-label">Talk</span></button>
+        <input id="text" type="text" placeholder="Or type to her, then Enter" autocomplete="off" disabled />
+        <button type="submit" class="btn" id="send" disabled>Say</button>
+        <span class="meta" id="status">Not connected</span>
+      </form>
+
+      <div class="start" id="start">
+        <div class="start-card ui-card">
+          <p class="start-kicker">Experiment B</p>
+          <h1>Talk to Tamsin</h1>
+          <p>Speak, or type. She answers in character, out loud, and only knows Greenhollow up to where you are in act 1.</p>
+          <button type="button" class="btn btn-big" id="go">Walk up to her</button>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="./talk.ts"></script>
+  </body>
+</html>

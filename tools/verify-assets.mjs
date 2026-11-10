@@ -257,7 +257,7 @@ export function checkManifest(root) {
   }
   for (const [section, entry] of Object.entries(manifest)) {
     if (section === 'version') continue;
-    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast') {
+    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast' && section !== 'voice') {
       warnings.push(`manifest.json has a "${section}" section that docs/assets.md does not describe. Add its shape to docs/assets.md.`);
     }
     if (section === 'models') {
@@ -288,6 +288,14 @@ export function checkManifest(root) {
         } catch (error) { failures.push(`cast.${name}: ${error.message}`); }
       }
       summary.push(`${Object.keys(entry).length} cast models checked against GLB bytes and their sources`);
+    } else if (section === 'voice') {
+      // The voiced lines have a list of their own; the voice check reads it. Here its files count as listed.
+      try {
+        const list = JSON.parse(fs.readFileSync(path.join(assets, entry.lines), 'utf8'));
+        used.add(entry.lines);
+        for (const line of Object.values(list.lines ?? {})) if (typeof line?.file === 'string') used.add(line.file);
+      } catch (error) { failures.push(`voice.lines: ${error.message}`); }
+      summary.push('voice');
     } else if (section === 'sprites') {
       if (!isObject(entry)) { failures.push('sprites is not an object.'); continue; }
       const example = isObject(doc?.sprites) ? Object.values(doc.sprites)[0] : null;
@@ -639,6 +647,47 @@ export function checkSizes(root, limits = LIMITS) {
   return { failures, warnings: [], detail, table };
 }
 
+// ---------------------------------------------------------------------------------------- 8. voice
+
+/** The voiced lines (docs/assets.md, Voiced lines): every clip the list names is there, and every clip there is listed. */
+export function checkVoice(root, manifest) {
+  const failures = [];
+  const assets = path.join(root, 'public/assets');
+  const pointer = manifest?.voice?.lines;
+  const folder = path.join(assets, 'voice');
+  const clips = fs.existsSync(folder) ? walk(folder).filter((f) => f.endsWith('.mp3')).map((f) => `voice/${f}`) : [];
+  if (pointer === undefined) {
+    if (clips.length) failures.push(`public/assets/voice holds ${plural(clips.length, 'clip')} but manifest.json has no "voice.lines" to list them.`);
+    return { failures, detail: 'no voiced lines' };
+  }
+  let list;
+  try {
+    list = JSON.parse(fs.readFileSync(path.join(assets, pointer), 'utf8'));
+  } catch (error) {
+    failures.push(`manifest.json names ${pointer} for the voiced lines, and it cannot be read: ${error.message}`);
+    return { failures, detail: pointer };
+  }
+  const listed = new Set();
+  let seconds = 0;
+  for (const [key, line] of Object.entries(list.lines ?? {})) {
+    const text = key.slice(key.indexOf('|') + 1);
+    if (!key.includes('|')) failures.push(`${pointer}: "${key}" is not <speaker>|<text>.`);
+    if (!line || typeof line.file !== 'string' || !fs.existsSync(path.join(assets, line.file))) failures.push(`${pointer}: the clip of "${key}" (${line?.file}) is missing.`);
+    else listed.add(line.file);
+    if (!(line?.seconds > 0)) failures.push(`${pointer}: "${key}" has no length.`);
+    else seconds += line.seconds;
+    const reveal = line?.reveal;
+    if (!Array.isArray(reveal) || reveal.length !== text.length || reveal.some((t, i) => !isWhole(t) || (i > 0 && t < reveal[i - 1]))) {
+      failures.push(`${pointer}: "${key}" needs one whole, rising millisecond per character of its text in "reveal".`);
+    }
+  }
+  for (const [conversation, keys] of Object.entries(list.conversations ?? {})) {
+    for (const key of keys) if (!list.lines?.[key]) failures.push(`${pointer}: conversation ${conversation} names "${key}", which has no clip.`);
+  }
+  for (const clip of clips) if (!listed.has(clip)) failures.push(`public/assets/${clip} is not in ${pointer}. Run tools/voice.ts, which deletes the clips of lines that are gone.`);
+  return { failures, detail: `${plural(listed.size, 'clip')}, ${(seconds / 60).toFixed(1)} minutes, model ${list.model}` };
+}
+
 // ---------------------------------------------------------------------------------------- the run
 
 const USUAL_FIX = {
@@ -649,6 +698,7 @@ const USUAL_FIX = {
   props: 'simplify the builder (fewer segments, merged faces). Raise the budget only inside the limits in docs/style-sheet.md.',
   palettes: 'give the palette the missing field or layer, copying the shape from src/content/palettes/meadow.ts.',
   sizes: 'a sheet this heavy is not palette-snapped pixel art. Rebuild it through tools/sprites, or cut its size in pixels.',
+  voice: 'run bun --env-file=.env.local tools/voice.ts, which makes the missing clips, deletes the ones no line uses and writes the list again. Never edit voice/ by hand.',
 };
 
 export async function verify({ root, strict = false, self }) {
@@ -686,6 +736,7 @@ export async function verify({ root, strict = false, self }) {
 
   const sizes = checkSizes(root);
   add('sizes', sizes);
+  add('voice', checkVoice(root, manifest.manifest));
 
   if (strict) {
     for (const check of checks) {

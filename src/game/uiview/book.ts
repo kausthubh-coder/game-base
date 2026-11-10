@@ -68,10 +68,6 @@ function createBook(view: GameView): Book {
 
   root.classList.add('ui-book');
   addStyle(root, 'tokens', TOKENS);
-  if (art.frames.panel) {
-    root.classList.add('ui-art');
-    root.style.setProperty('--ui-panel-art', `url("${art.frames.panel.url}")`);
-  }
 
   const panelListeners = new Set<(panel: PanelName | null) => void>();
   const sizeListeners = new Set<(size: number) => void>();
@@ -116,7 +112,8 @@ function createBook(view: GameView): Book {
       root.style.setProperty('--ui-size', String(next));
       for (const fn of sizeListeners) fn(next);
     },
-    art: { title: worldTitle ? undefined : art.frames.title, panel: art.frames.panel, button: art.frames.button },
+    // The panels are drawn in CSS, on the direction's paper. The pixel frames ui/panel.png and ui/button.png stay in the manifest, unused.
+    art: { title: worldTitle ? undefined : art.frames.title },
     keys: KEY_LIST,
     // The panels view binds I, B, J, Tab, M and Esc in one place, so the map and the pause menu cannot both take a key.
     hotkeys: false,
