@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Props, trees and buildings</title>
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #10141a; color: #e8eaee; font: 12px/1.35 ui-sans-serif, system-ui, sans-serif; }
+      #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+      #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+      #labels div { position: absolute; left: 0; top: 0; padding: 2px 6px; border-radius: 4px; background: rgba(16, 20, 28, 0.78); white-space: nowrap; text-align: center; font-variant-numeric: tabular-nums; }
+      #labels div b { font-weight: 600; }
+      #labels div.over { background: #a3302f; }
+      #labels div.title { font-size: 15px; font-weight: 600; padding: 4px 10px; }
+      #panel { position: fixed; top: 8px; right: 8px; max-height: calc(100% - 16px); width: 268px; overflow-y: auto; padding: 10px 12px; box-sizing: border-box; background: rgba(16, 20, 28, 0.86); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px; }
+      #panel.hidden { display: none; }
+      #panel h2 { margin: 12px 0 5px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9fb0c8; }
+      #panel h2:first-child { margin-top: 0; }
+      #panel .stats { display: grid; grid-template-columns: 1fr auto; gap: 1px 10px; font-variant-numeric: tabular-nums; }
+      #panel .stats b { font-weight: 600; text-align: right; }
+      #panel label.slider { display: grid; grid-template-columns: 62px 1fr 42px; align-items: center; gap: 6px; height: 22px; }
+      #panel label.slider output { text-align: right; font-variant-numeric: tabular-nums; }
+      #panel input[type='range'] { width: 100%; margin: 0; }
+      #panel .row { display: flex; flex-wrap: wrap; gap: 4px; }
+      #panel button, #panel select { font: inherit; color: inherit; padding: 3px 7px; border-radius: 5px; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.06); cursor: pointer; }
+      #panel select { background: #1c2230; max-width: 100%; }
+      #panel button:hover { background: rgba(255, 255, 255, 0.14); }
+      #panel button:focus-visible, #panel select:focus-visible, #panel input:focus-visible { outline: 2px solid #8fc4ff; outline-offset: 1px; }
+      #panel button.on { background: #e8c96a; border-color: #e8c96a; color: #1a1408; }
+      #panel label.check { display: inline-flex; align-items: center; gap: 4px; margin-right: 8px; }
+      #panel .note { color: #9fb0c8; margin: 4px 0 0; }
+      #panel a { color: #8fc4ff; }
+    </style>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="labels"></div>
+    <div id="panel"></div>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
