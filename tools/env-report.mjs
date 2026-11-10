@@ -1,6 +1,6 @@
 import fs from 'node:fs';import path from 'node:path';
 const root=path.resolve('.artifacts/env');const destination='/Users/dabot/dev/sandbox/game-look-test/design/img/3d/compare/environment/sol';fs.mkdirSync(destination,{recursive:true});
-for(const folder of ['shots','before','audit-before','audit-after','audit-variants','settings'])if(fs.existsSync(`${root}/${folder}`))fs.cpSync(`${root}/${folder}`,`${destination}/${folder}`,{recursive:true});
+for(const folder of ['shots','before','audit-before','audit-after','audit-variants','settings','crops'])if(fs.existsSync(`${root}/${folder}`))fs.cpSync(`${root}/${folder}`,`${destination}/${folder}`,{recursive:true});
 for(const file of fs.readdirSync(root).filter(n=>/^audit-(before|after|variants)-\d+\.png$/.test(n)))fs.copyFileSync(`${root}/${file}`,`${destination}/${file}`);
 for(const file of fs.readdirSync(root).filter(n=>n.endsWith('.log')||n==='audit.txt')){fs.mkdirSync(`${destination}/logs`,{recursive:true});fs.copyFileSync(`${root}/${file}`,`${destination}/logs/${file}`);}
 const before=JSON.parse(fs.readFileSync(`${root}/before/shots.json`)),after=JSON.parse(fs.readFileSync(`${root}/shots/shots.json`));
