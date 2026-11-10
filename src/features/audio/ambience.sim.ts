@@ -1,3 +1,4 @@
+import { outdoorSound } from '../../content/ambience.ts';
 // The numbers behind the ambience: how hard the wind is blowing this instant, and how long until the
 // next bird. The engine turns them into sound.
 import { clamp, type Rng } from './rng.sim.ts';
@@ -51,4 +52,24 @@ export function lifeRates(day: number, rain: number, trees: number, nearWater: n
   into.crickets = 0.55 * night * night * (0.4 + 0.6 * dry) * out;
   into.frogs = 0.3 * night * clamp(nearWater * 1.5 + rain * 0.5, 0, 1) * out;
   return into;
+}
+
+export interface AmbientLayers { birds: number; owl: number; town: number; water: number; rain: number; leaves: number }
+
+/** Continuous habitat weights. The caller owns `into`, so sampling produces no garbage. */
+export function ambientLayers(day: number, rain: number, town: number, trees: number, water: number, indoors: number, into: AmbientLayers): AmbientLayers {
+  const d = clamp(day, 0, 1), r = clamp(rain, 0, 1), t = clamp(town, 0, 1), leaf = clamp(trees, 0, 1);
+  const outside = 1 - 0.85 * clamp(indoors, 0, 1);
+  into.birds = d * d * (1 - r) ** 2 * (0.35 + 0.65 * leaf) * (1 - 0.7 * t) * outside;
+  into.owl = (1 - d) ** 2 * (0.35 + 0.65 * leaf) * (1 - r) * (1 - 0.8 * t) * outside;
+  into.town = t * (0.12 + 0.88 * d) * (1 - 0.55 * r) * outside;
+  into.water = clamp(water, 0, 1) * outside;
+  into.rain = r * outside;
+  into.leaves = leaf * outside;
+  return into;
+}
+
+/** Quiet air has no fixed hiss floor. */
+export function windLevel(wind: number, swell: number): number {
+ return outdoorSound.wind.gain * clamp(wind, 0, 1) ** outdoorSound.wind.power * Math.max(0, swell - 0.3) ** 1.5;
 }

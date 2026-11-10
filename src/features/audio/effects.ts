@@ -1,3 +1,5 @@
+import { treeSounds } from '../../content/tree-sounds.ts';
+import { treeSoundScale } from './tree.sim.ts';
 // One-shot sounds: feet, blocks, hits, spells, the interface, speech blips and the pet. Each is a few
 // bursts of filtered noise and a sine or two. Every call draws fresh random numbers, so no two are alike.
 import type { Surface } from '../../engine/types.ts';
@@ -187,6 +189,19 @@ export class Effects {
     }
     this.tone(o.b, o.out, time, 140, 60, 0.1, 0.4, 0.14);
     o.b.commit(time, time + 0.42);
+  }
+
+  tree(time: number, kind: 'chop' | 'fall', logs: number, place: Place): void {
+    const spec = treeSounds[kind];
+    const o = this.open(kind === 'fall' ? 2 : 1, time, spec.seconds, place, spec.gain * (kind === 'fall' ? treeSoundScale(logs) : 1));
+    if (!o) return;
+    const tuning = 0.94 + this.rig.rng() * 0.12;
+    for (const layer of spec.layers) {
+      const at = time + layer.at;
+      if (layer.kind === 'grain') this.grain(o.b, o.out, at, layer.color, layer.filter, layer.hz * tuning, layer.q, layer.level, layer.attack, layer.decay, layer.sweep);
+      else this.tone(o.b, o.out, at, layer.from * tuning, layer.to * tuning, layer.glide, layer.level, layer.decay);
+    }
+    o.b.commit(time, time + spec.seconds);
   }
 
   hit(time: number, place: Place): void {
