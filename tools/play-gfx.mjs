@@ -11,7 +11,7 @@ await page.waitForFunction(()=>window.__game);await page.evaluate(async()=>{cons
 const counts={};
 async function shot(name){await page.evaluate(()=>window.__game.frames(3));await page.screenshot({path:`${out}/${phase}-${name}.png`});counts[name]=await page.evaluate(()=>{const {drawCalls,triangles,quality,particles}=window.__game.counters();return {drawCalls,triangles,quality,particles};});console.log('captured '+name);}
 await page.evaluate(()=>{const a=window.__game.view.game.ambient;a.rain=.7;a.cloud=.8;a.wetness=.8;a.wind=.35;});await page.evaluate(()=>window.__game.frames(20));await shot('rain-out');
-await page.evaluate(()=>window.__game.view.camera.zoomBy(-10));await page.evaluate(()=>window.__game.frames(30));await shot('rain-in');
+await page.evaluate((close)=>{window.__game.view.camera.zoomBy(-1);if(close)window.__game.view.camera.zoomBy(-1);},after);await page.evaluate(()=>window.__game.frames(30));await shot('rain-in');
 await page.evaluate(()=>{const v=window.__game.view;v.game.ambient.rain=0;v.game.ambient.cloud=.25;v.game.ambient.wetness=.8;});await page.evaluate(()=>{const v=window.__game.view;v.sky.update(16,v.ctx);});await page.evaluate(()=>window.__game.frames(5));await shot('rainbow');
 if(after) {
   const result=await page.evaluate(async()=>{
@@ -28,7 +28,7 @@ if(after) {
   if(!result.fixed || !result.visible || !result.faded) errors.push('rainbow assertions failed');
 }
 
-await page.evaluate(()=>{window.__game.view.camera.zoomBy(1);window.__game.view.game.ambient.wetness=0;window.__game.setTime(10/24);});await shot('shadows-10');await page.evaluate(()=>window.__game.setTime(16/24));await shot('shadows-16');
+await page.evaluate((close)=>{window.__game.view.camera.zoomBy(1);if(close)window.__game.view.camera.zoomBy(1);window.__game.view.game.ambient.wetness=0;window.__game.setTime(10/24);},after);await shot('shadows-10');await page.evaluate(()=>window.__game.setTime(16/24));await shot('shadows-16');
 await page.keyboard.press('Escape');await page.getByRole('button',{name:'Settings',exact:true}).click();await shot('graphics');
 if(after) {
   await page.evaluate(()=>window.__game.view.settings.setGraphics({bloom:false,plantDensity:.3,reduceMotion:true}));

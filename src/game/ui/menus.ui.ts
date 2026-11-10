@@ -104,7 +104,7 @@ function graphicsControls(ctx: UiContext): HTMLElement {
     ['viewDistance','View distance',.5,1.5,.1,1],
   ] as const) {
     const id = 'gu-' + key;
-    const output = h('output', {class:'gu-num',for:id}, String(g[key] ?? fallback));
+    const output = h('output', {class:'gu-num',for:id}, g[key] === null ? 'Preset' : String(g[key]));
     section.append(h('div',{class:'gu-slider'}, h('label',{for:id},label), h('input',{id,type:'range',min,max,step,value:g[key] ?? fallback,oninput:(event: Event) => {const value = Number((event.target as HTMLInputElement).value);api.set({[key]:value});output.textContent=String(value);}}),output));
   }
   for (const [key,label] of [['bloom','Bloom'],['cloudShadows','Cloud shadows'],['weatherParticles','Weather particles']] as const) {

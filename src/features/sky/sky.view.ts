@@ -270,7 +270,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const scaledUp = new THREE.Vector3();
   const sunColor = new THREE.Color();
   const cloudScroll = new THREE.Vector2();
-  const showing: PhenomenaFrame = { time: 0, target, sunDirection: look.sunDirection, sunColor, rainbow: 0, rainbowCenter: new THREE.Vector3(), rainbowRadius: 45, rainbowRight: new THREE.Vector3(1,0,0), shafts: 0 };
+  const showing: PhenomenaFrame = { time: 0, target, sunDirection: look.sunDirection, sunColor, rainbow: 0, rainbowCenter: new THREE.Vector3(), rainbowRadius: 35, rainbowRight: new THREE.Vector3(1,0,0), shafts: 0 };
   let rainbow = 0, rainbowAge = 0, rainbowFade = 0, cloudOverride: boolean | null = null;
   const rainbowAnchor = new THREE.Vector3();
   const forward = new THREE.Vector3();
@@ -501,10 +501,10 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       rainbowFade += (goal - rainbowFade) * Math.min(1, dt / 3);
       camera.getWorldDirection(forward);
       const halfFov = perspective ? (camera as THREE.PerspectiveCamera).fov * Math.PI / 360 : 0;
-      const seesSky = Math.asin(forward.y) + halfFov > 0;
+      const seesSky = Math.asin(forward.y) + halfFov > 0.12;
       showing.rainbow = seesSky ? rainbowFade * (1 - key.night) : 0;
       showing.rainbowCenter.copy(rainbowAnchor);
-      showing.rainbowRadius = 45;
+      showing.rainbowRadius = 35;
 
       showing.shafts = level.shafts ? dawn * (1 - overcast) * (1 - a.fog) : 0;
       phenomena.update(dt, showing);
