@@ -107,7 +107,8 @@ export function townB(): TownPlan {
   lanternAt(fills, props, 133, -172, 0);
 
   // ---- lamps: the main street, the green's corners, the quay; strings of lanterns out from the oak
-  for (const [i, x] of [141.5, 149.5].entries()) lampPostAt(fills, models, `lamp.street${i}`, x, -171);
+  // A row back from the street, so the way out of the gate stays wide.
+  for (const [i, x] of [143.5, 149.5].entries()) lampPostAt(fills, models, `lamp.street${i}`, x, -170.5);
   for (const [i, [x, z]] of ([[158.5, -141], [187.5, -141], [186.5, -158]] as const).entries()) lampPostAt(fills, models, `lamp.green${i}`, x, z);
   for (const [i, x] of [141.5, 149.5, 157.5, 163.5, 182.5, 188.5].entries()) lampPostAt(fills, models, `lamp.quay${i}`, x, -133);
   stringLightsAt(fills, models, 'lights.west', 163.5, -146.5);

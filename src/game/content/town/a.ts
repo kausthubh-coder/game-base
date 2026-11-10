@@ -69,9 +69,10 @@ export function townA(): TownPlan {
   lampPostAt(fills, models, 'lamp.gate2', 132.5, -169.5, 3);
   modelAt(models, 'warden.statue', 'statue-gardener-warden', 131.5, -182.5, 0);
 
-  // ---- the main street: lamps before the houses on its north side, the harvest's banners on its south side
+  // ---- the main street: lamps before the houses on its north side, the harvest's banners on its south side.
   for (const [i, x] of [143.5, 158.5, 176.5, 192.5].entries()) lampPostAt(fills, models, `lamp.street${i}`, x, -176.5);
-  for (const [i, x] of [140, 147].entries()) modelAt(models, `banner.street${i}`, 'banner-pole', x, -172);
+  // A row back from the street, so the way out of the gate stays wide.
+  for (const [i, x] of [143, 147].entries()) modelAt(models, `banner.street${i}`, 'banner-pole', x, -170);
 
   // ---- the hall's front: the crown's banners and two braziers at its doors
   modelAt(models, 'banner.hall1', 'banner-pole', 166, -160);
