@@ -2,7 +2,10 @@ import fs from 'node:fs';import path from 'node:path';
 const root=path.resolve('.artifacts/env');const destination='/Users/dabot/dev/sandbox/game-look-test/design/img/3d/compare/environment/sol';fs.mkdirSync(destination,{recursive:true});
 for(const folder of ['shots','before','audit-before','audit-after','quality-low','quality-medium'])if(fs.existsSync(`${root}/${folder}`))fs.cpSync(`${root}/${folder}`,`${destination}/${folder}`,{recursive:true});
 for(const file of fs.readdirSync(root).filter(n=>/^audit-(before|after)-\d+\.png$/.test(n)))fs.copyFileSync(`${root}/${file}`,`${destination}/${file}`);
+for(const file of fs.readdirSync(root).filter(n=>n.endsWith('.log')||n==='audit.txt')){fs.mkdirSync(`${destination}/logs`,{recursive:true});fs.copyFileSync(`${root}/${file}`,`${destination}/logs/${file}`);}
 const before=JSON.parse(fs.readFileSync(`${root}/before/shots.json`)),after=JSON.parse(fs.readFileSync(`${root}/shots/shots.json`));
+if(Object.keys(before).length!==12||Object.keys(after).length!==12)throw Error('Expected all twelve comparison views');
+for(const key of ['tilt-meadow','tilt-rocks','tilt-town'])if(after[key].drawCalls>150||after[key].triangles>400000)throw Error('Scene budget exceeded: '+key);
 const rows=Object.keys(after).map(k=>({name:k,before:before[k],after:after[k]}));
 fs.writeFileSync(`${destination}/counts.json`,JSON.stringify(rows,null,2));
 const bars=rows.filter(r=>r.name.startsWith('tilt-')&&['meadow','rocks','town'].includes(r.after.place)).map(r=>`<section><b>${r.after.place}</b><div>Draw calls: ${r.before.drawCalls} → ${r.after.drawCalls} / 150</div><div class="track"><i style="width:${r.after.drawCalls/150*100}%"></i></div><div>Triangles: ${r.before.triangles.toLocaleString()} → ${r.after.triangles.toLocaleString()} / 400,000</div><div class="track"><i style="width:${r.after.triangles/400000*100}%"></i></div></section>`).join('');
