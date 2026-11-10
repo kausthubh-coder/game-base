@@ -237,6 +237,9 @@ export const STYLES = /* css */ `
 .gu-settings-side > * + * { margin-top: 0 !important; }
 /* A legend inside a section that has its own heading is read, not shown. */
 .gu-settings-side .gu-section .gu-choices > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* The View section holds two rows of choices, so each shows its name. */
+.gu-settings-side .gu-settings-view .gu-choices > legend { position: static; width: auto; height: auto; overflow: visible; clip-path: none; margin-bottom: var(--s2); }
+.gu-settings-view .gu-choices + .gu-choices { margin-top: var(--s4); }
 .gu-strip { display: flex; gap: 2px; padding: 3px; background: var(--paper-2); border-radius: var(--radius); }
 .gu-choice { position: relative; flex: 1; min-width: 0; }
 .gu-choice input { position: absolute; inset: -3px 0; width: 100%; height: calc(100% + 6px); margin: 0; opacity: 0; cursor: pointer; }
