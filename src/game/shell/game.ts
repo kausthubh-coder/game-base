@@ -136,7 +136,9 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // in. `?cam=today` gives the old camera, and `?cam=horizon` and the others in profiles.ts stand it elsewhere.
   const cam = cameraProfile(params.get('cam') ?? 'tilt');
 
-  const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress * (cam?.load ?? 1) });
+  // `?ground=clean` draws the same blocks as painted land, to compare with today's ground.
+  const ground = params.get('ground') === 'clean' ? 'clean' : 'today';
+  const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress * (cam?.load ?? 1), ground });
   ctx.world = world.query;
   const kernel = createKernel(world.sim, Number(params.get('seed')) || 7);
   const game = kernel.game;

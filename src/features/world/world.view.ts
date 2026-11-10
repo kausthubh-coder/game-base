@@ -9,7 +9,8 @@ import type { Quality } from '../../engine/types.ts';
 import type { WorldQuery } from '../../engine/world-query.ts';
 import { buildBlockTextures, drawBlockAtlas, type AtlasSource } from './atlas.view.ts';
 import { CHUNK, HEIGHT, OPAQUE, PAD_CELLS, chunkKey } from './chunk.sim.ts';
-import { createTerrainMaterial, createTerrainUniforms } from './material.view.ts';
+import { buildSoftTiles, createGroundMap, topMeans } from './ground.view.ts';
+import { createCleanUniforms, createTerrainMaterial, createTerrainUniforms } from './material.view.ts';
 import type { MeshArrays } from './mesh.sim.ts';
 import type { WorkerReply, WorkerRequest } from './mesher.worker.ts';
 import { World, type WorldSave } from './world.sim.ts';
@@ -38,6 +39,8 @@ export interface WorldOptions {
   viewScale?: number;
   /** Main-thread milliseconds per frame that chunk work may use. */
   budgetMs?: number;
+  /** `clean` draws the ground as painted land: softer tiles, broad grass color, blended edges. See ground.view.ts. */
+  ground?: 'today' | 'clean';
 }
 
 export interface WorldStats {
@@ -116,11 +119,15 @@ const REGION = CHUNK * 2;
 
 export function createWorld(ctx: ViewContext, options: WorldOptions = {}): WorldView {
   const sim = new World(options.seed ?? 1);
-  const textures = buildBlockTextures(options.atlas ?? drawBlockAtlas());
+  const atlas = options.atlas ?? drawBlockAtlas();
+  const textures = buildBlockTextures(atlas);
   const uniforms = createTerrainUniforms(textures.texture);
-  const solidMaterial = createTerrainMaterial('solid', uniforms);
+  const soft = options.ground === 'clean' ? buildSoftTiles(atlas) : null;
+  const ground = soft ? createGroundMap(sim, topMeans(atlas)) : null;
+  const clean = soft && ground ? createCleanUniforms(soft.texture, ground.texture, soft.kinds, soft.dirtLayer) : undefined;
+  const solidMaterial = createTerrainMaterial('solid', uniforms, clean);
   const waterMaterial = createTerrainMaterial('water', uniforms);
-  const capMaterial = createTerrainMaterial('cap', uniforms);
+  const capMaterial = createTerrainMaterial('cap', uniforms, clean);
   const group = new THREE.Group();
   group.name = 'world';
   ctx.scene.add(group);
@@ -315,6 +322,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
     entry.meshedRev = reply.rev;
     entry.solid = reply.mesh.solid;
     entry.water = reply.mesh.water;
+    ground?.writeChunk(entry.cx, entry.cz);
     markRegion(entry.cx, entry.cz);
     capStale = true;
   }
@@ -530,6 +538,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
         drawn += (region.solid ? 1 : 0) + (region.water ? 1 : 0);
       }
       stats.drawn = drawn;
+      ground?.upload();
     },
 
     setQuality(quality) {
@@ -549,6 +558,8 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
       waterMaterial.dispose();
       capMaterial.dispose();
       textures.texture.dispose();
+      soft?.texture.dispose();
+      ground?.dispose();
       ctx.scene.remove(group);
     },
   };
