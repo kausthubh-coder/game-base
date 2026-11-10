@@ -109,7 +109,10 @@ export class BedLoop {
       if (this.next >= 0 && this.next < now) this.next = -1;
       return;
     }
-    if (this.next < 0) this.next = now + 0.02;
+    // After a stall (a hidden tab, a slow frame, a paused test) the next start can lie in the past. A curve
+    // set in the past starts now, so both fades of that stretch would land on each other: start afresh instead.
+    // The stretch already playing fades out on its own.
+    if (this.next < now) this.next = now + 0.02;
     const fade = BedLoop.FADE;
     while (this.next < horizon) {
       const length = Math.min(this.buffer.duration - 0.05, 8 + this.rng() * 6);

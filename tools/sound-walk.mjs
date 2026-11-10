@@ -70,8 +70,9 @@ try {
   console.log('the game is up');
   await page.evaluate(() => window.__game.newGame());
   await page.waitForTimeout(2500);
+  // The opening scene's Skip button may still be moving in: click it where it is, and give up after 15 s.
   const skip = await page.$('[data-key="opening:skip"]');
-  if (skip) await skip.click().catch(() => {});
+  if (skip) await skip.click({ force: true, timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(500);
   // The first key starts the sound engine, on the offline context.
   await page.keyboard.press('KeyQ');
@@ -81,7 +82,7 @@ try {
   // Every recording decoded before the walk starts, as after the first seconds of play.
   await page.waitForFunction(() => ['bed.town.murmur', 'bed.meadow.day', 'step.grass', 'step.cobble', 'hit.chop', 'hit.dig', 'spot.well', 'shot.treefall'].every((id) => window.__game.view.audio.hasSample(id)), null, { timeout: 120000 });
 
-  console.log('the recordings are decoded');
+  console.log(`the recordings are decoded; the hero is ${(await page.evaluate(() => window.__game.view.game.player.busy)) ? 'busy' : 'free'}`);
   // Helpers in the page: render the sound up to a time, steer the hero along nav routes, read the state.
   await page.evaluate(() => {
     const g = window.__game, v = g.view, sys = v.game.systems, P = v.game.player, w = window.__walk;

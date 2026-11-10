@@ -44,3 +44,51 @@ test('a sound that never arrived plays nothing, so the made one plays instead', 
   expect(bank.pick('step.snow')).toBeNull();
   expect(bank.has('step.snow')).toBe(false);
 });
+
+/** Just enough of a context for BedLoop. A curve set in the past starts now, and two that overlap throw, as in Chrome. */
+function fakeRig() {
+  const clock = { now: 0 };
+  const param = () => {
+    const curves: [number, number][] = [];
+    return {
+      value: 0,
+      curves,
+      setValueCurveAtTime(_curve: Float32Array, start: number, seconds: number) {
+        const at = Math.max(start, clock.now);
+        for (const [a, b] of curves) if (at < b && a < at + seconds) throw new Error(`setValueCurveAtTime(..., ${at}, ${seconds}) overlaps`);
+        curves.push([at, at + seconds]);
+      },
+    };
+  };
+  const node = () => ({ connect: (n: unknown) => n, disconnect() {} });
+  const ctx = {
+    createGain: () => ({ ...node(), gain: param() }),
+    createStereoPanner: () => ({ ...node(), pan: param() }),
+    createBufferSource: () => ({ ...node(), buffer: null, start() {}, stop() {} }),
+  };
+  const tracked: unknown[] = [];
+  return { clock, rig: { ctx, keep: <T>(n: T) => n, track: (nodes: unknown[]) => tracked.push(nodes) }, tracked };
+}
+
+test('a bed picks up after a long stall without its fades landing on each other', async () => {
+  const { BedLoop } = await import('./samples.ts');
+  const { clock, rig, tracked } = fakeRig();
+  const loop = new BedLoop(rig as never, buffer(22.5), {} as AudioNode, 4);
+  for (let t = 0; t < 30; t += 0.05) { clock.now = t; loop.schedule(t, t + 1, true); }
+  // The page stalls for 40 seconds, longer than any stretch, then carries on.
+  for (let t = 70; t < 100; t += 0.05) { clock.now = t; expect(() => loop.schedule(t, t + 1, true)).not.toThrow(); }
+  expect(tracked.length).toBeGreaterThan(6);
+});
+
+test('a bed played without a stall crossfades: each stretch starts before the last one ends', async () => {
+  const { BedLoop } = await import('./samples.ts');
+  const { clock, rig, tracked } = fakeRig();
+  const loop = new BedLoop(rig as never, buffer(22.5), {} as AudioNode, 8);
+  for (let t = 0; t < 120; t += 0.05) { clock.now = t; loop.schedule(t, t + 1, true); }
+  const spans = (tracked as { gain?: { curves: [number, number][] } }[][]).map((nodes) => (nodes[1] as { gain: { curves: [number, number][] } }).gain.curves);
+  for (let i = 1; i < spans.length; i++) {
+    const [fadeIn] = spans[i] as [number, number][];
+    const [, fadeOut] = spans[i - 1] as [number, number][];
+    expect((fadeIn as [number, number])[0]).toBeCloseTo((fadeOut as [number, number])[0], 5);
+  }
+});
