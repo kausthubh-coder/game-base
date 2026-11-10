@@ -1,0 +1,228 @@
+/* The HUD looks like a book: parchment panels, ink lines, brass corners. Every size is in em, and
+   the root's font size is 16px times --hud-scale, so the size setting scales all of it.
+
+   The book theme: set these on :root to change the colors in the HUD, the map, the dialogue box
+   and the touch controls at once.
+     --book-parchment  --book-parchment-deep  --book-ink  --book-ink-soft
+     --book-brass  --book-brass-light  --book-font */
+.gb-hud {
+  --parchment: var(--book-parchment, #ecdcb9);
+  --parchment-deep: var(--book-parchment-deep, #dcc797);
+  --ink: var(--book-ink, #33241a);
+  --ink-soft: var(--book-ink-soft, #5a4330);
+  --brass: var(--book-brass, #b88a3e);
+  --brass-light: var(--book-brass-light, #e6c476);
+  --font: var(--book-font, ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif);
+  --hud-scale: 1;
+  --edge: 0.75em;
+  /* Clear of a phone's notch and home bar. The page needs viewport-fit=cover for these to be more than 0. */
+  --top: max(var(--edge), env(safe-area-inset-top, 0px));
+  --right: max(var(--edge), env(safe-area-inset-right, 0px));
+  --bottom: max(var(--edge), env(safe-area-inset-bottom, 0px));
+  --left: max(var(--edge), env(safe-area-inset-left, 0px));
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: calc(16px * var(--hud-scale));
+  line-height: 1.25;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.gb-hud[hidden] { display: none; }
+
+/* A panel: parchment, an ink line, a second fine line inside it, and a brass corner in each corner. */
+.gb-panel {
+  box-sizing: border-box;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.3em;
+  outline: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  outline-offset: -0.3em;
+  box-shadow: 0 0.15em 0.5em rgb(0 0 0 / 0.38);
+  background:
+    radial-gradient(circle at 0 0, var(--brass-light) 0 0.2em, var(--brass) 0.22em 0.46em, var(--ink) 0.48em 0.55em, transparent 0.57em) 0 0 / 0.6em 0.6em no-repeat,
+    radial-gradient(circle at 100% 0, var(--brass-light) 0 0.2em, var(--brass) 0.22em 0.46em, var(--ink) 0.48em 0.55em, transparent 0.57em) 100% 0 / 0.6em 0.6em no-repeat,
+    radial-gradient(circle at 0 100%, var(--brass-light) 0 0.2em, var(--brass) 0.22em 0.46em, var(--ink) 0.48em 0.55em, transparent 0.57em) 0 100% / 0.6em 0.6em no-repeat,
+    radial-gradient(circle at 100% 100%, var(--brass-light) 0 0.2em, var(--brass) 0.22em 0.46em, var(--ink) 0.48em 0.55em, transparent 0.57em) 100% 100% / 0.6em 0.6em no-repeat,
+    var(--parchment);
+}
+
+/* Top left: health, stamina, mana. */
+.gb-hud-vitals {
+  position: absolute;
+  top: var(--top);
+  left: var(--left);
+  width: 14em;
+  display: grid;
+  gap: 0.34em;
+  padding: 0.6em 0.75em;
+}
+.gb-bar { display: grid; grid-template-columns: 1.05em minmax(0, 1fr) 3.5em; align-items: center; gap: 0.45em; }
+.gb-bar-icon { display: grid; }
+.gb-bar-icon svg { width: 1.05em; height: 1.05em; }
+.gb-bar-track {
+  height: 0.72em;
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.36em;
+  background: color-mix(in srgb, var(--parchment-deep) 78%, var(--ink));
+}
+.gb-bar-fill { display: block; height: 100%; transform-origin: 0 50%; transition: transform 0.25s ease-out; }
+.gb-bar-text { font-size: max(0.8em, 11px); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gb-bar-health .gb-bar-icon { color: #a8281f; }
+.gb-bar-health .gb-bar-fill { background: linear-gradient(#d2473a, #a8281f); }
+.gb-bar-stamina .gb-bar-icon { color: #b07a12; }
+.gb-bar-stamina .gb-bar-fill { background: linear-gradient(#e0b23c, #b9860f); }
+.gb-bar-mana .gb-bar-icon { color: #285b9e; }
+.gb-bar-mana .gb-bar-fill { background: linear-gradient(#4d86cf, #285b9e); }
+.gb-bar.is-low .gb-bar-text { font-weight: 700; }
+
+/* Top right: the minimap, then the weather and the clock, then the tracked quest. */
+.gb-hud-right {
+  position: absolute;
+  top: var(--top);
+  right: var(--right);
+  width: 10.5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6em;
+}
+.gb-hud-minimap {
+  --gb-minimap-size: 100%;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 1;
+  /* Room for the minimap's brass ring. */
+  padding: 6px;
+  pointer-events: auto;
+}
+.gb-hud-sky { display: flex; align-items: center; gap: 0.4em; padding: 0.22em 0.8em 0.26em; }
+.gb-hud-weather { display: grid; }
+.gb-hud-weather svg { width: 1.45em; height: 1.45em; }
+.gb-hud-clock { font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; }
+.gb-hud-quest { flex: none; align-self: flex-end; width: 13.5em; margin-top: 0.3em; padding: 0.6em 0.8em 0.65em; }
+.gb-hud-quest[hidden] { display: none; }
+.gb-hud-quest h3 { margin: 0 0 0.35em; padding-bottom: 0.3em; font-size: 0.98em; font-weight: 700; border-bottom: 1px solid color-mix(in srgb, var(--ink) 45%, transparent); }
+.gb-hud-quest ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.22em; }
+.gb-hud-quest li { position: relative; padding-left: 1.3em; font-size: max(0.86em, 11px); }
+.gb-hud-quest li::before {
+  content: '';
+  position: absolute;
+  left: 0.1em;
+  top: 0.22em;
+  width: 0.62em;
+  height: 0.62em;
+  border: 1.5px solid var(--ink);
+  border-radius: 0.12em;
+}
+.gb-hud-quest li.is-done { color: var(--ink-soft); text-decoration: line-through; }
+.gb-hud-quest li.is-done::before { background: var(--ink); }
+
+/* Bottom left: short messages, each on its own strip. They sit above the line of the quick slots. */
+.gb-hud-log {
+  position: absolute;
+  left: var(--left);
+  bottom: calc(var(--bottom) + 4.6em);
+  max-width: min(24em, 60vw);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3em;
+}
+.gb-hud-log li {
+  padding: 0.22em 0.65em 0.26em;
+  font-size: max(0.9em, 11px);
+  background: var(--parchment);
+  border: 1px solid var(--ink);
+  border-left: 0.3em solid var(--brass);
+  border-radius: 0.2em;
+  box-shadow: 0 0.1em 0.35em rgb(0 0 0 / 0.35);
+  transition: opacity 0.45s, transform 0.45s;
+}
+.gb-hud-log li.is-leaving { opacity: 0; transform: translateX(-0.6em); }
+.gb-hud-log b { font-weight: 700; }
+/* With touch controls the stick is in that corner, so the messages go above it. */
+.gb-hud--touch .gb-hud-log { bottom: calc(var(--gb-hud-bottom, 0px) + 172px + env(safe-area-inset-bottom, 0px)); }
+@media (pointer: coarse) {
+  .gb-hud-log { bottom: calc(var(--gb-hud-bottom, 0px) + 172px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Bottom middle: nine quick slots. Each is 44 pixels or more, for a thumb. */
+.gb-hud-slots {
+  position: absolute;
+  left: 50%;
+  bottom: var(--bottom);
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  gap: 0.25em;
+  padding: 0.42em;
+  pointer-events: auto;
+}
+.gb-slot {
+  position: relative;
+  flex: none;
+  width: max(2.9em, 44px);
+  height: max(2.9em, 44px);
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--ink);
+  background: var(--parchment-deep);
+  border: 1.5px solid var(--ink);
+  border-radius: 0.25em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s;
+}
+.gb-slot:hover { background: color-mix(in srgb, var(--parchment-deep) 60%, var(--parchment)); }
+.gb-slot[aria-pressed='true'] {
+  background: var(--parchment);
+  transform: translateY(-0.16em);
+  box-shadow: 0 0 0 0.16em var(--brass-light), 0 0 0 calc(0.16em + 1.5px) var(--ink);
+}
+.gb-slot:focus-visible { outline: 2.5px solid #fff; outline-offset: 3px; }
+.gb-slot-key { position: absolute; top: 0.08em; left: 0.25em; font-size: max(0.7em, 11px); line-height: 1.2; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.gb-slot-icon { position: absolute; inset: 20% 16% 12%; display: grid; place-items: center; }
+.gb-slot-icon > * { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.gb-slot-count {
+  position: absolute;
+  right: 0.1em;
+  bottom: 0.05em;
+  padding: 0 0.22em;
+  font-size: max(0.72em, 11px);
+  font-weight: 700;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  background: var(--parchment);
+  border-radius: 0.2em;
+}
+.gb-slot-count:empty { display: none; }
+
+/* A phone held upright: smaller corners, and the slots wrap to five and four. */
+@media (max-width: 560px) {
+  .gb-hud { --edge: 0.5em; }
+  .gb-hud-vitals { width: 10.4em; padding: 0.5em 0.6em; }
+  .gb-bar { grid-template-columns: 0.95em minmax(0, 1fr) 3.1em; gap: 0.3em; }
+  .gb-hud-right { width: 7.8em; }
+  .gb-hud-quest { width: 11.5em; }
+  .gb-hud-log { max-width: 54vw; }
+  .gb-hud-slots { flex-wrap: wrap; width: calc(5 * max(2.9em, 44px) + 4 * 0.25em + 0.84em + 3px); box-sizing: border-box; }
+}
+/* A phone on its side: little height, and the touch buttons need the bottom right. The corner
+   becomes a row along the top: the quest, the clock, then the minimap. */
+@media (max-height: 480px) {
+  .gb-hud-right { width: auto; flex-direction: row-reverse; align-items: flex-start; gap: 0.5em; }
+  .gb-hud-minimap { width: 7.4em; flex: none; }
+  .gb-hud-quest { width: 12em; margin-top: 0; align-self: flex-start; padding: 0.45em 0.7em 0.5em; }
+  .gb-hud-quest ul { gap: 0.1em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gb-bar-fill, .gb-slot, .gb-hud-log li { transition: none; }
+}

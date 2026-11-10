@@ -1,0 +1,124 @@
+/* The dialogue box: a page of the book at the bottom of the screen. Colors come from the book
+   theme: set --book-parchment, --book-ink, --book-ink-soft, --book-brass, --book-brass-light and
+   --book-font on :root to change them everywhere. */
+.gb-dialogue {
+  --parchment: var(--book-parchment, #ecdcb9);
+  --parchment-deep: var(--book-parchment-deep, #dcc797);
+  --ink: var(--book-ink, #33241a);
+  --ink-soft: var(--book-ink-soft, #5a4330);
+  --brass: var(--book-brass, #b88a3e);
+  --brass-light: var(--book-brass-light, #e6c476);
+  --font: var(--book-font, ui-serif, 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif);
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 max(14px, env(safe-area-inset-right, 0px)) max(18px, env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left, 0px));
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.4;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.gb-dialogue[hidden] { display: none; }
+
+.gb-dialogue-box {
+  position: relative;
+  box-sizing: border-box;
+  width: min(760px, 100%);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px 20px 16px 16px;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  outline: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  outline-offset: -7px;
+  box-shadow: 0 0 0 4px var(--brass), 0 0 0 5.5px var(--ink), 0 10px 28px rgb(0 0 0 / 0.5);
+  background:
+    radial-gradient(circle at 0 0, var(--brass-light) 0 5px, var(--brass) 5.5px 11px, var(--ink) 11.5px 13px, transparent 13.5px) 0 0 / 14px 14px no-repeat,
+    radial-gradient(circle at 100% 0, var(--brass-light) 0 5px, var(--brass) 5.5px 11px, var(--ink) 11.5px 13px, transparent 13.5px) 100% 0 / 14px 14px no-repeat,
+    radial-gradient(circle at 0 100%, var(--brass-light) 0 5px, var(--brass) 5.5px 11px, var(--ink) 11.5px 13px, transparent 13.5px) 0 100% / 14px 14px no-repeat,
+    radial-gradient(circle at 100% 100%, var(--brass-light) 0 5px, var(--brass) 5.5px 11px, var(--ink) 11.5px 13px, transparent 13.5px) 100% 100% / 14px 14px no-repeat,
+    var(--parchment);
+}
+
+.gb-dialogue-portrait {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--parchment-deep);
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+.gb-dialogue-portrait > * { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+.gb-dialogue-portrait > .gb-dialogue-initial { display: grid; place-items: center; font-size: 54px; font-weight: 700; line-height: 1; color: var(--ink); }
+
+.gb-dialogue-body { position: relative; min-width: 0; display: grid; align-content: start; gap: 4px; }
+.gb-dialogue-name { font-size: 19px; font-weight: 700; letter-spacing: 0.01em; padding-bottom: 3px; border-bottom: 1px solid color-mix(in srgb, var(--ink) 45%, transparent); }
+/* Room for three rows, so the box keeps its height from line to line. */
+.gb-dialogue-text { margin: 4px 0 0; min-height: 4.2em; }
+.gb-dialogue-untyped { visibility: hidden; }
+.gb-dialogue-spoken { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.gb-dialogue-choices { margin: 2px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.gb-dialogue-choices[hidden] { display: none; }
+.gb-dialogue-choices button {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 4px 12px;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--parchment) 60%, #fff);
+  border: 1.5px solid var(--ink);
+  border-radius: 4px;
+  box-shadow: 0 2px 0 var(--ink);
+  cursor: pointer;
+}
+.gb-dialogue-choices button:hover, .gb-dialogue-choices button:focus-visible { background: #fffaf0; }
+.gb-dialogue-choices button:focus-visible { outline: 2.5px solid #1b5fae; outline-offset: 2px; }
+.gb-dialogue-choices button:active { transform: translateY(2px); box-shadow: none; }
+.gb-dialogue-key {
+  flex: none;
+  width: 1.5em;
+  height: 1.5em;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--parchment);
+  background: var(--ink);
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A small mark that says the line is whole and a click moves on. */
+.gb-dialogue-more { position: absolute; right: -6px; bottom: -6px; width: 0; height: 0; border: 7px solid transparent; border-top: 9px solid var(--ink); border-bottom: 0; opacity: 0; }
+.gb-dialogue-box.is-waiting .gb-dialogue-more { opacity: 1; animation: gb-dialogue-bob 0.9s ease-in-out infinite alternate; }
+@keyframes gb-dialogue-bob { from { transform: translateY(-3px); } to { transform: translateY(2px); } }
+@media (prefers-reduced-motion: reduce) {
+  .gb-dialogue-box.is-waiting .gb-dialogue-more { animation: none; }
+}
+
+@media (max-width: 560px) {
+  .gb-dialogue { font-size: 16px; padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+  .gb-dialogue-box { gap: 12px; padding: 14px 14px 14px 12px; }
+  .gb-dialogue-portrait { width: 64px; height: 64px; }
+  .gb-dialogue-portrait > .gb-dialogue-initial { font-size: 36px; }
+  .gb-dialogue-name { font-size: 17px; }
+  .gb-dialogue-text { min-height: 5.6em; }
+}

@@ -1,0 +1,79 @@
+/* The touch controls. Colors come from the book theme: set --book-parchment, --book-ink and
+   --book-brass on :root to change them everywhere. --gb-hud-bottom is how much room the HUD's
+   quick slots need under the controls, and the HUD sets it. */
+.gb-touch {
+  --parchment: var(--book-parchment, #ecdcb9);
+  --ink: var(--book-ink, #33241a);
+  --brass: var(--book-brass, #b88a3e);
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.gb-touch[hidden] { display: none; }
+
+.gb-touch-stick {
+  position: absolute;
+  left: calc(18px + env(safe-area-inset-left, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + var(--gb-hud-bottom, 0px));
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  pointer-events: auto;
+  touch-action: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--parchment) 50%, transparent) 0 58%, color-mix(in srgb, var(--parchment) 72%, transparent) 59% 100%);
+  border: 2px solid var(--ink);
+  box-shadow: 0 0 0 3px var(--brass), 0 0 0 4.5px var(--ink), 0 4px 10px rgb(0 0 0 / 0.35);
+}
+.gb-touch-knob {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-radius: 50%;
+  background: var(--parchment);
+  border: 2px solid var(--ink);
+  box-shadow: inset 0 0 0 3px var(--brass), 0 2px 4px rgb(0 0 0 / 0.3);
+  will-change: transform;
+}
+.gb-touch-stick.is-held .gb-touch-knob { background: color-mix(in srgb, var(--parchment) 80%, var(--brass)); }
+
+.gb-touch-pad {
+  position: absolute;
+  right: calc(14px + env(safe-area-inset-right, 0px));
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px) + var(--gb-hud-bottom, 0px));
+  width: 150px;
+  height: 196px;
+}
+.gb-touch-button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 0;
+  border-radius: 50%;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: pointer;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--parchment) 88%, transparent);
+  border: 2px solid var(--ink);
+  box-shadow: 0 0 0 3px var(--brass), 0 0 0 4.5px var(--ink), 0 3px 8px rgb(0 0 0 / 0.35);
+  -webkit-tap-highlight-color: transparent;
+}
+.gb-touch-button svg { width: 52%; height: 52%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.gb-touch-button.is-held { background: color-mix(in srgb, var(--parchment) 70%, var(--brass)); transform: scale(0.94); }
+.gb-touch-button:focus-visible { outline: 3px solid #fff; outline-offset: 5px; }
+
+/* Each is 44 pixels across or more, and none touches another. */
+.gb-touch-jump { right: 0; bottom: 0; width: 72px; height: 72px; }
+.gb-touch-use { right: 84px; bottom: 2px; width: 60px; height: 60px; }
+.gb-touch-interact { right: 6px; bottom: 84px; width: 60px; height: 60px; }
+.gb-touch-place { right: 80px; bottom: 74px; width: 52px; height: 52px; }
+.gb-touch-turnLeft { right: 86px; bottom: 140px; width: 46px; height: 46px; }
+.gb-touch-turnRight { right: 28px; bottom: 150px; width: 46px; height: 46px; }
