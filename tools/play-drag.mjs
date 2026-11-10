@@ -185,19 +185,23 @@ try {
   await dragAndClick('2.5D', 'spawn', 300, 0);
   await dragAndClick('2.5D', 'town.square', -260, 0, false);
 
-  // Q and R from an angle between two quarters come to rest on a quarter.
-  const between = await state();
+  // Q and R from an angle between two quarters come to rest on a quarter. The same view at a quarter and half a
+  // quarter off it, with the town's people in frame.
   const offQuarter = (yaw) => Math.abs(((((yaw - 45) % 90) + 135) % 90) - 45);
-  check('2.5D: after a drag the camera rests between two quarters', offQuarter(between.camera.yaw) > 5, `yaw ${between.camera.yaw}`);
+  const beforeQ = await state();
+  await page.mouse.move(1100, 160);
+  await page.keyboard.press('q');
+  await game(() => window.__game.advance(0.5));
+  await frames(3);
+  const onQuarter = await state();
+  check('2.5D: Q from between two quarters comes to rest on a quarter', offQuarter(beforeQ.camera.yaw) > 2 && offQuarter(onQuarter.camera.yaw) < 0.5, `yaw ${beforeQ.camera.yaw} to ${onQuarter.camera.yaw}`);
+  await shot('2-5d-on-a-quarter.png');
+  // Half a quarter is 45 degrees, about 327 pixels.
+  await rightDrag({ x: 1000, y: 300 }, -Math.round((Math.PI / 4) / SPEED), 0, 6);
+  const between = await state();
+  check('2.5D: after a drag the camera rests half a quarter off', Math.abs(offQuarter(between.camera.yaw) - 45) < 1, `yaw ${between.camera.yaw}`);
   await page.mouse.move(1100, 160);
   await shot('2-5d-between-quarters.png');
-  await page.keyboard.press('q');
-  await frames(4);
-  await game(() => window.__game.advance(0.5));
-  await frames(2);
-  const onQuarter = await state();
-  check('2.5D: Q from between two quarters comes to rest on a quarter', offQuarter(onQuarter.camera.yaw) < 0.5, `yaw ${between.camera.yaw} to ${onQuarter.camera.yaw}`);
-  await shot('2-5d-on-a-quarter.png');
   const sprites = await state();
   check('2.5D: the sprites are all there after the turns', sprites.sprites.missing.length === 0 && sprites.sprites.count > 1, JSON.stringify(sprites.sprites));
 
