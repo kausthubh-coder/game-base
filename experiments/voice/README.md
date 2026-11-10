@@ -9,6 +9,29 @@ Two ways to give Greenhollow's people a voice, built on the playable act 1 (`pla
 
 Nobody has listened to any of this audio. The Mac mini has no speakers. Every clip was checked by decoding it (length, loudness, pitch) and by transcribing it back with ElevenLabs Scribe.
 
+## Into the game (2026-11-10)
+
+Kausthubh listened and decided: Gus is `gus-3`, every line is made with **eleven_v4_turbo** (its take of `square-4` was the best of the four models by ear), Tamsin's designed voice is out, and voiced dialogue ships in the game itself. That work lives outside this folder now:
+
+- `src/game/content/cast.ts`: the game's cast, model, and the few audio tags (v4 Turbo performs `[sighs]` and `[whispers]` and does not read them out; checked by transcribing).
+- `tools/voice.ts`: makes a clip for every line the cast says in `src/game/content/dialogue.ts`, into `public/assets/voice/`. `tools/voice/` holds the ElevenLabs calls and the audio checks this experiment started with.
+- `gus-3` (`VXQGRSJ6Cm10Pt4GSFeG`) was only a preview. It is saved on the account now as "Greenhollow Gus 3", under the same id.
+
+### Six new Tamsins
+
+`tools/tamsin-auditions.ts` made `audio/auditions/tamsin-4.mp3` to `tamsin-9.mp3`. Each reads the same four of her lines in eleven_v4_turbo: "Twelve people have asked me for this plot. You are the first who looked at the ground before the view. Festival tonight. I am told to wear the good coat. I own one coat. You fed it first. I would have set a snare and priced the tail. Good harvest. Small, and good."
+
+| Audition | Voice | Source | Words a second | Pitch | Heard back |
+|---|---|---|---|---|---|
+| tamsin-4 | Beatrice, `kkPJzQOWz2Oz9cUaEaQd` | library: British, old, warm and steady, made for stories | 2.64 | 193 Hz | 98% ("You were the first") |
+| tamsin-5 | Jane, `RILOU7YmBhvwJGDGjNmP` | library: British audiobook reader in her fifties, the most used older British voice | 2.80 | 205 Hz | 100% |
+| tamsin-6 | Evelyn, `XEoBW4iDmiawQP72xnAF` | library: British, middle aged, "a dry sense of humour", "London irony and grit" | 2.83 | 188 Hz | 100% |
+| **tamsin-7** | **Charmion, `lUCNYQh2kqW2wiie85Qk`** | **library: British, middle aged, soft and husky, a character voice. The game's default** | **2.59** | **198 Hz** | **100%** |
+| tamsin-8 | "Greenhollow Tamsin (Yorkshire)", `mXgcP5FHXZ0rX2h5Lfa6` | Voice Design: seventy, gravelly and smoky, broad Northern accent | 2.38 | 162 Hz | 98% ("You were the first") |
+| tamsin-9 | "Greenhollow Tamsin (Highland)", `FJRYGJ6zLt6PQOCfd6yn` | Voice Design: late sixties, a raspy mezzo with a twinkle, soft Highland Scottish | 2.49 | 172 Hz | 100% |
+
+The default is Charmion because she is the one library voice inside every mark without adjusting: heard back word for word, unhurried (2.59 words a second, against 2.0 to 2.6), and husky. The two designed voices are lower and slower, but Voice Design is what sounded wrong last time. **Nobody has heard these. Pick by ear**: put another id from `TAMSIN_VOICES` in `CAST.tamsin.voiceId` (`src/game/content/cast.ts`) and run `bun --env-file=.env.local tools/voice.ts`. Only her lines are made again (about 1,400 credits). The design previews behind tamsin-8 and tamsin-9 are in `.artifacts/voice/design/` (not in git).
+
 ## Run it
 
 ```sh
@@ -54,7 +77,7 @@ bun --env-file=.env.local experiments/voice/tools/generate-lines.ts --check     
 | `talk/tamsin.ts` | Tamsin's character prompt, and the three moments of act 1 the page can put her in |
 | `talk/b1.server.ts`, `talk/b2.server.ts` | The two pipelines on the server side |
 | `talk/talk.ts`, `scene/scene.ts` | The pages |
-| `lib/` | ElevenLabs over fetch, the `codex app-server` client, audio checks |
+| `lib/codex.ts` | The `codex app-server` client. ElevenLabs over fetch and the audio checks moved to `tools/voice/` when voiced lines went into the game |
 | `tools/` | Voice design, line generation, the scene check, the latency bench |
 
 ## A. Voiced dialogue

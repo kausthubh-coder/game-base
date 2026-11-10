@@ -3,8 +3,8 @@
 //   bun experiments/voice/tools/design-voices.ts save <id> <preview 1-3>      saves that preview as a voice and prints its id
 // Every preview is measured (length, pitch, words a second), since nobody here can listen to it.
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
-import { analyse, decode, describe } from '../lib/analyse.ts';
-import { designVoice, saveDesignedVoice, usage } from '../lib/eleven.ts';
+import { analyse, decode, describe } from '../../../tools/voice/analyse.ts';
+import { designVoice, saveDesignedVoice, usage } from '../../../tools/voice/eleven.ts';
 import { CAST, type CastId } from '../cast.ts';
 
 const DIR = new URL('../audio/auditions/', import.meta.url).pathname;

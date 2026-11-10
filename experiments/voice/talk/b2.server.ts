@@ -7,7 +7,7 @@
 // endpoint at once, as raw 24 kHz PCM, and the audio is passed on in sentence order. Every step is
 // timed with the server's clock, so a turn reports where its time went.
 import { AppServer } from '../lib/codex.ts';
-import { speakStream } from '../lib/eleven.ts';
+import { speakStream } from '../../../tools/voice/eleven.ts';
 import { CAST } from '../cast.ts';
 import { prompt, type GameState } from './tamsin.ts';
 

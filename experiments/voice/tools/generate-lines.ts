@@ -8,8 +8,8 @@
 // since nobody here can listen: a tag read out loud or a dropped word shows up as a low score.
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { analyse, decode } from '../lib/analyse.ts';
-import { speakWithTimestamps, transcribe, usage, type Alignment } from '../lib/eleven.ts';
+import { analyse, decode } from '../../../tools/voice/analyse.ts';
+import { speakWithTimestamps, transcribe, usage, type Alignment } from '../../../tools/voice/eleven.ts';
 import { CAST, MODELS, type CastId } from '../cast.ts';
 import { COMPARE, SCENES } from '../scene/lines.ts';
 import { CONVERSATIONS, type Line } from '../../../src/game/content/dialogue.ts';
@@ -110,7 +110,7 @@ async function make(key: string, into: 'lines' | 'compare', dir: string, speaker
   const file = `${dir}/${key}.mp3`;
   const old = manifest[into][key];
   if (old?.hash === hash && existsSync(ROOT + file)) {
-    // Measured again, so a change to lib/analyse.ts reaches every clip without new audio.
+    // Measured again, so a change to tools/voice/analyse.ts reaches every clip without new audio.
     const facts = analyse(decode(ROOT + file));
     (old.seconds = +facts.seconds.toFixed(3)), (old.pitchHz = Math.round(facts.pitchHz));
     if (check && old.heard === undefined) await listen(old);

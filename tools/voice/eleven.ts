@@ -4,7 +4,7 @@ const API = 'https://api.elevenlabs.io';
 
 export function apiKey(): string {
   const key = process.env.ELEVENLABS_API_KEY;
-  if (!key) throw new Error('ELEVENLABS_API_KEY is not set. Put it in .env.local (see experiments/voice/README.md).');
+  if (!key) throw new Error('ELEVENLABS_API_KEY is not set. Put it in .env.local (see the voice section of docs/assets.md).');
   return key;
 }
 

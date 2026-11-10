@@ -14,7 +14,7 @@ import type { ServerWebSocket } from 'bun';
 import home from './index.html';
 import scene from './scene/index.html';
 import talk from './talk/index.html';
-import { transcribe } from './lib/eleven.ts';
+import { transcribe } from '../../tools/voice/eleven.ts';
 import { RealtimeBridge } from './talk/b1.server.ts';
 import { TextVoice } from './talk/b2.server.ts';
 import { MOMENTS, type GameState } from './talk/tamsin.ts';
