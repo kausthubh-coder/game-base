@@ -1,9 +1,10 @@
-// The two meshes of the crops view, each one instanced draw call: the plants, two crossed upright quads
-// each with a tile of the crops sheet, and the wet soil, a dark flat quad just above each wet block.
+// Solid Blender crop stages share one instanced draw call. The stage tag selects the visible model.
+// Wet soil is a second instanced draw call.
 //
 // A plant is lit the way a sprite is: the sky's light dimmed by how much sky reaches it, plus lamp light.
 // It moves in the vertex shader, so a field that only sways writes nothing from the page.
 import * as THREE from 'three';
+import { environmentGeometry } from '../../features/props/models.view.ts';
 
 /** Floats for one plant: where its foot is and a number of its own, its tile and when it last grew, its light. */
 export const PLANT_STRIDE = 10;
@@ -19,12 +20,15 @@ uniform vec3 uWind;
 uniform vec2 uTile;
 uniform vec3 uSky;
 uniform vec3 uLamp;
+attribute vec3 color;
+attribute vec2 aCrop;
 attribute vec4 aPlace;
 attribute vec4 aTile;
 attribute vec2 aLight;
 varying vec2 vUv;
 flat varying vec4 vRect;
 flat varying vec3 vColor;
+varying vec3 vPaint;
 #include <fog_pars_vertex>
 
 void main() {
@@ -38,6 +42,7 @@ void main() {
   float lamp = pow(0.8, 15.0 * (1.0 - aLight.y)) * step(0.02, aLight.y);
   vColor = uSky * sky + uLamp * lamp + 0.06;
 
+  vPaint = color * (0.72 + 0.28 * max(0.0, dot(normal, normalize(vec3(-0.4, 0.85, 0.3)))));
   vec3 p = position;
   // The pop: for a moment after it grows the plant is larger, then it settles.
   float pop = clamp((uTime - aTile.z) / ${POP_SECONDS.toFixed(2)}, 0.0, 1.0);
@@ -53,6 +58,8 @@ void main() {
 
   vec4 mvPosition = viewMatrix * vec4(aPlace.xyz + p, 1.0);
   gl_Position = projectionMatrix * mvPosition;
+  vec2 selected = floor(aTile.xy / uTile + 0.5);
+  if (abs(selected.x - aCrop.x) > 0.1 || abs(selected.y - aCrop.y) > 0.1) gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
   #include <fog_vertex>
 }
 `;
@@ -62,10 +69,11 @@ uniform sampler2D uSheet;
 varying vec2 vUv;
 flat varying vec4 vRect;
 flat varying vec3 vColor;
+varying vec3 vPaint;
 #include <fog_pars_fragment>
 
 void main() {
-  vec4 texel = texture2D(uSheet, clamp(vUv, vRect.xy, vRect.zw));
+  vec4 texel = vec4(vPaint, 1.0);
   // A hard cut: a pixel is there or it is not, so plants sort against blocks by depth alone.
   if (texel.a < 0.5) discard;
   gl_FragColor = vec4(texel.rgb * vColor, 1.0);
@@ -126,15 +134,20 @@ export interface CropMeshes {
 
 /** `tileU` and `tileV` are the size of one tile of the sheet in texture coordinates. */
 export function createCropMeshes(sheet: THREE.Texture, tileU: number, tileV: number): CropMeshes {
-  // ---- the plant: two upright quads crossed on the block's axes. The camera looks along a diagonal, so both show.
-  const corners: number[] = [], uvs: number[] = [], index: number[] = [];
-  for (const [ax, az] of [[1, 0], [0, 1]] as const) {
-    const first = corners.length / 3;
-    for (const [side, up] of [[-0.5, 0], [0.5, 0], [0.5, 1], [-0.5, 1]] as const) {
-      corners.push(ax * side, up, az * side);
-      uvs.push(side + 0.5, 1 - up);
+  const corners: number[] = [], colors: number[] = [], normals: number[] = [], cropTags: number[] = [], uvs: number[] = [], index: number[] = [];
+  for (const [row, crop] of ['wheat','turnip','carrot'].entries()) {
+    for (let stage=0;stage<(crop==='carrot'?5:4);stage++) {
+      const source = environmentGeometry('crop'+crop,stage);
+      if (!source) throw new Error(`Crop model missing: ${crop} ${stage}`);
+      const g = source.index ? source.toNonIndexed() : source;
+      const p=g.getAttribute('position'), c=g.getAttribute('color'), n=g.getAttribute('normal');
+      for (let i=0;i<p.count;i++) {
+        index.push(index.length); corners.push(p.getX(i),p.getY(i),p.getZ(i));
+        colors.push(c.getX(i),c.getY(i),c.getZ(i)); normals.push(n.getX(i),n.getY(i),n.getZ(i));
+        cropTags.push(stage,row);uvs.push(0,0);
+      }
+      if (g!==source) g.dispose();
     }
-    index.push(first, first + 1, first + 2, first, first + 2, first + 3);
   }
   const plantUniforms = {
     ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
@@ -212,6 +225,9 @@ export function createCropMeshes(sheet: THREE.Texture, tileU: number, tileV: num
         geometry.setIndex(index);
         geometry.setAttribute('position', new THREE.Float32BufferAttribute(corners, 3));
         geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+        geometry.setAttribute('aCrop', new THREE.Float32BufferAttribute(cropTags, 2));
         geometry.setAttribute('aPlace', new THREE.InterleavedBufferAttribute(plantBuffer, 4, 0));
         geometry.setAttribute('aTile', new THREE.InterleavedBufferAttribute(plantBuffer, 4, 4));
         geometry.setAttribute('aLight', new THREE.InterleavedBufferAttribute(plantBuffer, 2, 8));

@@ -1080,6 +1080,286 @@
       "triangles": 280,
       "budget": 300,
       "bytes": 29236
+    },
+    "env-cropturnip-0": {
+      "file": "models/env-cropturnip-0.glb",
+      "seed": 300,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4656
+    },
+    "env-cropturnip-1": {
+      "file": "models/env-cropturnip-1.glb",
+      "seed": 301,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4656
+    },
+    "env-cropturnip-3": {
+      "file": "models/env-cropturnip-3.glb",
+      "seed": 303,
+      "triangles": 66,
+      "budget": 300,
+      "bytes": 9628
+    },
+    "env-cropturnip-2": {
+      "file": "models/env-cropturnip-2.glb",
+      "seed": 302,
+      "triangles": 66,
+      "budget": 300,
+      "bytes": 9632
+    },
+    "env-mushroom-0": {
+      "file": "models/env-mushroom-0.glb",
+      "seed": 300,
+      "triangles": 40,
+      "budget": 300,
+      "bytes": 6212
+    },
+    "env-mushroom-1": {
+      "file": "models/env-mushroom-1.glb",
+      "seed": 301,
+      "triangles": 40,
+      "budget": 300,
+      "bytes": 6212
+    },
+    "env-mushroom-2": {
+      "file": "models/env-mushroom-2.glb",
+      "seed": 302,
+      "triangles": 40,
+      "budget": 300,
+      "bytes": 6212
+    },
+    "env-flower-5": {
+      "file": "models/env-flower-5.glb",
+      "seed": 305,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 20104
+    },
+    "env-flower-4": {
+      "file": "models/env-flower-4.glb",
+      "seed": 304,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 20104
+    },
+    "env-flower-3": {
+      "file": "models/env-flower-3.glb",
+      "seed": 303,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 20104
+    },
+    "env-rock-1": {
+      "file": "models/env-rock-1.glb",
+      "seed": 301,
+      "triangles": 42,
+      "budget": 300,
+      "bytes": 6480
+    },
+    "env-cropcarrot-3": {
+      "file": "models/env-cropcarrot-3.glb",
+      "seed": 303,
+      "triangles": 66,
+      "budget": 300,
+      "bytes": 9628
+    },
+    "env-cropcarrot-2": {
+      "file": "models/env-cropcarrot-2.glb",
+      "seed": 302,
+      "triangles": 66,
+      "budget": 300,
+      "bytes": 9632
+    },
+    "env-rock-0": {
+      "file": "models/env-rock-0.glb",
+      "seed": 300,
+      "triangles": 42,
+      "budget": 300,
+      "bytes": 6484
+    },
+    "env-flower-2": {
+      "file": "models/env-flower-2.glb",
+      "seed": 302,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 20104
+    },
+    "env-flower-0": {
+      "file": "models/env-flower-0.glb",
+      "seed": 300,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 20104
+    },
+    "env-rock-2": {
+      "file": "models/env-rock-2.glb",
+      "seed": 302,
+      "triangles": 42,
+      "budget": 300,
+      "bytes": 6480
+    },
+    "env-cropcarrot-0": {
+      "file": "models/env-cropcarrot-0.glb",
+      "seed": 300,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4656
+    },
+    "env-cropcarrot-1": {
+      "file": "models/env-cropcarrot-1.glb",
+      "seed": 301,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4656
+    },
+    "env-rock-3": {
+      "file": "models/env-rock-3.glb",
+      "seed": 303,
+      "triangles": 42,
+      "budget": 300,
+      "bytes": 6480
+    },
+    "env-flower-1": {
+      "file": "models/env-flower-1.glb",
+      "seed": 301,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 20104
+    },
+    "env-reeds-1": {
+      "file": "models/env-reeds-1.glb",
+      "seed": 301,
+      "triangles": 110,
+      "budget": 300,
+      "bytes": 14636
+    },
+    "env-bush-0": {
+      "file": "models/env-bush-0.glb",
+      "seed": 300,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 17544
+    },
+    "env-cropwheat-3": {
+      "file": "models/env-cropwheat-3.glb",
+      "seed": 303,
+      "triangles": 102,
+      "budget": 300,
+      "bytes": 14596
+    },
+    "env-cropwheat-2": {
+      "file": "models/env-cropwheat-2.glb",
+      "seed": 302,
+      "triangles": 102,
+      "budget": 300,
+      "bytes": 14600
+    },
+    "env-bush-1": {
+      "file": "models/env-bush-1.glb",
+      "seed": 301,
+      "triangles": 140,
+      "budget": 300,
+      "bytes": 17544
+    },
+    "env-reeds-0": {
+      "file": "models/env-reeds-0.glb",
+      "seed": 300,
+      "triangles": 70,
+      "budget": 300,
+      "bytes": 9112
+    },
+    "env-cropwheat-0": {
+      "file": "models/env-cropwheat-0.glb",
+      "seed": 300,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4652
+    },
+    "env-cropwheat-1": {
+      "file": "models/env-cropwheat-1.glb",
+      "seed": 301,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4652
+    },
+    "env-bush-2": {
+      "file": "models/env-bush-2.glb",
+      "seed": 302,
+      "triangles": 188,
+      "budget": 300,
+      "bytes": 24172
+    },
+    "env-wildflowers-0": {
+      "file": "models/env-wildflowers-0.glb",
+      "seed": 300,
+      "triangles": 210,
+      "budget": 300,
+      "bytes": 29512
+    },
+    "env-mossstump-0": {
+      "file": "models/env-mossstump-0.glb",
+      "seed": 300,
+      "triangles": 38,
+      "budget": 300,
+      "bytes": 5220
+    },
+    "env-berrybush-0": {
+      "file": "models/env-berrybush-0.glb",
+      "seed": 300,
+      "triangles": 188,
+      "budget": 300,
+      "bytes": 24180
+    },
+    "env-tallgrass-0": {
+      "file": "models/env-tallgrass-0.glb",
+      "seed": 300,
+      "triangles": 70,
+      "budget": 300,
+      "bytes": 9124
+    },
+    "env-lilypad-0": {
+      "file": "models/env-lilypad-0.glb",
+      "seed": 300,
+      "triangles": 16,
+      "budget": 300,
+      "bytes": 3504
+    },
+    "env-grasstuft-0": {
+      "file": "models/env-grasstuft-0.glb",
+      "seed": 300,
+      "triangles": 30,
+      "budget": 300,
+      "bytes": 4648
+    },
+    "env-grasstuft-1": {
+      "file": "models/env-grasstuft-1.glb",
+      "seed": 301,
+      "triangles": 40,
+      "budget": 300,
+      "bytes": 5776
+    },
+    "env-lilypad-1": {
+      "file": "models/env-lilypad-1.glb",
+      "seed": 301,
+      "triangles": 86,
+      "budget": 300,
+      "bytes": 12916
+    },
+    "env-grasstuft-2": {
+      "file": "models/env-grasstuft-2.glb",
+      "seed": 302,
+      "triangles": 50,
+      "budget": 300,
+      "bytes": 6892
+    },
+    "env-cropcarrot-4": {
+      "file": "models/env-cropcarrot-4.glb",
+      "seed": 304,
+      "triangles": 66,
+      "budget": 300,
+      "bytes": 9612
     }
   },
   "cast": {

@@ -1,3 +1,4 @@
+import { TownShape } from './town-shape.ts';
 // Clutter: the things that make a yard look used. A barrel, a crate, a cart, a sack.
 import type * as THREE from 'three';
 import { P, RAMP } from '../palette.ts';
@@ -5,7 +6,7 @@ import { Shape } from '../shape.ts';
 
 /** Variants: closed, and open with water in it. */
 export function barrel(variant: number): THREE.BufferGeometry {
-  const s = new Shape(1101 + variant);
+  const s = new TownShape(1101 + variant);
   s.tube([[0, 0, 0], [0, 0.3, 0], [0, 0.62, 0], [0, 0.92, 0]], [0.3, 0.37, 0.37, 0.3], 10, RAMP.plank, { cap: variant === 0 ? 'end' : 'none', capTone: P.plankLight });
   for (const [y, r] of [[0.14, 0.345], [0.7, 0.36]] as const) s.cyl(0, y, 0, r, r, 0.07, 10, P.slate, { cap: 'none' });
   if (variant === 1) {
@@ -30,7 +31,7 @@ function oneCrate(s: Shape, size: number, brace: boolean): void {
 
 /** Variants: one crate, and a stack of three. */
 export function crate(variant: number): THREE.BufferGeometry {
-  const s = new Shape(1123 + variant);
+  const s = new TownShape(1123 + variant);
   oneCrate(s, 0.8, true);
   s.shadowBox(0, 0, 0, 0.8, 0.8, 0.8);
   if (variant === 1) {
@@ -44,7 +45,7 @@ export function crate(variant: number): THREE.BufferGeometry {
 
 /** A hand cart that points along +x. Variants: empty, and loaded with hay. */
 export function cart(variant: number): THREE.BufferGeometry {
-  const s = new Shape(1151 + variant);
+  const s = new TownShape(1151 + variant);
   s.box(0, 0.55, 0, 1.7, 0.1, 0.96, P.plank, { top: P.plankLight });
   for (const z of [-0.45, 0.45]) s.box(0, 0.65, z, 1.7, 0.3, 0.06, P.plankDark, { skip: '-y' });
   for (const x of [-0.82, 0.82]) s.box(x, 0.65, 0, 0.06, 0.3, 0.84, P.plankDark, { skip: '-y+z-z' });
@@ -73,7 +74,7 @@ function oneSack(s: Shape): void {
 
 /** Variants: one sack, and a pile of three with one lying down. */
 export function sack(variant: number): THREE.BufferGeometry {
-  const s = new Shape(1171 + variant);
+  const s = new TownShape(1171 + variant);
   oneSack(s);
   s.shadowBlob(0, 0.26, 0, 0.28, 0.3, 0.24);
   if (variant === 1) {

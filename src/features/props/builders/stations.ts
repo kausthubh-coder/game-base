@@ -1,11 +1,11 @@
+import { TownShape } from './town-shape.ts';
 // Stations: the furniture a player works at or sleeps in. Each fits in one block, or two for the bed
 // and the forge, and reads from above: what it is for sits on its top.
 import type * as THREE from 'three';
 import { P, RAMP } from '../palette.ts';
-import { Shape } from '../shape.ts';
 
 export function workbench(): THREE.BufferGeometry {
-  const s = new Shape(1201);
+  const s = new TownShape(1201);
   s.box(0, 0.78, 0, 1.7, 0.12, 0.8, P.plankLight, { bevel: 0.02, top: P.plankPale });
   for (const x of [-0.74, 0.74]) for (const z of [-0.3, 0.3]) s.box(x, 0, z, 0.12, 0.78, 0.12, P.timber, { skip: '-y+y' });
   s.box(0, 0.2, 0, 1.5, 0.06, 0.6, P.plank);
@@ -28,7 +28,7 @@ export function workbench(): THREE.BufferGeometry {
 
 /** A stone hearth with live coals, a hood behind it and an anvil beside it. The coals glow by day too. */
 export function forge(): THREE.BufferGeometry {
-  const s = new Shape(1223);
+  const s = new TownShape(1223);
   s.box(-0.3, 0, 0, 1.3, 0.8, 1, RAMP.stone, { bevel: 0.05, skip: '-y', grade: 0.25 });
   s.box(-0.3, 0.8, 0.08, 1, 0.05, 0.66, P.umber, { skip: '-y' });
   const hot = [P.coral, P.apricot, P.butter] as const;
@@ -54,7 +54,7 @@ export function forge(): THREE.BufferGeometry {
 
 /** A clay oven with an iron top, a pot on it and a pipe at the back. The fire in its mouth glows by day too. */
 export function stove(): THREE.BufferGeometry {
-  const s = new Shape(1249);
+  const s = new TownShape(1249);
   s.box(0, 0, 0, 1, 0.8, 0.72, P.clay, { bevel: 0.04, skip: '-y', grade: 0.25 });
   s.box(0, 0.8, 0, 1.04, 0.06, 0.76, P.slate);
   // The fire mouth, on the front.
@@ -75,7 +75,7 @@ export function stove(): THREE.BufferGeometry {
 
 /** Variants: closed, and open with gold in it. Its front faces +z. */
 export function chest(variant: number): THREE.BufferGeometry {
-  const s = new Shape(1277 + variant);
+  const s = new TownShape(1277 + variant);
   s.box(0, 0, 0, 0.9, 0.44, 0.56, P.plank, { bevel: 0.03, skip: '-y', top: variant === 1 ? P.umber : P.plank });
   for (const x of [-0.3, 0.3]) s.box(x, 0, 0, 0.08, 0.45, 0.59, P.slate, { skip: '-y' });
   s.box(0, 0.26, 0.285, 0.12, 0.14, 0.03, P.butter, { skip: '-z' });
@@ -95,7 +95,7 @@ export function chest(variant: number): THREE.BufferGeometry {
 
 /** One block wide and two long, with the pillow toward -z. Variants: a teal blanket, a red one. */
 export function bed(variant: number): THREE.BufferGeometry {
-  const s = new Shape(1301 + variant);
+  const s = new TownShape(1301 + variant);
   const blanket = variant === 0 ? [P.teal, P.tealLight] : [P.rust, P.coral];
   s.box(0, 0, 0, 1, 0.3, 1.96, P.plankDark, { skip: '-y' });
   s.box(0, 0.3, 0, 0.9, 0.16, 1.86, P.bone, { bevel: 0.04, skip: '-y' });

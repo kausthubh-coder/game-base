@@ -9,4 +9,4 @@ for(const n of names)fs.unlinkSync(new URL(n,dir));
 const code=await new Promise((done,reject)=>{const p=spawn('bun',['tools/models/build.mjs'],{stdio:'inherit'});p.on('error',reject);p.on('exit',done);});
 if(code)process.exit(code);
 for(const n of names)if(before[n]!==hash(n))throw Error(`${n} changed on rebuild`);
-console.log('PASS: deleted and rebuilt all six GLBs, byte-identical SHA256');
+console.log('PASS: deleted and rebuilt all GLBs, byte-identical SHA256');
