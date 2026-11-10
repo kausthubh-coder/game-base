@@ -1,7 +1,11 @@
 // Talking: the line `game.systems.talk.current()` holds, drawn in the dialogue box with the speaker's
 // portrait and name. A click, Space, Enter or E shows the whole line and then moves on. A number key or a
-// click picks a choice. Each letter that types out is a blip in the speaker's voice. This is the one
-// file that touches src/features/dialogue.
+// click picks a choice. This is the one file that touches src/features/dialogue.
+//
+// A voiced line (one with a clip in public/assets/voice, made by tools/voice.ts) plays its clip on the sound
+// engine's voice bus and types in time with it. Any other line, or a voiced one whose clip is not ready in
+// time, types at the speaker's speed and each letter is a blip in their voice. Showing the whole line, moving
+// on or picking a choice stops the clip, so one line never talks over the next.
 //
 // The talk system runs the conversation. The dialogue feature runs conversations of its own, so each
 // line is handed to it as a conversation of one line: when the box says that one is over, the talk
@@ -12,12 +16,18 @@ import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
 import { TALK_ADVANCE_CODES } from '../uiview/keys.ts';
 import { addStyle, frame } from '../uiview/theme.ts';
+import { createSpokenLines, type VoiceRecord } from '../uiview/spoken.ts';
 import { NARRATOR_SPEED, VOICES } from '../uiview/voices.ts';
+import type { Speech } from '../../features/audio/index.ts';
 
 /** The flag the box writes the picked choice to. */
 const PICKED = 'picked';
 /** Pixels between the box and whatever sits above it. */
 const BOX_GAP = 12;
+/** How long a voiced line waits for its clip before it types at its speed instead. */
+const CLIP_WAIT_MS = 800;
+/** Records kept in `window.__voice.log`. */
+const LOG_SIZE = 300;
 
 const STYLE = /* css */ `
 /* The box takes every click while it is open: a click anywhere moves the line on. */
@@ -78,6 +88,80 @@ export function install(view: GameView): void {
   /** The quick slot held when the conversation began. A number key picks a choice, not a slot, until it ends. */
   let slotBefore = 0;
 
+  // ---- the voiced lines
+  const spoken = createSpokenLines(new URL('assets/', document.baseURI).href);
+  /** The clip speaking now. */
+  let speech: Speech | null = null;
+  /** What happened to the voiced line showing now. */
+  let record: VoiceRecord | null = null;
+  /** Counts up for every line shown and every skip, so a clip that loads too late for its line is dropped. */
+  let turn = 0;
+  const log: VoiceRecord[] = [];
+  window.__voice = { log, elapsed: () => (speech && !speech.ended ? speech.elapsed() : null) };
+
+  /** Stops the clip speaking now, if any, and drops one still loading. */
+  function hush(): void {
+    turn++;
+    if (record?.status === 'loading') record.status = 'stopped';
+    if (speech && !speech.ended) {
+      speech.stop();
+      if (record?.status === 'playing') record.status = 'stopped';
+    }
+    speech = null;
+  }
+
+  /** Plays the line's clip and types the box in time with it. A line with no clip is left to type and blip. */
+  function voice(line: TalkLine): void {
+    const found = line.npc ? spoken.clip(line.npc, line.text) : null;
+    // A clip made for other words (an old list) would type the wrong letters, so it is not played.
+    const clip = found && found.reveal.length === line.text.length ? found : null;
+    record = null;
+    if (!clip) return;
+    const entry: VoiceRecord = { key: `${line.npc}|${line.text}`, file: clip.file, status: 'loading', seconds: clip.seconds, lastLetter: (clip.reveal.at(-1) ?? 0) / 1000 };
+    record = entry;
+    if (log.push(entry) > LOG_SIZE) log.shift();
+    const audio = view.audio;
+    if (!audio) {
+      entry.status = 'silent';
+      return;
+    }
+    const mine = turn;
+    // Nothing types until the clip starts: below 0 the box waits.
+    box.follow(clip.reveal, () => (speech ? speech.elapsed() : -1));
+    const late = setTimeout(() => {
+      if (mine !== turn || speech) return;
+      turn++;
+      entry.status = audio.live ? 'late' : 'silent';
+      box.follow(null);
+    }, CLIP_WAIT_MS);
+    /** Starts the clip once the engine's clock runs: the key that opened the talk may have only just started it. */
+    const begin = (buffer: AudioBuffer): void => {
+      if (mine !== turn) return;
+      if (!audio.live) {
+        setTimeout(() => begin(buffer), 30);
+        return;
+      }
+      clearTimeout(late);
+      speech = audio.speak(buffer);
+      if (speech) entry.status = 'playing';
+      else {
+        entry.status = 'silent';
+        box.follow(null);
+      }
+    };
+    void spoken.decoded(clip, audio, (status) => { entry.http = status; }).then((buffer) => {
+      if (buffer) entry.decoded = buffer.duration;
+      if (mine !== turn) return;
+      if (!buffer) {
+        clearTimeout(late);
+        entry.status = 'failed';
+        box.follow(null);
+        return;
+      }
+      begin(buffer);
+    });
+  }
+
   const flags: Flags = {};
   const box = createDialogue(view.ctx, {
     parent: root,
@@ -92,6 +176,7 @@ export function install(view: GameView): void {
       const spec = VOICES[voice];
       if (spec) view.audio?.emit({ type: 'talk', voice: spec, char: letter });
     },
+    onSkip: hush,
     onEnd() {
       if (closing) return;
       const line = shown;
@@ -129,7 +214,9 @@ export function install(view: GameView): void {
       },
     };
     box.element.classList.toggle('is-narrator', line.name === '');
+    hush();
     box.start(conversation);
+    voice(line);
   }
 
   let wasOpen = false;
@@ -141,6 +228,7 @@ export function install(view: GameView): void {
       if (line) {
         present(line);
       } else if (box.isOpen) {
+        hush();
         closing = true;
         box.close();
         closing = false;
@@ -157,7 +245,8 @@ export function install(view: GameView): void {
     if (box.isOpen && !opening) box.advance();
   }
 
-  game.events.on('talk.started', () => {
+  game.events.on('talk.started', (e) => {
+    spoken.prepare(e.conversation);
     slotBefore = sys.inventory?.selected ?? 0;
     opening = true;
     setTimeout(() => { opening = false; }, 0);
@@ -189,5 +278,9 @@ export function install(view: GameView): void {
     // A load, or anything else that ends a conversation without the event, is caught here.
     sync();
     box.update(dt, view.ctx);
+    if (speech && record) {
+      if (record.typedAt === undefined && !box.typing && record.status === 'playing') record.typedAt = speech.elapsed();
+      if (speech.ended && record.status === 'playing') record.status = 'ended';
+    }
   });
 }

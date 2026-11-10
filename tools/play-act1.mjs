@@ -10,6 +10,11 @@
 //
 // One line per step with the game clock. A screenshot after each quest in .artifacts/play/act1/, and with
 // --shots one after every step. It fails on a console error or a failed check, and writes act1.json there.
+//
+// Voiced lines: every clip the game asks for must answer 200, and every voiced line shown must have its clip.
+// In four conversations (Tamsin's first and last, Maren's first, Gus's first) it waits instead of pressing:
+// each voiced line must decode to the length the list gives, play to its end, and type its last letter
+// within a frame or so of the moment the clip says it (this Mac draws about a frame a second).
 // This Mac draws WebGL in software, so it checks what the game does and draws, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -50,6 +55,10 @@ console.log(`serving ${dist} on ${BASE}  pid ${serverPid}`);
 const errors = [];
 const log = [];
 const notes = [];
+/** Every voiced line the game showed, as `window.__voice.log` recorded it, plus the waits' mid-line samples. */
+const voiced = [];
+/** The status of every clip file the game fetched. */
+const clipFiles = new Map();
 const started = Date.now();
 let failed = null;
 let page, browser;
@@ -345,13 +354,42 @@ const dialogue = () => game(() => {
   };
 });
 
-/** Presses Enter through the open conversation and clicks the first choice when one shows. Returns the lines. */
-async function talkThrough() {
+/** The voiced line showing now: its record's status, or null when the line has no clip. */
+const voicedNow = () => game(() => {
+  const line = window.__game.view.game.systems.talk.current();
+  const record = window.__voice?.log.at(-1);
+  if (!line || !record || record.key !== `${line.npc}|${line.text}`) return null;
+  return { key: record.key, status: record.status };
+});
+
+/** Waits through a voiced line instead of pressing: samples the typing once mid-line, then waits for the clip's end. */
+async function hear() {
+  const now = await voicedNow();
+  if (!now || now.status === 'ended') return;
+  await page.waitForFunction(() => window.__voice.log.at(-1)?.status !== 'loading', null, { timeout: 15000, polling: 50 });
+  await page.waitForTimeout(700);
+  const sample = await game(() => ({ elapsed: window.__voice.elapsed(), typed: document.querySelector('.gb-dialogue-typed')?.textContent?.length ?? 0 }));
+  await page.waitForFunction((key) => { const r = window.__voice.log.at(-1); return !r || r.key !== key || r.status !== 'playing'; }, now.key, { timeout: 30000, polling: 100 });
+  // The frame after the clip's end has typed the rest.
+  await frames(2);
+  samples.set(now.key, sample);
+}
+const samples = new Map();
+
+/** Copies the voiced lines recorded so far out of the page, before a reload clears them. */
+async function keepVoiced() {
+  const records = await game(() => { const v = window.__voice; return v ? v.log.splice(0) : []; });
+  for (const r of records) voiced.push({ ...r, sample: samples.get(r.key) ?? null });
+}
+
+/** Presses Enter through the open conversation and clicks the first choice when one shows. Returns the lines. With `listen` it waits through each voiced line first. */
+async function talkThrough(listen = false) {
   const lines = [];
   for (let presses = 0; presses < 120; presses++) {
     const now = await dialogue();
     if (!now.open && now.line === null) return lines;
     if (now.line && lines.at(-1) !== now.line) lines.push(now.line);
+    if (listen) await hear();
     if (now.choices.length > 0) {
       await page.waitForTimeout(260);
       await page.click('.gb-dialogue-choices:not([hidden]) button');
@@ -365,7 +403,7 @@ async function talkThrough() {
 }
 
 /** Walks up to someone until the prompt names them, presses the real E and talks it through. */
-async function talkTo(id, attempt = 0) {
+async function talkTo(id, attempt = 0, listen = false) {
   for (const within of [1.7, 1.2, 0.8, 0.4]) {
     const npc = await p.npc(id);
     must(npc, `nobody is called ${id}`);
@@ -380,8 +418,9 @@ async function talkTo(id, attempt = 0) {
   await page.keyboard.press('KeyE');
   await page.waitForFunction(() => { const e = document.querySelector('.gb-dialogue'); return e && !e.hidden; }, null, { timeout: 30000 });
   const speaker=(await state()).talk?.npc;
-  const lines = await talkThrough();
-  if(speaker!==id){must(attempt<3,`wanted ${id}, spoke to ${speaker}`);note(`approaching ${id} again after ${speaker} crossed the prompt`);return talkTo(id,attempt+1);}
+  const lines = await talkThrough(listen);
+  await keepVoiced();
+  if(speaker!==id){must(attempt<3,`wanted ${id}, spoke to ${speaker}`);note(`approaching ${id} again after ${speaker} crossed the prompt`);return talkTo(id,attempt+1,listen);}
   const after = await state();
   // The last talk of the act opens the end card, which holds the player until Keep playing.
   must((!after.player.busy || after.flags['act1.ended'] === true) && after.talk === null, `the conversation with ${id} left the player busy`);
@@ -390,6 +429,42 @@ async function talkTo(id, attempt = 0) {
 }
 
 const until = (code, seconds, every) => p.until(code, seconds, every);
+
+/** The voiced lines over the whole play: every clip answered 200, and each line waited through played in time. */
+async function checkVoice() {
+  const list = await (await fetch(`http://127.0.0.1:${PORT}/assets/voice/voice.json`)).json();
+  must(clipFiles.size > 0, 'the game asked for no voice clip');
+  const bad = [...clipFiles].filter(([, status]) => status !== 200);
+  must(bad.length === 0, `clips that did not answer 200: ${bad.map(([f, s]) => `${f} ${s}`).join(', ')}`);
+  must(voiced.length > 0, 'no voiced line was shown');
+  const failed = voiced.filter((r) => r.status === 'failed' || r.status === 'silent');
+  must(failed.length === 0, `voiced lines that did not play: ${failed.map((r) => `${r.key} (${r.status})`).join('; ')}`);
+  const heard = voiced.filter((r) => r.sample);
+  must(heard.length >= 15, `only ${heard.length} voiced lines were waited through`);
+  const late = [];
+  for (const r of heard) {
+    const where = `"${r.key}"`;
+    must(r.status === 'ended', `${where} did not play to its end (${r.status})`);
+    must(r.http === 200, `${where}: its clip answered ${r.http}`);
+    must(Math.abs(r.decoded - r.seconds) <= 0.1, `${where} decoded to ${r.decoded} s, the list says ${r.seconds} s`);
+    must(r.lastLetter <= r.seconds && r.seconds - r.lastLetter <= 1.2, `${where}: the last letter is due at ${r.lastLetter} s of ${r.seconds} s`);
+    must(r.typedAt !== undefined, `${where} never finished typing by itself`);
+    // Typing follows the clip, never ahead of it. It may trail by a frame: about a second on this Mac.
+    must(r.typedAt >= r.lastLetter - 0.05 && r.typedAt - r.lastLetter <= 1.6, `${where} finished typing at ${r.typedAt.toFixed(2)} s, its last letter is due at ${r.lastLetter} s`);
+    late.push(r.typedAt - r.lastLetter);
+    const { elapsed, typed } = r.sample;
+    if (elapsed !== null) {
+      const reveal = list.lines[r.key].reveal;
+      const due = (t) => reveal.filter((ms) => ms <= t * 1000).length;
+      must(typed <= due(elapsed + 0.05) && typed >= due(elapsed - 1.6), `${where} had typed ${typed} letters at ${elapsed.toFixed(2)} s, the clip had said ${due(elapsed)}`);
+    }
+  }
+  const skipped = voiced.filter((r) => r.status === 'stopped').length;
+  const slow = voiced.filter((r) => r.status === 'late').length;
+  late.sort((a, b) => a - b);
+  return `${voiced.length} voiced lines shown, ${clipFiles.size} clips fetched (all 200); ${heard.length} played to the end, each decoded to its listed length and typed its last letter ` +
+    `${late[0].toFixed(2)} to ${late.at(-1).toFixed(2)} s (median ${late[Math.floor(late.length / 2)].toFixed(2)}) after the clip said it; ${skipped} skipped with Enter; ${slow} too slow to load (typed instead)`;
+}
 
 // ------------------------------------------------------------------------------------- the play
 
@@ -491,7 +566,7 @@ const QUESTS = {
     });
     await step('plot', 'meet Tamsin at the grant stone with E', async () => {
       await expectStep('plot.meet');
-      const lines = await talkTo('tamsin');
+      const lines = await talkTo('tamsin', 0, true);
       must(lines[0] === 'Twelve people have asked me for this plot.', `her first line is "${lines[0]}"`);
       must((await p.flag('has.almanac')) === true && (await p.count('axe')) === 1, 'no Almanac and axe');
       must(await game(() => !document.querySelector('.ui-bookbtn').hidden), 'the Almanac button is not on the HUD after Tamsin gave the book');
@@ -680,12 +755,12 @@ const QUESTS = {
     await step('bread', 'meet Queen Maren in the granary', async () => {
       if ((await p.openStep()) === 'bread.town') await walkToTown();
       await expectStep('bread.queen');
-      await talkTo('maren');
+      await talkTo('maren', 0, true);
       must((await p.flag('bread.asked')) === true, 'Maren did not ask for the wheat');
       await expectStep('bread.seeds');
     });
     await step('bread', 'get the hoe, the can and 12 seeds from Gus', async () => {
-      await talkTo('gus');
+      await talkTo('gus', 0, true);
       must((await p.count('hoe')) === 1 && (await p.count('watering_can')) === 1 && (await p.count('wheat_seeds')) >= 12, 'Gus did not give the tools and seeds');
       await expectStep('bread.grow');
     });
@@ -799,7 +874,7 @@ const QUESTS = {
     await step('festival', 'talk to Tamsin on the bank, and the end card shows', async () => {
       const bank = await p.place('river.bank');
       await until(`(() => { const t = sys.people.get('tamsin'); return Math.hypot(t.pos.x - ${bank.x}, t.pos.z - ${bank.z}) < 6; })()`, 120, 1);
-      const lines = await talkTo('tamsin');
+      const lines = await talkTo('tamsin', 0, true);
       must(lines.at(-1) === 'Go on. Float your lamp.', `her last line is "${lines.at(-1)}"`);
       await page.waitForSelector('.gu-stage-end:not([hidden])', { timeout: 30000 });
       await shot('42-end-card.png');
@@ -826,7 +901,9 @@ try {
   page.setDefaultTimeout(180000);
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
+  page.on('response', (r) => { const m = /\/assets\/(voice\/.+\.mp3)$/.exec(r.url()); if (m) clipFiles.set(m[1], r.status()); });
   for (const quest of ['plot', 'roof', 'leaftail', 'bread', 'festival']) await QUESTS[quest]();
+  await step('voice', 'voiced lines fetched their clips and typed in time with them', checkVoice);
   const end = await state();
   must(Object.keys(end.failed).length === 0 && end.viewErrors.length === 0, `failed: ${JSON.stringify(end.failed)} ${end.viewErrors.join('; ')}`);
   log.push({ end: { stats: end.stats, clock: end.clock, counters: await game(() => window.__game.counters()) } });
@@ -837,7 +914,7 @@ try {
   process.kill(serverPid);
 }
 
-writeFileSync(resolve(out, 'act1.json'), JSON.stringify({ log, notes, errors, turns, seconds: (Date.now() - started) / 1000 }, null, 2));
+writeFileSync(resolve(out, 'act1.json'), JSON.stringify({ log, notes, errors, turns, voiced, clips: Object.fromEntries(clipFiles), seconds: (Date.now() - started) / 1000 }, null, 2));
 if (errors.length) console.log(`FAIL console errors:\n  ${errors.join('\n  ')}`);
 if (failed && !log.some((l) => l.ok === false)) console.log(`FAIL ${failed.stack ?? failed}`);
 const pass = !failed && errors.length === 0;

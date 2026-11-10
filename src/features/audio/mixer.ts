@@ -1,8 +1,11 @@
 // The mix: four buses (music, ambience, effects, voice), a hall for space, a small room for indoors, and a
-// limiter on the way out. Dialogue ducks the music. Everything here lives as long as the engine does.
+// limiter on the way out. Dialogue, blips or a spoken clip, ducks the music and a little of the ambience. Everything here lives as long as the engine does.
 import type { BusId, Rig } from './rig.ts';
 
 export type BusName = BusId | 'master';
+
+/** The ambience's level while someone talks (the music goes to 0.55). */
+const AMBIENCE_DUCK = 0.75;
 
 /** A noise burst that dies away: the sound of a space. Later reflections are darker, as in a real room. */
 function impulse(rig: Rig, seconds: number, decay: number, dark: number): AudioBuffer {
@@ -177,9 +180,14 @@ export class Mixer {
     return this.volumes[bus];
   }
 
-  /** Someone is talking: the music steps back until half a second after the last word. */
+  /** Someone is talking: the music steps back, and the ambience a little, until half a second after the last word. */
   speak(until: number): void {
     if (until > this.duckUntil) this.duckUntil = until;
+  }
+
+  /** The talking stopped early (a voiced line was skipped): the duck lets go at `until` at the latest. */
+  hush(until: number): void {
+    if (until < this.duckUntil) this.duckUntil = until;
   }
 
   get ducking(): number {
@@ -201,8 +209,10 @@ export class Mixer {
     g.musicSend.to(v.music * this.duck, now, 0.1);
     g.musicRoom.to(indoors * 0.5 * v.music, now, 0.25);
     g.ambTone.to(16000 * 0.05 ** indoors * (1 - 0.45 * fog), now, 0.25);
-    g.ambVol.to(v.ambience * (1 - 0.45 * indoors), now, 0.2);
-    g.ambSend.to(v.ambience * (1 - 0.6 * indoors), now, 0.2);
+    // Under speech the ambience steps back too, less than the music: birds and rain stay, a little lower.
+    const ambDuck = this.duck < 1 ? AMBIENCE_DUCK : 1;
+    g.ambVol.to(v.ambience * (1 - 0.45 * indoors) * ambDuck, now, this.duck < 1 ? 0.12 : 0.4);
+    g.ambSend.to(v.ambience * (1 - 0.6 * indoors) * ambDuck, now, this.duck < 1 ? 0.12 : 0.4);
     g.fxVol.to(v.effects, now, 0.05);
     g.fxSend.to(v.effects * (1 - 0.7 * indoors), now, 0.2);
     g.fxRoom.to(indoors * 0.6 * v.effects, now, 0.2);
