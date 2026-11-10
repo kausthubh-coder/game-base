@@ -133,7 +133,9 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
   group.name = 'world';
   ctx.scene.add(group);
 
-  const worker = new Worker(new URL('./mesher.worker.ts', import.meta.url), { type: 'module' });
+  // The worker cannot read the page's address, so it gets the query as its name: the region plan reads
+  // `?town=` from it (src/game/content/town/pick.ts).
+  const worker = new Worker(new URL('./mesher.worker.ts', import.meta.url), { type: 'module', name: location.search });
   const post = (message: WorkerRequest, transfer: Transferable[] = []): void => worker.postMessage(message, transfer);
   post({ type: 'tiles', tiles: textures.table });
 

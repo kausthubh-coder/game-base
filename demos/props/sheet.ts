@@ -5,8 +5,8 @@ import * as THREE from 'three';
 import { PROPS, PROP_KINDS, propDef, type PropGroup, type PropKind } from '../../src/content/props.ts';
 import { buildProp, propExtras } from '../../src/features/props/index.ts';
 
-export const GROUPS: PropGroup[] = ['tree', 'plant', 'ground', 'town', 'clutter', 'station'];
-export const GROUP_NAMES: Record<PropGroup, string> = { tree: 'Trees', plant: 'Small plants', ground: 'Ground', town: 'Town', clutter: 'Clutter', station: 'Stations' };
+export const GROUPS: PropGroup[] = ['tree', 'plant', 'ground', 'town', 'clutter', 'station', 'landmark'];
+export const GROUP_NAMES: Record<PropGroup, string> = { tree: 'Trees', plant: 'Small plants', ground: 'Ground', town: 'Town', clutter: 'Clutter', station: 'Stations', landmark: 'Landmarks' };
 
 /** The camera looks down at this angle on both pages, as the game's does. */
 export const PITCH = (35 * Math.PI) / 180;

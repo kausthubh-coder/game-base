@@ -194,6 +194,55 @@ const barn = house({
   ],
 });
 
-export const BLUEPRINTS = { cottage, shop, barn } as const satisfies Record<string, Blueprint>;
+/**
+ * The Queen's Granary, the seat of Hollowmere: a hall two storeys high under a teal roof, with sacks of the
+ * harvest inside and a bell tower at the back. Lamps burn in the open belfry all night and the realm's
+ * banner flies over it, so the hall shows from the meadow by day and by dark.
+ */
+const hall: Blueprint = (() => {
+  const base = house({
+    name: 'Granary hall',
+    wide: 14, deep: 9, wallHigh: 6,
+    floor: 'oak_plank', base: 'stone_brick', wall: 'plaster', post: 'oak_log', roof: 'shingle',
+    ridge: 'x', roofRise: 4,
+    door: { at: 7, wide: 2, high: 3, variant: 2 },
+    windows: [
+      { side: 'south', at: 3, variant: 2 }, { side: 'south', at: 5, variant: 2 }, { side: 'south', at: 10, variant: 2 }, { side: 'south', at: 12, variant: 2 },
+      { side: 'south', at: 3, y: 5, variant: 1 }, { side: 'south', at: 5, y: 5, variant: 1 }, { side: 'south', at: 10, y: 5, variant: 1 }, { side: 'south', at: 12, y: 5, variant: 1 },
+      { side: 'east', at: 6, variant: 1 }, { side: 'west', at: 6, variant: 1 }, { side: 'east', at: 6, y: 5, variant: 0 }, { side: 'west', at: 6, y: 5, variant: 0 },
+    ],
+    props: [
+      prop('sack', 1, 2.8, 1, 2.8), prop('sack', 1, 2.7, 1, 4.6), prop('sack', 0, 3.9, 1, 2.5),
+      prop('sack', 1, 12.2, 1, 2.8), prop('sack', 1, 12.3, 1, 4.7), prop('sack', 0, 11.1, 1, 2.6),
+      prop('crate', 1, 2.7, 1, 7.6, QUARTER), prop('crate', 1, 12.3, 1, 7.6, QUARTER),
+      prop('barrel', 0, 4.4, 1, 8.4), prop('barrel', 1, 10.6, 1, 8.4),
+      prop('bench', 0, 6.5, 1, 6.2), prop('bench', 0, 9.5, 1, 6.2),
+      prop('chest', 0, 11.6, 1, 5.6, -QUARTER),
+    ],
+  });
+  const blocks = [...base.blocks];
+  const put = (x: number, y: number, z: number, block: string) => blocks.push({ x, y, z, block });
+  // The tower, four blocks square against the back wall: stone up through the roof, then an open belfry.
+  for (let y = 1; y <= 14; y++) {
+    for (let x = 6; x <= 9; x++) {
+      for (let z = 1; z <= 4; z++) {
+        const edge = x === 6 || x === 9 || z === 1 || z === 4, corner = (x === 6 || x === 9) && (z === 1 || z === 4);
+        if (y <= 10) put(x, y, z, 'stone_brick');
+        else if (corner) put(x, y, z, 'oak_log');
+        else if (!edge) put(x, y, z, y === 11 ? 'stone_brick' : 'air');
+        else put(x, y, z, y === 11 || y === 14 ? 'plaster' : 'air');
+      }
+    }
+  }
+  put(7, 12, 2, 'lamp');
+  put(8, 12, 3, 'lamp');
+  // The spire: three steps of teal.
+  for (let x = 5; x <= 10; x++) for (let z = 0; z <= 5; z++) put(x, 15, z, 'shingle');
+  for (let x = 6; x <= 9; x++) for (let z = 1; z <= 4; z++) put(x, 16, z, 'shingle');
+  for (let x = 7; x <= 8; x++) for (let z = 2; z <= 3; z++) put(x, 17, z, 'shingle');
+  return { ...base, size: { ...base.size, y: 23 }, blocks, props: [...base.props, prop('banner', 0, 8, 18, 3, QUARTER)] };
+})();
+
+export const BLUEPRINTS = { cottage, shop, barn, hall } as const satisfies Record<string, Blueprint>;
 
 export type BlueprintName = keyof typeof BLUEPRINTS;

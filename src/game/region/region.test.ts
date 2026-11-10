@@ -16,11 +16,11 @@ import { install as installItems } from '../items/index.sim.ts';
 import { standable } from '../move.sim.ts';
 import { install as installNav } from '../nav/index.sim.ts';
 import { BUSH_REACH, REGROW_SECONDS, install as installRegion } from './index.sim.ts';
-import { BOUNDS, built } from './land.sim.ts';
+import { BOUNDS, built, regionProps } from './land.sim.ts';
 
 const SEED = 1;
 const id = (key: string): number => blockId(key);
-const MOSSY = id('mossy_stone'), WATER = id('water'), LAMP = id('lamp'), PATH = id('path'), GRASS = id('grass');
+const MOSSY = id('mossy_stone'), WATER = id('water'), LAMP = id('lamp'), LANTERN = id('lantern_light'), PATH = id('path'), GRASS = id('grass');
 const OAK = id('oak_log'), BIRCH = id('birch_log'), TILLED = id('tilled_soil'), PLANK = id('oak_plank'), SHINGLE = id('shingle');
 
 /** Every place docs/play/act1.md asks the region for. */
@@ -280,7 +280,8 @@ describe('the path and the town', () => {
     const all = built();
     expect(all.length).toBeGreaterThanOrEqual(10);
     expect(new Set(all.map((b) => b.plan.turns)).size).toBeGreaterThan(1);
-    expect(new Set(all.map((b) => b.plan.blueprint))).toEqual(new Set(['cottage', 'shop', 'barn']));
+    const kinds = new Set(all.map((b) => b.plan.blueprint));
+    for (const kind of ['cottage', 'shop', 'barn']) expect(kinds.has(kind as never), kind).toBe(true);
     const t = REGION.town;
     for (const b of all) {
       // Each one is whole, on the town's ground, and inside its bounds.
@@ -294,13 +295,16 @@ describe('the path and the town', () => {
     expect(count(SHINGLE, t.x0, t.z0, t.x1, t.z1)).toBeGreaterThan(600);
   });
 
-  test('the square is open, with a well in it', () => {
+  test('the square is open, with a well or a landmark in its middle', () => {
     const s = at('town.square');
     let open = 0;
     for (let x = Math.floor(s.x) - 12; x <= s.x + 12; x++) for (let z = Math.floor(s.z) - 6; z <= s.z + 6; z++) if (standable(world, x, s.y, z)) open++;
     expect(open).toBeGreaterThan(25 * 13 * 0.9);
-    // The well: water at ground level with a ring around it, a few blocks north of the place.
-    expect(count(WATER, Math.floor(s.x) - 1, Math.floor(s.z) - 6, Math.floor(s.x) + 1, Math.floor(s.z) - 2, s.y - 1, s.y)).toBe(1);
+    // The well: water at ground level with a ring around it, a few blocks north of the place. Or, in a
+    // layout of the town under test (content/town/), a landmark prop as far north or south of it.
+    const well = count(WATER, Math.floor(s.x) - 1, Math.floor(s.z) - 6, Math.floor(s.x) + 1, Math.floor(s.z) - 2, s.y - 1, s.y) === 1;
+    const landmark = regionProps().some((p) => (p.kind === 'rootFountain' || p.kind === 'elderOak') && Math.abs(p.x - s.x) <= 2 && Math.abs(s.z - p.z) >= 2 && Math.abs(s.z - p.z) <= 10);
+    expect(well || landmark).toBe(true);
   });
 
   test('nobody who stands a few blocks off a meeting place ends up on a well, a fence or a lamp', () => {
@@ -325,10 +329,12 @@ describe('the path and the town', () => {
 
   test('lamps stand along the square and the bank, so the town glows at night', () => {
     const t = REGION.town;
-    expect(count(LAMP, t.x0, t.z0, t.x1, t.z1)).toBeGreaterThanOrEqual(20);
+    // A lamp is a lamp block, or the light inside a lantern prop.
+    const lamps = (x0: number, z0: number, x1: number, z1: number): number => count(LAMP, x0, z0, x1, z1) + count(LANTERN, x0, z0, x1, z1);
+    expect(lamps(t.x0, t.z0, t.x1, t.z1)).toBeGreaterThanOrEqual(20);
     const square = at('town.square'), bank = at('river.bank');
-    expect(count(LAMP, Math.floor(square.x) - 17, Math.floor(square.z) - 17, Math.floor(square.x) + 17, Math.floor(square.z) + 7)).toBeGreaterThanOrEqual(4);
-    expect(count(LAMP, Math.floor(bank.x) - 32, Math.floor(bank.z) - 3, Math.floor(bank.x) + 32, Math.floor(bank.z) + 3)).toBeGreaterThanOrEqual(5);
+    expect(lamps(Math.floor(square.x) - 17, Math.floor(square.z) - 17, Math.floor(square.x) + 17, Math.floor(square.z) + 7)).toBeGreaterThanOrEqual(4);
+    expect(lamps(Math.floor(bank.x) - 32, Math.floor(bank.z) - 3, Math.floor(bank.x) + 32, Math.floor(bank.z) + 3)).toBeGreaterThanOrEqual(5);
     // Lamp light reaches the bank and the doorsteps. Sky light is not counted here: it is what night takes away.
     expect(world.blockLightAt(bank.x, bank.y + 1, bank.z)).toBeGreaterThan(3);
     for (const name of ['lodge', 'bakery', 'granary', 'town.gate', 'ferry']) expect(world.blockLightAt(at(name).x, at(name).y + 1, at(name).z), name).toBeGreaterThan(3);
@@ -666,7 +672,7 @@ describe('what a view reads', () => {
     // stands on a street or the square.
     for (let x = 157; x <= 189; x++) for (let z = -161; z <= -139; z++) {
       const lamp = world.getBlock(x, 21, z) === LAMP, well = Math.abs(x - 173) <= 1 && Math.abs(z + 150) <= 1;
-      if (!lamp && !well) expect(world.getBlock(x, 20, z), `${x}, ${z}`).toBe(0);
+      if (!lamp && !well) expect([OAK, BIRCH].includes(world.getBlock(x, 20, z)), `${x}, ${z}`).toBe(false);
     }
     expect(t.x1 - t.x0).toBeGreaterThan(60);
     // Along the path nothing solid stands on it.

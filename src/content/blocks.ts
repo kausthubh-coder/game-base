@@ -66,6 +66,9 @@ const rows: Row[] = [
   // Fills the cells of a placed station, so a body and a click stop at it. It has no tiles, so the mesher draws
   // nothing for it, and light passes through. The station's prop is what the player sees.
   ['barrier', 'Barrier', 'wood', all(''), 0x9a6b3e, { opaque: false }],
+  // The light inside a lantern prop, so the ground around a lantern is lit like the ground around a lamp. It has
+  // no tiles and no body: the mesher skips it, the hero walks through it, and the prop is what the player sees.
+  ['lantern_light', 'Lantern light', 'wood', all(''), 0xffd890, { solid: false, opaque: false, light: 14 }],
 ];
 
 export const BLOCKS: readonly BlockDef[] = rows.map(([key, name, surface, tiles, color, extra], id) => ({
