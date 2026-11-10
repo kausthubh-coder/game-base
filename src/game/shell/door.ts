@@ -111,7 +111,7 @@ export function createDoor(shell: Shell): DebugDoor {
       mode: view.settings.camera, quarter: c.quarter, zoom: c.zoom,
       yaw: round(c.yaw * DEG), pitch: round(c.pitch * DEG), distance: round(c.distance), reach: round(c.reach),
       at: { x: round(at.x), y: round(at.y), z: round(at.z) },
-      mouse: view.keys.mouse, locked: view.keys.locked, dragging: view.keys.dragging,
+      mouse: view.keys.mouse, locked: view.keys.locked, dragging: view.keys.dragging, tiltTurn: view.settings.tiltTurn,
     };
   }
 

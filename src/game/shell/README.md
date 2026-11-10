@@ -73,7 +73,7 @@ A new game while a game is running reloads the page, because systems keep their 
 | Shift | Walk at 2 blocks a second |
 | Space | Jump |
 | V | The next camera: 2.5D, free, first person |
-| Right button, dragged | Turn the camera, as in Roblox: the 2.5D camera smoothly along the ground, keeping its pitch and zoom; the free camera all ways (Drag to turn). The cursor hides during the drag |
+| Right button, dragged | Turn the camera, as in Roblox: the 2.5D camera smoothly along the ground, keeping its pitch and zoom, and with 2.5D turning on Quarter turns (the default) it glides to the nearest quarter when let go; the free camera all ways (Drag to turn). The cursor hides during the drag |
 | Q, R | Turn the 2.5D camera to the next quarter that way. Between two quarters, the nearer one |
 | Mouse | First person, and the free camera with Lock to turn: look around, once a click in the world has taken the mouse |
 | Alt, Esc | Give the cursor back, when it is locked |
@@ -86,7 +86,7 @@ A new game while a game is running reloads the page, because systems keep their 
 
 The mouse works one of three ways (`MouseMode` in `keys.ts`). In 2.5D (`point`) and in the free camera with Drag to turn (`drag`, the default) the cursor stays free and the buttons act on the block under it; a right click acts on the block it went down on. In first person and with Lock to turn (`lock`) they act on the block under the crosshair, in the middle of the screen. Either way reach is measured from the hero's eyes. The click that takes the mouse acts on nothing, and anything that holds the player (a panel, the map, a conversation, the title) gives the cursor back and ends a drag.
 
-The Mouse setting (`view.settings.mouse`, `drag` or `lock`, `?mouse=lock` for one visit) picks how the free camera turns. First person always locks. The `move` hint is worded for the mouse in use when it is sent: see `mouse` in `src/game/content/hints.ts`.
+The Mouse setting (`view.settings.mouse`, `drag` or `lock`, `?mouse=lock` for one visit) picks how the free camera turns. First person always locks. The 2.5D turning setting (`view.settings.tiltTurn`, `quarter` or `smooth`, `?turn=smooth` for one visit) picks where the 2.5D camera rests after a drag: Quarter turns because halfway between two quarters the camera looks straight along the grid and the blocks lose their 3D corners. The `move` hint is worded for the mouse in use when it is sent: see `mouse` in `src/game/content/hints.ts`.
 
 The drag does not lock the pointer. Chrome shows its "Press Esc to show your cursor" notice each time a page locks the mouse, and a drag happens too often for that, so the cursor is hidden and the pointer captured instead. When the drag ends, the cursor shows again where the hand left it.
 
@@ -113,7 +113,7 @@ The calls in `docs/play/act1.md`, and a few more for tests:
 | `newGame()`, `continueGame()`, `save()`, `hasSave()`, `started` | The game's life |
 | `setTime(t)`, `turn(1)`, `block(x, y, z)` | The clock, the camera, a block's id and key |
 | `setCamera(mode)` | `tilt` (2.5D), `free` or `first`, as the View setting and V pick it |
-| `state().camera` | The mode, quarter, zoom, yaw, pitch and distance, and the mouse: `mouse` (`point`, `drag` or `lock`), `locked`, `dragging` |
+| `state().camera` | The mode, quarter, zoom, yaw, pitch and distance, and the mouse: `mouse` (`point`, `drag` or `lock`), `locked`, `dragging`, `tiltTurn` |
 | `look(yaw, pitch, distance?)` | Free and first person: the view in degrees. Yaw 0 looks north and 90 west, pitch is how far it looks down. `distance` is the free camera's |
 | `aimAt(x, y, z)` | Free and first person: turns the view so the middle of the screen falls on that point |
 | `frames(n)`, `settle()` | Promises: n frames drawn, the land in view loaded and drawn |

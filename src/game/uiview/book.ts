@@ -106,6 +106,8 @@ function createBook(view: GameView): Book {
       setCamera: (mode) => view.settings.setCamera(mode),
       mouse: () => view.settings.mouse,
       setMouse: (style) => view.settings.setMouse(style),
+      tiltTurn: () => view.settings.tiltTurn,
+      setTiltTurn: (turn) => view.settings.setTiltTurn(turn),
       characters: () => view.settings.characters,
       setCharacters: (look) => view.settings.setCharacters(look),
     },

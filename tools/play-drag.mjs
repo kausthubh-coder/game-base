@@ -1,7 +1,8 @@
 // The right-button drag in the browser: builds the game, serves it, starts a new game from the title and, with
 // the real mouse, drags the 2.5D camera and the free camera around with the right button held, checks each turn
 // placed nothing, and checks a right click (and one with a little jitter) still sets a plank down.
-// Then the Mouse setting: Lock to turn takes the mouse on a click, as Genshin does, and Drag to turn gives it back.
+// The 2.5D camera glides to the nearest quarter when let go, and on Smooth stays where it was let go. Then the Mouse
+// setting: Lock to turn takes the mouse on a click, as Genshin does, and Drag to turn gives it back.
 //   bun tools/play-drag.mjs [--port 5391] [--dist dist-drag] [--no-build] [--shots <folder>]
 // With --shots it writes before, mid-drag and after frames at the spawn and the town square, the 2.5D view at a
 // quarter turn and between two, and the Settings rows, at 1440 by 900. This Mac draws WebGL in software, so it
@@ -128,10 +129,11 @@ try {
     await page.mouse.down({ button: 'right' });
     for (let i = 1; i <= steps; i++) await page.mouse.move(from.x + (dx * i) / steps, from.y + (dy * i) / steps);
     await frames(2);
-    const during = await game(() => ({ dragging: window.__game.state().camera.dragging, cursor: window.__game.view.canvas.style.cursor, aim: window.__game.state().aim }));
+    const during = await game(() => { const s = window.__game.state(); return { dragging: s.camera.dragging, cursor: window.__game.view.canvas.style.cursor, aim: s.aim, yaw: s.camera.yaw, pitch: s.camera.pitch }; });
     if (mid) await mid();
     await page.mouse.up({ button: 'right' });
-    await frames(2);
+    // Long enough for a 2.5D camera on Quarter turns to glide to its quarter, a frame being at most a tenth of a second.
+    await frames(6);
     return during;
   }
 
@@ -157,10 +159,15 @@ try {
     const during = await rightDrag(spot.at, dx, dy, 6, () => shot(`${slug}-2-mid-drag.png`));
     const after = await state();
     await shot(`${slug}-3-after.png`);
-    const yaw = turned(before.camera.yaw, after.camera.yaw);
-    check(`${label} at ${place}: a right drag turns the camera with the hand`, Math.abs(yaw - -dx * SPEED * DEG) < 1.5, `yaw ${before.camera.yaw} to ${after.camera.yaw}, turned ${yaw.toFixed(2)} for ${(-dx * SPEED * DEG).toFixed(2)} asked`);
-    if (dy) check(`${label} at ${place}: dragging down looks further down`, after.camera.pitch > before.camera.pitch + 3, `pitch ${before.camera.pitch} to ${after.camera.pitch}`);
-    else check(`${label} at ${place}: the 2.5D drag keeps the pitch and the zoom`, Math.abs(after.camera.pitch - before.camera.pitch) < 0.01 && after.camera.zoom === before.camera.zoom, `pitch ${before.camera.pitch} to ${after.camera.pitch}`);
+    const yaw = turned(before.camera.yaw, during.yaw);
+    check(`${label} at ${place}: a right drag turns the camera with the hand`, Math.abs(yaw - -dx * SPEED * DEG) < 1.5, `yaw ${before.camera.yaw} to ${during.yaw} mid-drag, turned ${yaw.toFixed(2)} for ${(-dx * SPEED * DEG).toFixed(2)} asked`);
+    if (dy) {
+      check(`${label} at ${place}: dragging down looks further down`, during.pitch > before.camera.pitch + 3, `pitch ${before.camera.pitch} to ${during.pitch}`);
+      check(`${label} at ${place}: the camera stays where the drag left it`, Math.abs(turned(during.yaw, after.camera.yaw)) < 0.01 && Math.abs(after.camera.pitch - during.pitch) < 0.01, `yaw ${during.yaw} to ${after.camera.yaw}`);
+    } else {
+      check(`${label} at ${place}: the 2.5D drag keeps the pitch and the zoom`, Math.abs(after.camera.pitch - before.camera.pitch) < 0.01 && after.camera.zoom === before.camera.zoom, `pitch ${before.camera.pitch} to ${after.camera.pitch}`);
+      check(`${label} at ${place}: on Quarter turns, let go, the camera glides to the nearest quarter`, offQuarter(after.camera.yaw) < 0.5 && Math.abs(turned(during.yaw, after.camera.yaw)) <= 45.5, `yaw ${during.yaw} mid-drag to ${after.camera.yaw}`);
+    }
     check(`${label} at ${place}: during the drag the cursor hides, the mouse is not locked and nothing is aimed at`, during.dragging && during.cursor === 'none' && during.aim === null && !after.camera.locked, JSON.stringify(during));
     const cursorAfter = await game(() => window.__game.view.canvas.style.cursor);
     check(`${label} at ${place}: the drag places nothing, and the cursor comes back`, (await planks()) === planksBefore && after.stats.blocks === before.stats.blocks && !after.camera.dragging && cursorAfter === '',
@@ -180,28 +187,30 @@ try {
     }
   }
 
+  /** Degrees from the nearest quarter turn, which stand at 45 + 90k. */
+  const offQuarter = (yaw) => Math.abs(((((yaw - 45) % 90) + 135) % 90) - 45);
+
   // ---- the 2.5D camera
-  check('the game opens on the 2.5D camera with the mouse pointing', (await state()).camera.mode === 'tilt' && (await state()).camera.mouse === 'point');
+  check('the game opens on the 2.5D camera with the mouse pointing, on Quarter turns', (await state()).camera.mode === 'tilt' && (await state()).camera.mouse === 'point' && (await state()).camera.tiltTurn === 'quarter');
   await dragAndClick('2.5D', 'spawn', 300, 0);
   await dragAndClick('2.5D', 'town.square', -260, 0, false);
 
-  // Q and R from an angle between two quarters come to rest on a quarter. The same view at a quarter and half a
-  // quarter off it, with the town's people in frame.
-  const offQuarter = (yaw) => Math.abs(((((yaw - 45) % 90) + 135) % 90) - 45);
-  const beforeQ = await state();
-  await page.mouse.move(1100, 160);
-  await page.keyboard.press('q');
-  await game(() => window.__game.advance(0.5));
-  await frames(3);
-  const onQuarter = await state();
-  check('2.5D: Q from between two quarters comes to rest on a quarter', offQuarter(beforeQ.camera.yaw) > 2 && offQuarter(onQuarter.camera.yaw) < 0.5, `yaw ${beforeQ.camera.yaw} to ${onQuarter.camera.yaw}`);
-  await shot('2-5d-on-a-quarter.png');
+  // On Smooth the camera stays where a drag leaves it; Q and R from there come to rest on a quarter. The same view
+  // half a quarter off and at a quarter, with the town's people in frame.
+  await game(() => window.__game.view.settings.setTiltTurn('smooth'));
   // Half a quarter is 45 degrees, about 327 pixels.
   await rightDrag({ x: 1000, y: 300 }, -Math.round((Math.PI / 4) / SPEED), 0, 6);
   const between = await state();
-  check('2.5D: after a drag the camera rests half a quarter off', Math.abs(offQuarter(between.camera.yaw) - 45) < 1, `yaw ${between.camera.yaw}`);
+  check('2.5D on Smooth: after a drag the camera rests where it was let go, half a quarter off', between.camera.tiltTurn === 'smooth' && Math.abs(offQuarter(between.camera.yaw) - 45) < 1, `yaw ${between.camera.yaw}`);
   await page.mouse.move(1100, 160);
   await shot('2-5d-between-quarters.png');
+  await page.keyboard.press('q');
+  await game(() => window.__game.advance(0.5));
+  await frames(6);
+  const onQuarter = await state();
+  check('2.5D: Q from between two quarters comes to rest on a quarter', offQuarter(onQuarter.camera.yaw) < 0.5, `yaw ${between.camera.yaw} to ${onQuarter.camera.yaw}`);
+  await shot('2-5d-on-a-quarter.png');
+  await game(() => window.__game.view.settings.setTiltTurn('quarter'));
   const sprites = await state();
   check('2.5D: the sprites are all there after the turns', sprites.sprites.missing.length === 0 && sprites.sprites.count > 1, JSON.stringify(sprites.sprites));
 
@@ -232,8 +241,11 @@ try {
   await page.locator('.gu-panel-pause button', { hasText: 'Settings' }).click();
   await page.waitForSelector('input[name="gu-mouse"]');
   const rows = await game(() => [...document.querySelectorAll('.gu-settings-view legend')].map((e) => e.textContent));
-  check('Settings: the View section has Camera, Mouse and Characters', rows.join() === 'Camera,Mouse,Characters', rows.join(', '));
-  check('Settings: Drag to turn is picked', await page.locator('input[name="gu-mouse"][value="drag"]').isChecked());
+  check('Settings: the View section has Camera, Mouse, 2.5D turning and Characters', rows.join() === 'Camera,Mouse,2.5D turning,Characters', rows.join(', '));
+  check('Settings: Drag to turn and Quarter turns are picked', await page.locator('input[name="gu-mouse"][value="drag"]').isChecked() && await page.locator('input[name="gu-tiltTurn"][value="quarter"]').isChecked());
+  await page.locator('input[name="gu-tiltTurn"][value="smooth"]').check();
+  check('Settings: 2.5D turning Smooth applies at once', (await game(() => window.__game.view.settings.tiltTurn)) === 'smooth');
+  await page.locator('input[name="gu-tiltTurn"][value="quarter"]').check();
   const keyRows = await game(() => [...document.querySelectorAll('.gu-keylist dt')].map((e) => e.textContent));
   check('Settings: the keys list names the right-button drag', keyRows.includes('Turn the camera'), keyRows.join(', '));
   const view = page.locator('.gu-settings-view');

@@ -62,6 +62,14 @@ export const CAMERA_MODES: readonly CameraMode[] = ['tilt', 'free', 'first'];
  */
 export type MouseStyle = 'drag' | 'lock';
 export const MOUSE_STYLES: readonly MouseStyle[] = ['drag', 'lock'];
+/**
+ * How the 2.5D camera comes to rest after a right-button drag. `quarter`, the default: the drag turns it smoothly
+ * with the hand, and when it is let go it glides to the nearest quarter turn, where the blocks read as 3D.
+ * `smooth`: it stays where it was let go. Halfway between two quarters the view looks straight along the grid
+ * and the blocks show only their fronts and tops.
+ */
+export type TiltTurn = 'quarter' | 'smooth';
+export const TILT_TURNS: readonly TiltTurn[] = ['quarter', 'smooth'];
 /** How people, the pet and the creatures are drawn: pixel-art sprites, the default, or 3D models. */
 export type CharacterLook = 'sprites' | 'models';
 export const CHARACTER_LOOKS: readonly CharacterLook[] = ['sprites', 'models'];
@@ -84,12 +92,16 @@ export interface ViewSettings {
   readonly mouse: MouseStyle;
   /** Takes effect at once, and is stored. */
   setMouse(style: MouseStyle): void;
+  /** `?turn=smooth` in the address holds it for this visit. */
+  readonly tiltTurn: TiltTurn;
+  /** Takes effect at once, and is stored. Quarter turns brings a camera that rests between two quarters to the nearest. */
+  setTiltTurn(turn: TiltTurn): void;
   /** `?chars=models` in the address holds a look for this visit. */
   readonly characters: CharacterLook;
   /** Takes effect at once, with no reload, and is stored. */
   setCharacters(look: CharacterLook): void;
-  /** Runs `fn` after the camera mode, the mouse style or the character look changed. Returns a function that stops it. */
-  onChange(fn: (setting: 'camera' | 'mouse' | 'characters') => void): () => void;
+  /** Runs `fn` after the camera mode, the mouse style, the 2.5D turning or the character look changed. Returns a function that stops it. */
+  onChange(fn: (setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters') => void): () => void;
 }
 
 /** What the aim is on: the block under the pointer, or under the crosshair when the mouse is locked, when it is in reach. Else null. */
