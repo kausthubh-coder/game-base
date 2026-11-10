@@ -93,9 +93,9 @@ export async function install(view: GameView): Promise<void> {
   const loader = new GLTFLoader();
   const clock = { value: 0 };
   const group = new THREE.Group(); group.name = 'model trees and rocks';
-  const manifest = await (await fetch('/assets/manifest.json')).json();
+  const manifest = await (await fetch(`${import.meta.env.BASE_URL}assets/manifest.json`)).json();
   // Load everything before changing the scene, so a failed request leaves no half-installed fixture.
-  const loaded = await Promise.all(['tree-17','tree-41','tree-83','birch-17','birch-41','birch-83','pine-17','pine-41','pine-83','rock-11','rock-37'].map(async name => ({ name, gltf: await loader.loadAsync(`/assets/${manifest.models[name].file}`) })));
+  const loaded = await Promise.all(['tree-17','tree-41','tree-83','birch-17','birch-41','birch-83','pine-17','pine-41','pine-83','rock-11','rock-37'].map(async name => ({ name, gltf: await loader.loadAsync(`${import.meta.env.BASE_URL}assets/${manifest.models[name].file}`) })));
   const batches = new Map<string,THREE.InstancedMesh>();
   const shapes = new Map<string,{ trunk: THREE.Matrix4; blobs: THREE.Matrix4[] }>();
   // The stand-ins for every tree: one box per trunk and BLOBS balls per crown.
