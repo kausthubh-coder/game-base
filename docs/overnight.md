@@ -28,3 +28,16 @@ Never more than three Claude agents at once: the Mac mini and the laptop share o
 - Two skills: `.agents/skills/make-sprite` and `.agents/skills/make-3d-asset`.
 
 ## Log
+- 22:25 Wave 1 started: world, audio, sky (Claude Fable) and sprite assets (GPT Sol).
+- 22:45 Handbook: research report added as a chapter, a plain summary of it, and the third draft of Lore, Story and Kingdoms ("You only keep what you give back to"). Older drafts kept behind a switch. Other chapters swept to match. Critly check passes on the changed pages.
+- 22:50 Wave 2 briefs written: `sprites.md`, `props.md`, `map.md`.
+
+## What the coordinator does when an agent finishes
+
+1. Read its report. Rerun its strongest check yourself (`bun tools/typecheck.mjs <feature>`, its tests, build its demo, look at a screenshot).
+2. Commit its folders with a message that names the feature.
+3. Start the next waiting brief, keeping at most three Claude agents running. Order: sprites (needs the sprite assets), props (needs `src/content/blocks.ts`), map.
+4. When all seven are in: join them in `src/main.ts` as one walkable scene, run `bun run check`, build, screenshot.
+5. Write `.agents/skills/make-sprite/SKILL.md` (load `writing-for-agents` first) from what the asset agent built.
+6. Add a chapter "The base" to the handbook (`~/dev/sandbox/game-look-test/design/16-base.md`) with what exists, how to run each demo, the numbers, and what is not proven. Update `14-v1.md`'s experiment table. Rebuild with `node build.mjs`.
+7. Leave a short morning note as the last message.
