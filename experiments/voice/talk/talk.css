@@ -1,0 +1,29 @@
+.field { display: grid; gap: 2px; }
+.field[hidden] { display: none; }
+.field label { font-size: 12px; color: var(--ui-ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+.field select { min-height: 32px; padding: 2px 6px; font: 15px var(--ui-font); color: var(--ui-ink); background: var(--ui-plate); border: 2px solid var(--ui-ink); border-radius: 2px; }
+.seg { display: flex; gap: 0; }
+.seg .btn + .btn { border-left-width: 0; }
+
+.log { position: absolute; left: 16px; top: calc(var(--bar-h, 100px) + 12px); bottom: calc(var(--box-h, 220px) + 76px); z-index: 3; width: min(440px, calc(100% - 32px)); display: flex; flex-direction: column; padding: 12px 14px; }
+.log h2 { margin: 0 0 8px; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ui-ink-2); }
+.log ol { margin: 0; padding: 0; list-style: none; overflow: auto; display: grid; gap: 10px; align-content: start; }
+.log li { line-height: 1.4; font-size: 15px; }
+.log .who { font-weight: 600; }
+.log .you { color: var(--ui-ink-2); }
+.log .times { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.log .chip { padding: 1px 6px; font-size: 12px; font-variant-numeric: tabular-nums; border: 1px solid var(--ui-line-strong); border-radius: 2px; background: var(--ui-plate); }
+.log .chip.total { background: var(--ui-ink); color: var(--ui-paper); border-color: var(--ui-ink); }
+
+.say { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(var(--box-h, 220px) + 12px); z-index: 4; width: min(780px, calc(100% - 32px)); display: flex; align-items: center; gap: 8px; padding: 8px; }
+.say input { flex: 1; min-width: 0; min-height: 36px; padding: 4px 10px; font: 16px var(--ui-font); color: var(--ui-ink); background: var(--ui-plate); border: 2px solid var(--ui-ink); border-radius: 2px; }
+.say input:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
+.say .meta { min-width: 9ch; text-align: right; }
+.mic .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ui-ink-2); }
+.mic[aria-pressed='true'] .dot { background: var(--ui-accent); }
+.mic.is-hearing .dot { box-shadow: 0 0 0 4px oklch(0.46 0.15 32 / 0.35); }
+
+@media (max-width: 720px) {
+  .log { display: none; }
+  .say .meta { display: none; }
+}

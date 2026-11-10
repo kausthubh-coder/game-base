@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>Voiced scene</title>
+    <link rel="stylesheet" href="../ui/page.css" />
+  </head>
+  <body>
+    <main id="stage" class="stage">
+      <div class="backdrop" id="backdrop"></div>
+      <header class="bar ui-card">
+        <div class="bar-title">
+          <strong>Voiced dialogue</strong>
+          <span>Act 1 lines, voiced ahead of time with ElevenLabs</span>
+        </div>
+        <nav class="scenes" id="scenes" aria-label="Scenes"></nav>
+        <div class="bar-tools">
+          <label class="check"><input type="checkbox" id="auto" checked /> Auto-advance</label>
+          <button type="button" class="btn" id="compare-open">Compare models</button>
+        </div>
+      </header>
+      <aside class="keys ui-card" id="keys">
+        <button type="button" class="btn" id="replay"><kbd>R</kbd> Replay line</button>
+        <button type="button" class="btn" id="skip"><kbd>Space</kbd> Skip</button>
+        <span class="meta" id="meta"></span>
+      </aside>
+      <div class="start" id="start">
+        <div class="start-card ui-card">
+          <p class="start-kicker">Experiment A</p>
+          <h1>Five moments from act 1, voiced</h1>
+          <p>Tamsin, Maren, Gus and Juniper, each with their own ElevenLabs voice. The words type in time with the voice.</p>
+          <button type="button" class="btn btn-big" id="play">Play the scene</button>
+        </div>
+      </div>
+      <section class="compare" id="compare" hidden>
+        <div class="compare-panel">
+          <header>
+            <h2>One line, four models</h2>
+            <button type="button" class="btn" id="compare-close">Close</button>
+          </header>
+          <p class="compare-note">
+            v3 reads the audio tags in brackets. Flash and v4 Turbo get the plain words. v4 got the tags too. Times are the clip length.
+          </p>
+          <div id="compare-rows"></div>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="./scene.ts"></script>
+  </body>
+</html>
