@@ -172,6 +172,16 @@ The build command writes actual counts. The verifier reads each GLB and checks
 the declared counts, byte size, one triangle primitive and the 1500/300 caps.
 They are loaded only by the optional `?models=1` look view.
 
+The Hollowmere town kit is listed there too, as `town-<name>` with `file`
+`models/town/<name>.glb`, `triangles`, `budget` and `bytes` and no seed. Each
+has two primitives, its Body and its Glow, and the kit's own budget, at most
+8000. Its GLBs are Draco-compressed and made by `bun tools/models/town.mjs`
+from `assets-src/models/town/` (`--rebuild` re-exports the `.blend` sources
+first). The town view fetches them only as the hero nears Hollowmere, so they
+are not part of the first load.
+
+The whole of `public/assets` must stay under 24 MB.
+
 ## Voiced lines
 
 The only sound files the game ships. `bun --env-file=.env.local tools/voice.ts` makes them ahead of time with
