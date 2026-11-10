@@ -6,6 +6,7 @@ import { loadEnvironmentModels } from '../../features/props/models.view.ts';
 // behind them. A chunk's props stay true to its blocks: when a block in the chunk changes (tilled soil,
 // a placed block, a station), every prop whose ground is no longer what it grew on is taken away.
 // Nothing is scattered where the region says not to.
+import type { RockModels } from './world-trees.view.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import type { RegionProp } from '../api.sim.ts';
 import type { GameView } from '../shell/view.ts';
@@ -67,7 +68,15 @@ export async function install(view: GameView): Promise<void> {
   await loadEnvironmentModels();
   const { game } = view;
   const sim = view.world.sim;
-  const props = worldProps(view);
+  const baseProps = worldProps(view);
+  const rocks = () => (view as GameView & {modelRocks?: RockModels}).modelRocks;
+  const props = { ...baseProps,
+    place(kind:string,variant:number,x:number,y:number,z:number,rotation=0,scale=1,must=false) {
+      if(kind==='rock'&&rocks()) return -rocks()!.place(x,y,z,rotation,scale,variant);
+      return baseProps.place(kind,variant,x,y,z,rotation,scale,must);
+    },
+    remove(id:number){if(id<0) rocks()?.remove(-id);else baseProps.remove(id);}
+  };
   const patches = new Map<number, Patch>();
   const patchList: Patch[] = [];
   const found: Scattered[] = [];

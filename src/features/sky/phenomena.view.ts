@@ -21,7 +21,7 @@ attribute vec2 aUv;
 attribute float aKind;
 attribute vec4 aData;
 uniform float uBolt, uRainbow, uShafts, uRainbowRadius;
-uniform vec3 uRainbowCenter, uShaftAnchor, uShaftDir;
+uniform vec3 uRainbowCenter, uRainbowRight, uShaftAnchor, uShaftDir;
 varying vec2 vUv;
 varying float vKind;
 varying float vSeed;
@@ -40,8 +40,8 @@ void main() {
     world = position + camRight * aData.x * aData.y * 1.2;
     on = uBolt;
   } else if (aKind < 1.5) {
-    // The rainbow: an arc that faces the camera.
-    world = uRainbowCenter + (camRight * position.x + camUp * position.y) * uRainbowRadius;
+    // The rainbow stands on the world plane fixed when the rain clears.
+    world = uRainbowCenter + (uRainbowRight * position.x + vec3(0.0, 1.0, 0.0) * position.y) * uRainbowRadius;
     on = uRainbow;
   } else {
     // A shaft: a long quad from the ground toward the sun, turned about its length to face the camera.
@@ -75,7 +75,7 @@ void main() {
     float hue = (1.0 - band) * 0.78;
     vec3 spectrum = clamp(abs(fract(hue + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);
     float arc = sin(band * 3.14159) * step(0.8, r) * step(r, 0.98);
-    color = spectrum * arc * smoothstep(0.0, 0.25, vUv.y) * uRainbow * 0.26;
+    color = mix(spectrum, vec3(0.65), 0.4) * arc * smoothstep(0.0, 0.25, vUv.y) * uRainbow * 0.30;
   } else {
     float across = 1.0 - vUv.x * vUv.x;
     float along = smoothstep(0.0, 0.12, vUv.y) * pow(1.0 - vUv.y, 0.8);
@@ -99,6 +99,7 @@ export interface PhenomenaFrame {
   /** The middle of the rainbow's base, and how far it reaches from there. */
   rainbowCenter: THREE.Vector3;
   rainbowRadius: number;
+  rainbowRight: THREE.Vector3;
   shafts: number;
 }
 
@@ -167,6 +168,7 @@ export function createPhenomena(): Phenomena {
     uShafts: { value: 0 },
     uTime: { value: 0 },
     uRainbowRadius: { value: 12 },
+    uRainbowRight: { value: new THREE.Vector3(1,0,0) },
     uRainbowCenter: { value: new THREE.Vector3() },
     uShaftAnchor: { value: new THREE.Vector3() },
     uShaftDir: { value: new THREE.Vector3(0, 1, 0) },
@@ -253,6 +255,7 @@ export function createPhenomena(): Phenomena {
       if (!mesh.visible) return;
 
       uniforms.uRainbowCenter.value.copy(frame.rainbowCenter);
+      uniforms.uRainbowRight.value.copy(frame.rainbowRight);
       uniforms.uRainbowRadius.value = frame.rainbowRadius;
       const sun = frame.sunDirection;
 

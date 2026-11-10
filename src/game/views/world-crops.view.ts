@@ -104,7 +104,7 @@ export async function install(view: GameView): Promise<void> {
     const crops = (game.systems as Partial<Systems>).crops;
     const list = crops?.all();
     const count = list ? list.length : 0;
-    const now = view.ctx.time;
+    const now = view.settings.graphics.reduceMotion ? 0 : view.ctx.time;
     if (count > room) {
       while (room < count) room *= 2;
       const at = new Int32Array(room * 3), stage = new Int16Array(room), wet = new Float32Array(room);

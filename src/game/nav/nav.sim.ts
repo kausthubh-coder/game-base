@@ -1,6 +1,7 @@
 // Path finding over block columns: A* between the blocks where a body two blocks tall can stand.
 // A step goes to one of the eight neighbors, up or down one block at most, and never cuts a corner.
 
+import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import { LIQUID, SOLID } from '../../features/world/chunk.sim.ts';
 import type { World } from '../../features/world/world.sim.ts';
@@ -76,6 +77,19 @@ export function search(world: World, from: Vec3, to: Vec3, limit = DEFAULT_LIMIT
   const goalFloor = floorAt(world, gx, to.y, gz);
   const gy = goalFloor ?? Math.floor(to.y + 0.01);
 
+  // A route follower turns before it reaches each cell center. Keep a spare cell around
+  // tree roots so the hero's 0.3-block half-width cannot cut into a trunk at that turn.
+  // Start and destination remain reachable beside a tree (for chopping or feeding).
+  const barrier = blockId('barrier');
+  const routeStand = (x: number, y: number, z: number): boolean => {
+    if (!canStand(world, x, y, z)) return false;
+    if ((x === sx && z === sz) || (x === gx && z === gz)) return true;
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+      if (world.getBlock(x + dx, y, z + dz) === barrier || world.getBlock(x + dx, y + 1, z + dz) === barrier) return false;
+    }
+    return true;
+  };
+
   // Nodes live in flat arrays. The open list is a binary heap of node numbers ordered by `f`.
   const xs: number[] = [], ys: number[] = [], zs: number[] = [], g: number[] = [], f: number[] = [], parent: number[] = [];
   const closed: boolean[] = [];
@@ -149,13 +163,13 @@ export function search(world: World, from: Vec3, to: Vec3, limit = DEFAULT_LIMIT
         const nx = x + dx, nz = z + dz;
         if (dx !== 0 && dz !== 0) {
           // A diagonal step is level, and both blocks beside it must be free, so no corner is cut.
-          if (canStand(world, nx, y, nz) && canStand(world, nx, y, z) && canStand(world, x, y, nz)) visit(nx, y, nz, g[n] + DIAGONAL, n);
-        } else if (canStand(world, nx, y, nz)) {
+          if (routeStand(nx, y, nz) && canStand(world, nx, y, z) && canStand(world, x, y, nz)) visit(nx, y, nz, g[n] + DIAGONAL, n);
+        } else if (routeStand(nx, y, nz)) {
           visit(nx, y, nz, g[n] + 1, n);
-        } else if (canStand(world, nx, y + 1, nz)) {
+        } else if (routeStand(nx, y + 1, nz)) {
           // Up one block: the head needs room above where it stands now.
           if (!solid(world, x, y + 2, z)) visit(nx, y + 1, nz, g[n] + 1 + CLIMB, n);
-        } else if (canStand(world, nx, y - 1, nz)) {
+        } else if (routeStand(nx, y - 1, nz)) {
           // Down one block: the head needs room above the lower block as it walks off the edge.
           if (!solid(world, nx, y + 1, nz)) visit(nx, y - 1, nz, g[n] + 1 + CLIMB, n);
         }

@@ -103,6 +103,7 @@ function createBook(view: GameView): Book {
     setQuality(quality) {
       if (made || !heldQuality) view.settings.setQuality(quality);
     },
+    graphics: { get: () => view.settings.graphics, set: (next) => view.settings.setGraphics(next) },
     setVolume: (channel, value) => view.settings.setVolume(channel, value),
     view: {
       camera: () => view.settings.camera,
