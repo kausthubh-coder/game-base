@@ -717,14 +717,21 @@ const QUESTS = {
     });
     if (!args.includes('--no-continue')) {
       await step('bread', 'reload the page mid-quest and Continue from the title', async () => {
+        // Time is held from the save to the check, so a slow machine's frames don't move the clock while
+        // the page reloads and the land loads. The check is then on what the save brought back, nothing else.
+        await game(() => window.__game.manual(true));
         const before = await state();
         await game(() => window.__game.save());
         await openGame();
+        await game(() => window.__game.manual(true));
         await page.click('[data-key="title:continue"]');
         await page.waitForFunction(() => window.__game.started);
         await game(() => window.__game.settle());
+        const clock = (await state()).clock;
+        must(clock.day === before.clock.day && Math.abs(clock.seconds - before.clock.seconds) < 2, `the clock came back as ${clock.seconds}, not ${before.clock.seconds}`);
+        // The rest is read after a few steps, since some of it (the tracked quest) is written on the first step.
+        await game(() => { window.__game.manual(false); window.__game.advance(0.5); });
         const after = await state();
-        must(after.clock.day === before.clock.day && Math.abs(after.clock.seconds - before.clock.seconds) < 2, `the clock came back as ${after.clock.seconds}, not ${before.clock.seconds}`);
         must(JSON.stringify(after.bag) === JSON.stringify(before.bag), 'the bag did not come back');
         must(after.flags['pet.leaftail.bonded'] === true && after.tracked === 'bread', 'the quests or the pet did not come back');
         const f = await field();
