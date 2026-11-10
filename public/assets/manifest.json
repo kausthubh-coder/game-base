@@ -995,5 +995,49 @@
         0
       ]
     }
+  },
+  "models": {
+    "tree-17": {
+      "file": "models/tree-17.glb",
+      "seed": 17,
+      "triangles": 1464,
+      "budget": 1500,
+      "bytes": 140560
+    },
+    "tree-41": {
+      "file": "models/tree-41.glb",
+      "seed": 41,
+      "triangles": 1464,
+      "budget": 1500,
+      "bytes": 140572
+    },
+    "tree-83": {
+      "file": "models/tree-83.glb",
+      "seed": 83,
+      "triangles": 1464,
+      "budget": 1500,
+      "bytes": 140568
+    },
+    "rock-11": {
+      "file": "models/rock-11.glb",
+      "seed": 11,
+      "triangles": 188,
+      "budget": 300,
+      "bytes": 20928
+    },
+    "rock-37": {
+      "file": "models/rock-37.glb",
+      "seed": 37,
+      "triangles": 188,
+      "budget": 300,
+      "bytes": 20940
+    },
+    "bush-29": {
+      "file": "models/bush-29.glb",
+      "seed": 29,
+      "triangles": 280,
+      "budget": 300,
+      "bytes": 29236
+    }
   }
 }
