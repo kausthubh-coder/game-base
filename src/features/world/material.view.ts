@@ -102,8 +102,9 @@ flat varying vec2 vCellBase;
 flat varying vec4 vEdges;
 
 // A lit lip along every edge the land drops away from, as if each block's edge were a little rounded and caught
-// the light, so a one-block step reads from above. The top's lip is the wider; a side's is a thin bright line
-// under it with a touch of shade below, so the side reads as turning away. 1 means no change.
+// the light, and a thin dark crease just under it on the side, which is a little darker all over. Together they
+// draw the edge of a one-block step even where the grass of the top and the turf of the side are one green.
+// 1 means no change.
 float tEdgeShade() {
   float d = 1.0;
   if (vEdges.x > 0.5) d = min(d, vEdgeUv.x);
@@ -111,8 +112,8 @@ float tEdgeShade() {
   if (vEdges.z > 0.5) d = min(d, vEdgeUv.y);
   if (vEdges.w > 0.5) d = min(d, 1.0 - vEdgeUv.y);
   if (d >= 1.0) return 1.0;
-  if (vTile.z > 0.5) return 1.0 + 0.2 * (1.0 - smoothstep(0.0, 0.17, d));
-  return 1.0 + 0.16 * (1.0 - smoothstep(0.0, 0.09, d)) - 0.07 * smoothstep(0.09, 0.2, d) * (1.0 - smoothstep(0.2, 0.55, d));
+  if (vTile.z > 0.5) return 1.0 + 0.3 * (1.0 - smoothstep(0.0, 0.13, d));
+  return 0.88 - 0.28 * (1.0 - smoothstep(0.02, 0.07, d));
 }
 
 float tDither() {
