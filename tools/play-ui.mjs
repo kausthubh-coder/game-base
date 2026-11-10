@@ -357,6 +357,7 @@ async function desktop(browser) {
   await key('i');
   check('I opens the bag', (await panel()) === 'bag');
   await shot('ui-08-bag.png');
+  await dragAndDrop(t);
   await key('b');
   check('B closes the bag', (await panel()) === null);
   await key('b');
@@ -445,6 +446,143 @@ async function desktop(browser) {
   check('Continue brings back the bag and the quest', back.tracked === 'bread' && back.bag.some((s) => s.id === 'oak_log'), `tracked ${back.tracked}, ${back.bag.length} stacks`);
   await shot('ui-16-continued.png');
   await t.context.close();
+}
+
+/**
+ * Moves stacks in the open bag with real mouse drags: onto an empty slot, a split with the right button and with Shift,
+ * a merge, a swap, onto a quick slot, a refused split, Esc in the middle, then click-to-move and the tooltip. Then a drag
+ * between the HUD's quick slots with the bag closed.
+ */
+async function dragAndDrop(t) {
+  const { page, game, shot, frames, panel } = t;
+  const slots = () => game(() => window.__game.view.game.systems.inventory.slots.map((s) => (s ? `${s.id}:${s.count}` : '')));
+  const find = async (id) => (await slots()).findIndex((s) => s.startsWith(`${id}:`));
+  const empty = async (from) => (await slots()).findIndex((s, i) => i >= from && s === '');
+  const center = async (selector) => {
+    const box = await page.locator(selector).boundingBox();
+    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  };
+  const slot = (i) => `[data-key="slot:${i}"]`;
+  /** Presses on one slot, moves in steps to another and lets go. `during` runs with the pointer over the target. */
+  const drag = async (fromSel, toSel, { button = 'left', shift = false, during } = {}) => {
+    const a = await center(fromSel), b = await center(toSel);
+    await page.mouse.move(a.x, a.y);
+    if (shift) await page.keyboard.down('Shift');
+    await page.mouse.down({ button });
+    await page.mouse.move(a.x + 12, a.y + 8, { steps: 3 });
+    await page.mouse.move(b.x, b.y, { steps: 8 });
+    const seen = during ? await during() : null;
+    await page.mouse.up({ button });
+    if (shift) await page.keyboard.up('Shift');
+    await frames(1);
+    return seen;
+  };
+
+  // A whole stack onto an empty slot, with the ghost and the lit target checked in the middle of the drag.
+  const logs = await find('oak_log');
+  const free = await empty(9);
+  const before = await slots();
+  const mid = await drag(slot(logs), slot(free), {
+    during: async () => {
+      const seen = await game((to) => ({
+        ghost: Boolean(document.querySelector('.gu-ghost')),
+        lit: document.querySelector(`[data-key="slot:${to}"]`)?.classList.contains('is-drop') ?? false,
+      }), free);
+      await shot('ui-08-bag-drag.png');
+      return seen;
+    },
+  });
+  let now = await slots();
+  check('drag: a ghost follows the pointer and the slot under it lights up', mid.ghost && mid.lit, JSON.stringify(mid));
+  check('drag: a stack dragged onto an empty slot moves there', now[logs] === '' && now[free] === before[logs], `${before[logs]} from ${logs} to ${free}`);
+  check('drag: the ghost is gone after the drop', !(await game(() => Boolean(document.querySelector('.gu-ghost')))));
+
+  // The right button takes half, onto an empty slot.
+  const free2 = await empty(9);
+  await drag(slot(free), slot(free2), { button: 'right' });
+  now = await slots();
+  check('drag: the right button splits a stack in half', now[free] === 'oak_log:7' && now[free2] === 'oak_log:7', `${now[free]} and ${now[free2]}`);
+  // Back onto the same item, it merges.
+  await drag(slot(free2), slot(free));
+  now = await slots();
+  check('drag: a stack dropped on the same item merges into it', now[free] === 'oak_log:14' && now[free2] === '', `${now[free]} and ${now[free2] || 'empty'}`);
+  // Shift with the left button takes half too.
+  await drag(slot(free), slot(free2), { shift: true });
+  now = await slots();
+  check('drag: Shift and the left button split a stack in half', now[free] === 'oak_log:7' && now[free2] === 'oak_log:7', `${now[free]} and ${now[free2]}`);
+  // Half a stack onto another item has nowhere to go, and nothing changes.
+  const planks = await find('plank');
+  const refusedBefore = await slots();
+  await drag(slot(free2), slot(planks), { button: 'right' });
+  check('drag: half a stack onto another item is refused, and nothing moves', JSON.stringify(await slots()) === JSON.stringify(refusedBefore));
+  // A whole stack onto another item swaps them.
+  await drag(slot(free2), slot(planks));
+  now = await slots();
+  check('drag: a stack dropped on another item swaps with it', now[planks] === 'oak_log:7' && now[free2] === refusedBefore[planks], `${now[planks]} and ${now[free2]}`);
+  // Onto a quick slot.
+  const quickBefore = (await slots())[4];
+  await drag(slot(free), slot(4));
+  now = await slots();
+  check('drag: a stack from the bag goes onto a quick slot, and the quick slot\'s stack comes back', now[4] === 'oak_log:7' && now[free] === quickBefore, `quick 5: ${now[4]}, slot ${free + 1}: ${now[free] || 'empty'}`);
+  // Esc in the middle of a drag puts the stack back and leaves the bag open.
+  const escBefore = await slots();
+  const a = await center(slot(4)), b = await center(slot(await empty(9)));
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(b.x, b.y, { steps: 8 });
+  await page.keyboard.press('Escape');
+  const escGhost = await game(() => Boolean(document.querySelector('.gu-ghost')));
+  await page.mouse.up();
+  await frames(1);
+  check('drag: Esc puts the stack back and keeps the bag open', !escGhost && JSON.stringify(await slots()) === JSON.stringify(escBefore) && (await panel()) === 'bag');
+
+  // Click-to-move still works, for the keyboard and for anyone who cannot drag.
+  const axe = await find('axe');
+  const free3 = await empty(9);
+  await page.click(slot(axe));
+  await page.click(slot(free3));
+  now = await slots();
+  check('click-to-move: a click on a stack, then on a slot, still moves it', now[axe] === '' && now[free3] === 'axe:1', `axe from ${axe} to ${free3}`);
+  await page.click(slot(free3));
+  await page.click(slot(axe));
+  // The keyboard: Enter picks up, an arrow moves the focus, Enter puts down.
+  await page.focus(slot(axe));
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('ArrowRight');
+  const right = await game(() => Number(document.activeElement?.dataset.key?.split(':')[1]));
+  await page.keyboard.press('Enter');
+  now = await slots();
+  check('keyboard: Enter, an arrow and Enter move a stack', now[right]?.startsWith('axe') && right === axe + 1, `axe to slot ${right + 1}`);
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('Enter');
+
+  // A tooltip names the thing under the pointer and says what it is for.
+  const at = await center(slot(await find('axe')));
+  await page.mouse.move(at.x, at.y);
+  const tip = await game(() => {
+    const e = document.querySelector('.gu-tip');
+    return e && !e.hidden ? { name: e.querySelector('.gu-tip-name')?.textContent ?? '', use: e.querySelector('.gu-tip-use')?.textContent ?? '' } : null;
+  });
+  check('the tooltip names the item and says what it is for', tip?.name === 'Axe' && /fell/.test(tip.use), JSON.stringify(tip));
+  await shot('ui-08-bag-tip.png');
+  await page.mouse.move(5, 5);
+
+  // The HUD's quick slots take a drag too, with the bag closed.
+  await page.keyboard.press('i');
+  await frames(2);
+  const hudBefore = await slots();
+  const from = hudBefore.findIndex((s, i) => i < 9 && s !== '');
+  const to = hudBefore.findIndex((s, i) => i < 9 && i !== from && s === '');
+  if (from >= 0 && to >= 0) {
+    await drag(`.gb-hud-slots .gb-slot[data-slot="${from}"]`, `.gb-hud-slots .gb-slot[data-slot="${to}"]`);
+    now = await slots();
+    check('drag: a stack moves from one quick slot at the bottom of the screen to another', now[from] === '' && now[to] === hudBefore[from], `${hudBefore[from]} from ${from + 1} to ${to + 1}`);
+    await drag(`.gb-hud-slots .gb-slot[data-slot="${to}"]`, `.gb-hud-slots .gb-slot[data-slot="${from}"]`);
+  } else {
+    check('drag: the quick slots have a stack and an empty slot to try', false, hudBefore.slice(0, 9).join(' | '));
+  }
+  await page.keyboard.press('i');
 }
 
 /** Presses every key a hint names, with the real keyboard and mouse, and checks that it does what the hint says. */

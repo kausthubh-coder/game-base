@@ -26,7 +26,8 @@ function recipeList(ctx: UiContext, recipes: readonly Recipe[], empty: string, r
         h('span', { class: have < need.count ? 'gu-need gu-short' : 'gu-need' },
           picture(ctx.options.icon(items.get(need.id).icon), items.get(need.id).name, 24),
           h('span', null, items.get(need.id).name),
-          h('span', { class: 'gu-num', 'aria-label': `${have} of ${need.count}` }, `${have}/${need.count}`),
+          // Enough: how many it takes. Short: how many there are of how many, in amber.
+          h('span', { class: 'gu-num', 'aria-label': `${have} of ${need.count}` }, have < need.count ? `${have}/${need.count}` : `×${need.count}`),
         ),
       );
     }
@@ -114,7 +115,11 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
       const def = items.get(stack.id);
       foot.replaceChildren(h('span', null, `Moving ${def.name}${(picked.count ?? stack.count) > 1 ? ` ×${picked.count ?? stack.count}` : ''}. Pick a slot for it, or press `), h('kbd', null, 'Esc'), '.');
     } else {
-      foot.replaceChildren('Drag a stack to move it. Drag with the right button, or hold ', h('kbd', null, 'Shift'), ', to take half.');
+      // A mouse can split with its right button or Shift. A finger has neither, so it is told about tapping instead.
+      foot.replaceChildren(
+        h('span', { class: 'gu-foot-fine' }, 'Drag a stack to move it. Drag with the right button, or hold ', h('kbd', null, 'Shift'), ', to take half.'),
+        h('span', { class: 'gu-foot-coarse' }, 'Drag a stack to move it, or tap it and then a slot.'),
+      );
     }
   };
 
