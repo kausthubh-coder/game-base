@@ -1,0 +1,4 @@
+// The performance meter and automatic quality.
+export { createPerf, type PerfCounters, type PerfOptions, type PerfSlot, type PerfSnapshot, type PerfView } from './perf.view.ts';
+export { FrameStats } from './stats.sim.ts';
+export { Governor, DEFAULT_GOVERNOR, type GovernorOptions, type GovernorStep } from './governor.sim.ts';
