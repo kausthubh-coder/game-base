@@ -29,7 +29,7 @@ export const TOKENS = /* css */ `
   --ui-accent-soft: oklch(0.53 0.095 192 / 0.16);
   --ui-done: oklch(0.56 0.12 150);
   --ui-new: oklch(0.72 0.15 68);
-  --ui-scrim: oklch(0.18 0.02 60 / 0.45);
+  --ui-scrim: oklch(0.18 0.02 60 / 0.55);
   --ui-shadow: oklch(0.18 0.03 60 / 0.28);
   --ui-lift: 0 1px 2px oklch(0.18 0.03 60 / 0.14), 0 12px 32px oklch(0.18 0.03 60 / 0.24);
   /* Dark glass over the world: no blur, so it costs nothing to draw. */

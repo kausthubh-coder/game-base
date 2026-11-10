@@ -28,7 +28,7 @@ export const STYLES = /* css */ `
   --done: oklch(0.52 0.12 150);
   --new: oklch(0.6 0.15 62);
   --new-light: oklch(0.85 0.12 78);
-  --scrim: oklch(0.18 0.02 60 / 0.45);
+  --scrim: oklch(0.18 0.02 60 / 0.55);
   --shadow: oklch(0.18 0.03 60 / 0.28);
   --lift: 0 1px 2px oklch(0.18 0.03 60 / 0.14), 0 12px 32px oklch(0.18 0.03 60 / 0.24);
   --glass: oklch(0.21 0.018 62 / 0.7);

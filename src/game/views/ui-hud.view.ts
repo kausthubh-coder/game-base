@@ -36,7 +36,7 @@ const STYLE = /* css */ `
 .ui-book .gb-slot:active { background: oklch(1 0 0 / 0.24); }
 .ui-book .gb-slot[aria-pressed='true'] { background: oklch(1 0 0 / 0.22); transform: none; box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
 .ui-book .gb-slot:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
-.ui-book .gb-slot-key { z-index: 1; top: 3px; left: 6px; padding: 0; font-size: 11px; font-weight: 600; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
+.ui-book .gb-slot-key { z-index: 1; top: 3px; left: 6px; padding: 0; font-size: 11px; font-weight: 500; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
 /* An icon is 32 pixels of pixel art, so it is drawn at exactly that. */
 .ui-book .gb-slot-icon { inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
 .ui-book .gb-slot-count { z-index: 1; right: 4px; bottom: 2px; padding: 0; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
@@ -61,10 +61,10 @@ const STYLE = /* css */ `
 .ui-book .gb-hud-sky { flex: none; gap: 8px; padding: 5px 12px; white-space: nowrap; }
 .ui-book .gb-hud-weather svg { width: 1.2em; height: 1.2em; }
 .ui-book .gb-hud-clock { font-size: 15px; font-weight: 650; letter-spacing: 0; }
-.ui-day { white-space: nowrap; font-size: 13px; font-weight: 600; color: var(--ui-glass-ink); }
+.ui-day { white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--ui-glass-ink); }
 /* The tracker: the quest, how far it has come, and only the step to do now. The quest log (J) has the rest. */
 .ui-book .gb-hud-quest { width: 260px; margin-top: 4px; padding: 12px 14px 13px; }
-.ui-book .gb-hud-quest h3 { margin: 0; padding: 0; font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--ui-glass-ink-2); border: 0; text-wrap: balance; }
+.ui-book .gb-hud-quest h3 { margin: 0; padding: 0; font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--ui-glass-ink-2); border: 0; text-wrap: balance; }
 .ui-pips { display: flex; gap: 4px; margin: 8px 0 10px; }
 .ui-pips i { flex: 1; height: 3px; border-radius: 2px; background: oklch(1 0 0 / 0.2); }
 .ui-pips i.is-done { background: oklch(0.89 0.07 188); }
@@ -88,7 +88,7 @@ const STYLE = /* css */ `
 .ui-bookbtn button[aria-expanded='true'] { box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
 .ui-bookbtn button:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
 .ui-bookbtn .ui-bookbtn-icon { position: absolute; inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
-.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 10px; font-weight: 600; line-height: 1.3; color: var(--ui-glass-ink-2); }
+.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 10px; font-weight: 500; line-height: 1.3; color: var(--ui-glass-ink-2); }
 /* The first time it shows, it glows twice so the eye finds it. */
 .ui-bookbtn.is-new button { animation: ui-book-glow 1.1s var(--ui-ease) 2; }
 @keyframes ui-book-glow { 0% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 0 oklch(0.8 0.13 78 / 0.7); } 100% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 12px oklch(0.8 0.13 78 / 0); } }
