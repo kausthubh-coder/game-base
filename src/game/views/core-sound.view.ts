@@ -287,7 +287,8 @@ export function install(view: GameView): void {
       const distance = Math.hypot(p.x - tree.x, p.z - tree.z);
       if (distance < 11) near += 1 - distance / 11;
     }
-    state.trees = Math.max(state.trees, Math.min(1, near / 3.5));
+    // Greenhollow's trees stand apart: two crowns within a few blocks is already under the trees.
+    state.trees = Math.max(state.trees, Math.min(1, near / 2.2));
     // A 2x2 pool can fall between every column of the sparse terrain probe.
     for (const place of waterPlaces) {
       const distance = Math.hypot(p.x - place.at.x, p.z - place.at.z);

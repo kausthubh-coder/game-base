@@ -170,33 +170,17 @@ try {
   await page.evaluate(() => window.__game.settle());
   await page.evaluate(() => window.__walk.renderTo(0.06));
 
-  // Where the woods are thickest near the path, for the stretch under the trees: the trees around a few points
-  // of the path, and the standing tree with the most others within 12 blocks.
-  const woods = await page.evaluate(() => {
-    const g = window.__game, sys = g.view.game.systems;
-    const seen = new Map();
-    for (const [x, z] of [[25, -232], [45, -232], [65, -232], [85, -225], [100, -205], [112, -192], [25, -210], [55, -210]]) {
-      g.teleport(x, z);
-      for (const t of sys.trees.all()) if (t.standing) seen.set(`${t.x},${t.z}`, { x: t.x + 0.5, z: t.z + 0.5 });
-    }
-    g.teleport(-12, -236);
-    const trees = [...seen.values()].filter((t) => t.x > 15 && t.x < 125 && t.z > -265 && t.z < -180);
-    const near = (a) => trees.filter((b) => Math.hypot(a.x - b.x, a.z - b.z) < 12);
-    const best = trees.map((t) => ({ t, n: near(t).length })).sort((a, b) => b.n - a.n)[0];
-    return best ? { center: best.t, count: best.n, trees: near(best.t) } : { center: null, count: 0, trees: [] };
-  });
-  console.log(`the thickest stand near the path: ${woods.count} trees around ${woods.center ? `${woods.center.x}, ${woods.center.z}` : 'nowhere'}`);
-  // Through the stand west to east, passing two blocks off each trunk.
-  const through = woods.trees.sort((a, b) => a.x - b.x).filter((t, i, all) => i === 0 || t.x - all[i - 1].x > 2.5).slice(0, 6).map((t) => ({ x: t.x + 1.8, z: t.z + 1.8 }));
+  // The thickest stand on the way is the row of oaks and birches north of the grant and the three oaks over the
+  // mossy rocks (src/game/content/region.ts). Wild trees near the path stand too far apart to walk under.
+  const through = [{ x: -24, z: -250.5 }, { x: -16, z: -251 }, { x: -8, z: -251 }, { x: -1, z: -249 }, { x: 4, z: -244 }, { x: 5, z: -237 }, { x: 10, z: -235.5 }];
 
   log('meadow'); await wait(6, 'meadow');
-  await walk({ x: 8, z: -230 }, 'meadow');
-  await walk({ x: 6, z: -227 }, 'meadow', { soft: true, limit: 6 });
-  // On to the edge of the stand over the open grass, then in under the trees.
-  if (through.length) await walk({ x: through[0].x - 6, z: through[0].z }, 'meadow', { limit: 40 });
+  await walk({ x: -20, z: -238 }, 'meadow');
+  await walk({ x: -25, z: -244 }, 'meadow', { soft: true, limit: 6 });
   log('through the trees');
-  for (const p of through.length ? through : [{ x: 30, z: -232 }, { x: 45, z: -236 }]) await walk(p, 'trees', { limit: 20 });
-  await wait(4, 'trees');
+  for (const p of through) await walk(p, 'trees', { limit: 20 });
+  await wait(3, 'trees');
+  await walk({ x: 16, z: -224 }, 'trees');
   log('onto the path');
   await walk({ x: 70, z: -221 }, 'path');
   await walk({ x: 92, z: -221 }, 'path');
