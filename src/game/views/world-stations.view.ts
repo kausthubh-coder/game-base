@@ -1,4 +1,3 @@
-import { loadEnvironmentModels } from '../../features/props/models.view.ts';
 // Draws the stations the player set down: every entry of `game.systems.placeables.all()` gets the prop
 // its definition names (workbench, chest, bed), turned by its quarter turns.
 //
@@ -27,8 +26,7 @@ interface Shown {
   seen: number;
 }
 
-export async function install(view: GameView): Promise<void> {
-  await loadEnvironmentModels();
+export function install(view: GameView): void {
   const { game } = view;
   const props = worldProps(view);
   const shown: Shown[] = [];

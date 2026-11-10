@@ -1,6 +1,5 @@
-import { loadEnvironmentModels } from '../../features/props/models.view.ts';
-// Draws each crop's solid Blender model on its soil block. The sheet coordinates identify its stage;
-// no crop texture is sampled. Wet soil gets a dark patch.
+// Draws the crops: every crop of `game.systems.crops.all()` stands on its soil block as two crossed quads
+// with the tile of its stage from the manifest's `crops` sheet, and wet soil gets a dark patch.
 // Two draw calls: one for all plants, one for all wet patches.
 //
 // No event tells a view that a crop is gone or that a save was loaded, so each frame the list is compared
@@ -25,8 +24,7 @@ function own(x: number, z: number): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-export async function install(view: GameView): Promise<void> {
-  await loadEnvironmentModels();
+export function install(view: GameView): void {
   const { game, assets } = view;
   if (!assets.sheetNames().includes('crops')) {
     console.warn('[crops] the manifest lists no crops sheet, so crops are not drawn.');
@@ -123,9 +121,9 @@ export async function install(view: GameView): Promise<void> {
       if (!same || (seenWet[i] > 0) !== (state.wet > 0)) wetChanged = true;
       if (!same || seenStage[i] !== state.stage) {
         const cells = tilesOf(state.crop);
-        const stage = Math.max(state.stage, 0);
+        const stage = Math.min(Math.max(state.stage, 0), cells.length / 2 - 1);
         data[row] = crop.x + 0.5; data[row + 1] = crop.y + 1; data[row + 2] = crop.z + 0.5; data[row + 3] = own(crop.x, crop.z);
-        data[row + 4] = stage * sheet.tile / sheet.pixels.width; data[row + 5] = cells[1] ?? 0;
+        data[row + 4] = cells[stage * 2]; data[row + 5] = cells[stage * 2 + 1];
         // It pops only when the plant that stood here grew. A plant that just came into the list does not.
         data[row + 6] = same && state.stage > seenStage[i] ? now : NEVER;
         data[row + 7] = 0;

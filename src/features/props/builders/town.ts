@@ -1,4 +1,3 @@
-import { TownShape } from './town-shape.ts';
 // Town pieces. Things fixed to a wall (door, window, sign, awning) have their middle on the wall's
 // outer face at x = 0, z = 0, and their front toward +z, away from the wall.
 import type * as THREE from 'three';
@@ -18,7 +17,7 @@ function leaf(s: Shape, wide: number, tall: number): void {
 
 /** Variants: closed, open (swung out), and a barn's two tall leaves folded back against the wall. */
 export function door(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(801 + variant);
+  const s = new Shape(801 + variant);
   if (variant === 2) {
     // It fills an opening two blocks wide and three high. The braces are thick enough to show on both faces.
     const barnLeaf = () => {
@@ -41,7 +40,7 @@ export function door(variant: number): THREE.BufferGeometry {
 
 /** It covers the outer face of one glass block. The glass glows when it is dark. */
 export function townWindow(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(829 + variant);
+  const s = new Shape(829 + variant);
   s.box(0, 0, 0.04, 1.06, 0.1, 0.18, P.timber);
   s.box(0, 0.9, 0.02, 1, 0.1, 0.12, P.timber);
   for (const x of [-0.45, 0.45]) s.box(x, 0.1, 0.02, 0.1, 0.8, 0.12, P.timber, { skip: '+y-y' });
@@ -68,7 +67,7 @@ export function townWindow(variant: number): THREE.BufferGeometry {
 }
 
 export function chimney(): THREE.BufferGeometry {
-  const s = new TownShape(853);
+  const s = new Shape(853);
   s.box(0, 0, 0, 0.58, 1.25, 0.58, RAMP.brick, { bevel: 0.03, skip: '-y', grade: 0.25 });
   // A few stones that stand proud, so the stack is not one flat block.
   s.box(0.08, 0.25, 0.29, 0.26, 0.14, 0.04, RAMP.stone, { skip: '-z' });
@@ -86,7 +85,7 @@ export function chimney(): THREE.BufferGeometry {
  * street. The mark goes through the board, so it shows from behind too.
  */
 export function sign(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(877 + variant);
+  const s = new Shape(877 + variant);
   s.box(0, 2.42, 0.24, 0.06, 0.06, 0.48, P.slate);
   s.tube([[0, 2.08, 0.02], [0, 2.42, 0.36]], [0.025, 0.025], 4, P.slate, { cap: 'none', flat: true });
   s.box(0, 2.42, 0.46, 0.8, 0.06, 0.06, P.slate);
@@ -109,7 +108,7 @@ export function sign(variant: number): THREE.BufferGeometry {
 
 /** Striped cloth over a shop front two blocks wide, on two poles. The strip along its front edge moves in the wind. */
 export function awning(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(907 + variant);
+  const s = new Shape(907 + variant);
   const cloth = variant === 0 ? [P.teal, P.plasterLight] : [P.rust, P.plasterLight];
   const half = 1.1, back = 2.35, front = 1.9, reach = 1.1, stripes = 6;
   for (let i = 0; i < stripes; i++) {
@@ -124,7 +123,7 @@ export function awning(variant: number): THREE.BufferGeometry {
 
 /** A table under a striped roof, with goods on it. Variants: produce, bread, cloth. */
 export function stall(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(929 + variant);
+  const s = new Shape(929 + variant);
   const cloth = [[P.teal, P.plasterLight], [P.rust, P.plasterLight], [P.gold, P.plasterLight]][variant];
   s.box(0, 0.74, 0, 2.2, 0.1, 1.1, P.plankLight);
   for (const x of [-1.02, 1.02]) for (const z of [-0.47, 0.47]) s.box(x, 0, z, 0.1, 2.05, 0.1, P.timber, { skip: '-y+y' });
@@ -163,7 +162,7 @@ export function stall(variant: number): THREE.BufferGeometry {
 }
 
 export function well(): THREE.BufferGeometry {
-  const s = new TownShape(953);
+  const s = new Shape(953);
   s.cyl(0, 0, 0, 0.84, 0.8, 0.7, 10, RAMP.stone, { cap: 'none', flat: true });
   s.cyl(0, 0.3, 0, 0.58, 0.58, 0.4, 10, RAMP.stone[0], { cap: 'none', flat: true, inside: true });
   for (let k = 0; k < 10; k++) {
@@ -191,7 +190,7 @@ export function well(): THREE.BufferGeometry {
 
 /** One meter of fence along x: a post at its left end and two rails. `post` is the post alone, to end a run. */
 export function fence(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(971 + variant);
+  const s = new Shape(971 + variant);
   const x = variant === 0 ? -0.5 : 0;
   s.box(x, 0, 0, 0.14, 0.92, 0.14, P.timber, { skip: '-y' });
   s.cone(x, 0.92, 0, 0.1, 0.08, 4, P.timberLight, { turn: Math.PI / 4 });
@@ -204,7 +203,7 @@ export function fence(variant: number): THREE.BufferGeometry {
 
 /** A gate one block wide between two tall posts. Variants: closed, open. */
 export function gate(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(983 + variant);
+  const s = new Shape(983 + variant);
   for (const x of [-0.5, 0.5]) {
     s.box(x, 0, 0, 0.16, 1.2, 0.16, P.timber, { skip: '-y' });
     s.cone(x, 1.2, 0, 0.12, 0.1, 4, P.timberLight, { turn: Math.PI / 4 });
@@ -220,7 +219,7 @@ export function gate(variant: number): THREE.BufferGeometry {
 
 /** A wooden post with a lantern hanging from its arm. The lantern glows when it is dark. */
 export function lampPost(): THREE.BufferGeometry {
-  const s = new TownShape(997);
+  const s = new Shape(997);
   s.box(0, 0, 0, 0.34, 0.26, 0.34, RAMP.stone, { bevel: 0.04, skip: '-y' });
   s.box(0, 0.26, 0, 0.12, 2.5, 0.12, P.timber, { skip: '-y' });
   s.box(0.3, 2.62, 0, 0.74, 0.09, 0.09, P.timber);
@@ -238,7 +237,7 @@ export function lampPost(): THREE.BufferGeometry {
 
 /** A post where roads part, with a board for each way. Its first board points along +x. Variants: two ways, three ways. */
 export function signpost(variant: number): THREE.BufferGeometry {
-  const s = new TownShape(1013 + variant);
+  const s = new Shape(1013 + variant);
   s.box(0, 0, 0, 0.32, 0.16, 0.32, RAMP.stone, { bevel: 0.03, skip: '-y' });
   s.box(0, 0.16, 0, 0.14, 2.1, 0.14, P.timber, { skip: '-y' });
   s.cone(0, 2.26, 0, 0.11, 0.1, 4, P.timberLight, { turn: Math.PI / 4 });
@@ -259,7 +258,7 @@ export function signpost(variant: number): THREE.BufferGeometry {
 }
 
 export function bench(): THREE.BufferGeometry {
-  const s = new TownShape(1009);
+  const s = new Shape(1009);
   s.box(0, 0.42, 0.02, 1.5, 0.07, 0.44, P.plankLight);
   for (const y of [0.62, 0.82]) s.box(0, y, -0.2, 1.5, 0.13, 0.05, P.plank);
   for (const x of [-0.64, 0.64]) {
