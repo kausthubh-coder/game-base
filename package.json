@@ -1,0 +1,30 @@
+{
+  "name": "game-base",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "bun tools/typecheck.mjs",
+    "test": "bun test src",
+    "boundaries": "bun tools/boundaries.mjs",
+    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && bun test src",
+    "demo:build": "bun tools/demo.mjs build",
+    "demo:dev": "bun tools/demo.mjs dev",
+    "serve": "bun tools/serve.mjs",
+    "shot": "bun tools/shot.mjs"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/three": "^0.187.0",
+    "playwright-core": "^1.65.0",
+    "sharp": "^0.35.5",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.6"
+  },
+  "dependencies": {
+    "three": "^0.187.0"
+  }
+}
