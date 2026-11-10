@@ -1081,5 +1081,9 @@
       "budget": 300,
       "bytes": 29236
     }
+  },
+  "voice": {
+    "lines": "voice/voice.json",
+    "model": "eleven_v4_turbo"
   }
 }

@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {
-  checkBlockTiles, checkManifest, checkNames, checkPalettes, checkProps, checkSizes, checkSprites,
+  checkBlockTiles, checkManifest, checkNames, checkPalettes, checkProps, checkSizes, checkSprites, checkVoice,
   countTriangles, inspectProps, pngSize,
 } from './verify-assets.mjs';
 
@@ -221,11 +221,11 @@ describe('names that code refers to', () => {
     const plain = run(root);
     expect(plain.status).toBe(0);
     expect(plain.out).toContain("  - [names] src/game/content/items.ts:2  icon 'plank' is not in manifest.icons.names or a sheet under manifest.icons.sheets");
-    expect(plain.out).toEndWith('TOTAL PASS: 7 checks, 7 passed, 0 failed, 3 warnings\n');
+    expect(plain.out).toEndWith('TOTAL PASS: 8 checks, 8 passed, 0 failed, 3 warnings\n');
     const strict = run(root, '--strict');
     expect(strict.status).toBe(1);
     expect(strict.out).toContain('FAILED names: 3 failures');
-    expect(strict.out).toEndWith('TOTAL FAIL: 7 checks, 6 passed, 1 failed, 0 warnings. First failure: names\n');
+    expect(strict.out).toEndWith('TOTAL FAIL: 8 checks, 7 passed, 1 failed, 0 warnings. First failure: names\n');
   });
 });
 
@@ -326,6 +326,38 @@ describe('music palettes', () => {
   });
 });
 
+describe('voiced lines', () => {
+  const list = (lines) => JSON.stringify({ version: 1, model: 'eleven_v4_turbo', lines, conversations: { 'gus.first': Object.keys(lines) } });
+  const voiced = (files) => withManifest((m) => { m.voice = { lines: 'voice/voice.json', model: 'eleven_v4_turbo' }; }, files);
+
+  test('every listed clip is there with a rising letter time per character, and its files count as listed', () => {
+    const root = voiced({
+      'public/assets/voice/voice.json': list({ 'gus|Hoe.': { file: 'voice/gus/abc.mp3', seconds: 1.2, reveal: [100, 200, 300, 300] } }),
+      'public/assets/voice/gus/abc.mp3': 'mp3',
+    });
+    expect(checkVoice(root, JSON.parse(fs.readFileSync(path.join(root, 'public/assets/manifest.json'), 'utf8')))).toEqual({ failures: [], detail: '1 clip, 0.0 minutes, model eleven_v4_turbo' });
+    expect(checkManifest(root).warnings).toEqual([]);
+  });
+
+  test('a missing clip, a clip nobody lists, and letter times that do not fit the text fail', () => {
+    const root = voiced({
+      'public/assets/voice/voice.json': list({ 'gus|Hoe.': { file: 'voice/gus/gone.mp3', seconds: 1.2, reveal: [100, 50] } }),
+      'public/assets/voice/gus/old.mp3': 'mp3',
+    });
+    const manifest = JSON.parse(fs.readFileSync(path.join(root, 'public/assets/manifest.json'), 'utf8'));
+    expect(checkVoice(root, manifest).failures).toEqual([
+      'voice/voice.json: the clip of "gus|Hoe." (voice/gus/gone.mp3) is missing.',
+      'voice/voice.json: "gus|Hoe." needs one whole, rising millisecond per character of its text in "reveal".',
+      'public/assets/voice/gus/old.mp3 is not in voice/voice.json. Run tools/voice.ts, which deletes the clips of lines that are gone.',
+    ]);
+  });
+
+  test('clips with no list in the manifest fail', () => {
+    const root = repoWith({ 'public/assets/voice/gus/abc.mp3': 'mp3' });
+    expect(checkVoice(root, goodManifest()).failures).toEqual(['public/assets/voice holds 1 clip but manifest.json has no "voice.lines" to list them.']);
+  });
+});
+
 describe('file sizes', () => {
   test('a PNG over the limit and a folder over the limit both fail, and the table lists every file', () => {
     const root = repoWith({ 'public/assets/sprites/hero.png': png(64, 96, 3000) });
@@ -349,9 +381,9 @@ describe('the command', () => {
     const { status, out } = run(repoWith());
     expect(status).toBe(0);
     expect(out.split('\n').filter((l) => /^(PASS|FAIL) /.test(l)).map((l) => l.split(/\s+/).slice(0, 2).join(' '))).toEqual([
-      'PASS manifest', 'PASS sprite-check', 'PASS names', 'PASS block-tiles', 'PASS props', 'PASS palettes', 'PASS sizes',
+      'PASS manifest', 'PASS sprite-check', 'PASS names', 'PASS block-tiles', 'PASS props', 'PASS palettes', 'PASS sizes', 'PASS voice',
     ]);
-    expect(out).toEndWith('TOTAL PASS: 7 checks, 7 passed, 0 failed, 0 warnings\n');
+    expect(out).toEndWith('TOTAL PASS: 8 checks, 8 passed, 0 failed, 0 warnings\n');
   });
 
   test('it exits 1, lists every failure of the first failing check, and only counts the later ones', () => {
@@ -365,15 +397,15 @@ describe('the command', () => {
     expect(out).toContain('FAILED manifest: 2 failures\n  - sprites.hero.sheet is "sprites/gone.png". No such file in public/assets/.\n  - icons.names.stone: cell [9, 9]');
     expect(out).toContain('Also failing: block-tiles (1). Fix manifest first, or list everything with --all.');
     expect(out).not.toContain('FAILED block-tiles');
-    expect(out).toEndWith('TOTAL FAIL: 7 checks, 5 passed, 2 failed, 1 warning. First failure: manifest\n');
+    expect(out).toEndWith('TOTAL FAIL: 8 checks, 6 passed, 2 failed, 1 warning. First failure: manifest\n');
     expect(run(root, '--all').out).toContain("FAILED block-tiles: 1 failure\n  - tile 'dirt' (block grass) has no cell in manifest.blocks.tiles");
   });
 
-  test('on this repo it prints a line for each of the seven checks and exits 1 exactly when one says FAIL', () => {
+  test('on this repo it prints a line for each of the eight checks and exits 1 exactly when one says FAIL', () => {
     const result = spawnSync(process.execPath, [script], { cwd: repo, encoding: 'utf8' });
     const lines = result.stdout.split('\n').filter((l) => /^(PASS|FAIL) /.test(l));
-    expect(lines.map((l) => l.split(/\s+/)[1])).toEqual(['manifest', 'sprite-check', 'names', 'block-tiles', 'props', 'palettes', 'sizes']);
+    expect(lines.map((l) => l.split(/\s+/)[1])).toEqual(['manifest', 'sprite-check', 'names', 'block-tiles', 'props', 'palettes', 'sizes', 'voice']);
     expect(result.status).toBe(lines.some((l) => l.startsWith('FAIL')) ? 1 : 0);
-    expect(result.stdout).toMatch(/\nTOTAL (PASS|FAIL): 7 checks, \d passed, \d failed, \d+ warnings?(\. First failure: [a-z-]+)?\n$/);
+    expect(result.stdout).toMatch(/\nTOTAL (PASS|FAIL): 8 checks, \d passed, \d failed, \d+ warnings?(\. First failure: [a-z-]+)?\n$/);
   });
 });

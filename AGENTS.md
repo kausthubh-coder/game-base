@@ -20,6 +20,7 @@ Read `15-system-design.md`, `12-art.md` and `13-sound.md` there before a large c
 | `bun tools/serve.mjs <folder> <port>` | Serves a built folder. It prints its pid. |
 | `bun tools/shot.mjs <url> <out.png>` | Screenshot in headless Chrome. Exits 1 on a console error. |
 | `bun run dev` | The game itself, on port 5300 |
+| `bun --env-file=.env.local tools/voice.ts` | Makes the voice clips of new or changed lines (`--dry` prices it first). Needs `ELEVENLABS_API_KEY` in `.env.local` |
 
 ## Layout
 
@@ -40,7 +41,7 @@ docs/                  briefs, the style sheet, the asset contract
 1. **A `.sim.ts` file is game rules.** It will run on a server later. It imports only other `.sim.ts` files, `src/content` and `engine/types`, `events` or `world-query`. It never touches Three.js, the page or Web Audio. `bun run boundaries` fails otherwise. Drawing goes in `.view.ts`, panels in `.ui.ts`.
 2. **A feature is a deep module.** It exports `createX(ctx, options)` and returns a `ViewSystem` plus a few methods of its own. No globals, no singletons, no reaching into another feature's files. Features meet through `src/engine` and through `src/main.ts`.
 3. **Content is data.** A block, a sound palette, an effect or a prop is an entry in `src/content`. Adding one does not change engine code.
-4. **No sound files. 3D models are made by code.** Code makes every sound. Simple shapes are TypeScript builders in `src/features/props/builders`. Richer models (trees, rocks, bushes) are `.glb` files built by Blender scripts in `tools/models/` and listed in `public/assets/manifest.json`; never commit a model no script rebuilds. Sprites and textures are PNG files listed there too.
+4. **No sound files but voiced lines. 3D models are made by code.** Code makes the music, the ambience and every effect. The one exception is spoken dialogue: `tools/voice.ts` makes a clip for each line a person in `src/game/content/cast.ts` says, ahead of time, into `public/assets/voice/` with its list `voice/voice.json` (see `docs/assets.md`). Never add a voice clip by hand, and never call ElevenLabs from the game. Simple shapes are TypeScript builders in `src/features/props/builders`. Richer models (trees, rocks, bushes) are `.glb` files built by Blender scripts in `tools/models/` and listed in `public/assets/manifest.json`; never commit a model no script rebuilds. Sprites and textures are PNG files listed there too.
 5. **Space.** y is up. One unit is one block is one meter. North is -z, east is +x.
 6. **Speed is part of done.** The target is 60 frames a second on a mid laptop with integrated graphics, with room to spare: 150 draw calls, 400,000 triangles, 6 ms of script per frame. Allocate nothing per frame. Every view system works at `low`, `medium` and `high` quality.
 7. **This Mac draws WebGL in software.** Use screenshots to check what is drawn. Never report a frame rate measured here.
