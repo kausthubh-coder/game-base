@@ -1,6 +1,9 @@
+import {banding,bandThreshold,bandExempt} from './banding.mjs';
+import {blockTileNames} from '../../src/content/blocks.ts';
+import {createHash} from 'node:crypto';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import {sprites,tiles,icons,animations} from './config.mjs';
+import {sprites,tiles,extraTiles,icons,animations} from './config.mjs';
 import {root,readJSON,pixels,cell,bounds,writeJSON} from './lib.mjs';
 const m=await readJSON('public/assets/manifest.json'),palette=new Set((await readJSON('assets-src/palette.json')).colors.map(s=>s.slice(1)));let frames=0;
 assert.equal(m.version,1);assert.deepEqual(Object.keys(m.sprites).sort(),Object.keys(sprites).sort());
@@ -13,9 +16,13 @@ for(const [name,c]of Object.entries(sprites)){
  for(let x=0;x<c.size;x++)for(const y of [0,c.size-1])assert.equal(q.data[(y*c.size+x)*4+3],0,name+' background');for(let y=0;y<c.size;y++)for(const x of [0,c.size-1])assert.equal(q.data[(y*c.size+x)*4+3],0,name+' background');frames++;
  }console.log('OK '+name+': sizes, anchors, transparency, palette and padding');
 }
-assert.equal(m.blocks.tile,32);assert.deepEqual(Object.keys(m.blocks.tiles).sort(),[...new Set(tiles)].sort());const bp=await read(m.blocks.atlas,256,128);let tileCount=0;
-for(const [name,cells]of Object.entries(m.blocks.tiles)){assert.equal(cells.length,tiles.filter(t=>t===name).length);for(const [x,y]of cells){assert(Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&x<8&&y>=0&&y<4);const p=await cell(bp,x,y,8,4);for(let i=3;i<p.data.length;i+=4)assert.equal(p.data[i],255,name+' opaque tile');for(let k=0;k<32;k++)for(let c=0;c<4;c++){assert.equal(p.data[(k*32)*4+c],p.data[(k*32+31)*4+c],name+' horizontal seam');assert.equal(p.data[k*4+c],p.data[(31*32+k)*4+c],name+' vertical seam');}tileCount++;}}
+assert.equal(m.blocks.tile,32);assert.deepEqual(Object.keys(m.blocks.tiles).sort(),[...new Set([...tiles,...extraTiles])].sort());const atlasRows=Math.ceil((tiles.length+extraTiles.length)/8);const bp=await read(m.blocks.atlas,256,atlasRows*32);let tileCount=0;
+for(const [name,cells]of Object.entries(m.blocks.tiles)){assert.equal(cells.length,[...tiles,...extraTiles].filter(t=>t===name).length);for(const [x,y]of cells){assert(Number.isInteger(x)&&Number.isInteger(y)&&x>=0&&x<8&&y>=0&&y<atlasRows);const p=await cell(bp,x,y,8,atlasRows);for(let i=3;i<p.data.length;i+=4)assert.equal(p.data[i],255,name+' opaque tile');for(let k=0;k<32;k++)for(let c=0;c<4;c++){assert.equal(p.data[(k*32)*4+c],p.data[(k*32+31)*4+c],name+' horizontal seam');assert.equal(p.data[k*4+c],p.data[(31*32+k)*4+c],name+' vertical seam');}assert(bandExempt.has(name)||banding(p)<=bandThreshold,`${name} banding ${banding(p).toFixed(2)} exceeds ${bandThreshold}`);tileCount++;}}
+for(const name of blockTileNames().filter(n=>n!=='water'))assert(m.blocks.tiles[name]?.length,'missing content tile '+name);
+const baseline=await readJSON('assets-src/block-baseline-2.json');
+assert.deepEqual(m.sprites,baseline.manifest.sprites,'sprite manifest unchanged');assert.deepEqual(m.icons,baseline.manifest.icons,'icon manifest unchanged');
+for(const [path,hash]of Object.entries(baseline.hashes))assert.equal(createHash('sha256').update(await fs.readFile(root+'public/assets/'+path)).digest('hex'),hash,path+' unchanged');
 assert.equal(m.icons.tile,32);assert.deepEqual(Object.keys(m.icons.names).sort(),icons.slice().sort());const ip=await read(m.icons.sheet,128,128);for(const name of icons){const [x,y]=m.icons.names[name];assert.deepEqual([x,y],[icons.indexOf(name)%4,Math.floor(icons.indexOf(name)/4)]);const p=await cell(ip,x,y,4,4),b=bounds(p);assert(b.left>0&&b.top>0&&b.left+b.width<32&&b.top+b.height<32,name+' transparent padding');}
-console.log('OK manifest v1: every required asset and path exists');console.log('OK blocks: all opposite edges match exactly');console.log('OK icons: transparent padding and locked palette');
+console.log('OK manifest v1: every required asset and path exists');console.log('OK blocks: all opposite edges match exactly');console.log('OK blocks: 4x4 row/column RGB mean deviation <= '+bandThreshold);console.log('OK content: every tile except shader water has atlas cells');console.log('OK sprites and icons: SHA-256 and manifest entries unchanged');console.log('OK icons: transparent padding and locked palette');
 const result=`PASS ${frames} sprite frames; ${tileCount} block tiles; ${icons.length} icons; all PNG colors in locked palette`;
 console.log(result);await writeJSON('.artifacts/sprites/check-result.json',{status:'PASS',frames,tiles:tileCount,icons:icons.length,result});

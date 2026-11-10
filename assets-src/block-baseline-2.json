@@ -1,0 +1,465 @@
+{
+  "manifest": {
+    "version": 1,
+    "sprites": {
+      "hero": {
+        "sheet": "sprites/hero.png",
+        "frame": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          120
+        ],
+        "worldHeight": 2,
+        "animations": {
+          "idle": {
+            "frames": 4,
+            "fps": 4,
+            "rows": {
+              "front": 0,
+              "back": 1,
+              "side": 2
+            }
+          },
+          "walk": {
+            "frames": 6,
+            "fps": 10,
+            "rows": {
+              "front": 3,
+              "back": 4,
+              "side": 5
+            }
+          },
+          "tool": {
+            "frames": 3,
+            "fps": 8,
+            "rows": {
+              "front": 6
+            }
+          }
+        }
+      },
+      "villager-a": {
+        "sheet": "sprites/villager-a.png",
+        "frame": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          120
+        ],
+        "worldHeight": 2,
+        "animations": {
+          "idle": {
+            "frames": 2,
+            "fps": 4,
+            "rows": {
+              "front": 0,
+              "back": 1,
+              "side": 2
+            }
+          },
+          "walk": {
+            "frames": 4,
+            "fps": 10,
+            "rows": {
+              "front": 3,
+              "back": 4,
+              "side": 5
+            }
+          }
+        }
+      },
+      "villager-b": {
+        "sheet": "sprites/villager-b.png",
+        "frame": [
+          128,
+          128
+        ],
+        "anchor": [
+          64,
+          120
+        ],
+        "worldHeight": 2,
+        "animations": {
+          "idle": {
+            "frames": 2,
+            "fps": 4,
+            "rows": {
+              "front": 0,
+              "back": 1,
+              "side": 2
+            }
+          },
+          "walk": {
+            "frames": 4,
+            "fps": 10,
+            "rows": {
+              "front": 3,
+              "back": 4,
+              "side": 5
+            }
+          }
+        }
+      },
+      "pet": {
+        "sheet": "sprites/pet.png",
+        "frame": [
+          96,
+          96
+        ],
+        "anchor": [
+          48,
+          88
+        ],
+        "worldHeight": 0.85,
+        "animations": {
+          "idle": {
+            "frames": 2,
+            "fps": 4,
+            "rows": {
+              "front": 0,
+              "back": 1,
+              "side": 2
+            }
+          },
+          "walk": {
+            "frames": 4,
+            "fps": 10,
+            "rows": {
+              "front": 3,
+              "back": 4,
+              "side": 5
+            }
+          }
+        }
+      },
+      "critter": {
+        "sheet": "sprites/critter.png",
+        "frame": [
+          96,
+          96
+        ],
+        "anchor": [
+          48,
+          88
+        ],
+        "worldHeight": 0.85,
+        "animations": {
+          "idle": {
+            "frames": 2,
+            "fps": 4,
+            "rows": {
+              "front": 0,
+              "back": 1,
+              "side": 2
+            }
+          },
+          "walk": {
+            "frames": 4,
+            "fps": 10,
+            "rows": {
+              "front": 3,
+              "back": 4,
+              "side": 5
+            }
+          }
+        }
+      }
+    },
+    "blocks": {
+      "tile": 32,
+      "atlas": "blocks/atlas.png",
+      "tiles": {
+        "grass_top": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            0
+          ],
+          [
+            2,
+            0
+          ]
+        ],
+        "grass_side": [
+          [
+            3,
+            0
+          ]
+        ],
+        "dirt": [
+          [
+            4,
+            0
+          ],
+          [
+            5,
+            0
+          ],
+          [
+            6,
+            0
+          ]
+        ],
+        "tilled_soil": [
+          [
+            7,
+            0
+          ]
+        ],
+        "path": [
+          [
+            0,
+            1
+          ]
+        ],
+        "sand": [
+          [
+            1,
+            1
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ]
+        ],
+        "clay": [
+          [
+            4,
+            1
+          ]
+        ],
+        "stone": [
+          [
+            5,
+            1
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            7,
+            1
+          ]
+        ],
+        "mossy_stone": [
+          [
+            0,
+            2
+          ]
+        ],
+        "cobble": [
+          [
+            1,
+            2
+          ]
+        ],
+        "stone_brick": [
+          [
+            2,
+            2
+          ]
+        ],
+        "oak_log_side": [
+          [
+            3,
+            2
+          ]
+        ],
+        "oak_log_top": [
+          [
+            4,
+            2
+          ]
+        ],
+        "oak_plank": [
+          [
+            5,
+            2
+          ]
+        ],
+        "birch_log_side": [
+          [
+            6,
+            2
+          ]
+        ],
+        "pine_log_side": [
+          [
+            7,
+            2
+          ]
+        ],
+        "thatch": [
+          [
+            0,
+            3
+          ]
+        ],
+        "shingle": [
+          [
+            1,
+            3
+          ]
+        ],
+        "plaster": [
+          [
+            2,
+            3
+          ]
+        ],
+        "glass": [
+          [
+            3,
+            3
+          ]
+        ],
+        "oak_leaves": [
+          [
+            4,
+            3
+          ],
+          [
+            5,
+            3
+          ],
+          [
+            6,
+            3
+          ]
+        ],
+        "pine_needles": [
+          [
+            7,
+            3
+          ]
+        ]
+      }
+    },
+    "icons": {
+      "tile": 32,
+      "sheet": "icons/icons.png",
+      "names": {
+        "wood": [
+          0,
+          0
+        ],
+        "stone": [
+          1,
+          0
+        ],
+        "seed": [
+          2,
+          0
+        ],
+        "wheat": [
+          3,
+          0
+        ],
+        "berry": [
+          0,
+          1
+        ],
+        "fish": [
+          1,
+          1
+        ],
+        "pickaxe": [
+          2,
+          1
+        ],
+        "axe": [
+          3,
+          1
+        ],
+        "sword": [
+          0,
+          2
+        ],
+        "bow": [
+          1,
+          2
+        ],
+        "staff": [
+          2,
+          2
+        ],
+        "potion": [
+          3,
+          2
+        ],
+        "coin": [
+          0,
+          3
+        ],
+        "key": [
+          1,
+          3
+        ],
+        "book": [
+          2,
+          3
+        ],
+        "lantern": [
+          3,
+          3
+        ]
+      }
+    }
+  },
+  "hashes": {
+    "sprites/hero.png": "a6751005d7f7e030a2a0dc212bd66d3d6369005ef14c6083496da14cd836e9e1",
+    "sprites/villager-a.png": "10c92cf8be3b6303ee4bcbff5bffd8873267de638ca7ea5ac1383659a8e73f62",
+    "sprites/villager-b.png": "2f2f4a20b5578f2a5edaae02cb810ca8edcd4eb3686934ef7173cbcd049bf37a",
+    "sprites/pet.png": "cc81f8334ba311cfa66926769e0e9a9fa046698e1eec792cd1a9c54e9e07847f",
+    "sprites/critter.png": "e5af867f5616124b2da492b222449e2fc515c4446cca3690d10f6b6f5d82dcc5",
+    "icons/icons.png": "ec06f2019f7b1947edb59a63b16ebf149057599ca33ca3e419b486af9479de75"
+  },
+  "scores": {
+    "grass_top 1": 23.0654296875,
+    "grass_top 2": 9.3447265625,
+    "grass_top 3": 15.0771484375,
+    "grass_side 1": 45.9375,
+    "dirt 1": 5.26171875,
+    "dirt 2": 12.7802734375,
+    "dirt 3": 9.7626953125,
+    "tilled_soil 1": 29.1787109375,
+    "path 1": 35.3818359375,
+    "sand 1": 31.4404296875,
+    "sand 2": 30.7744140625,
+    "sand 3": 30.7666015625,
+    "clay 1": 14.9072265625,
+    "stone 1": 36.91796875,
+    "stone 2": 17.8251953125,
+    "stone 3": 32.2294921875,
+    "mossy_stone 1": 47.7109375,
+    "cobble 1": 39.3671875,
+    "stone_brick 1": 39.1455078125,
+    "oak_log_side 1": 19.9169921875,
+    "oak_log_top 1": 25.001953125,
+    "oak_plank 1": 56.5029296875,
+    "birch_log_side 1": 26.9521484375,
+    "pine_log_side 1": 31.361328125,
+    "thatch 1": 37.9345703125,
+    "shingle 1": 31.326171875,
+    "plaster 1": 59.2685546875,
+    "glass 1": 42.33984375,
+    "oak_leaves 1": 52.4453125,
+    "oak_leaves 2": 25.5185546875,
+    "oak_leaves 3": 22.54296875,
+    "pine_needles 1": 17.396484375
+  },
+  "bandThreshold": 18
+}

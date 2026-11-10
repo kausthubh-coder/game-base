@@ -48,11 +48,187 @@
     "#66e4cf",
     "#dafff5",
     "#263441",
-    "#eae6cd"
+    "#eae6cd",
+    "#d2ba89",
+    "#dac291",
+    "#e2ca99",
+    "#817f78",
+    "#898780",
+    "#918f88",
+    "#e6dcc5",
+    "#eee4cd",
+    "#f6ecd5",
+    "#65733d",
+    "#6d7b45",
+    "#75834d",
+    "#587132",
+    "#60793a",
+    "#688142",
+    "#7c806c",
+    "#848874",
+    "#8c907c",
+    "#397876",
+    "#41807e",
+    "#498886",
+    "#b1cacd",
+    "#b9d2d5",
+    "#c1dadd",
+    "#5e4128",
+    "#664930",
+    "#6e5138",
+    "#ab8f64",
+    "#b3976c",
+    "#bb9f74",
+    "#9d8058",
+    "#a58860",
+    "#ad9068",
+    "#cbb68a",
+    "#d3be92",
+    "#dbc69a",
+    "#9f7342",
+    "#a77b4a",
+    "#af8352",
+    "#41cbb3",
+    "#49d3bb",
+    "#51dbc3",
+    "#eccd8c",
+    "#f4d594",
+    "#fcdd9c",
+    "#e6c27b",
+    "#eeca83",
+    "#f6d28b",
+    "#65635c",
+    "#75736c",
+    "#83817a",
+    "#9d9b94",
+    "#73716a",
+    "#7d7b74",
+    "#999790",
+    "#1d5c5a",
+    "#2d6c6a",
+    "#3b7a78",
+    "#559492",
+    "#3c5516",
+    "#4c6526",
+    "#5a7334",
+    "#748d4e",
+    "#b5a074",
+    "#bfaa7e",
+    "#916534",
+    "#9b6f3e",
+    "#b78b5a",
+    "#6d6b64",
+    "#7a7871",
+    "#85837c",
+    "#908e87",
+    "#797770",
+    "#807e77",
+    "#8f8d86",
+    "#94928b",
+    "#bba67a",
+    "#c2ad81",
+    "#d1bc90",
+    "#d6c195",
+    "#976b3a",
+    "#9e7241",
+    "#ad8150",
+    "#b28655"
   ],
   "references": [
     "/Users/dabot/dev/sandbox/game-look-test/mockups/B1-side-25d-village.jpg",
     "/Users/dabot/dev/sandbox/game-look-test/mockups/C1-fixed-3d-village.jpg"
   ],
-  "method": "Nearest reference RGB to balanced material ramps; lume occupies final teal ramp."
+  "method": "Original reference palette retained; explicit low-contrast material ramps added for block repair. Roof teal is muted; bright lume teal stays reserved for magic.",
+  "materialRamps": {
+    "sand": [
+      "#d2ba89",
+      "#dac291",
+      "#e2ca99"
+    ],
+    "stone": [
+      "#817f78",
+      "#898780",
+      "#918f88"
+    ],
+    "plaster": [
+      "#e6dcc5",
+      "#eee4cd",
+      "#f6ecd5"
+    ],
+    "grass_side": [
+      "#65733d",
+      "#6d7b45",
+      "#75834d"
+    ],
+    "oak_leaves": [
+      "#587132",
+      "#60793a",
+      "#688142"
+    ],
+    "mossy_stone": [
+      "#7c806c",
+      "#848874",
+      "#8c907c"
+    ],
+    "cobble": [
+      "#817f78",
+      "#898780",
+      "#918f88"
+    ],
+    "stone_brick": [
+      "#817f78",
+      "#898780",
+      "#918f88"
+    ],
+    "shingle": [
+      "#397876",
+      "#41807e",
+      "#498886"
+    ],
+    "glass": [
+      "#b1cacd",
+      "#b9d2d5",
+      "#c1dadd"
+    ],
+    "tilled_top": [
+      "#5e4128",
+      "#664930",
+      "#6e5138"
+    ],
+    "path_top": [
+      "#ab8f64",
+      "#b3976c",
+      "#bb9f74"
+    ],
+    "path_side": [
+      "#9d8058",
+      "#a58860",
+      "#ad9068"
+    ],
+    "birch_log_top": [
+      "#cbb68a",
+      "#d3be92",
+      "#dbc69a"
+    ],
+    "pine_log_top": [
+      "#9f7342",
+      "#a77b4a",
+      "#af8352"
+    ],
+    "lume_crystal": [
+      "#41cbb3",
+      "#49d3bb",
+      "#51dbc3"
+    ],
+    "lamp_top": [
+      "#eccd8c",
+      "#f4d594",
+      "#fcdd9c"
+    ],
+    "lamp_side": [
+      "#e6c27b",
+      "#eeca83",
+      "#f6d28b"
+    ]
+  }
 }

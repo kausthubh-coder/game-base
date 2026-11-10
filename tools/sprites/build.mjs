@@ -1,3 +1,5 @@
+// Approved sprites and icons stay untouched by default. The old full rebuild is explicit.
+if(!process.argv.includes('--rebuild-original-set')) { await import('./build-blocks.mjs'); process.exit(0); }
 import sharp from 'sharp';
 import fs from 'node:fs/promises';
 import {sprites,tiles,icons,animations} from './config.mjs';
@@ -27,3 +29,6 @@ const ip=await pixels('assets-src/raw/icons-1.png'),il=[];
 for(let i=0;i<icons.length;i++){const p=clean(await cell(ip,i%4,Math.floor(i/4),4,4)),b=bounds(p);snap(p,palette);const q=await fitted(p,b,26/Math.max(b.width,b.height)),xy=[i%4,Math.floor(i/4)];il.push({input:q.input,left:xy[0]*32+Math.floor((32-q.w)/2),top:xy[1]*32+Math.floor((32-q.h)/2)});manifest.icons.names[icons[i]]=xy;}
 await sharp({create:{width:128,height:128,channels:4,background:'#00000000'}}).composite(il).png().toFile(root+'public/assets/icons/icons.png');
 await writeJSON('public/assets/manifest.json',manifest);console.log('Built five sprite sheets, block atlas, icon sheet and manifest');
+
+// Reapply repaired block sources even after an explicitly requested original-set rebuild.
+await import('./build-blocks.mjs');

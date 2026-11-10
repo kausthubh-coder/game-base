@@ -1,5 +1,7 @@
 # Sprite asset experiment
 
+The block repair supersedes the block findings and rebuild steps below. Read `NOTES-2.md` for the current commands, five delivery checks, visual issues and attempts. The earlier character and icon findings below still apply.
+
 ISSUES. All files and automated checks pass. The strict visual no-seams check fails for some block textures.
 
 Built with the built-in image_gen.imagegen tool. Raw generated PNGs are in `assets-src/raw/`. The exact prompts are in `prompts.json` and `clay-prompt.txt`. No artwork was drawn in code. Sharp performs slicing, cleanup, alignment, palette conversion, edge blending and packing.
