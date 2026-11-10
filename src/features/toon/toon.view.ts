@@ -344,11 +344,14 @@ class Character implements ToonHandle {
   }
 }
 
+/** The ramp's lowest step: the light on the side of a body turned away from the sun. */
+const RAMP_LOW = 132;
+
 /** Two or three steps of light. Nearest filtering keeps the steps hard. */
 function stepRamp(): THREE.DataTexture {
   const ramp = new THREE.DataTexture(new Uint8Array([
-    132, 132, 132, 255,
-    132, 132, 132, 255,
+    RAMP_LOW, RAMP_LOW, RAMP_LOW, 255,
+    RAMP_LOW, RAMP_LOW, RAMP_LOW, 255,
     200, 200, 200, 255,
     255, 255, 255, 255,
     255, 255, 255, 255,
@@ -381,7 +384,10 @@ export function createToonCast(ctx: ViewContext, options: ToonOptions = {}): Too
     uLamp: { value: new THREE.Color(LAMP[0], LAMP[1], LAMP[2]) },
     uMinLight: { value: options.minLight ?? 0.08 },
     uOutline: { value: outlineWidth },
+    /** Half the height of the picture in pixels, for the outline's width on screen. */
+    uHalfHeight: { value: 450 },
   };
+  const drawn = new THREE.Vector2();
   const stats: ToonStats = { characters: 0, drawCalls: 0, triangles: 0 };
   let countedCall = -1;
   let sun: THREE.DirectionalLight | null = null;
@@ -420,6 +426,7 @@ export function createToonCast(ctx: ViewContext, options: ToonOptions = {}): Too
       poseVertices(shader, { ...uniforms, ...shared }, 'normal');
       shader.fragmentShader = shader.fragmentShader
         .replace('#include <common>', `#include <common>
+#define SHADED_STEP ${(RAMP_LOW / 255).toFixed(4)}
 uniform vec3 uRim;
 uniform vec3 uLamp;
 uniform float uMinLight;
@@ -428,6 +435,12 @@ varying vec3 vToonLight;
 varying float vToonGlow;`)
         .replace('vec4 diffuseColor = vec4( diffuse, opacity );', 'vec4 diffuseColor = vec4( vToon, opacity );')
         .replace('#include <opaque_fragment>', `
+          // A cast shadow never makes a body darker than its own shaded side: the ramp's lowest step of the sun
+          // still reaches it, as it reaches the side turned away. Without this a person in a house's shadow kept
+          // only the sky's fill and went nearly black, while a sprite beside them stayed lit.
+          #if NUM_DIR_LIGHTS > 0
+            outgoingLight = max(outgoingLight, reflectedLight.indirectDiffuse + diffuseColor.rgb * directionalLights[0].color * (SHADED_STEP * RECIPROCAL_PI));
+          #endif
           // Sky light where it stands dims everything; lamp light adds warmth.
           float sky = pow(0.8, 15.0 * (1.0 - vToonLight.x));
           float lamp = pow(0.8, 15.0 * (1.0 - vToonLight.y)) * step(0.02, vToonLight.y);
@@ -445,10 +458,14 @@ varying float vToonGlow;`)
     // A file painted by vertex colours darkens them for its outline too, not the white of its one slot.
     const outlineMaterial = new THREE.MeshBasicMaterial({ side: THREE.BackSide, fog: true, name: `toon-outline-${name}`, vertexColors: spec.vertexColours ?? false });
     outlineMaterial.onBeforeCompile = (shader) => {
-      // Pushed out along the normal by a width in blocks, whatever the character's scale.
-      poseVertices(shader, { ...uniforms, ...shared }, 'position',
-        'if (toonWorn > 0.5) transformed += normalize(mat3(toonM) * normal) * (uOutline / max(toonScale, 0.01));');
-      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nuniform float uOutline;');
+      // Pushed out along the normal by a width in blocks, whatever the character's scale. Where that width is
+      // under a pixel or so on screen the outline shrinks away: a dark line a pixel wide round a figure 30 pixels
+      // tall would paint most of it dark.
+      poseVertices(shader, { ...uniforms, ...shared }, 'position', `
+        float toonDepth = projectionMatrix[3][3] > 0.5 ? 1.0 : max(-(modelViewMatrix * instanceMatrix * vec4(transformed, 1.0)).z, 0.01);
+        float toonPixels = uOutline * projectionMatrix[1][1] * uHalfHeight / toonDepth;
+        if (toonWorn > 0.5) transformed += normalize(mat3(toonM) * normal) * (uOutline * smoothstep(0.5, 1.5, toonPixels) / max(toonScale, 0.01));`);
+      shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nuniform float uOutline;\nuniform float uHalfHeight;');
       shader.fragmentShader = shader.fragmentShader
         .replace('#include <common>', '#include <common>\nvarying vec3 vToon;\nvarying vec3 vToonLight;\nvarying float vToonGlow;')
         // A soft outline: the colour underneath, darkened, not black.
@@ -640,6 +657,7 @@ varying float vToonGlow;`)
         readLight(all[cursor++]);
       }
       if (sun) shared.uRim.value.copy(sun.color).multiplyScalar(sun.intensity * 0.2);
+      if (frame.renderer) shared.uHalfHeight.value = frame.renderer.getDrawingBufferSize(drawn).y / 2;
       frame.camera.updateMatrixWorld();
       viewProjection.multiplyMatrices(frame.camera.projectionMatrix, frame.camera.matrixWorldInverse);
       frustum.setFromProjectionMatrix(viewProjection);
