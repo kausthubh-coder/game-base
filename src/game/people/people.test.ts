@@ -412,3 +412,17 @@ test('Juniper and the villagers move between their places every few minutes', ()
   // And everybody is on the ground, on a block of their own or walking.
   for (const p of people.all()) expect(p.pos.y).toBe(FEET);
 });
+
+test.each([false,true])('a person briefly waits in talking range, then resumes even if the player stays', (leave) => {
+  const stage = town();
+  stage.run(0.05);
+  const pos=stage.kernel.game.systems.people.get('ann')!.pos;
+  stage.player(HOME[0]+1,HOME[1]);
+  hour(stage,12.5);
+  stage.run(1.5);
+  expect(at(pos,HOME)).toBe(true);
+  expect(stage.kernel.game.actors.get('npc:ann')!.anim).toBe('idle');
+  if(leave) stage.player(14,10);
+  stage.run(12);
+  expect(at(pos,SHOP)).toBe(true);
+});

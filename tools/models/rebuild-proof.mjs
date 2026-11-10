@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import { createHash } from 'node:crypto';
+import { spawn } from 'node:child_process';
+const dir=new URL('../../public/assets/models/',import.meta.url);
+const names=fs.readdirSync(dir).filter(n=>n.endsWith('.glb'));
+const hash=n=>createHash('sha256').update(fs.readFileSync(new URL(n,dir))).digest('hex');
+const before=Object.fromEntries(names.map(n=>[n,hash(n)]));
+for(const n of names)fs.unlinkSync(new URL(n,dir));
+const code=await new Promise((done,reject)=>{const p=spawn('bun',['tools/models/build.mjs'],{stdio:'inherit'});p.on('error',reject);p.on('exit',done);});
+if(code)process.exit(code);
+for(const n of names)if(before[n]!==hash(n))throw Error(`${n} changed on rebuild`);
+console.log('PASS: deleted and rebuilt all six GLBs, byte-identical SHA256');

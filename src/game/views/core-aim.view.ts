@@ -59,7 +59,9 @@ export function install(view: GameView): void {
         station.x0 = placed.x; station.y0 = placed.y; station.z0 = placed.z;
         station.x1 = placed.x + sx; station.y1 = placed.y + sy; station.z1 = placed.z + sz;
       }
-      box = onStation ? station : LOG[id] || (axe && LEAF[id]) ? findTree(view.world.sim, aim.x, aim.y, aim.z, RULES)?.box ?? null : null;
+      // A model tree is found by the trees system, a block tree by its logs.
+      box = onStation ? station : game.systems.trees?.at(aim.x, aim.y, aim.z)?.box
+        ?? (LOG[id] || (axe && LEAF[id]) ? findTree(view.world.sim, aim.x, aim.y, aim.z, RULES)?.box ?? null : null);
     }
     const breaking = game.systems.actions?.breaking() ?? null;
     let progress = 0;

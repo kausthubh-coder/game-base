@@ -143,6 +143,8 @@ export function install(kernel: Kernel): void {
 
   /** The tree a log belongs to, or the tree of a leaf when an axe is in hand. Null for anything else. */
   function treeAt(x: number, y: number, z: number, id: number, held: Stack | null): Tree | null {
+    const model = others.trees?.at(x,y,z);
+    if (model) return { base: model, logs: Math.max(3,Math.round(4 * model.size)), leaves: 20, cells: [], box: model.box };
     const axe = held !== null && game.systems.items.get(held.id).tool?.kind === 'axe';
     if (!LOG[id] && !(axe && LEAF[id])) return null;
     if (!felling || felling.x !== x || felling.y !== y || felling.z !== z || !active) {
@@ -154,7 +156,7 @@ export function install(kernel: Kernel): void {
   /** Holding on a tree: one meter for the whole tree, then it all comes down. */
   function fellHold(tree: Tree, held: Stack | null, dt: number): boolean {
     const { x, y, z } = tree.base;
-    if (isProtected(x, y, z)) {
+    if (isProtected(x, y, z) || others.trees?.at(x,y,z)?.protected) {
       toast(TOWN_TOAST);
       stop();
       return false;
@@ -178,6 +180,7 @@ export function install(kernel: Kernel): void {
   /** Takes the whole tree out of the world and puts its wood and fiber in the bag. */
   function fell(tree: Tree): boolean {
     const { x, y, z } = tree.base;
+    if (others.trees?.at(x,y,z)) return others.trees.fell(x,y,z);
     const id = world.getBlock(x, y, z);
     const c = tree.cells;
     for (let i = 0; i < c.length; i += 3) world.setBlock(c[i], c[i + 1], c[i + 2], AIR);
@@ -202,7 +205,8 @@ export function install(kernel: Kernel): void {
     const x = placed ? placed.x : hit.x, y = placed ? placed.y : hit.y, z = placed ? placed.z : hit.z;
     // The world is asked again: the hit may be a step old.
     const id = world.getBlock(x, y, z);
-    if (!inReach(hit.x, hit.y, hit.z) || (!placed && !SOLID[id])) {
+    const model = others.trees?.at(hit.x,hit.y,hit.z);
+    if ((model ? reachDistance(player,model.box.x0,model.box.y0,model.box.z0,model.box.x1,model.box.y1,model.box.z1)>REACH : !inReach(hit.x, hit.y, hit.z)) || (!placed && !model && !SOLID[id])) {
       stop();
       return false;
     }

@@ -44,7 +44,7 @@ export function createWeatherEmitters(store: ParticleStore): WeatherEmitters {
       // ---- rain: each streak ends where it lands. Its splash is born there right away, not when the streak
       // arrives: in steady rain nobody can tell, and a particle that waits would hold a slot while it waits.
       const rain = effects.rain;
-      const slantX = store.windX * rain.wind;
+      const slantX = 1.1 + store.windX * rain.wind;
       const slantZ = store.windZ * rain.wind;
       const top = focus.y + CEILING;
       for (let i = count('rain', ambient.rain * rain.count, dt); i > 0; i--) {

@@ -12,6 +12,7 @@
 //   - The panels. Crafting is `crafting.make`, which is what the bag panel calls. Something listens to
 //     `placeables.onUse`, as the panels view does, so "E: Craft" shows at a workbench as it does in the game.
 
+import { install as installTrees } from '../trees/index.sim.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import { World, type RayHit, type WorldSave } from '../../features/world/world.sim.ts';
 import { install as installActions } from '../actions/index.sim.ts';
@@ -54,6 +55,7 @@ export const INSTALLS: readonly (readonly [name: string, install: (kernel: Kerne
   ['items', installItems],
   ['inventory', installInventory],
   ['region', installRegion],
+  ['trees', installTrees],
   ['time', installTime],
   ['interact', installInteract],
   ['actions', installActions],

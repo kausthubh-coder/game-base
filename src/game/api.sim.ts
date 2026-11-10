@@ -156,6 +156,7 @@ export interface Game {
 
 /** Filled in by each system's install(). A system may read another only after that one is installed. */
 export interface Systems {
+  trees: import('./trees/index.sim.ts').TreesApi;
   items: ItemsApi;
   inventory: InventoryApi;
   actions: ActionsApi;

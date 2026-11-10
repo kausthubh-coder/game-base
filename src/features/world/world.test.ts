@@ -227,7 +227,7 @@ describe('terrain', () => {
         for (let y = 3; y < h - 6; y++) if (chunk.blocks[col * HEIGHT + y] === 0) caves++;
       }
     }
-    for (const key of ['grass', 'dirt', 'stone', 'sand', 'water', 'oak_log', 'oak_leaves', 'birch_log', 'pine_log', 'pine_needles', 'lume_crystal']) {
+    for (const key of ['grass', 'dirt', 'stone', 'sand', 'water', 'barrier', 'lume_crystal']) {
       expect(count.get(blockId(key)) ?? 0, key).toBeGreaterThan(0);
     }
     expect(low).toBeLessThan(18);

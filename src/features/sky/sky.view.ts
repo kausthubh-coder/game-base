@@ -41,6 +41,7 @@ export interface SkyLook {
 }
 
 export interface Sky extends ViewSystem {
+  setCloudShadows(enabled: boolean | null): void;
   readonly look: SkyLook;
   /** The same vector as `look.sunDirection`. */
   readonly sunDirection: THREE.Vector3;
@@ -219,7 +220,9 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const sun = new THREE.DirectionalLight(0xffffff, 1);
   sun.name = 'sun';
   sun.castShadow = true;
-  sun.shadow.bias = -0.0006;
+  sun.shadow.bias = -0.0003;
+  sun.shadow.radius = 3;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   sun.shadow.normalBias = 0.035;
   sun.shadow.camera.layers.enable(shadowLayer);
   const fill = new THREE.HemisphereLight(0xffffff, 0x888888, 1);
@@ -267,9 +270,10 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const scaledUp = new THREE.Vector3();
   const sunColor = new THREE.Color();
   const cloudScroll = new THREE.Vector2();
-  const cameraUp = new THREE.Vector3();
-  const showing: PhenomenaFrame = { time: 0, target, sunDirection: look.sunDirection, sunColor, rainbow: 0, rainbowCenter: new THREE.Vector3(), rainbowRadius: 12, shafts: 0 };
-  let rainbow = 0;
+  const showing: PhenomenaFrame = { time: 0, target, sunDirection: look.sunDirection, sunColor, rainbow: 0, rainbowCenter: new THREE.Vector3(), rainbowRadius: 35, rainbowRight: new THREE.Vector3(1,0,0), shafts: 0 };
+  let rainbow = 0, rainbowAge = 0, rainbowFade = 0, cloudOverride: boolean | null = null;
+  const rainbowAnchor = new THREE.Vector3();
+  const forward = new THREE.Vector3();
   let frame = 0;
 
   function applyShadowSettings(): void {
@@ -288,7 +292,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
     }
     sun.shadow.autoUpdate = level.shadowEvery === 1;
     sun.shadow.needsUpdate = true;
-    sheet.visible = level.cloudShadows;
+    sheet.visible = cloudOverride ?? level.cloudShadows;
   }
   applyShadowSettings();
 
@@ -340,6 +344,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   }
 
   const sky: Sky = {
+    setCloudShadows(enabled) { cloudOverride = enabled; sheet.visible = enabled ?? level.cloudShadows; },
     look,
     sunDirection: look.sunDirection,
     sun,
@@ -364,6 +369,14 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
     },
 
     setRainbow(amount) {
+      if (amount > 0 && rainbow === 0) {
+        rainbowAge = 0;
+        ctx.camera.getWorldDirection(forward);
+        forward.y = 0; forward.normalize();
+        rainbowAnchor.copy(target).addScaledVector(forward, 160);
+        rainbowAnchor.y = target.y - 4;
+        showing.rainbowRight.set(-forward.z, 0, forward.x);
+      }
       rainbow = amount;
     },
 
@@ -401,6 +414,14 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
         look.sunDirection.y = 0.45;
         look.sunDirection.normalize();
       }
+      // Keep the light below 50 degrees, including at noon.
+      if (look.sunDirection.y > 0.76) {
+        const d = look.sunDirection;
+        const horizontal = Math.hypot(d.x, d.z);
+        if (horizontal < 0.01) d.set(0.5, 0.76, 0.414);
+        else { d.x *= 0.65 / horizontal; d.z *= 0.65 / horizontal; d.y = 0.76; }
+        d.normalize();
+      }
       const moonPower = day ? 1 : 0.55 + 0.45 * moonLit(look.moonPhase);
       const strength = key.sunStrength * (1 - overcast * 0.72) * moonPower;
       const flash = a.flash * (0.6 + 0.4 * Math.sin(view.time * 70));
@@ -427,17 +448,14 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       // ---- the sky
       const camera = view.camera;
       // Half the height of the view at the target's distance, in meters.
-      let viewHalf: number;
       const perspective = (camera as THREE.PerspectiveCamera).isPerspectiveCamera === true;
       if (perspective) {
         const lens = camera as THREE.PerspectiveCamera;
         const tan = Math.tan((lens.fov * Math.PI) / 360) / lens.zoom;
         uniforms.uTan.value.set(tan * lens.aspect, tan);
-        viewHalf = reach * tan;
       } else {
         const flat = camera as THREE.OrthographicCamera;
         uniforms.uTan.value.set((0.36 * (flat.right - flat.left)) / (flat.top - flat.bottom), 0.36);
-        viewHalf = (flat.top - flat.bottom) / (2 * flat.zoom);
       }
       uniforms.uTop.value.setRGB(key.top[0], key.top[1], key.top[2]);
       uniforms.uMid.value.setRGB(key.mid[0], key.mid[1], key.mid[2]);
@@ -464,7 +482,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       scroll.z = (scroll.z - windX * drift * 0.4) % 1;
       scroll.w = (scroll.w - windZ * drift * 0.4) % 1;
 
-      if (level.cloudShadows) placeCloudShadows(a.cloud, dt, windX, windZ, a.wind);
+      if (sheet.visible) placeCloudShadows(a.cloud, dt, windX, windZ, a.wind);
 
       // ---- what other features read
       look.zenith.copy(uniforms.uTop.value);
@@ -478,16 +496,16 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       // ---- the bolt, the rainbow, and shafts of light on a clear dawn
       const dawn = smoothstep(0.232, 0.262, time) * (1 - smoothstep(0.3, 0.345, time));
       showing.time = view.time;
-      showing.rainbow = rainbow * (1 - key.night);
-      if (showing.rainbow > 0) {
-        // The game's camera looks down and never sees the sky, so the rainbow is not put where a real one
-        // would be. It arches over the middle of the view, sized to the view, and stands nearer the camera
-        // than anything on the ground so nothing cuts through it.
-        const near = 0.3;
-        cameraUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
-        showing.rainbowCenter.copy(target).addScaledVector(cameraUp, -0.35 * viewHalf).sub(camera.position).multiplyScalar(near).add(camera.position);
-        showing.rainbowRadius = 0.9 * viewHalf * (perspective ? near : 1);
-      }
+      rainbowAge += dt;
+      const goal = rainbow > 0 && rainbowAge < 110 ? rainbow * Math.min(1, rainbowAge / 8) * Math.min(1, (110 - rainbowAge) / 30) : 0;
+      rainbowFade += (goal - rainbowFade) * Math.min(1, dt / 3);
+      camera.getWorldDirection(forward);
+      const halfFov = perspective ? (camera as THREE.PerspectiveCamera).fov * Math.PI / 360 : 0;
+      const seesSky = Math.asin(forward.y) + halfFov > 0.12;
+      showing.rainbow = seesSky ? rainbowFade * (1 - key.night) : 0;
+      showing.rainbowCenter.copy(rainbowAnchor);
+      showing.rainbowRadius = 35;
+
       showing.shafts = level.shafts ? dawn * (1 - overcast) * (1 - a.fog) : 0;
       phenomena.update(dt, showing);
     },

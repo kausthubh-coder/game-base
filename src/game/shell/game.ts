@@ -1,3 +1,4 @@
+import { readGraphics, type Graphics } from './graphics.ts';
 // The shell: it makes the renderer, the block world, the kernel with its systems and every base feature,
 // steps the rules 20 times a second and draws in between. It hands all of it out as one `GameView`.
 //
@@ -16,6 +17,7 @@ import { createPost } from '../../features/post/index.ts';
 import { createSky } from '../../features/sky/index.ts';
 import { createWaterMaterial } from '../../features/water/index.ts';
 import { createWorld, emptyHit, spawnPoint } from '../../features/world/index.ts';
+import { reachDistance } from '../actions/index.sim.ts';
 import type { Systems, UseContext } from '../api.sim.ts';
 import { STEP, createKernel } from '../kernel.sim.ts';
 import { installSystems, type Installed } from '../systems.ts';
@@ -77,6 +79,7 @@ export interface Shell {
 }
 
 interface StoredSettings {
+  graphics: Graphics;
   quality: QualityMode;
   volumes: Record<BusName, number>;
   camera: CameraMode;
@@ -84,10 +87,11 @@ interface StoredSettings {
 }
 
 function readSettings(): StoredSettings {
-  const settings: StoredSettings = { quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', characters: 'sprites' };
+  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', characters: 'sprites' };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
     if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Quality)) settings.quality = stored!.quality as QualityMode;
+    settings.graphics = readGraphics(stored?.graphics);
     if (CAMERA_MODES.includes(stored?.camera as CameraMode)) settings.camera = stored!.camera as CameraMode;
     if (CHARACTER_LOOKS.includes(stored?.characters as CharacterLook)) settings.characters = stored!.characters as CharacterLook;
     for (const bus of BUSES) {
@@ -144,6 +148,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       sound.audio?.setQuality?.(quality);
       basePostScale = post.settings.renderScale;
       appliedScale = -1;
+      applyGraphics();
     },
   });
 
@@ -242,10 +247,14 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     origin.copy(lens.position);
     ray.set(centre ? 0 : pointer.x, centre ? 0 : pointer.y, 0.5).unproject(lens).sub(origin);
     // The ray skips what the cutaway hides, so a click goes through a hidden roof to the floor.
-    if (!world.sim.raycast(origin.x, origin.y, origin.z, ray.x, ray.y, ray.z, 500, hit, camera.hides)) return;
+    ray.normalize();
+    const blockHit = world.sim.raycast(origin.x, origin.y, origin.z, ray.x, ray.y, ray.z, 500, hit, camera.hides);
+    const treeHit = sys.trees?.raycast(origin, ray, blockHit ? hit.distance : 500, hit);
+    if (!blockHit && !treeHit) return;
     const p = game.player.pos, eye = p.y + EYE_HEIGHT;
     const dx = Math.max(hit.x - p.x, 0, p.x - hit.x - 1), dy = Math.max(hit.y - eye, 0, eye - hit.y - 1), dz = Math.max(hit.z - p.z, 0, p.z - hit.z - 1);
-    aimed = Math.hypot(dx, dy, dz) <= (sys.actions?.reach ?? 5);
+    const tree=sys.trees?.at(hit.x,hit.y,hit.z);
+    aimed = tree ? reachDistance(game.player,tree.box.x0,tree.box.y0,tree.box.z0,tree.box.x1,tree.box.y1,tree.box.z1) <= (sys.actions?.reach ?? 5) : Math.hypot(dx, dy, dz) <= (sys.actions?.reach ?? 5);
   }
 
   const using: UseContext = { hit: null, held: null, button: 'primary' };
@@ -432,7 +441,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
     const p = player.position;
     camera.follow(p.x, p.y + (camera.mode === 'first' && player.body.swimming ? SWIM_EYE : 0), p.z);
-    camera.update(Math.min(dt, 0.1), ctx);
+    if (settings.graphics.reduceMotion) camera.snap();
+    camera.update(settings.graphics.reduceMotion ? 1 : Math.min(dt, 0.1), ctx);
     world.setFocus(p.x, p.z);
     world.setCutaway(camera.cutaway);
     world.update(dt, ctx);
@@ -442,12 +452,14 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     const a = game.ambient;
     const look = camera.profile;
     if (look) {
-      // The free and first-person cameras see the horizon: the fog is whole before the loaded land ends.
-      if (look.shadowRange !== lastRange) sky.setShadowRange((lastRange = look.shadowRange));
-      const edge = world.stats.radius * 16 - 8;
-      sky.setFogReach(Math.min(look.fogStart, edge * 0.45), Math.min(look.fogEnd, edge));
+      // The free and first-person cameras see the horizon: the fog reaches as far as the view distance asks and is
+      // whole before the loaded land ends.
+      const range = settings.graphics.shadowDistance ?? look.shadowRange;
+      if (range !== lastRange) sky.setShadowRange((lastRange = range));
+      const edge = world.stats.radius * 16 - 8, far = settings.graphics.viewDistance ?? 1;
+      sky.setFogReach(Math.min(look.fogStart * far, edge * 0.45), Math.min(look.fogEnd * far, edge));
     } else if (cam) {
-      const range = Math.round(camera.stepped(cam.shadowRange));
+      const range = settings.graphics.shadowDistance ?? Math.round(camera.stepped(cam.shadowRange));
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       // The fog is whole before the loaded land ends, which is nearer at a lower quality.
       const edge = world.stats.radius * 16 - 8;
@@ -507,6 +519,21 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     }
   }
 
+  function applyGraphics(): void {
+    const g = settings.graphics;
+    sky.sun.castShadow = g.shadows !== 'off';
+    sky.sun.shadow.radius = g.shadows === 'sharp' ? 0 : 3;
+    sprites.setShadowsEnabled(g.shadows !== 'off');
+    const type = g.shadows === 'sharp' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+    if (renderer.shadowMap.type !== type) {
+      renderer.shadowMap.type = type;
+      scene.traverse((object) => { const m = (object as THREE.Mesh).material; if (m) { if (Array.isArray(m)) m.forEach(x => x.needsUpdate = true); else m.needsUpdate = true; } });
+    }
+    sky.setCloudShadows(g.cloudShadows);
+    effects.setWeatherEnabled(g.weatherParticles ?? true);
+    post.set({ bloom: g.bloom ?? ctx.quality !== 'low' });
+    world.setViewDistance((g.viewDistance ?? 1) * perf.stress * (cam?.load ?? 1));
+  }
   const view: GameView = {
     kernel, game, ctx, renderer, scene, canvas, root,
     world, camera, sprites, sky, water, effects, post, perf,
@@ -536,6 +563,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
 
     settings: {
+      get graphics() { return settings.graphics; },
+      setGraphics(next) { settings.graphics = readGraphics({ ...settings.graphics, ...next }); applyGraphics(); store(); },
       get quality() { return mode; },
       setQuality,
       volume: (bus) => sound.volume(bus),
@@ -582,6 +611,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
     get paused() { return pauses.size > 0; },
   };
+
+  applyGraphics();
 
   // The camera looks at the start from the first frame, behind a title or not. The worker loads the land there.
   place(start.x, start.y, start.z, Math.PI, false);

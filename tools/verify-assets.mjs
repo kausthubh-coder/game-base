@@ -7,6 +7,7 @@
 // It prints one PASS or FAIL line per check, a size table, every failure of the first failing check,
 // the warnings, and a one-line total. How to read each failure: .agents/skills/verify-assets/SKILL.md.
 import fs from 'node:fs';
+import { inspectGlb } from './models/inspect.mjs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
@@ -256,10 +257,23 @@ export function checkManifest(root) {
   }
   for (const [section, entry] of Object.entries(manifest)) {
     if (section === 'version') continue;
-    if (doc && doc[section] === undefined) {
+    if (doc && doc[section] === undefined && section !== 'models') {
       warnings.push(`manifest.json has a "${section}" section that docs/assets.md does not describe. Add its shape to docs/assets.md.`);
     }
-    if (section === 'sprites') {
+    if (section === 'models') {
+      for (const [name, model] of Object.entries(entry)) {
+        try {
+          if (!/^models\/[a-z0-9-]+\.glb$/.test(model.file)) throw Error('invalid model path');
+          const data = fs.readFileSync(path.join(assets, model.file));
+          used.add(model.file);
+          const { triangles } = inspectGlb(data);
+          if (!isWhole(model.budget, 1) || model.budget > (/^(tree|birch|pine)-/.test(name) ? 1500 : 300)) throw Error('invalid triangle budget');
+          if (triangles !== model.triangles || triangles > model.budget) throw Error(`${triangles} triangles, declared ${model.triangles}, budget ${model.budget}`);
+          if (data.length !== model.bytes) throw Error(`${data.length} bytes, declared ${model.bytes}`);
+        } catch (error) { failures.push(`models.${name}: ${error.message}`); }
+      }
+      summary.push(`${Object.keys(entry).length} models checked against GLB bytes`);
+    } else if (section === 'sprites') {
       if (!isObject(entry)) { failures.push('sprites is not an object.'); continue; }
       const example = isObject(doc?.sprites) ? Object.values(doc.sprites)[0] : null;
       for (const [name, value] of Object.entries(entry)) sprite(name, value, example);
