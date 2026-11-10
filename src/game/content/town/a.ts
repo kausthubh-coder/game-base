@@ -134,7 +134,7 @@ export function townA(): TownPlan {
       { x: 174, z: -189, kind: 'oak', size: 0.4 },
       { x: 199, z: -186, kind: 'birch', size: 0.7 },
       { x: 154, z: -136, kind: 'oak', size: 0.6 },
-      { x: 186, z: -137, kind: 'birch', size: 0.5 },
+      { x: 196, z: -135, kind: 'birch', size: 0.5 },
       { x: 140, z: -140, kind: 'oak', size: 0.8 },
     ],
     // The ground under the gatehouse's walls.
