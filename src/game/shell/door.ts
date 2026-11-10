@@ -7,6 +7,7 @@ import { BLOCKS } from '../../content/blocks.ts';
 import type { Systems } from '../api.sim.ts';
 import { STEP } from '../kernel.sim.ts';
 import type { Shell } from './game.ts';
+import type { CameraMode, CharacterLook } from './view.ts';
 
 export interface DebugDoor {
   /** Plain data: player, clock, quests, bag, flags, counts of actors, and what the shell knows. */
@@ -47,6 +48,10 @@ export interface DebugDoor {
   setTime(timeOfDay: number): void;
   /** Turns the camera a quarter turn: 1 to the right, -1 to the left. */
   turn(direction: 1 | -1): void;
+  /** The camera mode, as the View setting picks it: `tilt` (2.5D), `free` or `first`. Stored like the setting. */
+  setCamera(mode: CameraMode): void;
+  /** How characters are drawn, as the View setting picks it: `sprites` or `models`. Stored like the setting. */
+  setCharacters(look: CharacterLook): void;
   /**
    * With `true` the frames stop stepping the rules, so only `advance` moves time and a test reads exact numbers.
    * The picture is still drawn. `false` hands time back to the frames.
@@ -129,7 +134,8 @@ export function createDoor(shell: Shell): DebugDoor {
         breaking: sys.actions?.breaking() ?? null,
         aim: view.aim ? { x: view.aim.x, y: view.aim.y, z: view.aim.z, id: view.aim.id } : null,
         stats: view.stats(),
-        camera: { quarter: view.camera.quarter, zoom: view.camera.zoom },
+        camera: { mode: view.settings.camera, quarter: view.camera.quarter, zoom: view.camera.zoom },
+        characters: view.settings.characters,
         sound: view.audio ? view.audio.debug().running : false,
         sprites: { count: view.sprites.count, missing: [...view.sprites.missing] },
         quality: view.ctx.quality,
@@ -235,6 +241,8 @@ export function createDoor(shell: Shell): DebugDoor {
       else game.clock.timeOfDay = game.ambient.timeOfDay = timeOfDay;
     },
     turn: (direction) => view.camera.turn(direction),
+    setCamera: (mode) => view.settings.setCamera(mode),
+    setCharacters: (look) => view.settings.setCharacters(look),
     manual: (on = true) => view.setPaused('door', on),
     frames: (count) => shell.frames(count),
     settle: () => shell.settled(),

@@ -3,6 +3,7 @@
 import { add, h, keycaps } from './dom.ui.ts';
 import { DEFAULT_KEYS, QUALITIES, SIZES } from './logic.ui.ts';
 import type { PanelView, Quality, UiContext, VolumeChannel } from './types.ui.ts';
+import { viewSection } from './view-settings.ui.ts';
 
 const button = (label: string, onclick: () => void, extra: Record<string, string | boolean | null> = {}): HTMLButtonElement =>
   h('button', { class: 'gu-btn', type: 'button', onclick, ...extra }, label);
@@ -126,7 +127,10 @@ export function settingsPanel(ctx: UiContext): PanelView {
           sound,
           choices('size', 'Interface size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value)),
         ),
-        h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
+        h('div', null,
+          ctx.options.view ? viewSection(ctx, ctx.options.view) : null,
+          h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
+        ),
       );
     },
   };

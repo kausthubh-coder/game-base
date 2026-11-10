@@ -24,7 +24,7 @@ import { createKeys, type Press } from './keys.ts';
 import { HERO_STEP, createPlayer, type PlayerRig } from './player.ts';
 import { clearSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
 import { BUSES, DEFAULT_VOLUMES, createSound } from './sound.ts';
-import type { GameView, QualityMode, ScreenPoint } from './view.ts';
+import { CAMERA_MODES, CHARACTER_LOOKS, type CameraMode, type CharacterLook, type GameView, type QualityMode, type ScreenPoint } from './view.ts';
 import { dressWater } from './water.ts';
 
 /** The camera's distance at each wheel step, nearest first. A person is about 90 pixels tall at the first on a 900 pixel screen. */
@@ -73,13 +73,17 @@ export interface Shell {
 interface StoredSettings {
   quality: QualityMode;
   volumes: Record<BusName, number>;
+  camera: CameraMode;
+  characters: CharacterLook;
 }
 
 function readSettings(): StoredSettings {
-  const settings: StoredSettings = { quality: 'auto', volumes: { ...DEFAULT_VOLUMES } };
+  const settings: StoredSettings = { quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', characters: 'sprites' };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
     if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Quality)) settings.quality = stored!.quality as QualityMode;
+    if (CAMERA_MODES.includes(stored?.camera as CameraMode)) settings.camera = stored!.camera as CameraMode;
+    if (CHARACTER_LOOKS.includes(stored?.characters as CharacterLook)) settings.characters = stored!.characters as CharacterLook;
     for (const bus of BUSES) {
       const value = stored?.volumes?.[bus];
       if (typeof value === 'number' && Number.isFinite(value)) settings.volumes[bus] = Math.min(1, Math.max(0, value));
@@ -97,6 +101,11 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // `?quality=low` holds a level for this visit only. It is how a test gets the same picture every time.
   const asked = LEVELS.find((level) => level === params.get('quality'));
   let mode: QualityMode = asked ?? settings.quality;
+  // `?camera=free` and `?chars=models` hold a camera mode and a character look for this visit, so a test or a
+  // comparison shot gets the same picture whatever was stored.
+  let cameraMode: CameraMode = CAMERA_MODES.find((m) => m === params.get('camera')) ?? settings.camera;
+  let characterLook: CharacterLook = CHARACTER_LOOKS.find((l) => l === params.get('chars')) ?? settings.characters;
+  const changeListeners: ((setting: 'camera' | 'characters') => void)[] = [];
 
   // ---------------------------------------------------------------- the renderer and the scene
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -502,6 +511,29 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       setVolume(bus, value) {
         sound.setVolume(bus, value);
         store();
+      },
+      get camera() { return cameraMode; },
+      setCamera(next) {
+        settings.camera = next;
+        store();
+        if (next === cameraMode) return;
+        cameraMode = next;
+        for (const fn of [...changeListeners]) fn('camera');
+      },
+      get characters() { return characterLook; },
+      setCharacters(next) {
+        settings.characters = next;
+        store();
+        if (next === characterLook) return;
+        characterLook = next;
+        for (const fn of [...changeListeners]) fn('characters');
+      },
+      onChange: (fn) => {
+        changeListeners.push(fn);
+        return () => {
+          const at = changeListeners.indexOf(fn);
+          if (at >= 0) changeListeners.splice(at, 1);
+        };
       },
     },
 

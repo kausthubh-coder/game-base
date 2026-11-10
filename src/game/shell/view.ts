@@ -47,6 +47,16 @@ export interface EndStats {
 
 export type QualityMode = 'auto' | Quality;
 
+/**
+ * How the camera stands. `tilt` is the 2.5D camera, the default: a fixed pitch with quarter turns and pointer
+ * aiming. `free` is third person, orbited with the mouse, aimed from a crosshair. `first` is first person.
+ */
+export type CameraMode = 'tilt' | 'free' | 'first';
+export const CAMERA_MODES: readonly CameraMode[] = ['tilt', 'free', 'first'];
+/** How people, the pet and the creatures are drawn: pixel-art sprites, the default, or 3D models. */
+export type CharacterLook = 'sprites' | 'models';
+export const CHARACTER_LOOKS: readonly CharacterLook[] = ['sprites', 'models'];
+
 /** The settings a title or pause screen changes. Each one is stored and is there again on the next visit. */
 export interface ViewSettings {
   /** `auto` lets the performance meter pick the level. */
@@ -55,6 +65,16 @@ export interface ViewSettings {
   /** 0 to 1 for `master`, `music`, `ambience`, `effects` or `voice`. It holds before the sound has started too. */
   volume(bus: BusName): number;
   setVolume(bus: BusName, value: number): void;
+  /** `?camera=free` in the address holds a mode for this visit, as `?quality=` does. */
+  readonly camera: CameraMode;
+  /** Takes effect at once, with no reload, and is stored. */
+  setCamera(mode: CameraMode): void;
+  /** `?chars=models` in the address holds a look for this visit. */
+  readonly characters: CharacterLook;
+  /** Takes effect at once, with no reload, and is stored. */
+  setCharacters(look: CharacterLook): void;
+  /** Runs `fn` after the camera mode or the character look changed. Returns a function that stops it. */
+  onChange(fn: (setting: 'camera' | 'characters') => void): () => void;
 }
 
 /** What the aim is on: the block under the pointer when it is in reach, else null. */
