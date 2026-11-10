@@ -2,11 +2,12 @@ import { chromium } from 'playwright-core';
 import { mkdirSync, writeFileSync } from 'node:fs';
 const phase=process.argv[2]??'after';
 const after=phase==='after';
+const port=process.env.GFX_PORT ?? '5373';
 const out='/Users/dabot/dev/sandbox/game-look-test/design/img/options/weather';
 mkdirSync(out,{recursive:true});
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--enable-unsafe-swiftshader','--use-angle=swiftshader']});
-const page=await browser.newPage({viewport:{width:1440,height:900}}); const errors=[];page.on('pageerror',e=>errors.push(String(e)));
-await page.goto('http://localhost:5374/?hold=1&quality=high');
+const page=await browser.newPage({viewport:{width:1440,height:900}}); const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+await page.goto(`http://localhost:${port}/?hold=1&quality=high`);
 await page.waitForFunction(()=>window.__game);await page.evaluate(async()=>{const g=window.__game;g.newGame();g.manual(true);g.setTime(10/24);await g.settle();});
 const counts={};
 async function shot(name){await page.evaluate(()=>window.__game.frames(3));await page.screenshot({path:`${out}/${phase}-${name}.png`});counts[name]=await page.evaluate(()=>{const {drawCalls,triangles,quality,particles}=window.__game.counters();return {drawCalls,triangles,quality,particles};});console.log('captured '+name);}
