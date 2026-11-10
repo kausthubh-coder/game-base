@@ -28,4 +28,4 @@ for(const label of kinds){
  }
  inventory.push({kind:label,triangles:geo.index.count/3});geo.dispose();
 }
-writeFileSync(out+'/inventory.json',JSON.stringify(inventory,null,2));await browser.close();
+writeFileSync(out+'/inventory'+(process.env.ENV_ONLY?'-'+process.env.ENV_ONLY:'')+'.json',JSON.stringify(inventory,null,2));await browser.close();
