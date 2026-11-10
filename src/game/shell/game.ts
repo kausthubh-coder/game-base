@@ -1,3 +1,4 @@
+import { readGraphics, type Graphics } from './graphics.ts';
 // The shell: it makes the renderer, the block world, the kernel with its systems and every base feature,
 // steps the rules 20 times a second and draws in between. It hands all of it out as one `GameView`.
 //
@@ -72,15 +73,17 @@ export interface Shell {
 }
 
 interface StoredSettings {
+  graphics: Graphics;
   quality: QualityMode;
   volumes: Record<BusName, number>;
 }
 
 function readSettings(): StoredSettings {
-  const settings: StoredSettings = { quality: 'auto', volumes: { ...DEFAULT_VOLUMES } };
+  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES } };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
     if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Quality)) settings.quality = stored!.quality as QualityMode;
+    settings.graphics = readGraphics(stored?.graphics);
     for (const bus of BUSES) {
       const value = stored?.volumes?.[bus];
       if (typeof value === 'number' && Number.isFinite(value)) settings.volumes[bus] = Math.min(1, Math.max(0, value));
@@ -130,6 +133,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       sound.audio?.setQuality?.(quality);
       basePostScale = post.settings.renderScale;
       appliedScale = -1;
+      applyGraphics();
     },
   });
 
@@ -403,7 +407,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
     const p = player.position;
     camera.follow(p.x, p.y, p.z);
-    camera.update(Math.min(dt, 0.1), ctx);
+    if (settings.graphics.reduceMotion) camera.snap();
+    camera.update(settings.graphics.reduceMotion ? 1 : Math.min(dt, 0.1), ctx);
     world.setFocus(p.x, p.z);
     world.setCutaway(camera.cutaway);
     world.update(dt, ctx);
@@ -412,7 +417,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     // Everything follows the hero. The sky gets what Ambient does not carry: the moon, a rainbow after rain.
     const a = game.ambient;
     if (cam) {
-      const range = Math.round(camera.stepped(cam.shadowRange));
+      const range = settings.graphics.shadowDistance ?? Math.round(camera.stepped(cam.shadowRange));
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       // The fog is whole before the loaded land ends, which is nearer at a lower quality.
       const edge = world.stats.radius * 16 - 8;
@@ -472,6 +477,21 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     }
   }
 
+  function applyGraphics(): void {
+    const g = settings.graphics;
+    sky.sun.castShadow = g.shadows !== 'off';
+    sky.sun.shadow.radius = g.shadows === 'sharp' ? 0 : 3;
+    sprites.setShadowsEnabled(g.shadows !== 'off');
+    const type = g.shadows === 'sharp' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+    if (renderer.shadowMap.type !== type) {
+      renderer.shadowMap.type = type;
+      scene.traverse((object) => { const m = (object as THREE.Mesh).material; if (m) { if (Array.isArray(m)) m.forEach(x => x.needsUpdate = true); else m.needsUpdate = true; } });
+    }
+    sky.setCloudShadows(g.cloudShadows);
+    effects.setWeatherEnabled(g.weatherParticles ?? true);
+    post.set({ bloom: g.bloom ?? ctx.quality !== 'low' });
+    world.setViewDistance((g.viewDistance ?? 1) * perf.stress * (cam?.load ?? 1));
+  }
   const view: GameView = {
     kernel, game, ctx, renderer, scene, canvas, root,
     world, camera, sprites, sky, water, effects, post, perf,
@@ -501,6 +521,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
 
     settings: {
+      get graphics() { return settings.graphics; },
+      setGraphics(next) { settings.graphics = readGraphics({ ...settings.graphics, ...next }); applyGraphics(); store(); },
       get quality() { return mode; },
       setQuality,
       volume: (bus) => sound.volume(bus),
@@ -523,6 +545,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
     get paused() { return pauses.size > 0; },
   };
+
+  applyGraphics();
 
   // The camera looks at the start from the first frame, behind a title or not. The worker loads the land there.
   place(start.x, start.y, start.z, Math.PI, false);
