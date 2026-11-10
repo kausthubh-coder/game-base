@@ -132,8 +132,9 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
   });
 
-  // `?cam=horizon` and the others in the camera's profiles.ts stand the camera somewhere else, to compare.
-  const cam = cameraProfile(params.get('cam'));
+  // The camera is the tilt profile: today's top-down view zoomed out, lowering toward the horizon as you zoom
+  // in. `?cam=today` gives the old camera, and `?cam=horizon` and the others in profiles.ts stand it elsewhere.
+  const cam = cameraProfile(params.get('cam') ?? 'tilt');
 
   const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress * (cam?.load ?? 1) });
   ctx.world = world.query;
