@@ -67,6 +67,8 @@ export const effects = {
 
   // ---- blocks
   chips: { shape: 'square', blend: 'normal', count: 14, life: [0.5, 0.9], radius: 0.35, height: [-0.3, 0.3], speed: [1.6, 3.8], aim: { up: 0.9, out: 1, any: 0.4 }, gravity: 12, spin: 0.9, size: [0.14, 0.09], color: [0x9a7b55, 0x7a5f40], fade: [0, 0.25], lands: true },
+  // A felled tree's crown: leaves thrown out and drifting down.
+  leafBurst: { shape: 'leaf', blend: 'normal', count: 16, life: [0.9, 1.8], radius: 1.1, height: [-0.4, 0.6], speed: [0.8, 2.4], aim: { up: 0.5, out: 1, any: 0.3 }, gravity: 2.5, drag: 1.2, wobble: [0.35, 0.6], spin: 1, size: [0.2, 0.16], color: [0x8fd65a, 0x4f9a3a], pickColor: true, fade: [0, 0.3], lands: true },
   pop: { shape: 'ring', blend: 'normal', facing: 'ground', count: 1, life: [0.28, 0.32], height: [0.03, 0.03], speed: [0, 0], gravity: 0, size: [0.5, 1.7], color: [0xffffff, 0xffffff], alpha: [0.75, 0], fade: [0, 0.4], with: ['popDust'] },
   popDust: { shape: 'puff', blend: 'normal', count: 8, life: [0.3, 0.5], radius: 0.45, height: [0.05, 0.2], speed: [1.2, 2.1], aim: { up: 0.2, out: 1 }, gravity: 0, drag: 4, size: [0.14, 0.32], color: [0xd9cdb8, 0xd9cdb8], alpha: [0.7, 0], fade: [0, 0.5] },
 

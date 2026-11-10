@@ -292,3 +292,21 @@ test('quests are saved and loaded: the open step, the event already seen and the
   expect(d.game.flags.get('quest.bread.step')).toBe('queen');
   expect(d.marks.get('maren')).toBe('quest');
 });
+
+test('the lamp step points at Odo until the river lamp is in the bag, then at the river bank', () => {
+  const s = stage({ story: false });
+  s.run(0.05);
+  s.game.systems.quests.skipTo('festival');
+  s.game.flags.set('festival.started', true);
+  s.moveTo('town.square');
+  s.run(0.6);
+  expect(s.game.flags.get('quest.festival.step')).toBe('lamp');
+  const odo = s.people.get('odo')!.pos;
+  expect(s.game.systems.quests.tracked()!.steps[1].at).toEqual({ x: odo.x, y: odo.y, z: odo.z });
+  expect(s.marks.get('odo')).toBe('quest');
+
+  s.bag.set('river_lamp', 1);
+  s.run(0.6);
+  expect(s.game.systems.quests.tracked()!.steps[1].at).toEqual({ x: PLACES['river.bank'][0] + 0.5, y: GROUND, z: PLACES['river.bank'][1] + 0.5 });
+  expect(s.marks.get('odo')).toBe('');
+});

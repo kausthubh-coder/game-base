@@ -5,7 +5,8 @@ import { AIR, BLOCKS } from '../../content/blocks.ts';
 import { SOLID } from '../../features/world/chunk.sim.ts';
 import type { RayHit } from '../../features/world/world.sim.ts';
 import type { ActionsApi, ItemId, Placed, Player, Stack, Systems, ToolKind, UseContext } from '../api.sim.ts';
-import { BREAKING, DEFAULT_BREAK, PLACEABLE_BREAK_SECONDS, type BreakRule } from '../content/drops.ts';
+import { BREAKING, DEFAULT_BREAK, FELLING, PLACEABLE_BREAK_SECONDS, type BreakRule } from '../content/drops.ts';
+import { findTree, type Tree, type TreeRules } from './tree.sim.ts';
 import { footprint } from '../content/placeables.ts';
 import { STEP, type Kernel } from '../kernel.sim.ts';
 
@@ -49,7 +50,12 @@ export function install(kernel: Kernel): void {
   const rules: BreakRule[] = BLOCKS.map((block) => BREAKING[block.key] ?? DEFAULT_BREAK);
   const handlers: ((context: UseContext) => boolean)[] = [];
   const toasted = new Map<string, number>();
-  const meter = { x: 0, y: 0, z: 0, progress: 0 };
+  const meter: { x: number; y: number; z: number; progress: number; tree: Tree['box'] | null } = { x: 0, y: 0, z: 0, progress: 0, tree: null };
+  const LOG = BLOCKS.map((block) => block.surface === 'wood' && /_log$/.test(block.key));
+  const LEAF = BLOCKS.map((block) => block.surface === 'leaves');
+  const treeRules: TreeRules = { isLog: (id) => LOG[id] === true, isLeaf: (id) => LEAF[id] === true, maxLogs: FELLING.maxLogs, leafReach: FELLING.leafReach };
+  /** The tree under the last hit, kept while the same block is held, so the search runs once per tree. */
+  let felling: { x: number; y: number; z: number; tree: Tree | null } | null = null;
   let active = false;
   /** Seconds since hold() was last called. */
   let idle = 0;
@@ -127,6 +133,57 @@ export function install(kernel: Kernel): void {
   function stop(): void {
     active = false;
     meter.progress = 0;
+    meter.tree = null;
+  }
+
+  /** The tree a log belongs to, or the tree of a leaf when an axe is in hand. Null for anything else. */
+  function treeAt(x: number, y: number, z: number, id: number, held: Stack | null): Tree | null {
+    const axe = held !== null && game.systems.items.get(held.id).tool?.kind === 'axe';
+    if (!LOG[id] && !(axe && LEAF[id])) return null;
+    if (!felling || felling.x !== x || felling.y !== y || felling.z !== z || !active) {
+      felling = { x, y, z, tree: findTree(world, x, y, z, treeRules) };
+    }
+    return felling.tree;
+  }
+
+  /** Holding on a tree: one meter for the whole tree, then it all comes down. */
+  function fellHold(tree: Tree, held: Stack | null, dt: number): boolean {
+    const { x, y, z } = tree.base;
+    if (isProtected(x, y, z)) {
+      toast(TOWN_TOAST);
+      stop();
+      return false;
+    }
+    const axe = held !== null && game.systems.items.get(held.id).tool?.kind === 'axe';
+    const seconds = axe ? FELLING.axe : FELLING.hand;
+    if (!active || meter.x !== x || meter.y !== y || meter.z !== z || meter.tree === null) {
+      meter.x = x;
+      meter.y = y;
+      meter.z = z;
+      meter.progress = 0;
+      meter.tree = tree.box;
+      active = true;
+    }
+    meter.progress = Math.min(1, meter.progress + dt / seconds);
+    if (meter.progress < 1 - 1e-9) return false;
+    stop();
+    return fell(tree);
+  }
+
+  /** Takes the whole tree out of the world and puts its wood and fiber in the bag. */
+  function fell(tree: Tree): boolean {
+    const { x, y, z } = tree.base;
+    const id = world.getBlock(x, y, z);
+    const c = tree.cells;
+    for (let i = 0; i < c.length; i += 3) world.setBlock(c[i], c[i + 1], c[i + 2], AIR);
+    felling = null;
+    const drops = rules[id].drops;
+    const wood = drops === 'self' ? itemForBlock(id) : drops[0]?.item ?? null;
+    if (wood) give(wood, tree.logs, x, y, z);
+    give('fiber', Math.max(1, Math.round(tree.leaves / FELLING.leavesPerFiber)), x, y, z);
+    events.emit('block.broken', { x, y, z, id, by: 'player' });
+    events.emit('tree.felled', { x, y, z, id, logs: tree.logs, leaves: tree.leaves, box: tree.box });
+    return true;
   }
 
   function hold(context: UseContext, dt: number): boolean {
@@ -144,6 +201,8 @@ export function install(kernel: Kernel): void {
       stop();
       return false;
     }
+    const tree = placed ? null : treeAt(x, y, z, id, context.held);
+    if (tree) return fellHold(tree, context.held, dt);
     if (isProtected(x, y, z)) {
       toast(TOWN_TOAST);
       stop();
@@ -208,16 +267,23 @@ export function install(kernel: Kernel): void {
       // Its front turns toward the player.
       const turns = (Math.round(player.facing / (Math.PI / 2)) + 2) & 3;
       const [sx, sy, sz] = footprint(kind.size, turns);
-      for (let cx = x; cx < x + sx; cx++) {
-        for (let cz = z; cz < z + sz; cz++) {
+      // A thing longer than a block starts at the clicked cell and goes on the way the player faces, so the
+      // bed's foot is at the player's end and its pillow at the far one.
+      const ax = turns === 1 ? x - sx + 1 : x, az = turns === 2 ? z - sz + 1 : z;
+      for (let cx = ax; cx < ax + sx; cx++) {
+        for (let cz = az; cz < az + sz; cz++) {
           for (let cy = y; cy < y + sy; cy++) if (bodyInCell(player.pos.x, player.pos.y, player.pos.z, cx, cy, cz)) return false;
+          if (isProtected(cx, y, cz)) {
+            toast(TOWN_TOAST);
+            return false;
+          }
           if (!SOLID[world.getBlock(cx, y - 1, cz)]) {
             toast(NO_GROUND_TOAST);
             return false;
           }
         }
       }
-      if (!placeables.place(kind.kind, x, y, z, turns)) {
+      if (!placeables.place(kind.kind, ax, y, az, turns)) {
         toast(NO_ROOM_TOAST);
         return false;
       }

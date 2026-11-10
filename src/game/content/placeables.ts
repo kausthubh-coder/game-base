@@ -3,7 +3,7 @@ import type { PlaceableDef } from '../api.sim.ts';
 
 export const PLACEABLES: readonly PlaceableDef[] = [
   { kind: 'workbench', name: 'Workbench', prop: 'workbench', size: [1, 1, 1], prompt: 'Craft', station: 'workbench' },
-  { kind: 'bed', name: 'Bed', prop: 'bed', size: [1, 1, 1], prompt: 'Sleep', station: 'bed' },
+  { kind: 'bed', name: 'Bed', prop: 'bed', size: [1, 1, 2], prompt: 'Sleep', station: 'bed' },
   { kind: 'chest', name: 'Chest', prop: 'chest', size: [1, 1, 1], prompt: 'Open', station: 'chest' },
 ];
 

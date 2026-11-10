@@ -140,7 +140,8 @@ test('save then load gives the same bag and the same stations', () => {
   a.inventory.selected = 2;
   a.placeables.place('workbench', 7, g, 5, 0);
   const gone = a.placeables.place('chest', 8, g, 5, 0) as Placed;
-  a.placeables.place('bed', 6, g, 5, 3);
+  // The bed is two blocks long: turned three times it lies along x, on 5 and 6.
+  a.placeables.place('bed', 5, g, 5, 3);
   a.placeables.remove(gone.id);
   const save = JSON.parse(JSON.stringify(first.kernel.save()));
 
@@ -153,11 +154,12 @@ test('save then load gives the same bag and the same stations', () => {
   expect(b.placeables.all()).toEqual(a.placeables.all());
   expect(b.placeables.all()).toEqual([
     { id: 'workbench:1', kind: 'workbench', x: 7, y: g, z: 5, quarterTurns: 0 },
-    { id: 'bed:3', kind: 'bed', x: 6, y: g, z: 5, quarterTurns: 3 },
+    { id: 'bed:3', kind: 'bed', x: 5, y: g, z: 5, quarterTurns: 3 },
   ]);
 
   // The loaded stations work: cells, near(), the prompt, and the next id.
   expect(b.placeables.at(7, g, 5)?.kind).toBe('workbench');
+  expect([b.placeables.at(5, g, 5)?.kind, b.placeables.at(6, g, 5)?.kind]).toEqual(['bed', 'bed']);
   expect(b.placeables.near('workbench', second.kernel.game.player.pos, 5)).toBe(true);
   expect(b.interact.nearest()?.prompt()).toBe('Sleep');
   expect(b.placeables.place('chest', 7, g, 5, 0)).toBeNull();

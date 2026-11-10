@@ -135,10 +135,13 @@ const box = (x0: number, y0: number, z0: number, x1: number, y1: number, z1: num
   fills.push({ x0, y0, z0, x1, y1, z1, block });
 };
 const one = (x: number, y: number, z: number, block: string): void => box(x, y, z, x, y, z, block);
-/** A post with a lamp on it, three blocks tall. */
+/**
+ * A post with a lamp on it, two blocks tall. The lamp sits at head height, under the line the camera's
+ * cutaway hides above when the hero stands under an eave, so it never leaves a bare post behind.
+ */
 const lampPost = (x: number, z: number, ground: number): void => {
-  box(x, ground, z, x, ground + 1, z, 'oak_log');
-  one(x, ground + 2, z, 'lamp');
+  one(x, ground, z, 'oak_log');
+  one(x, ground + 1, z, 'lamp');
 };
 
 // ---- the grant: the standing stone
@@ -355,6 +358,17 @@ export const REGION: RegionPlan = {
     { kind: 'bench', variant: 0, x: 181.5, y: TOWN_GROUND, z: -133.5, rotation: 0 },
     { kind: 'stall', variant: 1, x: 176.5, y: TOWN_GROUND, z: -159.5, rotation: 0 },
     { kind: 'stall', variant: 0, x: 158.5, y: TOWN_GROUND, z: -150.5, rotation: Math.PI / 2 },
+    // The valley set: a harvest stall in the square, hay by Gus's field, moss on stumps by the rocks and
+    // wildflowers along the path where the game starts.
+    { kind: 'harvestStall', variant: 0, x: 166.5, y: TOWN_GROUND, z: -159.5, rotation: 0 },
+    { kind: 'hayBale', variant: 0, x: 189.5, y: TOWN_GROUND, z: -145.5, rotation: 0.3 },
+    { kind: 'hayBale', variant: 0, x: 190.7, y: TOWN_GROUND, z: -144.3, rotation: 1.2 },
+    { kind: 'hayBale', variant: 0, x: 197.5, y: TOWN_GROUND, z: -153.5, rotation: 2.1 },
+    { kind: 'mossStump', variant: 0, x: 1.5, y: GRANT_GROUND, z: -230.5, rotation: 0.7 },
+    { kind: 'mossStump', variant: 0, x: 15.5, y: GRANT_GROUND, z: -227.5, rotation: 2.4 },
+    { kind: 'wildflowers', variant: 0, x: -5.5, y: GRANT_GROUND, z: -219.5, rotation: 0 },
+    { kind: 'wildflowers', variant: 0, x: 1.5, y: GRANT_GROUND, z: -219.5, rotation: 1.6 },
+    { kind: 'wildflowers', variant: 0, x: -6.5, y: GRANT_GROUND, z: -225.5, rotation: 3.1 },
   ],
   noTrees: [
     { x0: GRANT.x - 3, z0: GRANT.z - 3, x1: GRANT.x + GRANT.width + 2, z1: GRANT.z + GRANT.depth + 2 },

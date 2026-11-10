@@ -134,13 +134,15 @@ try {
   check('breaking and placing throw particles', await game(() => window.__game.view.effects.live > 0), `${await game(() => window.__game.view.effects.live)} alive`);
 
   // Somebody else: an actor with a mark gets a sprite and a badge over its head, and loses both when it goes.
+  // The town's people and creatures are actors too, so count against what was there before.
+  const crowdBefore = await game(() => ({ count: window.__game.state().sprites.count, quest: document.querySelectorAll('.mark.mark-quest').length, marks: document.querySelectorAll('.mark').length }));
   await game(() => {
     const g = window.__game, p = g.state().player;
     g.view.game.actors.set('npc:smoke', { id: 'npc:smoke', sprite: 'tamsin', pos: { x: p.x + 2, y: p.y, z: p.z + 1 }, facing: Math.PI, anim: 'idle', visible: true, mark: 'quest' });
   });
   await game(() => window.__game.frames(2));
   const crowd = await game(() => ({ sprites: window.__game.state().sprites, badges: document.querySelectorAll('.mark.mark-quest').length }));
-  check('an actor gets a sprite and its mark', crowd.sprites.count === 2 && crowd.sprites.missing.length === 0 && crowd.badges === 1, JSON.stringify(crowd));
+  check('an actor gets a sprite and its mark', crowd.sprites.count === crowdBefore.count + 1 && crowd.sprites.missing.length === 0 && crowd.badges === crowdBefore.quest + 1, `${JSON.stringify(crowd)}, before ${JSON.stringify(crowdBefore)}`);
 
   // A real key press: Q turns the camera, and the first key starts the sound.
   await page.keyboard.press('KeyQ');
@@ -155,7 +157,7 @@ try {
   await game(() => { window.__game.view.game.actors.delete('npc:smoke'); });
   await game(() => window.__game.frames(2));
   const alone = await game(() => ({ count: window.__game.state().sprites.count, badges: document.querySelectorAll('.mark').length }));
-  check('a removed actor loses its sprite and its mark', alone.count === 1 && alone.badges === 0, JSON.stringify(alone));
+  check('a removed actor loses its sprite and its mark', alone.count === crowdBefore.count && alone.badges === crowdBefore.marks, `${JSON.stringify(alone)}, before ${JSON.stringify(crowdBefore)}`);
 
   // Night.
   await game(() => { window.__game.setTime(0.93); window.__game.advance(2); });
@@ -165,15 +167,26 @@ try {
   await shot('03-night.png');
 
   // The real mouse: point at the ground two blocks from the player, hold the left button, and the block breaks.
-  // The frames step the rules here, as they do for a player.
-  await game(() => { window.__game.setTime(0.4); window.__game.teleport(4, 5); window.__game.advance(0.5); });
+  // The frames step the rules here, as they do for a player. At the spawn, on open ground, with the camera
+  // turned back from Q: the forest stands where the old test site was, a block tree hides the ground beside the
+  // hero from the turned camera, and the dig above must stay in the loaded chunks for the Continue check.
+  await game((back) => { const g = window.__game; g.setTime(0.4); g.teleport('spawn'); if (back) g.turn(back); g.advance(0.5); },
+    turned.camera.quarter === (start.camera.quarter + 1) % 4 ? -1 : 1);
   await game(() => window.__game.settle());
   await game(() => window.__game.frames(3));
+  // The first block near the player that may be broken (the road is the town's) and whose spot on the page is
+  // bare canvas (the prompt under the hero is HTML).
   const target = await game(() => {
     const g = window.__game, p = g.state().player;
-    const x = Math.floor(p.x) + 2, z = Math.floor(p.z) + 1, y = g.view.world.sim.heightAt(x, z) - 1;
-    return { x, y, z, key: g.block(x, y, z).key, at: g.view.project(x + 0.5, y + 1, z + 0.5) };
+    for (const [ox, oz] of [[2, 1], [2, -1], [-2, 1], [-2, -1], [3, 0], [-3, 0]]) {
+      const x = Math.floor(p.x) + ox, z = Math.floor(p.z) + oz, y = g.view.world.sim.heightAt(x, z) - 1;
+      const at = g.view.project(x + 0.5, y + 1, z + 0.5);
+      if (g.view.game.systems.region?.isProtected(x, y, z)) continue;
+      if (at && document.elementFromPoint(at.x, at.y)?.tagName === 'CANVAS') return { x, y, z, key: g.block(x, y, z).key, at };
+    }
+    return null;
   });
+  if (!target) throw new Error('no block near the spawn shows on bare canvas');
   await page.mouse.move(target.at.x, target.at.y);
   await game(() => window.__game.frames(2));
   const aim = await game(() => { const a = window.__game.view.aim; return a ? { x: a.x, y: a.y, z: a.z } : null; });

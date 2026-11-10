@@ -2,7 +2,7 @@
 // when their API shifts, this is where it is mended: loading the manifest, the painted block atlas,
 // making the sprite layer, and copying the game's actors to sprite handles.
 import type { ViewContext } from '../../engine/system.ts';
-import { loadAssets, type Assets } from '../../features/assets/index.ts';
+import { loadAssets, type Assets, type TileSheetAsset } from '../../features/assets/index.ts';
 import { createSprites, type SpriteHandle, type Sprites } from '../../features/sprites/index.ts';
 import { loadBlockAtlas, type AtlasSource } from '../../features/world/index.ts';
 import type { Actor } from '../api.sim.ts';
@@ -13,13 +13,36 @@ export interface Art {
   blockAtlas: AtlasSource | undefined;
 }
 
+/**
+ * Block tiles drawn over a frozen tile of the block atlas: the tile's name, and the tile in the manifest's
+ * `materials` sheet that replaces it. The atlas file stays as it was approved.
+ */
+const MATERIALS: Readonly<Record<string, string>> = { oak_plank: 'oak_boards' };
+
 /** Loads the manifest and every file it lists. `onProgress` gets 0 to 1. */
 export async function loadArt(onProgress?: (done: number) => void): Promise<Art> {
   const baseUrl = new URL('assets/', document.baseURI).href;
   const assets = await loadAssets({ baseUrl, onProgress: (p) => onProgress?.(p.loaded / p.total) });
   const blocks = assets.manifest.blocks;
   const blockAtlas = blocks ? await loadBlockAtlas(blocks, baseUrl) : undefined;
+  if (blockAtlas && assets.sheetNames().includes('materials')) await paintMaterials(blockAtlas, assets.sheet('materials'));
   return { assets, blockAtlas };
+}
+
+async function paintMaterials(atlas: AtlasSource, materials: TileSheetAsset): Promise<void> {
+  const image = new Image();
+  image.src = materials.url;
+  await image.decode();
+  const ctx = atlas.canvas.getContext('2d')!;
+  ctx.imageSmoothingEnabled = false;
+  for (const [tile, material] of Object.entries(MATERIALS)) {
+    if (!materials.names.includes(material)) continue;
+    const from = materials.cells(material)[0];
+    for (const [column, row] of atlas.cells.get(tile) ?? []) {
+      ctx.clearRect(column * atlas.tile, row * atlas.tile, atlas.tile, atlas.tile);
+      ctx.drawImage(image, from.x, from.y, materials.tile, materials.tile, column * atlas.tile, row * atlas.tile, atlas.tile, atlas.tile);
+    }
+  }
 }
 
 export function makeSprites(ctx: ViewContext, assets: Assets): Sprites {

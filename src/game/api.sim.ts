@@ -57,6 +57,9 @@ export interface Clock {
 // ---------------------------------------------------------------------------------------- events
 
 /** Every event the game's systems send. The key is the event's name, the value is what it carries. */
+/** A box of whole blocks, max exclusive. */
+export interface TreeBox { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number }
+
 export interface GameEvents {
   // world and movement, also heard by sound and effects
   footstep: { surface: Surface; at: Vec3 };
@@ -64,6 +67,8 @@ export interface GameEvents {
   land: { surface: Surface; at: Vec3 };
   'block.placed': { x: number; y: number; z: number; id: number; by: 'player' | 'world' };
   'block.broken': { x: number; y: number; z: number; id: number; by: 'player' | 'world' };
+  /** A whole tree came down. x, y, z is its lowest log; the box is the space it stood in, max exclusive. */
+  'tree.felled': { x: number; y: number; z: number; id: number; logs: number; leaves: number; box: TreeBox };
   // items
   'item.gained': { id: ItemId; count: number; at?: Vec3 };
   'item.lost': { id: ItemId; count: number };
@@ -233,8 +238,11 @@ export interface ActionsApi {
    * Breaking takes time, so this fills a meter and breaks the block when it is full. Returns true when it broke.
    */
   hold(context: UseContext, dt: number): boolean;
-  /** The block being broken right now and how far along it is, 0 to 1, or null. */
-  breaking(): { x: number; y: number; z: number; progress: number } | null;
+  /**
+   * The block being broken right now and how far along it is, 0 to 1, or null. When it is a tree being
+   * felled, `tree` is the box the whole tree stands in, and x, y, z is its lowest log.
+   */
+  breaking(): { x: number; y: number; z: number; progress: number; tree?: TreeBox | null } | null;
   /** How far the player reaches, in blocks. */
   readonly reach: number;
 }

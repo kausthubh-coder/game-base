@@ -52,7 +52,7 @@ describe('the props of the world', () => {
     expect(worldProps(headless())).not.toBe(worldProps(view));
   });
 
-  test('the scatter rules alone stay well inside the budget, and a tree knows its top', () => {
+  test('the scatter rules alone stay well inside the budget, and scatter no trees', () => {
     const props = worldProps(headless());
     const wild = meadow(props);
     expect(wild.length).toBeGreaterThan(10);
@@ -62,10 +62,10 @@ describe('the props of the world', () => {
 
     const found: Scattered[] = [];
     props.scatter(0, 0, 64, 64, { density: 3 }, found);
-    const trees = found.filter((p) => p.reach > 0);
-    expect(trees.length).toBeGreaterThan(0);
-    for (const tree of trees) expect(tree.top).toBeGreaterThan(tree.y + 3);
-    expect(found.filter((p) => p.reach === 0).every((p) => Number.isNaN(p.top))).toBe(true);
+    // Every tree is a block tree of the terrain. The props add what grows under them.
+    expect(found.length).toBeGreaterThan(0);
+    expect(found.filter((p) => ['oak', 'birch', 'pine'].includes(p.kind))).toEqual([]);
+    expect(found.every((p) => p.reach === 0 && Number.isNaN(p.top))).toBe(true);
   });
 
   test('nothing is scattered where the settings say not to', () => {
@@ -85,10 +85,10 @@ describe('the props of the world', () => {
     });
     expect(town.every((handle) => handle !== 0 && props.alive(handle))).toBe(true);
     expect(props.stats().models).toBeLessThanOrEqual(PROP_DRAW_CALLS - 2);
-    // The scattered kinds that gave way are the least important ones. The oak and the grass stay.
+    // The scattered kinds that gave way are the least important ones. The grass and the reeds stay.
     const gone = wild.filter((w) => !props.alive(w.handle)).map((w) => w.key);
     expect(gone.length).toBe(wild.length + TOWN.length - (PROP_DRAW_CALLS - 2));
-    expect(gone).not.toContain('oak:0');
+    expect(gone).not.toContain('reeds:0');
     expect(gone).not.toContain('grassTuft:0');
     expect(gone).toContain('mushroom:1');
   });
@@ -98,8 +98,8 @@ describe('the props of the world', () => {
     meadow(props);
     for (const [i, key] of TOWN.entries()) props.place(key.split(':')[0], Number(key.split(':')[1]), 200 + i * 2, 0, 0, 0, 1, true);
     const before = props.stats().models;
-    // Another oak variant becomes the oak that stands. A mushroom, with none standing, is not drawn.
-    expect(props.place('oak', 2, 5, 0, 5)).not.toBe(0);
+    // Another rock variant becomes the rock that stands. A mushroom, with none standing, is not drawn.
+    expect(props.place('rock', 0, 5, 0, 5)).not.toBe(0);
     expect(props.place('mushroom', 1, 6, 0, 6)).toBe(0);
     expect(props.stats().models).toBe(before);
   });

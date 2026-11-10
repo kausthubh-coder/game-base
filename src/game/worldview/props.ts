@@ -78,12 +78,10 @@ export interface WorldProps {
  * Which variant a scattered prop is drawn as. The scatter rules use every variant of every kind, 36 draw
  * calls on their own. Folding the look-alikes together leaves 26 and room for the town.
  * A berry bush from the scatter rules becomes a plain bush: the only bushes with berries are the ones the
- * region lists, which can be picked.
+ * region lists, which can be picked. Trees are left out: every tree in the game is a block tree of the
+ * terrain, which can be cut and stops the player, so a smooth prop tree beside one would be from another game.
  */
 const WILD: Record<string, { kind: PropKind; variants: readonly number[] }> = {
-  oak: { kind: 'oak', variants: [0, 1, 2] },
-  birch: { kind: 'birch', variants: [0, 1, 0] },
-  pine: { kind: 'pine', variants: [0, 1, 1] },
   grassTuft: { kind: 'grassTuft', variants: [0, 0, 2] },
   tallGrass: { kind: 'tallGrass', variants: [0] },
   flower: { kind: 'flower', variants: [0, 1, 2, 2, 4, 4] },
@@ -103,9 +101,9 @@ const WILD: Record<string, { kind: PropKind; variants: readonly number[] }> = {
  * are 29 kinds and variants, the first nine are what is left of the wild.
  */
 const KEEP_ORDER = [
-  'oak:0', 'grassTuft:0', 'reeds:0', 'flower:0', 'tallGrass:0', 'rock:1', 'birch:0', 'bush:0', 'pine:0',
-  'flower:1', 'oak:1', 'grassTuft:2', 'flower:2', 'flower:4', 'rock:2', 'rock:0', 'lilyPad:1', 'reeds:1',
-  'bush:1', 'mushroom:0', 'oak:2', 'birch:1', 'pine:1', 'log:0', 'stump:0', 'mushroom:1',
+  'grassTuft:0', 'reeds:0', 'flower:0', 'tallGrass:0', 'rock:1', 'bush:0',
+  'flower:1', 'grassTuft:2', 'flower:2', 'flower:4', 'rock:2', 'rock:0', 'lilyPad:1', 'reeds:1',
+  'bush:1', 'mushroom:0', 'log:0', 'stump:0', 'mushroom:1',
 ];
 /** What the game needs seen comes before every scattered thing. */
 const MUST = -1;

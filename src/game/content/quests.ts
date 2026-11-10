@@ -74,6 +74,8 @@ export interface StepDef {
   place?: string;
   /** The waypoint follows the pet of this kind. */
   pet?: string;
+  /** Until the bag holds `bag`, the quest mark and the waypoint go to these people instead: whoever hands it over. */
+  first?: { bag: ItemId; npc: NpcId[] };
   /** What the tracker counts: items in the bag, known facts on a page, or a pet's trust. */
   count?: { bag: ItemId | ItemId[]; need: number } | { page: string } | { trust: string; need: number };
 }
@@ -157,7 +159,7 @@ export const QUESTS: readonly QuestDef[] = [
     summary: 'Lamps on the Mere at dusk, and the whole town in the square.',
     steps: [
       { id: 'evening', text: 'Come to the square at dusk', done: { all: [{ flag: 'festival.started' }, { place: 'town.square', within: 16 }] }, place: 'town.square' },
-      { id: 'lamp', text: 'Float a lamp on the river from the bank', done: { flag: 'festival.lamp' }, place: 'river.bank' },
+      { id: 'lamp', text: 'Float a lamp on the river from the bank', done: { flag: 'festival.lamp' }, place: 'river.bank', first: { bag: 'river_lamp', npc: ['odo'] } },
       { id: 'end', text: 'Talk to Tamsin on the bank', done: { flag: 'festival.ended' }, gate: true, npc: ['tamsin'] },
     ],
     skip: [{ flag: 'festival.started' }, { flag: 'festival.lamp' }, { flag: 'festival.ended' }],

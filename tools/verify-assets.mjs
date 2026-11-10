@@ -701,7 +701,24 @@ if (import.meta.main) {
   const args = process.argv.slice(2);
   if (args[0] === '--props-worker') {
     // The small script the props check runs: import the builders, build every shape, print the counts.
-    const module = await import(pathToFileURL(path.resolve(args[1])).href);
+    let module = await import(pathToFileURL(path.resolve(args[1])).href);
+    // An entry may name its builder instead of holding it: the functions then live in the props feature's
+    // builders index, keyed by that name, and take (variant index, entry).
+    const index = path.join(path.dirname(path.dirname(path.resolve(args[1]))), 'features/props/builders/index.ts');
+    if (fs.existsSync(index)) {
+      const builders = Object.values(await import(pathToFileURL(index).href)).find((v) => isObject(v) && Object.values(v).some((f) => typeof f === 'function'));
+      if (builders) {
+        const named = {};
+        for (const [exportName, value] of Object.entries(module)) {
+          if (!isObject(value) || Array.isArray(value)) continue;
+          for (const [key, entry] of Object.entries(value)) {
+            const fn = isObject(entry) && typeof entry.builder === 'string' ? builders[entry.builder] : undefined;
+            if (fn) named[`${exportName}.${key}`] = { ...entry, name: entry.name ?? key, builder: (_variant, i) => fn(i, entry) };
+          }
+        }
+        if (Object.keys(named).length) module = { named };
+      }
+    }
     console.log(JSON.stringify(inspectProps(module)));
     process.exit(0);
   }

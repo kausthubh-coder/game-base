@@ -25,6 +25,21 @@ const LOG: BreakRule = { hand: 1.5, tool: { kind: 'axe', seconds: 0.5 }, drops: 
 const EARTH: BreakRule = { hand: 0.5, drops: [always('dirt')] };
 const ROCK: BreakRule = { hand: null, tool: { kind: 'pickaxe', seconds: 1 }, drops: [always('stone')] };
 
+/**
+ * A tree comes down whole: one hold on any log, or on its leaves with an axe in hand, fells all of it. It
+ * gives one log for each log block and one fiber for every `leavesPerFiber` leaves, at least one.
+ */
+export const FELLING = {
+  /** Seconds to fell a tree with an axe, and by hand. */
+  axe: 1.2,
+  hand: 3.5,
+  leavesPerFiber: 15,
+  /** More logs than this joined together is something a player built. */
+  maxLogs: 40,
+  /** Leaves this many steps from a log, through other leaves, are part of its tree. */
+  leafReach: 3,
+} as const;
+
 /** Planks and every other placed block. */
 export const DEFAULT_BREAK: BreakRule = { hand: 0.6, drops: 'self' };
 

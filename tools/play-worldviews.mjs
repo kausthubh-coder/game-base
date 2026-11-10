@@ -443,28 +443,24 @@ try {
     }
   }
 
-  // The wide view: zoom all the way out where the trees are thickest.
+  // The wide view: zoom all the way out at the start. Every tree is a block tree of the terrain, which can be
+  // cut. The props draw none, so no smooth tree stands among them.
   const wide = await game(async () => {
     const g = window.__game, wv = window.__wv, group = g.view.scene.getObjectByName('props');
-    // Back to the start, where the trees for this picture are: stand by the first scattered tree in view.
-    g.teleport('spawn');
+    const at = g.teleport('spawn');
     for (let i = 0; i < 4; i++) g.view.camera.zoomBy(1);
     wv.noon();
     await g.settle();
-    await g.frames(4);
-    const trees = group.children.filter((m) => /^props:(oak|birch|pine):/.test(m.name) && m.count > 0);
-    let at = null;
-    if (trees.length > 0) {
-      const m = trees[0].instanceMatrix.array;
-      at = g.teleport(Math.floor(m[12]) + 2.5, Math.floor(m[14]) + 2.5);
-      g.advance(0.3);
-      await g.settle();
-    }
     await g.frames(8);
-    return { at, treeKinds: trees.map((m) => `${m.name} x${m.count}`), calls: await wv.propCalls() };
+    const propTrees = group.children.filter((m) => /^props:(oak|birch|pine):/.test(m.name) && m.count > 0);
+    let blockTrees = 0;
+    for (let x = Math.floor(at.x) - 30; x <= Math.floor(at.x) + 30; x++) for (let z = Math.floor(at.z) - 30; z <= Math.floor(at.z) + 30; z++) {
+      for (let y = Math.floor(at.y) - 4; y <= Math.floor(at.y) + 4; y++) if (/_log$/.test(g.block(x, y, z).key)) { blockTrees++; break; }
+    }
+    return { at, blockTrees, propTrees: propTrees.map((m) => `${m.name} x${m.count}`), calls: await wv.propCalls() };
   });
   numbers.wide = wide.calls;
-  check('scattered trees stand near the start', wide.treeKinds.length > 0, wide.treeKinds.join(', '));
+  check('block trees stand near the start, and no prop tree', wide.blockTrees >= 5 && wide.propTrees.length === 0, `${wide.blockTrees} block trees within 30 blocks; prop trees: ${wide.propTrees.join(', ') || 'none'}`);
   check('the props stay inside 40 draw calls', wide.calls.props <= 40 && wide.calls.counted.drawCalls + wide.calls.counted.shadowCalls <= 40,
     `the renderer drew ${wide.calls.props} calls for props of ${wide.calls.frame} in the frame. Counted: ${wide.calls.counted.drawCalls} kinds and ${wide.calls.counted.shadowCalls} for shadows, ${wide.calls.counted.drawn} props in view`);
   console.log(`     triangles: ${wide.calls.triangles} in the frame, ${wide.calls.counted.triangles} of them props and their shadows. Heaviest: ${wide.calls.heaviest.join('; ')}`);

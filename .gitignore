@@ -5,3 +5,6 @@ dist
 .DS_Store
 assets-src/raw
 play-serve
+
+# Each agent and check builds into its own dist-<name> folder.
+dist-*

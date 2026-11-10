@@ -147,7 +147,7 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
     const wanted = new Set<NpcId>();
     for (const def of defs) {
       const p = progress.get(def.id)!;
-      if (p.state === 'active') for (const npc of def.steps[p.step].npc ?? []) wanted.add(npc);
+      if (p.state === 'active') for (const npc of markedBy(def.steps[p.step])) wanted.add(npc);
     }
     if (resync) {
       resync = false;
@@ -165,11 +165,18 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
     }
   }
 
+  /** Who the step points at now: the giver of what it needs first, while the bag lacks it, else its own people. */
+  function markedBy(step: StepDef): readonly NpcId[] {
+    if (step.first && bagCount(game, step.first.bag) === 0) return step.first.npc;
+    return step.npc ?? [];
+  }
+
   function waypoint(step: StepDef): Vec3 | undefined {
-    if (step.npc) {
+    const npcs = markedBy(step);
+    if (npcs.length > 0) {
       let best: Vec3 | undefined;
       let bestDistance = Infinity;
-      for (const id of step.npc) {
+      for (const id of npcs) {
         const npc = game.systems.people?.get(id);
         if (!npc) continue;
         const d = distance2d(npc.pos, game.player.pos);

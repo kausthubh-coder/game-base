@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { AIR, blockId } from '../../content/blocks.ts';
 import type { UseContext } from '../api.sim.ts';
-import { BAG_FULL_TOAST, NO_GROUND_TOAST, TOWN_TOAST } from './index.sim.ts';
+import { BAG_FULL_TOAST, NO_GROUND_TOAST, NO_ROOM_TOAST, TOWN_TOAST } from './index.sim.ts';
 import { TOWN_X, makeStage, type Stage } from './stage.ts';
 
 const LOG = blockId('oak_log'), STONE = blockId('stone'), GRASS = blockId('grass'), LEAVES = blockId('oak_leaves');
@@ -222,7 +222,7 @@ test('handlers get the click first, in the order they were added, and a click on
   // No handler wants the next click, so it starts the break and holding finishes it.
   take = false;
   expect(actions.use(click)).toBe(true);
-  expect(actions.breaking()).toEqual({ x: 7, y: g, z: 5, progress: 0 });
+  expect(actions.breaking()).toEqual({ x: 7, y: g, z: 5, progress: 0, tree: null });
   expect(holdsToBreak(s, click)).toBe(10);
   expect(calls).toEqual(['first', 'second', 'first', 'second']);
   // A click on nothing does nothing.
@@ -302,6 +302,26 @@ test('a held workbench is placed on the ground, near() is then true, and holding
   expect(placeables.all()).toEqual([]);
   expect(placeables.near('workbench', game.player.pos, 5)).toBe(false);
   expect(inventory.count('workbench')).toBe(1);
+});
+
+test('a bed is two blocks long: its foot goes on the clicked cell and it goes on the way the player faces', () => {
+  const s = makeStage();
+  const g = s.ground, game = s.kernel.game, { inventory, actions, placeables } = game.systems;
+  inventory.add('bed', 2);
+  // The player stands at 5.5, 5.5. Facing north the bed runs from 5, 3 to 5, 2, away from them.
+  game.player.facing = 0;
+  expect(actions.use(s.context('secondary', s.hit(5, g - 1, 3)))).toBe(true);
+  expect(placeables.all()).toMatchObject([{ kind: 'bed', x: 5, y: g, z: 2, quarterTurns: 2 }]);
+  expect([placeables.at(5, g, 2)?.kind, placeables.at(5, g, 3)?.kind, placeables.at(5, g, 4)]).toEqual(['bed', 'bed', null]);
+  // Facing east it runs from 7, 5 to 8, 5. With the second cell blocked it does not go down.
+  game.player.facing = Math.PI / 2;
+  s.world.setBlock(8, g, 5, STONE);
+  expect(actions.use(s.context('secondary', s.hit(7, g - 1, 5)))).toBe(false);
+  expect(s.toasts().at(-1)).toBe(NO_ROOM_TOAST);
+  s.world.setBlock(8, g, 5, AIR);
+  expect(actions.use(s.context('secondary', s.hit(7, g - 1, 5)))).toBe(true);
+  expect([placeables.at(7, g, 5)?.kind, placeables.at(8, g, 5)?.kind]).toEqual(['bed', 'bed']);
+  expect(inventory.count('bed')).toBe(0);
 });
 
 test('a drop that does not fit is lost with a toast, and a station stays down when the bag is full', () => {

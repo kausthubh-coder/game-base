@@ -27,6 +27,8 @@ import { BUSES, DEFAULT_VOLUMES, createSound } from './sound.ts';
 import type { GameView, QualityMode, ScreenPoint } from './view.ts';
 import { dressWater } from './water.ts';
 
+/** The camera's distance at each wheel step, nearest first. A person is about 90 pixels tall at the first on a 900 pixel screen. */
+const CAMERA_DISTANCES = [34, 46, 66, 94];
 const SETTINGS_KEY = 'greenhollow.settings';
 /** Body steps in one kernel step: 60 a second against 20. */
 const BODY_STEPS = Math.round(STEP / HERO_STEP);
@@ -139,7 +141,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const systems = installSystems(kernel);
   const sys = game.systems as Partial<Systems>;
 
-  const camera = createCamera(ctx, { blocks: world.sim, input: false });
+  // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
+  const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: { distances: CAMERA_DISTANCES, zoom: 0 } });
   const sky = createSky(ctx, { shadowRange: 40 });
   const water = createWaterMaterial(ctx);
   const effects = createEffects(ctx);

@@ -6,6 +6,7 @@ import type { Vec3 } from '../../engine/types.ts';
 import { HERO_STEP, HeroBody } from '../../features/hero/index.ts';
 import type { World } from '../../features/world/index.ts';
 import type { Actor, Game } from '../api.sim.ts';
+import { facingOf } from '../move.sim.ts';
 import type { Keys } from './keys.ts';
 
 /** Blocks a second with Shift held. A leaftail is startled by anything faster. */
@@ -49,10 +50,21 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3):
     p.facing = body.facing;
     p.onGround = body.grounded;
     p.inWater = body.swimming;
-    actor.facing = body.facing;
     const speed = Math.hypot(body.vx, body.vz);
     const breaking = game.systems.actions?.breaking() ?? null;
-    actor.anim = breaking && speed < MOVING ? 'tool' : speed > MOVING ? 'walk' : 'idle';
+    // Standing and breaking something: turn to it, so the hero works on what is in front of them.
+    if (breaking && speed < MOVING) {
+      const tx = breaking.tree ? (breaking.tree.x0 + breaking.tree.x1) / 2 : breaking.x + 0.5;
+      const tz = breaking.tree ? (breaking.tree.z0 + breaking.tree.z1) / 2 : breaking.z + 0.5;
+      if (Math.hypot(tx - body.x, tz - body.z) > 0.2) body.facing = facingOf(tx - body.x, tz - body.z);
+      p.facing = body.facing;
+    }
+    actor.facing = body.facing;
+    // The swing is its own sheet, in the hero's style and seen from every side. The hero sheet's tool row is
+    // drawn in another style and to one side only, so it is never played.
+    const swinging = breaking !== null && speed < MOVING;
+    actor.sprite = swinging ? 'hero-swing' : 'hero';
+    actor.anim = swinging ? 'tool' : speed > MOVING ? 'walk' : 'idle';
   }
   write();
 

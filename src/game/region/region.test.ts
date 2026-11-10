@@ -674,7 +674,7 @@ describe('what a view reads', () => {
     // In town the only logs below roof height are posts: lamps, the well, corners of houses and fences. No trunk
     // stands on a street or the square.
     for (let x = 157; x <= 189; x++) for (let z = -161; z <= -139; z++) {
-      const lamp = world.getBlock(x, 22, z) === LAMP, well = Math.abs(x - 173) <= 1 && Math.abs(z + 150) <= 1;
+      const lamp = world.getBlock(x, 21, z) === LAMP, well = Math.abs(x - 173) <= 1 && Math.abs(z + 150) <= 1;
       if (!lamp && !well) expect(world.getBlock(x, 20, z), `${x}, ${z}`).toBe(0);
     }
     expect(t.x1 - t.x0).toBeGreaterThan(60);

@@ -8,7 +8,6 @@
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import { SOLID } from '../../features/world/chunk.sim.ts';
-import { reachDistance } from '../actions/index.sim.ts';
 import type { NpcId, PetState } from '../api.sim.ts';
 import { REGION } from '../content/region.ts';
 import { distance2d } from '../move.sim.ts';
@@ -133,26 +132,6 @@ function trunks(p: Play): Trunk[] {
     .sort((a, b) => Math.hypot(a.x - at.x, a.z - at.z) - Math.hypot(b.x - at.x, b.z - at.z));
 }
 
-/** Holds the button on the leaves in reach, nearest first, until the bag has `want` fiber or none are left. */
-function pickLeaves(p: Play, want: number): void {
-  const { world } = p, player = p.game.player;
-  for (let tries = 0; tries < 60 && p.count('fiber') < want; tries++) {
-    let best: Vec3 | null = null, bestD = 4.8;
-    const px = Math.floor(player.pos.x), py = Math.floor(player.pos.y), pz = Math.floor(player.pos.z);
-    for (let x = px - 5; x <= px + 5; x++) {
-      for (let z = pz - 5; z <= pz + 5; z++) {
-        for (let y = py; y <= py + 7; y++) {
-          if (!LEAVES.has(world.getBlock(x, y, z))) continue;
-          const d = reachDistance(player, x, y, z, x + 1, y + 1, z + 1);
-          if (d < bestD) { bestD = d; best = { x, y, z }; }
-        }
-      }
-    }
-    if (!best) return;
-    must(p, p.dig(best.x, best.y, best.z, [0, -1, 0]), `leaves in reach at ${best.x}, ${best.y}, ${best.z} did not break`);
-  }
-}
-
 /** Cuts real trees near the player until the bag holds `logs` logs and `fiber` fiber. */
 function gather(p: Play, logs: number, fiber: number): void {
   must(p, p.take('axe'), 'there is no axe in the bag to take in hand');
@@ -162,16 +141,11 @@ function gather(p: Play, logs: number, fiber: number): void {
     const spot = p.sys.nav.near({ x: tree.x + 0.5, y: tree.y, z: tree.z + 0.5 }, 1.5, (x, z) => x === tree.x && z === tree.z);
     must(p, spot, `nowhere to stand beside the tree at ${tree.x}, ${tree.z}`);
     must(p, p.walkTo(spot, { within: 0.3, seconds: 120 }), `could not walk to the tree at ${tree.x}, ${tree.z}`);
-    for (let y = tree.y; LOGS.has(p.world.getBlock(tree.x, y, tree.z)); y++) {
-      const before = p.count('oak_log');
-      if (!p.dig(tree.x, y, tree.z, faceToward(p, tree.x, tree.z))) {
-        // Too high to reach from the ground. The rest of the trunk stays.
-        must(p, y > tree.y, `the lowest log of the tree at ${tree.x}, ${tree.y}, ${tree.z} did not break`);
-        break;
-      }
-      must(p, p.count('oak_log') === before + 1, 'a log broke and gave no wood');
-    }
-    pickLeaves(p, fiber);
+    // One hold on the lowest log fells the whole tree: every log and leaf goes, the logs and some fiber come.
+    const logsBefore = p.count('oak_log'), fiberBefore = p.count('fiber');
+    must(p, p.dig(tree.x, tree.y, tree.z, faceToward(p, tree.x, tree.z)), `the tree at ${tree.x}, ${tree.y}, ${tree.z} did not come down`);
+    must(p, p.count('oak_log') >= logsBefore + 3 && p.count('fiber') > fiberBefore, `a felled tree gave ${p.count('oak_log') - logsBefore} logs and ${p.count('fiber') - fiberBefore} fiber`);
+    for (let y = tree.y; y < tree.y + 12; y++) must(p, !LOGS.has(p.world.getBlock(tree.x, y, tree.z)), `a log of the felled tree still stands at ${tree.x}, ${y}, ${tree.z}`);
   }
   must(p, p.count('oak_log') >= logs, `only ${p.count('oak_log')} logs after a dozen trees`);
   must(p, p.count('fiber') >= fiber, `only ${p.count('fiber')} fiber after a dozen trees`);
@@ -343,9 +317,13 @@ export const STEPS: readonly Step[] = [
       for (const [x, z, high] of [[h.x - 1, h.z, 3], [h.x - 1, h.z + 1, 3], [h.x, h.z - 1, 3], [h.x + 1, h.z, 2]] as const) {
         for (let i = 0; i < high; i++) set(p, 'plank', x, g - 1 + i, z, TOP, PLANK);
       }
+      // The bed is two blocks long and goes on the way the player faces: step back and come up facing north,
+      // and set its foot down at h.z + 1 so its pillow is at h.z, under the roof to come.
+      must(p, p.walkTo({ x: h.x + 0.5, y: g, z: h.z + 3.5 }, { within: 0.3, seconds: 30 }), 'could not step back from the hut');
+      must(p, p.walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 30 }), 'could not come back up to the hut');
       must(p, p.take('bed'), 'the bed is not in the bag');
-      must(p, p.use(h.x, g - 1, h.z), 'the bed did not go down');
-      must(p, p.sys.placeables.at(h.x, g, h.z)?.kind === 'bed', 'no bed stands where it was set down');
+      must(p, p.use(h.x, g - 1, h.z + 1), 'the bed did not go down');
+      must(p, p.sys.placeables.at(h.x, g, h.z)?.kind === 'bed' && p.sys.placeables.at(h.x, g, h.z + 1)?.kind === 'bed', 'no bed two blocks long stands where it was set down');
       // Under open sky the quest still waits.
       p.advance(1);
       must(p, openStep(p) === 'roof.shelter', 'a bed under open sky should not pass the shelter step');
@@ -358,8 +336,8 @@ export const STEPS: readonly Step[] = [
     quest: 'roof', name: 'wait for evening and sleep',
     run(p) {
       const h = hut(p), clock = p.game.clock;
-      // The bed fills its block, so the player stands beside it, in the open doorway.
-      must(p, p.walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 1.5 }, { within: 0.25, seconds: 120 }), 'could not walk up to the bed');
+      // The bed fills its two blocks, so the player stands at its foot, in the open doorway.
+      must(p, p.walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 120 }), 'could not walk up to the bed');
       must(p, p.prompt() === 'Sleep', `beside the bed the prompt should be "Sleep" and is "${String(p.prompt())}"`);
       if (clock.timeOfDay < EVENING) {
         // Too early: the bed says so and the day goes on.

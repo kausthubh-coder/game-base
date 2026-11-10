@@ -99,7 +99,8 @@ export function install(kernel: Kernel): void {
     list.push(placed);
     eachCell(e, (x, y, z) => {
       cells.set(cellKey(x, y, z), e);
-      if (BARRIER !== null) world.setBlock(x, y, z, BARRIER);
+      // A save from when the thing was smaller may have a block in a new cell. It stays.
+      if (BARRIER !== null && world.getBlock(x, y, z) === AIR) world.setBlock(x, y, z, BARRIER);
     });
     others.interact?.add(e.target);
     return e;
