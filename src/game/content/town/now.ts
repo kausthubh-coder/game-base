@@ -66,6 +66,7 @@ export function townNow(): TownPlan {
   return {
     fills,
     buildings: [...BUILDINGS],
+    models: [],
     places: [
       { name: 'town.gate', x: 134, y: TOWN_GROUND, z: -174, label: 'Hollowmere' },
       // Six blocks from the well: the villagers stand up to four blocks off this place, and none should end up on the well's rim.

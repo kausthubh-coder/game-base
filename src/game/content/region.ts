@@ -9,6 +9,7 @@
 // and the bend of the river Mere east of it. Another seed gets the same plan on its own land.
 
 import type { BlueprintName } from '../../content/blueprints.ts';
+import type { TownModelName } from '../../content/town-kit.ts';
 import { TOWN_GROUND, type TownPlan } from './town/kit.ts';
 import { townNow } from './town/now.ts';
 import { townA } from './town/a.ts';
@@ -51,6 +52,22 @@ export interface PlanBuilding {
   sign?: number;
   /** The named place it gives: the block just outside its door, or the doorway itself. */
   place?: { name: string; label: string; at: 'outside' | 'door' };
+}
+
+/**
+ * A model of the Hollowmere town kit (src/content/town-kit.ts) set down in the town. It is drawn by
+ * src/game/views/world-town.view.ts, and its solid cells become invisible barrier blocks.
+ */
+export interface PlanModel {
+  id: string;
+  model: TownModelName;
+  /** The corner with the lowest x and z of its footprint, after it is turned. */
+  x: number;
+  z: number;
+  /** Quarter turns, counter-clockwise seen from above. 0 leaves its front facing south, 1 east, 3 west. */
+  turns: number;
+  /** The named place it gives: the block in front of the middle of its front, or the one past that. */
+  place?: { name: string; label: string; at: 'door' | 'outside' };
 }
 
 export interface PlanPlace {
@@ -101,6 +118,8 @@ export interface RegionPlan {
   paths: readonly PlanPath[];
   fills: readonly Fill[];
   buildings: readonly PlanBuilding[];
+  /** Models of the town kit, in a layout of the town that uses them. */
+  models: readonly PlanModel[];
   /** Feet height of the town's floors: buildings are stamped one block under it. */
   townGround: number;
   trees: readonly PlanTree[];
@@ -265,6 +284,7 @@ export const REGION: RegionPlan = {
   paths: [{ points: [[STONE.x + 2, STONE.z], [92, -221], [126, -177], [137, -174]], half: 1.5 }],
   fills: [...fills, ...HOLLOWMERE.fills],
   buildings: HOLLOWMERE.buildings,
+  models: HOLLOWMERE.models,
   townGround: TOWN_GROUND,
   trees: TREES,
   bushes: BUSHES,

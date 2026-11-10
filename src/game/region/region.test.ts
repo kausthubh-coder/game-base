@@ -16,7 +16,8 @@ import { install as installItems } from '../items/index.sim.ts';
 import { standable } from '../move.sim.ts';
 import { install as installNav } from '../nav/index.sim.ts';
 import { BUSH_REACH, REGROW_SECONDS, install as installRegion } from './index.sim.ts';
-import { BOUNDS, built, regionProps } from './land.sim.ts';
+import { BOUNDS, built, placedModels, regionProps } from './land.sim.ts';
+import { TOWN_MODELS } from '../../content/town-kit.ts';
 
 const SEED = 1;
 const id = (key: string): number => blockId(key);
@@ -85,10 +86,12 @@ describe('places', () => {
       const indoors = built().some((b) => p.x > b.x0 + 1 && p.x < b.x1 && p.z > b.z0 + 1 && p.z < b.z1);
       if (indoors) expect(doors.has(`${Math.floor(p.x)},${Math.floor(p.z)}`), name).toBe(true);
     }
-    // The granary's place is its doorway: the wall stands on both sides of it and the way out is open.
-    const granary = built().find((b) => b.plan.id === 'granary')!;
+    // The granary's place is its doorway: the wall stands on both sides of it and the way out is open. A
+    // granary of the town kit has no inside, so its place is the doorstep in front of its doors.
+    const granary = built().find((b) => b.plan.id === 'granary') ?? placedModels().find((m) => m.plan.id === 'granary')!;
     expect(at('granary')).toEqual({ x: granary.door.x + 0.5, y: granary.door.y, z: granary.door.z + 0.5 });
-    expect(block(granary.door.x - 1, granary.door.y, granary.door.z)).not.toBe(0);
+    if ('cells' in granary) expect(block(granary.door.x - 1, granary.door.y, granary.door.z)).not.toBe(0);
+    else expect(standable(world, granary.door.x, granary.door.y, granary.door.z)).toBe(true);
     expect(standable(world, granary.outside.x, granary.outside.y, granary.outside.z)).toBe(true);
   });
 
@@ -277,22 +280,29 @@ describe('the path and the town', () => {
   });
 
   test('about ten buildings stand around the square, turned more than one way, most under teal shingle', () => {
-    const all = built();
+    // Buildings of blocks, or of the town kit: its buildings and landmarks, not its street pieces.
+    const kit = placedModels().filter((m) => TOWN_MODELS[m.plan.model].category !== 'street');
+    const all = [...built(), ...kit];
     expect(all.length).toBeGreaterThanOrEqual(10);
     expect(new Set(all.map((b) => b.plan.turns)).size).toBeGreaterThan(1);
-    const kinds = new Set(all.map((b) => b.plan.blueprint));
-    for (const kind of ['cottage', 'shop', 'barn']) expect(kinds.has(kind as never), kind).toBe(true);
+    if (kit.length === 0) {
+      const kinds = new Set(built().map((b) => b.plan.blueprint));
+      for (const kind of ['cottage', 'shop', 'barn']) expect(kinds.has(kind as never), kind).toBe(true);
+    }
     const t = REGION.town;
     for (const b of all) {
       // Each one is whole, on the town's ground, and inside its bounds.
       expect(b.x0 >= t.x0 && b.x1 <= t.x1 && b.z0 >= t.z0 && b.z1 <= t.z1, b.plan.id).toBe(true);
-      expect(standable(world, b.door.x, b.door.y, b.door.z), `${b.plan.id} doorway`).toBe(true);
+      // A building of the kit has its doorstep where one of blocks has its doorway; a landmark may stand on a way.
+      if ('cells' in b || b.plan.place) expect(standable(world, b.door.x, b.door.y, b.door.z), `${b.plan.id} doorway`).toBe(true);
+      if (!('cells' in b) && !b.plan.place) continue;
       expect(standable(world, b.outside.x, b.outside.y, b.outside.z), `${b.plan.id} doorstep`).toBe(true);
       expect(nav.path(at('town.gate'), { x: b.door.x + 0.5, y: b.door.y, z: b.door.z + 0.5 }), `${b.plan.id} door`).not.toBeNull();
     }
     // No two overlap.
     for (const a of all) for (const b of all) if (a !== b) expect(a.x1 < b.x0 || b.x1 < a.x0 || a.z1 < b.z0 || b.z1 < a.z0, `${a.plan.id} and ${b.plan.id}`).toBe(true);
-    expect(count(SHINGLE, t.x0, t.z0, t.x1, t.z1)).toBeGreaterThan(600);
+    // The kit's roofs are drawn, not built, so only a town of blocks counts its shingle.
+    if (kit.length === 0) expect(count(SHINGLE, t.x0, t.z0, t.x1, t.z1)).toBeGreaterThan(600);
   });
 
   test('the square is open, with a well or a landmark in its middle', () => {
@@ -303,7 +313,9 @@ describe('the path and the town', () => {
     // The well: water at ground level with a ring around it, a few blocks north of the place. Or, in a
     // layout of the town under test (content/town/), a landmark prop as far north or south of it.
     const well = count(WATER, Math.floor(s.x) - 1, Math.floor(s.z) - 6, Math.floor(s.x) + 1, Math.floor(s.z) - 2, s.y - 1, s.y) === 1;
-    const landmark = regionProps().some((p) => (p.kind === 'rootFountain' || p.kind === 'elderOak') && Math.abs(p.x - s.x) <= 2 && Math.abs(s.z - p.z) >= 2 && Math.abs(s.z - p.z) <= 10);
+    const near = (p: { x: number; z: number }): boolean => Math.abs(p.x - s.x) <= 2 && Math.abs(s.z - p.z) >= 2 && Math.abs(s.z - p.z) <= 10;
+    const landmark = regionProps().some((p) => (p.kind === 'rootFountain' || p.kind === 'elderOak') && near(p))
+      || placedModels().some((m) => TOWN_MODELS[m.plan.model].category === 'landmark' && near(m));
     expect(well || landmark).toBe(true);
   });
 
@@ -370,9 +382,13 @@ describe('what the player may change', () => {
       expect(region.isProtected(p.x, p.y, p.z), name).toBe(true);
       expect(region.isProtected(p.x, p.y - 1, p.z), name).toBe(true);
     }
-    // A wall of the lodge, a lamp on the square, the well.
-    const lodge = built().find((b) => b.plan.id === 'lodge')!;
-    expect(region.isProtected(lodge.x0 + 1, lodge.y0 + 2, lodge.z0 + 1)).toBe(true);
+    // A wall of the lodge, of blocks or of the kit.
+    const lodge = built().find((b) => b.plan.id === 'lodge');
+    if (lodge) expect(region.isProtected(lodge.x0 + 1, lodge.y0 + 2, lodge.z0 + 1)).toBe(true);
+    else {
+      const model = placedModels().find((m) => m.plan.id === 'lodge')!;
+      expect(region.isProtected(model.solid[0], REGION.townGround + 1, model.solid[1])).toBe(true);
+    }
     // The path, at its middle and its edge, far from town.
     for (const dz of [-1, 0, 1]) expect(region.isProtected(60, 21, -221 + dz)).toBe(true);
     expect(region.isProtected(60, 21, -224)).toBe(false);
@@ -563,8 +579,8 @@ describe('what a view reads', () => {
       expect(door.quarterTurns).toBe(b.plan.turns);
       expect(door.rotation).toBeCloseTo((b.plan.turns * Math.PI) / 2, 6);
     }
-    // The bakery hangs the loaf.
-    expect(props.find((p) => p.kind === 'sign' && p.building === 'bakery')!.variant).toBe(1);
+    // The bakery hangs the loaf. A bakery of the town kit has its sign in its model.
+    if (all.some((b) => b.plan.id === 'bakery')) expect(props.find((p) => p.kind === 'sign' && p.building === 'bakery')!.variant).toBe(1);
     // Props that stand alone are in the list too, with no building.
     expect(props.filter((p) => p.building === '').length).toBe(REGION.props.length);
     expect(region.props!()).toBe(props);
@@ -723,7 +739,13 @@ describe('making the land', () => {
         expect(world.getBlock(x, b.y0 + 1, z), `${b.plan.id} corner ${x}, ${z}, crosses ${crosses}`).toBe(OAK);
       }
     }
-    expect(built().some((b) => b.x0 >> 4 !== b.x1 >> 4)).toBe(true);
+    // A model of the town kit is a body of barrier blocks: every solid column of one that crosses a chunk edge is there.
+    for (const m of placedModels()) {
+      for (let i = 0; i < m.solid.length; i += 2) {
+        expect(world.getBlock(m.solid[i], REGION.townGround, m.solid[i + 1]), `${m.plan.id} at ${m.solid[i]}, ${m.solid[i + 1]}`).toBe(id('barrier'));
+      }
+    }
+    expect([...built(), ...placedModels()].some((b) => b.x0 >> 4 !== b.x1 >> 4)).toBe(true);
   });
 
   test('another seed gets the same plan on its own land: every place can still be stood on', () => {

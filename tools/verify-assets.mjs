@@ -263,11 +263,14 @@ export function checkManifest(root) {
     if (section === 'models') {
       for (const [name, model] of Object.entries(entry)) {
         try {
-          if (!/^models\/[a-z0-9-]+\.glb$/.test(model.file)) throw Error('invalid model path');
+          // A town model (tools/models/town.mjs) has a Body and a Glow, and the budget of its kind in the kit.
+          const town = name.startsWith('town-');
+          if (!(town ? /^models\/town\/[a-z0-9-]+\.glb$/ : /^models\/[a-z0-9-]+\.glb$/).test(model.file)) throw Error('invalid model path');
           const data = fs.readFileSync(path.join(assets, model.file));
           used.add(model.file);
-          const { triangles } = inspectGlb(data);
-          if (!isWhole(model.budget, 1) || model.budget > (/^(tree|birch|pine)-/.test(name) ? 1500 : 300)) throw Error('invalid triangle budget');
+          const { triangles } = inspectGlb(data, { primitives: town ? 2 : 1 });
+          const cap = town ? 8000 : /^(tree|birch|pine)-/.test(name) ? 1500 : 300;
+          if (!isWhole(model.budget, 1) || model.budget > cap) throw Error('invalid triangle budget');
           if (triangles !== model.triangles || triangles > model.budget) throw Error(`${triangles} triangles, declared ${model.triangles}, budget ${model.budget}`);
           if (data.length !== model.bytes) throw Error(`${data.length} bytes, declared ${model.bytes}`);
         } catch (error) { failures.push(`models.${name}: ${error.message}`); }

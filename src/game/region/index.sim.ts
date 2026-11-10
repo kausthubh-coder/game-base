@@ -8,7 +8,7 @@ import { forestAt, groundHeight } from '../../features/world/terrain.sim.ts';
 import type { BerryBush, Game, Interactable, Place, RegionApi, RegionScatter, SimSystem } from '../api.sim.ts';
 import { REGION } from '../content/region.ts';
 import type { Kernel } from '../kernel.sim.ts';
-import { built, clearing, onPath, regionProps, scatterBlocked } from './land.sim.ts';
+import { built, clearing, onPath, placedModels, regionProps, scatterBlocked } from './land.sim.ts';
 import { isTreeSpot } from './tree-spots.sim.ts';
 
 /** Seconds of game time a picked bush stays bare. */
@@ -32,7 +32,7 @@ const feetAt = (x: number, y: number, z: number): Vec3 => ({ x: x + 0.5, y, z: z
 export function createRegion(game: Game): Region {
   // ------------------------------------------------------------------------------------ places
   const places: Place[] = REGION.places.map((p) => ({ name: p.name, at: feetAt(p.x, p.y, p.z), label: p.label }));
-  for (const b of built()) {
+  for (const b of [...built(), ...placedModels()]) {
     const want = b.plan.place;
     if (!want) continue;
     const at = want.at === 'door' ? b.door : b.outside;

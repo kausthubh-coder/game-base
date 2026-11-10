@@ -1080,6 +1080,168 @@
       "triangles": 280,
       "budget": 300,
       "bytes": 29236
+    },
+    "town-granary-hall": {
+      "file": "models/town/granary-hall.glb",
+      "triangles": 7714,
+      "budget": 8000,
+      "bytes": 359072
+    },
+    "town-rootworks-gate": {
+      "file": "models/town/rootworks-gate.glb",
+      "triangles": 5312,
+      "budget": 8000,
+      "bytes": 236936
+    },
+    "town-town-well": {
+      "file": "models/town/town-well.glb",
+      "triangles": 2800,
+      "budget": 8000,
+      "bytes": 122824
+    },
+    "town-bakery": {
+      "file": "models/town/bakery.glb",
+      "triangles": 2893,
+      "budget": 4000,
+      "bytes": 140248
+    },
+    "town-lodge": {
+      "file": "models/town/lodge.glb",
+      "triangles": 3923,
+      "budget": 4000,
+      "bytes": 187456
+    },
+    "town-workshop": {
+      "file": "models/town/workshop.glb",
+      "triangles": 2629,
+      "budget": 4000,
+      "bytes": 125644
+    },
+    "town-kennel": {
+      "file": "models/town/kennel.glb",
+      "triangles": 3031,
+      "budget": 4000,
+      "bytes": 146564
+    },
+    "town-ferry-house": {
+      "file": "models/town/ferry-house.glb",
+      "triangles": 3507,
+      "budget": 4000,
+      "bytes": 167800
+    },
+    "town-house-a": {
+      "file": "models/town/house-a.glb",
+      "triangles": 2463,
+      "budget": 4000,
+      "bytes": 121684
+    },
+    "town-house-b": {
+      "file": "models/town/house-b.glb",
+      "triangles": 3603,
+      "budget": 4000,
+      "bytes": 173936
+    },
+    "town-house-c": {
+      "file": "models/town/house-c.glb",
+      "triangles": 3294,
+      "budget": 4000,
+      "bytes": 159272
+    },
+    "town-house-d": {
+      "file": "models/town/house-d.glb",
+      "triangles": 3255,
+      "budget": 4000,
+      "bytes": 160008
+    },
+    "town-market-stall-a": {
+      "file": "models/town/market-stall-a.glb",
+      "triangles": 684,
+      "budget": 800,
+      "bytes": 32592
+    },
+    "town-market-stall-b": {
+      "file": "models/town/market-stall-b.glb",
+      "triangles": 684,
+      "budget": 800,
+      "bytes": 34872
+    },
+    "town-cart": {
+      "file": "models/town/cart.glb",
+      "triangles": 660,
+      "budget": 800,
+      "bytes": 30496
+    },
+    "town-barrels-crates": {
+      "file": "models/town/barrels-crates.glb",
+      "triangles": 552,
+      "budget": 800,
+      "bytes": 26540
+    },
+    "town-bench": {
+      "file": "models/town/bench.glb",
+      "triangles": 512,
+      "budget": 800,
+      "bytes": 24444
+    },
+    "town-signpost": {
+      "file": "models/town/signpost.glb",
+      "triangles": 400,
+      "budget": 800,
+      "bytes": 19740
+    },
+    "town-lamp-post": {
+      "file": "models/town/lamp-post.glb",
+      "triangles": 652,
+      "budget": 800,
+      "bytes": 31580
+    },
+    "town-string-lights": {
+      "file": "models/town/string-lights.glb",
+      "triangles": 754,
+      "budget": 800,
+      "bytes": 36132
+    },
+    "town-banner-pole": {
+      "file": "models/town/banner-pole.glb",
+      "triangles": 352,
+      "budget": 800,
+      "bytes": 19072
+    },
+    "town-flower-planter": {
+      "file": "models/town/flower-planter.glb",
+      "triangles": 728,
+      "budget": 800,
+      "bytes": 40144
+    },
+    "town-fence-straight": {
+      "file": "models/town/fence-straight.glb",
+      "triangles": 308,
+      "budget": 800,
+      "bytes": 15684
+    },
+    "town-fence-corner": {
+      "file": "models/town/fence-corner.glb",
+      "triangles": 336,
+      "budget": 800,
+      "bytes": 17048
+    },
+    "town-stone-bridge": {
+      "file": "models/town/stone-bridge.glb",
+      "triangles": 692,
+      "budget": 800,
+      "bytes": 31876
+    },
+    "town-dock-segment": {
+      "file": "models/town/dock-segment.glb",
+      "triangles": 728,
+      "budget": 800,
+      "bytes": 34260
+    },
+    "town-statue-gardener-warden": {
+      "file": "models/town/statue-gardener-warden.glb",
+      "triangles": 768,
+      "budget": 800,
+      "bytes": 36716
     }
   },
   "voice": {

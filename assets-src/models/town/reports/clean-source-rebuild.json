@@ -1,0 +1,141 @@
+{
+  "command": "blender -b -t 1 --python-exit-code 1 --python scripts/build_export.py -- --no-renders --no-check",
+  "all_byte_identical": true,
+  "assets": [
+    {
+      "name": "bakery.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "banner-pole.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "barrels-crates.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "bench.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "cart.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "dock-segment.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "fence-corner.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "fence-straight.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "ferry-house.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "flower-planter.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "granary-hall.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "house-a.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "house-b.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "house-c.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "house-d.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "kennel.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "lamp-post.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "lodge.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "market-stall-a.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "market-stall-b.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "rootworks-gate.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "signpost.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "statue-gardener-warden.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "stone-bridge.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "string-lights.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "town-well.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    },
+    {
+      "name": "workshop.glb",
+      "source_reexport_exists": true,
+      "byte_identical": true
+    }
+  ]
+}

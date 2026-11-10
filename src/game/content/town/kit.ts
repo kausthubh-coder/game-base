@@ -4,7 +4,9 @@
 // the river basin) is the same under every one.
 //
 // Coordinates are whole blocks, as in region.ts: x runs east, z runs south, y is up.
-import type { Fill, Level, PlanBuilding, PlanPlace, PlanProp, PlanTree } from '../region.ts';
+import type { TownModelName } from '../../../content/town-kit.ts';
+import { TOWN_MODELS } from '../../../content/town-kit.ts';
+import type { Fill, Level, PlanBuilding, PlanModel, PlanPlace, PlanProp, PlanTree } from '../region.ts';
 
 /** Feet height of the town's floors and streets. */
 export const TOWN_GROUND = 20;
@@ -12,9 +14,11 @@ export const TOWN_GROUND = 20;
 export interface TownPlan {
   fills: Fill[];
   buildings: PlanBuilding[];
+  /** Models of the town kit. A layout of blocks has none. */
+  models: PlanModel[];
   /**
    * The town's named places. Every layout gives `town.gate`, `town.square`, `gus.field`, `kennel`,
-   * `river.bank` and `ferry` here, and `granary`, `lodge`, `bakery` and `carpenter` through its buildings.
+   * `river.bank` and `ferry` here, and `granary`, `lodge`, `bakery` and `carpenter` through its buildings or models.
    */
   places: PlanPlace[];
   trees: PlanTree[];
@@ -55,7 +59,7 @@ export function townEdges(fills: Fill[], places: PlanPlace[], props: PlanProp[])
   box(190, top, -172, 192, top, -132, 'path');
   box(139, top, -131, 201, top, -129, 'stone_brick');
   box(139, 15, -129, 201, top, -129, 'stone_brick');
-  box(194, top, -157, 202, top, -141, 'tilled_soil');
+  box(194, top, -157, 202, top, -142, 'tilled_soil');
 
   // The kennel: a fenced yard with a gap on its west side, and a hutch in one corner.
   const kx0 = 194, kx1 = 202, kz0 = -170, kz1 = -162;
@@ -111,4 +115,21 @@ export function lanternAt(fills: Fill[], props: PlanProp[], x: number, z: number
 /** Lights hung over the ground: a block of lantern light at head height, under a string of lanterns or a crown. */
 export function glowAt(fills: Fill[], x: number, z: number, y = TOWN_GROUND + 2): void {
   fills.push({ x0: x, y0: y, z0: z, x1: x, y1: y, z1: z, block: 'lantern_light' });
+}
+
+/** The footprint of a kit model once it is turned, x by z. */
+export function turnedFootprint(model: TownModelName, turns: number): [number, number] {
+  const [w, d] = TOWN_MODELS[model].footprint;
+  return turns % 2 === 0 ? [w, d] : [d, w];
+}
+
+/**
+ * Sets a kit model down with its footprint's middle at (cx, cz), which may be a half block. The footprint
+ * is whole metres, so its corner is the middle less half of it.
+ */
+export function modelAt(models: PlanModel[], id: string, model: TownModelName, cx: number, cz: number, turns = 0, place?: PlanModel['place']): PlanModel {
+  const [w, d] = turnedFootprint(model, turns);
+  const plan: PlanModel = { id, model, x: Math.round(cx - w / 2), z: Math.round(cz - d / 2), turns, ...(place ? { place } : {}) };
+  models.push(plan);
+  return plan;
 }

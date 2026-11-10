@@ -1,0 +1,880 @@
+[
+  {
+    "name": "granary-hall",
+    "footprint": [
+      14,
+      12
+    ],
+    "category": "landmark",
+    "budget": 8000,
+    "description": "Proud grain-store civic hall with an open oak arcade, sweeping layered teal gables, wheat standards, and a lantern cupola.",
+    "triangles": 7714,
+    "bytes": 359072,
+    "dimensions": [
+      13.95,
+      13.1201,
+      10.07
+    ],
+    "blender_bounds": [
+      [
+        -6.975000381469727,
+        -5.034999847412109,
+        0.0
+      ],
+      [
+        6.975000381469727,
+        5.034999847412109,
+        13.120100021362305
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "rootworks-gate",
+    "footprint": [
+      12,
+      8
+    ],
+    "category": "landmark",
+    "budget": 8000,
+    "description": "Friendly ancient river-intake gateway, with a truly open stone arch, teal-roofed towers, bronze root pipes, water wheel, and pressure gauge.",
+    "triangles": 5312,
+    "bytes": 236936,
+    "dimensions": [
+      10.9433,
+      7.49,
+      5.9
+    ],
+    "blender_bounds": [
+      [
+        -5.4716691970825195,
+        -2.950000047683716,
+        0.0
+      ],
+      [
+        5.4716691970825195,
+        2.950000047683716,
+        7.489999771118164
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "town-well",
+    "footprint": [
+      6,
+      6
+    ],
+    "category": "landmark",
+    "budget": 8000,
+    "description": "Circular carved stone well, with an open water shaft, curved teal canopy, working spindle and hanging bucket, wheat finial, and paper lanterns.",
+    "triangles": 2800,
+    "bytes": 122824,
+    "dimensions": [
+      4.09,
+      5.1201,
+      3.74
+    ],
+    "blender_bounds": [
+      [
+        -2.0450000762939453,
+        -1.8700000047683716,
+        0.0
+      ],
+      [
+        2.0450000762939453,
+        1.8700000047683716,
+        5.120100021362305
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "bakery",
+    "footprint": [
+      10,
+      8
+    ],
+    "category": "building",
+    "description": "Cream-and-oak bakehouse with teal curved roof, rounded clay oven wing, wheat crest, bread sign and striped shop awning.",
+    "budget": 4000,
+    "triangles": 2893,
+    "bytes": 140248,
+    "dimensions": [
+      8.77,
+      6.3265,
+      6.6153
+    ],
+    "blender_bounds": [
+      [
+        -4.385000228881836,
+        -3.30764102935791,
+        0.0
+      ],
+      [
+        4.385000228881836,
+        3.30764102935791,
+        6.326499938964844
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "lodge",
+    "footprint": [
+      12,
+      10
+    ],
+    "category": "building",
+    "description": "Proud two-storey riverside lodge with stepped golden gables, long welcoming porch and generous glowing windows.",
+    "budget": 4000,
+    "triangles": 3923,
+    "bytes": 187456,
+    "dimensions": [
+      11.54,
+      8.7665,
+      8.925
+    ],
+    "blender_bounds": [
+      [
+        -5.769999980926514,
+        -4.462499618530273,
+        0.0
+      ],
+      [
+        5.769999980926514,
+        4.462499618530273,
+        8.766500473022461
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "workshop",
+    "footprint": [
+      10,
+      8
+    ],
+    "category": "building",
+    "description": "Asymmetric makers workshop with tall teal cottage and genuinely open timber work bay, bench, anvil and stacked lumber.",
+    "budget": 4000,
+    "triangles": 2629,
+    "bytes": 125644,
+    "dimensions": [
+      9.05,
+      6.4265,
+      5.98
+    ],
+    "blender_bounds": [
+      [
+        -4.525000095367432,
+        -2.990000009536743,
+        0.0
+      ],
+      [
+        4.525000095367432,
+        2.990000009536743,
+        6.426499843597412
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "kennel",
+    "footprint": [
+      10,
+      8
+    ],
+    "category": "building",
+    "description": "Substantial keeper cottage with warm windows, lower thatched canine wing, dog-size arched entrances and paw sign.",
+    "budget": 4000,
+    "triangles": 3031,
+    "bytes": 146564,
+    "dimensions": [
+      9.06,
+      6.1665,
+      6.69
+    ],
+    "blender_bounds": [
+      [
+        -4.53000020980835,
+        -3.3449997901916504,
+        0.0
+      ],
+      [
+        4.53000020980835,
+        3.3449997901916504,
+        6.166500091552734
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "ferry-house",
+    "footprint": [
+      10,
+      10
+    ],
+    "category": "building",
+    "description": "River-teal ferry keeper house with flat plank dock, bollards, landing rails, crossed-oar sign and welcoming lanterns.",
+    "budget": 4000,
+    "triangles": 3507,
+    "bytes": 167800,
+    "dimensions": [
+      8.775,
+      6.3165,
+      9.045
+    ],
+    "blender_bounds": [
+      [
+        -4.387499809265137,
+        -4.522500038146973,
+        0.0
+      ],
+      [
+        4.387499809265137,
+        4.522500038146973,
+        6.316500186920166
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "house-a",
+    "footprint": [
+      7,
+      6
+    ],
+    "category": "building",
+    "description": "Small one-storey wheat-thatched cottage with broad curved eaves, one luminous gable eye and a flower-filled front window.",
+    "budget": 4000,
+    "triangles": 2463,
+    "bytes": 121684,
+    "dimensions": [
+      5.75,
+      5.1765,
+      5.05
+    ],
+    "blender_bounds": [
+      [
+        -2.875,
+        -2.5250000953674316,
+        0.0
+      ],
+      [
+        2.875,
+        2.5250000953674316,
+        5.176499843597412
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "house-b",
+    "footprint": [
+      9,
+      8
+    ],
+    "category": "building",
+    "description": "Medium L-plan teal-roof home with lower side gable, projecting window bay and a little roof dormer.",
+    "budget": 4000,
+    "triangles": 3603,
+    "bytes": 173936,
+    "dimensions": [
+      7.94,
+      6.5065,
+      6.75
+    ],
+    "blender_bounds": [
+      [
+        -3.9700000286102295,
+        -3.375,
+        0.0
+      ],
+      [
+        3.9700000286102295,
+        3.375,
+        6.506499767303467
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "house-c",
+    "footprint": [
+      10,
+      7
+    ],
+    "category": "building",
+    "description": "Broad medium farmhouse with warm golden thatch, projecting entry gable, exposed cross timber and colorful window boxes.",
+    "budget": 4000,
+    "triangles": 3294,
+    "bytes": 159272,
+    "dimensions": [
+      8.55,
+      5.6865,
+      6.2
+    ],
+    "blender_bounds": [
+      [
+        -4.275000095367432,
+        -3.0999999046325684,
+        0.0
+      ],
+      [
+        4.275000095367432,
+        3.0999999046325684,
+        5.686500072479248
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "house-d",
+    "footprint": [
+      8,
+      8
+    ],
+    "category": "building",
+    "description": "Two-storey jettied townhome with steep teal gable, oak balcony, prominent corner braces and flower boxes.",
+    "budget": 4000,
+    "triangles": 3255,
+    "bytes": 160008,
+    "dimensions": [
+      6.92,
+      8.6965,
+      6.84
+    ],
+    "blender_bounds": [
+      [
+        -3.4599997997283936,
+        -3.4200000762939453,
+        0.0
+      ],
+      [
+        3.4599997997283936,
+        3.4200000762939453,
+        8.696499824523926
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "market-stall-a",
+    "footprint": [
+      3,
+      3
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Bread seller with scalloped teal-and-wheat canvas, timber trestles and scored loaves.",
+    "triangles": 684,
+    "bytes": 32592,
+    "dimensions": [
+      2.65,
+      2.5108,
+      1.895
+    ],
+    "blender_bounds": [
+      [
+        -1.3250000476837158,
+        -0.9474999904632568,
+        0.0
+      ],
+      [
+        1.3250000476837158,
+        0.9474999904632568,
+        2.5108323097229004
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "market-stall-b",
+    "footprint": [
+      3,
+      3
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Harvest stall with teal-and-gold canvas, produce bins and hanging harvest crest.",
+    "triangles": 684,
+    "bytes": 34872,
+    "dimensions": [
+      2.65,
+      2.5108,
+      1.895
+    ],
+    "blender_bounds": [
+      [
+        -1.3250000476837158,
+        -0.9474999904632568,
+        0.0
+      ],
+      [
+        1.3250000476837158,
+        0.9474999904632568,
+        2.5108323097229004
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "cart",
+    "footprint": [
+      3,
+      4
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Oak harvest handcart with open spoke wheels, long handles, crate and grain sack.",
+    "triangles": 660,
+    "bytes": 30496,
+    "dimensions": [
+      2.2,
+      1.5645,
+      2.93
+    ],
+    "blender_bounds": [
+      [
+        -1.100000023841858,
+        -1.4649999141693115,
+        0.0
+      ],
+      [
+        1.100000023841858,
+        1.4649999141693115,
+        1.564549446105957
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "barrels-crates",
+    "footprint": [
+      3,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Coopered oak barrels with dark hoops and slatted harvest crates.",
+    "triangles": 552,
+    "bytes": 26540,
+    "dimensions": [
+      2.3405,
+      1.4217,
+      1.365
+    ],
+    "blender_bounds": [
+      [
+        -1.1702499389648438,
+        -0.682488203048706,
+        0.0
+      ],
+      [
+        1.1702499389648438,
+        0.682488203048706,
+        1.421668529510498
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "bench",
+    "footprint": [
+      3,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Welcoming curved oak bench with a teal back and sprouting harvest medallion.",
+    "triangles": 512,
+    "bytes": 24444,
+    "dimensions": [
+      2.34,
+      1.28,
+      1.0094
+    ],
+    "blender_bounds": [
+      [
+        -1.1699999570846558,
+        -0.5047047734260559,
+        0.0
+      ],
+      [
+        1.1699999570846558,
+        0.5047047734260559,
+        1.28000009059906
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "signpost",
+    "footprint": [
+      3,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Carved river-town directional signpost, arrow boards and grain seal.",
+    "triangles": 400,
+    "bytes": 19740,
+    "dimensions": [
+      2.45,
+      2.57,
+      0.8126
+    ],
+    "blender_bounds": [
+      [
+        -1.225000023841858,
+        -0.406291663646698,
+        0.0
+      ],
+      [
+        1.225000023841858,
+        0.406291663646698,
+        2.569999933242798
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "lamp-post",
+    "footprint": [
+      3,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Warm-brown cast lantern post with two glowing pointed lanterns and curved branches.",
+    "triangles": 652,
+    "bytes": 31580,
+    "dimensions": [
+      2.3848,
+      2.78,
+      0.6
+    ],
+    "blender_bounds": [
+      [
+        -1.1923999786376953,
+        -0.30000001192092896,
+        0.0
+      ],
+      [
+        1.1923999786376953,
+        0.30000001192092896,
+        2.7799999713897705
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "string-lights",
+    "footprint": [
+      6,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Sagging festival cable between timber poles with alternating teal and gold lanterns.",
+    "triangles": 754,
+    "bytes": 36132,
+    "dimensions": [
+      5.7832,
+      3.09,
+      0.2771
+    ],
+    "blender_bounds": [
+      [
+        -2.8915998935699463,
+        -0.1385640650987625,
+        0.0
+      ],
+      [
+        2.8915998935699463,
+        0.1385640650987625,
+        3.0899999141693115
+      ]
+    ],
+    "materials": [
+      "Body",
+      "Glow"
+    ]
+  },
+  {
+    "name": "banner-pole",
+    "footprint": [
+      2,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Gold-tipped oak standard with sculpted teal swallowtail and raised wheat-sheaf emblem.",
+    "triangles": 352,
+    "bytes": 19072,
+    "dimensions": [
+      1.7151,
+      3.275,
+      0.68
+    ],
+    "blender_bounds": [
+      [
+        -0.8575500249862671,
+        -0.3400000035762787,
+        0.0
+      ],
+      [
+        0.8575500249862671,
+        0.3400000035762787,
+        3.2749998569488525
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "flower-planter",
+    "footprint": [
+      3,
+      2
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Chamfered cream planter full of fluffy pink-and-gold garden blossoms.",
+    "triangles": 728,
+    "bytes": 40144,
+    "dimensions": [
+      2.52,
+      1.4076,
+      1.237
+    ],
+    "blender_bounds": [
+      [
+        -1.2599999904632568,
+        -0.6184999942779541,
+        0.0
+      ],
+      [
+        1.2599999904632568,
+        0.6184999942779541,
+        1.4076000452041626
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "fence-straight",
+    "footprint": [
+      3,
+      1
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Stout oak field fence with shaped caps, two rails and crossed timber braces.",
+    "triangles": 308,
+    "bytes": 15684,
+    "dimensions": [
+      2.976,
+      1.32,
+      0.427
+    ],
+    "blender_bounds": [
+      [
+        -1.4879999160766602,
+        -0.2134999930858612,
+        0.0
+      ],
+      [
+        1.4879999160766602,
+        0.2134999930858612,
+        1.3200000524520874
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "fence-corner",
+    "footprint": [
+      3,
+      3
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Matching right-angle oak field fence with capped posts and diagonal braces.",
+    "triangles": 336,
+    "bytes": 17048,
+    "dimensions": [
+      2.976,
+      1.32,
+      2.976
+    ],
+    "blender_bounds": [
+      [
+        -1.4879999160766602,
+        -1.4879999160766602,
+        0.0
+      ],
+      [
+        1.4879999160766602,
+        1.4879999160766602,
+        1.3200000524520874
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "stone-bridge",
+    "footprint": [
+      6,
+      3
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Exactly six-metre flat-deck crossing with warm voussoir arches below and low stone parapets.",
+    "triangles": 692,
+    "bytes": 31876,
+    "dimensions": [
+      6.0,
+      1.38,
+      2.98
+    ],
+    "blender_bounds": [
+      [
+        -3.0,
+        -1.4900000095367432,
+        0.0
+      ],
+      [
+        3.0,
+        1.4900000095367432,
+        1.3799999952316284
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "dock-segment",
+    "footprint": [
+      3,
+      3
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Three-metre square flat timber river dock with pegged planks, fenders and mooring bollards.",
+    "triangles": 728,
+    "bytes": 34260,
+    "dimensions": [
+      2.986,
+      0.83,
+      3.0
+    ],
+    "blender_bounds": [
+      [
+        -1.4930000305175781,
+        -1.5,
+        0.0
+      ],
+      [
+        1.4930000305175781,
+        1.5,
+        0.8300000429153442
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  },
+  {
+    "name": "statue-gardener-warden",
+    "footprint": [
+      3,
+      3
+    ],
+    "category": "street",
+    "budget": 800,
+    "description": "Friendly carved gardener guardian in a broad straw hat, holding a spade and young sprout.",
+    "triangles": 768,
+    "bytes": 36716,
+    "dimensions": [
+      1.72,
+      2.48,
+      1.72
+    ],
+    "blender_bounds": [
+      [
+        -0.8600000143051147,
+        -0.8600000143051147,
+        0.0
+      ],
+      [
+        0.8600000143051147,
+        0.8600000143051147,
+        2.4800000190734863
+      ]
+    ],
+    "materials": [
+      "Body"
+    ]
+  }
+]
