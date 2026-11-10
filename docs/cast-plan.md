@@ -2,9 +2,18 @@
 
 Today the 3D cast is CC0 stand-ins from KayKit's Adventurers pack, recoloured per person (`public/assets/stand-ins/kaykit`, rebuilt by `tools/models/cast/stand-ins.mjs`). They read well, but they are generic adventurers with stern faces, and every person shares one of three bodies. This plan replaces them with our own people: chibi, about 2 blocks tall, rigged and animated by script, so the rule "no model a script does not rebuild" holds with no exception.
 
+## Dropping a new cast in
+
+Kausthubh's own bot is building the real cast in Blender: 14 models on one shared rig, with idle, walk, run, swing, talk and wave clips. It needs no code change. In `src/game/content/cast.ts`:
+
+1. Add the file to `CAST_MODELS`, with its clip names for the game's animations (`tool: 'swing'`), and the bone names if hats, aprons or the cheap shadow shape should work on it.
+2. Point each character at the file and the mesh, or meshes, that are theirs. Drop `colours` to show the file's own materials, or keep some to override a material by its name.
+
+A file without the stand-ins' `_TONE` attribute paints with its materials, its texture and its vertex colours, each material a slot named after it. This was checked by pointing the hero at KayKit's untouched `Rogue.glb`.
+
 ## What stays as it is
 
-The game side needs no change. The toon feature (`src/features/toon/`) takes any GLB laid out the way the stand-in script writes it:
+The game side needs no change. The toon feature (`src/features/toon/`) takes any skinned GLB on one rig, and works best with one laid out the way the stand-in script writes it:
 
 - One rig, shared by every body. Bones named as KayKit names them (`hips`, `spine`, `chest`, `head`, `upperarm.l` and so on), so `src/game/shell/art.ts` and the accessories find them.
 - Bodies as skinned meshes with four bones per vertex and a `_TONE` attribute: colour slot, shade, part, glow. The mesh's `extras.parts` names the parts.
@@ -38,7 +47,7 @@ Chibi, as in the reference and the sprites: the head about a third of the height
 | The shadow shape | the capsules `art.ts` builds now, about 500 |
 | The file, three bodies, eight hair parts, five clips | under 300 KB |
 
-At 1,800 triangles the town square with everyone in it costs about 60,000 triangles for the cast, against 175,000 today.
+At 1,800 triangles the whole cast in one view costs about 60,000 triangles, against 178,000 with the stand-ins (measured by `tools/chars-lineup.mjs`, everyone in a row).
 
 ## Steps
 
