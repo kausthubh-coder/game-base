@@ -22,8 +22,8 @@ Read `docs/style-lab/README.md` first: the target look, the five styles, what do
    | voxel | 5435 |
 
 3. Shoot it: `bun tools/style-lab.mjs --style <style> --url http://127.0.0.1:<port>/`. It takes several
-   minutes, because this Mac draws WebGL in software and other agents share it, so run it in the background
-   and wait. While you iterate, shoot less: `--skip-places` when only motion changed, `--places town` for one
+   minutes, because this Mac draws WebGL in software and other agents share it. A full shoot can pass
+   30 minutes, so run it with `run_in_background` and a 2-hour timeout (7200000 ms), and wait. While you iterate, shoot less: `--skip-places` when only motion changed, `--places town` for one
    place. Run the full shoot at the end.
 4. Look. Open with the Read tool, in this order:
    - `.artifacts/style-lab/<style>/card.png`: the reference first, then your places, then every clip.
