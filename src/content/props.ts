@@ -107,7 +107,7 @@ export const PROPS = {
   brazier: { name: 'Brazier', group: 'town', builder: 'brazier', variants: ['lit'], triangles: 140, wind: true, light: 12, vary: SNUG },
   planter: { name: 'Flower planter', group: 'clutter', builder: 'planter', variants: ['flowers'], triangles: 220, wind: true, light: 0, vary: LOOSE },
   noticeBoard: { name: 'Notice board', group: 'town', builder: 'noticeBoard', variants: ['notices'], triangles: 140, ...still, vary: SNUG },
-  rootFountain: { name: 'Root Fountain', group: 'landmark', builder: 'rootFountain', variants: ['brass'], triangles: 640, wind: false, light: 10, alwaysLit: true, vary: SNUG },
+  rootFountain: { name: 'Root Fountain', group: 'landmark', builder: 'rootFountain', variants: ['brass'], triangles: 800, wind: false, light: 10, alwaysLit: true, vary: SNUG },
   elderOak: { name: 'Hollow Oak', group: 'landmark', builder: 'elderOak', variants: ['lamps'], triangles: 1400, wind: true, light: 11, vary: SNUG },
 
   // ---- clutter

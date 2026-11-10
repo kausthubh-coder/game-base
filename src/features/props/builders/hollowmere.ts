@@ -238,27 +238,31 @@ export function rootFountain(): THREE.BufferGeometry {
   }
   s.disc(0, 0.5, 0, R - 0.32, sides, P.denim, { turn: Math.PI / 8 });
   s.disc(0, 0.505, 0, R - 0.9, sides, P.sky, { turn: 0 });
-  // The plinth, and the roots: four brass roots that twist up around each other to the stone.
-  s.cyl(0, 0.3, 0, 0.62, 0.5, 0.75, 8, RAMP.brick, { cap: 'end', flat: true });
-  for (let k = 0; k < 4; k++) {
-    const a = k * TAU / 4;
+  // The roots: five brass roots that rise from the water in a slow twist and close round a cup at the top.
+  s.cyl(0, 0.3, 0, 0.7, 0.62, 0.32, 8, RAMP.brick, { cap: 'end', flat: true });
+  for (let k = 0; k < 5; k++) {
+    const a = k * TAU / 5;
     const path: [number, number, number][] = [];
     for (let i = 0; i <= 6; i++) {
-      const t = i / 6, r = 0.95 - 0.75 * t + 0.25 * Math.sin(t * Math.PI), b = a + t * 1.9;
-      path.push([Math.cos(b) * r, 0.5 + t * 2.75, Math.sin(b) * r]);
+      const t = i / 6, r = 1.45 - 1.05 * t + 0.35 * Math.sin(t * Math.PI), b = a + t * 2.4;
+      path.push([Math.cos(b) * r, 0.45 + t * 2.3 - 0.25 * (1 - t) * (1 - t), Math.sin(b) * r]);
     }
-    s.tube(path, [0.16, 0.14, 0.12, 0.1, 0.09, 0.08, 0.07], 5, k % 2 ? [P.ochre, P.gold] : [P.oak, P.ochre], { cap: 'end' });
-    // Water runs from the foot of each root back into the basin.
-    s.at(Math.cos(a + 0.4) * 1.05, 0.52, Math.sin(a + 0.4) * 1.05, -a, () => s.box(0, 0, 0, 0.3, 0.02, 0.9, P.ice));
+    s.tube(path, [0.24, 0.21, 0.18, 0.15, 0.13, 0.11, 0.1], 5, [P.oak, P.ochre, P.gold], { cap: 'end' });
   }
-  s.cyl(0, 3.1, 0, 0.12, 0.34, 0.22, 6, P.ochre, { cap: 'none' });
-  s.blob(0, 3.55, 0, 0.36, 0.42, 0.36, [P.lumeDeep, P.lume, P.lumeLight], { sides: 6, rings: 3, glow: 2, jitter: 0.05 });
-  s.light(0, 3.55, 0);
+  s.cyl(0, 2.55, 0, 0.32, 0.62, 0.36, 8, [P.oak, P.ochre], { cap: 'start' });
+  s.cyl(0, 2.6, 0, 0.56, 0.56, 0.3, 8, P.oakDark, { cap: 'none', inside: true });
+  // Water spills over the cup's lip into the basin.
+  for (let k = 0; k < 4; k++) {
+    const a = k * TAU / 4 + 0.6;
+    const arc: [number, number, number][] = [[0.6, 2.9, 0], [1.05, 2.6, 0], [1.35, 1.6, 0], [1.5, 0.5, 0]];
+    s.at(0, 0, 0, -a, () => s.tube(arc, [0.07, 0.08, 0.07, 0.05], 4, [P.sky, P.ice, P.mist], { cap: 'none' }));
+  }
+  s.blob(0, 3.3, 0, 0.36, 0.44, 0.36, [P.lumeDeep, P.lume, P.lumeLight], { sides: 6, rings: 3, glow: 2, jitter: 0.05 });
+  s.light(0, 3.3, 0);
   s.shadowBox(0, 0, 0, R * 2, 0.66, R * 2);
-  s.shadowBox(0, 0.6, 0, 1.2, 3.2, 1.2);
+  s.shadowBox(0, 0.6, 0, 1.4, 2.6, 1.4);
   return s.done();
 }
-
 /**
  * The Hollow Oak that Hollowmere is named for: a trunk wider than a door, hollow at its foot, roots over
  * broken stone, and a crown about seven meters out at the height of three houses. Lamps of the festival

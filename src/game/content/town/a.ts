@@ -35,6 +35,12 @@ export function townA(): TownPlan {
   box(167, top, -144, 176, top, -134, 'stone_brick');
   box(168, top, -143, 175, top, -135, 'cobble');
   box(162, top, -172, 163, top, -162, 'path');
+  // Two beds of grass and flowers in the court, either side of the way to the hall.
+  box(164, top, -159, 167, top, -156, 'grass');
+  box(176, top, -159, 179, top, -156, 'grass');
+  for (const x of [164, 176]) {
+    props.push(townProp('bush', x + 1, -158, 0.4, 2), townProp('wildflowers', x, -156, 1.1), townProp('wildflowers', x + 3, -157, 2.3), townProp('bush', x + 3, -159, 1.9, 0));
+  }
   // The fountain stands on the stones; a body of two blocks keeps walkers out of its basin.
   box(FOUNTAIN.x - 2, g, FOUNTAIN.z - 2, FOUNTAIN.x + 1, g + 1, FOUNTAIN.z + 1, 'barrier');
   props.push({ kind: 'rootFountain', variant: 0, x: FOUNTAIN.x, y: g, z: FOUNTAIN.z, rotation: 0 });

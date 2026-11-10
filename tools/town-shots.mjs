@@ -1,8 +1,9 @@
 // Screenshots of Hollowmere in one layout, to compare the layouts (src/game/content/town/). It opens an
-// already served build with `?town=<name>`, starts a game through the debug door, and shoots two views at
-// noon, dusk and night: the town from the meadow path at the default zoom, and the square two zoom steps in.
+// already served build with `?town=<name>`, starts a game through the debug door, and shoots three views at
+// noon, dusk and night: the town from the meadow path at the default zoom, its skyline from farther back two
+// zoom steps in, and the square two zoom steps in.
 // It writes <name>-<view>-<time>.png and adds the renderer's counts to shots.json in the out folder.
-//   bun tools/town-shots.mjs --town a [--url http://127.0.0.1:5391/] [--out .artifacts/town] [--views far,square]
+//   bun tools/town-shots.mjs --town a [--url http://127.0.0.1:5391/] [--out .artifacts/town] [--views far,approach,square]
 //     [--times noon,dusk,night] [--w 1440] [--h 900] [--quality high]
 // It fails on a console error. This Mac draws WebGL in software, so it reads draw calls and triangles, never frames a second.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -21,10 +22,12 @@ mkdirSync(out, { recursive: true });
 
 /** The views. `at` is a column or a place, `quarter` the camera's quarter turn (0 looks north-west), `zoom` the steps in from the default. */
 const VIEWS = {
-  // On the path where it leaves the meadow, looking south-east down the main street at the town.
-  far: { at: [122, -186], quarter: 2, zoom: 0 },
-  // The middle of the square, looking north-west at what stands behind it.
-  square: { at: 'town.square', quarter: 0, zoom: 2 },
+  // On the meadow path a few blocks short of the gate, looking south-east at it, at the default zoom.
+  far: { at: [128, -178], quarter: 2, zoom: 0 },
+  // Farther back on the path, two steps in, where the camera tips up to the horizon and the town's skyline shows.
+  approach: { at: [116, -192], quarter: 2, zoom: 2 },
+  // A few blocks south-east of the square's place, looking north-west across it at what stands behind it.
+  square: { at: 'town.square', quarter: 0, zoom: 2, step: [5, 2] },
 };
 const TIMES = { noon: 0.5, dusk: 0.762, night: 0.9 };
 const views = opt('views', Object.keys(VIEWS).join(',')).split(',');
@@ -67,7 +70,8 @@ try {
       const counts = await game(async ({ view, t, home }) => {
         const g = window.__game;
         const cam = g.view.camera;
-        const spot = typeof view.at === 'string' ? g.teleport(view.at) : g.teleport(view.at[0], view.at[1]);
+        let spot = typeof view.at === 'string' ? g.teleport(view.at) : g.teleport(view.at[0], view.at[1]);
+        if (view.step) spot = g.teleport(Math.floor(spot.x) + view.step[0], Math.floor(spot.z) + view.step[1]);
         const now = g.state().camera.quarter;
         const left = (view.quarter - now + 4) % 4;
         if (left === 3) g.turn(1);
