@@ -1,3 +1,4 @@
+import type { Graphics } from '../shell/graphics.ts';
 // The shapes the panels share: what createGameUi takes, what it returns, and what one panel is.
 
 import type { Game } from '../api.sim.ts';
@@ -76,6 +77,7 @@ export interface GameUiOptions {
   /** Pause: Save and return to title. The title opens after it returns. */
   saveAndQuit(): void;
   /** Called once when the interface is made, with the stored value, and again on every change. */
+  graphics?: { get(): Readonly<Graphics>; set(next: Partial<Graphics>): void };
   setQuality(quality: Quality): void;
   /** Called once per channel when the interface is made, and again on every change. 0 to 1. */
   setVolume(channel: VolumeChannel, value: number): void;

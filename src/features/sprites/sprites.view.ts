@@ -98,6 +98,7 @@ export interface Sprites extends ViewSystem {
   /** Removes every character. */
   clear(): void;
   /** Characters alive now. */
+  setShadowsEnabled(enabled: boolean): void;
   readonly count: number;
   readonly capacity: number;
   /** Names asked for that the manifest does not have. */
@@ -245,6 +246,7 @@ void main() {
 
 const SHADOW_VERTEX = /* glsl */ `
 uniform float uStrength;
+uniform vec3 uSunDirection;
 attribute vec4 aPlace;
 attribute vec4 aFrame;
 attribute vec4 aAnchor;
@@ -261,7 +263,7 @@ void main() {
   // Fainter where little sky reaches, since there is little light to block.
   float open = pow(0.8, 15.0 * (1.0 - max(aLight.x, aLight.y)));
   vAlpha = uStrength * aLight.z * mix(0.5, 1.0, open) / (1.0 + 1.2 * lift);
-  vec4 mvPosition = viewMatrix * vec4(aPlace.x + vDisc.x * radius, aPlace.w + 0.02, aPlace.z + vDisc.y * radius, 1.0);
+  vec4 mvPosition = viewMatrix * vec4(aPlace.x + vDisc.x * radius - uSunDirection.x * radius / max(0.45, uSunDirection.y), aPlace.w + 0.02, aPlace.z + vDisc.y * radius - uSunDirection.z * radius / max(0.45, uSunDirection.y), 1.0);
   gl_Position = aFrame.w == 0.0 || vAlpha <= 0.0 ? vec4(2.0, 2.0, 2.0, 1.0) : projectionMatrix * mvPosition;
   #include <fog_vertex>
 }
@@ -625,7 +627,9 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     fog: true,
   });
 
+  let shadowsEnabled = true;
   const shadowUniforms = {
+    uSunDirection: { value: new THREE.Vector3(0.5, 0.76, 0.4) },
     ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
     uStrength: { value: 0.45 },
     // Dark and a little purple, like the outlines of the art. Never pure black.
@@ -703,6 +707,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
   }
 
   return {
+    setShadowsEnabled(enabled) { shadowsEnabled = enabled; },
     get count() { return count; },
     get capacity() { return capacity; },
     missing,
@@ -795,7 +800,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
       }
       // Shadows are strongest under a bright sky.
       const bright = Math.min(1, light.r * 0.3 + light.g * 0.5 + light.b * 0.2);
-      shadowUniforms.uStrength.value = 0.2 + 0.25 * bright;
+      shadowUniforms.uStrength.value = shadowsEnabled ? 0.2 + 0.25 * bright : 0;
 
       // A few characters a frame look at the world again, in turn.
       for (let n = Math.min(refresh, count); n > 0; n--) {

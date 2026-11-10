@@ -1,3 +1,4 @@
+import type { Graphics } from './graphics.ts';
 // What a view file gets. A view is any file in src/game/views/ named `<something>.view.ts` that exports
 // `install(view: GameView)`. src/game/boot.ts finds every one of them, sorts them by file name and calls
 // each install once, after the world, the systems and the base features exist and before the first frame.
@@ -50,6 +51,8 @@ export type QualityMode = 'auto' | Quality;
 /** The settings a title or pause screen changes. Each one is stored and is there again on the next visit. */
 export interface ViewSettings {
   /** `auto` lets the performance meter pick the level. */
+  readonly graphics: Readonly<Graphics>;
+  setGraphics(settings: Partial<Graphics>): void;
   readonly quality: QualityMode;
   setQuality(mode: QualityMode): void;
   /** 0 to 1 for `master`, `music`, `ambience`, `effects` or `voice`. It holds before the sound has started too. */

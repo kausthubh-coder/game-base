@@ -251,6 +251,8 @@ function create(view: GameView): WorldProps {
   };
 
   view.onFrame((dt) => {
+    props.setReduceMotion(view.settings.graphics.reduceMotion);
+    props.setPlantDensity(view.settings.graphics.plantDensity);
     props.update(dt, view.ctx);
     api.stats();
   });

@@ -41,7 +41,7 @@ void main() {
     on = uBolt;
   } else if (aKind < 1.5) {
     // The rainbow: an arc that faces the camera.
-    world = uRainbowCenter + (camRight * position.x + camUp * position.y) * uRainbowRadius;
+    world = uRainbowCenter + (vec3(1.0, 0.0, 0.0) * position.x + vec3(0.0, 1.0, 0.0) * position.y) * uRainbowRadius;
     on = uRainbow;
   } else {
     // A shaft: a long quad from the ground toward the sun, turned about its length to face the camera.
@@ -75,7 +75,7 @@ void main() {
     float hue = (1.0 - band) * 0.78;
     vec3 spectrum = clamp(abs(fract(hue + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0);
     float arc = sin(band * 3.14159) * step(0.8, r) * step(r, 0.98);
-    color = spectrum * arc * smoothstep(0.0, 0.25, vUv.y) * uRainbow * 0.26;
+    color = mix(spectrum, vec3(0.65), 0.4) * arc * smoothstep(0.0, 0.25, vUv.y) * uRainbow * 0.12;
   } else {
     float across = 1.0 - vUv.x * vUv.x;
     float along = smoothstep(0.0, 0.12, vUv.y) * pow(1.0 - vUv.y, 0.8);
