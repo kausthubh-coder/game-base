@@ -13,7 +13,7 @@ const counts={};
 async function shot(name){await page.evaluate(()=>window.__game.frames(3));await page.screenshot({path:`${out}/${phase}-${name}.png`});counts[name]=await page.evaluate(()=>{const {drawCalls,triangles,quality,particles}=window.__game.counters();return {drawCalls,triangles,quality,particles};});console.log('captured '+name);}
 await page.evaluate(()=>{const a=window.__game.view.game.ambient;a.rain=.7;a.cloud=.8;a.wetness=.8;a.wind=.35;});await page.evaluate(()=>window.__game.frames(20));await shot('rain-out');
 await page.evaluate((close)=>{window.__game.view.camera.zoomBy(-1);if(close)window.__game.view.camera.zoomBy(-1);},after);await page.evaluate(()=>window.__game.frames(30));await shot('rain-in');
-await page.evaluate(()=>{const v=window.__game.view;v.game.ambient.rain=0;v.game.ambient.cloud=.25;v.game.ambient.wetness=.8;});await page.evaluate(()=>{const v=window.__game.view;v.sky.update(16,v.ctx);});await page.evaluate(()=>window.__game.frames(5));await shot('rainbow');
+await page.evaluate(()=>{const v=window.__game.view;v.game.ambient.rain=0;v.game.ambient.cloud=.25;v.game.ambient.wetness=.8;});await page.evaluate(()=>window.__game.frames(2));await page.evaluate(()=>{const v=window.__game.view;v.sky.update(16,v.ctx);});await page.evaluate(()=>window.__game.frames(5));await shot('rainbow');
 if(after) {
   const result=await page.evaluate(async()=>{
     const v=window.__game.view, mesh=v.scene.getObjectByName('sky-phenomena'), u=mesh.material.uniforms;
