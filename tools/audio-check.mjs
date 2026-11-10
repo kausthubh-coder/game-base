@@ -6,6 +6,7 @@
 //   bun tools/audio-check.mjs                 everything
 //   bun tools/audio-check.mjs --only fight    one scene (solo, crossing, fight, footsteps, stress, soak, page, code, moods, effects, ambience)
 //   bun tools/audio-check.mjs --no-build      reuse dist/demos/audio
+//   bun tools/audio-check.mjs --port 5313     serve on another port, when 5312 is taken
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -14,9 +15,9 @@ import { centroid, decodeWav, likeness, loudestHz, mono, onsets, peakOf, rmsDb, 
 
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/audio');
-const PORT = 5312;
-const url = `http://127.0.0.1:${PORT}/`;
 const args = process.argv.slice(2);
+const PORT = args.includes('--port') ? Number(args[args.indexOf('--port') + 1]) : 5312;
+const url = `http://127.0.0.1:${PORT}/`;
 const only = args.includes('--only') ? args[args.indexOf('--only') + 1].split(',') : null;
 const wants = (name) => !only || only.includes(name);
 mkdirSync(out, { recursive: true });

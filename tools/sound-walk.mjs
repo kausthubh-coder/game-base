@@ -1,5 +1,5 @@
 // The sound walk: plays a three-minute walk through the real game and records what a player would hear, with
-// a picture every fifth of a second, then muxes the two into a video. After the walk it plays each footstep set
+// three pictures a second, then muxes the two into a video. After the walk it plays each footstep set
 // and each recorded bed alone, for listening to one thing at a time.
 //   bun tools/sound-walk.mjs --dist dist-sound --port 5390 --out <folder>
 //
@@ -21,7 +21,7 @@ const OUT = resolve(opt('out', resolve(root, '.artifacts/sound/walk')));
 const FFMPEG = '/opt/homebrew/bin/ffmpeg';
 const RATE = 44100;
 /** Seconds of game per picture, and the sound is rendered this many times a picture. */
-const FRAME = 0.2, SUB = 4;
+const FRAME = 1 / 3, SUB = 6;
 /** Room in the offline buffer: the walk, then the footstep sets and the beds alone. */
 const BUFFER_SECONDS = 420;
 const frames = resolve(OUT, 'frames');
@@ -60,7 +60,7 @@ try {
     headless: true,
     args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
   });
-  const page = await (await browser.newContext({ viewport: { width: 960, height: 600 } })).newPage();
+  const page = await (await browser.newContext({ viewport: { width: 800, height: 500 } })).newPage();
   page.setDefaultTimeout(300000);
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
@@ -135,7 +135,7 @@ try {
   let shots = 0, label = '';
   async function frame(drive) {
     await page.evaluate(() => window.__game.frames(1));
-    await page.screenshot({ path: resolve(frames, `${String(shots++).padStart(5, '0')}.jpg`), type: 'jpeg', quality: 82 });
+    await page.screenshot({ path: resolve(frames, `${String(shots++).padStart(5, '0')}.jpg`), type: 'jpeg', quality: 70 });
     const s = await page.evaluate(async ({ drive, FRAME, SUB }) => {
       const w = window.__walk, g = window.__game;
       let left = 0;
@@ -170,23 +170,33 @@ try {
   await page.evaluate(() => window.__game.settle());
   await page.evaluate(() => window.__walk.renderTo(0.06));
 
-  // Where the woods are thickest beside the path, for the stretch under the trees.
+  // Where the woods are thickest near the path, for the stretch under the trees: the trees around a few points
+  // of the path, and the standing tree with the most others within 12 blocks.
   const woods = await page.evaluate(() => {
     const g = window.__game, sys = g.view.game.systems;
-    g.teleport(40, -228);
-    const trees = sys.trees.all().filter((t) => t.standing && t.x > 18 && t.x < 75 && t.z > -260 && t.z < -200);
+    const seen = new Map();
+    for (const [x, z] of [[25, -232], [45, -232], [65, -232], [85, -225], [100, -205], [112, -192], [25, -210], [55, -210]]) {
+      g.teleport(x, z);
+      for (const t of sys.trees.all()) if (t.standing) seen.set(`${t.x},${t.z}`, { x: t.x + 0.5, z: t.z + 0.5 });
+    }
     g.teleport(-12, -236);
-    return trees.map((t) => ({ x: t.x + 0.5, z: t.z + 0.5 }));
+    const trees = [...seen.values()].filter((t) => t.x > 15 && t.x < 125 && t.z > -265 && t.z < -180);
+    const near = (a) => trees.filter((b) => Math.hypot(a.x - b.x, a.z - b.z) < 12);
+    const best = trees.map((t) => ({ t, n: near(t).length })).sort((a, b) => b.n - a.n)[0];
+    return best ? { center: best.t, count: best.n, trees: near(best.t) } : { center: null, count: 0, trees: [] };
   });
-  console.log(`${woods.length} standing trees beside the path`);
-  // A line through the woods: points two blocks off a run of trees, west to east.
-  const through = woods.sort((a, b) => a.x - b.x).filter((t, i, all) => i === 0 || t.x - all[i - 1].x > 3).slice(0, 6).map((t) => ({ x: t.x + 1.8, z: t.z + 1.8 }));
+  console.log(`the thickest stand near the path: ${woods.count} trees around ${woods.center ? `${woods.center.x}, ${woods.center.z}` : 'nowhere'}`);
+  // Through the stand west to east, passing two blocks off each trunk.
+  const through = woods.trees.sort((a, b) => a.x - b.x).filter((t, i, all) => i === 0 || t.x - all[i - 1].x > 2.5).slice(0, 6).map((t) => ({ x: t.x + 1.8, z: t.z + 1.8 }));
 
   log('meadow'); await wait(6, 'meadow');
   await walk({ x: 8, z: -230 }, 'meadow');
   await walk({ x: 6, z: -227 }, 'meadow', { soft: true, limit: 6 });
+  // On to the edge of the stand over the open grass, then in under the trees.
+  if (through.length) await walk({ x: through[0].x - 6, z: through[0].z }, 'meadow', { limit: 40 });
   log('through the trees');
   for (const p of through.length ? through : [{ x: 30, z: -232 }, { x: 45, z: -236 }]) await walk(p, 'trees', { limit: 20 });
+  await wait(4, 'trees');
   log('onto the path');
   await walk({ x: 70, z: -221 }, 'path');
   await walk({ x: 92, z: -221 }, 'path');
@@ -285,7 +295,7 @@ try {
     const steps = ['grass', 'dirt', 'path', 'cobble', 'stone', 'wood', 'floor', 'sand', 'water', 'leaves'];
     for (const material of steps) {
       const start = w.at;
-      for (const [gait, rate, seconds] of [['walk', 1 / 5.5, 3.3], ['soft', 1 / 2.5, 2.4], ['run', 1 / 7.5, 2]]) {
+      for (const [gait, rate, seconds] of [['walk', 1 / 5.5, 3], ['soft', 1 / 2.5, 2], ['run', 1 / 7.5, 1.6]]) {
         for (let t = 0; t < seconds; t += 0.05) {
           if (Math.floor((t + 0.05) / rate) > Math.floor(t / rate)) a.emit({ type: 'footstep', surface: 'grass', at, material, gait, cloth: 0.35 });
           a.update(0.05);
@@ -305,7 +315,7 @@ try {
       for (const other of beds) a.setBed(other, other === bed ? 1 : 0, null);
       for (let k = 0; k < 30; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
       const start = w.at;
-      for (let k = 0; k < 240; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
+      for (let k = 0; k < 200; k++) { a.update(0.05); await w.renderTo(w.at + 0.05); }
       out.push({ name: bed.replace(/^bed\./, 'bed-').replace(/\./g, '-'), start, end: w.at });
     }
     return out;
@@ -352,9 +362,11 @@ try {
   writeFileSync(resolve(OUT, 'timeline.json'), JSON.stringify({ frame: FRAME, walkEnd, pieces, timeline }, null, 1));
 
   // The pictures at five a second, and the sound under them.
-  const mux = spawnSync(FFMPEG, ['-v', 'error', '-y', '-framerate', String(1 / FRAME), '-i', resolve(frames, '%05d.jpg'), '-i', resolve(OUT, 'walk.wav'),
-    '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '192k', '-shortest', resolve(OUT, 'walk.mp4')], { stdio: 'inherit' });
+  const mux = spawnSync(FFMPEG, ['-v', 'error', '-y', '-framerate', String(Math.round(1 / FRAME)), '-i', resolve(frames, '%05d.jpg'), '-i', resolve(OUT, 'walk.wav'),
+    '-c:v', 'libx264', '-crf', '26', '-pix_fmt', 'yuv420p', '-r', '30', '-c:a', 'aac', '-b:a', '192k', '-shortest', resolve(OUT, 'walk.mp4')], { stdio: 'inherit' });
   if (mux.status !== 0) throw new Error('ffmpeg could not make the video');
+  // The pictures are in the video now. The disk this runs on is shared and small.
+  rmSync(frames, { recursive: true, force: true });
   console.log(`wrote ${OUT}/walk.mp4, walk.wav, ${pieces.length} pieces, timeline.json`);
   console.log(errors.length ? `console errors:\n${errors.join('\n')}` : 'no console errors');
 } finally {
