@@ -1,0 +1,80 @@
+{
+  "spawn": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "spawn",
+    "camera": {
+      "mode": "tilt"
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "town": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "town.square",
+    "camera": {
+      "mode": "tilt"
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "farm": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "gus.field",
+    "camera": {
+      "mode": "free",
+      "yaw": 262,
+      "pitch": 22,
+      "distance": 11
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "river": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "river.bank",
+    "camera": {
+      "mode": "free",
+      "yaw": 30,
+      "pitch": 8,
+      "distance": 11
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "night": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "town.square",
+    "camera": {
+      "mode": "tilt"
+    },
+    "time": 0.9,
+    "weather": "clear",
+    "seed": 7
+  },
+  "rain": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "spawn",
+    "camera": {
+      "mode": "tilt"
+    },
+    "time": 0.5,
+    "weather": "rain",
+    "seed": 7
+  }
+}

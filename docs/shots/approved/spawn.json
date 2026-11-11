@@ -1,0 +1,30 @@
+{
+  "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+  "scene": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "spawn",
+    "camera": {
+      "mode": "tilt"
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "counters": {
+    "drawCalls": 86,
+    "triangles": 341444,
+    "frameMs": 16.826666700839997,
+    "scriptMs": 13.698666652043661,
+    "simMs": 0,
+    "chunkMs": 0,
+    "chunks": 129,
+    "quality": "medium",
+    "renderScale": 1,
+    "auto": false,
+    "sprites": 21,
+    "particles": 1
+  },
+  "scriptBytes": 2372161
+}
