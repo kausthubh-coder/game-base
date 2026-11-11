@@ -59,7 +59,7 @@ export interface BotRun {
   readonly failure: Failure | null;
   /** The input of the last step. */
   readonly last: Input | null;
-  /** How often each event was sent, by name, so a run can show what the bot got done. Steps and flags are left out. */
+  /** How often each event was sent, by name, so a run can show what the bot got done. Footsteps, flag changes and bag changes are left out. */
   readonly did: Readonly<Record<string, number>>;
   /** Plays up to this many more steps and stops at the first failure. Returns the steps it played. */
   advance(steps: number): number;

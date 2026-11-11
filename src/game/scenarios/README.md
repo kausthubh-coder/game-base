@@ -94,4 +94,4 @@ steps faster than one that fells trees.
   its ray from the camera, so a block hidden from the camera can be clicked here and not there.
 - "Every started quest can still finish" checks that the people, places and items a quest needs still exist
   or can be had. It does not play the quest to its end. `src/game/play/act1.test.ts` does that for a clean game.
-- The bot rarely reaches the town and rarely sleeps. The `did` line of a run shows what it got done.
+- A bot does not do everything. Of 100 bots of 100,000 steps on 2026-11-11, 52 slept at least one night, 60 fed the leaftail, 79 harvested a crop and 95 finished a conversation. The `did` line of a run shows what that bot got done.
