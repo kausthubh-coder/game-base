@@ -53,7 +53,7 @@ try {
       await page.evaluate(() => { window.__game.newGame(); window.__loadOrigin=window.__game.state().player; window.__game.key('w',true); });
       await page.waitForFunction(() => window.__loadFrame !== null,null,{timeout:180000});
       const first = await page.evaluate(() => { window.__game.key('w',false); return window.__loadFrame; });
-      await page.evaluate(() => window.__game.settle());
+      await page.waitForLoadState('networkidle', {timeout:60000});
       await page.waitForTimeout(1500);
       const resources=await page.evaluate(() => [...performance.getEntriesByType('navigation'),...performance.getEntriesByType('resource')].map(r => ({url:r.name,start:r.startTime,end:r.responseEnd,transfer:r.transferSize,encoded:r.encodedBodySize,decoded:r.decodedBodySize})).sort((a,b)=>a.start-b.start));
       const before=resources.filter(r=>r.start<=first);
@@ -69,6 +69,6 @@ try {
     await context.close();
   }
   await mkdir(resolve(output,'..'),{recursive:true});
-  await writeFile(output,JSON.stringify({method:'Chrome 1280x800, local gzip server, no throttling; first drawn RAF after horizontal player movement from held W proves input and near-terrain simulation work; collect later requests through terrain settle; full transferSize of requests begun by that callback; fresh context per pair',runs},null,2));
+  await writeFile(output,JSON.stringify({method:'Chrome 1280x800, local gzip server, no throttling; first drawn RAF after horizontal player movement from held W proves input and near-terrain simulation work; collect later requests through network idle plus 1.5 seconds; full transferSize of requests begun by that callback; fresh context per pair',runs},null,2));
   if(runs.some(r=>r.errors.length || r.resources.some(x=>x.encoded===0 && x.transfer>300))) process.exitCode=1;
 } finally { await browser.close(); await new Promise(r=>server.close(r)); }

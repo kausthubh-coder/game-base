@@ -37,12 +37,14 @@ try {
  // Add a page marker to prove this navigation fetched the new HTML despite the old controller.
  const html=await readFile(resolve(root,'index.html'),'utf8');await writeFile(resolve(root,'index.html'),html.replace('</head>','<meta name="cache-proof" content="new-deploy"></head>'));
  hits=[];await load();report.network=[...hits];report.pageMarker=await page.locator('meta[name=cache-proof]').getAttribute('content');
- report.newFetched=hits.includes('/assets/'+report.new);report.pageFetched=hits.some(p=>p==='/');
+ report.newFetched=hits.includes('/assets/'+report.new);
+ report.cachedOldStatus=await page.evaluate(async path => (await fetch('assets/'+path)).status,report.old);
+ report.oldRequestedFromNetwork=hits.includes('/assets/'+report.old);report.pageFetched=hits.some(p=>p==='/');
  await page.keyboard.press('Shift');
  await page.evaluate(()=>{ window.__game.teleport('tamsin'); window.__game.advance(0.1); window.__game.interact(); });
  await page.waitForFunction(()=>window.__voice?.log.some(r=>r.http===200&&r.decoded>0&&['playing','ended'].includes(r.status)),null,{timeout:60000});
  report.voice=await page.evaluate(()=>window.__voice.log);report.errors=errors;
- report.pass=report.old!==report.new&&report.newFetched&&report.pageFetched&&report.pageMarker==='new-deploy'&&errors.length===0;
+ report.pass=report.cachedOldStatus===200&&!report.oldRequestedFromNetwork&&report.old!==report.new&&report.newFetched&&report.pageFetched&&report.pageMarker==='new-deploy'&&errors.length===0;
  await page.goto(`http://127.0.0.1:${port}/?nosw`,{waitUntil:'load',timeout:180000});
  await page.waitForFunction(async()=>!(await navigator.serviceWorker.getRegistration()));report.noswUnregistered=true;
  console.log(JSON.stringify(report,null,2));
