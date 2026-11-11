@@ -303,10 +303,19 @@ export const HALL = {
   door: { x0: DOOR.x0, x1: DOOR.x1, y0: HALL_GROUND, y1: HALL_GROUND + DOOR.high - 1, z: DOOR.z },
   /** The middle of the doorway, for the door's prop: it faces south. */
   doorAt: { x: (DOOR.x0 + DOOR.x1 + 1) / 2, y: HALL_GROUND, z: DOOR.z + 0.5 },
-  heartstone: { x: -16.5, y: HALL_GROUND, z: -262.5 },
-  gate: { x: -22.5, y: HALL_GROUND, z: -259.5 },
+  /** The Heartstone, against the north wall, two columns wide. */
+  heartstone: { x: -16, y: HALL_GROUND, z: -262.5 },
+  /** The Gate, by the west wall. Its opening faces east: its two feet are three blocks apart, north and south. */
+  gate: { x: -22.5, y: HALL_GROUND, z: -259 },
+  /** The plinth the Custodian sleeps on, and the height of its top. */
   plinth: { x: -11.5, y: HALL_GROUND, z: -261.5 },
-  mural: { x: -20.5, y: HALL_GROUND, z: -264 },
+  plinthTop: 0.4,
+  /** The mural, a slab standing against the north wall. */
+  mural: { x: -20, y: HALL_GROUND, z: -263.75 },
+  /** Broken pillars by the walls: where each stands and which of the three it is. */
+  pillars: [
+    { x: -23.5, y: HALL_GROUND, z: -256.5, variant: 2 }, { x: -10.5, y: HALL_GROUND, z: -258.5, variant: 1 }, { x: -20.5, y: HALL_GROUND, z: -254.5, variant: 0 },
+  ],
   lamps: [
     { x: -23.5, y: HALL_GROUND, z: -254.5 }, { x: -10.5, y: HALL_GROUND, z: -254.5 },
     { x: -23.5, y: HALL_GROUND, z: -263.5 }, { x: -10.5, y: HALL_GROUND, z: -263.5 },
@@ -318,6 +327,11 @@ export const HALL = {
   box(-17, g, -263, -16, g + 1, -263, 'barrier');
   box(-23, g, -261, -23, g + 2, -261, 'barrier');
   box(-23, g, -258, -23, g + 2, -258, 'barrier');
+  one(-12, g, -262, 'barrier');
+  // The pillars, and the mural's slab along the wall.
+  one(-24, g, -257, 'barrier');
+  one(-11, g, -259, 'barrier');
+  one(-21, g, -255, 'barrier');
 }
 
 const PLACES: readonly PlanPlace[] = [

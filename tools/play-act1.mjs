@@ -1,5 +1,5 @@
 // The browser play of the first part: builds the game into dist-play, serves it on port 5340, opens it in
-// headless Chrome and plays all five quests of docs/play/act1.md from the title to the end card.
+// headless Chrome and plays all six quests of docs/play/act1.md from the title to the end card.
 //   bun tools/play-act1.mjs [--port 5340] [--dist dist-play] [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
 //     [--camera tilt|free|first] [--mouse drag|lock]
 //
@@ -791,11 +791,36 @@ const QUESTS = {
       must((await p.openStep()) === 'roof.shelter', 'a bed under open sky passed the shelter step');
       await hold('plank');
       await use(h.x - 1, g + 2, h.z, [1, 0, 0]);
-      await expectStep('roof.sleep');
+      // The roof quest ends with the roof. The night is a quest of its own.
+      await expectStep('night.bed');
     });
-    await step('roof', 'wait for evening and sleep in the bed with E', async () => {
+    await questDone('roof', '13-roof-done.png');
+  },
+
+  // The first night: src/game/hall. Every scene is started by walking or by the real E, and clicked through with Enter.
+  async night() {
+    const flag = (name) => p.flag(name);
+    const scene = async () => {
+      await page.waitForFunction(() => { const e = document.querySelector('.gb-dialogue'); return e && !e.hidden; }, null, { timeout: 30000 });
+      const lines = await talkThrough();
+      await game(() => window.__game.advance(0.6));
+      return lines;
+    };
+    const toBed = async () => {
       const h = await hut();
-      await walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 60 });
+      await walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 120 });
+    };
+    await step('night', 'push the stone door by day: it does not move', async () => {
+      await walkTo('shut.door', { within: 1.2, seconds: 120 });
+      const prompt = (await state()).prompt;
+      must(prompt === 'Push the door', `at the stone door the prompt is "${prompt}"`);
+      await shot('14-door-shut.png');
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines.some((line) => line.includes('It does not move')) && (await flag('door.open')) !== true, `pushing the door said "${lines.join(' | ')}"`);
+    });
+    await step('night', 'lie down at evening with E, and something is outside', async () => {
+      await toBed();
       const prompt = (await state()).prompt;
       must(prompt === 'Sleep', `beside the bed the prompt is "${prompt}"`);
       if ((await state()).clock.timeOfDay < 0.66) {
@@ -804,15 +829,84 @@ const QUESTS = {
         must((await state()).clock.day === 1, 'the bed slept before evening');
         await until('g.state().clock.timeOfDay >= 0.66', 720, 2);
       }
-      await shot('13-shelter-evening.png');
       must(await p.canSleep(), 'canSleep() is false in the evening beside the bed');
       const day = (await state()).clock.day;
       await page.keyboard.press('KeyE');
-      await until(`g.state().clock.day === ${day + 1}`, 10, 0.25);
-      must((await state()).clock.day === day + 1, 'E beside the bed in the evening did not sleep to the next morning');
-      await game(() => window.__game.advance(2));
+      await game(() => window.__game.advance(1.5));
+      must((await state()).clock.day === day && (await flag('night.fox')) === true, 'the player slept through the first night, or the fox did not come');
+      const fox = await game(() => window.__game.view.game.systems.hall.fox());
+      must(fox !== null, 'no fox is about after it was heard');
+      await expectStep('night.door');
+      await shot('15-fox.png');
     });
-    await questDone('roof', '14-morning.png');
+    await step('night', 'back away to the stone door, and it opens', async () => {
+      await walkTo('shut.door', { within: 2.2, seconds: 180 });
+      const lines = await scene();
+      must(lines.at(-1) === 'Behind you, stone moves for the first time in a thousand years.' && (await flag('door.open')) === true, `the scene at the door ended on "${lines.at(-1)}"`);
+      await expectStep('night.mark');
+      await shot('16-door-open.png');
+    });
+    await step('night', 'walk in, and the Mark comes', async () => {
+      const inside = await p.place('hall.door');
+      await walkTo({ x: inside.x, y: inside.y, z: inside.z + 0.4 }, { within: 0.5, seconds: 60 });
+      const lines = await scene();
+      must(lines.some((line) => line.includes('a ring of seven points')) && (await flag('mark')) === true, 'the scene in the Hall did not give the Mark');
+      await expectStep('night.key');
+      await shot('17-hall-lit.png');
+    });
+    await step('night', 'turn the key with E, and the Custodian wakes', async () => {
+      await walkTo('hall.custodian', { within: 0.6, seconds: 60 });
+      const prompt = (await state()).prompt;
+      must(prompt === 'Turn the key', `at the plinth the prompt is "${prompt}"`);
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines.includes('(one eye opening) You\'re late.') && (await flag('custodian.awake')) === true, 'turning the key did not wake the Custodian');
+      await expectStep('night.calm');
+      await shot('18-custodian.png');
+    });
+    await step('night', 'hold out a hand to the fox in the doorway with E', async () => {
+      const inside = await p.place('hall.door');
+      await walkTo({ x: inside.x, y: inside.y, z: inside.z + 1.5 }, { within: 0.4, seconds: 60 });
+      must(await until(`g.state().prompt === 'Hold out your hand'`, 6, 0.25), `in the doorway the prompt is "${(await state()).prompt}"`);
+      await shot('19-fox-doorway.png');
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines.length === 3 && (await flag('fox.calmed')) === true, 'holding out the marked hand did not calm the fox');
+      must(await until(`sys.hall.fox() === null`, 24, 0.5), 'the calmed fox never left');
+      await expectStep('night.heart');
+    });
+    await step('night', 'touch the Heartstone with E', async () => {
+      await walkTo('hall.heart', { within: 0.6, seconds: 60 });
+      const prompt = (await state()).prompt;
+      must(prompt === 'Touch the Heartstone', `at the Heartstone the prompt is "${prompt}"`);
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines[0].startsWith('That is the Heartstone.') && (await flag('heart.seen')) === true, 'the Custodian did not explain the Heartstone');
+      await expectStep('night.sleep');
+      await shot('20-heartstone.png');
+    });
+    await step('night', 'sleep until morning with E', async () => {
+      await toBed();
+      must(await p.canSleep(), 'after the Hall canSleep() is false beside the bed');
+      const day = (await state()).clock.day;
+      await page.keyboard.press('KeyE');
+      await until(`g.state().clock.day === ${day + 1}`, 10, 0.25);
+      must((await state()).clock.day === day + 1, 'E beside the bed did not sleep to the next morning');
+      await game(() => window.__game.advance(2));
+      await expectStep('night.tamsin');
+    });
+    await step('night', 'show Tamsin the Mark at the grant stone', async () => {
+      const stone = await p.place('grant.stone');
+      for (const id of ['tamsin', 'juniper', 'gus', 'brack']) {
+        const npc = await p.npc(id);
+        must(npc && Math.hypot(npc.x - stone.x, npc.z - stone.z) < 6, `${id} is not at the grant stone the morning after (${npc?.place})`);
+      }
+      await walkTo('grant.stone', { within: 4, seconds: 120 });
+      await shot('21-morning-after.png');
+      const lines = await talkTo('tamsin');
+      must(lines[0] === '(looking at your hand) So the door opened. I saw the light from the lodge.' && (await flag('night.told')) === true, `Tamsin's first words were "${lines[0]}"`);
+    });
+    await questDone('night', '22-night-done.png');
   },
 
   async leaftail() {
@@ -1022,7 +1116,7 @@ try {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('response', (r) => { const m = /\/assets\/(voice\/.+\.mp3)$/.exec(r.url()); if (m) clipFiles.set(m[1], r.status()); });
-  for (const quest of ['plot', 'roof', 'leaftail', 'bread', 'festival']) await QUESTS[quest]();
+  for (const quest of ['plot', 'roof', 'night', 'leaftail', 'bread', 'festival']) await QUESTS[quest]();
   await step('voice', 'voiced lines fetched their clips and typed in time with them', checkVoice);
   const end = await state();
   must(Object.keys(end.failed).length === 0 && end.viewErrors.length === 0, `failed: ${JSON.stringify(end.failed)} ${end.viewErrors.join('; ')}`);

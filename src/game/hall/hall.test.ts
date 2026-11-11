@@ -25,7 +25,9 @@ test('a new game has the door shut, the Custodian asleep on its plinth and no fo
   const p = newPlay();
   p.advance(0.5);
   expect(doorCells(p).every((id) => id !== AIR)).toBe(true);
-  expect(p.game.actors.get(CUSTODIAN_ID)).toMatchObject({ sprite: 'custodian', anim: 'sleep', mark: 'sleep', pos: HALL.plinth });
+  // It lies on top of its plinth.
+  const top = { x: HALL.plinth.x, y: HALL.plinth.y + HALL.plinthTop, z: HALL.plinth.z };
+  expect(p.game.actors.get(CUSTODIAN_ID)).toMatchObject({ sprite: 'custodian', anim: 'sleep', mark: 'sleep', pos: top });
   expect(p.game.actors.has(FOX_ID)).toBe(false);
   expect(p.sys.hall.fox()).toBeNull();
 });

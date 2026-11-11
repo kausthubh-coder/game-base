@@ -86,7 +86,7 @@ export function createHall(game: Game): Hall {
   let pending: HallSave | null = null;
 
   const custodian: Actor = {
-    id: CUSTODIAN_ID, sprite: CUSTODIAN_SPRITE, pos: { x: HALL.plinth.x, y: HALL.plinth.y, z: HALL.plinth.z },
+    id: CUSTODIAN_ID, sprite: CUSTODIAN_SPRITE, pos: { x: HALL.plinth.x, y: HALL.plinth.y + HALL.plinthTop, z: HALL.plinth.z },
     facing: Math.PI, anim: 'sleep', visible: true, mark: 'sleep',
   };
 
