@@ -117,5 +117,37 @@
     "tries": 1,
     "background": "opaque",
     "defects": "Seamless repetition not verified."
+  },
+  {
+    "file": "foliage-1.png",
+    "prompt": "ONE rounded clump of broadleaf tree foliage, a single bough's worth of leaves seen from the side. No trunk, no branch. Ragged leafy edge all round with single leaf dabs sticking out. Mostly solid inside, with two or three small dark gaps. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  },
+  {
+    "file": "foliage-2.png",
+    "prompt": "The same subject, wider than tall, flatter on the underside, a little looser. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  },
+  {
+    "file": "foliage-3.png",
+    "prompt": "The same subject, a smaller tighter clump with larger leaf dabs, as seen close up. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  },
+  {
+    "file": "foliage-4.png",
+    "prompt": "One clump of dark conifer or cedar foliage, denser and darker green, with short dabs that point outward and upward. No trunk. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
   }
 ]

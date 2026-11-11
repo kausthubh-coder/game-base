@@ -22,6 +22,12 @@ export interface TreeSpec {
   squash: number;
   /** How far the trunk leans, in meters at the top. */
   lean: number;
+  /** The most a card is turned, in radians. Leaf masks turn any way; a painting with its own light stays upright. */
+  spin?: number;
+  /** How far out on its blob a card sits, as a share of the blob's radius: least and most. */
+  inset?: [number, number];
+  /** The dark ball inside each blob, as a share of the blob's radius. */
+  core?: number;
 }
 
 export interface TreeShape { wood: THREE.BufferGeometry; leaves: THREE.BufferGeometry; cards: number }
@@ -112,11 +118,13 @@ export function buildTree(spec: TreeSpec): TreeShape {
       wood.tube([from, mid, blob.c], [spec.trunk * 0.36, spec.trunk * 0.24, spec.trunk * 0.1], 5, BARK_HIGH, BARK_HIGH);
     }
   }
-  for (const blob of blobs) wood.ball(blob.c, new THREE.Vector3(blob.r * 0.8, blob.r * 0.8 * spec.squash, blob.r * 0.8), CORE);
+  const core = spec.core ?? 0.8;
+  for (const blob of blobs) wood.ball(blob.c, new THREE.Vector3(blob.r * core, blob.r * core * spec.squash, blob.r * core), CORE);
 
   // ---- leaf cards on the blobs
   const positions: number[] = [], normals: number[] = [], uvs: number[] = [], cards: number[] = [], index: number[] = [];
   const dir = new THREE.Vector3(), p = new THREE.Vector3(), n = new THREE.Vector3();
+  const spin = spec.spin ?? Math.PI, inset = spec.inset ?? [0.92, 1.08];
   let count = 0;
   const crownTop = crownY + spec.crown * spec.squash, crownLow = crownY - spec.crown * spec.squash;
   for (const blob of blobs) {
@@ -126,10 +134,10 @@ export function buildTree(spec: TreeSpec): TreeShape {
       const y = 1 - (2 * (k + 0.5)) / wanted, ring = Math.sqrt(1 - y * y), a = k * 2.399963 + r() * 0.5;
       dir.set(Math.cos(a) * ring, y, Math.sin(a) * ring);
       if (dir.y < -0.45) continue;
-      p.set(dir.x * blob.r, dir.y * blob.r * spec.squash, dir.z * blob.r).multiplyScalar(0.92 + r() * 0.16).add(blob.c);
+      p.set(dir.x * blob.r, dir.y * blob.r * spec.squash, dir.z * blob.r).multiplyScalar(inset[0] + r() * (inset[1] - inset[0])).add(blob.c);
       if (blobs.some((other) => other !== blob && p.distanceTo(other.c) < other.r * 0.78)) continue;
       n.copy(p).sub(crownCentre).normalize().lerp(dir, 0.55).normalize();
-      const size = spec.card * (0.75 + r() * 0.6), turn = r() * Math.PI * 2, rand = r();
+      const size = spec.card * (0.65 + r() * 0.8), turn = (r() - 0.5) * 2 * spin, rand = r();
       const sway = spec.height > 0 ? 0.35 + 0.65 * (p.y - crownLow) / (crownTop - crownLow) : 0.3;
       for (const [u, v] of [[0, 0], [1, 0], [1, 1], [0, 1]] as const) {
         positions.push(p.x, p.y, p.z); normals.push(n.x, n.y, n.z); uvs.push(u, v); cards.push(size, turn, rand, sway);
@@ -150,46 +158,79 @@ export function buildTree(spec: TreeSpec): TreeShape {
 /** Four tones from deep shade to the sunlit top, as a painter mixes them for one kind of tree. */
 export type Tones = [string, string, string, string];
 
-/** Shader hooks for anything drawn as cards that face the camera. The geometry needs `aCard`: size, turn, a random number, sway. */
-export const CARD_HOOKS: PaintOptions = {
-  vertexPars: 'attribute vec4 aCard; varying vec2 vCard;',
-  // The whole card sways with the bough it hangs from, more in a gust and more near the top.
-  vertexWorld: /* glsl */ `
-    float gust = paintGust(paintWorldPos.xz);
-    float phase = paintWorldPos.x * 0.21 + paintWorldPos.z * 0.17 + aCard.z * 6.283;
-    paintWorldPos.xz += uWind.xy * (0.05 + 0.3 * gust) * aCard.w * (0.6 + 0.4 * sin(uTime * 1.7 + phase));`,
-  // All four corners start at the card's middle. They move out in view space, so the card faces the camera.
-  vertexView: /* glsl */ `
-    float cardSize = aCard.x;
-    #ifdef USE_INSTANCING
-      cardSize *= length(instanceMatrix[0].xyz);
-    #endif
-    float turn = aCard.y + sin(uTime * 1.3 + aCard.z * 40.0) * (0.06 + 0.16 * gust);
-    vec2 corner = (uv * 2.0 - 1.0) * cardSize * vec2(0.66, 0.42);
-    mvPosition.xy += mat2(cos(turn), sin(turn), -sin(turn), cos(turn)) * corner;
-    vCard = vec2(aCard.z, gust);`,
-  // A card takes its shadow from a point pushed out along its normal, clear of the cards beside it. Without
-  // this the leaves shade one another at random and the crown loses its round form.
-  vertexShadow: 'worldPosition.xyz += normalize(mat3(modelMatrix) * objectNormal) * aCard.x * 1.3;',
-};
+/**
+ * Shader hooks for anything drawn as cards that face the camera. The geometry needs `aCard`: size, turn, a
+ * random number, sway. `shape` is the card's half width and half height in card sizes, `wobble` how much a
+ * card turns in the wind, `push` how far out (in card sizes) the point lies whose shadow the card takes.
+ */
+export function cardHooks(shape: [number, number], wobble = 1, push = 1.3): PaintOptions {
+  return {
+    vertexPars: 'attribute vec4 aCard; varying vec3 vCard;',
+    // The whole card sways with the bough it hangs from, more in a gust and more near the top.
+    vertexWorld: /* glsl */ `
+      float gust = paintGust(paintWorldPos.xz);
+      float phase = paintWorldPos.x * 0.21 + paintWorldPos.z * 0.17 + aCard.z * 6.283;
+      paintWorldPos.xz += uWind.xy * (0.05 + 0.3 * gust) * aCard.w * (0.6 + 0.4 * sin(uTime * 1.7 + phase));`,
+    // All four corners start at the card's middle. They move out in view space, so the card faces the camera.
+    vertexView: /* glsl */ `
+      float cardSize = aCard.x;
+      #ifdef USE_INSTANCING
+        cardSize *= length(instanceMatrix[0].xyz);
+      #endif
+      float turn = aCard.y + sin(uTime * 1.3 + aCard.z * 40.0) * (0.06 + 0.16 * gust) * ${wobble.toFixed(2)};
+      vec2 corner = (uv * 2.0 - 1.0) * cardSize * vec2(${shape[0].toFixed(3)}, ${shape[1].toFixed(3)});
+      mvPosition.xy += mat2(cos(turn), sin(turn), -sin(turn), cos(turn)) * corner;
+      vCard = vec3(aCard.z, gust, aCard.w);`,
+    // A card takes its shadow from a point pushed out along its normal, clear of the cards beside it. Without
+    // this the leaves shade one another at random and the crown loses its round form.
+    vertexShadow: `worldPosition.xyz += normalize(mat3(modelMatrix) * objectNormal) * aCard.x * ${push.toFixed(2)};`,
+  };
+}
+
+/**
+ * How a crown's leaves are drawn. `fluffy`: many small cards cut by a leaf mask, shaded smoothly through four
+ * tones. `painted`: a few large cards, each a painting of a bough of leaves with its own light and shade.
+ */
+export type LeafLook = { kind: 'fluffy'; mask: THREE.Texture; tones: Tones } | { kind: 'painted'; map: THREE.Texture };
 
 export interface Foliage { leaf: THREE.MeshLambertMaterial; depth: THREE.MeshDepthMaterial; wood: THREE.MeshLambertMaterial }
 
 /** The materials of one kind of tree. */
-export function foliageMaterials(textures: Textures, mask: THREE.Texture, tones: Tones): Foliage {
-  const uniforms = { uTones: { value: tones.map((t) => new THREE.Color(t)) } };
-  const leaf = paint({
-    ...CARD_HOOKS, map: mask, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, uniforms, brush: 0.16, bands: 0, wrap: 0.45, brushScale: 0.05,
-    fragmentPars: 'uniform vec3 uTones[4], uLeafSun, uLeafShade; varying vec2 vCard;',
-    // One tone a card, picked by how much sun it gets. A gust turns the leaves' pale side up for a moment.
-    fragmentFinal: /* glsl */ `
-      float lit = paintLit((vCard.x - 0.5) * 0.16 + vCard.y * 0.07);
-      vec3 tone = mix(uTones[0], uTones[1], smoothstep(0.2, 0.26, lit));
-      tone = mix(tone, uTones[2], smoothstep(0.45, 0.51, lit));
-      tone = mix(tone, uTones[3], smoothstep(0.74, 0.8, lit));
-      vec3 outgoingLight = paintHaze(tone * mix(uLeafShade, uLeafSun, lit) * diffuseColor.rgb + uSkyAdd * (1.0 - lit) * 0.25);`,
-  });
-  const depth = paintDepth({ ...CARD_HOOKS, map: mask, alphaTest: 0.5, side: THREE.DoubleSide });
+export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
+  let leaf: THREE.MeshLambertMaterial, depth: THREE.MeshDepthMaterial;
+  if (look.kind === 'fluffy') {
+    const hooks = cardHooks([0.62, 0.5], 1, 1.6);
+    leaf = paint({
+      ...hooks, map: look.mask, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0, wrap: 0.5, brushScale: 0.05,
+      uniforms: { uTones: { value: look.tones.map((t) => new THREE.Color(t)) } },
+      fragmentPars: 'uniform vec3 uTones[4], uLeafSun, uLeafShade; varying vec3 vCard;',
+      // The tone runs smoothly from deep shade to the sunlit top. The mask's own brush marks shift it a little,
+      // so single leaves catch the light, and leaves low in the crown are darker.
+      fragmentFinal: /* glsl */ `
+        float detail = texture2D(map, vMapUv).r;
+        float lit = paintLit((vCard.x - 0.5) * 0.12 + (detail - 0.85) * 0.7 + vCard.y * 0.06);
+        vec3 tone = mix(uTones[0], uTones[1], smoothstep(0.08, 0.36, lit));
+        tone = mix(tone, uTones[2], smoothstep(0.36, 0.66, lit));
+        tone = mix(tone, uTones[3], smoothstep(0.7, 0.96, lit));
+        tone *= mix(0.78, 1.0, vCard.z);
+        vec3 outgoingLight = paintHaze(tone * mix(uLeafShade, uLeafSun, lit) * diffuseColor.rgb + uSkyAdd * (1.0 - lit) * 0.25);`,
+    });
+    depth = paintDepth({ ...hooks, map: look.mask, alphaTest: 0.5, side: THREE.DoubleSide });
+  } else {
+    const hooks = cardHooks([0.5, 0.5], 0.3, 0.5);
+    leaf = paint({
+      ...hooks, map: look.map, alphaTest: 0.4, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0, wrap: 0.5, brushScale: 0.05,
+      fragmentPars: 'uniform vec3 uLeafSun, uLeafShade; varying vec3 vCard;',
+      // The painting carries its own light and shade. The sun only decides how bright the whole bough is.
+      fragmentFinal: /* glsl */ `
+        float lit = paintLit((vCard.x - 0.5) * 0.1);
+        vec3 bough = diffuseColor.rgb * mix(vec3(0.5, 0.66, 0.74), vec3(1.06, 1.03, 0.94), lit) * mix(0.84, 1.0, vCard.z);
+        vec3 outgoingLight = paintHaze(bough * mix(uLeafShade, uLeafSun, lit) + uSkyAdd * (1.0 - lit) * 0.25);`,
+    });
+    depth = paintDepth({ ...hooks, map: look.map, alphaTest: 0.4, side: THREE.DoubleSide });
+  }
+  // With the scene's multisampled target this softens the cut edge of every leaf.
+  leaf.alphaToCoverage = true;
   const wood = paint({
     vertexColors: true, brush: 0.35, bands: 0.7, wrap: 0.3, brushScale: 0.3,
     uniforms: { uBark: { value: textures.bark } },

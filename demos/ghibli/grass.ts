@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 import { GREAT_TREE, HOUSE, bare, fbm, groundColor, heightAt, noise, smoothstep } from './land.ts';
 import { paint } from './paint.ts';
-import { CARD_HOOKS } from './trees.ts';
+import { cardHooks } from './trees.ts';
 import type { Textures } from './textures.ts';
 
 function random(seed: number): () => number {
@@ -23,9 +23,9 @@ function bladeGeometry(): THREE.BufferGeometry {
 
 /** Rings of grass round the middle of the scene: fine blades near, broad strokes far. */
 const RINGS = [
-  { to: 30, spacing: 0.41, width: [0.11, 0.19], height: [0.28, 0.6] },
-  { to: 62, spacing: 0.75, width: [0.22, 0.35], height: [0.36, 0.8] },
-  { to: 112, spacing: 1.5, width: [0.5, 0.75], height: [0.5, 1.0] },
+  { to: 30, spacing: 0.44, width: [0.11, 0.19], height: [0.28, 0.6] },
+  { to: 62, spacing: 0.84, width: [0.22, 0.35], height: [0.36, 0.8] },
+  { to: 112, spacing: 1.7, width: [0.5, 0.75], height: [0.5, 1.0] },
 ] as const;
 const MIDDLE = { x: 0, z: 20 };
 
@@ -99,7 +99,8 @@ export function createFlowers(textures: Textures, wanted: number): THREE.Instanc
   geometry.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0], 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 1], 2));
   geometry.setIndex([0, 1, 2, 0, 2, 3]);
-  const material = paint({ ...CARD_HOOKS, map: textures.flower, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0.2, wrap: 0.6 });
+  const material = paint({ ...cardHooks([0.5, 0.5]), map: textures.flower, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0.2, wrap: 0.6 });
+  material.alphaToCoverage = true;
   const mesh = new THREE.InstancedMesh(geometry, material, wanted);
   const cards = new Float32Array(wanted * 4);
   let placed = 0;
@@ -151,6 +152,7 @@ export function createTufts(textures: Textures, wanted: number): THREE.Group {
         vec3 foot = diffuseColor.rgb * vec3(0.6, 0.8, 0.72), tips = diffuseColor.rgb * vec3(1.15, 1.12, 0.86) + vec3(0.02, 0.025, 0.0);
         diffuseColor.rgb = mix(foot, tips, smoothstep(0.05, 0.85, vCard.x)) + vec3(0.09, 0.1, 0.05) * vCard.y * vCard.x;`,
     });
+    material.alphaToCoverage = true;
     const count = Math.floor(wanted / textures.tufts.length), mesh = new THREE.InstancedMesh(geometry, material, count), cards = new Float32Array(count * 4);
     let placed = 0;
     for (let tries = 0; placed < count && tries < count * 30; tries++) {

@@ -1,16 +1,16 @@
 // The painted meadow: a test scene for the environment's look, apart from the game. It asks one
 // question: can this engine draw a place that looks like a hand-painted film background?
 //
-// In the address: `?view=wide|tree|pond|house|tilt`, `?mood=noon|evening`, `?paint=0` (no paint filter),
-// `?radius=5` (brush size), `?quality=low|medium|high`, `?t=12` (hold the clock at 12 s, for screenshots),
-// `?panel=0`. Keys: 1 to 5 pick a view, P turns the filter on and off, M changes the mood. Drag to look
-// round. `window.__ghibli` lets a script wait for the scene and read its counters.
+// In the address: `?view=wide|tree|pond|house|tilt`, `?mood=noon|evening`, `?trees=fluffy|painted`,
+// `?paint=1` (the paint filter), `?radius=5` (its brush size), `?quality=low|medium|high`, `?t=12` (hold the
+// clock at 12 s, for screenshots), `?panel=0`. Keys: 1 to 5 pick a view, T changes the trees, M the mood,
+// P turns the filter on and off. Drag to look round. `window.__ghibli` lets a script wait for the scene and read its counters.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GREAT_TREE, HOUSE, POND, WATER_Y, heightAt } from './land.ts';
 import { shared } from './paint.ts';
 import { createPost } from './post.ts';
-import { createWorld, type MoodName, type Quality } from './scene.ts';
+import { createWorld, type MoodName, type Quality, type TreeLook } from './scene.ts';
 import { loadTextures } from './textures.ts';
 
 type ViewName = 'wide' | 'tree' | 'pond' | 'house' | 'tilt';
@@ -55,11 +55,13 @@ controls.maxDistance = 160;
 const textures = await loadTextures();
 const world = await createWorld(textures, quality);
 const post = createPost(textures.paper, textures.paperMean);
-post.settings.paint = query.get('paint') !== '0' && quality !== 'low';
+// The paint filter is off unless asked for: Kausthubh did not like it.
+post.settings.paint = query.get('paint') === '1';
 post.settings.radius = Number(query.get('radius') ?? (quality === 'high' ? 5 : 3));
 
 let view: ViewName = pick<ViewName>('view', ['wide', 'tree', 'pond', 'house', 'tilt'], 'wide');
 let mood: MoodName = pick<MoodName>('mood', ['noon', 'evening'], 'noon');
+let trees: TreeLook = pick<TreeLook>('trees', ['fluffy', 'painted'], 'painted');
 
 function setView(name: ViewName): void {
   view = name;
@@ -75,6 +77,12 @@ function setView(name: ViewName): void {
 function setMood(name: MoodName): void {
   mood = name;
   world.setMood(name);
+  refreshPanel();
+}
+
+function setTrees(look: TreeLook): void {
+  trees = look;
+  world.setTrees(look);
   refreshPanel();
 }
 
@@ -105,6 +113,9 @@ label('View');
 label('Light');
 button('noon', () => mood === 'noon', () => setMood('noon'));
 button('evening', () => mood === 'evening', () => setMood('evening'));
+label('Trees');
+button('fluffy', () => trees === 'fluffy', () => setTrees('fluffy'));
+button('painted', () => trees === 'painted', () => setTrees('painted'));
 label('Filter');
 button('paint', () => post.settings.paint, () => { post.settings.paint = !post.settings.paint; });
 panel.append(stats);
@@ -117,6 +128,7 @@ window.addEventListener('keydown', (e) => {
   if (n >= 1 && n <= names.length) setView(names[n - 1] as ViewName);
   else if (e.key === 'p') { post.settings.paint = !post.settings.paint; refreshPanel(); }
   else if (e.key === 'm') setMood(mood === 'noon' ? 'evening' : 'noon');
+  else if (e.key === 't') setTrees(trees === 'fluffy' ? 'painted' : 'fluffy');
 });
 
 // ---------------------------------------------------------------- the loop
@@ -132,6 +144,7 @@ function resize(): void {
 window.addEventListener('resize', resize);
 resize();
 setMood(mood);
+setTrees(trees);
 setView(view);
 document.querySelector('#loading')?.remove();
 
@@ -150,6 +163,6 @@ function frame(now: number): void {
 requestAnimationFrame(frame);
 
 declare global {
-  interface Window { __ghibli: { frames(): number; stats(): { calls: number; triangles: number }; setView(name: ViewName): void; setMood(name: MoodName): void; standIns: string[] } }
+  interface Window { __ghibli: { frames(): number; stats(): { calls: number; triangles: number }; setView(name: ViewName): void; setMood(name: MoodName): void; setTrees(look: TreeLook): void; standIns: string[] } }
 }
-window.__ghibli = { frames: () => frames, stats: () => ({ ...post.stats }), setView, setMood, standIns: textures.standIns };
+window.__ghibli = { frames: () => frames, stats: () => ({ ...post.stats }), setView, setMood, setTrees, standIns: textures.standIns };

@@ -18,6 +18,8 @@ export interface Textures {
   leaves: THREE.Texture[];
   tufts: THREE.Texture[];
   clouds: THREE.Texture[];
+  /** Paintings of one bough of leaves each: three broadleaf, one conifer. */
+  foliage: THREE.Texture[];
   flower: THREE.Texture;
   /** Names of the textures that are stand-ins. */
   standIns: string[];
@@ -75,6 +77,21 @@ function leafClump(seed: number): HTMLCanvasElement {
     g.fillStyle = `rgb(${shade},${shade},${shade})`;
     g.save(); g.translate(128 + Math.cos(a) * d, 128 + Math.sin(a) * d); g.rotate(r() * Math.PI);
     g.beginPath(); g.ellipse(0, 0, 20 + r() * 12, 9 + r() * 5, 0, 0, Math.PI * 2); g.fill();
+    g.restore();
+  }
+  return c;
+}
+
+function bough(seed: number): HTMLCanvasElement {
+  const [c, g] = canvas(256);
+  const r = random(seed);
+  for (let i = 0; i < 150; i++) {
+    const a = r() * Math.PI * 2, d = Math.sqrt(r()) * 100, x = 128 + Math.cos(a) * d, y = 128 + Math.sin(a) * d;
+    // Lighter toward the upper left, as the paintings are.
+    const light = Math.min(1, Math.max(0, 0.5 - (x - 128) / 260 - (y - 128) / 220 + (r() - 0.5) * 0.3));
+    g.fillStyle = `rgb(${Math.round(40 + 140 * light)},${Math.round(92 + 118 * light)},${Math.round(62 + 20 * light)})`;
+    g.save(); g.translate(x, y); g.rotate(r() * Math.PI);
+    g.beginPath(); g.ellipse(0, 0, 17 + r() * 10, 8 + r() * 4, 0, 0, Math.PI * 2); g.fill();
     g.restore();
   }
   return c;
@@ -160,6 +177,7 @@ export async function loadTextures(): Promise<Textures> {
     leaves: await many('leaves', 3, false, false, (i) => leafClump(11 + i)),
     tufts: await many('tuft', 2, false, false, (i) => tuft(21 + i)),
     clouds: await many('cloud', 6, false, true, (i) => cloud(31 + i)),
+    foliage: await many('foliage', 4, false, true, (i) => bough(41 + i)),
     standIns: standIns.filter((n) => n !== 'flower'),
   };
 }

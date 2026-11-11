@@ -51,8 +51,13 @@ const OAK: TreeSpec = { seed: 21, height: 9.5, trunk: 0.42, crown: 4.6, blobs: 8
 const ELM: TreeSpec = { seed: 34, height: 12.5, trunk: 0.5, crown: 5.0, blobs: 9, card: 1.15, cover: 1.45, squash: 0.92, lean: -0.6 };
 const CEDAR: TreeSpec = { seed: 55, height: 13, trunk: 0.38, crown: 2.3, blobs: 6, card: 0.9, cover: 1.5, squash: 2.3, lean: 0 };
 const BUSH: TreeSpec = { seed: 89, height: 0, trunk: 0, crown: 1.35, blobs: 4, card: 0.55, cover: 1.5, squash: 0.7, lean: 0 };
-/** Trees on the far hills: the same shapes in fewer, larger dabs. */
-const far = (spec: TreeSpec): TreeSpec => ({ ...spec, card: spec.card * 1.75, cover: 1.3 });
+/** `fluffy`: many small leaf cards. `painted`: a few paintings of whole boughs. */
+export type TreeLook = 'fluffy' | 'painted';
+const fluffy = (spec: TreeSpec): TreeSpec => ({ ...spec, card: spec.card * 0.68, cover: 1.5 });
+/** Trees on the far hills: the same shapes in fewer, larger cards. */
+const far = (spec: TreeSpec): TreeSpec => ({ ...spec, card: spec.card * 1.9, cover: 1.3 });
+/** A painting covers a whole bough, so its cards are large, few, upright and set into the blob. */
+const painted = (spec: TreeSpec): TreeSpec => ({ ...spec, card: Math.min(5.4, spec.crown * 0.56), cover: 2.4, spin: 0.3, inset: [0.68, 0.9], core: 0.45 });
 
 // Deep shade, shade, light, the sunlit top.
 const TONES: Record<'great' | 'oak' | 'elm' | 'cedar' | 'bush', Tones> = {
@@ -106,6 +111,7 @@ export interface World {
   scene: THREE.Scene;
   light: THREE.DirectionalLight;
   setMood(name: MoodName): void;
+  setTrees(look: TreeLook): void;
   update(camera: THREE.Camera, dt: number): void;
 }
 
@@ -127,20 +133,28 @@ export async function createWorld(textures: Textures, quality: Quality): Promise
   scene.add(sky.group, createLand(textures), water.mesh, createGrass(quality), createFlowers(textures, quality === 'low' ? 1200 : 4200),
     createTufts(textures, quality === 'low' ? 1200 : 3600), await createProps(textures));
 
+  // Both leaf looks stand at the same places, so the two can be compared tree for tree.
   const [leavesA, leavesB, leavesC] = textures.leaves as [THREE.Texture, THREE.Texture, THREE.Texture];
-  const kinds: Array<[TreeSpec, THREE.Texture, Tones, Placement[]]> = [
-    [GREAT, leavesA, TONES.great, [{ ...place(GREAT_TREE.x, GREAT_TREE.z, 1), turn: 0.4, tint: new THREE.Color(1, 1, 1) }]],
-    [OAK, leavesA, TONES.oak, [
+  const [boughA, boughB, boughC, boughDark] = textures.foliage as [THREE.Texture, THREE.Texture, THREE.Texture, THREE.Texture];
+  const stands: Array<[TreeSpec, Placement[], THREE.Texture, Tones, THREE.Texture, boolean]> = [
+    [GREAT, [{ ...place(GREAT_TREE.x, GREAT_TREE.z, 1), turn: 0.4, tint: new THREE.Color(1, 1, 1) }], leavesA, TONES.great, boughA, false],
+    [OAK, [
       place(-15, 42, 1.3), place(-58, -8, 1.1), place(-64, -21, 0.95), place(-52, -25, 1.2), place(-70, -3, 1.0), place(-47, -37, 0.9), place(-61, -41, 1.15),
       place(45, -62, 1.1), place(53, -54, 0.95), place(38, -71, 1.2), place(19, -67, 1.0), place(47, 2, 1.05), place(53, 11, 0.9), place(41, 23, 1.1),
-    ]],
-    [far(OAK), leavesA, TONES.oak, ring(26, 84, 128, [1.0, 1.7])],
-    [ELM, leavesC, TONES.elm, [place(-55, -15, 1.0), place(49, -67, 1.1), place(57, -3, 1.0), place(-33, 44, 1.05), place(-74, -30, 1.2)]],
-    [far(ELM), leavesC, TONES.elm, ring(16, 80, 126, [0.9, 1.5])],
-    [CEDAR, leavesB, TONES.cedar, [place(39.5, -45, 1.0), place(42, -48.5, 0.84), place(21.5, -60, 1.1), place(37, -58, 0.92), place(-66, -12, 1.0), ...ring(8, 90, 124, [0.9, 1.3])]],
-    [BUSH, leavesB, TONES.bush, bushes()],
+    ], leavesA, TONES.oak, boughA, false],
+    [OAK, ring(26, 84, 128, [1.0, 1.7]), leavesA, TONES.oak, boughA, true],
+    [ELM, [place(-55, -15, 1.0), place(49, -67, 1.1), place(57, -3, 1.0), place(-33, 44, 1.05), place(-74, -30, 1.2)], leavesC, TONES.elm, boughB, false],
+    [ELM, ring(16, 80, 126, [0.9, 1.5]), leavesC, TONES.elm, boughB, true],
+    [CEDAR, [place(39.5, -45, 1.0), place(42, -48.5, 0.84), place(21.5, -60, 1.1), place(37, -58, 0.92), place(-66, -12, 1.0), ...ring(8, 90, 124, [0.9, 1.3])], leavesB, TONES.cedar, boughDark, false],
+    [BUSH, bushes(), leavesB, TONES.bush, boughC, false],
   ];
-  for (const [spec, mask, tones, places] of kinds) scene.add(plantTrees(buildTree(spec), foliageMaterials(textures, mask, tones), places));
+  const looks: Record<TreeLook, THREE.Group> = { fluffy: new THREE.Group(), painted: new THREE.Group() };
+  for (const [spec, places, mask, tones, bough, distant] of stands) {
+    const small = distant ? far(fluffy(spec)) : fluffy(spec);
+    looks.fluffy.add(plantTrees(buildTree(small), foliageMaterials(textures, { kind: 'fluffy', mask, tones }), places));
+    looks.painted.add(plantTrees(buildTree(painted(spec)), foliageMaterials(textures, { kind: 'painted', map: bough }), places));
+  }
+  scene.add(looks.fluffy, looks.painted);
 
   const sun = new THREE.Vector3(), skyColors = { zenith: new THREE.Color(), mid: new THREE.Color(), horizon: new THREE.Color(), glow: new THREE.Color(), cloud: new THREE.Color(), haze: new THREE.Color() };
   return {
@@ -158,6 +172,7 @@ export async function createWorld(textures: Textures, quality: Quality): Promise
       sky.setColors(skyColors, sun);
       water.setColors(m.shallow, m.deep, m.foam, skyColors.horizon, skyColors.mid);
     },
+    setTrees(look) { looks.fluffy.visible = look === 'fluffy'; looks.painted.visible = look === 'painted'; },
     update(camera, dt) { sky.update(camera, dt); },
   };
 }

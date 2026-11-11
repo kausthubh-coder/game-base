@@ -1,8 +1,8 @@
 // Turns the generated paintings in assets-src/ghibli/raw into the textures the Ghibli test scene loads.
 //   bun tools/ghibli-assets.mjs
-// Clouds keep their own alpha. Leaf and grass masks are white paint on black: their brightness becomes
-// the alpha and what is left of it becomes a light grey that keeps the brush marks. Surfaces are scaled
-// down. The scene repeats surfaces mirrored, so an edge that does not tile leaves no seam.
+// Clouds and boughs of leaves keep their own alpha. Leaf and grass masks are white paint on black: their
+// brightness becomes the alpha and what is left of it becomes a light grey that keeps the brush marks.
+// Surfaces are scaled down. The scene repeats surfaces mirrored, so an edge that does not tile leaves no seam.
 import sharp from 'sharp';
 import { existsSync, mkdirSync, readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -27,11 +27,12 @@ async function mask(file, name, size) {
   await sharp(rgba, { raw: { width: info.width, height: info.height, channels: 4 } }).webp({ quality: 88, alphaQuality: 92 }).toFile(resolve(out, name + '.webp'));
 }
 
-async function cloud(file, name) {
+/** A painting on a transparent background: a cloud or a bough of leaves. */
+async function cutout(file, name, width) {
   const image = sharp(file);
   const { hasAlpha } = await image.metadata();
   if (!hasAlpha) throw new Error(`${name} has no transparent background: generate it again`);
-  await image.trim({ threshold: 2 }).resize({ width: 1024, withoutEnlargement: true }).webp({ quality: 86, alphaQuality: 92 }).toFile(resolve(out, name + '.webp'));
+  await image.trim({ threshold: 2 }).resize({ width, withoutEnlargement: true }).webp({ quality: 86, alphaQuality: 92 }).toFile(resolve(out, name + '.webp'));
 }
 
 const surface = (file, name, grey) => {
@@ -42,7 +43,9 @@ const surface = (file, name, grey) => {
 let made = 0;
 for (const file of readdirSync(raw).filter((f) => f.endsWith('.png')).sort()) {
   const name = file.replace('.png', ''), path = resolve(raw, file);
-  if (name.startsWith('cloud-')) await cloud(path, name);
+  if (name.startsWith('cloud-')) await cutout(path, name, 1024);
+  else if (name.startsWith('foliage-')) await cutout(path, name, 512);
+  else if (/^(bush|tree)-/.test(name)) continue; // whole bushes and trees: painted, not used by the scene
   else if (name.startsWith('leaves-') || name.startsWith('tuft-')) await mask(path, name, 512);
   else await surface(path, name, name === 'brush' || name === 'paper');
   made++;
