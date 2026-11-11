@@ -19,6 +19,24 @@ Read before a large change:
 
 Every task in a new worktree starts with the `worktree-game` skill. Say done only after the `verify-game` skill. Ship only with the `ship-game` skill, when Kausthubh says so.
 
+## Skills
+
+They are in `.agents/skills`. Load the one that fits before you start.
+
+| The task | Skill |
+|---|---|
+| A new worktree, or packages, keys or a port look wrong | `worktree-game` |
+| Build or change a rule, a system, something drawn, a panel | `make-feature` |
+| Add a check, test something, or a bug was reported | `test-game` |
+| Prove a change works before saying done | `verify-game` |
+| A rule where the order of events is the risk, or "model-check this" | `formal-game`, and `verify-build-stroke` for build mode |
+| A 3D prop, or a sprite, icon, portrait or tile | `make-3d-asset`, `make-sprite`, then `verify-assets` |
+| An art style behind `?style=` | `verify-style-lab` |
+| Work for several agents: design it, brief helpers, merge | `coordinate-game` |
+| Kausthubh says ship, deploy or release | `ship-game` |
+
+What to build next, one line a task: `docs/backlog.md`.
+
 | Command | What it does |
 |---|---|
 | `bun tools/doctor.mjs` | Makes this checkout run: packages, keys, Chrome, a port of its own. Prints the port to use. |

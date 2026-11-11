@@ -42,7 +42,7 @@ Last confirmed against the code at commit `4f03e93`. Run `git diff 4f03e93 -- sr
    - `the plan called N cells ok and the release changed M` means the picture under the pointer and the change to the world disagree. That is a bug in `compute()`, `judge` or `apply()`.
    - A count under `AT_LEAST` means the random runs stopped reaching a case. The events or their weights need another look, not the code.
 3. Run `bun docs/verify/build-stroke/break-code.mjs`. It breaks `index.sim.ts` nine ways and expects the test to catch each. `GONE` means your change removed the text of a break: write that break again for the new code, so the test is still shown to fail.
-4. Run `bun tools/play-build.mjs` when you changed `keys.ts` or a view. It plays build mode in a browser with the real mouse and takes about 6 minutes on this Mac. It is the only check of the keys themselves.
+4. Run `bun tools/play-build.mjs` when you changed `keys.ts` or a view. It plays build mode in a browser with the real mouse and takes about 20 seconds. It is the only check of the keys themselves.
 
 Done when all three pass, and step 4 when it applies.
 
