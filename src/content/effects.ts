@@ -75,6 +75,9 @@ export const effects = {
   // ---- items
   trail: { shape: 'spark', blend: 'add', count: 14, life: [0.5, 0.9], radius: 0.2, speed: [1.2, 2.4], aim: { up: 1, any: 0.25 }, gravity: -1.5, drag: 1.5, wobble: [0.18, 1.4], size: [0.24, 0.05], color: [0xfff0a0, 0x7df0d0], glow: 2.6, fade: [0.05, 0.4] },
 
+  // ---- the ancients' lume: small teal motes that drift up from a woken lamp or the Heartstone.
+  lume: { shape: 'glow', blend: 'add', count: 2, life: [3.5, 6], radius: 0.45, height: [0.2, 1.1], speed: [0.12, 0.3], aim: { up: 1 }, gravity: 0, wobble: [0.25, 0.2], size: [0.15, 0.05], color: [0x7fffd0, 0x3fe0c8], glow: 2.4, fade: [0.2, 0.5] },
+
   // ---- weather. `count` is particles a second at full strength.
   rain: { shape: 'streak', blend: 'normal', facing: 'motion', count: 1300, life: [0.6, 0.9], radius: 1.2, speed: [15, 19], aim: { up: -1 }, gravity: 0, wind: 0.75, stretch: 18, size: [0.018, 0.018], color: [0xd4e4f8, 0xd4e4f8], alpha: [0.23, 0.16], glow: 1, fade: [0.05, 0.05], weather: true },
   rainSplash: { shape: 'ring', blend: 'normal', facing: 'ground', count: 1, life: [0.25, 0.35], speed: [0, 0], gravity: 0, size: [0.06, 0.32], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.3, 0], fade: [0, 0.3], weather: true },
