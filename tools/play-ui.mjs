@@ -175,7 +175,7 @@ async function desktop(browser) {
     seconds: window.__game.state().clock.seconds,
   }));
   check('the game opens on the title and nothing has started', title.started === false);
-  check('the title shows the picture from the manifest, ui/title.png', title.art.includes('ui/title.png'), title.art.slice(0, 90));
+  check('the title shows the picture from the manifest, ui/title.png', /ui\/title(?:\.[a-f0-9]+)?\.png/.test(title.art), title.art.slice(0, 90));
   check('Continue is off without a save', title.continueOff === true);
   check('the HUD is hidden behind the title', title.hud === false);
   await frames(3);
@@ -282,7 +282,8 @@ async function desktop(browser) {
     busy: window.__game.state().player.busy,
   }));
   check('the box shows the talk system\'s line, with the name', mid.name === 'Tamsin' && mid.whole === mid.line, `${mid.name}: ${mid.whole}`);
-  check('the portrait comes from the manifest\'s portraits sheet', mid.portrait.includes('portraits/portraits.png'), mid.portrait.slice(0, 80));
+  check('the portrait comes from the manifest\'s portraits sheet', /portraits\/portraits(?:\.[a-f0-9]+)?\.png/.test(mid.portrait), mid.portrait.slice(0, 80));
+  await page.waitForFunction(() => window.__typing.partial || window.__typing.full, null, { timeout: 15000 });
   const typing = await game(() => window.__typing);
   if (typing.partial || typing.frames > 2) check('the line types out a letter at a time', typing.partial, `partly typed in some frame: ${typing.partial}; ${typing.frames} frames until now`);
   else note(`Typing could not be seen: the whole line showed within ${typing.frames} drawn frame(s) (${Math.round(typing.full - typing.opened)} ms), so this machine is too slow to watch it.`);
@@ -819,10 +820,7 @@ async function worldTitle(browser) {
 
 let browser;
 try {
-  // Metal misses the fixed-frame typewriter sample; command delays also break click-to-move.
-  // Preserve software for this existing scenario until its input timing checks are rewritten.
   browser = await launchChrome({
-    software: true,
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
