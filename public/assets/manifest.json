@@ -755,6 +755,61 @@
           }
         }
       }
+    },
+    "thistlehog": {
+      "sheet": "sprites/thistlehog.png",
+      "frame": [
+        96,
+        96
+      ],
+      "anchor": [
+        48,
+        88
+      ],
+      "worldHeight": 1.27,
+      "animations": {
+        "idle": {
+          "frames": 2,
+          "fps": 4,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        },
+        "walk": {
+          "frames": 4,
+          "fps": 10,
+          "rows": {
+            "front": 3,
+            "back": 4,
+            "side": 5
+          }
+        }
+      }
+    },
+    "thistlehog-fight": {
+      "sheet": "sprites/thistlehog-fight.png",
+      "frame": [
+        96,
+        96
+      ],
+      "anchor": [
+        48,
+        88
+      ],
+      "worldHeight": 1.27,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
     }
   },
   "blocks": {
