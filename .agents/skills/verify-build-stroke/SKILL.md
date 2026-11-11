@@ -31,7 +31,7 @@ Seeds stand for everything that costs one item a cell: blocks, fences and placea
 | `Undo` | `undo()` and `revert()` |
 | `SwitchHand`, `BusyOn`, `BusyOff`, `World…`, `BagGains`, `BagLoses` | The rest of the game: the quick slots, a panel, crops, the bag |
 
-Last confirmed against the code at commit `db2e461`. Run `git diff db2e461 -- src/game/build src/game/shell/keys.ts src/game/views/world-build.view.ts`. When that prints nothing, stop: the verification still describes the code.
+Last confirmed against the code at commit `4f03e93`. Run `git diff 4f03e93 -- src/game/build src/game/shell/keys.ts src/game/views/world-build.view.ts`. When that prints nothing, stop: the verification still describes the code.
 
 ## Check a change
 
@@ -42,7 +42,7 @@ Last confirmed against the code at commit `db2e461`. Run `git diff db2e461 -- sr
    - `the plan called N cells ok and the release changed M` means the picture under the pointer and the change to the world disagree. That is a bug in `compute()`, `judge` or `apply()`.
    - A count under `AT_LEAST` means the random runs stopped reaching a case. The events or their weights need another look, not the code.
 3. Run `bun docs/verify/build-stroke/break-code.mjs`. It breaks `index.sim.ts` nine ways and expects the test to catch each. `GONE` means your change removed the text of a break: write that break again for the new code, so the test is still shown to fail.
-4. Run `bun tools/play-build.mjs` when you changed `keys.ts` or a view. It plays build mode in a browser with the real mouse, 36 checks, and takes about 5 minutes on this Mac. It is the only check of the keys themselves.
+4. Run `bun tools/play-build.mjs` when you changed `keys.ts` or a view. It plays build mode in a browser with the real mouse and takes about 6 minutes on this Mac. It is the only check of the keys themselves.
 
 Done when all three pass, and step 4 when it applies.
 
@@ -66,4 +66,4 @@ Left out:
 - Picking a placed thing up with a press, and turning a piece. `build.test.ts` tests both by example.
 - Which cells a stroke covers and each cell's verdict. `build.test.ts` tests them by example.
 - That a commit is one step. The model applies a whole stroke at once. The code applies it cell by cell and sends events as it goes, so a listener that changed the bag or a cell of the stroke in the middle would be outside the model. `apply()` counts the bag again for each cell for that reason.
-- The browser's own events. The model starts at `keys.ts` sending `use` and `letGo`. `tools/play-build.mjs` checks that a right click, a lost window and a release over the quick slots reach the build system as the model assumes.
+- The browser's own events. The model starts at `keys.ts` sending `use` and `letGo`. `tools/play-build.mjs` checks that a right click, a lost window, the pause menu and a release over the quick slots reach the build system as the model assumes. It found one case the model could not: the pause menu took the keys before the view heard of it, and left a stroke with no button. `world-build.view.ts` now also drops, each frame, a stroke whose button is not down.
