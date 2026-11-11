@@ -93,7 +93,21 @@ await page.evaluate(() => {
   window.__hits = [];
   window.__held = null;
   const kinds = new Set();
+  let podsCut = 0;
   const watch = () => {
+    // A pod breaks in one cut and leaves the targets in the same step: one that left as cut is a hit on a pod.
+    const gone = [...last.keys()].filter((id) => !window.__fight.fight.targets.some((t) => t.id === id));
+    if (gone.length) {
+      for (const id of gone) last.delete(id);
+      const cut = window.__fight.hall.record().boss?.counts.podsCut ?? 0;
+      const pet = window.__fight.fight.pet.strikeT;
+      if (cut > podsCut && !(pet > 0 && pet < 0.05)) {
+        const s = window.__fight.state();
+        window.__hits.push({ kind: 'pod', act: s.hero.act, t: s.hero.t, freeze: s.freeze });
+        if (s.hero.act === 'cut' && !kinds.has('pod') && window.__held === null) { kinds.add('pod'); window.__held = 'pod'; window.__fight.hold(true); }
+      }
+      podsCut = cut;
+    }
     for (const t of window.__fight.fight.targets) {
       const before = last.get(t.id);
       last.set(t.id, t.guard);
