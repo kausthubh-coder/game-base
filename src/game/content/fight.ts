@@ -19,8 +19,11 @@ export const HERO = {
   /** Stamina that comes back each second, once this long has passed since it was last spent. */
   staminaBack: 20,
   staminaWait: 1,
-  /** A cut: 6 frames before it can land, then 18 frames of recovery. The next cut may start after `chain`, a dodge after `cancel`. */
-  cut: { startup: 0.1, total: 0.4, chain: 0.2, cancel: 0.15, reach: 2.2, arc: 150 * DEG, guard: 10, pace: 0.25 },
+  /**
+   * A cut: 6 frames before it can land, then 18 frames of recovery. The next cut may start after `chain`, a dodge after `cancel`.
+   * A cut pushes the beast it lands on `push` blocks over `pushTime` seconds, unless the beast is `steady` (note 05's knockback table).
+   */
+  cut: { startup: 0.1, total: 0.4, chain: 0.2, cancel: 0.15, reach: 2.2, arc: 150 * DEG, guard: 10, pace: 0.25, push: 0.4, pushTime: 0.12 },
   /** The charged spin: hold the button this long, let go, and it hits everything around. */
   spin: { hold: 0.6, startup: 0.05, total: 0.55, cancel: 0.4, reach: 2.5, guard: 30 },
   /** The dodge travels 3.5 blocks. Nothing hits the hero for the first `safe` seconds of it. */
@@ -82,6 +85,8 @@ export interface BeastDef {
   /** True for a guardian machine: it is shut down, not calmed. */
   machine: boolean;
   radius: number;
+  /** True for a machine or a big beast: a cut does not push it until its guard is empty. */
+  steady: boolean;
   /** Blocks a second while it closes in. */
   speed: number;
   guard: number;
@@ -107,7 +112,7 @@ export interface BeastDef {
 export const BEASTS: readonly BeastDef[] = [
   {
     kind: 'thistlehog', name: 'Blighted thistlehog', depth: 1, machine: false,
-    radius: 0.45, speed: 2.6, guard: 60, segments: 1, dizzy: 3, rigShare: 1 / 2, crash: 2, drawnToLight: false, wakes: 6,
+    radius: 0.45, steady: false, speed: 2.6, guard: 60, segments: 1, dizzy: 3, rigShare: 1 / 2, crash: 2, drawnToLight: false, wakes: 6,
     attacks: [
       { id: 'needles', shape: 'circle', reach: 3, width: 0, lead: 0.9, recover: 1.5, damage: 10, heavy: false, charge: 0, from: 0, to: 2.3, rest: 1 },
     ],
@@ -116,7 +121,7 @@ export const BEASTS: readonly BeastDef[] = [
   },
   {
     kind: 'gearling', name: 'Gearling', depth: 2, machine: true,
-    radius: 0.5, speed: 3, guard: 90, segments: 1, dizzy: 3, rigShare: 1 / 2, crash: 2, drawnToLight: true, wakes: 7,
+    radius: 0.5, steady: true, speed: 3, guard: 90, segments: 1, dizzy: 3, rigShare: 1 / 2, crash: 2, drawnToLight: true, wakes: 7,
     attacks: [
       { id: 'charge', shape: 'line', reach: 8, width: 1.2, lead: 1, recover: 0, damage: 12, heavy: false, charge: 12, from: 3, to: 9, rest: 1.5, then: 'spin' },
       { id: 'spin', shape: 'circle', reach: 1.5, width: 0, lead: 0.6, recover: 1.5, damage: 10, heavy: false, charge: 0, from: 0, to: 2.2, rest: 2.5 },
@@ -126,7 +131,7 @@ export const BEASTS: readonly BeastDef[] = [
   },
   {
     kind: 'boar', name: 'The Blighted boar', depth: 5, machine: false,
-    radius: 1.3, speed: 3.2, guard: 300, segments: 3, dizzy: 4, rigShare: 1 / 3, crash: 2.5, drawnToLight: true, wakes: 9,
+    radius: 1.3, steady: true, speed: 3.2, guard: 300, segments: 3, dizzy: 4, rigShare: 1 / 3, crash: 2.5, drawnToLight: true, wakes: 9,
     attacks: [
       { id: 'charge', shape: 'line', reach: 12, width: 2.6, lead: 1.3, recover: 1.4, damage: 22, heavy: true, charge: 13, from: 4.5, to: 13, rest: 2.5 },
       { id: 'tusks', shape: 'cone', reach: 4, width: 60 * DEG, lead: 0.9, recover: 1.2, damage: 14, heavy: false, charge: 0, from: 0, to: 4.2, rest: 1.5 },

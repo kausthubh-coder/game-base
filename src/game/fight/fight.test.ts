@@ -281,6 +281,33 @@ describe('the hero fights', () => {
     expect(l.fight.record.whiffs).toBe(0);
   });
 
+  test('a cut pushes a thistlehog 0.4 blocks away, and the gearling and the boar not until their guard is empty', () => {
+    const small = lab('hero'), hog = small.fight.bring('thistlehog'), from = hog.z;
+    stand(small, hog.x, hog.z + 2);
+    small.fight.press('attack');
+    small.run(HERO.cut.startup + HERO.cut.pushTime + 0.05);
+    // Away from the hero, who stands to the south: north is -z. It is still waking, so it does not walk.
+    expect(hog.doing).toBe('alert');
+    expect(from - hog.z).toBeCloseTo(HERO.cut.push, 2);
+    expect(hog.x).toBeCloseTo(small.fight.beasts[0]!.x);
+
+    for (const kind of ['gearling', 'boar']) {
+      const l = lab('hero'), b = l.fight.bring(kind), at = { x: b.x, z: b.z };
+      stand(l, b.x, b.z + b.def.radius + 1.2);
+      l.fight.press('attack');
+      l.run(HERO.cut.startup + HERO.cut.pushTime + 0.05);
+      expect(b.guard).toBeLessThan(b.def.guard);
+      expect(Math.hypot(b.x - at.x, b.z - at.z)).toBe(0);
+      cutDown(l);
+      expect(b.doing).toBe('dizzy');
+      const z = b.z;
+      stand(l, b.x, b.z + b.def.radius + 1.2);
+      l.fight.press('attack');
+      l.run(HERO.cut.startup + HERO.cut.pushTime + 0.05);
+      expect(z - b.z).toBeCloseTo(HERO.cut.push, 2);
+    }
+  });
+
   test('a cut at nothing is a whiff', () => {
     const l = lab('hero'), b = l.fight.bring('thistlehog');
     stand(l, b.x, b.z + 9);
@@ -302,8 +329,9 @@ describe('the hero fights', () => {
     l.run(0.05);
     expect(l.fight.hero.facing).toBeCloseTo(0);
     l.run(0.5);
-    l.fight.input.aimX = b.x + 6;
-    l.fight.input.aimZ = b.z + 2;
+    // Due east of the hero. The cut pushed the beast, so this is measured from the hero.
+    l.fight.input.aimX = l.fight.hero.x + 6;
+    l.fight.input.aimZ = l.fight.hero.z;
     l.fight.press('attack');
     l.run(0.05);
     expect(l.fight.hero.facing).toBeCloseTo(Math.PI / 2);

@@ -295,6 +295,10 @@ interface Beast extends BeastState {
   /** The speed it is thrown at. */
   flyX: number;
   flyZ: number;
+  /** A cut's push: its first speed, and the seconds left of it. */
+  pushX: number;
+  pushZ: number;
+  pushLeft: number;
 }
 
 function emptyRecord(way: Way, pet: string, gentle: boolean): FightRecord {
@@ -489,6 +493,8 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       if (!inside) continue;
       hits++;
       emit('hit', b.x, b.z, spin ? 3 : hero.cuts);
+      // A cut pushes a small beast a little. A steady one stands until its guard is empty.
+      if (!spin && (!b.def.steady || b.doing === 'dizzy')) shove(b);
       hurtGuard(b, spin ? HERO.spin.guard : HERO.cut.guard, 'hero');
       // With the hero fighting, the pet goes for whatever the hero hit last.
       if (way === 'hero' && pet.mode !== 'down' && stillUp(b)) { pet.mode = 'engage'; pet.target = b; }
@@ -497,6 +503,15 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       record.whiffs++;
       emit('whiff', hero.x + dirX(hero.facing) * 1.4, hero.z + dirZ(hero.facing) * 1.4);
     }
+  }
+
+  /** Starts a cut's push on a beast, away from the hero. */
+  function shove(b: Beast): void {
+    const dx = b.x - hero.x, dz = b.z - hero.z, away = Math.hypot(dx, dz) || 1;
+    // It starts fast and slows to a stop, so its first speed is twice its mean.
+    b.pushX = (dx / away) * (2 * HERO.cut.push) / HERO.cut.pushTime;
+    b.pushZ = (dz / away) * (2 * HERO.cut.push) / HERO.cut.pushTime;
+    b.pushLeft = HERO.cut.pushTime;
   }
 
   function startDodge(): void {
@@ -1190,6 +1205,14 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     b.angerHero *= Math.exp(-dt / 5);
     b.angerPet *= Math.exp(-dt / 5);
     if (b.markLeft > 0) { b.markLeft -= dt; if (b.markLeft <= 0) b.marks = 0; }
+    if (b.pushLeft > 0) {
+      // A cut's push, slowing to a stop. What stands in the way stops it.
+      // The speed at the middle of the step, so the push covers its distance exactly at any dt.
+      const step = Math.min(dt, b.pushLeft), k = (b.pushLeft - step / 2) / HERO.cut.pushTime;
+      const nx = b.x + b.pushX * k * step, nz = b.z + b.pushZ * k * step;
+      if (free(nx, nz, b.def.radius)) { b.x = nx; b.z = nz; } else b.pushLeft = 0;
+      b.pushLeft = Math.max(0, b.pushLeft - dt);
+    }
     const held = b.calming;
     if (!held && b.doing === 'dizzy') b.calm = Math.max(0, b.calm - dt * 1.5);
     b.calming = false;
@@ -1449,7 +1472,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
         calm: 0, marks: 0, moving: false,
         // The first attack does not come the moment it wakes.
         rests: def.attacks.map(() => 0.3 + random() * 0.3), run: 0, hitHero: false, hitPet: false, shape: null, calming: false, markLeft: 0,
-        angerHero: 0, angerPet: 0, drawn: 0, flyX: 0, flyZ: 0,
+        angerHero: 0, angerPet: 0, drawn: 0, flyX: 0, flyZ: 0, pushX: 0, pushZ: 0, pushLeft: 0,
       };
       beasts.push(b);
       record.enemy = kind;
