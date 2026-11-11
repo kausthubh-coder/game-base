@@ -43,11 +43,10 @@ const errors = [];
 let browser;
 
 try {
-  // Fixed-frame input assertions assume slow software frames (four frames must walk >0.5m).
-  // Metal also moves the projected pointer target before this test samples aim.
+  // Projected pointer targets differ on Metal, and four frames are too short for the walking assertion.
+  // Keep this existing smoke scenario on software until its frame-based aim checks are rewritten.
   browser = await launchChrome({
     software: true,
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });

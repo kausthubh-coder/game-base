@@ -26,7 +26,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { REGION } from '../src/game/content/region.ts';
 
 const args = process.argv.slice(2);
@@ -1011,10 +1011,11 @@ const QUESTS = {
 };
 
 try {
-  browser = await chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  // On Metal, step 16 cannot aim at its projected farm cells; software preserves the existing scenario.
+  browser = await launchChrome({
+    software: true,
     headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+    args: ['--autoplay-policy=no-user-gesture-required'],
   });
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   page = await context.newPage();

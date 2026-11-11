@@ -819,10 +819,9 @@ async function worldTitle(browser) {
 
 let browser;
 try {
-  // The typewriter check samples only three frames; on Metal they elapse before the first letter.
+  // Give the typewriter time to reveal letters between browser observations on Metal.
   browser = await launchChrome({
-    software: true,
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    slowMo: 100,
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });

@@ -10,7 +10,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
@@ -68,10 +68,11 @@ const DEG = 180 / Math.PI;
 const turned = (from, to) => ((((to - from + 180) % 360) + 360) % 360) - 180;
 
 try {
-  browser = await chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  // Give camera easing time to settle between browser observations on Metal.
+  browser = await launchChrome({
+    slowMo: 250,
     headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+    args: ['--autoplay-policy=no-user-gesture-required'],
   });
   const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
   page.setDefaultTimeout(180000);
