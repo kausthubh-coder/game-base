@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "mode": "door",
+  "seed": 7,
+  "inputs": [
+    {"type":"door","method":"newGame"},
+    {"type":"door","method":"skipTo","args":["festival"]},
+    {"type":"door","method":"teleport","args":["town.square"]},
+    {"type":"door","method":"setTime","args":[0.75]},
+    {"type":"check","path":"tracked","equals":"festival"},
+    {"type":"wait","ms":1500}
+  ]
+}
