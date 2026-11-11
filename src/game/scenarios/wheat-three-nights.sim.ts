@@ -44,6 +44,10 @@ export const WHEAT_INPUTS: readonly Input[] = [
   ...FIELD.map((cell): Input => ({ do: 'use', at: cell })),
   { do: 'take', item: 'wheat_seeds' },
   ...FIELD.map((cell): Input => ({ do: 'use', at: cell })),
+  // The roof is done, and the first night is the Shut Door's, which keeps the player awake. The field is
+  // about the nights after it, so the night's quest is passed over.
+  { do: 'check', what: 'the roof quest is done and the first night has begun', that: (p) => p.game.flags.is('quest.roof.done') },
+  { do: 'run', name: 'pass over the first night', run: (p) => p.sys.quests.skipTo('leaftail') },
   ...night,
   { do: 'check', what: 'on the morning of day 2 every plant is at stage 2', that: (p) => p.game.clock.day === 2 && p.sys.crops.all().length === 6 && p.sys.crops.all().every((crop) => crop.state.stage === 2) },
   ...night,

@@ -29,7 +29,7 @@ describe('the copy a browser keeps', () => {
     const room = createRoom();
     room.join('ann', 'Ann');
     const first = step(room, ['ann']).get('ann')!;
-    expect(Object.keys(first.state?.systems ?? {}).sort()).toEqual(['almanac', 'crops', 'inventory', 'people', 'pets', 'quests', 'region', 'trees']);
+    expect(Object.keys(first.state?.systems ?? {}).sort()).toEqual(['almanac', 'crops', 'hall', 'inventory', 'people', 'pets', 'quests', 'region', 'trees']);
     expect(Array.isArray(first.state?.flags)).toBe(true);
     expect(first.air).toHaveLength(AMBIENT_KEYS.length);
     // Nothing happened, so the next ten steps carry no state at all.
