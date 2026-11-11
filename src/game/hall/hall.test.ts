@@ -3,7 +3,7 @@
 // outside the night, the Heartstone's sum and a game that skips past the night.
 
 import { expect, test } from 'bun:test';
-import { CONVERSATIONS, SCENE } from '../content/dialogue.ts';
+import { CONVERSATIONS, CUSTODIAN_HEART, SCENE } from '../content/dialogue.ts';
 import { HALL } from '../content/region.ts';
 import { newPlay, type Play } from '../play/harness.sim.ts';
 import { CUSTODIAN_ID, FOX_ID, HEART_WORTH, SCENES, heartWords } from './index.sim.ts';
@@ -101,4 +101,43 @@ test('the Heartstone adds up roofs, crops and bonded beasts', () => {
   const heart = p.sys.hall.heart();
   expect(heart.level).toBe(HEART_WORTH.roof + HEART_WORTH.beast);
   expect(heartWords(heart)).toBe(`The Heartstone holds ${heart.level}. 1 roof, 1 beast.`);
+});
+
+test('once awake, the Custodian says one line as the Heartstone rises past 3, 6 and 10, and each only once', () => {
+  const p = newPlay();
+  p.advance(0.5);
+  p.sys.quests.skipTo('leaftail');
+  p.advance(1);
+  const lines = (): string[] => p.said.filter((text) => text.startsWith('The Custodian: '));
+  const g = p.sys.region.grant(), y = p.sys.region.place('grant.center').at.y;
+  const start = p.sys.hall.heart().level;
+  // What the stone held before the Custodian could watch it is never remarked on.
+  expect(lines()).toEqual([]);
+  let beds = 0;
+  const bed = (): void => {
+    expect(p.sys.placeables.place('bed', g.x + 2 + 2 * beds, y, g.z + 6, 0)).not.toBeNull();
+    beds++;
+    p.advance(1);
+  };
+  while (p.sys.hall.heart().level < 10) bed();
+  const said = CUSTODIAN_HEART.filter(([at]) => at > start).map(([, text]) => `The Custodian: ${text}`);
+  expect(said.length).toBeGreaterThan(0);
+  expect(lines()).toEqual(said);
+  for (const [at] of CUSTODIAN_HEART.filter(([at]) => at > start)) expect(p.game.flags.is(`heart.said.${at}`)).toBe(true);
+
+  // Torn down and built again, the stone crosses the same levels without a second word.
+  for (const placed of p.sys.placeables.all().filter((placed) => placed.kind === 'bed')) p.sys.placeables.remove(placed.id);
+  p.advance(1);
+  while (p.sys.hall.heart().level < 10) bed();
+  expect(lines()).toEqual(said);
+});
+
+test('the Custodian says nothing while it sleeps, however high the stone goes', () => {
+  const p = newPlay();
+  p.advance(0.5);
+  const g = p.sys.region.grant(), y = p.sys.region.place('grant.center').at.y;
+  for (let i = 0; i < 6; i++) p.sys.placeables.place('bed', g.x + 2 + 2 * i, y, g.z + 6, 0);
+  p.advance(1);
+  expect(p.sys.hall.heart().level).toBeGreaterThanOrEqual(10);
+  expect(p.said.filter((text) => text.startsWith('The Custodian: '))).toEqual([]);
 });
