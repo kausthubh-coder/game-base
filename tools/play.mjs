@@ -46,6 +46,10 @@ async function serveSession() {
   async function fresh(nextMode, nextSeed = 7) {
     if (!['door', 'human'].includes(nextMode)) throw new Error('mode must be door or human');
     mode = nextMode; seed = nextSeed;
+    if (existsSync(pidFile)) {
+      const info = JSON.parse(readFileSync(pidFile, 'utf8'));
+      if (info.pid === process.pid) writeFileSync(pidFile, JSON.stringify({ ...info, mode, seed }, null, 2));
+    }
     await context?.close(); errors = [];
     context = await browser.newContext({ viewport: { width: 960, height: 540 } });
     page = await context.newPage(); page.setDefaultTimeout(60000);
