@@ -4,6 +4,7 @@ dist
 *.local
 .DS_Store
 assets-src/raw
+assets-src/ghibli/raw
 play-serve
 
 # Each agent and check builds into its own dist-<name> folder.
