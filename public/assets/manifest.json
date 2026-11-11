@@ -1646,7 +1646,18 @@
       "name-plate": "ui/kit/name-plate.png",
       "hint": "ui/kit/hint.png",
       "stars": "ui/kit/stars.png",
-      "tooltip": "ui/kit/tooltip.png"
+      "tooltip": "ui/kit/tooltip.png",
+      "book-cover": "ui/kit/book-cover.png",
+      "page": "ui/kit/page.png",
+      "gutter": "ui/kit/gutter.png",
+      "ribbon": "ui/kit/ribbon.png",
+      "map-paper": "ui/kit/map-paper.png",
+      "compass": "ui/kit/compass.png",
+      "map-fog": "ui/kit/map-fog.png",
+      "tile": "ui/kit/tile.png",
+      "tile-hover": "ui/kit/tile-hover.png",
+      "detail": "ui/kit/detail.png",
+      "slot-empty": "ui/kit/slot-empty.png"
     },
     "tabs": {
       "tile": 96,

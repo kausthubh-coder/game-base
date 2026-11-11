@@ -1,0 +1,6 @@
+$ bun tools/verify.mjs assets build shots
+pass assets     0.7 s  every asset against the asset contract
+pass build      0.6 s  a production build
+pass shots     15.1 s  six scenes against their approved pictures, and the draw budgets
+
+verify: 3 parts, nothing failed
