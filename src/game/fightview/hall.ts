@@ -27,6 +27,7 @@ import type { GameView } from '../shell/view.ts';
 import type { Feel } from './feel.ts';
 import { MARK, createGround } from './ground.ts';
 import { GOLD, HOT, PALE, SHADE, TEAL } from './looks.ts';
+import { SPARK, type Sparks } from './sparks.ts';
 
 // The locked palette's colors (assets-src/palette.json), by the names `features/props/palette.ts` gives them.
 const C = {
@@ -35,6 +36,8 @@ const C = {
   lime: 0x8d9a4a, straw: 0xadac59, lumeLight: 0x66e4cf, lamp: 0xf4d594, lampHot: 0xfcdd9c, bone: 0xeae6cd, coral: 0xd67c59,
 } as const;
 const LAMP_LIGHT = new THREE.Color(C.lampHot);
+/** The grey ash that lifts off the Stag where its colors come back, as off a calmed beast (`calm.ts`). */
+const ASH = new THREE.Color(0.6, 0.61, 0.65);
 const RIM = new THREE.Color(C.butter);
 
 // ---------------------------------------------------------------------------------------- the blocks
@@ -358,8 +361,11 @@ export interface HallView {
 /** The hour of the hall in each phase, as the game's time of day: morning, then dusk while the lamps are dark, then morning again once they are lit. */
 const HOURS = [0.42, 0.8, 0.42] as const;
 
-/** `setTime` sets the game's time of day, so the overgrowth's dark is the world's own dusk. */
-export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: number, y: number, oz: number, feel: Feel, setTime?: (timeOfDay: number) => void): HallView {
+/**
+ * `setTime` sets the game's time of day, so the overgrowth's dark is the world's own dusk. `sparks` is the lab's
+ * batch of small things in the air, for the ash that lifts off the Stag as it is freed.
+ */
+export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: number, y: number, oz: number, feel: Feel, setTime?: (timeOfDay: number) => void, sparks?: Sparks): HallView {
   const group = new THREE.Group();
   group.name = 'stag-hall';
   view.scene.add(group);
@@ -634,6 +640,25 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
     body.scale.y = 1 + breath * 0.5;
   }
 
+  // ---------------------------------------------------------------- the ash, as the grey runs out
+  let ashDue = 0;
+  /**
+   * Flecks of grey ash lift off where the line of color passes: off the antlers and head high up, the body below.
+   * They are drawn larger than a beast's, for the hall's far camera. Fewer at lower quality, none with reduce motion.
+   */
+  function ash(dt: number): void {
+    const line = drain.uDrain.value - y;
+    if (!sparks || line > 15 || line < 0.3 || view.settings.graphics.reduceMotion) return;
+    const q = view.settings.quality;
+    ashDue += dt * 70 * (q === 'low' ? 0.45 : q === 'medium' ? 0.7 : 1);
+    for (; ashDue >= 1; ashDue--) {
+      const r = Math.random(), high = line > 8.4;
+      // The head and antlers stand over the chest; the body runs north from it.
+      const x = chest.x + (r - 0.5) * (high ? 3.2 : 4.4), z = high ? chest.z + 1 + Math.random() * 2.4 : chest.z + 0.8 - Math.random() * 9.6;
+      sparks.spawn(SPARK.ash, x, y + line + (Math.random() - 0.5) * 0.2, z, (Math.random() - 0.5) * 0.4, 0.8 + Math.random() * 0.8, (Math.random() - 0.5) * 0.4, 1 + Math.random() * 0.6, 0.85 + Math.random() * 0.3, ASH, -0.35, 0.3);
+    }
+  }
+
   // ---------------------------------------------------------------- one frame
   function frame(dt: number, clock: number): void {
     if (hall.round !== shownRound) reset();
@@ -661,6 +686,7 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
       collar.position.y = 1.15 - Math.min(9, freedFor * freedFor * 9);
       collar.visible = freedFor < 1.2;
       drain.uDrain.value = freedFor < 0.6 ? 1000 : y + 16 - (freedFor - 0.6) * 7;
+      ash(dt);
     }
     placeChains(dt);
 

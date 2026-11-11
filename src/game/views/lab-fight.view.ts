@@ -216,7 +216,7 @@ export function install(view: GameView): void {
       sys.time?.setWeather('clear', true);
       dressHall(view, ox, oy, oz);
       hall = createHall(fight, stage as ReturnType<typeof hallStage>, { random: () => game.random(), onEnd });
-      hallView = createHallView(view, fight, hall, ox, oy, oz, feel, (hour) => sys.time?.setTimeOfDay(hour));
+      hallView = createHallView(view, fight, hall, ox, oy, oz, feel, (hour) => sys.time?.setTimeOfDay(hour), draw.sparks);
       const line = createHallLine(view.root);
       hallFrame = (dt, now) => { hallView?.frame(dt, now); if (hall) line.update(hall, hallView?.lastHit ?? null); };
       // The hall steps right after the fight, on every step of the body the fight steps on.
