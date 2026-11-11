@@ -42,7 +42,7 @@ export function reachDistance(player: Player, x0: number, y0: number, z0: number
 }
 
 /** True when a standing body with its feet at (px, py, pz) reaches into the block cell at (x, y, z). */
-function bodyInCell(px: number, py: number, pz: number, x: number, y: number, z: number): boolean {
+export function bodyInCell(px: number, py: number, pz: number, x: number, y: number, z: number): boolean {
   return px + BODY_HALF > x && px - BODY_HALF < x + 1 && pz + BODY_HALF > z && pz - BODY_HALF < z + 1 && py + BODY_TALL > y && py < y + 1;
 }
 

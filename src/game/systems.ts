@@ -10,6 +10,7 @@
 //   - region before anyone who asks for a named place.
 //   - time before crops, so crops read this step's rain.
 //   - actions before the systems that add click handlers to it (placeables, crops, creatures, pets).
+//   - build and sprinklers after crops and placeables, which they work through.
 //   - quests and story last: they judge what the step did.
 import type { SimSystem } from './api.sim.ts';
 import type { Kernel } from './kernel.sim.ts';
@@ -25,6 +26,8 @@ export const SYSTEM_ORDER: readonly string[] = [
   'placeables',
   'crafting',
   'crops',
+  'build',
+  'sprinklers',
   'nav',
   'almanac',
   'creatures',

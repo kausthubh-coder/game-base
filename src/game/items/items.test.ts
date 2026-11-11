@@ -22,7 +22,7 @@ test('every item the first part needs is in the table, once', () => {
   expect(ids.sort()).toEqual([
     'oak_log', 'plank', 'fiber', 'moss_tuft', 'berry', 'wheat', 'wheat_seeds', 'bread',
     'axe', 'hoe', 'watering_can', 'pickaxe',
-    'workbench', 'bed', 'chest',
+    'workbench', 'bed', 'chest', 'fence', 'sprinkler',
     'dirt', 'stone', 'cobble', 'oak_plank', 'lamp', 'glass', 'thatch', 'plaster', 'stone_brick', 'sand',
     'almanac', 'river_lamp',
   ].sort());

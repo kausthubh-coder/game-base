@@ -99,6 +99,13 @@ export interface GameEvents {
   'night.started': { day: number };
   slept: { day: number };
   'placeable.placed': { kind: string; x: number; y: number; z: number };
+  // building
+  /** Build mode went on or off. */
+  'build.mode': { active: boolean };
+  /** A stroke was applied, or the last one was undone. `count` is the cells that changed. `build.last()` lists them. */
+  'build.applied': { kind: StrokeKind; count: number; undone: boolean };
+  /** A sprinkler wet the soil around it. x, y, z is its own cell; `reach` is how many blocks it wets each way. */
+  'sprinkler.ran': { x: number; y: number; z: number; reach: number };
   // interface
   toast: { text: string; icon?: string };
   hint: { id: string; text: string };
@@ -164,6 +171,7 @@ export interface Systems {
   placeables: PlaceablesApi;
   crafting: CraftingApi;
   crops: CropsApi;
+  build: BuildApi;
   time: TimeApi;
   creatures: CreaturesApi;
   almanac: AlmanacApi;
@@ -284,6 +292,12 @@ export interface PlaceableDef {
   station?: string;
   /** Light it gives off, 0 to 15. */
   light?: number;
+  /** It joins the same kind beside it into one run, as a fence does. In build mode it is laid in a line. */
+  joins?: boolean;
+  /** In build mode it turns its back to a wall beside it, as a chest does. */
+  backs?: boolean;
+  /** It keeps tilled soil wet this many blocks each way from its own cell. */
+  waters?: number;
 }
 
 export interface Placed {
@@ -360,6 +374,117 @@ export interface CropsApi {
   at(x: number, y: number, z: number): CropState | null;
   /** Every crop, for drawing. Coordinates are the soil block. */
   all(): readonly { x: number; y: number; z: number; state: CropState }[];
+
+  // ---- added for build mode. Each is optional so that a fake without it still fits. The real system always has them.
+  /** Wets this one soil block and sends nothing. False when it is not tilled soil. */
+  wet?(x: number, y: number, z: number): boolean;
+  /** Pulls the crop out of this soil block and puts its seed back in the bag. False when nothing grows there. */
+  pull?(x: number, y: number, z: number): boolean;
+}
+
+// ---------------------------------------------------------------------------------------- building
+
+/** What a stroke does to each cell: nothing, till it, plant a seed, wet it, set a block on it, stand a placeable on it. */
+export type StrokeKind = 'none' | 'till' | 'plant' | 'water' | 'block' | 'place';
+/** Which cells a stroke covers between where it was pressed and where the pointer is: a filled rectangle, a straight line, or the one cell under the pointer. */
+export type StrokeShape = 'area' | 'line' | 'one';
+
+/** What the held item does in build mode. */
+export interface BuildTool {
+  kind: StrokeKind;
+  shape: StrokeShape;
+  /** The held item, or null with an empty hand. */
+  item: ItemId | null;
+  /** True when every cell it changes takes one of the item from the bag. */
+  costs: boolean;
+  /** The block it sets, for `block`. */
+  block: number;
+  /** The placeable it stands, for `place`. */
+  placeable: PlaceableDef | null;
+}
+
+/**
+ * What a stroke would do to one cell.
+ * `ok` it changes. `short` it would, but the bag runs out before it. `skip` there is nothing to do: tilled already,
+ * planted already. `far` out of reach. `town` the town's land. `ground` no level ground at the stroke's height.
+ * `wrong` the wrong kind of ground: stone under a hoe, grass under a seed. `blocked` something is in the way.
+ */
+export type CellVerdict = 'ok' | 'short' | 'skip' | 'far' | 'town' | 'ground' | 'wrong' | 'blocked';
+
+export interface PlanCell {
+  x: number;
+  z: number;
+  verdict: CellVerdict;
+}
+
+/** What a stroke would do if the button came up now. The same object and the same cells on every call: copy what you keep. */
+export interface BuildPlan {
+  tool: BuildTool;
+  /** The height of the ground blocks the stroke works on. A block or a placeable goes one above. */
+  y: number;
+  /** True while the button is down. False for the plan under a pointer that only hovers. */
+  dragging: boolean;
+  /** The cells, nearest the press first. */
+  cells: readonly PlanCell[];
+  /** Cells with each verdict. */
+  ok: number;
+  short: number;
+  skip: number;
+  refused: number;
+  /** How many of the item the bag holds, when the tool costs. */
+  have: number;
+  /** The quarter turns a placeable would stand with, as in `Placed.quarterTurns`. */
+  turns: number;
+  /** The corner the placeable would stand at, which is not the pointed cell for a turned thing longer than a block. */
+  ax: number;
+  az: number;
+  /** A placed thing under the pointer that a press would take back into the bag, or null. */
+  lift: Placed | null;
+}
+
+/** One cell a stroke changed, as `build.last()` lists it. `y` is the cell that changed: the soil, or the block or placeable above it. */
+export interface BuildChange {
+  kind: StrokeKind;
+  x: number;
+  y: number;
+  z: number;
+}
+
+/** Where the pointer is: the block it hit and the face, as a ray cast gives it. */
+export interface BuildPoint {
+  x: number; y: number; z: number;
+  nx: number; ny: number; nz: number;
+}
+
+export interface BuildApi {
+  /** True while the player is in build mode. */
+  readonly active: boolean;
+  /** Turns build mode on or off. Turning it off cancels a stroke in progress. It stays off while the player is busy. */
+  setActive(on: boolean): void;
+  /** Tells where the pointer is, or `null` when it is on nothing. During a stroke it moves the stroke's far end. */
+  point(at: BuildPoint | null): void;
+  /**
+   * The button went down. On a placed thing it takes that back into the bag and into the hand. Elsewhere it
+   * starts a stroke with the held item at the pointed cell. False when it did neither.
+   */
+  press(): boolean;
+  /** The button came up: the stroke is judged again against the world as it is now, and applied. Returns the cells it changed, or -1 when there was no stroke. */
+  release(): number;
+  /** Drops the stroke in progress and changes nothing. False when there was none. */
+  cancel(): boolean;
+  /** True from a press that started a stroke until its release or cancel. */
+  readonly dragging: boolean;
+  /** What a release would do now, or what a press and release on the pointed cell would do. Null outside build mode or with the pointer on nothing. */
+  plan(): BuildPlan | null;
+  /** Turns the held placeable a quarter turn: 1 clockwise seen from above, -1 the other way. From then it keeps that turn until the held item changes. */
+  turn(direction: 1 | -1): void;
+  /** Takes back the last stroke: every cell that is still as the stroke left it goes back, and its item returns to the bag. False when there is nothing to take back. */
+  undo(): boolean;
+  readonly canUndo: boolean;
+  /** The cells the last stroke changed, or the last undo put back. The same array until the next one. */
+  last(): readonly BuildChange[];
+  /** True while a stroke or an undo is changing cells, so a listener can tell a burst of events from single ones. */
+  readonly applying: boolean;
 }
 
 export interface TimeApi {

@@ -108,6 +108,7 @@ export const PROPS = {
   stove: { name: 'Kitchen stove', group: 'station', builder: 'stove', variants: ['pot'], triangles: 160, wind: false, light: 8, alwaysLit: true, vary: SNUG },
   chest: { name: 'Chest', group: 'station', builder: 'chest', variants: ['closed', 'open'], triangles: 160, ...still, vary: SNUG },
   bed: { name: 'Bed', group: 'station', builder: 'bed', variants: ['teal', 'red'], triangles: 150, ...still, vary: SNUG },
+  sprinkler: { name: 'Sprinkler', group: 'station', builder: 'sprinkler', variants: ['brass'], triangles: 170, ...still, vary: SNUG },
 } as const satisfies Record<string, PropDef>;
 
 export type PropKind = keyof typeof PROPS;

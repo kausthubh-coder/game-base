@@ -107,3 +107,16 @@ export function bed(variant: number): THREE.BufferGeometry {
   s.shadowBox(0, 0, 0, 1, 0.5, 2);
   return s.done();
 }
+
+/** A short brass standpipe on a stone foot, with a round head and four nozzles. It is the same from every side. */
+export function sprinkler(): THREE.BufferGeometry {
+  const s = new Shape(1409);
+  s.cyl(0, 0, 0, 0.26, 0.2, 0.1, 7, P.iron, { capTone: P.pewter });
+  s.cyl(0, 0.1, 0, 0.07, 0.06, 0.5, 6, P.ochre);
+  s.cyl(0, 0.3, 0, 0.1, 0.1, 0.05, 6, P.gold, { capTone: P.butter });
+  s.cyl(0, 0.6, 0, 0.15, 0.11, 0.12, 7, P.gold, { capTone: P.butter });
+  for (const [x, z] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) s.box(x * 0.2, 0.63, z * 0.2, x ? 0.14 : 0.06, 0.05, z ? 0.14 : 0.06, P.ochre);
+  s.cone(0, 0.72, 0, 0.08, 0.08, 6, P.tealLight);
+  s.shadowBox(0, 0, 0, 0.44, 0.7, 0.44);
+  return s.done();
+}
