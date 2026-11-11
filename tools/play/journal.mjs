@@ -52,7 +52,7 @@ export async function render(folder) {
     const input = step.input === undefined ? '' : `<pre class="input">${escape(JSON.stringify(step.input))}</pre>`;
     const failed = step.failed ? `<p class="failed">Input failed: ${escape(step.failed)}</p>` : '';
     const film = step.kind === 'film'
-      ? `<p>${step.frames} frames by ${escape(step.how)}; median difference ${step.median}, jumps over ${step.limit}: ${step.jumps?.length ? step.jumps.map((j) => `#${j.frame} (${j.diff}${j.back ? ', and back' : ''})`).join(', ') : 'none'}</p>`
+      ? `<p>${step.frames} frames by ${escape(step.how)}. Flickers: ${step.flickers?.length ? step.flickers.map((r) => `#${r.from}${r.to > r.from ? `-#${r.to}` : ''} at ${r.t} s (${r.score})`).join(', ') : 'none'}. Jumps over ${step.limit} (median ${step.median}): ${step.jumps?.length ? step.jumps.map((j) => `#${j.frame} (${j.diff}${j.back ? ', and back' : ''})`).join(', ') : 'none'}.</p>`
       : '';
     blocks.push(`<section id="step-${step.step}">
   <h3>${escape(String(step.step).padStart(3, '0'))} · ${escape(step.kind)} · ${escape(step.name ?? '')}</h3>

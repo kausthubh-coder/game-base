@@ -46,15 +46,17 @@ session('wrong.html', () => {
   expect(!after.failed && after.problems.some((p) => p.includes('broken on purpose')), 'act reports the console error under problems and goes on');
   expect(json('look', 'again').problems.length === 0, 'the next look does not report it again');
   const still = json('film', '{"type":"wait","ms":500}', 'still');
-  expect(still.film.jumps.length === 0, `film finds no jump on a still page (${still.film.frames} frames by ${still.film.how})`);
+  expect(still.film.jumps.length === 0 && still.film.flickers.length === 0, `film finds no jump or flicker on a still page (${still.film.frames} frames by ${still.film.how})`);
 });
 
 session('flicker.html', () => {
   const calm = json('film', '{"type":"wait","ms":600}', 'calm');
-  expect(calm.film.jumps.length === 0, `film finds no jump while only the dot moves (${calm.film.frames} frames, median ${calm.film.median})`);
+  expect(calm.film.jumps.length === 0 && calm.film.flickers.length === 0, `film finds no jump or flicker while only the dot moves (${calm.film.frames} frames, median ${calm.film.median})`);
   const flick = json('film', '[{"type":"wait","ms":200},{"type":"press","key":"KeyF"},{"type":"wait","ms":300}]', 'flicker');
   const there = flick.film.jumps.find((j) => j.back);
-  expect(Boolean(there), `film finds the one-frame flicker: ${JSON.stringify(flick.film.jumps)} (${flick.film.frames} frames by ${flick.film.how}, limit ${flick.film.limit})`);
+  expect(Boolean(there), `film finds the one-frame flicker as a jump there and back: ${JSON.stringify(flick.film.jumps)} (${flick.film.frames} frames by ${flick.film.how}, limit ${flick.film.limit})`);
+  const one = flick.film.flickers;
+  expect(one.length === 1 && one[0].frames === 1 && one[0].from === there?.frame, `film lists it under flickers: ${JSON.stringify(one)}`);
 });
 
 console.log(failed ? `check-eyes: ${failed} failed` : 'check-eyes: every check passed');

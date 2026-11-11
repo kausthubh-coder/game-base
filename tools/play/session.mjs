@@ -139,17 +139,19 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     const base = `${n}-${slug(name || 'film')}`;
     let failed = null;
     const shot = await capture(page, async () => { failed = await playAll(inputs); }, { fps });
-    const diffs = await differences(shot.frames);
+    const { diffs, flickers } = await differences(shot.frames);
     const found = jumps(diffs);
+    const at = (i) => Math.round(shot.frames[i].t * 1000) / 1000;
     const folder = resolve(journal, base), picture = resolve(journal, `${base}.png`);
-    await sheet(shot.frames, { folder, sheetPath: picture, fps, found: found.jumps, size: shot.size });
+    await sheet(shot.frames, { folder, sheetPath: picture, fps, found: found.jumps, runs: flickers, size: shot.size });
     const seconds = shot.frames.length > 1 ? Math.round((shot.frames.at(-1).t - shot.frames[0].t) * 100) / 100 : 0;
     const info = {
       frames: shot.frames.length, seconds, how: shot.how, failed: shot.failed, folder, median: found.median, limit: found.limit,
-      jumps: found.jumps.map((j) => ({ ...j, t: Math.round(shot.frames[j.frame].t * 1000) / 1000 })),
+      jumps: found.jumps.map((j) => ({ ...j, t: at(j.frame) })),
+      flickers: flickers.map((f) => ({ ...f, t: at(f.from), frames: f.to - f.from + 1 })),
     };
     const result = { title: `film ${n}${name ? ` ${name}` : ''}`, step, picture, film: info, ...(failed ? { failed } : {}), ...(await observe()) };
-    record('film', name, result, { input: inputs, film: { frames: info.frames, how: info.how, median: info.median, limit: info.limit, jumps: info.jumps, folder } });
+    record('film', name, result, { input: inputs, film: { frames: info.frames, how: info.how, median: info.median, limit: info.limit, jumps: info.jumps, flickers: info.flickers, folder } });
     return result;
   }
 

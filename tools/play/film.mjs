@@ -83,11 +83,65 @@ export function cellDifference(a, b, { w = SMALL.w, h = SMALL.h, cols = SMALL.co
   return most / (cw * ch);
 }
 
-/** Each frame against the one before. */
-export async function differences(frames) {
+/** The mean red, green and blue of each cell of a shrunk frame, on a `cols` x `rows` grid. */
+export function cellMeans(frame, { w = SMALL.w, h = SMALL.h, cols = 32, rows = 18, channels = 3 } = {}) {
+  const means = new Float64Array(cols * rows * 3);
+  const cw = w / cols, ch = h / rows;
+  for (let y = 0; y < h; y++) {
+    const row = Math.min(rows - 1, Math.floor(y / ch)) * cols;
+    for (let x = 0; x < w; x++) {
+      const cell = (row + Math.min(cols - 1, Math.floor(x / cw))) * 3, at = (y * w + x) * channels;
+      for (let k = 0; k < 3; k++) means[cell + k] += frame[at + k] / (cw * ch);
+    }
+  }
+  return means;
+}
+
+/**
+ * How much a short run of frames looks like neither the frame before it nor the frame after it, while those two
+ * look like each other. Frames are given as cell means (`cellMeans`), so a sprite that only changes its pose
+ * scores little and one drawn in the wrong colour or shape scores high. For each cell: the smallest difference of
+ * any frame of the run to either side, less the difference between the two sides; the largest cell is the score.
+ * Steady motion and a change that stays score near 0, even while the camera scrolls.
+ */
+export function flickerScore(before, run, after) {
+  const diff = (a, b, at) => Math.max(Math.abs(a[at] - b[at]), Math.abs(a[at + 1] - b[at + 1]), Math.abs(a[at + 2] - b[at + 2]));
+  let most = 0;
+  for (let at = 0; at < before.length; at += 3) {
+    let least = Infinity;
+    for (const frame of run) least = Math.min(least, diff(before, frame, at), diff(frame, after, at));
+    most = Math.max(most, least - diff(before, after, at));
+  }
+  return most;
+}
+
+/**
+ * Runs of 1 to `longest` frames drawn unlike the frames on either side: { from, to, score }. Where runs overlap,
+ * the one that scores highest is kept. `score(from, to)` gives a run's flicker score.
+ */
+export function flickers(count, score, { longest = 4, floor = 15 } = {}) {
+  const runs = [];
+  for (let from = 1; from < count - 1; from++) {
+    for (let to = from; to < Math.min(count - 1, from + longest); to++) {
+      const value = score(from, to);
+      if (value > floor) runs.push({ from, to, score: Math.round(value * 10) / 10 });
+    }
+  }
+  runs.sort((a, b) => b.score - a.score || (a.to - a.from) - (b.to - b.from));
+  const kept = [];
+  for (const run of runs) if (!kept.some((k) => run.from <= k.to + 1 && k.from <= run.to + 1)) kept.push(run);
+  return kept.sort((a, b) => a.from - b.from);
+}
+
+/** Each frame against the one before (`diffs`), and the short runs drawn unlike their neighbours (`flickers`). */
+export async function differences(frames, options) {
   const smalls = [];
   for (const frame of frames) smalls.push(await small(frame.data));
-  return smalls.map((s, i) => (i === 0 ? 0 : cellDifference(smalls[i - 1], s)));
+  const means = smalls.map((s) => cellMeans(s));
+  return {
+    diffs: smalls.map((s, i) => (i === 0 ? 0 : cellDifference(smalls[i - 1], s))),
+    flickers: flickers(means.length, (from, to) => flickerScore(means[from - 1], means.slice(from, to + 1), means[to + 1]), options),
+  };
 }
 
 /**
@@ -136,24 +190,24 @@ export async function capture(page, play, { tail = 500, fps = 10 } = {}) {
 }
 
 /** Writes the full-size frames into `folder` and the sheet at `sheetPath`. Returns the frames shown on the sheet. */
-export async function sheet(frames, { folder, sheetPath, fps = 10, found = [], size }) {
+export async function sheet(frames, { folder, sheetPath, fps = 10, found = [], runs = [], size }) {
   mkdirSync(folder, { recursive: true });
   frames.forEach((frame, i) => writeFileSync(resolve(folder, `${String(i).padStart(3, '0')}-${frame.t.toFixed(3)}s.jpg`), frame.data));
-  // At most `fps` frames a second of the film on the sheet, plus every jump.
+  // At most `fps` frames a second of the film on the sheet, plus every jump and every frame of a flicker.
   const span = frames.length > 1 ? frames.at(-1).t - frames[0].t : 0;
   const every = span > 0 ? Math.max(1, Math.round(frames.length / Math.max(1, span * fps))) : 1;
-  const jumpAt = new Set(found.map((j) => j.frame));
-  const shown = pick(frames.length, { every, keep: [...jumpAt] });
+  const mark = new Map(found.map((j) => [j.frame, 'JUMP']));
+  for (const run of runs) for (let i = run.from; i <= run.to; i++) mark.set(i, 'FLICKER');
+  const shown = pick(frames.length, { every, keep: [...mark.keys()] });
   const layout = sheetLayout({ count: shown.length, frameW: size.width, frameH: size.height });
   const parts = [];
   for (let k = 0; k < shown.length; k++) {
-    const i = shown[k], cell = layout.cells[k];
+    const i = shown[k], cell = layout.cells[k], tag = mark.get(i);
     const image = await sharp(frames[i].data).resize(cell.w, cell.h, { fit: 'fill' }).png().toBuffer();
     parts.push({ input: image, left: cell.x, top: cell.y });
-    const jump = jumpAt.has(i);
-    const label = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell.w}" height="${layout.labelH}"><rect width="100%" height="100%" fill="${jump ? '#b00020' : '#202020'}"/><text x="4" y="${layout.labelH - 5}" font-family="Menlo, monospace" font-size="12" fill="#fff">#${i}  ${frames[i].t.toFixed(2)} s${jump ? '  JUMP' : ''}</text></svg>`;
+    const label = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell.w}" height="${layout.labelH}"><rect width="100%" height="100%" fill="${tag ? '#b00020' : '#202020'}"/><text x="4" y="${layout.labelH - 5}" font-family="Menlo, monospace" font-size="12" fill="#fff">#${i}  ${frames[i].t.toFixed(2)} s${tag ? `  ${tag}` : ''}</text></svg>`;
     parts.push({ input: Buffer.from(label), left: cell.x, top: cell.y + cell.h });
-    if (jump) {
+    if (tag) {
       const ring = `<svg xmlns="http://www.w3.org/2000/svg" width="${cell.w}" height="${cell.h}"><rect x="1.5" y="1.5" width="${cell.w - 3}" height="${cell.h - 3}" fill="none" stroke="#ff1744" stroke-width="3"/></svg>`;
       parts.push({ input: Buffer.from(ring), left: cell.x, top: cell.y });
     }

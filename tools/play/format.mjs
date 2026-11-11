@@ -36,6 +36,7 @@ export function formatLook(look) {
   if (look.film) {
     const f = look.film;
     out.push(`film: ${f.frames} frames in ${f.seconds} s by ${f.how}${f.failed ? ` (${f.failed})` : ''}; frames in ${f.folder}`);
+    out.push(`flickers: ${f.flickers.length ? f.flickers.map((r) => `#${r.from}${r.to > r.from ? `-#${r.to}` : ''} at ${r.t} s, ${r.frames} frame${r.frames > 1 ? 's' : ''} (${r.score})`).join(', ') : 'none'}`);
     out.push(`jumps: ${f.jumps.length ? f.jumps.map((j) => `#${j.frame} at ${j.t} s (${j.diff}${j.back ? ', and back' : ''})`).join(', ') : 'none'}  (median ${f.median}, limit ${f.limit})`);
   }
   const lines = screenLines(look.screen);

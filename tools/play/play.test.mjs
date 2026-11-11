@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import { changes, clockText, heading, now } from './diff.mjs';
-import { cellDifference, jumps, pick, sheetLayout } from './film.mjs';
+import { cellDifference, cellMeans, flickers, flickerScore, jumps, pick, sheetLayout } from './film.mjs';
 import { formatLook } from './format.mjs';
 import { parseInputs } from './inputs.mjs';
 import { findWrong, order } from './screen.mjs';
@@ -150,6 +150,26 @@ describe('film', () => {
     expect(cellDifference(a, b)).toBe(60);
     let mean = 0; for (let i = 0; i < a.length; i++) mean += Math.abs(a[i] - b[i]);
     expect(mean / a.length).toBeLessThan(1);
+  });
+  test('flickers: a few frames unlike both sides score high; scrolling and a change that stays do not', () => {
+    // One row of four cells as means, the camera scrolling: each frame's colours move one cell on.
+    const frame = (...cells) => new Float64Array(cells.flatMap((v) => [v, v, v]));
+    const scroll = [frame(10, 20, 30, 40), frame(20, 30, 40, 50), frame(30, 40, 50, 60), frame(40, 50, 60, 70)];
+    expect(flickerScore(scroll[0], [scroll[1]], scroll[2])).toBe(0);
+    // A sprite in the last cell goes dark for two frames, then comes back.
+    const dark = [frame(10, 10, 10, 200), frame(10, 10, 10, 40), frame(10, 10, 10, 45), frame(10, 10, 10, 200)];
+    expect(flickerScore(dark[0], dark.slice(1, 3), dark[3])).toBe(155);
+    // The same change that stays (the hint closing) is not a flicker.
+    expect(flickerScore(dark[0], [dark[1]], dark[2])).toBe(0);
+  });
+  test('flickers keeps the best run where runs overlap', () => {
+    const scores = { '3-3': 18, '3-4': 30, '4-4': 16, '8-8': 40 };
+    expect(flickers(12, (from, to) => scores[`${from}-${to}`] ?? 0)).toEqual([{ from: 3, to: 4, score: 30 }, { from: 8, to: 8, score: 40 }]);
+  });
+  test('cell means average a cell, so a pose change inside it moves the mean little', () => {
+    const w = 4, h = 2, f = new Uint8Array(w * h * 3).fill(0);
+    for (let i = 0; i < 4; i++) f[(i % 2 + Math.floor(i / 2) * w) * 3] = 200; // the left 2x2 cell: red 200
+    expect([...cellMeans(f, { w, h, cols: 2, rows: 1 })]).toEqual([200, 0, 0, 0, 0, 0]);
   });
   test('the sheet is at most 1600 px wide, in rows of five', () => {
     const layout = sheetLayout({ count: 16, frameW: 960, frameH: 540 });
