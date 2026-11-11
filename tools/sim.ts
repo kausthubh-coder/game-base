@@ -59,10 +59,10 @@ function scenarios(names: string[]): number {
     const outcome = runScenario(scenario);
     const took = seconds(performance.now() - from);
     if (outcome.passed) {
-      console.log(`pass  ${scenario.name.padEnd(22)} ${String(outcome.inputs).padStart(3)} inputs, ${String(outcome.steps).padStart(6)} steps, ${took}, state ${outcome.hash}`);
+      console.log(`pass  ${scenario.name.padEnd(27)} ${String(outcome.inputs).padStart(3)} inputs, ${String(outcome.steps).padStart(6)} steps, ${took}, state ${outcome.hash}`);
     } else {
       failed++;
-      console.log(`FAIL  ${scenario.name.padEnd(22)} ${outcome.reason}`);
+      console.log(`FAIL  ${scenario.name.padEnd(27)} ${outcome.reason}`);
       console.log(`      ${scenario.about}`);
       console.log(`      again: bun tools/sim.ts scenarios ${scenario.name}`);
     }

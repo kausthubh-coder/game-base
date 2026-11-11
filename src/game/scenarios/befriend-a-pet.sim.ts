@@ -15,8 +15,9 @@ export const befriendAPet: Scenario = {
   inputs: [
     { do: 'teleport', to: { place: 'dead.garden', dx: 14 } },
     { do: 'wait', seconds: 1 },
-    { do: 'walk', to: { pet: 'leaftail' }, within: 2 },
-    { do: 'check', what: 'a run up to it startled it and it trusts nobody yet', that: (p) => count(p, 'pet.startled') >= 1 && pet(p).trust === 0 },
+    // A run of nine blocks, into the garden. The leaftail backs off as long as it is run at, so the run is short.
+    { do: 'walk', to: { place: 'dead.garden', dx: 5 } },
+    { do: 'check', what: 'a run toward it startled it and it trusts nobody yet', that: (p) => count(p, 'pet.startled') >= 1 && pet(p).trust === 0 },
     // It will not eat for 15 seconds after a fright.
     { do: 'wait', seconds: 16 },
     { do: 'feed', pet: 'leaftail' },

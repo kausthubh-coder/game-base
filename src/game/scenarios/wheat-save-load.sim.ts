@@ -4,7 +4,8 @@ import type { Input } from '../play/inputs.sim.ts';
 import type { Scenario } from '../play/scenario.sim.ts';
 import { WHEAT_INPUTS, WHEAT_START, wheatFacts } from './wheat-three-nights.sim.ts';
 
-const firstNight = WHEAT_INPUTS.findIndex((input) => input.do === 'interact');
+// The check on the morning of day 2 is the last input of the first night.
+const firstNight = WHEAT_INPUTS.findIndex((input) => input.do === 'check' && input.what.startsWith('on the morning of day 2'));
 const harvest = WHEAT_INPUTS.findIndex((input) => input.do === 'hit');
 const reload: Input = { do: 'reload' };
 

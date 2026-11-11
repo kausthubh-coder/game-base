@@ -3,6 +3,7 @@
 import type { Cell, Input } from '../play/inputs.sim.ts';
 import type { Fact, Scenario, Start } from '../play/scenario.sim.ts';
 import type { Play } from '../play/harness.sim.ts';
+import { NO_ROOF_TOAST, TOO_EARLY_TOAST } from '../placeables/index.sim.ts';
 
 /** A block of the grant's meadow, counted from its middle. `dy` -1 is the ground. */
 const at = (dx: number, dz: number, dy = -1): Cell => ({ place: 'grant.center', dx, dy, dz });
@@ -26,11 +27,17 @@ export const WHEAT_INPUTS: readonly Input[] = [
   // A bed, and a roof over its pillow: two planks beside it and one out over it.
   { do: 'take', item: 'bed' },
   { do: 'use', at: at(3, 1) },
+  // Under open sky the bed says why not.
+  { do: 'interact', prompt: 'Sleep' },
+  { do: 'check', what: 'a bed under open sky asks for a roof', that: (p) => p.game.clock.day === 1 && p.said.at(-1) === NO_ROOF_TOAST },
   { do: 'take', item: 'plank' },
   { do: 'use', at: at(4, 0) },
   { do: 'use', at: at(4, 0, 0) },
   { do: 'use', at: at(4, 0, 1), face: [-1, 0, 0] },
   { do: 'check', what: 'the bed is two blocks long with a plank over its pillow', that: (p) => bedAt(p, 3, 0) && bedAt(p, 3, 1) && !p.world.openSky(Math.floor(center(p).x) + 3, center(p).y + 1, Math.floor(center(p).z)) },
+  // In the morning the bed says it is too early.
+  { do: 'interact', prompt: 'Sleep' },
+  { do: 'check', what: 'a roofed bed in the morning says it is not evening yet', that: (p) => p.game.clock.day === 1 && p.said.at(-1) === TOO_EARLY_TOAST },
   // The field goes in at dusk, so nothing grows before the first night.
   { do: 'wait', until: 'evening' },
   { do: 'take', item: 'hoe' },
