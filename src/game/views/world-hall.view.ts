@@ -6,7 +6,9 @@
 // changed is set down again.
 //
 // The lume lights the ground too: one mesh of soft teal pools, under each lit lamp, round the Heartstone and
-// on the doorstep, where a little of it leaks under the shut door at night. They breathe slowly.
+// on the doorstep, where a little of it leaks under the shut door at night. They breathe slowly, and motes
+// of lume drift up from whatever is awake. When the Mark is taken in play the lamps wake one after another,
+// the pair by the door first.
 import * as THREE from 'three';
 import type { Systems } from '../api.sim.ts';
 import { HALL } from '../content/region.ts';
@@ -14,7 +16,11 @@ import type { GameView } from '../shell/view.ts';
 import { worldProps } from '../worldview/props.ts';
 
 /** Seconds between two looks at the flags. */
-const EVERY = 0.5;
+const EVERY = 0.2;
+/** Seconds between one lamp waking and the next. */
+const WAKE = 0.45;
+/** Seconds between two puffs of motes. */
+const MOTES = 0.6;
 /** From this level the Heartstone lights the whole court. */
 const BRIGHT = 10;
 /** The hall's lamps stand a little taller than a town lantern's post. */
@@ -88,7 +94,9 @@ export function install(view: GameView): void {
 
   const piece = (kind: string, at: { x: number; y: number; z: number }, variant: () => number, rotation = 0, scale = 1): Piece =>
     ({ kind, x: at.x, y: at.y, z: at.z, rotation, scale, variant, handle: 0, shown: -1 });
-  const lit = (): number => (flags.is('hall.lit') ? 1 : 0);
+  /** When the lamps began to wake, on the view's clock. Infinity while they are dark, long ago in a loaded game. */
+  let woke = Infinity, looked = false;
+  const lit = (i: number) => (): number => (view.ctx.time - woke >= i * WAKE ? 1 : 0);
   const level = (): number => (game.systems as Partial<Systems>).hall?.heart().level ?? 0;
   // Dull until the Mark is on the player's hand, faint with it, and awake once the player has touched it.
   const glow = (): number => {
@@ -102,7 +110,7 @@ export function install(view: GameView): void {
     piece('gateArch', HALL.gate, () => 0, EAST),
     piece('muralSlab', HALL.mural, () => 0),
     piece('plinth', HALL.plinth, () => 0),
-    ...HALL.lamps.map((at) => piece('hallLamp', at, lit, 0, LAMP_SIZE)),
+    ...HALL.lamps.map((at, i) => piece('hallLamp', at, lit(i), 0, LAMP_SIZE)),
     ...HALL.pillars.map((at, i) => piece('ruinPillar', at, () => at.variant, i * 1.3)),
   ];
 
@@ -110,7 +118,7 @@ export function install(view: GameView): void {
   const pool = (at: { x: number; y: number; z: number }, wide: number, strength: () => number, dz = 0): Pool =>
     ({ x: at.x, y: at.y, z: at.z + dz, wide, strength });
   const pools: Pool[] = [
-    ...HALL.lamps.map((at) => pool(at, 7, lit)),
+    ...HALL.lamps.map((at, i) => pool(at, 7, lit(i))),
     // The Heartstone: a breath of light with the Mark, the whole floor before it once it has been touched.
     pool(HALL.heartstone, 11, () => [0, 0.45, 1][glow()] + Math.min(0.5, level() / (BRIGHT * 2)), 1.2),
     // The doorstep: a thread of lume under the shut door, and the hall's light through it once it stands open.
@@ -164,15 +172,41 @@ export function install(view: GameView): void {
   let lightUp = false;
   setPools();
 
+  // What is awake gives off motes: the Heartstone, then each lamp in turn.
+  const from = { x: 0, y: 0, z: 0 };
+  let puff = 0, turn = 0;
+  function motes(): void {
+    turn = (turn + 1) % (HALL.lamps.length + 2);
+    // The Heartstone has two turns in each round.
+    const lamp = turn - 2;
+    if (lamp < 0) {
+      if (glow() === 0) return;
+      from.x = HALL.heartstone.x; from.y = HALL.heartstone.y + 0.6; from.z = HALL.heartstone.z + 0.4;
+    } else {
+      if (lit(lamp)() === 0) return;
+      const at = HALL.lamps[lamp];
+      from.x = at.x; from.y = at.y + 1.2; from.z = at.z;
+    }
+    view.effects.play('lume', from);
+  }
+
   let since = EVERY;
   view.onFrame((dt) => {
     // By day the lume is faint. At night it is what you see first. It breathes, slowly.
     const player = game.player.pos;
     mesh.visible = lightUp && Math.abs(player.x - HALL.doorAt.x) < FAR && Math.abs(player.z - HALL.doorAt.z) < FAR;
     uniforms.uStrength.value = (0.1 + 0.5 * view.sky.look.night) * (1 + 0.12 * Math.sin(view.ctx.time * 0.9));
+    puff += dt;
+    if (puff >= MOTES && mesh.visible) {
+      puff = 0;
+      motes();
+    }
     since += dt;
     if (since < EVERY) return;
     since = 0;
+    if (!flags.is('hall.lit')) woke = Infinity;
+    else if (woke === Infinity) woke = looked ? view.ctx.time : -Infinity;
+    looked = true;
     for (const p of pieces) {
       if (!props.has(p.kind)) continue;
       const variant = p.variant();

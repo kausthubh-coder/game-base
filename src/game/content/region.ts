@@ -315,6 +315,8 @@ export const HALL = {
   /** Broken pillars by the walls: where each stands and which of the three it is. */
   pillars: [
     { x: -23.5, y: HALL_GROUND, z: -256.5, variant: 2 }, { x: -10.5, y: HALL_GROUND, z: -258.5, variant: 1 }, { x: -20.5, y: HALL_GROUND, z: -254.5, variant: 0 },
+    // Two more outside, either side of the way to the door: what is left of a porch.
+    { x: -20.5, y: HALL_GROUND, z: -249.5, variant: 1 }, { x: -13.5, y: HALL_GROUND, z: -250.5, variant: 0 },
   ],
   lamps: [
     { x: -23.5, y: HALL_GROUND, z: -254.5 }, { x: -10.5, y: HALL_GROUND, z: -254.5 },
@@ -332,6 +334,8 @@ export const HALL = {
   one(-24, g, -257, 'barrier');
   one(-11, g, -259, 'barrier');
   one(-21, g, -255, 'barrier');
+  one(-21, g, -250, 'barrier');
+  one(-14, g, -251, 'barrier');
 }
 
 const PLACES: readonly PlanPlace[] = [
@@ -442,12 +446,23 @@ export const REGION: RegionPlan = {
     { kind: 'wildflowers', variant: 0, x: -5.5, y: GRANT_GROUND, z: -219.5, rotation: 0 },
     { kind: 'wildflowers', variant: 0, x: 1.5, y: GRANT_GROUND, z: -219.5, rotation: 1.6 },
     { kind: 'wildflowers', variant: 0, x: -6.5, y: GRANT_GROUND, z: -225.5, rotation: 3.1 },
+    // The Hall, a thousand years untended: flowers where the roots lifted the paving, bushes against its walls.
+    { kind: 'wildflowers', variant: 0, x: -22.5, y: HALL_GROUND, z: -261.5, rotation: 0.4 },
+    { kind: 'wildflowers', variant: 0, x: -11.5, y: HALL_GROUND, z: -255.5, rotation: 2.2 },
+    { kind: 'wildflowers', variant: 0, x: -20.5, y: HALL_GROUND, z: -257.5, rotation: 1.1 },
+    { kind: 'wildflowers', variant: 0, x: -13.5, y: HALL_GROUND, z: -262.5, rotation: 4 },
+    { kind: 'wildflowers', variant: 0, x: -19.5, y: HALL_GROUND, z: -251.5, rotation: 5.2 },
+    { kind: 'bush', variant: 0, x: -23, y: HALL_GROUND, z: -251.4, rotation: 0.9, scale: 0.9 },
+    { kind: 'bush', variant: 1, x: -11, y: HALL_GROUND, z: -251.3, rotation: 2.6, scale: 0.8 },
+    { kind: 'bush', variant: 2, x: -26.4, y: HALL_GROUND, z: -258, rotation: 4.1, scale: 1 },
   ],
   noTrees: [
     { x0: GRANT.x - 3, z0: GRANT.z - 3, x1: GRANT.x + GRANT.width + 2, z1: GRANT.z + GRANT.depth + 2 },
     { x0: -1, z0: -238, x1: 16, z1: -224 },
     { x0: GARDEN.x - 13, z0: GARDEN.z - 17, x1: GARDEN.x + 13, z1: GARDEN.z + 12 },
     { x0: COURT.x0 - 2, z0: COURT.z0 - 2, x1: COURT.x1 + 2, z1: COURT.z1 + 4 },
+    // And none close on its east side, where a crown would stand between the camera and the court.
+    { x0: COURT.x1, z0: COURT.z0 - 4, x1: COURT.x1 + 9, z1: COURT.z1 + 4 },
     { x0: 128, z0: -193, x1: 206, z1: -118 },
     ...BUSHES.map((b) => around(b.x, b.z, 2)),
   ],
