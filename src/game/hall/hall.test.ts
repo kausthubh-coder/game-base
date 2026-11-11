@@ -85,7 +85,7 @@ test('the open door, the woken Custodian and the fox on the doorstep come back f
   // It has walked on for a tenth of a second since: it stands where it was saved, to within its stride.
   const back = again.sys.hall.fox()!;
   expect(Math.hypot(back.x - fox!.x, back.z - fox!.z)).toBeLessThan(0.3);
-  expect(again.game.actors.get(FOX_ID)).toMatchObject({ sprite: 'leaftail', mark: 'alert' });
+  expect(again.game.actors.get(FOX_ID)).toMatchObject({ sprite: 'fox-blighted', mark: 'alert' });
   expect(again.game.actors.get(CUSTODIAN_ID)).toMatchObject({ anim: 'idle' });
 });
 
