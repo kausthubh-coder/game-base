@@ -1,6 +1,6 @@
 # fightview
 
-The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/views/lab-fight.view.ts` makes each part and calls them in order. The rules are `src/game/fight`; nothing here writes their state except through `fight.input`, `press`, `placeRig`, `bring`, `setWay` and the other calls a player could make. `docs/fight-lab.md` says how the lab fits together.
+The fight lab's picture, sound and interface, behind `?scene=fight` (the meadow) and `?scene=stag` (the Verdant Stag's hall). `src/game/views/lab-fight.view.ts` makes each part and calls them in order. The rules are `src/game/fight`; nothing here writes their state except through `fight.input`, `press`, `placeRig`, `bring`, `setWay` and the other calls a player could make. `docs/fight-lab.md` says how the lab fits together.
 
 ## What it exports
 
@@ -9,14 +9,14 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 | `keys.ts` | `createKeys(view, fight, hooks)` | Keys and mouse into `fight.input` and `press`, the rig in the hand, and the `steer` hook that steps the fight with the hero's body |
 | `feel.ts` | `createFeel(view, fight, hooks)`, `jolt`, `settle` | A fight event into a freeze, a jolt, a shake of the screen, a flash on the ground, particles and a sound. The table is `hear`. |
 | `looks.ts` | `createLooks(figures)`, `TEAL`, `GOLD`, `HOT`, `PALE`, `SHADE`, `RED` | Which sheet, frame, squash and tint a fighter shows for what it is doing, timed to the rules. The stand-in table. |
-| `draw.ts` | `createDraw(view, fight, stage, floor, keys, feel, hooks)`, `heightOf(view)` | Each frame: the fighters where the rules have them, their shadows, the shapes of attacks, the cut's arc, the pips of thrown light and the rigs |
+| `draw.ts` | `createDraw(view, fight, stage, floor, keys, feel, hooks)`, `heightOf(view)` | Each frame: the fighters where the rules have them, their shadows, the shapes of attacks, the cut's arc, the pips of thrown light and the rigs. `hooks.hall` says where the hall's floor, vines and wall are. |
 | `calm.ts` | `createCalming(view, ground, sparks, hooks)`, `CALM`, `SHUT` | The moment of calming around the beast: the thread of the hold, the release, the ash, the heart, the green, the gift and its name |
 | `figures.ts` | `createFigures(view)` | One quad per fighter: size, flash, shake, squash, roll, warm and teal glow, a mirror, drained grey, colors coming back |
-| `ground.ts` | `createGround(view)`, `MARK` | Every flat mark on the ground in one draw call |
+| `ground.ts` | `createGround(view)`, `MARK` | Every flat mark on the ground in one draw call. `clip` cuts them at a circle. |
 | `sparks.ts` | `createSparks(view)`, `SPARK` | Small 8 by 8 pixel pictures in the air, turned to the camera, in one draw call: motes, ash, a heart, flowers, pips and the gifts |
 | `rigs.ts` | `createRigViews(view)` | The four rigs and the rig in the hand, drawn with the game's rig props |
 | `arena.ts` | `stampArena`, `dressArena` | Stamps the arena into the block world and dresses it |
-| `panel.ui.ts` | `createPanel(root, log, actions)` | The card, the bars, the bar over the beast, the warm edge, "Again?" and the log. Where the bars go on a narrow window. |
+| `panel.ui.ts` | `createPanel(root, log, actions, { hall })` | The card, the bars, the bar over the beast, the warm edge, "Again?" and the log. Where the bars go on a narrow window. |
 | `log.ts` | `createLog()` | The fights that ended, kept in the browser, and sent to `fight-log` with `&log=1` |
 | `hall.ts` | `stampHall`, `setRamp`, `dressHall`, `createHallView(...)` | The Verdant Stag's hall in the world, behind `?scene=stag` |
 | `hall.ui.ts` | `createHallLine(root)` | The hall's line at the top: the phase, what to do, and the guard of the thing hit last |
@@ -24,7 +24,9 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 ## How a frame goes
 
 1. The hero's body steps 60 times a second. On each step `keys.ts` writes the keys into `fight.input`, steps the bot when it is on, steps the fight, hands each event to `feel.hear`, and moves the body as the fight says.
-2. Once a frame the view calls `keys.aim()` (the pointer on the ground), `feel.frame(dt)` (the shake), `draw.frame(dt, clock)` and `panel.update`. `draw.frame` also runs the moment of calming (`calm.ts`) for a beast whose clock is running.
+2. Once a frame the view calls `keys.aim()` (the pointer on the ground), `feel.frame(dt)` (the shake), `draw.frame(dt, clock)`, the hall's own frame in the hall, and `panel.update`. `draw.frame` also runs the moment of calming (`calm.ts`) for a beast whose clock is running.
+
+In the hall, `lab-fight.view.ts` wraps the body's step so the hall steps right after the fight, and wraps `feel.hear` so the hall hears the targets' events. `feel.ts` itself knows nothing of the hall.
 
 ## Facts
 
@@ -41,11 +43,12 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 - The game's hints are hidden in the lab. A rig refused near a beast shows a red ring at the distance the beast keeps clear.
 - A rig is its prop from `src/content/props.ts`, placed through `worldProps` like the game's stations: the armed prop while it is set, the spent one for the 1.2 seconds after it goes off, and a channel as three pieces in a row. Each kind costs one draw call. The rig in the hand is the armed prop, see-through, pale green where it can go and red where it cannot.
 - The snare vine is leaf green on grass, so `draw.ts` draws a bright ring where it lies, pulls the ring tight when it goes off, and keeps a ring around the feet of a beast it holds. The lamp keeps its circle of teal light, and the plate the pale ring of its hand spring's reach.
-- The card folds to its title when a beast wakes and opens again when the fight ends or the beast is taken away. A player who opens it during a fight keeps it open.
-- "Again?" is about one fight. A new beast, way or pet closes it, and "Fight it again" replays the way, pet and beast it names. A fight that ends while the lab waits to ask is not asked about once another starts.
-- A new way or pet brings the same beast back asleep. If a fight was on, it ends as left and the line over the bars says so.
+- The card folds to its title when a beast or the Stag wakes, and opens again when the fight ends, the beast is taken away or the Stag is freed. A player who opens it during a fight keeps it open.
+- "Again?" is about one fight. A new beast, way or pet closes it, and so does the hall starting over. "Fight it again" replays the way, pet and beast it names, or starts the hall again. A fight that ends while the lab waits to ask is not asked about once another starts. It says calmed for a beast, shut down for a machine and freed for the Stag, and so does the log.
+- A new way or pet brings the same beast back asleep. If a fight was on, it ends as left and the line over the bars says so. In the hall a new pet starts the hall over, since changing the pet clears the fight's targets.
+- In the hall the card shows what works there: "Start over" in place of the ways and the beasts, the hero's keys without the Mark and the pet's skill, and the three phases as its rules. The bars leave out the pet's skill.
 - Esc with a rig in the hand puts the rig back and does not pause. `keys.ts` hears Esc first because views install in the order of their file names, and `lab-fight` comes before `ui-panels`.
-- On a window too narrow for centered bars beside the card, the bars move right of it and wrap. "Again?" and the line over the bars center in the same room. Below 820 pixels high the card tightens, and below 720 it scrolls with its bar showing.
+- On a window too narrow for centered bars beside the card, the bars move right of it and wrap. "Again?" and the line over the bars center in the same room. "Again?" also keeps clear of the minimap and clock, 232 pixels of the top right corner, when it would reach them, and the hall's line always does. Below 820 pixels high the card tightens, and below 720 it scrolls with its bar showing.
 - The Log button's count is the log's length, read each frame.
 - Every view part works at low, medium and high quality. The draw path makes no mesh, material, color or vector per frame; a few small iterators and closures remain.
 
@@ -55,23 +58,24 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 
 - **The blocks.** `stampHall` paves the floor with cobble and two rings of stone brick (the painted land draws them as paving), clears the plot, sets a ring of barriers two high for the boulders, a barrier post under each pin and lamp, and the Stag's body as barriers eight high, taller than the top of the ramp. It runs every time the hall opens. `setRamp` adds or takes away the vines' ramp as barrier steps, one block higher every two cells; the painted hero walks up a one-block step.
 - **The Stag.** Two merged meshes built from spheres and rods in the palette: the body (about 8 blocks at the shoulder), and the neck, head and antlers (past 14), which turn and dip with `hall.stag`. A sweep turns the head to the side it comes from, lowers the antlers, and swings them across as it lands. A stamp rears the front up and drops it. A shake rolls the body. A stagger hangs the head. Between phases it throws its head up. Freed, it stands still, then lowers its head to the hero.
-- **Grey and color.** One uniform, `uDrain`, is a height in the world above which the colors are back. It stays above everything until the collar breaks, then falls from the antlers to the hooves in about two and a half seconds. The vines keep their colors: they are alive.
+- **Grey and color.** One uniform, `uDrain`, is a height in the world above which the colors are back. It stays above everything until the collar breaks, then falls from the antlers to the hooves in about two and a half seconds, and flecks of ash lift off where it passes, through the lab's sparks. The vines keep their colors: they are alive.
+- **Dusk.** A second uniform, `uDusk`, follows the hall's hour toward dusk. The body keeps a pale rim of light and some of its own color, so at dusk it reads as a body with a head and antlers, not a black shape.
 - **The rest.** The gold chains are one instanced mesh of links on sagging curves; a pin's end drops to the floor when it breaks, and every end on the collar drops when the Stag is freed. The pins topple when broken. The lamp heads glow once lit. The pods are one instanced mesh, growing and warming toward their burst. The roots flood out from the legs over the second phase's rise, and the ramp grows up out of the floor over the third's.
 - **The hour.** The hall keeps its own hour: morning, then dusk while the lamps are dark, then morning again once they are lit. The lit lamps draw warm circles on the floor.
-- **The marks.** The hall's own `ground.ts` batch: a ring round each target it can hit now with its guard as a gold arc, the collar's ring on the top of the ramp, the light of the lamps, and a shake drawn at the height of the hero's feet on the vines. `draw.ts` still draws every loose shape on the floor as it draws any attack.
-- **The feel.** A hit on a target freezes the fight 4 frames (3 for a pod), as a hit on a beast does. A broken pin freezes 8, a phase 10, and the collar 20, note 05's "A Warden phase ends". `feel.hear` is wrapped to hear the targets' events; `feel.ts` itself is unchanged.
+- **The marks.** The hall has its own `ground.ts` batch. It draws a ring round each target the hero can hit now, with its guard as a gold arc, the collar's ring on the top of the ramp, and the light of the lamps. It also draws each shake, on every step of the vines the shake covers, at that step's height. `draw.ts` draws the other shapes as for any attack, at the hall's floor or the top of the vines, cut at the hall's wall, and without the meadow's edge ring.
+- **The feel.** A hit on a target freezes the fight 4 frames (3 for a pod), as a hit on a beast does, so a cut on a pin, a lamp, a pod or the collar holds its strike frame. A broken pin freezes 8, a phase 10, and the collar 20, note 05's "A Warden phase ends".
 - **The camera** goes to its furthest step when the hall opens. The wheel brings it in as anywhere.
-- The hall's meshes and marks draw about 16,000 triangles with their shadows, and about 12 draw calls.
+- The hall's meshes and marks draw about 14,500 triangles with their shadows, and about 12 draw calls.
 
 ## The door
 
-`window.__fight`, only with `?scene=fight`:
+`window.__fight`, only with `?scene=fight` or `?scene=stag`:
 
 | Call | What it gives |
 |---|---|
 | `fight` | The fight itself |
 | `bot(on, layout)` | Lets the rule-made player fight, or hands the keys back. `layout` is `rigs` or `wall`. |
-| `state()` | Plain data: the way, the phase, the hero, the pet, the first beast, the rigs, the record, the rig in the hand, the shake in pixels, and how many figures and marks are drawn |
+| `state()` | Plain data: the way, the phase, the hero with its seconds in its act, the pet, the first beast, the rigs, the record, the rig in the hand, the shake in pixels, the freeze left, how many figures and marks are drawn, and the hall |
 | `log()` | The fights that ended, with their answers |
 | `standIns()` | Which art is a stand-in right now |
 | `screen(x, z)` | Where a point of the ground is on the page |
@@ -86,7 +90,7 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 ## Checks
 
 - `bun tools/fight-play.mjs --port <port> --way <way> --beast <beast>` plays one fight in headless Chrome through the door. `--keys` plays it with real keys and mouse instead, `--pet pebblepup` picks the second pet, `--layout wall` sets no rigs, `--quality low` holds a quality level, and `--log` turns on `&log=1`. `--card` checks the card instead of playing one fight: "Again?", Esc with a rig in the hand, the fold and the log's count. Pictures go to `.artifacts/fight/`. It prints the cost during the fight and through the calming.
-- `bun tools/fight-play.mjs --port <port> --scene stag` plays the Stag's hall, by its bot or with `--keys`. It takes a picture at each zoom step and in each phase, and prints the hall's record, draw calls, triangles (and the hall's own) and script time.
+- `bun tools/fight-play.mjs --port <port> --scene stag` plays the Stag's hall, by its bot or with `--keys`, and `--size 1024x640` in a smaller window. It checks the card in the hall, the strike frame of a cut on each kind of target, and that no panel covers another. It takes a picture at each zoom step, in each phase and of each strike, and prints the hall's record, then draw calls, triangles (and the hall's own) and script time, in all and in each phase.
 - `bun tools/fight-poses.mjs --port <port>` shoots every state of every fighter in three views, one sheet each in `.artifacts/fight/poses/`. `--only hero` shoots one.
 - `bun tools/fight-strip.mjs --port <port> --beast <beast>` shoots nine frames through one calming, in order, into `.artifacts/fight/strips/`. `--still` turns on reduce motion first.
 - `bun tools/fight-serve.mjs <folder> <port>` serves a build and writes what `&log=1` sends to `.artifacts/fight/ratings.jsonl`.

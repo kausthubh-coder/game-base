@@ -112,7 +112,7 @@ The record's `way` may be `stag`, and a boss puts its own numbers in `record.bos
 - **The collar.** The vines grow a ramp, two cells wide, up the Stag's east flank from the floor to six blocks at its shoulder. It counts as water to the stage, so the pet stays below. A hero on it gets shakes instead of sweeps: a stretch of 3.2 blocks of the ramp, 1.2 seconds of lead, and a hit throws the hero 3.5 blocks out, off the vines to the floor. The collar, 120 guard, opens to a hero five or more blocks up the ramp, and only the hero's own cut reaches it. A floor attack never lands on a hero up the vines, and a shake never lands on the floor.
 - Between two phases the Stag rears for 1.5 seconds. After an attack it stands 1 second, then waits 0.8 seconds (1.2 in the overgrowth). It never goes more than about four seconds without an attack on the ground while the hero is up.
 - A hero who faints wakes at the door. The Stag keeps its phase and everything broken. It waits for the hero to wake before it attacks again.
-- Breaking the collar frees it: the hall sends `freed`, stops, and calls `onEnd` with a record whose `way` is `stag` and whose `result` is `calmed`. `restart()` starts the hall over from the chains and reports one in progress as `left`.
+- Breaking the collar frees it: the hall sends `freed`, stops, and calls `onEnd` with a record whose `way` is `stag` and whose `result` is `calmed`, which the card and the log show as freed. `restart()` starts the hall over from the chains and reports one in progress as `left`.
 
 `hall.events` holds the hall's own events for the view: `woke`, `phase`, `pin`, `lamp`, `sprout`, `burst`, `cut`, `wither`, `fall`, `stagger`, `freed`, `restart`.
 

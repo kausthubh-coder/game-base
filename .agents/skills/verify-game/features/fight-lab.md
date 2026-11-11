@@ -1,6 +1,6 @@
 # Fight lab
 
-A test scene where three ways of fighting are played against the same three beasts: the hero fights, the pet fights, or rigs on the ground do. It is behind `?scene=fight` and changes nothing in the game without it.
+A test scene with two places to fight. In the meadow, behind `?scene=fight`, three ways of fighting are played against the same three beasts: the hero fights, the pet fights, or rigs on the ground do. In the Verdant Stag's hall, behind `?scene=stag`, the hero fights a giant boss. Without either flag nothing in the game changes.
 
 ## Sub-features
 
@@ -11,9 +11,9 @@ A test scene where three ways of fighting are played against the same three beas
 - `calming`: the moment a beast is calmed or a machine shut down, from the hold to the gift (`fightview/calm.ts`).
 - `pets`: the leaftail and the pebblepup, picked on the card. The pebblepup's brace takes an attack for the hero.
 - `rigs`: the world way's lamp, snare vine, spring plate and water channel, drawn with the game's rig props (`fightview/rigs.ts`), with the lab's rings so they read on grass.
-- `card`: the card folds when a beast wakes and opens when the fight ends, Esc puts back a rig in the hand before it pauses, and the bars move right of the card on a narrow window.
-- `again`: after a win the lab asks "Again?" and keeps the answer with the fight's numbers. The card is about one fight and closes when the beast, way or pet changes. With `&log=1` and `tools/fight-serve.mjs` the answers land in `.artifacts/fight/ratings.jsonl`.
-- `stag`: the Verdant Stag's hall behind `?scene=stag`, the first boss test. Three phases: the chains, the overgrowth, the collar. It ends with the Stag freed and "Again?" logged with the way `stag`.
+- `card`: the card folds when a beast or the Stag wakes and opens when the fight ends, Esc puts back a rig in the hand before it pauses, and the bars move right of the card on a narrow window. In the hall it shows only what works there.
+- `again`: after a win the lab asks "Again?" and keeps the answer with the fight's numbers. The card is about one fight and closes when the beast, way or pet changes, or the hall starts over. With `&log=1` and `tools/fight-serve.mjs` the answers land in `.artifacts/fight/ratings.jsonl`.
+- `stag`: the Verdant Stag's hall, the first boss test. Three phases: the chains, the overgrowth, the collar. A cut on a pin, a lamp, a pod or the collar holds its strike frame through the freeze, as on a beast. It ends with the Stag freed, ash lifting off it as its colors come back, and "Again?" logged with the way `stag`.
 
 ## How to get to it (user POV)
 
@@ -32,7 +32,8 @@ Preconditions: `bun tools/doctor.mjs` is clean, its `export PORT=â€¦ PLAY_PORT=â
 | `looks.ts`, `figures.ts` or a fight sheet | `bun tools/fight-poses.mjs --port $PORT`, and look at every sheet in `.artifacts/fight/poses/` |
 | `calm.ts`, `sparks.ts`, or the calm in `looks.ts` or `feel.ts` | `bun tools/fight-strip.mjs --port $PORT --beast <beast>` for the thistlehog, the boar and the gearling, once more with `--still`, and look at each strip in `.artifacts/fight/strips/` |
 | `tools/fight-play.mjs` or `tools/fight-serve.mjs` | The run that uses it, and the build run below |
-| `src/game/fight/hall*.ts`, `src/game/fightview/hall*.ts`, the `STAG` numbers, or the boss hooks in `fight.sim.ts` | `bun test src/game/fight`, `bun tools/fight-sim.ts stag --seeds 30` (all freed), then the three Stag runs below and a look at their pictures |
+| `src/game/fight/hall*.ts`, `src/game/fightview/hall*.ts`, the `STAG` numbers, or the boss hooks in `fight.sim.ts` | `bun test src/game/fight`, `bun tools/fight-sim.ts stag --seeds 30` (all freed), then the Stag runs below and a look at their pictures |
+| `panel.ui.ts`, `hall.ui.ts`, or the hall's part of `draw.ts` or `ground.ts` | The Stag runs below, and once with `--size 1280x720` and `--size 1024x640` |
 | Anything at all | `bun run check`, and `http://localhost:$PORT/` without the flag opens the game with no console error and no `window.__fight` |
 
 The bot runs, one line each, with the arguments written out (a loop over a quoted string passes it as one argument in zsh and plays the defaults):
@@ -65,16 +66,18 @@ bun tools/fight-play.mjs --port $PORT --way pet --beast thistlehog --pet pebblep
 bun tools/fight-play.mjs --port $PORT --way pet --beast boar --pet pebblepup --keys
 ```
 
-The Stag's hall, by its bot at each quality and once with real keys and mouse:
+The Stag's hall, by its bot and with real keys and mouse, at each quality:
 
 ```sh
 bun tools/fight-play.mjs --port $PORT --scene stag --quality low
 bun tools/fight-play.mjs --port $PORT --scene stag --quality medium
 bun tools/fight-play.mjs --port $PORT --scene stag
+bun tools/fight-play.mjs --port $PORT --scene stag --keys --quality low
+bun tools/fight-play.mjs --port $PORT --scene stag --keys --quality medium
 bun tools/fight-play.mjs --port $PORT --scene stag --keys
 ```
 
-Each prints the hall's record (seconds in each phase, hits by attack, faints, the longest wait for an attack), the draw calls, the triangles with the hall's own share, and the script time, and the cost of each zoom step. A clumsy player against the boar in every way, with no browser: `bun tools/fight-sim.ts clumsy`.
+Each checks the card in the hall (only what works there, folded while the Stag is awake, open once it is freed, "Again?" saying freed), that no panel covers another or the minimap, and that each cut on a pin, a lamp, a pod and the collar landed on its strike frame with the freeze of a hit. It prints the hall's record (seconds in each phase, hits by attack, faints, the longest wait for an attack), then the draw calls, the triangles with the hall's own share and the script time, in all and in each phase, and the cost of each zoom step. A run where the bot cut no pod says so and skips that check. A clumsy player against the boar in every way, with no browser: `bun tools/fight-sim.ts clumsy`.
 
 A built copy with the log on:
 
@@ -90,18 +93,17 @@ kill <the pid it printed>
 
 - Each run ends with `no console errors`, exits 0, and prints note 08's checks for its way with their numbers. The bot never gets hit, so its numbers are a floor for a person's.
 - Look at the pictures in `.artifacts/fight/<way>-<beast>-*.png` yourself: `tell` (the shape on the ground), `dizzy`, `calming` (the thread and the ring closing), `colors-return` (the line of color part way down), `bow` (the heart, the green, the gift) and `again`. A run that passes with a picture that reads badly is not done.
-- For the hall, `.artifacts/fight/stag-*.png` (`stag-keys-*`, `stag-low-*`, `stag-medium-*`): `zoom-0` to `zoom-4`, `chains-sweep` (the head turned to the side the sweep comes from), `chains-stamp`, `chains-pin` (a toppled pin, its chain down), `overgrowth-pods` (dusk, pods with rings), `overgrowth-lamps`, `collar-vines`, `collar-climb`, `collar-shake` (the gold strip on the vines), `collar-cut`, `freed`, `colors-return`, `head-lowered` and `again`.
+- For the hall, `.artifacts/fight/stag-*.png` (`stag-keys-*`, `stag-low-*`, `stag-medium-*`, `-1024` for a smaller window): `zoom-0` to `zoom-4`, `chains-sweep` (the head turned to the side the sweep comes from, the gold cut at the wall), `chains-stamp`, `chains-pin` (a toppled pin, its chain down), `strike-pin`, `strike-lamp`, `strike-pod` and `strike-collar` (the hero on the strike frame, the cut's arc on the ground), `overgrowth-pods` (dusk, the Stag still a body with a head and antlers, pods with rings), `overgrowth-lamps`, `collar-vines`, `collar-climb`, `collar-shake` (gold on the steps of the vines, nothing on the floor under its belly), `collar-cut`, `freed`, `colors-return` (ash lifting off), `head-lowered` and `again`. No pale ring shows outside the hall's wall.
 - `--quality low`, `medium` and `high` each print draw calls, triangles and script time, during the fight and through the calming. The budget is 150 draw calls, 400,000 triangles and 6 ms of script a frame. Never report a frame rate from this Mac.
 - A pose sheet (`fight-poses.mjs`) holds every state of one fighter in three views. Feet sit on the shadow, the strike frame shows at `cut t=.10`, the hero is there at `safe after a hit`, and nothing is squashed out of its drawing.
 - A strip (`fight-strip.mjs`) is nine frames in order: the hold, the release, then the moment by seconds. Grey runs out from the head down, then the bow and the heart, the green ring and flowers, the gift in flight with its name. The gearling has no ash, no heart and no green. `--still` shows the same story with nothing moving.
 
 ## Gotchas
 
-- `fight-poses.mjs` and `fight-strip.mjs` drive the lab through `__fight.hold` and `__fight.slow`. They leave the rules running and the picture at full speed when they end, but a page they used is not a clean page for a fight.
-
+- `fight-poses.mjs` and `fight-strip.mjs` drive the lab through `__fight.hold` and `__fight.slow`. They leave the rules running and the picture at full speed when they end, but a page they used is not a clean page for a fight. The hall's run holds the rules for a moment at each first strike, for its picture.
 - `.artifacts/fight/ratings.jsonl` also holds Kausthubh's own answers. When a served copy is out for him to play, run the build check without `--log` and never open a page with `log=1`.
 - The lab keeps its own save (`greenhollow.save.fight`) and its own log in the browser. `fight-play.mjs` empties the log first.
 - The game's meter gives script time as a mean over the last 2 seconds. `fight-play.mjs` leaves out the first 2.5 seconds of a fight, which still hold the page loading (the meter reads about 16 ms there), so its peak is the worst 2-second mean once settled. A peak over 6 ms from an older copy of the tool is the load, not the lab.
-- The Stag's hall at high quality, from the top of the vines at the furthest zoom step, draws up to about 400,000 triangles. The hall's own meshes are about 16,000 of them: the run prints both. A run over budget there is the valley, not the hall.
+- The Stag's hall at high quality, from the top of the vines at the furthest zoom step, draws up to about 397,000 triangles. The hall's own meshes are about 14,500 of them: the run prints both. The valley's share moves by a few hundred from run to run, so a peak near 400,000 there is the valley, not the hall.
 - The hall's stamped blocks are part of its save (`greenhollow.save.stag`). It stamps itself again every time it opens, so a ramp left in the save never stands at the start.
 - A fight played twice in one page counts toward "different layouts that beat the boar". Each run of the tool empties the log, so one run never shows it: the rigs run and the `--layout wall` run are the two layouts.
