@@ -10,7 +10,7 @@
     "typecheck": "bun tools/typecheck.mjs",
     "test": "bun test src",
     "boundaries": "bun tools/boundaries.mjs",
-    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && tsc -p server && tsc -p server/test && bun test src server",
+    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && tsc -p server && tsc -p server/test && bun test src server && vitest run --root convex",
     "demo:build": "bun tools/demo.mjs build",
     "demo:dev": "bun tools/demo.mjs dev",
     "serve": "bun tools/serve.mjs",
@@ -24,12 +24,15 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
     "@cloudflare/workers-types": "^5.20261110.1",
+    "@edge-runtime/vm": "^5.0.0",
     "@types/bun": "^1.4.4",
     "@types/three": "^0.187.0",
+    "convex-test": "^0.0.69",
     "playwright-core": "^1.65.0",
     "sharp": "^0.35.5",
     "typescript": "~7.0.2",
     "vite": "^8.3.6",
+    "vitest": "^5.1.0",
     "wrangler": "^4.160.1"
   },
   "dependencies": {

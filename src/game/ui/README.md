@@ -17,11 +17,12 @@ separate feature and is not here.
 
 | Method | What it does |
 |---|---|
-| `open(panel, detail?)` | Opens `bag`, `make`, `almanac`, `quests`, `title`, `pause`, `settings` or `end`. `detail` is a page id for the Almanac, or `'hand'` to open the bag on its "By hand" tab. |
-| `close()` | Closes the open panel. Settings goes back to the title or the pause menu it came from. |
+| `open(panel, detail?)` | Opens `bag`, `make`, `almanac`, `quests`, `title`, `pause`, `settings`, `account` or `end`. `detail` is a page id for the Almanac, or `'hand'` to open the bag on its "By hand" tab. |
+| `close()` | Closes the open panel. Settings and Account go back to the title or the pause menu they came from. |
 | `toggle(panel)` | Opens it, or closes it when it is the open one. |
 | `isOpen(panel?)` | True when that panel is open. With no name: true when any is. |
 | `settings()` | A copy of the stored settings. |
+| `setAccount(panel)` | Gives the pause menu an Account entry that opens the `PanelView` this function returns. Without it there is no entry and `open('account')` does nothing. `src/game/views/ui-account.view.ts` calls it. |
 | `notices.hold(on)` | While held, the hint and the Almanac's note at the top step aside and their time stands still. A story card holds them while it shows. |
 | `notices.skip(id)` | A hint with this id is never shown, because something on screen already says it. |
 | `dispose()` | Removes every element and listener. |

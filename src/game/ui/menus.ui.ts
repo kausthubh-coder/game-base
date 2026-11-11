@@ -50,16 +50,19 @@ export function titlePanel(ctx: UiContext): PanelView {
   return view;
 }
 
-export function pausePanel(ctx: UiContext): PanelView {
+/** `account` is true when a view has given the interface an Account panel to open. */
+export function pausePanel(ctx: UiContext, account: boolean): PanelView {
   const body = h('div', { class: 'gu-menu' });
   return {
     title: 'Paused',
     className: 'gu-panel-pause',
     body,
     render() {
-      body.replaceChildren(
+      body.replaceChildren();
+      add(body,
         button('Resume', () => ctx.ui.close(), { class: 'gu-btn gu-primary' }),
         button('Settings', () => ctx.ui.open('settings')),
+        account && button('Account', () => ctx.ui.open('account'), { 'data-key': 'pause:account' }),
         button('Save and return to title', () => { ctx.sound('click'); ctx.options.saveAndQuit(); ctx.ui.open('title'); }),
       );
     },

@@ -57,7 +57,7 @@ export interface KeyHint {
   keys: readonly string[];
 }
 
-export type PanelName = 'bag' | 'make' | 'almanac' | 'quests' | 'title' | 'pause' | 'settings' | 'end';
+export type PanelName = 'bag' | 'make' | 'almanac' | 'quests' | 'title' | 'pause' | 'settings' | 'account' | 'end';
 
 export interface GameUiOptions {
   /** An icon from the manifest by name, or null when it has none. Null draws a plain square with two letters. */
@@ -127,6 +127,11 @@ export interface GameUi {
   isOpen(panel?: PanelName): boolean;
   /** The stored settings. */
   settings(): Settings;
+  /**
+   * Gives the pause menu an Account entry that opens this panel. Closing it goes back to the pause menu.
+   * Until a view calls this the pause menu has no such entry, and `open('account')` does nothing.
+   */
+  setAccount(panel: () => PanelView): void;
   /** The hints and the Almanac's note at the top of the screen. */
   readonly notices: {
     /** While held they step aside and their time stands still, so a story card can have the top of the screen. */

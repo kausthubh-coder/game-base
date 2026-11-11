@@ -18,8 +18,9 @@ const config = { url: 'https://happy-otter-123.convex.cloud/', siteUrl: 'https:/
 
 describe('the Convex gate', () => {
   test('mayEnter is the worlds:mayEnter query, asked with the player\'s token', async () => {
-    const { fetcher, calls } = convex(() => Response.json({ status: 'success', value: true, logLines: [] }));
-    expect(await convexGate(config, fetcher).mayEnter('w1', 'the-players-token')).toBe(true);
+    const yes = { allowed: true, role: 'owner', playerId: 'p1', playerName: 'Ann', worldName: 'Hollow Oak', kind: 'online' };
+    const { fetcher, calls } = convex(() => Response.json({ status: 'success', value: yes, logLines: [] }));
+    expect(await convexGate(config, fetcher).mayEnter('w1', 'the-players-token')).toEqual({ playerId: 'p1', playerName: 'Ann' });
     expect(calls).toEqual([{
       url: 'https://happy-otter-123.convex.cloud/api/query',
       method: 'POST',
@@ -28,24 +29,27 @@ describe('the Convex gate', () => {
     }]);
   });
 
-  test('only a plain yes lets a player in', async () => {
-    const answers: [unknown, boolean][] = [[true, true], [{ allowed: true }, true], [false, false], [{ allowed: false }, false], [null, false], ['yes', false]];
+  test('only `allowed: true` lets a player in', async () => {
+    const answers: [unknown, boolean][] = [
+      [{ allowed: true }, true], [{ allowed: false, reason: 'notAllowed' }, false], [{ allowed: false, reason: 'signedOut' }, false],
+      [true, false], [false, false], [null, false], ['yes', false],
+    ];
     for (const [value, expected] of answers) {
       const { fetcher } = convex(() => Response.json({ status: 'success', value }));
-      expect(await convexGate(config, fetcher).mayEnter('w1', 't')).toBe(expected);
+      expect((await convexGate(config, fetcher).mayEnter('w1', 't')) !== null, JSON.stringify(value)).toBe(expected);
     }
     const failed = convex(() => Response.json({ status: 'error', errorMessage: 'Not signed in' }));
-    expect(await convexGate(config, failed.fetcher).mayEnter('w1', 't')).toBe(false);
+    expect(await convexGate(config, failed.fetcher).mayEnter('w1', 't')).toBeNull();
     const down = (async () => { throw new Error('no network'); }) as unknown as typeof fetch;
-    expect(await convexGate(config, down).mayEnter('w1', 't')).toBe(false);
+    expect(await convexGate(config, down).mayEnter('w1', 't')).toBeNull();
   });
 
-  test('the card is posted to /world-card with the shared secret', async () => {
+  test('the card is posted to /world-server/card with the shared secret', async () => {
     const { fetcher, calls } = convex(() => new Response(null, { status: 200 }));
-    const card = { worldId: 'w1', players: [{ id: 'user_2abc', name: 'Ann' }], lastPlayed: 1_800_000_000_000 };
+    const card = { worldId: 'w1', playersNow: ['p1'], lastPlayedAt: 1_800_000_000_000 };
     await convexGate(config, fetcher).postCard(card);
     expect(calls).toEqual([{
-      url: 'https://happy-otter-123.convex.site/world-card',
+      url: 'https://happy-otter-123.convex.site/world-server/card',
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer s3cret' },
       body: card,
@@ -54,15 +58,15 @@ describe('the Convex gate', () => {
 
   test('a card that cannot be posted does not throw', async () => {
     const refused = convex(() => new Response('no', { status: 401 }));
-    await convexGate(config, refused.fetcher).postCard({ worldId: 'w1', players: [], lastPlayed: 0 });
+    await convexGate(config, refused.fetcher).postCard({ worldId: 'w1', playersNow: [], lastPlayedAt: 0 });
     const down = (async () => { throw new Error('no network'); }) as unknown as typeof fetch;
-    await convexGate(config, down).postCard({ worldId: 'w1', players: [], lastPlayed: 0 });
+    await convexGate(config, down).postCard({ worldId: 'w1', playersNow: [], lastPlayedAt: 0 });
   });
 });
 
 describe('the stand-ins', () => {
   test('the open gate lets everyone in, the shut gate nobody', async () => {
-    expect(await openGate.mayEnter('w1', 't')).toBe(true);
-    expect(await shutGate.mayEnter('w1', 't')).toBe(false);
+    expect(await openGate.mayEnter('w1', 't')).toEqual({});
+    expect(await shutGate.mayEnter('w1', 't')).toBeNull();
   });
 });

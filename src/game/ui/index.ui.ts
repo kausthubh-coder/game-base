@@ -15,9 +15,11 @@ import { STYLES } from './styles.ui.ts';
 import type { GameUi, GameUiOptions, PanelName, PanelView, Settings, UiContext, VolumeChannel } from './types.ui.ts';
 
 export { DEFAULT_KEYS, DEFAULT_SETTINGS } from './logic.ui.ts';
-export type { EndStats, GameUi, GameUiOptions, IconRef, KeyHint, NineSlice, PanelName, PictureRef, Quality, Settings, VolumeChannel } from './types.ui.ts';
+export type { EndStats, GameUi, GameUiOptions, IconRef, KeyHint, NineSlice, PanelName, PanelView, PictureRef, Quality, Settings, VolumeChannel } from './types.ui.ts';
 
-const PANELS: readonly PanelName[] = ['bag', 'make', 'almanac', 'quests', 'title', 'pause', 'settings', 'end'];
+const PANELS: readonly PanelName[] = ['bag', 'make', 'almanac', 'quests', 'title', 'pause', 'settings', 'account', 'end'];
+/** Panels opened from the title or the pause menu. Closing one goes back to the menu it came from. */
+const NESTED: readonly PanelName[] = ['settings', 'account'];
 /** Panels the player opens and closes freely while playing. A click outside closes them, and their keys swap between them. */
 const LIGHT: readonly PanelName[] = ['bag', 'make', 'almanac', 'quests'];
 const VOLUMES: readonly VolumeChannel[] = ['music', 'ambience', 'effects', 'voice'];
@@ -66,16 +68,18 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
   let current: PanelName | null = null;
   let view: PanelView | null = null;
   let panel: HTMLElement | null = null;
-  /** The panel Settings was opened from, to go back to. */
-  let behindSettings: PanelName | null = null;
+  /** The panel Settings or Account was opened from, to go back to. */
+  let behind: PanelName | null = null;
+  /** The Account panel, once a view has given one. */
+  let account: (() => PanelView) | null = null;
   /** What had the focus before the first panel opened. */
   let focusBefore: HTMLElement | null = null;
 
   const ui: GameUi = {
     open(name, detail) {
-      if (!PANELS.includes(name)) return;
+      if (!PANELS.includes(name) || (name === 'account' && !account)) return;
       if (current === null) focusBefore = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      if (name === 'settings') behindSettings = current === 'title' || current === 'pause' ? current : null;
+      if (NESTED.includes(name)) behind = current === 'title' || current === 'pause' ? current : null;
       current = name;
       view = build(name, detail);
       const framed = view.framed !== false;
@@ -84,7 +88,7 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
           ? h('header', { class: 'gu-panel-head' },
               h('h2', { class: 'gu-panel-title' }, view.title),
               view.head ?? null,
-              h('button', { class: 'gu-close', type: 'button', 'aria-label': name === 'settings' && behindSettings ? 'Back' : 'Close', onclick: () => ui.close() }, '×'),
+              h('button', { class: 'gu-close', type: 'button', 'aria-label': NESTED.includes(name) && behind ? 'Back' : 'Close', onclick: () => ui.close() }, '×'),
             )
           : null,
         h('div', { class: 'gu-panel-body' }, view.body),
@@ -101,7 +105,7 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
     },
     close() {
       if (current === null) return;
-      if (current === 'settings' && behindSettings) return ui.open(behindSettings);
+      if (NESTED.includes(current) && behind) return ui.open(behind);
       current = view = panel = null;
       stage.hidden = true;
       stage.replaceChildren();
@@ -118,6 +122,9 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
     },
     isOpen: (name) => (name ? current === name : current !== null),
     settings: () => ({ ...settings }),
+    setAccount(panel) {
+      account = panel;
+    },
     notices: {
       hold: (on) => overlay.hold(on),
       skip: (id) => overlay.skip(id),
@@ -158,8 +165,9 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
       case 'almanac': return almanacPanel(ctx, detail);
       case 'quests': return questsPanel(ctx);
       case 'title': return titlePanel(ctx);
-      case 'pause': return pausePanel(ctx);
+      case 'pause': return pausePanel(ctx, account !== null);
       case 'settings': return settingsPanel(ctx);
+      case 'account': return account ? account() : pausePanel(ctx, false);
       case 'end': return endPanel(ctx);
     }
   };

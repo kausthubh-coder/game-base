@@ -158,28 +158,25 @@ Content-Type: application/json
 { "path": "worlds:mayEnter", "args": { "worldId": "<id>" }, "format": "json" }
 ```
 
-The server lets the player in when the answer is `{ "status": "success", "value": true }`. It also reads
-`{ "allowed": true }` as the value. Anything else, an error or no answer in 5 seconds keeps the player out.
+The server lets the player in when the answer is `{ "status": "success", "value": { "allowed": true, ... } }`.
+It takes `playerId` (the player's profile id) and `playerName` from that answer: the name is what other players
+see, and the id is what the card lists. Anything else, an error or no answer in 5 seconds keeps the player out.
 `worldId` is the `<id>` of `/world/<id>`. Convex reads who is asking from the token, the same token the
-browser shows Convex.
+browser shows Convex. `convex/README.md` has Convex's side of both calls.
 
 **2. The world's card.** When a player joins or leaves, and every 5 minutes while the world is awake.
 
 ```
-POST <CONVEX_SITE_URL>/world-card
+POST <CONVEX_SITE_URL>/world-server/card
 Authorization: Bearer <WORLD_SERVER_SECRET>
 Content-Type: application/json
 
-{ "worldId": "<id>", "players": [{ "id": "<Clerk user id>", "name": "<name>" }], "lastPlayed": 1794412800000 }
+{ "worldId": "<id>", "playersNow": ["<playerId>"], "lastPlayedAt": 1794412800000 }
 ```
 
-`players` is everyone in the world now, and empty after the last one left. `lastPlayed` is milliseconds
-since 1970. Any 2xx answer is fine. A failed post is logged and not tried again.
-
-Two things to settle with the Convex side:
-
-- The card has no world name. The server never learns one: the menu that makes a world gives its name to Convex. If the name should come from the server, `mayEnter` can answer `{ allowed, name }` and the server can send it back.
-- A player's name is the token's `name` claim, or `Player`. Clerk's default token has no `name`. Convex knows the profile, so it can ignore the name and use the id.
+`playersNow` is the `playerId` of everyone in the world now, and empty after the last one left. `lastPlayedAt`
+is milliseconds since 1970. Any 2xx answer is fine. A failed post is logged and not tried again. The world's
+name is Convex's: the menu that makes a world gives it there, so the server sends none.
 
 ## What the rules cannot do yet
 

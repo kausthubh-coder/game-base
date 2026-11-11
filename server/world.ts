@@ -77,6 +77,8 @@ export class WorldServer extends DurableObject<Env> {
   private readonly sessions = new Map<WebSocket, Session>();
   /** The socket each player in the room plays through, by user id. */
   private readonly sockets = new Map<string, WebSocket>();
+  /** Each player's profile id in Convex, by Clerk user id. The world's card names players by it. */
+  private readonly profiles = new Map<string, string>();
 
   private timer: ReturnType<typeof setTimeout> | null = null;
   /** When the next step is due, in milliseconds since 1970. */
@@ -157,7 +159,8 @@ export class WorldServer extends DurableObject<Env> {
     session.checking = true;
     const who = await this.check(message.token);
     if (!who) return this.refuse(ws, 'token');
-    if (!(await this.gate.mayEnter(this.worldId, message.token))) return this.refuse(ws, 'closed');
+    const entry = await this.gate.mayEnter(this.worldId, message.token);
+    if (!entry) return this.refuse(ws, 'closed');
     // The connection may have closed while the token was checked.
     if (this.sessions.get(ws) !== session) return;
 
@@ -168,8 +171,9 @@ export class WorldServer extends DurableObject<Env> {
       this.sessions.delete(before);
       this.end(before, CLOSE.replaced, 'this player connected again');
     }
-    const you = room.join(who.id, who.name);
+    const you = room.join(who.id, entry.playerName ?? who.name);
     if (you === null) return this.refuse(ws, 'full');
+    if (entry.playerId) this.profiles.set(who.id, entry.playerId);
     session.checking = false;
     session.user = who.id;
     session.heardAt = room.steps;
@@ -331,7 +335,12 @@ export class WorldServer extends DurableObject<Env> {
     const room = this.room;
     if (!room) return;
     this.cardAt = room.steps;
-    this.ctx.waitUntil(this.gate.postCard({ worldId: this.worldId, players: room.who(), lastPlayed: Date.now() }));
+    const playersNow: string[] = [];
+    for (const player of room.who()) {
+      const id = this.profiles.get(player.id);
+      if (id) playersNow.push(id);
+    }
+    this.ctx.waitUntil(this.gate.postCard({ worldId: this.worldId, playersNow, lastPlayedAt: Date.now() }));
   }
 
   // ---------------------------------------------------------------------------------------- for the checks
