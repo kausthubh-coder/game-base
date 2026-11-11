@@ -23,6 +23,8 @@ Read `15-system-design.md`, `12-art.md` and `13-sound.md` there before a large c
 | `bun tools/play-build.mjs` | Plays build mode in the build lab (`?scene=build`) with the real mouse, and writes a screenshot of each step to `.artifacts/build/` |
 | `bun tools/painted-shots.mjs` | Pictures of the painted world from fixed places, into `.artifacts/painted` (see `docs/painted-world.md`) |
 | `bun tools/land-relief.mjs` | Draws the shape of the land from above into `.artifacts/painted/relief.png`, without starting the game |
+| `bun tools/sprite-fringe.mjs` | Measures the pale rim a white background leaves round a sprite. The sprite check fails a sheet that has one |
+| `bun tools/hero-frames.mjs` | Films the hero walking, a twentieth of a second a frame, into `.artifacts/painted/hero-frames.png`, to see a frame that is drawn wrong |
 | `bun --env-file=.env.local tools/voice.ts` | Makes the voice clips of new or changed lines (`--dry` prices it first). Needs `ELEVENLABS_API_KEY` in `.env.local` |
 
 ## Layout

@@ -4,10 +4,13 @@ import {createHash} from 'node:crypto';
 import {readJSON,pixels,cell,bounds,root} from './lib.mjs';
 import {storySprites} from './story-config.mjs';
 import {animations} from './config.mjs';
+import {fringe} from '../sprite-fringe.mjs';
 const m=await readJSON('public/assets/manifest.json'),pal=new Set((await readJSON('assets-src/palette.json')).colors.map(h=>h.slice(1)));
 export async function readStory(path,w,h){const p=await pixels('public/assets/'+path);assert.equal(p.w,w,path+' width');assert.equal(p.h,h,path+' height');for(let i=0;i<p.data.length;i+=4){assert(p.data[i+3]===0||p.data[i+3]===255,path+' binary alpha');if(p.data[i+3])assert(pal.has(p.data.subarray(i,i+3).toString('hex')),path+' palette');}return p;}
 let count=0;
 for(const [n,c]of Object.entries(storySprites)){const s=m.sprites[n];if(!s)continue;assert.deepEqual(s.frame,[c.size,c.size]);assert.deepEqual(s.anchor,c.anchor);assert.deepEqual(s.animations,c.animations??animations(c));const p=await readStory(s.sheet,c.cols*c.size,c.rows*c.size);for(const a of Object.values(s.animations))for(const row of Object.values(a.rows))for(let col=0;col<c.cols;col++){const q=await cell(p,col,row,c.cols,c.rows);if(col>=a.frames){assert(q.data.every((v,i)=>i%4!==3||!v));continue;}const b=bounds(q);assert.equal(b.top+b.height-1,c.anchor[1],n+' baseline');assert(Math.abs(b.left+(b.width-1)/2-c.anchor[0])<=1,n+' horizontal anchor');assert(b.left>0&&b.top>0&&b.left+b.width<c.size&&b.top+b.height<c.size,n+' padding');count++;}console.log('OK story '+n+': sizes, anchors, transparency, palette');}
+// No sheet carries the pale rim a white background leaves: at most one outline pixel in twenty is near white.
+for(const [n,s]of Object.entries(m.sprites)){const f=await fringe(root+'public/assets/'+s.sheet);assert(f.share<=0.05,`${n} pale fringe: ${(f.share*100).toFixed(1)}% of its outline is near white`);}
 const baseline=await readJSON('assets-src/story-baseline-3.json');
 function preserved(old,now){for(const [k,v]of Object.entries(old)){assert(k in now,'missing old '+k);if(v&&typeof v==='object'&&!Array.isArray(v))preserved(v,now[k]);else assert.deepEqual(now[k],v,'changed old '+k);}}
 preserved(baseline.manifest,m);for(const [p,h]of Object.entries(baseline.hashes))assert.equal(createHash('sha256').update(await fs.readFile(root+'public/assets/'+p)).digest('hex'),h,'old file changed '+p);

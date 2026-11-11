@@ -49,6 +49,8 @@ Say `No teal` in the subject line unless the thing is magic. Lume teal is for ma
 **A white background instead of a transparent one.** It leaves a pale fringe on the outline after the
 build. Wren's first attempt had it. Ask the tool to edit that same image, with the retry prompt from
 `prompts-3.json`: `Remove all white background and grid lines, preserve character, genuine transparent background.`
+If the sheet is already built, `bun tools/sprites/defringe.mjs <sheet>` peels the rim off and sets each frame back on
+its anchor. `bun tools/sprite-fringe.mjs` measures it, and the sprite check fails a sheet that has one.
 
 **A creature seen from one side** (the lanternfly): `FOUR columns ONE row, four equal square cells`, one
 pose per cell, `Identical body size and center in each frame`, and `no glow haze outside silhouette` for
