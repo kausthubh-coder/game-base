@@ -36,8 +36,8 @@ const PIECES: Record<RigKind, readonly number[]> = { lamp: [0], snare: [0], plat
 
 export function createRigViews(view: GameView): RigViews {
   const props = worldProps(view);
-  const ghostOk = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xb8ffe6, transparent: true, opacity: 0.6, fog: false });
-  const ghostNo = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xff8a6a, transparent: true, opacity: 0.6, fog: false });
+  const ghostOk = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xd0fff0, transparent: true, opacity: 0.85, fog: false });
+  const ghostNo = new THREE.MeshBasicMaterial({ vertexColors: true, color: 0xff8a6a, transparent: true, opacity: 0.7, fog: false });
 
   interface Shown { handles: number[]; armed: boolean; y: number }
   const shown = new Map<Rig, Shown>();
