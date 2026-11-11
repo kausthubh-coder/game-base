@@ -10,7 +10,7 @@ import { markNewGame } from './opening.ts';
 import { TOKENS, addStyle } from './theme.ts';
 
 /** Panels that stop the rules while they are up. The bag, the Make panel, the Almanac and the quest log do not. */
-const MENUS: readonly PanelName[] = ['title', 'pause', 'settings', 'end'];
+const MENUS: readonly PanelName[] = ['title', 'pause', 'settings', 'account', 'end'];
 
 /** The full map, as the panels view needs it. The map view sets it. */
 export interface MapDoor {
