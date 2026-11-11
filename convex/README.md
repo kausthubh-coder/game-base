@@ -22,7 +22,8 @@ functions run in. `bun run check` does not run them.
 ## Deployment
 
 The Convex project is `game-base` in the team `kausthubh-nandimandalam`. The dev deployment is
-`valiant-spider-493`. There is no production deployment yet.
+`valiant-spider-493`. The production deployment is `rare-lion-700`: the live copy of the game uses it, and
+GitHub deploys to it on every push to `main` (the `ship-game` skill).
 
 `.env.local` at the repo root names the deployment (`CONVEX_DEPLOYMENT`) and gives the browser its address
 (`VITE_CONVEX_URL`, `VITE_CONVEX_SITE_URL`). The deployment itself holds two variables, set with

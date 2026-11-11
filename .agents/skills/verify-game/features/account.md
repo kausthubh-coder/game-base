@@ -26,4 +26,4 @@ Preconditions: `.env.local` holds the dev keys (`.env.example` has the names). T
 
 - No script in the repo signs in through Clerk's box in a browser yet. The helper that built accounts did it once by hand-written script; `src/features/account/README.md` describes the flow.
 - Never run `bunx convex ai-files install` here. It rewrites `AGENTS.md` and adds skills.
-- Only the dev deployment exists. Nothing here touches production.
+- Everything here uses the dev deployment, `valiant-spider-493`. The live copy has its own database, `rare-lion-700`; only `bun server/test/live.ts --url <live address>` touches it, and it removes the world it makes.

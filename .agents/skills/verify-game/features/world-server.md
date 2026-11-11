@@ -23,6 +23,6 @@ Preconditions: `bun run build` has made `dist/`.
 
 ## Gotchas
 
-- Local `workerd` does not enforce Cloudflare's 128 MB limit. Only a deployed run settles it.
+- Local `workerd` does not enforce Cloudflare's 128 MB limit. The live copy does: `bun server/test/live.ts --url https://game-base.kausthubh2007.workers.dev` joins one player there. Nobody has run the 8-player memory test against it.
 - With `CONVEX_URL` empty and `DEV_TOKENS` not `1`, nobody enters any world. That is on purpose.
 - The rules know one player: the bag and quests are shared, and creatures react to the player who has been in longest.

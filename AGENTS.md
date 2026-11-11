@@ -2,7 +2,8 @@
 
 Kausthubh's untitled 2.5D open-world RPG for the browser: a painted 3D world, 2D pixel-art characters, an
 isometric-style camera, farms and kingdoms the player builds. The name is not picked yet, so the repo keeps
-its working name. `main` is the one true game. It is on GitHub at `kausthubh-coder/game-base` (private).
+its working name. `main` is the one true game. It is on GitHub at `kausthubh-coder/game-base` (private), and
+every push to `main` that passes the check goes live at https://game-base.kausthubh2007.workers.dev.
 
 Read before a large change:
 
@@ -34,7 +35,8 @@ Every task in a new worktree starts with the `worktree-game` skill. Say done onl
 | `bun server/test/live.ts` | Clerk, Convex and the world server together. Needs `.env.local`. |
 | `bunx convex dev --once` | Pushes `convex/` to the dev deployment (`convex/README.md`) |
 | `bun tools/load-measure.mjs` | Bytes and requests before the first playable frame, first and second visit |
-| `bun run deploy --dry-run` | Builds and packages the live copy and sends nothing |
+| `bun run deploy --dry-run` | Builds and packages the live copy and sends nothing. GitHub does the real deploy. |
+| `bun tools/live-look.mjs <url>` | Opens a deployed copy like a player, starts a new game, takes two pictures |
 | `bun tools/typecheck.mjs <feature>` | Type-checks the shared code and one feature only |
 | `bun tools/demo.mjs dev <feature> <port>` | Dev server for one demo. It prints its pid. `build` builds it into `dist/demos/<feature>`. |
 | `bun tools/serve.mjs <folder> <port>` | Serves a built folder. It prints its pid. |
