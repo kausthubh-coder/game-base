@@ -49,6 +49,9 @@ const SNUG: PropVary = { turn: 0, size: 0, tint: 0.04 };
 const still = { wind: false, light: 0 } as const;
 
 export const PROPS = {
+  rigLamp: { name: 'Lure lamp', group: 'station', builder: 'rigLamp', variants: ['armed'], triangles: 170, wind: false, light: 13, alwaysLit: true, vary: SNUG },
+  rigLampSpent: { name: 'Spent lure lamp', group: 'station', builder: 'rigLampSpent', variants: ['spent'], triangles: 190, ...still, vary: SNUG },
+
   pastureFence: { name: 'Pasture fence', group: 'town', builder: 'pastureFence', variants: ['valley'], triangles: 130, wind: false, light: 0, vary: SNUG },
   footbridge: { name: 'Wooden footbridge', group: 'town', builder: 'footbridge', variants: ['valley'], triangles: 240, wind: false, light: 0, vary: SNUG },
   mossStump: { name: 'Mossy stump', group: 'ground', builder: 'mossStump', variants: ['valley'], triangles: 120, wind: false, light: 0, vary: WILD },
