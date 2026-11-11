@@ -24,8 +24,8 @@ export const HERO = {
    * A cut pushes the beast it lands on `push` blocks over `pushTime` seconds, unless the beast is `steady` (note 05's knockback table).
    */
   cut: { startup: 0.1, total: 0.4, chain: 0.2, cancel: 0.15, reach: 2.2, arc: 150 * DEG, guard: 10, pace: 0.25, push: 0.4, pushTime: 0.12 },
-  /** The charged spin: hold the button this long, let go, and it hits everything around. */
-  spin: { hold: 0.6, startup: 0.05, total: 0.55, cancel: 0.4, reach: 2.5, guard: 30 },
+  /** The charged spin: hold the button this long, let go, and it hits everything around, pushing each beast `push` blocks away over `pushTime` seconds unless it is `steady`. */
+  spin: { hold: 0.6, startup: 0.05, total: 0.55, cancel: 0.4, reach: 2.5, guard: 30, push: 2, pushTime: 0.25 },
   /** The dodge travels 3.5 blocks. Nothing hits the hero for the first `safe` seconds of it. */
   dodge: { time: 0.35, safe: 0.3, speed: 10, cost: 25, after: 0.1 },
   /** After a hit: the stagger, how long nothing else can hit, and the push as blocks over seconds. */

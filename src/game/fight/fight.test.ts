@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { BEASTS, GENTLE, HERO, RIG, WAYS, beastOf, type Way } from '../content/fight.ts';
 import { ARENA, arenaStage, pondCells } from './arena.sim.ts';
 import { createBot } from './bot.sim.ts';
-import { createFight, type Fight, type FightEvent, type FightOptions, type FightRecord } from './fight.sim.ts';
+import { createFight, type BeastState, type Fight, type FightEvent, type FightOptions, type FightRecord } from './fight.sim.ts';
 import { dirX, dirZ, facingOf, inCircle, inCone, inLine, turnBetween } from './shapes.sim.ts';
 
 const DT = 1 / 60;
@@ -357,6 +357,40 @@ describe('the hero fights', () => {
     l.run(0.2);
     expect(before - b.guard).toBe(HERO.spin.guard);
     expect(l.fight.record.swings).toBe(2);
+  });
+
+  test('a spin pushes a thistlehog 2 blocks away over a quarter second, and the boar only once its guard is empty', () => {
+    /** Charges a spin from the north of the beast, lets it go, and returns how far south it went. */
+    const spinAt = (l: Lab, b: BeastState): number => {
+      stand(l, b.x, b.z - b.def.radius - 1.2);
+      l.fight.press('attack');
+      l.fight.input.attackHeld = true;
+      l.run(HERO.spin.hold + 0.1);
+      const from = b.z;
+      l.fight.input.attackHeld = false;
+      l.run(HERO.spin.startup + HERO.spin.pushTime + 0.05);
+      expect(l.count('hit')).toBeGreaterThanOrEqual(2);
+      return b.z - from;
+    };
+    const small = lab('hero'), hog = small.fight.bring('thistlehog');
+    cutDown(small);
+    expect(spinAt(small, hog)).toBeCloseTo(HERO.spin.push, 2);
+
+    const big = lab('hero'), boar = big.fight.bring('boar');
+    expect(Math.abs(spinAt(big, boar))).toBeLessThan(0.05);
+    cutDown(big);
+    expect(boar.doing).toBe('dizzy');
+    expect(spinAt(big, boar)).toBeCloseTo(HERO.spin.push, 2);
+  });
+
+  test('a cut lands six steps of the body after the step that reads the press, as note 05 times it', () => {
+    const l = lab('hero'), b = l.fight.bring('thistlehog');
+    stand(l, b.x, b.z + 2);
+    l.fight.press('attack');
+    l.run(6 / 60);
+    expect(l.count('hit')).toBe(0);
+    l.run(1 / 60);
+    expect(l.count('hit')).toBe(1);
   });
 
   test('a dodge carries the hero 3.5 blocks and through an attack', () => {

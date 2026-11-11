@@ -197,6 +197,8 @@ export interface FightRecord {
   ordersInTime: number;
   slowestOrder: number;
   whistles: number;
+  /** Attacks a braced pet took on its back for the hero. */
+  blocks: number;
   petHits: number;
   petFaints: number;
   skills: number;
@@ -273,6 +275,8 @@ export interface Fight {
 // ---------------------------------------------------------------------------------------- the rules
 
 const SHAPES = 8, BOLTS = 6;
+/** A sum of sixtieths falls a hair short of the tenth it should make: a cut lands on its sixth step of the body, not its seventh. */
+const TIME_SLACK = 1e-6;
 /** The turns a walker tries, in order, when the straight way is shut. */
 const TURNS = [0, 0.7, -0.7, 1.4, -1.4, 2.1, -2.1];
 const RIG_KINDS: readonly RigKind[] = ['lamp', 'snare', 'plate', 'channel'];
@@ -295,17 +299,18 @@ interface Beast extends BeastState {
   /** The speed it is thrown at. */
   flyX: number;
   flyZ: number;
-  /** A cut's push: its first speed, and the seconds left of it. */
+  /** A cut's or a spin's push: its first speed, the seconds left of it, and the seconds it lasts in all. */
   pushX: number;
   pushZ: number;
   pushLeft: number;
+  pushTime: number;
 }
 
 function emptyRecord(way: Way, pet: string, gentle: boolean): FightRecord {
   return {
     way, enemy: '', pet, gentle, result: 'open', setup: 0, length: 0,
     hitsTaken: 0, hitBy: {}, faints: 0, dodges: 0, dodged: 0, swings: 0, whiffs: 0, inputs: 0, longestGap: 0,
-    throws: 0, throwHits: 0, orders: 0, ordersInTime: 0, slowestOrder: 0, whistles: 0, petHits: 0, petFaints: 0, skills: 0,
+    throws: 0, throwHits: 0, orders: 0, ordersInTime: 0, slowestOrder: 0, whistles: 0, blocks: 0, petHits: 0, petFaints: 0, skills: 0,
     rigsPlaced: 0, rigsTriggered: 0, placing: 0, layout: [], crashes: 0, again: 0,
   };
 }
@@ -493,8 +498,8 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       if (!inside) continue;
       hits++;
       emit('hit', b.x, b.z, spin ? 3 : hero.cuts);
-      // A cut pushes a small beast a little. A steady one stands until its guard is empty.
-      if (!spin && (!b.def.steady || b.doing === 'dizzy')) shove(b);
+      // A cut pushes a small beast a little, a spin pushes it well away. A steady one stands until its guard is empty.
+      if (!b.def.steady || b.doing === 'dizzy') shove(b, spin ? HERO.spin.push : HERO.cut.push, spin ? HERO.spin.pushTime : HERO.cut.pushTime);
       hurtGuard(b, spin ? HERO.spin.guard : HERO.cut.guard, 'hero');
       // With the hero fighting, the pet goes for whatever the hero hit last.
       if (way === 'hero' && pet.mode !== 'down' && stillUp(b)) { pet.mode = 'engage'; pet.target = b; }
@@ -505,13 +510,13 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     }
   }
 
-  /** Starts a cut's push on a beast, away from the hero. */
-  function shove(b: Beast): void {
+  /** Starts a push on a beast, away from the hero: `push` blocks over `time` seconds. */
+  function shove(b: Beast, push: number, time: number): void {
     const dx = b.x - hero.x, dz = b.z - hero.z, away = Math.hypot(dx, dz) || 1;
     // It starts fast and slows to a stop, so its first speed is twice its mean.
-    b.pushX = (dx / away) * (2 * HERO.cut.push) / HERO.cut.pushTime;
-    b.pushZ = (dz / away) * (2 * HERO.cut.push) / HERO.cut.pushTime;
-    b.pushLeft = HERO.cut.pushTime;
+    b.pushX = (dx / away) * (2 * push) / time;
+    b.pushZ = (dz / away) * (2 * push) / time;
+    b.pushLeft = b.pushTime = time;
   }
 
   function startDodge(): void {
@@ -643,11 +648,11 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       if (h.t >= HERO.dodge.time) { act('none'); h.slow = HERO.dodge.after; }
     } else if (h.act === 'cut') {
       h.pace = HERO.cut.pace;
-      if (!h.landed && h.t >= HERO.cut.startup) land(false);
+      if (!h.landed && h.t >= HERO.cut.startup - TIME_SLACK) land(false);
       if (h.t >= HERO.cut.total) act('none');
     } else if (h.act === 'spin') {
       h.pace = HERO.cut.pace;
-      if (!h.landed && h.t >= HERO.spin.startup) land(true);
+      if (!h.landed && h.t >= HERO.spin.startup - TIME_SLACK) land(true);
       if (h.t >= HERO.spin.total) act('none');
     } else if (h.act === 'throw') {
       h.pace = HERO.bolt.pace;
@@ -868,6 +873,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       // The braced pet turns the attack: the beast staggers and loses guard.
       const skill = pet.def.skills[0];
       emit('blocked', pet.x, pet.z, 0, attack);
+      record.blocks++;
       pet.mode = 'heel';
       hurtGuard(b, skill.guard, 'pet');
       if (b.doing !== 'dizzy') { dropShape(b); go(b, 'stun', 1); }
@@ -1218,9 +1224,9 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     b.angerPet *= Math.exp(-dt / 5);
     if (b.markLeft > 0) { b.markLeft -= dt; if (b.markLeft <= 0) b.marks = 0; }
     if (b.pushLeft > 0) {
-      // A cut's push, slowing to a stop. What stands in the way stops it.
+      // A push, slowing to a stop. What stands in the way stops it.
       // The speed at the middle of the step, so the push covers its distance exactly at any dt.
-      const step = Math.min(dt, b.pushLeft), k = (b.pushLeft - step / 2) / HERO.cut.pushTime;
+      const step = Math.min(dt, b.pushLeft), k = (b.pushLeft - step / 2) / b.pushTime;
       const nx = b.x + b.pushX * k * step, nz = b.z + b.pushZ * k * step;
       if (free(nx, nz, b.def.radius)) { b.x = nx; b.z = nz; } else b.pushLeft = 0;
       b.pushLeft = Math.max(0, b.pushLeft - dt);
@@ -1484,7 +1490,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
         calm: 0, marks: 0, moving: false,
         // The first attack does not come the moment it wakes.
         rests: def.attacks.map(() => 0.3 + random() * 0.3), run: 0, hitHero: false, hitPet: false, shape: null, calming: false, markLeft: 0,
-        angerHero: 0, angerPet: 0, drawn: 0, flyX: 0, flyZ: 0, pushX: 0, pushZ: 0, pushLeft: 0,
+        angerHero: 0, angerPet: 0, drawn: 0, flyX: 0, flyZ: 0, pushX: 0, pushZ: 0, pushLeft: 0, pushTime: 1,
       };
       beasts.push(b);
       record.enemy = kind;
