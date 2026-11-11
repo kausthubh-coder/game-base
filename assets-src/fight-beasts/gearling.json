@@ -1,0 +1,49 @@
+{
+  "name": "gearling",
+  "tool": "image_gen.imagegen",
+  "baseCommit": "0c26a77",
+  "references": [
+    "public/assets/sprites/critter.png",
+    "public/assets/sprites/leaftail.png"
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, matching the reference creatures. Transparent background, NO text, NO grids, NO cast shadows, no ground.\nSTRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells, image ratio 2:3. Every cell contains exactly one whole creature with ample transparent padding.\nRows 1-3 idle: front, back (no face), right profile; all four columns repeat idle variations.\nRows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing.\nSame creature, accessories and proportions throughout. Feet baseline equal in each cell. Full body visible, nothing crosses cell boundaries.\nReferences show approved style only; generate a NEW creature. Match chunky clusters and restrained detail. No teal. Brown outlines #302529 #493335 #65453a, warm cream highlights, violet/brown shadows.\nGEARLING: small ancient guardian MACHINE, squat pale cream stone body on two stubby brass legs, one large round glass eye glowing amber gold, warm brass joints and butterfly wind-up key in back. Clearly a machine, not an animal. No ears, no fur, NO TEAL. Key visible in side and back. Back has NO eye. Roughly 68 pixels tall in final 96-square cells.",
+      "source": "assets-src/raw/gearling-3.png",
+      "selected": true
+    }
+  ],
+  "fight": {
+    "references": [
+      "assets-src/raw/gearling-3.png"
+    ],
+    "attempts": [
+      {
+        "number": 1,
+        "prompt": "Use case: stylized-concept. Production combat POSE sprite sheet for cozy anime pixel RPG. Create a NEW four-column THREE-row sheet of the EXACT SAME creature in attached base sheet. Reference is identity, size, proportions, palette, outline and pixel density. Transparent background, NO white matte or pale halo, NO grid, NO text, NO shadow, no ground. STRICT FOUR columns THREE rows, twelve equal square cells, 4:3 canvas aspect ratio. Every cell contains one whole creature with generous transparent padding. Row 1 FRONT, row 2 BACK with NO FACE OR EYES, row 3 RIGHT PROFILE. Four columns in EVERY row are: column 1 TELL, column 2 ATTACK, column 3 DIZZY, column 4 CALM. Preserve base body size across poses, compress/tilt for action only, do not scale character. Warm top-left light, brown outlines, chunky pixel art. No teal. The back view communicates same pose through body posture without a face.\nGEARLING: small ancient guardian MACHINE, squat pale cream stone body on two stubby brass legs, one large round glass eye glowing amber gold, warm brass joints and butterfly wind-up key in back. Clearly a machine, not an animal. No ears, no fur, NO TEAL. Key visible in side and back. Back has NO eye. Roughly 68 pixels tall in final 96-square cells.\nTell: crouched back, wind-up key wound, eye bright. Attack: leaning far forward in charge, feet thrust back. Dizzy: tipped on its SIDE, eye dim amber, a loose spring poking out of body. Calm SHUT DOWN: sitting upright, eye completely dark, key still. Preserve reference exactly, including cream spherical stone body, brass round joints, single amber eye and butterfly key.",
+        "source": "assets-src/fight-beasts/gearling-fight-attempt-1.png",
+        "selected": false,
+        "defects": "Charge too upright; floating arrows, lines and stars."
+      },
+      {
+        "number": 2,
+        "prompt": "Edit this Gearling combat pose sheet, keep same exact machine identity, cream stone body, brass, amber eye, brown pixel outline, uniform 4 column 3 row layout. Genuine transparent background. Remove ALL floating stars, motion lines, winding arrows, dust and decorative effects. Keep creature body size equal to attached original base sheet. COLUMN TWO attack must lean FAR FORWARD in a charge, visibly tipped 35 degrees toward movement, head/eye leading and feet trailing, front view lunges toward viewer, back lunges away, side lunges RIGHT. COLUMN THREE dizzy stays tipped on side with dim amber eye and attached loose spring, NO stars. Column one tell crouches rearward, key wound. Column four calm upright eye DARK. Back row no eye or face. Keep equal square cells with ample padding, no shadow, no text. Preserve original base proportions exactly.\n",
+        "source": "assets-src/raw/gearling-fight-3.png",
+        "references": [
+          "assets-src/fight-beasts/gearling-fight-attempt-1.png",
+          "assets-src/raw/gearling-3.png"
+        ],
+        "selected": true
+      }
+    ]
+  },
+  "defects": [
+    "Key angle and stone seam positions drift slightly between frames and views.",
+    "Front and back charge read as a diagonal tip rather than a strong forward lunge.",
+    "Tell crouch and brighter eye differ only subtly from idle.",
+    "Dim dizzy eye is a static pose; flicker needs renderer animation.",
+    "Fight body is slightly rounder/wider than base in some poses."
+  ],
+  "processing": "Standard build-story.mjs; no builder changes, no hand-drawn pixels."
+}
