@@ -425,3 +425,20 @@ test('every line and every choice of every conversation can be shown', () => {
   }
   expect(missing).toEqual([]);
 });
+
+test('job barks follow the assigned appearance and yield to festival lines', () => {
+  const s = stage({story: false});
+  s.run(.1);
+  s.people.get('villager-1')!.sprite = 'town-pell';
+  const talk = s.game.systems.talk;
+  talk.talkTo('villager-1');
+  expect(talk.current()?.text).toBe('Fish took my bait. Left me the hook. Polite of them.');
+  s.through();
+  s.people.get('villager-1')!.sprite = 'town-pip';
+  talk.talkTo('villager-1');
+  expect(talk.current()?.text).toBe('Mira let me sort the nails. Bent ones have their own pot.');
+  s.through();
+  s.game.flags.set('festival.started', true);
+  talk.talkTo('villager-1');
+  expect(VILLAGER_LINES.filter(l => l.when).map(l => l.text)).toContain(talk.current()?.text ?? '');
+});

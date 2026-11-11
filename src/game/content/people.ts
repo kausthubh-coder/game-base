@@ -17,6 +17,8 @@ export interface PersonDef {
   portrait: string;
   /** A voice id for the sound engine. */
   voice: string;
+  /** Background resident assigned a unique appearance at world creation. */
+  crowd?: boolean;
   /** Stops in order of hour. Before the first hour of a day, the last stop still holds. */
   routine: RoutineStop[];
   /** Stays at this place, whatever the hour, until the flag is set. */
@@ -35,6 +37,7 @@ const TOWN_WALK = ['town.square', 'river.bank', 'town.gate'];
 
 const villager = (n: number, name: string, kind: 'a' | 'b', every: number): PersonDef => ({
   id: `villager-${n}`,
+  crowd: true,
   name,
   sprite: `villager-${kind}`,
   portrait: `villager-${kind}`,
@@ -61,6 +64,10 @@ export const PEOPLE: readonly PersonDef[] = [
   villager(4, 'Hesper', 'b', 115),
   villager(5, 'Dunn', 'a', 130),
   villager(6, 'Isolde', 'b', 145),
+  villager(7, 'Nessa', 'a', 95),
+  villager(8, 'Roan', 'b', 110),
+  villager(9, 'Pip', 'a', 125),
+  villager(10, 'Bryn', 'b', 140),
 ];
 
 /** Blocks a second. */
@@ -71,3 +78,17 @@ export const WALK_RANGE = 60;
 export const FACE_RANGE = 3;
 /** How close the player must be for "Talk to" to show. */
 export const TALK_RANGE = 2.5;
+
+/** One appearance per resident, shuffled once by the world's seeded random stream. */
+export const CROWD_SPRITES = ['villager-a', 'villager-b', 'town-pell', 'town-corin', 'town-hesper', 'town-dunn', 'town-isolde', 'town-nessa', 'town-roan', 'town-pip'] as const;
+
+export const JOB_BARKS: Readonly<Record<string, string>> = {
+  'town-pell': "Fish took my bait. Left me the hook. Polite of them.",
+  'town-corin': "Pears are a penny. Advice is free. Pears are better.",
+  'town-hesper': "River gets the mud out. Keeps the gossip.",
+  'town-dunn': "Quiet watch today. Even the geese let me pass.",
+  'town-isolde': "A page missing. Right where the answer ought to be.",
+  'town-nessa': "Sit a minute. The work will wait. Mine always has.",
+  'town-roan': "Gus says the rows are crooked. Wheat hasn't complained.",
+  'town-pip': "Mira let me sort the nails. Bent ones have their own pot.",
+};

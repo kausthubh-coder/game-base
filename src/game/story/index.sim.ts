@@ -61,7 +61,7 @@ const FESTIVAL_SPOTS: Readonly<Record<NpcId, FestivalSpot>> = {
   juniper: { place: 'town.square', x: 2, z: 3 },
 };
 /** Spots in the square for everyone without one of their own, taken in the order people are listed. */
-const CROWD_SPOTS: readonly (readonly [x: number, z: number])[] = [[-10, -1], [7, -4], [-3, 4], [6, 4], [-8, -5], [11, -2], [-5, -6], [-11, 4]];
+const CROWD_SPOTS: readonly (readonly [x: number, z: number])[] = [[-10, -1], [7, -4], [-3, 4], [6, 4], [-8, -5], [11, -2], [-5, -6], [-11, 4], [-5, 7], [9, 7]];
 
 const AXE_LOST: Condition = { all: [{ flag: 'plot.met' }, { not: { bag: 'axe' } }, { not: { flag: 'owed.axe' } }] };
 const SEEDS_SHORT: Condition = { all: [{ flag: 'bread.seeds' }, { not: { flag: 'bread.delivered' } }, WHEAT_SHORT] };

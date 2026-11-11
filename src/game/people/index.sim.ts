@@ -4,7 +4,7 @@
 
 import type { Vec3 } from '../../engine/types.ts';
 import type { Actor, Game, NpcState, PeopleApi, SimSystem } from '../api.sim.ts';
-import { FACE_RANGE, PEOPLE, TALK_RANGE, WALK_RANGE, WALK_SPEED, type PersonDef } from '../content/people.ts';
+import { CROWD_SPRITES, FACE_RANGE, PEOPLE, TALK_RANGE, WALK_RANGE, WALK_SPEED, type PersonDef } from '../content/people.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { distance2d, facingOf } from '../move.sim.ts';
 import { walkAlong } from '../nav/walk.sim.ts';
@@ -51,6 +51,7 @@ interface Person {
 
 interface PersonSave {
   id: string;
+  sprite?: string;
   x: number; y: number; z: number;
   facing: number;
   place: string;
@@ -282,7 +283,16 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
     if (started) return true;
     if (!game.systems.region || !game.systems.nav) return false;
     started = true;
-    defs.forEach((def, n) => {
+    const crowd = [...CROWD_SPRITES];
+    for (let i = crowd.length - 1; i > 0; i--) {
+      const j = Math.floor(game.random() * (i + 1));
+      [crowd[i], crowd[j]] = [crowd[j], crowd[i]];
+    }
+    let crowdIndex = 0;
+    defs.forEach((definition, n) => {
+      const def = definition.crowd
+        ? { ...definition, sprite: crowd[crowdIndex++ % crowd.length] }
+        : definition;
       const p = build(def, n);
       people.push(p);
       states.push(p.state);
@@ -293,7 +303,16 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
         id: p.actor.id,
         pos: () => p.state.pos,
         radius: TALK_RANGE,
-        prompt: () => prompt,
+        prompt: () => {
+          // A festival passer can cross directly through a guest who is handing over a quest.
+          // Yield only when the player is already within one step of that marked guest.
+          if (p.actor.mark !== 'quest' && p.held && p.sent && (p.plan || p.path !== null)) {
+            for (const guest of people) {
+              if (guest.actor.mark === 'quest' && distance2d(guest.state.pos, player.pos) <= 1 && Math.abs(guest.state.pos.y - player.pos.y) < 2) return null;
+            }
+          }
+          return prompt;
+        },
         act: () => game.systems.talk.talkTo(def.id),
       });
     });
@@ -313,6 +332,9 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
     for (const s of save.people) {
       const p = byId.get(s.id);
       if (!p) continue;
+      if (p.def.crowd && s.sprite && (CROWD_SPRITES as readonly string[]).includes(s.sprite)) {
+        p.state.sprite = p.actor.sprite = s.sprite;
+      }
       const pos = p.state.pos;
       pos.x = s.x; pos.y = s.y; pos.z = s.z;
       p.actor.facing = s.facing;
@@ -425,6 +447,7 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
         version: 1,
         people: people.map((p) => ({
           id: p.def.id,
+          sprite: p.state.sprite,
           x: p.state.pos.x, y: p.state.pos.y, z: p.state.pos.z,
           facing: p.actor.facing,
           place: p.state.place,

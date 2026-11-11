@@ -2,6 +2,7 @@ import { expect, test } from 'bun:test';
 import type { Vec3 } from '../../engine/types.ts';
 import { PEOPLE, type PersonDef } from '../content/people.ts';
 import type { GameSave, Kernel } from '../kernel.sim.ts';
+import { install as installInteract } from '../interact/index.sim.ts';
 import { install as installNav } from '../nav/index.sim.ts';
 import { FEET, makeStage, wall, type Stage } from '../nav/stage.testkit.ts';
 import { createPeople, install } from './index.sim.ts';
@@ -343,14 +344,14 @@ function hollowmere(): Stage {
   return stage;
 }
 
-test('the eight townspeople and six villagers stand where act 1 puts them', () => {
+test('the eight townspeople and ten villagers stand where act 1 puts them', () => {
   const stage = hollowmere();
   const { actors, systems } = stage.kernel.game;
   stage.run(0.05);
   const people = systems.people;
   expect(people.all().map((p) => p.id)).toEqual([
     'tamsin', 'maren', 'odo', 'gus', 'mira', 'wren', 'juniper', 'brack',
-    'villager-1', 'villager-2', 'villager-3', 'villager-4', 'villager-5', 'villager-6',
+    'villager-1', 'villager-2', 'villager-3', 'villager-4', 'villager-5', 'villager-6', 'villager-7', 'villager-8', 'villager-9', 'villager-10',
   ]);
   const posts = { tamsin: 'grant.stone', maren: 'granary', odo: 'bakery', gus: 'gus.field', mira: 'carpenter', wren: 'kennel', brack: 'ferry' };
   for (const [id, place] of Object.entries(posts)) {
@@ -362,14 +363,14 @@ test('the eight townspeople and six villagers stand where act 1 puts them', () =
     expect(stage.prompts.get('npc:' + id)!.prompt()).toBe('Talk to ' + person.name);
   }
   const sprites = people.all().slice(8).map((p) => p.sprite);
-  expect(sprites.filter((s) => s === 'villager-a').length).toBe(3);
-  expect(sprites.filter((s) => s === 'villager-b').length).toBe(3);
-  expect(actors.size).toBe(14);
-  expect(PEOPLE.length).toBe(14);
+  expect(new Set(sprites).size).toBe(10);
+  expect(sprites.filter(s => s.startsWith('town-')).length).toBe(8);
+  expect(actors.size).toBe(18);
+  expect(PEOPLE.length).toBe(18);
 
   // Nobody shares a block.
   const blocks = new Set(people.all().map((p) => `${Math.floor(p.pos.x)},${Math.floor(p.pos.z)}`));
-  expect(blocks.size).toBe(14);
+  expect(blocks.size).toBe(18);
 });
 
 test('Tamsin waits at the grant stone until the first quest is done, then keeps the lodge by day and stands near it at night', () => {
@@ -425,4 +426,40 @@ test.each([false,true])('a person briefly waits in talking range, then resumes e
   if(leave) stage.player(14,10);
   stage.run(12);
   expect(at(pos,SHOP)).toBe(true);
+});
+
+test('the background crowd has distinct faces that survive a reload', () => {
+  const residents = PEOPLE.filter(p => p.crowd);
+  const defs = residents.map(p => ({ ...p, routine: [{hour: 0, place: 'home'}], wander: undefined }));
+  const first = town(defs);
+  first.run(.05);
+  const faces = first.kernel.game.systems.people.all().map(p => p.sprite);
+  expect(new Set(faces).size).toBe(10);
+  expect(faces.filter(s => s.startsWith('town-')).length).toBe(8);
+  const reload = town(defs, first.kernel.save());
+  reload.run(.05);
+  expect(reload.kernel.game.systems.people.all().map(p => p.sprite)).toEqual(faces);
+  for (const p of reload.kernel.game.systems.people.all()) {
+    expect(reload.kernel.game.actors.get('npc:' + p.id)!.sprite).toBe(p.sprite);
+  }
+});
+
+
+test('a festival passer yields to a quest guest within one step of the player', () => {
+  const stage = makeStage({places:{home:HOME,shop:SHOP},install:[installNav,installInteract,withPeople([ann,bo])]});
+  stage.kernel.game.clock.timeOfDay = 8 / 24;
+  stage.player(24,6);
+  stage.run(.05);
+  const {people,interact} = stage.kernel.game.systems;
+  people.send('ann','shop',{x:4,z:0});
+  people.hold('ann',true);
+  const passing = people.get('ann')!.pos;
+  Object.assign(passing, stage.kernel.game.player.pos);
+  // Bo is beside the player. Ann is crossing directly through the player.
+  people.get('bo')!.pos.x += .3;
+  people.setMark('bo','quest');
+  expect(interact.nearest()?.id).toBe('npc:bo');
+  // Travelling does not stop a person offering Talk when no quest guest is close.
+  people.setMark('bo','');
+  expect(interact.nearest()?.id).toBe('npc:ann');
 });
