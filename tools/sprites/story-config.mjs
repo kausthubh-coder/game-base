@@ -14,4 +14,6 @@ storySprites['hero-cut'] = {size:128,anchor:[64,120],height:110,worldHeight:2,co
 storySprites['hero-moves'] = {size:128,anchor:[64,120],height:110,worldHeight:2,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
 storySprites['hero-call'] = {size:128,anchor:[64,120],height:110,worldHeight:2,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
 storySprites['leaftail-fight'] = {size:96,anchor:[48,88],height:68,worldHeight:.85,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
+storySprites['pebblepup'] = {size:96,anchor:[48,88],height:68,worldHeight:.9,idle:2,walk:4,cols:4,rows:6};
+storySprites['pebblepup-fight'] = {size:96,anchor:[48,88],height:68,worldHeight:.9,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
 // END fight-lab hero and pets.

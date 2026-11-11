@@ -1,0 +1,18 @@
+{
+  "name": "pebblepup-fight",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "assets-src/raw/pebblepup-3.png",
+    "public/assets/sprites/leaftail.png"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: stylized-concept. Production pixel-art RPG sprite sheet PEBBLEPUP-FIGHT. Image 1 is the exact guardian pup identity to preserve, image 2 is the approved game's pixel rendering style. Warm top-left light, dark brown outlines, chunky pixel clusters, rounded GREY river stones and muted green moss on back, warm tan fur underneath, big paws, short tail, floppy ears, NO TEAL. GENUINE TRANSPARENT ALPHA background, no brown background, NO text/grid/ground/shadows. STRICT FOUR columns THREE rows uniform grid, twelve equal square cells, each one whole pup with ample padding. Row0 FRONT; row1 BACK NO FACE; row2 SIDE facing RIGHT. Same four columns in each view: 0 BRACE planted low behind stone back to BLOCK a hit; 1 HEADBUTT thrust head forward, paws pushing; 2 HURT flinch eyes shut; 3 FAINTED lying flat swirl eyes if visible. Same pup proportions throughout, about 68 pixels tall in final 96px square cell, feet baseline equal. Output 4:3 landscape.",
+      "source": "assets-src/fight-sprites/pebblepup-fight-attempt-1.png",
+      "selected": true
+    }
+  ],
+  "raw": "assets-src/raw/pebblepup-fight-3.png",
+  "processing": "bun tools/sprites/build-story.mjs"
+}
