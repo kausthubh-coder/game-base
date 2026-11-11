@@ -1,9 +1,12 @@
 // How a fight of the fight lab feels: each event the rules send becomes a freeze of the fight, a jolt on a
-// fighter, a short flash on the ground, particles and a sound. The table is `hear`. Nothing here moves a body
-// or changes the fight: the freeze is a number the body's step reads (`keys.ts`), and the jolts and flashes are
-// numbers `draw.ts` draws.
+// fighter, a shake of the screen, a short flash on the ground, particles and a sound. The table is `hear`.
+// Nothing here moves a body or changes the fight: the freeze is a number the body's step reads (`keys.ts`), and
+// the jolts and flashes are numbers `draw.ts` draws.
+//
+// The shake moves the picture, not the camera: a few pixels of offset on the lens, so the world, the aim and
+// the shadows stay where they are. The card's switch and the game's "reduce motion" both turn it off.
 import type * as THREE from 'three';
-import { HERO } from '../content/fight.ts';
+import { HERO, SHAKE } from '../content/fight.ts';
 import type { Fight, FightEvent } from '../fight/fight.sim.ts';
 import type { GameView } from '../shell/view.ts';
 import { MARK } from './ground.ts';
@@ -38,12 +41,18 @@ export interface FeelHooks {
 export interface Feel {
   /** Seconds the fight stands still: the freeze of a hit. Only the picture goes on. The body's step spends it. */
   freeze: number;
+  /** False turns the screen's shake off. */
+  shakes: boolean;
+  /** Pixels the picture is moved by right now, for the door. */
+  readonly shaken: number;
   readonly hero: Jolt;
   readonly pet: Jolt;
   /** The short marks on the ground, a fixed few. `life` at or under 0 is a free one. */
   readonly flashes: readonly Flash[];
   /** One event of the fight. */
   hear(e: FightEvent): void;
+  /** Once a frame, after the camera moved and before the picture is drawn: the shake. */
+  frame(dt: number): void;
 }
 
 export function createFeel(view: GameView, fight: Fight, hooks: FeelHooks): Feel {
@@ -62,12 +71,43 @@ export function createFeel(view: GameView, fight: Fight, hooks: FeelHooks): Feel
   }
   const sound = (event: Parameters<NonNullable<GameView['audio']>['emit']>[0]): void => { view.audio?.emit(event); };
 
+  // ---------------------------------------------------------------- the shake of the screen
+  const lens = view.ctx.camera as THREE.PerspectiveCamera;
+  /** Pixels at its start, seconds it lasts, seconds left. */
+  let shakePx = 0, shakeTime = 1, shakeLeft = 0, shakeClock = 0, offset = false, shaken = 0;
+  function shake(px: number, time: number): void {
+    if (!feel.shakes || view.settings.graphics.reduceMotion) return;
+    // A stronger shake takes over. A weaker one does not cut a stronger one short.
+    if (shakeLeft > 0 && shakePx * (shakeLeft / shakeTime) > px) return;
+    shakePx = px;
+    shakeTime = shakeLeft = time;
+  }
+  function frame(dt: number): void {
+    shakeClock += dt;
+    if (shakeLeft > 0 && feel.shakes) {
+      shakeLeft = Math.max(0, shakeLeft - dt);
+      const k = shakeLeft / shakeTime, w = view.canvas.clientWidth || innerWidth, h = view.canvas.clientHeight || innerHeight;
+      // As far as the shake says, in a direction that turns fast and unevenly, so it does not slide along one line.
+      const turn = shakeClock * 97 + Math.sin(shakeClock * 53) * 2, dx = Math.cos(turn) * shakePx * k, dy = Math.sin(turn) * shakePx * k;
+      lens.setViewOffset(w, h, dx, dy, w, h);
+      offset = true;
+      shaken = Math.hypot(dx, dy);
+    } else if (offset) {
+      lens.clearViewOffset();
+      offset = false;
+      shaken = 0;
+    }
+  }
+
   const feel: Feel = {
     freeze: 0,
+    shakes: true,
+    get shaken() { return shaken; },
     hero: jolt(),
     pet: jolt(),
     flashes,
     hear,
+    frame,
   };
   const stop = (frames: number): void => { feel.freeze = Math.max(feel.freeze, frames / 60); };
   const heroJolt = feel.hero, petJolt = feel.pet;
@@ -86,12 +126,24 @@ export function createFeel(view: GameView, fight: Fight, hooks: FeelHooks): Feel
         sound({ type: 'jump', at: spot });
         break;
       }
-      case 'hit': stop(e.n === 3 ? 6 : 4); effect('chips', e.x, e.z, 0.5, 0xfff2c8, 0.5); sound({ type: 'hit', at: spot }); break;
+      case 'hit':
+        stop(e.n === 3 ? 6 : 4);
+        if (e.n === 3) shake(SHAKE.spin.px, SHAKE.spin.time);
+        effect('chips', e.x, e.z, 0.5, 0xfff2c8, 0.5);
+        sound({ type: 'hit', at: spot });
+        break;
       case 'guard': { const d = nearest(e.x, e.z); if (d) { d.jolt.flash = 1; d.jolt.shake = 0.12; d.jolt.squash = 1; } break; }
       case 'charged': effect('trail', e.x, e.z, 0.6, 0xfff2c8, 0.5); sound({ type: 'ui', sound: 'open' }); break;
       case 'dodge': effect('dust', e.x, e.z, 0.05); sound({ type: 'jump', at: spot }); break;
       case 'dodged': effect('trail', e.x, e.z, 0.8, 0x9ff5e6, 0.4); break;
-      case 'heroHurt': stop(5); heroJolt.flash = 1; heroJolt.shake = e.n ? 0.2 : 0.12; sound({ type: 'hit', at: spot }); effect('dust', e.x, e.z, 0.3); break;
+      case 'heroHurt':
+        stop(5);
+        heroJolt.flash = 1;
+        heroJolt.shake = e.n ? 0.2 : 0.12;
+        if (e.n) shake(SHAKE.heavy.px, SHAKE.heavy.time);
+        sound({ type: 'hit', at: spot });
+        effect('dust', e.x, e.z, 0.3);
+        break;
       case 'faint': sound({ type: 'pet', mood: 'sad', at: spot }); break;
       case 'segment': stop(8); effect('pop', e.x, e.z, 0.1); sound({ type: 'blockBroken', surface: 'stone', at: spot }); break;
       case 'dizzy': stop(6); effect('pop', e.x, e.z, 0.1); sound({ type: 'ui', sound: 'open' }); break;

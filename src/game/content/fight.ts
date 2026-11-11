@@ -47,6 +47,11 @@ export const HERO = {
   body: 0.15,
 } as const;
 
+/** The screen shakes this many pixels for this many seconds: a spin that lands, and a heavy hit on the hero. A switch on the card turns it off. */
+export const SHAKE = { spin: { px: 3, time: 0.1 }, heavy: { px: 6, time: 0.2 } } as const;
+/** Below this share of the hero's health the edge of the screen glows warm, stronger as it falls. Never a red flash. */
+export const LOW_HEALTH = 0.35;
+
 // ---------------------------------------------------------------------------------------- beasts
 
 export interface AttackDef {

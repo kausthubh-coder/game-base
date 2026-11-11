@@ -72,7 +72,7 @@ export function install(view: GameView): void {
   const stage = arenaStage(ox, oz);
   const groundY = heightOf(view);
   const log = createLog();
-  let stored: { way?: Way; pet?: string; gentle?: boolean } = {};
+  let stored: { way?: Way; pet?: string; gentle?: boolean; shake?: boolean } = {};
   try { stored = JSON.parse(localStorage.getItem(STORE) ?? '{}') as typeof stored; } catch { /* the defaults stand */ }
   const asked = WAYS.find((way) => way === params.get('way'));
   /** The fight that ended last, waiting for the calm to play out before the lab asks about it. */
@@ -89,7 +89,7 @@ export function install(view: GameView): void {
     },
   });
   const keep = (): void => {
-    try { localStorage.setItem(STORE, JSON.stringify({ way: fight.way, pet: fight.pet.def.kind, gentle: fight.gentle })); } catch { /* it holds for this visit */ }
+    try { localStorage.setItem(STORE, JSON.stringify({ way: fight.way, pet: fight.pet.def.kind, gentle: fight.gentle, shake: feel.shakes })); } catch { /* it holds for this visit */ }
   };
 
   let lastKind = '';
@@ -99,6 +99,8 @@ export function install(view: GameView): void {
     wake() { fight.wake(); },
     clear() { keys.held = null; fight.clear(); },
     setGentle(on) { fight.setGentle(on); keep(); },
+    setShake(on) { feel.shakes = on; keep(); },
+    shaking: () => feel.shakes,
     setPet(kind) { fight.setPet(kind); keep(); },
     setQuality(mode) { view.settings.setQuality(mode); },
     pickRig(kind) { keys.held = kind; },
@@ -106,6 +108,7 @@ export function install(view: GameView): void {
   });
   const say = (text: string): void => panel.say(text);
   const feel = createFeel(view, fight, { say, groundY, nearest: (x, z) => draw.nearest(x, z) });
+  feel.shakes = stored.shake !== false;
   const keys = createKeys(view, fight, { feel, say, groundY });
   const draw = createDraw(view, fight, stage, oy, keys, feel);
 
@@ -153,6 +156,7 @@ export function install(view: GameView): void {
     }
     clock += dt;
     keys.aim();
+    feel.frame(dt);
     draw.frame(dt, clock);
     if (ended && (askIn -= dt) <= 0) { panel.ask(ended); ended = null; }
     panel.update(fight, keys.held, view.settings.quality, draw.beastAt);
@@ -173,6 +177,7 @@ export function install(view: GameView): void {
         shapes: fight.shapes.filter((s) => s.live).length,
         record: { ...fight.record },
         held: keys.held,
+        shaken: feel.shaken,
         figures: draw.figures.count,
         marks: draw.ground.count,
       };

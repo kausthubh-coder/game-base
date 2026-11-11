@@ -1,7 +1,8 @@
 // The fight lab's interface, in HTML over the game: the card that picks the way to fight and the beast, the
-// hero's two bars, the pet's hearts and skills, the kit of rigs, the bar over the beast, the "Again?" card and
-// the log. It reads the fight and draws it. Every button calls back into the lab's view, which owns the fight.
-import { BEASTS, FIGHT_PETS, HERO, RIGS, WAYS, type RigKind, type Way } from '../content/fight.ts';
+// hero's two bars, the pet's hearts and skills, the kit of rigs, the bar over the beast, the "Again?" card, the
+// log, and the warm edge of the screen when the hero is low. It reads the fight and draws it. Every button calls
+// back into the lab's view, which owns the fight.
+import { BEASTS, FIGHT_PETS, HERO, LOW_HEALTH, RIGS, WAYS, type RigKind, type Way } from '../content/fight.ts';
 import type { BeastState, Fight } from '../fight/fight.sim.ts';
 import { checksOf, type Check } from '../fight/record.sim.ts';
 import type { QualityMode } from '../shell/view.ts';
@@ -14,6 +15,9 @@ export interface PanelActions {
   wake(): void;
   clear(): void;
   setGentle(on: boolean): void;
+  /** Turns the screen's shake on or off, and `shaking` says which it is. */
+  setShake(on: boolean): void;
+  shaking(): boolean;
   setPet(kind: string): void;
   setQuality(mode: QualityMode): void;
   pickRig(kind: RigKind | null): void;
@@ -119,6 +123,15 @@ const STYLE = /* css */ `
   font: 600 13px / 1.2 var(--ui-font); color: var(--ui-glass-ink); background: var(--ui-glass); opacity: 0; transition: opacity 0.2s; }
 .ui-book .fl-say.is-on { opacity: 1; }
 
+/* Low health: the edge of the screen glows warm and beats slowly. Never a red flash over the whole picture. */
+.ui-book .fl-edge { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.4s; }
+.ui-book .fl-edge i { position: absolute; inset: 0; opacity: 0.8;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 55%, oklch(0.72 0.15 55 / 0.42) 82%, oklch(0.6 0.16 45 / 0.7) 100%); }
+/* Only the opacity moves, so the beat costs the page no repaint. */
+.ui-book .fl-edge.is-low i { animation: fl-beat 1.1s ease-in-out infinite; }
+@keyframes fl-beat { 0%, 100% { opacity: 0.8; } 18% { opacity: 1; } 36% { opacity: 0.82; } 52% { opacity: 0.95; } }
+@media (prefers-reduced-motion: reduce) { .ui-book .fl-edge.is-low i { animation: none; } }
+
 .ui-book .fl-beast { position: absolute; left: 0; top: 0; width: 170px; margin: -52px 0 0 -85px; pointer-events: none; text-align: center;
   font: 600 12px / 1.25 var(--ui-font); color: var(--ui-glass-ink); text-shadow: var(--ui-text-shadow); will-change: transform; }
 .ui-book .fl-beast .fl-guard { position: relative; height: 9px; margin: 3px 0; border-radius: 5px; background: oklch(0 0 0 / 0.45); overflow: hidden; }
@@ -195,13 +208,15 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   const options = el('div', 'fl-row');
   const gentle = button('Gentle', () => actions.setGentle(!gentle.classList.contains('is-on')));
   gentle.title = 'Longer warnings and half the hurt';
+  const shake = button('Shake', () => actions.setShake(!actions.shaking()));
+  shake.title = 'The screen shakes for a spin that lands and a heavy hit on you';
   const pets = el('select');
   for (const pet of FIGHT_PETS) { const o = el('option', '', pet.name); o.value = pet.kind; pets.append(o); }
   pets.addEventListener('change', () => { actions.setPet(pets.value); pets.blur(); });
   const quality = el('select');
   for (const [value, name] of [['auto', 'Quality: auto'], ['low', 'Quality: low'], ['medium', 'Quality: medium'], ['high', 'Quality: high']] as const) { const o = el('option', '', name); o.value = value; quality.append(o); }
   quality.addEventListener('change', () => { actions.setQuality(quality.value as QualityMode); quality.blur(); });
-  options.append(gentle, pets, quality);
+  options.append(gentle, shake, pets, quality);
   const keys = el('ul', 'fl-keys');
   const rulesTitle = el('h3', '', 'Its rules');
   const rules = el('ul', 'fl-rules');
@@ -242,6 +257,8 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   });
   hud.append(bars, petBox, kitBox);
   const line = el('div', 'fl-say');
+  const edge = el('div', 'fl-edge');
+  edge.append(el('i'));
 
   // ---------------------------------------------------------------- over the beast
   const over = el('div', 'fl-beast');
@@ -255,7 +272,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   again.hidden = true;
   const logBox = el('section', 'fl-log');
   logBox.hidden = true;
-  root.append(card, hud, line, over, again, logBox);
+  root.append(edge, card, hud, line, over, again, logBox);
 
   function checkRows(checks: Check[]): HTMLTableElement {
     const table = el('table', 'fl-checks');
@@ -397,11 +414,19 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
       }
       wake.disabled = !beast || beast.doing !== 'asleep';
       gentle.classList.toggle('is-on', fight.gentle);
+      shake.classList.toggle('is-on', actions.shaking());
       if (pets.value !== fight.pet.def.kind) pets.value = fight.pet.def.kind;
       if (quality.value !== mode) quality.value = mode;
 
       const h = Math.round((fight.hero.health / HERO.health) * 100), s = Math.round((fight.hero.stamina / HERO.stamina) * 100);
-      if (h !== shownHealth) { shownHealth = h; healthFill.style.transform = `scaleX(${h / 100})`; }
+      if (h !== shownHealth) {
+        shownHealth = h;
+        healthFill.style.transform = `scaleX(${h / 100})`;
+        // The edge comes in below LOW_HEALTH and is whole at a quarter of that. A fainted hero is past it.
+        const low = fight.hero.act === 'faint' ? 0 : Math.min(1, Math.max(0, (LOW_HEALTH * 100 - h) / (LOW_HEALTH * 75)));
+        edge.style.opacity = low.toFixed(2);
+        edge.classList.toggle('is-low', low > 0);
+      }
       if (s !== shownStamina) { shownStamina = s; staminaFill.style.transform = `scaleX(${s / 100})`; }
 
       if (fight.way === 'pet' && fight.pet.hearts !== shownHearts) {
