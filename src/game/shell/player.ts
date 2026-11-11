@@ -30,7 +30,14 @@ export interface PlayerRig {
   teleport(x: number, y: number, z: number, facing?: number): void;
 }
 
-export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3): PlayerRig {
+export interface PlayerOptions {
+  /** The height of a ledge the hero walks up without a jump. See `HeroTuning.stepUp`. */
+  stepUp?: number;
+  /** How far above the block it stands on the hero is drawn: the painted land's lift. */
+  lift?: (x: number, y: number, z: number) => number;
+}
+
+export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, options: PlayerOptions = {}): PlayerRig {
   const bus = createBus<GameEvent>();
   bus.on((event) => {
     if (event.type === 'footstep') game.events.emit('footstep', { surface: event.surface, at: event.at });
@@ -38,7 +45,8 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3):
     else if (event.type === 'land') game.events.emit('land', { surface: event.surface, at: event.at });
   });
 
-  const body = new HeroBody(world, spawn, bus);
+  const body = new HeroBody(world, spawn, bus, { stepUp: options.stepUp ?? 0 });
+  const lift = options.lift ?? (() => 0);
   // South, toward the camera's starting side, so a new game opens on the hero's face.
   body.facing = Math.PI;
   const position = { ...spawn };
@@ -97,6 +105,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3):
       position.x = previous.x + (body.x - previous.x) * blend;
       position.y = previous.y + (body.y - previous.y) * blend - (body.swimming ? 0.25 : 0);
       position.z = previous.z + (body.z - previous.z) * blend;
+      position.y += lift(position.x, position.y, position.z);
     },
 
     teleport(x, y, z, facing) {

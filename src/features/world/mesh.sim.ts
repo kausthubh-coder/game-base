@@ -8,7 +8,7 @@
 // corner's place on the face, u and v, 0 or 1. The material lights a thin lip along those edges, so a
 // step of one block reads from above.
 import { BLOCKS } from '../../content/blocks.ts';
-import { CHUNK, HEIGHT, LIQUID, OPAQUE, PAD } from './chunk.sim.ts';
+import { CHUNK, HEIGHT, LIQUID, OPAQUE, PAD, SOLID } from './chunk.sim.ts';
 
 export interface MeshArrays {
   positions: Uint8Array;
@@ -204,14 +204,42 @@ function dropEdges(d: number, i: number, f: number, su: number, sv: number): num
 }
 
 /**
- * Meshes one chunk. `blocks` and `light` are the padded copies from `World.snapshot`.
+ * Blocks that are the land of the painted world: where they are natural ground, another view draws them as one
+ * surface, and the faces that surface stands for are left out here. They still hide the faces of the blocks
+ * beside them, so a plank on the ground has no bottom face.
  */
-export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTable): ChunkMesh {
+const LEFT_OUT = new Uint8Array(256);
+/** For each padded column, the y of the top of its natural ground as it is now: dug into, never built up. */
+const surface = new Uint8Array(PAD * PAD);
+
+/** Tells the mesher which block ids are land. An empty list draws every block again. */
+export function leaveOut(ids: ArrayLike<number>): void {
+  LEFT_OUT.fill(0);
+  for (let i = 0; i < ids.length; i++) LEFT_OUT[ids[i]] = 1;
+}
+
+/**
+ * Meshes one chunk. `blocks` and `light` are the padded copies from `World.snapshot`.
+ *
+ * `ground` turns on the painted land: for each padded column, in the copies' order, how many blocks of ground
+ * the land had before anything was built on it. A land block under that height loses every face that looks
+ * out over the land: its top, and a side that stands above the ground of the column beside it. A land block
+ * above that height was put there, and is drawn as a block. So is the wall of a cave, which looks into the ground.
+ */
+export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTable, ground?: Uint8Array): ChunkMesh {
   for (let col = 0; col < PAD * PAD; col++) {
     const to = col * TALL, from = col * HEIGHT;
     ids[to] = WALL; lit[to] = 0;
     for (let y = 0; y < HEIGHT; y++) { ids[to + 1 + y] = blocks[from + y]; lit[to + 1 + y] = light[from + y]; }
     ids[to + TALL - 1] = 0; lit[to + TALL - 1] = 0xf0;
+  }
+  if (ground) {
+    for (let col = 0; col < PAD * PAD; col++) {
+      let y = Math.min(HEIGHT, ground[col]) - 1;
+      const from = col * HEIGHT;
+      while (y >= 0 && (!SOLID[blocks[from + y]] || LIQUID[blocks[from + y]])) y--;
+      surface[col] = y + 1;
+    }
   }
   solid.reset();
   water.reset();
@@ -232,7 +260,12 @@ export function meshChunk(blocks: Uint8Array, light: Uint8Array, tiles: TileTabl
           const i = BASE + s * sn + u * su + v * sv, m = v * nu + u;
           const b = ids[i];
           let key = 0;
-          if (b !== 0 && !UNSEEN[b]) {
+          let drawn = b !== 0 && !UNSEEN[b];
+          if (drawn && ground && LEFT_OUT[b]) {
+            const front = i + step, ci = (i / TALL) | 0, cf = (front / TALL) | 0;
+            if (i - ci * TALL - 1 < surface[ci] && front - cf * TALL - 1 >= surface[cf]) drawn = false;
+          }
+          if (drawn) {
             const f = i + step, nb = ids[f];
             if (LIQUID[b]) {
               if (nb !== b && !OPQ[nb]) {

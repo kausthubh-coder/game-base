@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { blockId } from '../../content/blocks.ts';
 import { HEIGHT, PAD, PAD_CELLS, padIndex } from './chunk.sim.ts';
-import { EDGE_HIGH_U, EDGE_HIGH_V, EDGE_LOW_U, EDGE_LOW_V, meshChunk, TILE_TABLE_SIZE } from './mesh.sim.ts';
+import { EDGE_HIGH_U, EDGE_HIGH_V, EDGE_LOW_U, EDGE_LOW_V, leaveOut, meshChunk, TILE_TABLE_SIZE } from './mesh.sim.ts';
 import { World } from './world.sim.ts';
 
 const STONE = blockId('stone'), WATER = blockId('water'), GLASS = blockId('glass');
@@ -161,5 +161,55 @@ describe('meshing', () => {
     for (const shade of faceOf(2, 0, 11, 0, 16, 11, 16)) expect(edgesOf(shade)).toBe(0);
     // See-through glass gets none.
     for (const shade of faceOf(2, 3, 12, 3, 4, 12, 4)) expect(edgesOf(shade)).toBe(0);
+  });
+});
+
+describe('land that another view draws', () => {
+  /** Ten blocks of stone under every column, the chunk's and its neighbours' alike. */
+  function ground(): { blocks: Uint8Array; light: Uint8Array; heights: Uint8Array } {
+    const { blocks, light } = empty();
+    for (let lx = -1; lx <= 16; lx++) for (let lz = -1; lz <= 16; lz++) for (let y = 0; y < 10; y++) blocks[padIndex(lx, y, lz)] = STONE;
+    return { blocks, light, heights: new Uint8Array(PAD * PAD).fill(10) };
+  }
+
+  test('natural ground has no faces, and a pit dug into it has none either', () => {
+    const { blocks, light, heights } = ground();
+    expect(meshChunk(blocks, light, tiles).faces).toBe(256);
+    leaveOut([STONE]);
+    try {
+      // Without the land's heights nothing is left out: the mesher cannot tell ground from a wall.
+      expect(meshChunk(blocks, light, tiles).faces).toBe(256);
+      expect(meshChunk(blocks, light, tiles, heights).faces).toBe(0);
+      blocks[padIndex(5, 9, 5)] = 0;
+      blocks[padIndex(5, 8, 5)] = 0;
+      expect(meshChunk(blocks, light, tiles, heights).faces).toBe(0);
+    } finally {
+      leaveOut([]);
+    }
+  });
+
+  test('a land block put on the ground is drawn as a block', () => {
+    const { blocks, light, heights } = ground();
+    blocks[padIndex(5, 10, 5)] = STONE;
+    leaveOut([STONE]);
+    try {
+      // Its bottom rests on the ground and is hidden.
+      const mesh = meshChunk(blocks, light, tiles, heights);
+      expect(mesh.faces).toBe(5);
+      expect([mesh.minY, mesh.maxY]).toEqual([10, 11]);
+    } finally {
+      leaveOut([]);
+    }
+  });
+
+  test('a hollow under the ground keeps its six walls', () => {
+    const { blocks, light, heights } = ground();
+    blocks[padIndex(5, 5, 5)] = 0;
+    leaveOut([STONE]);
+    try {
+      expect(meshChunk(blocks, light, tiles, heights).faces).toBe(6);
+    } finally {
+      leaveOut([]);
+    }
   });
 });

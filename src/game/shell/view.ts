@@ -111,6 +111,19 @@ export interface Aim {
   id: number;
 }
 
+/**
+ * How the ground is drawn. `smooth`, the default: painted land, every one-block step a slope the hero walks up.
+ * `steps` (`?look=steps`): the same painted land with every block's top flat and a riser between, climbed with
+ * a jump. `blocks` (`?look=blocks`): the block world as it was before the painted look, with its own trees.
+ */
+export type Look = 'smooth' | 'steps' | 'blocks';
+
+/** Something that draws a scattered prop its own way. `place` returns a number above 0 to take it away by. */
+export interface StandIn {
+  place(x: number, y: number, z: number, rotation: number, scale: number, variant: number): number;
+  remove(id: number): void;
+}
+
 export interface GameView {
   readonly kernel: Kernel;
   readonly game: Game;
@@ -179,6 +192,26 @@ export interface GameView {
   /** While paused the simulation stands still and the picture is still drawn. Each reason is counted on its own. */
   setPaused(reason: string, paused: boolean): void;
   readonly paused: boolean;
+
+  // ---- the painted world
+  /** True when the world is drawn in the painted look. False with `?look=blocks` in the address. */
+  readonly painted: boolean;
+  /** How the ground is drawn. */
+  readonly look: Look;
+  /**
+   * The height of the drawn ground at a point. On painted land it is the smooth surface, which lies up to
+   * half a block from the tops of the blocks. NaN where the land is not drawn yet, and everywhere without painted land.
+   */
+  groundAt(x: number, z: number): number;
+  /** How far above the block it stands on a thing at this point is drawn. 0 without painted land. */
+  lift(x: number, y: number, z: number): number;
+  /** The painted world's view hands its ground in here. */
+  setGround(heightAt: (x: number, z: number) => number): void;
+  /**
+   * What the painted world draws in place of a scattered prop, by the prop's kind (`rock`, `bush`, `berryBush`).
+   * A view that places a prop asks here first. Empty without painted land.
+   */
+  readonly standIns: Map<string, StandIn>;
 
   // ---- a view that takes some of the keys for itself
   /**

@@ -87,6 +87,23 @@ describe('the hero body', () => {
     expect(top - 10).toBeLessThan(1.6);
   });
 
+  test('with a step-up it walks onto one block without a jump, and still stops at a wall of three', () => {
+    const walker = (x: number): HeroBody => new HeroBody(land, { x, y: 10, z: 2.5 }, createBus<GameEvent>(), { stepUp: 1 });
+    const onStep = walker(-2.5);
+    run(onStep, 0.5, { moveX: -1, moveZ: 0, jump: false });
+    expect(onStep.x).toBeLessThan(-4.3);
+    expect(onStep.y).toBeCloseTo(11, 3);
+    // The same walk without it ends against the step.
+    const { body: stopped } = heroAt(-2.5, 10, 2.5);
+    run(stopped, 0.5, { moveX: -1, moveZ: 0, jump: false });
+    expect(stopped.x).toBeGreaterThan(-3.8);
+    expect(stopped.y).toBeCloseTo(10, 3);
+    const atWall = walker(2.5);
+    run(atWall, 1.5, { moveX: 1, moveZ: 0, jump: false });
+    expect(atWall.x).toBeLessThan(4.75);
+    expect(atWall.y).toBeCloseTo(10, 3);
+  });
+
   test('bumps its head and does not pass through a ceiling', () => {
     const roofed: BlockSource = { getBlock: (_x, y) => (y < 10 || y === 12 ? STONE : 0) };
     const body = new HeroBody(roofed, { x: 0.5, y: 10, z: 0.5 });

@@ -13,7 +13,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 const MB = 1024 * 1024;
-export const LIMITS = { png: 1 * MB, folder: 12 * MB };
+export const LIMITS = { png: 1 * MB, folder: 13 * MB };
 
 // A palette that leaves a layer out on purpose, with the reason. Anything else missing is a failure.
 export const LAYER_EXEMPT = {
@@ -257,7 +257,7 @@ export function checkManifest(root) {
   }
   for (const [section, entry] of Object.entries(manifest)) {
     if (section === 'version') continue;
-    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast' && section !== 'voice' && section !== 'sound') {
+    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast' && section !== 'voice' && section !== 'sound' && section !== 'painted') {
       warnings.push(`manifest.json has a "${section}" section that docs/assets.md does not describe. Add its shape to docs/assets.md.`);
     }
     if (section === 'models') {
@@ -304,6 +304,16 @@ export function checkManifest(root) {
         for (const sound of Object.values(list.sounds ?? {})) if (typeof sound?.file === 'string') used.add(sound.file);
       } catch (error) { failures.push(`sound.list: ${error.message}`); }
       summary.push('sound');
+    } else if (section === 'painted') {
+      // The painted world's paintings are webp, each one a file that exists.
+      const textures = isObject(entry?.textures) ? Object.entries(entry.textures) : [];
+      if (!textures.length) failures.push('painted.textures lists no paintings.');
+      for (const [name, file] of textures) {
+        if (typeof file !== 'string' || !/^painted\/[a-z0-9-]+\.webp$/.test(file)) failures.push(`painted.textures.${name} is ${JSON.stringify(file)}. It must be painted/<name>.webp.`);
+        else if (!files.has(file)) failures.push(`painted.textures.${name} is "${file}". No such file in public/assets/.`);
+        else used.add(file);
+      }
+      summary.push(plural(textures.length, 'painting'));
     } else if (section === 'sprites') {
       if (!isObject(entry)) { failures.push('sprites is not an object.'); continue; }
       const example = isObject(doc?.sprites) ? Object.values(doc.sprites)[0] : null;

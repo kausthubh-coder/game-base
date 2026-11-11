@@ -9,6 +9,8 @@ import * as THREE from 'three';
 import type { ViewContext } from '../../engine/system.ts';
 import { calmNoon, type Quality } from '../../engine/types.ts';
 import { flatWorld } from '../../engine/world-query.ts';
+import { BLOCKS } from '../../content/blocks.ts';
+import { LAND_BLOCKS } from '../../content/land.ts';
 import type { BusName } from '../../features/audio/index.ts';
 import { cameraProfile, createCamera } from '../../features/camera/index.ts';
 import { createEffects } from '../../features/effects/index.ts';
@@ -27,7 +29,7 @@ import { createKeys, type MouseMode, type Press } from './keys.ts';
 import { HERO_STEP, createPlayer, type PlayerRig } from './player.ts';
 import { clearSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
 import { BUSES, DEFAULT_VOLUMES, createSound } from './sound.ts';
-import { CAMERA_MODES, CHARACTER_LOOKS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type CharacterLook, type GameView, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
+import { CAMERA_MODES, CHARACTER_LOOKS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type CharacterLook, type GameView, type Look, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
 import { dressWater } from './water.ts';
 
 /** The camera's distance at each wheel step, nearest first. A person is about 90 pixels tall at the first on a 900 pixel screen. */
@@ -166,7 +168,24 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // The ground is drawn clean: the same blocks as painted land, with soft edges between materials.
   // `?ground=today` gives the old, tile-by-tile ground to compare.
   const ground = params.get('ground') === 'today' ? 'today' : 'clean';
-  const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress * (cam?.load ?? 1), ground });
+  // The painted world draws the natural ground itself, as one smooth surface, so the block mesher leaves
+  // those blocks out. `?look=blocks` draws the ground as blocks again.
+  const look: Look = params.get('look') === 'blocks' ? 'blocks' : params.get('look') === 'steps' ? 'steps' : 'smooth';
+  const painted = look !== 'blocks';
+  const leaveOut = painted ? BLOCKS.filter((block) => LAND_BLOCKS.includes(block.key)).map((block) => block.id) : [];
+  const world = createWorld(ctx, { seed: Number(params.get('seed')) || 1, atlas: art.blockAtlas, viewScale: perf.stress * (cam?.load ?? 1), ground, leaveOut });
+  let groundAt: (x: number, z: number) => number = () => NaN;
+  /**
+   * How far above the block it stands on something is drawn. The painted land is smooth, so it lies up to half
+   * a block from the tops of the blocks. Nothing where the land is not drawn, and nothing for what stands on a
+   * floor or a roof and not on the ground.
+   */
+  function lift(x: number, y: number, z: number): number {
+    const g = groundAt(x, z);
+    if (!(g === g)) return 0;
+    const base = world.sim.heightAt(Math.floor(x), Math.floor(z)), d = g - base;
+    return Math.abs(d) <= 0.75 && Math.abs(y - base) < 1.7 ? d : 0;
+  }
   ctx.world = world.query;
   const kernel = createKernel(world.sim, Number(params.get('seed')) || 7);
   const game = kernel.game;
@@ -196,7 +215,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // With Quarter turns the 2.5D camera turns with the hand during a drag and glides to the nearest quarter after it.
   keys.onDragEnd(() => { if (tiltTurn === 'quarter') camera.settle(); });
   const start = sys.region?.spawn() ?? spawnPoint();
-  const player = createPlayer(game, world.sim, keys, start);
+  const player = createPlayer(game, world.sim, keys, start, { stepUp: look === 'smooth' ? 1 : 0, lift });
 
   /**
    * How the mouse works with a camera: the 2.5D camera points and drags, first person locks the mouse, and the free
@@ -660,6 +679,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       if (paused) keys.release();
     },
     get paused() { return pauses.size > 0; },
+
+    painted,
+    look,
+    groundAt: (x, z) => groundAt(x, z),
+    lift,
+    setGround(heightAt) { groundAt = heightAt; },
+    standIns: new Map(),
 
     claim(reason, kinds) {
       if (kinds) claims.set(reason, kinds);

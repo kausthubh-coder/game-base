@@ -275,6 +275,8 @@ export interface ActorSprites {
   setModels(models: CastModels | null): void;
   /** The id of the actor speaking in a conversation now. A model of them plays `talk` while it would stand idle. */
   setSpeaker(id: string | null): void;
+  /** How far above the block it stands on an actor is drawn: the painted land's lift. Nothing by default. */
+  setLift(lift: (x: number, y: number, z: number) => number): void;
   clear(): void;
 }
 
@@ -289,6 +291,7 @@ export function createActorSprites(sprites: Sprites): ActorSprites {
   let models: CastModels | null = null;
   let speaker: string | null = null;
   const state = { swap: false };
+  let lift: (x: number, y: number, z: number) => number = () => 0;
 
   /** The character a sprite stands for, so the hero's swing sheet does not make a new model. */
   const character = (sprite: string): string => CAST_ALIAS[sprite] ?? sprite;
@@ -299,6 +302,7 @@ export function createActorSprites(sprites: Sprites): ActorSprites {
   }
 
   return {
+    setLift(next) { lift = next; },
     sync(actors, dt) {
       pass++;
       if (state.swap) {
@@ -313,20 +317,23 @@ export function createActorSprites(sprites: Sprites): ActorSprites {
           s = undefined;
         }
         const p = actor.pos;
+        // On painted land the drawn ground lies a little off the block an actor stands on. The player's own
+        // position has that in it already.
+        const py = actor.id === 'player' ? p.y : p.y + lift(p.x, p.y, p.z);
         const anim = models && actor.id === speaker && actor.anim === 'idle' ? 'talk' : actor.anim;
         if (!s) {
-          const options = { x: p.x, y: p.y, z: p.z, facing: actor.facing, animation: anim, visible: actor.visible };
+          const options = { x: p.x, y: py, z: p.z, facing: actor.facing, animation: anim, visible: actor.visible };
           // A character the cast has no look for stays a sprite among the models.
           const model = models?.add(actor.sprite, actor.id, options) ?? null;
           const handle = model ?? sprites.add(actor.sprite, options);
-          s = { handle, sprite: model ? character(actor.sprite) : actor.sprite, model: model !== null, x: p.x, y: p.y, z: p.z, seen: pass };
+          s = { handle, sprite: model ? character(actor.sprite) : actor.sprite, model: model !== null, x: p.x, y: py, z: p.z, seen: pass };
           shown.set(actor.id, s);
         }
         s.seen = pass;
         // The player's actor is already smooth: the shell blends it between body steps.
-        const far = Math.abs(p.x - s.x) + Math.abs(p.y - s.y) + Math.abs(p.z - s.z) > SNAP;
+        const far = Math.abs(p.x - s.x) + Math.abs(py - s.y) + Math.abs(p.z - s.z) > SNAP;
         const k = actor.id === 'player' || far ? 1 : ease;
-        const dx = (p.x - s.x) * k, dy = (p.y - s.y) * k, dz = (p.z - s.z) * k;
+        const dx = (p.x - s.x) * k, dy = (py - s.y) * k, dz = (p.z - s.z) * k;
         // A sprite that stands still is not written again, so a crowd at rest costs nothing.
         if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) > 1e-4) {
           s.x += dx; s.y += dy; s.z += dz;

@@ -41,6 +41,8 @@ export interface WorldOptions {
   budgetMs?: number;
   /** `clean` draws the ground as painted land: softer tiles, broad grass color, blended edges. See ground.view.ts. */
   ground?: 'today' | 'clean';
+  /** Block ids whose faces are not drawn, because another view draws them: the land of the painted world. */
+  leaveOut?: readonly number[];
 }
 
 export interface WorldStats {
@@ -135,7 +137,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
 
   const worker = new Worker(new URL('./mesher.worker.ts', import.meta.url), { type: 'module' });
   const post = (message: WorkerRequest, transfer: Transferable[] = []): void => worker.postMessage(message, transfer);
-  post({ type: 'tiles', tiles: textures.table });
+  post({ type: 'tiles', tiles: textures.table, leftOut: Uint8Array.from(options.leaveOut ?? []) });
 
   let viewScale = options.viewScale ?? 1;
   let quality = ctx.quality;
@@ -345,7 +347,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
     }
     entry.meshing = true;
     inFlight++;
-    post({ type: 'mesh', epoch, cx: entry.cx, cz: entry.cz, rev, blocks: pad.blocks, light: pad.light }, [pad.blocks.buffer, pad.light.buffer]);
+    post({ type: 'mesh', epoch, seed: sim.seed, cx: entry.cx, cz: entry.cz, rev, blocks: pad.blocks, light: pad.light }, [pad.blocks.buffer, pad.light.buffer]);
   }
 
   /** Sends the most useful job to the worker. False when there is nothing to send. */

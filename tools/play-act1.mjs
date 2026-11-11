@@ -763,7 +763,11 @@ const QUESTS = {
       // and set its foot down at h.z + 1 so its pillow is at h.z, under the roof to come.
       await walkTo({ x: h.x + 0.5, y: g, z: h.z + 3.5 }, { within: 0.3, seconds: 30 });
       if (!ORBIT) {
-        await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 30 });
+        // A slow walk that stops a little short: the body is 0.3 wide each way, and the bed's foot ends at h.z + 2.
+        // A fast walk to h.z + 2.5 could end as far north as h.z + 2.2, on the cell the foot needs.
+        await walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.8 }, { within: 0.2, seconds: 30, soft: true });
+        const stand = (await state()).player.z;
+        must(stand - 0.3 >= h.z + 2, `the hero stopped at z ${stand.toFixed(2)}, on the cell the bed's foot needs`);
       } else {
         // Far enough back that the body stays clear of the bed's foot at h.z + 1, which ends at h.z + 2, after
         // the short step north below.

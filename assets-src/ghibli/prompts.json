@@ -1,0 +1,153 @@
+[
+  {
+    "file": "cloud-1.png",
+    "prompt": "1536x1024 PNG. ONE isolated cumulus cloud, transparent background, no sky, ground, birds or other objects. Lit upper left, warm white tops, pale blue then soft blue-violet-grey undersides, flat base and rounded billowing tops, softly brushed edges. Cloud fills about 85 percent width, entirely inside canvas. LANDSCAPE canvas width 1536 height 1024. A tall upright cumulus within a wide empty transparent canvas, full cloud centered with generous transparent margins above and below, no glow or haze outside silhouette. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 2,
+    "background": "transparent",
+    "defects": "Wider than tall; soft halo around silhouette."
+  },
+  {
+    "file": "cloud-2.png",
+    "prompt": "1536x1024 PNG. ONE isolated cumulus cloud, transparent background, no sky, ground, birds or other objects. Lit upper left, warm white tops, pale blue then soft blue-violet-grey undersides, flat base and rounded billowing tops, softly brushed edges. Cloud fills about 85 percent width, entirely inside canvas. Wide medium cumulus with three or four big lobes. Landscape canvas. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "transparent",
+    "defects": "Soft halo around silhouette."
+  },
+  {
+    "file": "cloud-3.png",
+    "prompt": "1536x1024 PNG. ONE isolated cumulus cloud, transparent background, no sky, ground, birds or other objects. Lit upper left, warm white tops, pale blue then soft blue-violet-grey undersides, flat base and rounded billowing tops, softly brushed edges. Cloud fills about 85 percent width, entirely inside canvas. Compact puffy nearly round cumulus. LANDSCAPE 1536x1024 canvas, round cloud centered with empty transparent sides. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "transparent",
+    "defects": "Wider than round; soft halo."
+  },
+  {
+    "file": "cloud-4.png",
+    "prompt": "1536x1024 PNG. ONE isolated cumulus cloud, transparent background, no sky, ground, birds or other objects. Lit upper left, warm white tops, pale blue then soft blue-violet-grey undersides, flat base and rounded billowing tops, softly brushed edges. Cloud fills about 85 percent width, entirely inside canvas. Loose group of exactly three small puffs forming one cloud asset. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "transparent",
+    "defects": "Three puffs connected by broad base; halo."
+  },
+  {
+    "file": "cloud-5.png",
+    "prompt": "A very wide LOW THIN distant horizon cloud bank, aspect ratio of cloud itself 8:1, centered on a transparent 1536x1024 landscape canvas. Only a thin horizontal strip of cloud in middle; empty space above and below. Warm white upper left tops and blue violet grey flat underside, gouache painting, soft brushed edges. No sky, no ground, no text.",
+    "tries": 1,
+    "background": "transparent",
+    "defects": "Soft halo."
+  },
+  {
+    "file": "cloud-6.png",
+    "prompt": "1536x1024 PNG. ONE isolated cumulus cloud, transparent background, no sky, ground, birds or other objects. Lit upper left, warm white tops, pale blue then soft blue-violet-grey undersides, flat base and rounded billowing tops, softly brushed edges. Cloud fills about 85 percent width, entirely inside canvas. Huge towering thunderhead column with a broad anvil top. LANDSCAPE canvas 1536x1024. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "transparent",
+    "defects": "Soft halo; base close to bottom edge."
+  },
+  {
+    "file": "leaves-1.png",
+    "prompt": "1024x1024 opaque PNG greyscale alpha mask, pure black #000000 background. Rounded foliage clump fills 80 percent of square. Many overlapping short leaf shaped gouache brush dabs, pure white and light grey only. Mostly solid white-grey inside, ragged edge with single leaf dabs sticking out. No stem, branch, colour, text, border, shadow or grey background. Round broad leaves.",
+    "tries": 1,
+    "background": "black",
+    "defects": "Clump fills more than 80 percent. Background visually black but some pixels differ slightly from pure black; slight RGB channel variation in mask."
+  },
+  {
+    "file": "leaves-2.png",
+    "prompt": "1024x1024 opaque PNG greyscale alpha mask, pure black #000000 background. Rounded foliage clump fills 80 percent of square. Many overlapping short leaf shaped gouache brush dabs, pure white and light grey only. Mostly solid white-grey inside, ragged edge with single leaf dabs sticking out. No stem, branch, colour, text, border, shadow or grey background. Longer pointed leaves.",
+    "tries": 1,
+    "background": "black",
+    "defects": "Clump fills more than 80 percent. Background visually black but some pixels differ slightly from pure black; slight RGB channel variation in mask."
+  },
+  {
+    "file": "leaves-3.png",
+    "prompt": "1024x1024 opaque PNG greyscale alpha mask, pure black #000000 background. Rounded foliage clump fills 80 percent of square. Many overlapping short leaf shaped gouache brush dabs, pure white and light grey only. Mostly solid white-grey inside, ragged edge with single leaf dabs sticking out. No stem, branch, colour, text, border, shadow or grey background. Looser clump with a few small BLACK gaps inside.",
+    "tries": 1,
+    "background": "black",
+    "defects": "Clump fills more than 80 percent. Background visually black but some pixels differ slightly from pure black; slight RGB channel variation in mask."
+  },
+  {
+    "file": "brush.png",
+    "prompt": "1024x1024 square opaque texture. Seamless tileable on all four edges, full bleed, uniform even lighting, no cast shadows, no objects, no vignette, no border, no text. Flat mid-grey gouache wash with visible overlapping flat brush strokes in slightly lighter and darker grey, low contrast, strictly greyscale.",
+    "tries": 1,
+    "background": "opaque",
+    "defects": "Visually grey but slight RGB channel variation. Seamless repetition not verified."
+  },
+  {
+    "file": "meadow.png",
+    "prompt": "1024x1024 square opaque texture. Seamless tileable on all four edges, full bleed, uniform even lighting, no cast shadows, no objects, no vignette, no border, no text. Grass meadow straight overhead, painted dabs and short strokes yellow-green, fresh mid green, some deeper blue-green, a few tiny pale flower dabs. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "opaque",
+    "defects": "Seamless repetition not verified."
+  },
+  {
+    "file": "tuft-1.png",
+    "prompt": "1024x1024 greyscale alpha mask opaque pure black #000000 background, one tuft of long grass blades painted tapering gouache strokes white and light grey only, growing up from bottom centre fanning out, tips near top. No colour, no grey background, no ground, text or border. About 12 broad blades.",
+    "tries": 1,
+    "background": "black",
+    "defects": "Background visually black but some pixels differ slightly from pure black; slight RGB channel variation in mask."
+  },
+  {
+    "file": "tuft-2.png",
+    "prompt": "1024x1024 greyscale alpha mask opaque pure black #000000 background, one tuft of long grass blades painted tapering gouache strokes white and light grey only, growing up from bottom centre fanning out, tips near top. No colour, no grey background, no ground, text or border. About 20 thin blades, a few bent over.",
+    "tries": 1,
+    "background": "black",
+    "defects": "Background visually black but some pixels differ slightly from pure black; slight RGB channel variation in mask."
+  },
+  {
+    "file": "path.png",
+    "prompt": "1024x1024 square opaque texture. Seamless tileable on all four edges, full bleed, uniform even lighting, no cast shadows, no objects, no vignette, no border, no text. Dry dirt path material straight overhead, warm ochre and pale tan, a few small pebbles, soft brush strokes. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "opaque",
+    "defects": "Some violet patches and pebble shading. Seamless repetition not verified."
+  },
+  {
+    "file": "rock.png",
+    "prompt": "1024x1024 square opaque texture. Seamless tileable on all four edges, full bleed, uniform even lighting, no cast shadows, no objects, no vignette, no border, no text. Painted rock surface warm grey planes with cool blue-violet shade strokes and a few cracks. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "opaque",
+    "defects": "Seamless repetition not verified."
+  },
+  {
+    "file": "bark.png",
+    "prompt": "1024x1024 square opaque texture. Seamless tileable on all four edges, full bleed, uniform even lighting, no cast shadows, no objects, no vignette, no border, no text. Painted tree bark, vertical strokes, warm brown, darker violet-brown furrows, a few ochre highlights. Opaque poster colour gouache on paper, late-1980s hand-painted Japanese anime countryside summer film background aesthetic. Visible soft brush marks, clean subdued colour, warm light, cool blue-violet shade, no outlines, no photo detail, no text, signature, border or frame.",
+    "tries": 1,
+    "background": "opaque",
+    "defects": "Seamless repetition not verified."
+  },
+  {
+    "file": "paper.png",
+    "prompt": "1024x1024 square opaque texture. Seamless tileable on all four edges, full bleed, uniform even lighting, no cast shadows, no objects, no vignette, no border, no text. Blank cold-press watercolour paper, very light warm grey, fine even grain, no marks, absolutely blank flat paper texture.",
+    "tries": 1,
+    "background": "opaque",
+    "defects": "Seamless repetition not verified."
+  },
+  {
+    "file": "foliage-1.png",
+    "prompt": "ONE rounded clump of broadleaf tree foliage, a single bough's worth of leaves seen from the side. No trunk, no branch. Ragged leafy edge all round with single leaf dabs sticking out. Mostly solid inside, with two or three small dark gaps. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  },
+  {
+    "file": "foliage-2.png",
+    "prompt": "The same subject, wider than tall, flatter on the underside, a little looser. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  },
+  {
+    "file": "foliage-3.png",
+    "prompt": "The same subject, a smaller tighter clump with larger leaf dabs, as seen close up. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  },
+  {
+    "file": "foliage-4.png",
+    "prompt": "One clump of dark conifer or cedar foliage, denser and darker green, with short dabs that point outward and upward. No trunk. Opaque poster colour (gouache), as in late-1980s hand-painted anime film backgrounds of the countryside in summer. Leaves suggested by many small brush dabs. Light from the upper left: warm yellow-green dabs on the upper left, fresh mid green in the middle, deep cool blue-green in the lower right and in the gaps. No black, no outlines, no text. True transparent background, nothing else in the picture. 1024x1024, subject centred, filling about 85 percent of the square.",
+    "tries": null,
+    "background": "transparent",
+    "defects": "",
+    "note": "This is the brief given to the image agent. Its run was stopped before it saved its exact wording and try count."
+  }
+]

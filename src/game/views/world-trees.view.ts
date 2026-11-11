@@ -1,4 +1,3 @@
-export interface RockModels {place(x:number,y:number,z:number,rotation:number,scale:number,variant:number):number;remove(id:number):void}
 // One instanced draw per model variant. Rules own the placements and standing state.
 // Shadows: a crown of 1,300 to 1,500 triangles in the shadow pass costs too much, so each tree is stood in for
 // there by a box for its trunk and a few balls fitted to its leaves when the model loads. Both live on the layer
@@ -88,6 +87,8 @@ function dappleTexture(): THREE.DataTexture {
 }
 
 export async function install(view: GameView): Promise<void> {
+  // The painted world draws its own trees and boulders.
+  if (view.painted) return;
 
   const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
   const loader = new GLTFLoader();
@@ -182,7 +183,7 @@ export async function install(view: GameView): Promise<void> {
   // Dressing hands rock placements to this shared two-variant batch.
   const rocks=new Map<number,{name:string;x:number;y:number;z:number;rotation:number;scale:number}>();
   let next=1;
-  (view as GameView & {modelRocks: RockModels}).modelRocks={place(x,y,z,rotation,scale,variant){const id=next++;rocks.set(id,{name:variant%2?'rock-37':'rock-11',x,y,z,rotation,scale});refresh();return id;},remove(id){rocks.delete(id);refresh();}};
+  view.standIns.set('rock',{place(x,y,z,rotation,scale,variant){const id=next++;rocks.set(id,{name:variant%2?'rock-37':'rock-11',x,y,z,rotation,scale});refresh();return id;},remove(id){rocks.delete(id);refresh();}});
   function refresh():void {
     for(const name of ['rock-11','rock-37']) batches.get(name)!.count=0;
     for(const r of rocks.values()){

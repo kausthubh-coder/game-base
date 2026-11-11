@@ -31,9 +31,14 @@ export interface HeroTuning {
   jumpSpeed: number;
   /** Meters between two footstep events. */
   stride: number;
+  /**
+   * The height of a ledge the body walks up without a jump, in blocks. 0 stops at every ledge. The painted
+   * world draws a one-block rise as a slope, so there it is 1.
+   */
+  stepUp: number;
 }
 
-export const DEFAULT_HERO: HeroTuning = { half: 0.3, tall: 1.8, walkSpeed: 4.4, swimSpeed: 2.4, gravity: 28, jumpSpeed: 8.6, stride: 0.8 };
+export const DEFAULT_HERO: HeroTuning = { half: 0.3, tall: 1.8, walkSpeed: 4.4, swimSpeed: 2.4, gravity: 28, jumpSpeed: 8.6, stride: 0.8, stepUp: 0 };
 
 /** The body moves in steps of this many seconds, always, so it behaves the same at any frame rate. */
 export const HERO_STEP = 1 / 60;
@@ -137,6 +142,11 @@ export class HeroBody {
 
     this.blocked = false;
     const dx = this.vx * dt, dz = this.vz * dt;
+    // A low ledge in the way is walked up: the body rises onto it when there is room for it up there.
+    if (t.stepUp > 0 && this.grounded && !this.swimming && (dx !== 0 || dz !== 0) && this.hits(this.x + dx, this.y, this.z + dz)
+      && !this.hits(this.x, this.y + t.stepUp, this.z) && !this.hits(this.x + dx, this.y + t.stepUp, this.z + dz)) {
+      this.y += t.stepUp;
+    }
     if (dx !== 0) {
       if (this.hits(this.x + dx, this.y, this.z)) {
         this.x = dx > 0 ? Math.floor(this.x + dx + t.half) - t.half - EPS : Math.floor(this.x + dx - t.half) + 1 + t.half + EPS;

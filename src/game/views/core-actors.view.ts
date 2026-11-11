@@ -83,6 +83,7 @@ export async function install(view: GameView): Promise<void> {
   layer.setAttribute('aria-hidden', 'true');
   view.root.append(style, layer);
 
+  actors.setLift(view.lift);
   const badges = new Map<string, Badge>();
   const rings = new Map<string, { element: HTMLElement; seen: number }>();
   const sys = view.game.systems as Partial<Systems>;

@@ -181,6 +181,19 @@ The optional `cast` object lists the characters drawn when Characters is "3D mod
 `"hero": {"file":"models/cast-hero.glb","source":"assets-src/cast/sources/hero.blend","triangles":3400,"budget":4000,"bytes":149716}`.
 The verifier reads each GLB and checks the counts, the byte size and that the source exists.
 
+## The painted world's textures
+
+The painted world (`src/features/painted`) draws its land, trees, rocks, grass tufts and clouds with twelve
+paintings: a brush-mark texture, the meadow, bark, rock, two grass tufts and six clouds.
+
+- **The files.** `public/assets/painted/<name>.webp`. `manifest.json` lists them as
+  `"painted": { "textures": { "<name>": "painted/<name>.webp" } }`.
+- **Where they come from.** Generated images, kept out of git in `assets-src/ghibli/raw`, with their prompts
+  in `assets-src/ghibli/prompts.json`. `bun tools/ghibli-assets.mjs` cuts and scales them for the painted
+  meadow test scene (`demos/ghibli/assets`) and copies these twelve into `public/assets/painted`.
+- **When one is missing.** The feature draws a stand-in by code, so the world is always drawn. The leaf sprays
+  and the flowers are always drawn by code and have no file.
+
 ## Recorded sounds
 
 Ambience beds, footsteps, tool strikes, hand sounds and the town's spot sounds. `bun --env-file=.env.local

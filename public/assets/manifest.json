@@ -1445,5 +1445,21 @@
   "sound": {
     "list": "sound/sound.json",
     "model": "eleven_text_to_sound_v3"
+  },
+  "painted": {
+    "textures": {
+      "brush": "painted/brush.webp",
+      "meadow": "painted/meadow.webp",
+      "bark": "painted/bark.webp",
+      "rock": "painted/rock.webp",
+      "tuft-1": "painted/tuft-1.webp",
+      "tuft-2": "painted/tuft-2.webp",
+      "cloud-1": "painted/cloud-1.webp",
+      "cloud-2": "painted/cloud-2.webp",
+      "cloud-3": "painted/cloud-3.webp",
+      "cloud-4": "painted/cloud-4.webp",
+      "cloud-5": "painted/cloud-5.webp",
+      "cloud-6": "painted/cloud-6.webp"
+    }
   }
 }

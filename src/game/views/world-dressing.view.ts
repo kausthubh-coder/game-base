@@ -5,10 +5,9 @@
 // behind them. A chunk's props stay true to its blocks: when a block in the chunk changes (tilled soil,
 // a placed block, a station), every prop whose ground is no longer what it grew on is taken away.
 // Nothing is scattered where the region says not to.
-import type { RockModels } from './world-trees.view.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import type { RegionProp } from '../api.sim.ts';
-import type { GameView } from '../shell/view.ts';
+import type { GameView, StandIn } from '../shell/view.ts';
 import { worldProps, type Scattered } from '../worldview/props.ts';
 import { berryBushes, buildingProps, scatterSettings } from '../worldview/region.ts';
 
@@ -63,17 +62,31 @@ interface ShownBush {
   handle: number;
 }
 
+/** Scattered props the painted world does not use: it grows grass, tufts and flowers of its own. */
+const PAINTED_GROWS = new Set(['grassTuft', 'tallGrass', 'flower']);
+
 export function install(view: GameView): void {
   const { game } = view;
   const sim = view.world.sim;
   const baseProps = worldProps(view);
-  const rocks = () => (view as GameView & {modelRocks?: RockModels}).modelRocks;
+  // A prop the painted world draws its own way goes there, and is known by a number below 0. Everything
+  // else is a prop as before. The painted ground lies a little off the blocks' tops, so both are lifted onto it.
+  const stoodIn = new Map<number, { by: StandIn; id: number }>();
+  let nextStandIn = -1;
   const props = { ...baseProps,
-    place(kind:string,variant:number,x:number,y:number,z:number,rotation=0,scale=1,must=false) {
-      if(kind==='rock'&&rocks()) return -rocks()!.place(x,y,z,rotation,scale,variant);
-      return baseProps.place(kind,variant,x,y,z,rotation,scale,must);
+    place(kind: string, variant: number, x: number, y: number, z: number, rotation = 0, scale = 1, must = false): number {
+      const by = view.standIns.get(kind), py = y + view.lift(x, y, z);
+      if (!by) return baseProps.place(kind, variant, x, py, z, rotation, scale, must);
+      const id = by.place(x, py, z, rotation, scale, variant);
+      if (id <= 0) return 0;
+      stoodIn.set(nextStandIn, { by, id });
+      return nextStandIn--;
     },
-    remove(id:number){if(id<0) rocks()?.remove(-id);else baseProps.remove(id);}
+    remove(handle: number): void {
+      if (handle >= 0) { baseProps.remove(handle); return; }
+      const stood = stoodIn.get(handle);
+      if (stood) { stood.by.remove(stood.id); stoodIn.delete(handle); }
+    },
   };
   const patches = new Map<number, Patch>();
   const patchList: Patch[] = [];
@@ -120,6 +133,8 @@ export function install(view: GameView): void {
       found.length = 0;
     }
     for (const p of found) {
+      // The painted world grows its own grass and flowers, and its ground lies a little off the blocks' tops.
+      if (view.painted && PAINTED_GROWS.has(p.kind)) continue;
       const handle = props.place(p.kind, p.variant, p.x, p.y, p.z, p.rotation, p.scale);
       if (handle === 0) continue;
       patch.handles.push(handle);
