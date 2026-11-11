@@ -41,6 +41,20 @@ They are written twice, on purpose: on `.gu-root` in `src/game/ui/styles.ui.ts` 
 `.ui-book` in `src/game/uiview/theme.ts` (as `--ui-paper`, `--ui-gold` …), because `createGameUi` also runs on its own
 in demos. Change a value in both.
 
+## The four big screens
+
+- **Bag:** the slots on the left, a detail pane on the right that draws the pointed-at (or held) thing large on the
+  painted `detail` card with its name, count, use and description. A narrow screen drops the pane for the tooltip.
+- **Almanac:** a leather book lying open (`book-cover`, `page`, `gutter`, `ribbon`): the index on the left page, the
+  entry on the right, facts inked in Fraunces.
+- **Pause:** big night tiles with gold line icons to the bag, the Almanac, the quests and the map, then the pills
+  that leave the menu.
+- **Map:** a chart on `map-paper` with a faint grid and the `compass`; the land is multiplied into the paper and its
+  seen edge is a rounded, feathered outline (`feather()` in `src/features/map/fullmap.ui.ts`).
+
+Kit pieces made but not used yet: `panel-dark`, `card-rare`, `card-epic`, `dial`, `name-plate`, `hint`, `map-fog`,
+`tile`, `tile-hover`, `slot-empty`. Reach for them before asking for new art.
+
 ## Where each piece is styled
 
 | Piece | Stylesheet |
