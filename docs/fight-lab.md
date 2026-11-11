@@ -47,8 +47,10 @@ src/game/fightview/           drawing and the interface for the lab
   feel.ts                       a fight event into a freeze, a jolt, a flash on the ground, particles and a sound
   looks.ts                      which sheet, frame, squash and tint a fighter shows, and the stand-ins
   draw.ts                       each frame: the fighters where the rules have them, and the marks on the ground
-  figures.ts                    one quad per fighter: size, flash, shake, squash, drained grey, colors coming back
+  calm.ts                       the moment of calming around the beast: the thread, the ash, the green, the gift
+  figures.ts                    one quad per fighter: size, flash, shake, squash, roll, drained grey, colors coming back
   ground.ts                     everything flat on the ground, one draw call
+  sparks.ts                     small pixel pictures in the air: motes, ash, a heart, flowers, pips, gifts. One draw call
   rigs.ts                       the four rigs as stand-in shapes
   arena.ts                      stamps the arena into the block world and dresses it
   panel.ui.ts                   the card, the bars, the bar over the beast, "Again?", the log
@@ -56,6 +58,8 @@ src/game/fightview/           drawing and the interface for the lab
 src/game/views/lab-fight.view.ts   the glue: the flag, the arena, making the fight, the order of a frame, the door
 tools/fight-sim.ts            the bot against every beast in every way, with no browser
 tools/fight-play.mjs          one fight in headless Chrome, by the bot or by real keys
+tools/fight-poses.mjs         every pose of every fighter, set through the door, one sheet of pictures each
+tools/fight-strip.mjs         a strip of pictures through one calming, in order
 ```
 
 The arrows go one way. Content knows nothing. The rules read content. The view reads the rules and never
@@ -89,10 +93,14 @@ The words `window`, `document` and `THREE` may not appear in a `.sim.ts` file, n
   and from its stand-in otherwise. `window.__fight.standIns()` lists what is a stand-in right now.
 - **One freeze.** The freeze of a hit is in one place, `steer`: the fight's clock and the body wait, the
   picture goes on.
-- **Draw calls.** One for each fighter (at most about eight), one for everything on the ground, a few for the
-  rigs and the three trees. The game's budget is 150 draw calls, 400,000 triangles and 6 ms of script a frame.
+- **Draw calls.** One for each fighter (at most about eight), one for everything on the ground, one for the
+  sparks in the air, a few for the rigs and the three trees. The game's budget is 150 draw calls, 400,000
+  triangles and 6 ms of script a frame.
 - **The door.** `window.__fight` has the fight, `bot(on, layout)`, `state()`, `log()`, `standIns()`,
-  `screen(x, z)` and `keysToward(x, z)`. Tests use it. The game's own door `window.__game` is still there.
+  `screen(x, z)` and `keysToward(x, z)`. `hold(on)` stops the rules while the picture goes on, so a test can
+  set a fighter's state by hand and look at its pose. `slow(k)` plays the picture's own clocks k times as
+  fast, for a strip of screenshots. `reduceMotion(on)` switches the game's setting. `state().beast.moment` is
+  the seconds into the moment of calming. Tests use it. The game's own door `window.__game` is still there.
 
 ## The sheets the lab asks for
 
@@ -112,6 +120,52 @@ contract: the view looks for them in the manifest.
 Beasts are drawn in their healthy colors. The drained grey and the colors coming back are the shader in
 `figures.ts`, so the two looks always have the same pose.
 
+How `looks.ts` uses them:
+
+| Fighter | State | What shows |
+|---|---|---|
+| Hero | A cut | Wind-up until the step the cut lands, the strike for a tenth of a second from there (so the freeze of the hit holds it), the follow-through, the recovery. The second cut starts from the recovery and is mirrored when seen from the front or the back, so it swings the other way. |
+| Hero | Charging a spin, the spin | The wind-up held, brighter when the spin is ready. The strike turned once around the views. |
+| Hero | Dodge, hurt | Their poses. The two afterimages of a dodge are the dodge pose. |
+| Hero | Holding the Mark | Reach for 0.18 seconds, then calm, and calm through the release after it. |
+| Hero | Throw, whistle | Wind-up, then release. A throw that is also an order to the pet points instead. |
+| Hero | Faint | The hurt pose tipped over onto its back, pale. |
+| Hero | Safe after a hit | A cool, brighter light on every other frame. The hero never disappears. |
+| Pet | Strike, hurt, fainted | Their poses. A strike hops: 0.35 blocks for the leaftail, 0.12 for the pebblepup. |
+| Pet | Brace | The ready pose, planted wider and lower. |
+| Beast | Asleep | The calm pose, its eyes shut, drained grey. |
+| Beast | Tell | The tell pose with a small breath of squash, and a warm light for the last quarter second. |
+| Beast | Charge, just after an attack | The attack pose. |
+| Beast | Dizzy, stunned, snared | The dizzy pose. Dizzy sways, a snare struggles. |
+| Beast | Thrown by a plate | The dizzy pose, tumbling through the air. |
+| Beast | Calmed | The dizzy pose while the grey runs out, then the calm pose with a settle. |
+
+## The moment of calming
+
+Research note 08 says winning without killing has to play as a win, and the handbook calls the color coming
+back the most important small animation in the game. It is one clock per beast, counted in seconds from the
+end of the release's freeze (`CALM` in `calm.ts`):
+
+| Seconds | What happens |
+|---|---|
+| The hold | The hero holds out the Mark. A thread of teal light runs along the ground to the beast and fills as the hold grows, and motes rise off it. The ring that closes around the beast stays. |
+| The release, before 0 | 10 frames of freeze. The beast is lit in the Mark's pale teal, never the white of a hit, and a ring of light goes out from under it. The spell sound plays. |
+| 0 to 1.5 | The colors come back from the head down behind a bright line. Flecks of grey ash lift off where the line passes and vanish upward. |
+| 1.25 to 2.6 | A ring of fresh green spreads from under the beast and fades, and seven flowers open as it passes them. |
+| 1.5 | It bows: the calm pose with a small settle. A teal heart shows over it, and the stinger plays. |
+| 1.95 to 3.1 | The gift pops out in a small arc, lands, and flies to the hero with its name over it: a quill, a tusk, a spring. |
+| 3.6 | The lab asks "Again?". |
+
+A machine is shut down, not calmed. The gearling stays tipped over and lit for 0.4 seconds while its eye goes
+dark, then stands, settles with a puff of dust and the stinger, and a spring pops out at 0.75. No ash, no
+heart, no green.
+
+With the game's reduce motion on, nothing flies: the colors fade back in place, the ring of green and the
+flowers stand at full size and fade, and the gift's name shows over the hero.
+
+The hold's motes and the ash are fewer at lower quality: 45% at `low`, 70% at `medium`. The sparks are one
+draw call at every level.
+
 ## Where the view should be cut
 
 The view is cut along these lines, so two people can work on it without meeting in one file:
@@ -126,16 +180,31 @@ The view is cut along these lines, so two people can work on it without meeting 
 
 ## Still to build
 
+Milestone 2, the real art in the lab, is done. Every pose of every fighter was set through the door and looked
+at, at the game's zoom (`tools/fight-poses.mjs`). The scales fit the rules as drawn: each beast is about as wide
+as its radius says, and the boar stands a little taller than the hero. What changed:
+
+- The cut is timed to the rules: the strike is on screen from the step the cut lands and through the freeze.
+  The rules now land a cut on its sixth step, as note 05 times it, where before it was a step late.
+- The second cut swings back, the charge holds the wind-up, the faint lies down, a throw that orders points.
+- A tell keeps its pose with only a small breath of squash on it (it was puffed up to 1.28 times on top of a
+  real pose), and its warm light no longer darkens a grey beast to brown.
+- The moment of calming, above.
+- The hero shimmers through the safe moment after a hit instead of vanishing on every other frame.
+- The marks of thrown light are teal pips over the beast's head. The pet's strike sends them diving into it.
+- The game's own hints are hidden in the lab.
+- A rig refused for being too near a beast shows the ring the beast keeps clear, in red, outside its body.
+- The spin pushes what it hits 2 blocks away over a quarter second, and a steady beast only once its guard is
+  empty, with a test.
+- The pebblepup plays the pet's way. Its brace takes an attack for the hero, and the record counts it.
+
 Milestone 1, the lab with stand-in art, is done: every way plays start to finish against every beast in the
 browser, by the bot and by real keys; the view is cut into `keys`, `feel`, `looks` and `draw`; a cut pushes a
 small beast; the screen shakes, with a switch; the edge warms at low health; `tools/fight-serve.mjs` keeps
 the ratings; and the lab is in `verify-game`'s feature map (`features/fight-lab.md`).
 
-Milestone 2, real assets:
-
-- The sheets above, wired through `looks.ts`.
-- The four rigs and the marks of an attack as props, with the `make-3d-asset` skill.
-- The moment of calming, worked up: it is the most important small animation in the game.
+Still open from milestone 2: the four rigs and the marks of an attack as props, with the `make-3d-asset`
+skill. Another helper has that.
 
 Milestone 3, the boss tests. Two hooks go into `fight.sim.ts` so a boss can be its own module:
 
@@ -151,12 +220,21 @@ the place and its parts are the targets, and fails when it stops attacking the p
 
 ## Known weak spots
 
-- The hero's stand-in cut is the farm tool's swing, and it has no dodge, hurt or calm pose. The hurt and the
-  dodge are the idle and walk frames squashed and tinted.
-- A hero nobody can hit blinks fully out on every other frame, so for half a second after a hit the hero is
-  gone on half the frames.
-- The marks of thrown light are thin teal rings close around the beast, the same color as the hold of the
-  Mark. They read as one thing at a glance.
+Most serious first. The ones that need a sheet redrawn say so.
+
+- The hero in `hero-cut` is slimmer than in his own sheet, and his front view turns a little to the side, so
+  he changes shape for the length of a cut. Code cannot fix it: the sheet needs redrawing.
+- The sheets have three views, so a cut at 45 degrees shows the side view while its arc on the ground shows
+  the true angle. Note 05 names eight directions as the upgrade if this reads wrong in play.
+- The second cut in a side view is the first cut again: mirroring a side view would turn the hero around. A
+  real backswing needs its own frames.
+- The pets are small at the fight's zoom (0.85 and 0.9 blocks tall), so the leaftail's tail whip and the
+  pebblepup's brace read as a crouch and a hop. The pebblepup's brace does not show its stone back clearly
+  (the artists' report says so too): a sheet with a clearer brace pose would fix it.
+- The boar's tell holds its head high, where a charge would want it low. The code adds only a small draw back.
+- The release lights the boar so far it reads as a flat pale shape for 10 frames. That is the bright frame the
+  design asks for, but it loses the boar's detail.
+- The gift's name can sit over the hero's head as it arrives.
 - Tall grass pokes through the shapes on the ground. Their rims stay readable at every quality, but their
   fill is broken up.
 - A charge that ends at the arena's edge stops as if at water. Nothing shows the edge but a pale ring.

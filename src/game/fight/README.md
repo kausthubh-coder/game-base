@@ -42,10 +42,10 @@ Options: `way`, `pet`, `gentle`, `random`, `onEnd(record)`, `external` (the call
 
 ## The hero fights (`hero`)
 
-- A cut lands 0.1 seconds after the press, in a 150 degree arc 2.2 blocks long, and takes 10 guard. A second press after 0.2 seconds chains a second cut. Each cut takes 0.4 seconds in all.
+- A cut lands six steps of the body (0.1 seconds) after the step that reads the press, in a 150 degree arc 2.2 blocks long, and takes 10 guard. A second press after 0.2 seconds chains a second cut. Each cut takes 0.4 seconds in all.
 - A cut turns toward a beast within 35 degrees of the pointer.
 - A cut pushes a thistlehog 0.4 blocks over 0.12 seconds, slowing to a stop. The gearling and the boar are steady: a cut moves them only once their guard is empty.
-- Holding the button 0.6 seconds charges a spin. Letting go hits everything within 2.5 blocks for 30 guard.
+- Holding the button 0.6 seconds charges a spin. Letting go hits everything within 2.5 blocks for 30 guard, and pushes each beast it hits 2 blocks away over 0.25 seconds. A steady beast is not pushed until its guard is empty.
 - Shift dodges 3.5 blocks the way the hero walks, or back with no key held. Nothing hits the hero for its first 0.3 seconds. It costs 25 of 100 stamina, which comes back 1 second after it was last spent.
 - The pet strikes what the hero hit last, with 1.5 times as long between strikes as in the pet's way. C calls its first skill.
 
@@ -86,7 +86,7 @@ Options: `way`, `pet`, `gentle`, `random`, `onEnd(record)`, `external` (the call
 
 ## The record
 
-`fight.record` counts what note 08's checks need: the seconds of setup and of the fight, hits taken and by what, swings and whiffs, useful presses and the longest gap, orders and how many were in time, whistles, the pet's hits and faints, rigs placed and set off, the layout, crashes, and the answer to "Again?". `onEnd` gets a copy when a fight is won and when one in progress is dropped. `checksOf` turns it into pass or fail lines.
+`fight.record` counts what note 08's checks need: the seconds of setup and of the fight, hits taken and by what, swings and whiffs, useful presses and the longest gap, orders and how many were in time, whistles, attacks a braced pet took for the hero, the pet's hits and faints, rigs placed and set off, the layout, crashes, and the answer to "Again?". `onEnd` gets a copy when a fight is won and when one in progress is dropped. `checksOf` turns it into pass or fail lines.
 
 ## Tests
 
