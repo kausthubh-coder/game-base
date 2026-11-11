@@ -10,7 +10,8 @@
 // With everything on that is four small draw calls after the scene.
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
-import type { Quality, Vec3 } from '../../engine/types.ts';
+import type { Vec3 } from '../../engine/types.ts';
+import { QUALITY, type Level } from '../../content/quality.ts';
 
 export interface PostSettings {
   /** Glow around bright things: lamps, lume, the sun, lightning, glowing particles. */
@@ -63,11 +64,11 @@ export interface Post extends ViewSystem {
   cost(): PostCost;
 }
 
-const LEVELS: Record<Quality, PostSettings> = {
-  low: { bloom: false, tiltShift: false, vignette: false, toneMapping: true, renderScale: 0.75, msaa: 0 },
-  medium: { bloom: true, tiltShift: false, vignette: true, toneMapping: true, renderScale: 1, msaa: 2 },
-  high: { bloom: true, tiltShift: true, vignette: true, toneMapping: true, renderScale: 1, msaa: 4 },
-};
+/** A level's switches, from the quality table. */
+function levelSettings(level: Level): PostSettings {
+  const q = QUALITY[level];
+  return { bloom: q.bloom, tiltShift: q.tiltShift, vignette: q.vignette, toneMapping: q.toneMapping, renderScale: q.renderScale, msaa: q.msaa };
+}
 
 const COSTS: Record<keyof PostSettings, string> = {
   bloom: 'Three draw calls at a quarter of the width and height: about a fifth of one full-screen pass, plus one texture read in the final pass.',
@@ -154,7 +155,7 @@ export function createPost(ctx: ViewContext, options: PostOptions = {}): Post {
   const { renderer } = ctx;
   // The scene and camera to draw: the ones from the latest `update`.
   let view = ctx;
-  const settings: PostSettings = { ...LEVELS[ctx.quality] };
+  const settings: PostSettings = levelSettings(ctx.quality);
   let basePixelRatio = options.pixelRatio ?? renderer.getPixelRatio();
   let appliedPixelRatio = basePixelRatio;
   const toneMappingBefore = renderer.toneMapping;
@@ -265,7 +266,7 @@ export function createPost(ctx: ViewContext, options: PostOptions = {}): Post {
     },
 
     setQuality(quality) {
-      Object.assign(settings, LEVELS[quality]);
+      Object.assign(settings, levelSettings(quality));
       applySettings();
     },
 

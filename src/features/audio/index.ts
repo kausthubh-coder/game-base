@@ -16,6 +16,7 @@ import type { Palette } from '../../content/palettes/types.ts';
 import type { GameEvent } from '../../engine/events.ts';
 import type { ViewSystem } from '../../engine/system.ts';
 import type { Ambient, Quality, Surface, Vec3 } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import { Ambience, type Air } from './ambience.ts';
 import { dayAmount, dominant, maskNames, noteName, normalizeWeights, slewWeights, snapToMask } from './blend.sim.ts';
 import { barOf, beatOf } from './conductor.sim.ts';
@@ -559,8 +560,7 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
     },
 
     setQuality(quality: Quality) {
-      music.rich = quality !== 'low';
-      mixer.rich = quality !== 'low';
+      music.rich = mixer.rich = QUALITY[quality].richSound;
     },
 
     soloLayer(layer) {

@@ -115,9 +115,6 @@ export const footstepEffect: Record<Surface, { effect: EffectId; color?: number;
   metal: null,
 };
 
-/** How much of the particle count each quality level keeps. */
-export const effectQuality = { low: 0.5, medium: 0.75, high: 1 } as const;
-
 /** The most particles alive at once, and how many of those the weather may hold. */
 export const effectBudget = { particles: 2000, weather: 1500 } as const;
 

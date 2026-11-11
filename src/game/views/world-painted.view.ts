@@ -56,7 +56,8 @@ export async function install(view: GameView): Promise<void> {
   const waterRings = view.water.material.uniforms as { uRipples?: { value: THREE.Vector4[] }; uTime?: { value: number } };
   const water = createWater(blocks, land, PAINTED_WATER, waterRings.uRipples && waterRings.uTime ? { rings: waterRings.uRipples, time: waterRings.uTime } : undefined);
   view.water.material.visible = false;
-  const grass = createGrass(land, textures, view.ctx.quality);
+  let grassLevel = view.ctx.quality;
+  const grass = createGrass(land, textures, grassLevel);
   const backdrop = createBackdrop(textures);
   // Past the land the game holds in memory, the same hills and rivers drawn from the land's shape alone.
   const farLand = createFarLand({
@@ -322,6 +323,8 @@ export async function install(view: GameView): Promise<void> {
     farLand.update(p.x, p.z, edge - 15);
     water.update(p.x, p.z, reach);
     plantFar();
+    // The grass grows again, thinner or denser, when the quality level changes.
+    if (view.ctx.quality !== grassLevel) grass.setQuality((grassLevel = view.ctx.quality));
     grass.update(p.x, p.z);
     for (let i = falling.length - 1; i >= 0; i--) {
       const f = falling[i] as (typeof falling)[number];

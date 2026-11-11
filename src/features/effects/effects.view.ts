@@ -7,7 +7,8 @@ import * as THREE from 'three';
 import type { GameEvent } from '../../engine/events.ts';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality, Vec3 } from '../../engine/types.ts';
-import { effectQuality, type EffectId } from '../../content/effects.ts';
+import { QUALITY } from '../../content/quality.ts';
+import type { EffectId } from '../../content/effects.ts';
 import { playEvent } from './event-effects.ts';
 import { createParticleStore, STRIDE, type EmitOptions } from './particles.ts';
 import { createWeatherEmitters } from './weather-emitters.ts';
@@ -162,7 +163,7 @@ export function createEffects(ctx: ViewContext, options: EffectsOptions = {}): E
   const { scene } = ctx;
   const store = createParticleStore({ seed: options.seed });
   const weather = createWeatherEmitters(store);
-  store.quality = effectQuality[ctx.quality];
+  store.quality = QUALITY[ctx.quality].particles;
   let world = ctx.world;
   store.groundAt = (x, z) => world.heightAt(x, z);
 
@@ -245,7 +246,7 @@ export function createEffects(ctx: ViewContext, options: EffectsOptions = {}): E
     },
 
     setQuality(quality: Quality) {
-      store.quality = effectQuality[quality];
+      store.quality = QUALITY[quality].particles;
     },
 
     update(dt, view) {

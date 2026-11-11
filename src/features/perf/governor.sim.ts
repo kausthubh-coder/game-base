@@ -2,10 +2,10 @@
 // size first, effects second. When the rate holds above the high mark it takes them back, in the
 // opposite order. A step up that fails makes it wait longer before it tries again, so it settles
 // and does not flicker between two levels.
-import type { Quality } from '../../engine/types.ts';
+import { QUALITY_LADDER, type Level } from '../../content/quality.ts';
 
 export interface GovernorStep {
-  quality: Quality;
+  quality: Level;
   /** The share of the full render size on each axis, 1 is full size. */
   scale: number;
 }
@@ -28,13 +28,7 @@ export const DEFAULT_GOVERNOR: GovernorOptions = {
   high: 58,
   lowHold: 2,
   highHold: 4,
-  ladder: [
-    { quality: 'high', scale: 1 },
-    { quality: 'high', scale: 0.85 },
-    { quality: 'high', scale: 0.7 },
-    { quality: 'medium', scale: 0.7 },
-    { quality: 'low', scale: 0.7 },
-  ],
+  ladder: QUALITY_LADDER,
 };
 
 export class Governor {

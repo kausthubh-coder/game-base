@@ -16,7 +16,8 @@
 // the last stroke back. The model of those events is docs/verify/build-stroke/Stroke.tla.
 import * as THREE from 'three';
 import { BLOCKS } from '../../content/blocks.ts';
-import type { Quality, Vec3 } from '../../engine/types.ts';
+import type { Vec3 } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import { buildProp } from '../../features/props/index.ts';
 import { SOLID } from '../../features/world/chunk.sim.ts';
 import { emptyHit } from '../../features/world/index.ts';
@@ -27,8 +28,6 @@ import type { GameView } from '../shell/view.ts';
 import { KNOWS_BUILD_FLAG } from '../uiview/build.ts';
 import { worldProps } from '../worldview/props.ts';
 
-/** The grid reaches this many cells from the pointer each way, at each quality. */
-const GRID_REACH: Record<Quality, number> = { low: 4, medium: 6, high: 7 };
 const GRID_MOST = (2 * 7 + 1) ** 2;
 /** The most cells a sprinkler's reach is drawn on: five blocks each way. */
 const REACH_MOST = 11 * 11;
@@ -154,7 +153,7 @@ export function install(view: GameView): void {
   let gridCount = 0, gridX = NaN, gridY = NaN, gridZ = NaN, gridAge = 0;
 
   function layGrid(x: number, y: number, z: number): void {
-    const reach = GRID_REACH[view.ctx.quality];
+    const reach = QUALITY[view.ctx.quality].buildGridReach;
     gridCount = 0;
     for (let dx = -reach; dx <= reach; dx++) {
       for (let dz = -reach; dz <= reach; dz++) {
@@ -427,7 +426,7 @@ export function install(view: GameView): void {
   }
 
   function drawFlashes(now: number): void {
-    if (view.ctx.quality === 'low') return;
+    if (!QUALITY[view.ctx.quality].buildFlashes) return;
     for (let i = 0; i < MAX_CELLS; i++) {
       const born = flashes[i * 4 + 3];
       if (born <= 0 || now - born > FLASH_SECONDS) continue;

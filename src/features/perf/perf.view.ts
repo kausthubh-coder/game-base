@@ -1,10 +1,17 @@
 // The performance meter: an overlay with the numbers that say whether the game is fast, a button
-// that copies them as text, three quality levels and an automatic mode.
+// that copies them as text, the four quality levels and an automatic mode.
 //
 // The meter reads the renderer's counters itself. The host tells it what it cannot see: how long
 // the rules took (`begin('sim')`, `end('sim')`) and the world's numbers (`counters`).
+// `costs` splits the draw calls and triangles by feature (cost.view.ts).
+// `warm` compiles shaders before the things that wear them are seen (warm.view.ts).
+// `flight` holds the log of the fixed flight (flight.sim.ts) for whoever flies it.
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
+import type { Level } from '../../content/quality.ts';
+import { createCostMeter, type CostMeter } from './cost.view.ts';
+import { FlightLog } from './flight.sim.ts';
+import { createWarm, type Warm } from './warm.view.ts';
 import { Governor, type GovernorOptions } from './governor.sim.ts';
 import { createPerfPanel } from './perf.ui.ts';
 import { FrameStats } from './stats.sim.ts';
@@ -39,13 +46,18 @@ export interface PerfSnapshot {
   meshMs: number;
   drawCalls: number;
   triangles: number;
+  /** The last frame alone: milliseconds since the frame before it, and milliseconds of the main thread it took. */
+  lastFrameMs: number;
+  lastCpuMs: number;
+  /** Shader programs the renderer holds. */
+  programs: number;
   chunks: number;
   meshQueue: number;
   geometries: number;
   textures: number;
   /** JavaScript heap in megabytes, or -1 where the browser does not tell. */
   heapMb: number;
-  quality: Quality;
+  quality: Level;
   renderScale: number;
   auto: boolean;
 }
@@ -56,12 +68,20 @@ export interface PerfView extends ViewSystem {
   readonly snapshot: PerfSnapshot;
   /** `?stress=N` from the address, 1 when absent. Multiply the view distance by it. */
   readonly stress: number;
-  readonly quality: Quality;
+  readonly quality: Level;
+  /** Draw calls and triangles by feature, and shader programs compiled in the middle of a draw. */
+  readonly costs: CostMeter;
+  /** Shader warm-up. It does nothing until the host calls `warm.start()` or `warm.finish()`. */
+  readonly warm: Warm;
+  /** The log of the fixed flight. Empty until something flies it. */
+  readonly flight: FlightLog;
+  /** The graphics chip's name, as the browser gives it. */
+  readonly gpu: string;
   /** Start and stop a timer. Wrap the whole frame in 'frame' and the rules in 'sim'. */
   begin(slot: PerfSlot): void;
   end(slot: PerfSlot): void;
   /** 'auto' or a level to hold. */
-  setMode(mode: 'auto' | Quality): void;
+  setMode(mode: 'auto' | Level): void;
   /** The text the copy button copies. */
   report(): string;
 }
@@ -78,9 +98,12 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
   const governor = new Governor(options.governor);
   const counters: PerfCounters = { chunks: 0, meshQueue: 0, meshMs: 0 };
   const snapshot: PerfSnapshot = {
-    fps: 0, low1Fps: 0, frameMs: 0, scriptMs: 0, simMs: 0, meshMs: 0, drawCalls: 0, triangles: 0, chunks: 0, meshQueue: 0,
-    geometries: 0, textures: 0, heapMb: -1, quality: ctx.quality, renderScale: 1, auto: options.auto !== false,
+    fps: 0, low1Fps: 0, frameMs: 0, scriptMs: 0, simMs: 0, meshMs: 0, drawCalls: 0, triangles: 0, lastFrameMs: 0, lastCpuMs: 0, programs: 0,
+    chunks: 0, meshQueue: 0, geometries: 0, textures: 0, heapMb: -1, quality: ctx.quality, renderScale: 1, auto: options.auto !== false,
   };
+  const costs = createCostMeter(renderer, ctx.scene);
+  const warm = createWarm(ctx, { costs });
+  const flight = new FlightLog();
   const stress = Math.max(0.25, Number(new URLSearchParams(location.search).get('stress')) || 1);
   const started: Record<PerfSlot, number> = { frame: 0, sim: 0 };
   let simThisFrame = 0, sinceText = 1, warmup = 3, worstMesh = 0;
@@ -90,19 +113,20 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
   const debug = gl.getExtension('WEBGL_debug_renderer_info');
   const gpu = String(debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
 
-  function apply(quality: Quality, scale: number): void {
+  function apply(quality: Level, scale: number): void {
     if (scale !== snapshot.renderScale) {
       snapshot.renderScale = scale;
       renderer.setPixelRatio(basePixelRatio * scale);
     }
     if (quality !== snapshot.quality) {
       snapshot.quality = quality;
+      // The engine's `Quality` names three of the four levels, so `ultra` travels under that type. See src/content/quality.ts.
       ctx.quality = quality;
       options.onQuality?.(quality);
     }
   }
 
-  function setMode(mode: 'auto' | Quality): void {
+  function setMode(mode: 'auto' | Level): void {
     snapshot.auto = mode === 'auto';
     if (mode === 'auto') {
       governor.reset(0);
@@ -129,6 +153,8 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
       `chunk work: ${fixed(s.meshMs, 2)} ms this frame, ${fixed(worstMesh, 2)} ms worst frame`,
       `draw calls: ${s.drawCalls}`,
       `triangles: ${s.triangles}`,
+      ...costs.read().features.map((f) => `  ${f.feature}: ${f.drawCalls} draw calls (${f.shadowCalls} for shadows), ${f.triangles} triangles (${f.shadowTriangles} for shadows)`),
+      `shader programs: ${s.programs}, ${costs.compiles().inDraw} of them compiled in the middle of a draw`,
       `chunks: ${s.chunks} loaded, ${s.meshQueue} waiting`,
       `gpu objects: ${s.geometries} geometries, ${s.textures} textures`,
       `memory: ${s.heapMb < 0 ? 'not reported by this browser' : fixed(s.heapMb) + ' MB of script heap'}`,
@@ -154,7 +180,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     }
   }
 
-  const panel = createPerfPanel(options.parent ?? document.body, (mode) => setMode(mode as 'auto' | Quality), () => void copy());
+  const panel = createPerfPanel(options.parent ?? document.body, (mode) => setMode(mode as 'auto' | Level), () => void copy());
   panel.setMode(snapshot.auto ? 'auto' : snapshot.quality);
 
   return {
@@ -162,6 +188,10 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     snapshot,
     stress,
     get quality() { return snapshot.quality; },
+    costs,
+    warm,
+    flight,
+    gpu,
 
     begin(slot) {
       started[slot] = performance.now();
@@ -170,7 +200,10 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     end(slot) {
       const ms = performance.now() - started[slot];
       if (slot === 'sim') simThisFrame += ms;
-      else script.push(ms);
+      else {
+        script.push(ms);
+        snapshot.lastCpuMs = ms;
+      }
     },
 
     setMode,
@@ -179,6 +212,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     update(dt) {
       const now = performance.now();
       stats.push(now - last);
+      snapshot.lastFrameMs = now - last;
       last = now;
       sim.push(simThisFrame);
       simThisFrame = 0;
@@ -186,6 +220,8 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
       const info = renderer.info, s = snapshot;
       s.drawCalls = info.render.calls;
       s.triangles = info.render.triangles;
+      s.programs = info.programs ? info.programs.length : 0;
+      costs.latch();
       info.reset();
       s.meshMs = counters.meshMs;
       if (counters.meshMs > worstMesh) worstMesh = counters.meshMs;
@@ -227,6 +263,8 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     },
 
     dispose() {
+      warm.dispose();
+      costs.dispose();
       renderer.info.autoReset = true;
       renderer.setPixelRatio(basePixelRatio);
       panel.dispose();

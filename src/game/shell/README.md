@@ -50,7 +50,7 @@ What `GameView` gives you is in `view.ts`, with a comment on every member. The p
 - `view.project(x, y, z, out?)` gives CSS pixels from the root's top left, or null off screen. It has the shape `createGameUi` asks for.
 - `view.playerPosition` is where the hero is drawn. `view.aim` is the block under the pointer when it is in reach.
 - `view.assets` for icons, portraits and sprite frames. `view.audio` is null until the first click or key, so write `view.audio?.emit(...)`, or use `view.onAudio(fn)`.
-- `view.settings.setQuality('auto' | 'low' | 'medium' | 'high')`, `view.settings.setVolume(bus, value)` and `view.stats()` fit `GameUiOptions` as they are.
+- `view.settings.setQuality('auto' | 'low' | 'medium' | 'high' | 'ultra')`, `view.settings.setVolume(bus, value)` and `view.stats()` fit `GameUiOptions` as they are.
 - `view.keys.onPress(fn)` hears E, Q, R, the digits, the wheel and the mouse buttons. Listen there, not on `window`, so the base's input feature can replace `keys.ts` later.
 
 ## The title screen
@@ -117,9 +117,12 @@ The calls in `docs/play/act1.md`, and a few more for tests:
 | `look(yaw, pitch, distance?)` | Free and first person: the view in degrees. Yaw 0 looks north and 90 west, pitch is how far it looks down. `distance` is the free camera's |
 | `aimAt(x, y, z)` | Free and first person: turns the view so the middle of the screen falls on that point |
 | `frames(n)`, `settle()` | Promises: n frames drawn, the land in view loaded and drawn |
+| `costs()` | The last frame's draw calls and triangles by feature (land, grass, trees, town). The rows add up to the totals. |
+| `programs()` | Shader programs held, how many were compiled in the middle of a draw, and the warm-up's state |
+| `bench()` | The fixed flight's report, flown with `?bench` in the address |
 | `view` | The `GameView` |
 
-Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hold a quality level and `?perf=1` to show the meter. `advance` does nothing before a game has started.
+Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hold a quality level (`low`, `medium`, `high` or `ultra`) and `?perf=1` to show the meter. `?bench` flies the fixed flight with no click. `src/features/perf/README.md` says what the last three calls give. `advance` does nothing before a game has started.
 
 `bun tools/play-act1.mjs --port 5364 --dist dist-trees-act1` runs the five-quest browser check with its own port and build folder. Its save check compares standing and felled trees, the bonded pet, the bag and the tracked quest after Continue.
 

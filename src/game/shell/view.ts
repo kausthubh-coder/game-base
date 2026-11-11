@@ -13,7 +13,8 @@ import type { Graphics } from './graphics.ts';
 // Nothing here is a global. A view keeps what it needs from the object it is handed.
 import type * as THREE from 'three';
 import type { ViewContext } from '../../engine/system.ts';
-import type { Quality, Vec3 } from '../../engine/types.ts';
+import type { Vec3 } from '../../engine/types.ts';
+import type { Level } from '../../content/quality.ts';
 import type { Assets } from '../../features/assets/index.ts';
 import type { AudioSystem, BusName } from '../../features/audio/index.ts';
 import type { CameraView } from '../../features/camera/index.ts';
@@ -46,7 +47,8 @@ export interface EndStats {
   pages: number;
 }
 
-export type QualityMode = 'auto' | Quality;
+/** `auto`, or one of the four levels of the quality table (src/content/quality.ts). */
+export type QualityMode = 'auto' | Level;
 
 /**
  * How the camera stands. `tilt` is the 2.5D camera, the default: a fixed pitch, turned with a right-button drag or

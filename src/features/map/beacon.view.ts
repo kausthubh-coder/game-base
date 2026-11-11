@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import './map.css';
 import type { ViewContext } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import { clampToScreen, emptyEdgeMark } from './geometry.sim.ts';
 import { ARROW_PATH, hex, svgIcon } from './icons.ts';
 import { WAYPOINT_COLORS, type Marks, type Waypoint } from './marks.sim.ts';
@@ -170,7 +171,7 @@ export function createBeacon(ctx: ViewContext, marks: Marks, options: BeaconOpti
       const blocks = Math.hypot(active.x - playerX, active.z - playerZ);
       // It thins out when the player stands in it, so it never hides them.
       const near = Math.min(1, Math.max(0.25, blocks / 6));
-      const pulse = quality === 'low' ? 1 : 0.88 + 0.12 * Math.sin(frame.time * 3);
+      const pulse = QUALITY[quality].beaconPulse ? 0.88 + 0.12 * Math.sin(frame.time * 3) : 1;
       material.uniforms.opacity.value = near * pulse;
       mesh.visible = true;
 

@@ -6,7 +6,7 @@
 // hero asks for, and keeps it. Each kind of thing is one draw call: when the cells in reach change, their
 // kept blades are copied into it. So walking costs a copy, and only new land costs growing.
 import * as THREE from 'three';
-import type { Quality } from '../../engine/types.ts';
+import { QUALITY, type Level } from '../../content/quality.ts';
 import { fbm, smoothstep, type Land } from './land.ts';
 import { paint } from './paint.ts';
 import { cardHooks } from './trees.ts';
@@ -16,7 +16,7 @@ export interface Grass {
   readonly group: THREE.Group;
   /** Grows and keeps the grass round this point. Call it every frame. */
   update(x: number, z: number): void;
-  setQuality(quality: Quality): void;
+  setQuality(quality: Level): void;
   readonly triangles: number;
 }
 
@@ -27,8 +27,6 @@ const RINGS = [
   { to: 66, spacing: 1.0, width: [0.22, 0.35], height: [0.36, 0.8], tufts: 9, flowers: 12 },
   { to: 112, spacing: 2.3, width: [0.5, 0.75], height: [0.5, 1.0], tufts: 0, flowers: 0 },
 ] as const;
-/** How much each quality thins the blades, and how far out it grows them. */
-const LEVELS: Record<Quality, { thin: number; rings: number }> = { low: { thin: 1.9, rings: 2 }, medium: { thin: 1.35, rings: 3 }, high: { thin: 1, rings: 3 } };
 /** Cells grown in one frame at most. */
 const PER_FRAME = 2;
 const PETALS = ['#fffaf0', '#fffaf0', '#f8dd6a', '#f8dd6a', '#f4aebd', '#cdb8f0'].map((h) => new THREE.Color(h));
@@ -76,10 +74,11 @@ interface Batch {
   cards: THREE.InstancedBufferAttribute | null;
 }
 
-export function createGrass(land: Land, textures: Textures, quality: Quality): Grass {
+export function createGrass(land: Land, textures: Textures, quality: Level): Grass {
   const group = new THREE.Group();
   group.name = 'grass';
-  let level = LEVELS[quality];
+  // The quality table says how much the blades are thinned and how far out they grow.
+  let level = QUALITY[quality];
 
   const bladeMaterial = paint({
     side: THREE.DoubleSide, keepNormal: true, brush: 0.3, bands: 0.3, wrap: 0.25, brushScale: 0.06, dapple: 1,
@@ -152,7 +151,7 @@ export function createGrass(land: Land, textures: Textures, quality: Quality): G
   function grow(cx: number, cz: number, ringIndex: number): Cell | null {
     const x0 = cx * CELL, z0 = cz * CELL;
     if (!(land.heightAt(x0 + 8, z0 + 8) === land.heightAt(x0 + 8, z0 + 8))) return null;
-    const ring = RINGS[ringIndex] as (typeof RINGS)[number], spacing = ring.spacing * level.thin;
+    const ring = RINGS[ringIndex] as (typeof RINGS)[number], spacing = ring.spacing * level.grassSpacing;
     const r = random(Math.imul(cx, 73856093) ^ Math.imul(cz, 19349663) ^ (ringIndex * 977));
     const bladeData: number[] = [], bladeColorData: number[] = [];
     for (let z = z0 + spacing / 2; z < z0 + CELL; z += spacing) {
@@ -231,7 +230,7 @@ export function createGrass(land: Land, textures: Textures, quality: Quality): G
     group,
     update(x, z) {
       const fx = Math.floor(x / CELL), fz = Math.floor(z / CELL);
-      const reach = Math.ceil((RINGS[level.rings - 1] as (typeof RINGS)[number]).to / CELL);
+      const reach = Math.ceil((RINGS[level.grassRings - 1] as (typeof RINGS)[number]).to / CELL);
       if (fx !== lastX || fz !== lastZ) { lastX = fx; lastZ = fz; stale = true; }
       // Grow what is missing or too coarse, nearest first, a few cells a frame.
       let budget = PER_FRAME;
@@ -240,10 +239,10 @@ export function createGrass(land: Land, textures: Textures, quality: Quality): G
           for (let dz = -ring; dz <= ring && budget > 0; dz++) {
             if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
             const far = Math.hypot((fx + dx + 0.5) * CELL - x, (fz + dz + 0.5) * CELL - z);
-            const want = RINGS.findIndex((r, i) => i < level.rings && far < r.to + CELL * 0.7);
+            const want = RINGS.findIndex((r, i) => i < level.grassRings && far < r.to + CELL * 0.7);
             if (want < 0) continue;
             // A cell keeps finer grass than it needs until it is well past the ring, so a step back and forth grows nothing.
-            const loose = RINGS.findIndex((r, i) => i < level.rings && far < r.to + CELL * 1.9);
+            const loose = RINGS.findIndex((r, i) => i < level.grassRings && far < r.to + CELL * 1.9);
             const k = key(fx + dx, fz + dz), have = cells.get(k);
             if (have && have.ring <= want && have.ring >= loose && have.stamp === land.stampAt(fx + dx, fz + dz)) continue;
             const grown = grow(fx + dx, fz + dz, want);
@@ -271,7 +270,7 @@ export function createGrass(land: Land, textures: Textures, quality: Quality): G
       triangles = blades.mesh.count * 3 + (flowers.mesh.count + tufts.reduce((sum, b) => sum + b.mesh.count, 0)) * 2;
     },
     setQuality(next) {
-      level = LEVELS[next];
+      level = QUALITY[next];
       cells.clear();
       stale = true;
     },

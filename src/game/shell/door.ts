@@ -2,6 +2,7 @@
 // picture. It plays through here instead: it steps the rules without drawing, moves the player, presses
 // keys and reads the state back as plain data. The table in docs/play/act1.md lists the calls.
 import type { Vec3 } from '../../engine/types.ts';
+import type { CostReport, FlightReport } from '../../features/perf/index.ts';
 import { LANDMARKS, spawnPoint } from '../../features/world/index.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import type { Systems } from '../api.sim.ts';
@@ -36,6 +37,19 @@ export interface DebugDoor {
   skipTo(quest: string): void;
   /** Draw calls, triangles, frame and simulation milliseconds, from the performance meter. */
   counters(): Record<string, number | string | boolean>;
+  /**
+   * The last frame's draw calls and triangles by feature (land, grass, trees, town and so on), the most triangles
+   * first, with the part of each spent on shadows. `sum` adds the rows up, `total` is the renderer's own count, and
+   * `addsUp` says they are equal.
+   */
+  costs(): CostReport;
+  /**
+   * Shader programs: how many the renderer holds, how many were compiled in the middle of a draw since the page
+   * loaded (each a possible stall, with the features that caused the latest), and how the warm-up stands.
+   */
+  programs(): { count: number; compiledInDraw: number; latest: string[]; warm: 'cold' | 'warming' | 'warm'; warmRuns: number; late: number; held: number };
+  /** The fixed flight's report, flown with `?bench` in the address: one row a second and one a stop. Its `state` is `done` when the flight has ended. */
+  bench(): FlightReport;
 
   // ---- beyond the table: what a test needs around the calls above
   /** True when a game is running. */
@@ -246,9 +260,18 @@ export function createDoor(shell: Shell): DebugDoor {
       return {
         drawCalls: s.drawCalls, triangles: s.triangles, frameMs: s.frameMs, scriptMs: s.scriptMs, simMs: s.simMs,
         chunkMs: s.meshMs, chunks: s.chunks, quality: s.quality, renderScale: s.renderScale, auto: s.auto,
-        sprites: view.sprites.count, particles: view.effects.live,
+        sprites: view.sprites.count, particles: view.effects.live, programs: s.programs,
       };
     },
+
+    costs: () => view.perf.costs.read(),
+
+    programs() {
+      const compiles = view.perf.costs.compiles(), warm = view.perf.warm.stats;
+      return { count: compiles.programs, compiledInDraw: compiles.inDraw, latest: compiles.latest, warm: warm.state, warmRuns: warm.runs, late: warm.late, held: warm.held };
+    },
+
+    bench: () => view.perf.flight.report,
 
     get started() { return view.started; },
     newGame: () => view.newGame(),

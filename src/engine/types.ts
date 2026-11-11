@@ -33,4 +33,4 @@ export function calmNoon(): Ambient {
 }
 
 /** How much the machine can afford. Every view system must look right at each level. */
-export type Quality = 'low' | 'medium' | 'high';
+export type Quality = 'low' | 'medium' | 'high' | 'ultra';
