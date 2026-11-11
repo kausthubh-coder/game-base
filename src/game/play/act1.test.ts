@@ -233,10 +233,15 @@ describe('the first part', () => {
         p.interact();
       }
       const trust = pet.trust;
-      must(p, p.walkTo(pet.pos, { soft: true, within: 2.2, seconds: 120 }), 'could not walk softly up to the leaftail');
-      expect(p.prompt()).toBe('Offer a berry');
-      p.interact();
-      must(p, p.until(() => pet.trust > trust, 8), `the leaftail did not take berry ${fed + 1} offered with E`);
+      // The leaftail keeps walking between its beds. If it has walked out of reach before the hero has stood
+      // still for a second, the berry is not taken and the hero walks up and offers it again, as a player would.
+      for (let tries = 0; tries < 4 && pet.trust === trust; tries++) {
+        must(p, p.walkTo(pet.pos, { soft: true, within: 2.2, seconds: 120 }), 'could not walk softly up to the leaftail');
+        expect(p.prompt()).toBe('Offer a berry');
+        p.interact();
+        p.until(() => pet.trust > trust, 8);
+      }
+      must(p, pet.trust > trust, `the leaftail did not take berry ${fed + 1} offered with E`);
       p.advance(3.2);
     }
     expect(pet.bonded).toBe(true);

@@ -15,6 +15,9 @@ export interface WaterOptions {
   landSize?: number;
   /** Rows of the picture re-read each frame. */
   rowsPerFrame?: number;
+  /** The water's colour over a shallow bed and over a deep one, as sRGB hex. */
+  shallow?: string;
+  deep?: string;
 }
 
 /** The part of the sky the water needs. `createSky(...).look` fits. */
@@ -174,8 +177,8 @@ export function createWaterMaterial(ctx: ViewContext, options: WaterOptions = {}
     uLight: { value: new THREE.Color(1, 1, 1) },
     uSkyColor: { value: new THREE.Color(0.6, 0.8, 0.95) },
     uSunColor: { value: new THREE.Color(1, 0.95, 0.85) },
-    uShallow: { value: new THREE.Color(0.22, 0.8, 0.8) },
-    uDeep: { value: new THREE.Color(0.03, 0.34, 0.62) },
+    uShallow: { value: options.shallow ? new THREE.Color(options.shallow) : new THREE.Color(0.22, 0.8, 0.8) },
+    uDeep: { value: options.deep ? new THREE.Color(options.deep) : new THREE.Color(0.03, 0.34, 0.62) },
     uFocus: { value: new THREE.Vector3() },
     uLand: { value: land },
     uRipples: { value: Array.from({ length: RIPPLES }, () => new THREE.Vector4(0, 0, 0, 0)) },

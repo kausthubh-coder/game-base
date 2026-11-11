@@ -50,7 +50,8 @@ export function townB(): TownPlan {
   box(172, g, -153, 174, g + 1, -151, 'barrier');
   props.push({ kind: 'elderOak', variant: 0, x: OAK.x, y: g, z: OAK.z, rotation: 0 });
   for (const [dx, dz] of [[-4, 0], [4, 0], [0, -4], [-3, 3], [3, 3]] as const) glowAt(fills, Math.floor(OAK.x + dx), Math.floor(OAK.z + dz), g + 4);
-  modelAt(models, 'warden.statue', 'statue-gardener-warden', 173.5, -146.5);
+  // The Warden stands at the oak's foot on its west side, so the green south of the oak is open for the festival.
+  modelAt(models, 'warden.statue', 'statue-gardener-warden', 167.5, -148.5);
 
   // ---- the ruin: broken pillars of the old hall on the oak's north side, tall at the back, a lintel and ivy
   const pillars: [angle: number, high: number][] = [[180, 2], [205, 3], [230, 4], [255, 5], [285, 5], [310, 4], [335, 3], [0, 2]];
@@ -95,9 +96,10 @@ export function townB(): TownPlan {
   one(136, g + 6, -177, 'oak_leaves');
   box(135, g, -171, 136, g + 3, -171, 'stone_brick');
   one(135, g + 3, -171, 'mossy_stone');
+  // The hedge is a row of bushes. Nobody walks through it.
   for (const [z0, z1] of [[-190, -179], [-169, -148]] as const) {
-    box(135, g, z0, 135, g, z1, 'mossy_stone');
-    box(135, g + 1, z0, 135, g + 1, z1, 'oak_leaves');
+    box(135, g, z0, 135, g + 1, z1, 'barrier');
+    for (let z = z0; z <= z1; z += 2) props.push({ ...townProp('bush', 135, z, z * 1.7, Math.abs(z >> 1) % 3), scale: 2.4 + (Math.abs(z * 7) % 5) * 0.1 });
   }
   props.push(
     townProp('banner', 133, -179, -QUARTER, 2), townProp('banner', 133, -169, -QUARTER, 2),
@@ -115,7 +117,7 @@ export function townB(): TownPlan {
   stringLightsAt(fills, models, 'lights.east', 183.5, -146.5);
   stringLightsAt(fills, models, 'lights.north', 182, -156, 1);
   // Stone lanterns down the lantern walk, and a lamp either side of where it meets the quay.
-  for (const z of [-141, -138, -135]) for (const x of [171, 175]) lanternAt(fills, props, x, z, 2);
+  for (const z of [-138, -135]) for (const x of [171, 175]) lanternAt(fills, props, x, z, 2);
   lanternAt(fills, props, 171, -132, 0);
   lanternAt(fills, props, 175, -132, 0);
 
@@ -128,13 +130,14 @@ export function townB(): TownPlan {
   modelAt(models, 'bench.quay2', 'bench', 145.5, -133);
   modelAt(models, 'cart.green', 'cart', 180.5, -137, 1);
   props.push(
-    townProp('bench', 165, -149, 1.1), townProp('bench', 181, -149, -1.1), townProp('bench', 166, -142, 0.5), townProp('bench', 180, -142, -0.5),
+    townProp('bench', 164, -150, 1.1), townProp('bench', 183, -150, -1.1),
     townProp('noticeBoard', 158, -163, 0),
     townProp('wildflowers', 168, -155, 0.4), townProp('wildflowers', 179, -156, 2.1), townProp('wildflowers', 167, -147, 1.3), townProp('wildflowers', 180, -145, 2.8),
     townProp('wildflowers', 164, -137, 0.9), townProp('wildflowers', 184, -136, 1.9),
   );
 
-  places.push({ name: 'town.square', x: 173, y: g, z: -143, label: 'Lantern Green' });
+  // On the green south of the oak, clear of the quay's sound and with room all round for the festival.
+  places.push({ name: 'town.square', x: 173, y: g, z: -145, label: 'Lantern Green' });
 
   return {
     fills, places, props, models,
@@ -148,8 +151,8 @@ export function townB(): TownPlan {
     ],
     // The ground under the hedge and the gate's pillars, and under the kennel keeper's cottage.
     levels: [
-      { x0: 129, z0: -190, x1: 137, z1: -146, ground: g, blend: 4 },
-      { x0: 193, z0: -182, x1: 205, z1: -172, ground: g, blend: 3 },
+      { x0: 129, z0: -190, x1: 137, z1: -146, ground: g, blend: 9 },
+      { x0: 193, z0: -182, x1: 205, z1: -172, ground: g, blend: 8 },
     ],
   };
 }

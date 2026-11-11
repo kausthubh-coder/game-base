@@ -208,13 +208,15 @@ export interface LeafLook {
   vary?: number;
   /** How much lighter the top of the crown is than its foot, whatever the sun does. */
   top?: number;
+  /** True for a tree that is drawn leaf by leaf however far off it is: a landmark. It never becomes a far tree. */
+  always?: boolean;
 }
 
 export interface Foliage { leaf: THREE.MeshLambertMaterial; depth: THREE.MeshDepthMaterial; wood: THREE.MeshLambertMaterial }
 
 /** The materials of one kind of tree. */
 export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
-  const hooks = cardHooks([0.62, 0.5], 1, 1.6);
+  const hooks = cardHooks([0.62, 0.5], 1, 1.6), air = look.always ? 'paintAir' : 'paintHazeTree';
   const leaf = paint({
     ...hooks, map: look.mask, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0, wrap: 0.5, brushScale: 0.05,
     uniforms: { uTones: { value: look.tones.map((t) => new THREE.Color(t)) }, uVary: { value: look.vary ?? 0.12 }, uTop: { value: look.top ?? 0 } },
@@ -229,7 +231,7 @@ export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
       tone = mix(tone, uTones[2], smoothstep(0.36, 0.66, lit));
       tone = mix(tone, uTones[3], smoothstep(0.7, 0.96, lit));
       tone *= mix(0.78, 1.0, vCard.z);
-      vec3 outgoingLight = paintHazeTree(tone * mix(uLeafShade, uLeafSun, lit) * diffuseColor.rgb + uSkyAdd * (1.0 - lit) * 0.25);`,
+      vec3 outgoingLight = ${air}(tone * mix(uLeafShade, uLeafSun, lit) * diffuseColor.rgb + uSkyAdd * (1.0 - lit) * 0.25);`,
   });
   const depth = paintDepth({ ...hooks, map: look.mask, alphaTest: 0.5, side: THREE.DoubleSide });
   // With the scene's multisampled target this softens the cut edge of every leaf.
@@ -239,7 +241,7 @@ export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
     uniforms: { uBark: { value: textures.bark } },
     fragmentPars: 'uniform sampler2D uBark;',
     fragmentAlbedo: 'diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uBark, vec2(vPaintWorld.x + vPaintWorld.z, vPaintWorld.y) * 0.35).g;',
-    fragmentFinal: 'vec3 outgoingLight = paintHazeTree(paintShade(diffuseColor.rgb, paintLit(0.0))) + totalEmissiveRadiance;',
+    fragmentFinal: `vec3 outgoingLight = ${air}(paintShade(diffuseColor.rgb, paintLit(0.0))) + totalEmissiveRadiance;`,
   });
   return { leaf, depth, wood };
 }

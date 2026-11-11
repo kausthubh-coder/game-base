@@ -6,9 +6,10 @@
 // terrain's own functions give the far land and its woods theirs, the trees system says where trees stand, the sky gives the sun's direction and how much of it is shadow, and the
 // clock gives the colour of the light.
 import * as THREE from 'three';
-import { EMERALD, FAR_TREES, HAZE, MOODS, PAINTED_TREES, TREE_NEAR, TREE_REACH, type Mood } from '../../content/painted.ts';
-import { buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Sitter, type Stand, type TreeSpec } from '../../features/painted/index.ts';
+import { EMERALD, FAR_TREES, GREAT_OAK, HAZE, PAINTED_WATER, MOODS, PAINTED_TREES, TREE_NEAR, TREE_REACH, type Mood } from '../../content/painted.ts';
+import { STANDING_STONE, buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Sitter, type Stand, type TreeSpec } from '../../features/painted/index.ts';
 import { WATER_LEVEL, forestAt, groundHeight, landHeight, surfaceAt, treesInArea } from '../../features/world/index.ts';
+import { REGION } from '../content/region.ts';
 import type { ModelTree } from '../trees/index.sim.ts';
 import type { Systems } from '../api.sim.ts';
 import type { GameView } from '../shell/view.ts';
@@ -57,6 +58,7 @@ export async function install(view: GameView): Promise<void> {
     topAt: (x, z) => surfaceAt(sim.seed, x, z),
     forestAt: (x, z) => forestAt(sim.seed, x, z),
     waterLevel: WATER_LEVEL,
+    water: PAINTED_WATER.far,
   }, textures);
   view.scene.add(land.group, grass.group, backdrop.group, farLand.group);
   view.setGround((x, z) => land.heightAt(x, z));
@@ -80,6 +82,17 @@ export async function install(view: GameView): Promise<void> {
     });
   }
   view.scene.add(trees);
+  // The Hollow Oak stands where the region plan has its prop, and is drawn leaf by leaf from any distance.
+  const oaks = (sys.region?.props?.() ?? []).filter((prop) => prop.kind === GREAT_OAK.prop);
+  if (oaks.length > 0) {
+    const always = foliageMaterials(textures, { mask: textures.rosettes[0] as THREE.Texture, tones: [...EMERALD], vary: 0.3, top: 0.3, always: true });
+    const great = createStand(buildTree(leafy(GREAT_OAK.spec)), always, oaks.length, true);
+    great.plant(oaks.map((prop) => ({ x: prop.x, y: prop.y - 0.15, z: prop.z, scale: GREAT_OAK.scale, turn: prop.rotation, tint: new THREE.Color(1.03, 1, 0.96) })));
+    great.group.name = 'great-oak';
+    view.scene.add(great.group);
+    // The props feature does not draw its own oak there.
+    view.standIns.set(GREAT_OAK.prop, { place: () => 1, remove: () => {} });
+  }
   // Far trees are pictures of these same trees, taken now.
   const farTrees = createImpostors(view.renderer, sitters);
   view.scene.add(farTrees.group);
@@ -194,9 +207,26 @@ export async function install(view: GameView): Promise<void> {
   // is a mound of the trees' leaves, and a ripe berry bush carries berries.
   const boulders = createBoulders(textures), bushes = createBushes(foliage[0] as (typeof foliage)[number]);
   view.scene.add(boulders.group, bushes.group);
-  view.standIns.set('rock', { place: (x, y, z, turn, scale, variant) => boulders.place(x, y, z, turn, scale * 0.95, variant), remove: (id) => boulders.remove(id) });
+  view.standIns.set('rock', { place: (x, y, z, turn, scale, variant) => boulders.place(x, y, z, turn, scale * 0.78, variant), remove: (id) => boulders.remove(id) });
   view.standIns.set('bush', { place: (x, y, z, turn, scale, variant) => bushes.place(x, y, z, turn, scale * 0.85, variant), remove: (id) => bushes.remove(id) });
   view.standIns.set('berryBush', { place: (x, y, z, turn, scale, variant) => bushes.place(x, y, z, turn, scale * 0.85, variant, true), remove: (id) => bushes.remove(id) });
+
+  // The plan stands a stone on the land as a column of blocks: the grant's standing stone. Out in the wild it is
+  // drawn as a painted stone large enough to hold its blocks, which the rules still see. In town a column of
+  // stone is a pillar and stays as it is.
+  const columns = new Map<string, { x: number; z: number; top: number }>();
+  for (const f of REGION.fills) {
+    if ((f.block !== 'stone' && f.block !== 'mossy_stone') || f.x0 !== f.x1 || f.z0 !== f.z1) continue;
+    if (f.x0 >= REGION.town.x0 && f.x0 <= REGION.town.x1 && f.z0 >= REGION.town.z0 && f.z0 <= REGION.town.z1) continue;
+    const column = columns.get(`${f.x0},${f.z0}`) ?? { x: f.x0, z: f.z0, top: 0 };
+    column.top = Math.max(column.top, f.y1 + 1);
+    columns.set(`${f.x0},${f.z0}`, column);
+  }
+  for (const { x, z, top } of columns.values()) {
+    const ground = groundHeight(sim.seed, x, z), tall = top - ground;
+    if (tall <= 0) continue;
+    if (tall >= 3) boulders.place(x + 0.5, ground - 0.1, z + 0.5, own(x, z, 5) * 0.6, tall / 3, STANDING_STONE);
+  }
 
   // ---------------------------------------------------------------- the light
   const sunTint = new THREE.Color(), shadeTint = new THREE.Color(), skyAdd = new THREE.Color(), cloud = new THREE.Color(), grey = new THREE.Color();
@@ -238,7 +268,7 @@ export async function install(view: GameView): Promise<void> {
     backdrop.setColors(cloud, shared.uHaze.value, 1 - overcast * 0.9);
   }
 
-  const look = new THREE.Vector3();
+  const look = new THREE.Vector3(), seen = new THREE.Frustum(), projection = new THREE.Matrix4();
   let hillY = view.playerPosition.y;
   view.onFrame((dt) => {
     const p = view.playerPosition, sun = view.sky.sun, reach = view.world.stats.radius;
@@ -249,12 +279,14 @@ export async function install(view: GameView): Promise<void> {
     const edge = reach * 16 - 8;
     shared.uEdge.value.set(edge - 14, edge);
     shared.uEdgeTree.value.set(TREE_REACH - 12, TREE_REACH);
-    land.update(p.x, p.z, reach);
-    farLand.update(p.x, p.z, edge - 15);
-    plantFar();
     // The camera must see as far as the far land and the ridges behind it.
     const camera = view.ctx.camera as THREE.PerspectiveCamera;
     if (camera.far < FAR_PLANE) { camera.far = FAR_PLANE; camera.updateProjectionMatrix(); }
+    camera.updateMatrixWorld();
+    seen.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+    land.update(p.x, p.z, reach, seen);
+    farLand.update(p.x, p.z, edge - 15);
+    plantFar();
     grass.update(p.x, p.z);
     for (let i = falling.length - 1; i >= 0; i--) {
       const f = falling[i] as (typeof falling)[number];

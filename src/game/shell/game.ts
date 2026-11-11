@@ -11,7 +11,7 @@ import { calmNoon, type Quality } from '../../engine/types.ts';
 import { flatWorld } from '../../engine/world-query.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import { LAND_BLOCKS } from '../../content/land.ts';
-import { HAZE } from '../../content/painted.ts';
+import { HAZE, PAINTED_WATER } from '../../content/painted.ts';
 import type { BusName } from '../../features/audio/index.ts';
 import { cameraProfile, createCamera } from '../../features/camera/index.ts';
 import { createEffects } from '../../features/effects/index.ts';
@@ -198,9 +198,11 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
   const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov, mode: cameraMode });
   const sky = createSky(ctx, { shadowRange: 40 });
-  const water = createWaterMaterial(ctx);
+  // The painted world's water is the pale blue of the painted meadow's pond.
+  const water = createWaterMaterial(ctx, painted ? { shallow: PAINTED_WATER.shallow, deep: PAINTED_WATER.deep } : {});
   const effects = createEffects(ctx);
-  const post = createPost(ctx);
+  // The painted world is finished as it is drawn: its colours are the painter's, so the final pass adds nothing but glow.
+  const post = createPost(ctx, painted ? { saturation: 1 } : {});
   const sprites = makeSprites(ctx, art.assets);
   water.setSky(sky.look);
   effects.setSky(sky.look);
@@ -587,6 +589,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     sky.setCloudShadows(g.cloudShadows);
     effects.setWeatherEnabled(g.weatherParticles ?? true);
     post.set({ bloom: g.bloom ?? ctx.quality !== 'low' });
+    // No blur toward the screen's edges, no dark corners and no roll-off: the painted picture is sharp and plain.
+    if (painted) post.set({ tiltShift: false, vignette: false, toneMapping: false });
     world.setViewDistance((g.viewDistance ?? 1) * perf.stress * (cam?.load ?? 1));
   }
   const view: GameView = {

@@ -97,6 +97,8 @@ export interface PlanProp {
   z: number;
   /** Radians around y. At 0 its front faces south. */
   rotation: number;
+  /** How much larger than usual it is drawn. 1 when left out. */
+  scale?: number;
 }
 
 export interface PlanPath {
@@ -107,8 +109,8 @@ export interface PlanPath {
 }
 
 /**
- * Gentle ground along a line: the vale the path runs through. Within `half` blocks of the line, land above
- * `ground` keeps only `keep` of its height over it; it has its own shape again `fade` blocks further out.
+ * Gentle ground along a line: the vale the path runs through. No hill stands within `half` blocks of the
+ * line, and land above `ground` keeps only `keep` of its height over it, so the meadow still rolls; it has its own shape again `fade` blocks further out.
  */
 export interface Vale {
   points: readonly (readonly [x: number, z: number])[];
@@ -118,6 +120,14 @@ export interface Vale {
   keep: number;
 }
 
+/** A round rise in the meadow: `height` blocks at its middle, gone about `radius` blocks out. */
+export interface Knoll {
+  x: number;
+  z: number;
+  radius: number;
+  height: number;
+}
+
 export interface RegionPlan {
   /** The player's plot. Blocks placed inside it stay. */
   grant: { x: number; z: number; width: number; depth: number };
@@ -125,6 +135,8 @@ export interface RegionPlan {
   spawn: { x: number; y: number; z: number; facing: number };
   /** Shaped before the levels, so a site's level ground still lies in the vale. */
   vales: readonly Vale[];
+  /** Raised after the vales and before the levels. */
+  knolls: readonly Knoll[];
   levels: readonly Level[];
   /** Columns dug down to `ground`, with a sharp edge. Water fills them. */
   basins: readonly (Rect & { ground: number })[];
@@ -192,14 +204,14 @@ const ROCKS_FLUSH: readonly (readonly [number, number])[] = [
   [11, -231], [12, -231], [13, -231],
 ];
 const ROCKS_POOL: readonly (readonly [number, number])[] = [[6, -230], [7, -230], [6, -229], [7, -229]];
+/** The boulders among the mossy rocks: column, and height in blocks. */
+const BOULDERS: readonly (readonly [x: number, z: number, high: number])[] = [[8, -232, 1], [4, -229, 2], [12, -232, 1]];
 {
   const g = GRANT_GROUND;
   for (const [x, z] of ROCKS_FLUSH) one(x, g - 1, z, 'mossy_stone');
   for (const [x, z] of ROCKS_POOL) one(x, g - 1, z, 'water');
-  // Three boulders that stand up from the ground.
-  one(8, g, -232, 'mossy_stone');
-  box(4, g, -229, 4, g + 1, -229, 'mossy_stone');
-  one(12, g, -232, 'mossy_stone');
+  // Three boulders that stand up from the ground: rocks to look at (`props` below) around blocks nobody walks through.
+  for (const [x, z, high] of BOULDERS) box(x, g, z, x, g + high - 1, z, 'barrier');
 }
 
 // ---- the dead garden: four dry beds, a broken fence around them, and the ruin of a house to the north
@@ -264,6 +276,15 @@ const TREES: readonly PlanTree[] = [
   { x: -5, z: -255, kind: 'oak', size: 0.2 },
   { x: 1, z: -249, kind: 'birch', size: 0.4 },
   { x: 3, z: -242, kind: 'oak', size: 0.5 },
+  // The lone oak on its hill, with two smaller trees for company, and the old oaks on the rise behind the grant.
+  { x: 40, z: -257, kind: 'oak', size: 1 },
+  { x: 47, z: -251, kind: 'birch', size: 0.5 },
+  { x: 33, z: -250, kind: 'oak', size: 0.4 },
+  { x: -36, z: -284, kind: 'oak', size: 0.9 },
+  { x: -28, z: -279, kind: 'oak', size: 0.6 },
+  { x: -42, z: -278, kind: 'birch', size: 0.7 },
+  { x: 168, z: -224, kind: 'oak', size: 0.8 },
+  { x: 175, z: -219, kind: 'birch', size: 0.5 },
   // Old trees behind the ruined house.
   { x: -70, z: -247, kind: 'oak', size: 0.6 },
   { x: -89, z: -248, kind: 'oak', size: 0.4 },
@@ -284,14 +305,34 @@ export const REGION: RegionPlan = {
   // Two blocks north of the stone, facing it.
   spawn: { x: STONE.x, y: GRANT_GROUND, z: STONE.z - 2, facing: Math.PI },
   // The vale of Greenhollow: from the dead garden past the grant and along the path to Hollowmere's gate.
-  vales: [{ points: [[GARDEN.x, GARDEN.z], [GRANT.x + 14, GRANT.z + 14], [STONE.x + 2, STONE.z], [92, -221], [126, -177], [170, -160]], half: 22, fade: 80, ground: 21.2, keep: 0.3 }],
+  vales: [
+    { points: [[GARDEN.x, GARDEN.z], [GRANT.x + 14, GRANT.z + 14], [STONE.x + 2, STONE.z], [92, -221], [126, -177], [170, -160]], half: 18, fade: 70, ground: 21, keep: 0.9 },
+    // The land comes down to the town's level well before the gate, so the path walks into Hollowmere and does not drop into it.
+    { points: [[104, -204], [126, -177], [170, -160]], half: 30, fade: 45, ground: 20.4, keep: 0.2 },
+  ],
+  // The rises the eye rests on from the grant and the path. Each stands clear of the path, so the way stays easy,
+  // and north or west of where people act, where the camera looks.
+  knolls: [
+    // Behind the grant, with the old oaks on it.
+    { x: -34, z: -282, radius: 30, height: 7 },
+    // The hill of the lone oak, north of the path where it sets out.
+    { x: 40, z: -256, radius: 34, height: 9 },
+    // A low rise south of the path, toward the river.
+    { x: 58, z: -196, radius: 24, height: 5 },
+    // Between the path's bend and the north river.
+    { x: 112, z: -246, radius: 30, height: 7 },
+    // Over the town, north of its roofs.
+    { x: 168, z: -222, radius: 30, height: 8 },
+    // West of the dead garden, where the woods begin.
+    { x: -118, z: -212, radius: 28, height: 6 },
+  ],
   levels: [
-    { x0: GRANT.x - 2, z0: GRANT.z - 2, x1: GRANT.x + GRANT.width + 1, z1: GRANT.z + GRANT.depth + 1, ground: GRANT_GROUND, blend: 5 },
-    { x0: 0, z0: -237, x1: 15, z1: -225, ground: GRANT_GROUND, blend: 4 },
-    { x0: GARDEN.x - 13, z0: GARDEN.z - 17, x1: GARDEN.x + 13, z1: GARDEN.z + 12, ground: GARDEN_GROUND, blend: 4 },
-    { x0: 137, z0: -190, x1: 203, z1: -129, ground: TOWN_GROUND, blend: 4 },
+    { x0: GRANT.x - 2, z0: GRANT.z - 2, x1: GRANT.x + GRANT.width + 1, z1: GRANT.z + GRANT.depth + 1, ground: GRANT_GROUND, blend: 9 },
+    { x0: 0, z0: -237, x1: 15, z1: -225, ground: GRANT_GROUND, blend: 7 },
+    { x0: GARDEN.x - 13, z0: GARDEN.z - 17, x1: GARDEN.x + 13, z1: GARDEN.z + 12, ground: GARDEN_GROUND, blend: 8 },
+    { x0: 137, z0: -190, x1: 203, z1: -129, ground: TOWN_GROUND, blend: 8 },
     // The ground the gate stands on.
-    { x0: 130, z0: -179, x1: 137, z1: -169, ground: TOWN_GROUND, blend: 4 },
+    { x0: 130, z0: -179, x1: 137, z1: -169, ground: TOWN_GROUND, blend: 9 },
     ...HOLLOWMERE.levels,
   ],
   // The river in front of the quay, so the bank has a straight edge and deep water at any seed.
@@ -307,6 +348,7 @@ export const REGION: RegionPlan = {
   places: PLACES,
   props: [
     ...HOLLOWMERE.props,
+    ...BOULDERS.map(([x, z, high], i) => ({ kind: 'rock', variant: i, x: x + 0.5, y: GRANT_GROUND, z: z + 0.5, rotation: i * 2.1, scale: 0.9 + high * 0.45 })),
     // Moss on stumps by the rocks and wildflowers along the path where the game starts.
     { kind: 'mossStump', variant: 0, x: 1.5, y: GRANT_GROUND, z: -230.5, rotation: 0.7 },
     { kind: 'mossStump', variant: 0, x: 15.5, y: GRANT_GROUND, z: -227.5, rotation: 2.4 },

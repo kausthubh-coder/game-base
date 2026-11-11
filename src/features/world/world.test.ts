@@ -16,8 +16,8 @@ function worldAround(seed: number, cx = 0, cz = 0, radius = 1, reverse = false):
   return world;
 }
 
-// Chunk (4, -1) of seed 1 has flat open meadow in its middle, far from the start site.
-const TCX = 4, TCZ = -1, EDGE = TCX * CHUNK + CHUNK - 1, ROW = TCZ * CHUNK + 6;
+// Chunk (6, -1) of seed 1 has flat open meadow in its middle, far from the start site.
+const TCX = 6, TCZ = -1, EDGE = TCX * CHUNK + CHUNK - 1, ROW = TCZ * CHUNK + 6;
 
 /** A flat, open spot in the middle of the test chunk. */
 function openGround(world: World): { x: number; y: number; z: number } {

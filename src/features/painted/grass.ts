@@ -23,9 +23,9 @@ export interface Grass {
 const CELL = 16;
 /** How fine a cell's grass is, by its distance from the hero: fine blades near, broad strokes far. */
 const RINGS = [
-  { to: 34, spacing: 0.46, width: [0.11, 0.19], height: [0.28, 0.6], tufts: 22, flowers: 26 },
-  { to: 66, spacing: 0.9, width: [0.22, 0.35], height: [0.36, 0.8], tufts: 9, flowers: 12 },
-  { to: 112, spacing: 1.8, width: [0.5, 0.75], height: [0.5, 1.0], tufts: 0, flowers: 0 },
+  { to: 34, spacing: 0.5, width: [0.11, 0.19], height: [0.28, 0.6], tufts: 22, flowers: 26 },
+  { to: 66, spacing: 1.0, width: [0.22, 0.35], height: [0.36, 0.8], tufts: 9, flowers: 12 },
+  { to: 112, spacing: 2.3, width: [0.5, 0.75], height: [0.5, 1.0], tufts: 0, flowers: 0 },
 ] as const;
 /** How much each quality thins the blades, and how far out it grows them. */
 const LEVELS: Record<Quality, { thin: number; rings: number }> = { low: { thin: 1.9, rings: 2 }, medium: { thin: 1.35, rings: 3 }, high: { thin: 1, rings: 3 } };

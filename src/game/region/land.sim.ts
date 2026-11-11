@@ -29,7 +29,7 @@ const inside = (r: Rect, x: number, z: number): boolean => x >= r.x0 && x <= r.x
 // ------------------------------------------------------------------------------------------ bounds
 
 /** How far past the plan's own shapes the land can still differ: a level's blend, a tree's leaves. */
-const MARGIN = 6;
+const MARGIN = 12;
 
 /** The box of columns the plan can change. Outside it the terrain never asks. */
 export const BOUNDS: Rect = (() => {
@@ -42,6 +42,7 @@ export const BOUNDS: Rect = (() => {
   for (const c of REGION.clearings) { take(c.x0 - c.fade, c.z0 - c.fade); take(c.x1 + c.fade, c.z1 + c.fade); }
   for (const f of REGION.fills) { take(f.x0, f.z0); take(f.x1, f.z1); }
   for (const p of REGION.paths) for (const [x, z] of p.points) take(x, z);
+  for (const k of REGION.knolls) { take(k.x - k.radius * 2, k.z - k.radius * 2); take(k.x + k.radius * 2, k.z + k.radius * 2); }
   for (const v of REGION.vales) for (const [x, z] of v.points) { take(x - v.half - v.fade, z - v.half - v.fade); take(x + v.half + v.fade, z + v.half + v.fade); }
   for (const t of [...REGION.trees, ...REGION.bushes]) take(t.x, t.z);
   for (const m of REGION.models) { const [w, d] = TOWN_MODELS[m.model].footprint; take(m.x, m.z); take(m.x + Math.max(w, d), m.z + Math.max(w, d)); }
@@ -80,6 +81,13 @@ function levelWeight(i: number, x: number, z: number): number {
   return ease(1 - Math.hypot(dx, dz) / l.blend);
 }
 
+/** How much of the land's hills the plan leaves at a column: 0 in the middle of a vale, 1 outside it. */
+export function hillsKept(x: number, z: number): number {
+  let kept = 1;
+  for (const v of REGION.vales) kept = Math.min(kept, 1 - ease(1 - (reachOf(v.points, x, z) - v.half) / v.fade));
+  return kept;
+}
+
 /** True when the plan shapes the ground of this column. There the land is plain grass over dirt, with no cave under it. */
 export function shaped(x: number, z: number): boolean {
   if (!inBounds(x, z)) return false;
@@ -95,6 +103,10 @@ export function shapeGround(x: number, z: number, natural: number): number {
     const w = ease(1 - (reachOf(v.points, x, z) - v.half) / v.fade);
     // Only high ground comes down. A river or a pond in the vale keeps its bed.
     if (w > 0 && h > v.ground) h += (v.ground + (h - v.ground) * v.keep - h) * w;
+  }
+  for (const k of REGION.knolls) {
+    const d = ((x - k.x) * (x - k.x) + (z - k.z) * (z - k.z)) / (k.radius * k.radius);
+    if (d < 4) h += k.height * Math.exp(-d * 1.6);
   }
   for (let i = 0; i < REGION.levels.length; i++) {
     const w = levelWeight(i, x, z);
@@ -214,7 +226,7 @@ export function regionProps(): readonly RegionProp[] {
   if (propList) return propList;
   propList = [];
   for (const b of built()) propList.push(...b.props);
-  for (const p of REGION.props) propList.push({ ...p, scale: 1, quarterTurns: 0, building: '' });
+  for (const p of REGION.props) propList.push({ ...p, scale: p.scale ?? 1, quarterTurns: 0, building: '' });
   return propList;
 }
 

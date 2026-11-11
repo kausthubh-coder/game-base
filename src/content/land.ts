@@ -4,16 +4,20 @@
 //
 // `colors` are sRGB hex. Grass takes its greens from a slow noise; the others are one colour each.
 
-/** Blocks the land is made of. The block mesher draws none of their faces when the land is on. */
-export const LAND_BLOCKS: readonly string[] = ['grass', 'dirt', 'sand', 'clay', 'stone', 'mossy_stone', 'path'];
+/**
+ * Blocks the land is made of. The block mesher draws none of their faces where they are natural ground, and
+ * the land draws them instead. Tilled soil and paving are land too: a field or a paved square is painted into
+ * the ground, with a soft edge where it meets the grass.
+ */
+export const LAND_BLOCKS: readonly string[] = ['grass', 'dirt', 'sand', 'clay', 'stone', 'mossy_stone', 'path', 'tilled_soil', 'cobble', 'stone_brick'];
+
+/** Ground that somebody made, and what is painted on it: the furrows of a field, or paving stones. */
+export const MADE_GROUND: Readonly<Record<string, 'soil' | 'paving'>> = { tilled_soil: 'soil', cobble: 'paving', stone_brick: 'paving' };
 
 /**
- * Ground that somebody made flat and square: a tilled bed, a paved square. It stays a block, and the land
- * lies just under its top so the two never fight for the same pixels.
+ * How far under its top the land lies where the ground is a block that is not land (a plank floor let into
+ * the earth). That block is drawn as a block, and the two never fight for the same pixels.
  */
-export const FLAT_BLOCKS: readonly string[] = ['tilled_soil', 'cobble', 'stone_brick'];
-
-/** How far under the top of a flat block the land lies, in blocks. */
 export const FLAT_DROP = 0.08;
 
 export const LAND_COLORS = {
@@ -26,6 +30,9 @@ export const LAND_COLORS = {
   clay: '#b9a892',
   stone: '#b8b3a6',
   mossy_stone: '#9aa67f',
+  tilled_soil: '#9a7450',
+  cobble: '#c2bcae',
+  stone_brick: '#b9b6ae',
   /** A slope too steep for grass shows earth and rock. */
   cliff: '#a69d86',
   /** The riser of a step, where the land is drawn stepped: the earth under the turf. */

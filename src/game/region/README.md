@@ -4,7 +4,7 @@ The land of the first part: the grant, the mossy rocks, the dead garden, the pat
 
 ## How the land is made
 
-The plan is data in `src/game/content/region.ts`: level ground, a river basin, the path, boxes of blocks, buildings, trees, bushes, places. The terrain (`src/features/world/terrain.sim.ts`) reads that plan while it makes each chunk, so the page and the worker make the same blocks. Trees are model entities owned by `src/game/trees`; terrain stamps only their invisible root barriers. This system writes no blocks. It answers questions about them and runs the berry bushes.
+The plan is data in `src/game/content/region.ts`: a vale of gentle ground from the dead garden to the town, level ground, a river basin, the path, boxes of blocks, buildings, trees, bushes, places. The terrain (`src/features/world/terrain.sim.ts`) reads that plan while it makes each chunk, so the page and the worker make the same blocks. Trees are model entities owned by `src/game/trees`; terrain stamps only their invisible root barriers. This system writes no blocks. It answers questions about them and runs the berry bushes.
 
 The plan is laid out on the land of world seed 1, which is the seed the game uses. Another seed gets the same plan at the same coordinates on its own land. Every place can still be stood on, but the river and the hills are somewhere else.
 
@@ -14,7 +14,7 @@ To move something, change its numbers in `content/region.ts`, then run `bun tool
 
 ## Hollowmere's layouts
 
-Hollowmere has three layouts while Kausthubh chooses: `content/town/now.ts` is the town of blocks as it stands, `a.ts` the Queen's Granary and `b.ts` the Hollow Oak. `?town=a` picks one on the page, `VITE_TOWN=a` sets a build's default, and `town/pick.ts` says how the chunk worker learns it. Run the tests of a layout with `VITE_TOWN=a bun run check`.
+Hollowmere is `content/town/b.ts`, the Hollow Oak on its Lantern Green. Two other layouts are kept to look at: `now.ts`, the first town, built of blocks, and `a.ts`, the Queen's Granary. `?town=now` picks one on the page, `VITE_TOWN=now` sets a build's default, and `town/pick.ts` says how the chunk worker learns it. Run the tests of a layout with `VITE_TOWN=now bun run check`. The table of places below gives the first town's coordinates; ask `region.place(name)` for the ones in use.
 
 A and B are built from the Hollowmere town kit (`src/content/town-kit.ts`, made by `tools/models/town.mjs`). A layout sets kit models down with `modelAt` in `content/town/kit.ts`. `land.sim.ts` turns each one's solid cells into two blocks of invisible barrier, and a model can give a place at its doorstep, as a building of blocks gives one at its door. `src/game/views/world-town.view.ts` draws the models. Nobody can walk into a kit building, so its quest places are the doorsteps. Keep three blocks of open ground in front of a door: the nav keeps one block of room around a barrier, so a narrower way is closed to it.
 

@@ -5,7 +5,7 @@
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import { REGION } from '../../game/content/region.ts';
-import { built, chunkInBounds, inBounds, onPath, placedModels, shapeGround, shaped, stampStructures, treeAllowed } from '../../game/region/land.sim.ts';
+import { built, chunkInBounds, hillsKept, inBounds, onPath, placedModels, shapeGround, shaped, stampStructures, treeAllowed } from '../../game/region/land.sim.ts';
 import { CHUNK, HEIGHT, cellIndex } from './chunk.sim.ts';
 import { clamp, fbm2, hash2, hash3, noise3, smoothstep } from './noise.sim.ts';
 
@@ -66,13 +66,18 @@ export const LANDMARKS = {
 /** The height of one shelf of a hill, in blocks. */
 const SHELF = 6;
 
-const hillMask = (seed: number, x: number, z: number): number => smoothstep(0.57, 0.72, fbm2(x / 170, z / 170, seed + 23, 2));
+/** How much of a hill a place is, from 0 to 1. The region plan keeps the hills out of its vale. */
+const hillMask = (seed: number, x: number, z: number): number =>
+  smoothstep(0.57, 0.72, fbm2(x / 170, z / 170, seed + 23, 2)) * (inBounds(x, z) ? hillsKept(x, z) : 1);
 
 function naturalHeight(seed: number, x: number, z: number, hills: number): number {
   // Downs: broad swells the eye can follow to the horizon, with smaller ones lying on them.
   // They rise far more than they dip, so the low ground between them stays a meadow and not a marsh.
   const swell = fbm2(x / 150, z / 150, seed + 13, 2) - 0.46;
-  let h = 20.6 + swell * (swell > 0 ? 24 : 5) + (fbm2(x / 52, z / 52, seed + 11, 3) - 0.5) * 3;
+  let h = 20.7 + swell * (swell > 0 ? 24 : 5) + (fbm2(x / 23, z / 23, seed + 11, 2) - 0.5) * 1.5;
+  // Rolling meadow: a rise every seventy blocks or so, a few blocks high, gentle enough to walk straight over.
+  const roll = fbm2(x / 72, z / 72, seed + 17, 3) - 0.43;
+  h += roll * (roll > 0 ? 15 : 5);
   if (hills > 0) {
     // A hill is a crest along a winding line with shoulders on either side. It climbs in shelves: a bank of
     // rock, then level ground to stand or build on, then the next bank.
@@ -84,7 +89,7 @@ function naturalHeight(seed: number, x: number, z: number, hills: number): numbe
   }
   // The river runs along one contour line of a slow noise. Its valley flattens the land beside it.
   const r = Math.abs(fbm2(x / 240 + 7.3, z / 240 - 3.1, seed + 51, 2) - 0.5);
-  const valley = smoothstep(0.075, 0.022, r);
+  const valley = smoothstep(0.05, 0.02, r);
   h += (19.6 - h) * valley;
   h += (14.5 - h) * smoothstep(0.02, 0.007, r);
   // Ponds sit on a loose grid, in the meadow only. No two have the same outline, and one in five is a small lake.

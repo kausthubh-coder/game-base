@@ -10,10 +10,13 @@
 // The Glow is dim by day and brighter than white at night, so the bloom of the final picture catches it.
 // The light on the ground comes from blocks of lantern light the plan puts beside the lamps and doors.
 // A building that stands between the camera and the hero fades to a dither, the way blocks are cut away.
+// In the painted world the bodies take the painted light and its air, and the kit is fetched from much
+// farther off, so the town shows across the vale.
 // Without models in the plan, nothing is drawn or loaded.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { TOWN_MODELS } from '../../content/town-kit.ts';
+import { paint } from '../../features/painted/index.ts';
 import { darkness } from '../../features/props/light.sim.ts';
 import { REGION } from '../content/region.ts';
 import { placedModels } from '../region/land.sim.ts';
@@ -27,6 +30,8 @@ const DAY_GLOW = new THREE.Color(0.55, 0.42, 0.22), NIGHT_GLOW = new THREE.Color
 const FADED = 0.28, FADE_RATE = 6;
 /** The kit is fetched once the hero is this many blocks from the town's middle. The game starts about 185 away. */
 const LOAD_REACH = 140;
+/** The same in the painted world, where the town can be seen from as far as the far land reaches. */
+const PAINTED_REACH = 330;
 /** The stand-ins' plaster walls and teal roofs, as linear colour. */
 const PLASTER = new THREE.Color(0xe6dcc5), ROOF = new THREE.Color(0x397876);
 
@@ -135,9 +140,20 @@ export function install(view: GameView): void {
 
   const group = new THREE.Group();
   group.name = 'town models';
-  const bodyMaterial = new THREE.MeshLambertMaterial({ vertexColors: true });
+  // The painted body: the same fade, written as the painted light's own hooks, and air instead of the near world's edge.
+  const bodyMaterial = view.painted
+    ? paint({
+      vertexColors: true, brush: 0.22, bands: 0.55, wrap: 0.25, brushScale: 0.22,
+      uniforms: { uFade: uniforms.uFade },
+      vertexPars: `attribute float aFader;\nuniform float uFade[${FADERS}];\nvarying float vFade;`,
+      vertexBegin: 'vFade = aFader < 0.0 ? 1.0 : uFade[int(aFader)];',
+      fragmentPars: 'varying float vFade;',
+      fragmentAlbedo: 'if (vFade < 0.99 && fract(sin(dot(floor(gl_FragCoord.xy), vec2(12.9898, 78.233))) * 43758.5453) > vFade) discard;',
+      fragmentFinal: 'vec3 outgoingLight = paintAir(paintShade(diffuseColor.rgb, paintLit(0.0))) + totalEmissiveRadiance;',
+    })
+    : new THREE.MeshLambertMaterial({ vertexColors: true });
   const glowMaterial = new THREE.MeshBasicMaterial({ color: DAY_GLOW.clone() });
-  dither(bodyMaterial);
+  if (!view.painted) dither(bodyMaterial);
   dither(glowMaterial);
   view.scene.add(group);
 
@@ -209,7 +225,7 @@ export function install(view: GameView): void {
   const center = REGION.townCenter;
   view.onFrame((dt) => {
     const hero = view.playerPosition;
-    if (!loading && Math.hypot(hero.x - center.x, hero.z - center.z) < LOAD_REACH) {
+    if (!loading && Math.hypot(hero.x - center.x, hero.z - center.z) < (view.painted ? PAINTED_REACH : LOAD_REACH)) {
       loading = true;
       arrive().catch((error) => console.warn('[town] the town kit did not load, so its stand-ins stay:', error));
     }

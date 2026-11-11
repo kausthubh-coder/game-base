@@ -25,6 +25,12 @@ export const PAINTED_TREES: Readonly<Record<string, readonly { spec: PaintedTree
 /** Deep shade, shade, light, the sunlit top: a clear emerald, pale mint where the sun catches a spray. */
 export const EMERALD: readonly [string, string, string, string] = ['#0d6248', '#128a4c', '#24a957', '#66d68e'];
 
+/**
+ * The Hollow Oak of Hollowmere: older than the kingdom and far larger than any tree of the woods. It is drawn
+ * leaf by leaf from any distance, where the region plan stands a prop of this kind.
+ */
+export const GREAT_OAK = { prop: 'elderOak', spec: { ...SPREADING, seed: 91, height: 8.4, trunk: 0.95, crown: 6.2, blobs: 20, card: 1.5, squash: 0.62, lean: 0.5, fork: 0.42, low: -0.5 } as PaintedTree, scale: 2.1 };
+
 /** A tree nearer than this is drawn leaf by leaf and casts a shadow. Farther, it is fewer and larger cards. */
 export const TREE_NEAR = 40;
 
@@ -48,7 +54,7 @@ export interface Mood {
 
 const NIGHT: Mood = { sunTint: [0.13, 0.2, 0.36], shadeTint: [0.04, 0.065, 0.15], skyAdd: [0.003, 0.006, 0.02], leafSun: [0.22, 0.32, 0.55], leafShade: [0.16, 0.24, 0.46], cloud: [0.2, 0.25, 0.4], air: [0.035, 0.06, 0.15], glow: [0.2, 0.3, 0.55], glowing: 0.35 };
 const DAWN: Mood = { sunTint: [1.22, 0.92, 0.68], shadeTint: [0.27, 0.32, 0.56], skyAdd: [0.022, 0.02, 0.06], leafSun: [1.2, 0.95, 0.7], leafShade: [0.86, 0.78, 1.0], cloud: [1.1, 0.88, 0.8], air: [0.62, 0.52, 0.66], glow: [1.25, 0.72, 0.42], glowing: 0.9 };
-const NOON: Mood = { sunTint: [1.06, 1.0, 0.84], shadeTint: [0.21, 0.37, 0.58], skyAdd: [0.008, 0.022, 0.05], leafSun: [1, 1, 1], leafShade: [1, 1, 1], cloud: [1, 1, 1], air: [0.33, 0.55, 0.86], glow: [1.0, 0.94, 0.74], glowing: 0.55 };
+const NOON: Mood = { sunTint: [1.06, 1.0, 0.84], shadeTint: [0.21, 0.37, 0.58], skyAdd: [0.008, 0.022, 0.05], leafSun: [1, 1, 1], leafShade: [1, 1, 1], cloud: [1, 1, 1], air: [0.47, 0.68, 0.87], glow: [1.0, 0.95, 0.8], glowing: 0.45 };
 const EVENING: Mood = { sunTint: [1.3, 0.9, 0.55], shadeTint: [0.3, 0.33, 0.6], skyAdd: [0.03, 0.022, 0.07], leafSun: [1.28, 0.93, 0.6], leafShade: [0.86, 0.74, 1.0], cloud: [1.12, 0.84, 0.74], air: [0.58, 0.42, 0.6], glow: [1.35, 0.66, 0.3], glowing: 1 };
 
 /** The moods through the day, by the clock: 0 is midnight, 0.25 sunrise, 0.5 noon, 0.75 sunset. */
@@ -63,6 +69,9 @@ export const MOODS: readonly (readonly [number, Mood])[] = [
  * `fog` is where the fog on what is not painted (blocks, sprites) starts and is whole, measured from the hero.
  */
 export const HAZE = { start: 42, density: 0.0042, most: 0.88, low: 20, clears: 0.05, fog: [60, 420] };
+
+/** The colour of water over a shallow bed and over a deep one, and of water on the far land. */
+export const PAINTED_WATER = { shallow: '#8fd6c4', deep: '#3c88b4', far: '#74b9d4' };
 
 /** How far from the hero a tree is drawn leaf by leaf. Past it a tree is a picture of itself. The rules know trees this far at least. */
 export const TREE_REACH = 62;

@@ -21,6 +21,8 @@ export interface FarSource {
   forestAt(x: number, z: number): number;
   /** Water lies on ground lower than this. */
   waterLevel: number;
+  /** The colour of water seen from far off, as sRGB hex. */
+  water: string;
 }
 
 export interface FarLand {
@@ -41,7 +43,7 @@ const SNAP = 32;
 const ROWS = 16;
 /** How far under the true ground the far land lies, so the near land always covers it where both are drawn. */
 const SINK = 0.7;
-const WATER = new THREE.Color('#5a9fcf'), DEEP = new THREE.Color(LAND_COLORS.grass.deep), CLIFF = new THREE.Color(LAND_COLORS.cliff);
+const DEEP = new THREE.Color(LAND_COLORS.grass.deep), CLIFF = new THREE.Color(LAND_COLORS.cliff);
 
 export function createFarLand(source: FarSource, textures: Textures): FarLand {
   const group = new THREE.Group();
@@ -74,7 +76,7 @@ export function createFarLand(source: FarSource, textures: Textures): FarLand {
   // One sheet is shown while the other is made for the hero's new place.
   let shown = sheet(), next = sheet();
   let row = -1, hole = -1, triangles = 0;
-  const color = new THREE.Color(), normal = new THREE.Vector3();
+  const color = new THREE.Color(), normal = new THREE.Vector3(), WATER = new THREE.Color(source.water);
 
   /** Leaves out the cells that the near land always covers, wherever in its square the hero stands. */
   function cut(near: number): void {

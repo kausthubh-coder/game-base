@@ -95,9 +95,9 @@ export function createBackdrop(textures: Textures): Backdrop {
   clouds.renderOrder = -6;
   // The three rings are one mesh, so they cost one draw call.
   const ridges = new THREE.Mesh(mergeGeometries([
-    ridge(330, 8, 34, 3, '#6fa85a', '#3f8449', 0.6),
-    ridge(440, 12, 70, 11, '#5f9a62', '#3c7a5a', 0.72),
-    ridge(560, 16, 130, 23, '#55906e', '#3f7a6e', 0.82),
+    ridge(330, 8, 34, 3, '#7fb356', '#3f8449', 0.5),
+    ridge(440, 12, 70, 11, '#5f9a58', '#3c7a52', 0.64),
+    ridge(560, 16, 130, 23, '#55906a', '#3f7a66', 0.76),
   ]), paint({
     vertexColors: true, side: THREE.DoubleSide, keepNormal: true, brush: 0.5, bands: 0.6, wrap: 0.2, brushScale: 0.012, fog: false,
     vertexPars: 'attribute float aHaze; varying float vHazeAmt;',

@@ -16,6 +16,8 @@ export interface Textures {
   /** Masks of one spray of leaves each: leaflets that fan out from a stem, as on a chestnut. Drawn by code. */
   rosettes: THREE.Texture[];
   flower: THREE.Texture;
+  /** Paving stones, drawn by code. Red is how light a stone is (dark between stones), green is a number of the stone's own. It repeats. */
+  cobble: THREE.Texture;
   /** Names of the textures that are stand-ins. */
   standIns: string[];
 }
@@ -140,6 +142,39 @@ async function image(base: string, name: string): Promise<HTMLImageElement | nul
   }
 }
 
+/** Rounded stones of many sizes set close together, with dark earth between them. */
+function cobbles(): THREE.DataTexture {
+  const size = 256, cells = 9, r = random(77), data = new Uint8Array(size * size * 4);
+  // One stone in each square of a grid, pushed off its middle. The grid wraps, so the texture repeats.
+  const px = new Float32Array(cells * cells), py = new Float32Array(cells * cells), tone = new Float32Array(cells * cells), own = new Float32Array(cells * cells);
+  for (let i = 0; i < cells * cells; i++) { px[i] = 0.18 + r() * 0.64; py[i] = 0.18 + r() * 0.64; tone[i] = 0.82 + r() * 0.3; own[i] = r(); }
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const u = (x / size) * cells, v = (y / size) * cells, cu = Math.floor(u), cv = Math.floor(v);
+      let near = 9, next = 9, which = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const c = ((cv + dy + cells) % cells) * cells + ((cu + dx + cells) % cells), d = Math.hypot(cu + dx + (px[c] as number) - u, cv + dy + (py[c] as number) - v);
+          if (d < near) { next = near; near = d; which = c; } else if (d < next) next = d;
+        }
+      }
+      // Near the line between two stones lies the gap. A stone is a little darker toward its rim.
+      const rim = next - near, gap = Math.min(1, Math.max(0, (rim - 0.05) / 0.09)), at = (y * size + x) * 4;
+      data[at] = Math.round(255 * Math.min(1, (0.42 + (0.4 * (tone[which] as number) + 0.1 * Math.min(1, rim * 3)) * gap) ));
+      data[at + 1] = Math.round(255 * (own[which] as number));
+      data[at + 2] = Math.round(255 * gap);
+      data[at + 3] = 255;
+    }
+  }
+  const t = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.magFilter = THREE.LinearFilter; t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.generateMipmaps = true;
+  t.anisotropy = 4;
+  t.needsUpdate = true;
+  return t;
+}
+
 /** `base` is the folder the paintings are served from, with its last slash. */
 export async function loadTextures(base: string): Promise<Textures> {
   const standIns: string[] = [];
@@ -160,7 +195,7 @@ export async function loadTextures(base: string): Promise<Textures> {
   const [rock] = await one('rock', true, true, () => strokes(4, '#a7a297', ['#8f8d92', '#bcb6a8', '#9a97a2'], 160, 40, 14));
   const [flowerTexture] = await one('flower', false, false, flower, false);
   return {
-    brush, ground, groundMean: new THREE.Color().setRGB(...meanPixel(groundSource), THREE.SRGBColorSpace), bark, rock, flower: flowerTexture,
+    brush, ground, groundMean: new THREE.Color().setRGB(...meanPixel(groundSource), THREE.SRGBColorSpace), bark, rock, flower: flowerTexture, cobble: cobbles(),
     tufts: await many('tuft', 2, false, false, (i) => tuft(21 + i)),
     clouds: await many('cloud', 6, false, true, (i) => cloud(31 + i)),
     rosettes: [[51, 6], [52, 7], [53, 5]].map(([seed, leaflets]) => finish(rosette(seed as number, leaflets as number), false, false)),

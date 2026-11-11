@@ -32,6 +32,8 @@ export interface PostOptions {
   bloomStrength?: number;
   /** Brightness above which a pixel glows. 1 is the brightest a lit surface normally gets. */
   bloomThreshold?: number;
+  /** How much stronger than drawn the colours come out. 1 leaves them as they are; 1.08 when left out. */
+  saturation?: number;
 }
 
 export interface PostCost {
@@ -181,7 +183,7 @@ export function createPost(ctx: ViewContext, options: PostOptions = {}): Post {
       uTilt: { value: 2.2 },
       uFocusY: { value: 0.5 },
       uVignette: { value: 0.22 },
-      uSaturation: { value: 1.08 },
+      uSaturation: { value: options.saturation ?? 1.08 },
     },
     true,
   );

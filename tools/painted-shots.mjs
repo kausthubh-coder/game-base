@@ -1,7 +1,7 @@
 // Pictures of the painted world from fixed places, to judge the look after a change. It builds the game, serves
 // it, starts a game through the debug door, hides the interface and shoots each view.
 //   bun tools/painted-shots.mjs [--port 5470] [--dist dist-painted] [--no-build] [--out .artifacts/painted]
-//     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,south,west,vale,low] [--query "look=blocks"] [--tag blocks] [--time 0.5]
+//     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,green,street,town,farm,wide,knoll,south,west,vale,low] [--query "look=blocks"] [--tag blocks] [--time 0.5]
 //     [--frames 30] [--quality high]
 // A view is a place, a camera and a zoom. `--tag` goes into the file names, so two looks can sit side by side.
 // It fails on a console error. This Mac draws WebGL in software: the pictures say what is drawn, never how fast.
@@ -39,7 +39,14 @@ const VIEWS = {
   river: { at: 'river.bank', camera: 'free', yaw: 30, pitch: 8, distance: 11 },
   gate: { at: [124, -176], camera: 'free', yaw: 275, pitch: 7, distance: 10 },
   square: { at: 'town.square', camera: 'tilt', zoom: 1, quarter: 0 },
-  // Long views, to judge the air and the far land.
+  // The town.
+  green: { at: [173, -142], camera: 'free', yaw: 0, pitch: 7, distance: 15 },
+  street: { at: [143, -174], camera: 'free', yaw: 272, pitch: 6, distance: 10 },
+  town: { at: [150, -139], camera: 'free', yaw: 318, pitch: 11, distance: 17 },
+  farm: { at: 'gus.field', camera: 'free', yaw: 262, pitch: 22, distance: 11 },
+  // Long views, to judge the air and the far land. `wide` stands back and high, as the painted meadow's first view does.
+  wide: { at: [12, -214], camera: 'free', yaw: 338, pitch: 13, distance: 36 },
+  knoll: { at: [38, -238], camera: 'free', yaw: 5, pitch: 6, distance: 15 },
   south: { at: 'spawn', camera: 'free', yaw: 170, pitch: 3, distance: 10 },
   west: { at: [30, -221], camera: 'free', yaw: 80, pitch: 4, distance: 10 },
   vale: { at: [100, -210], camera: 'free', yaw: 250, pitch: 5, distance: 12 },

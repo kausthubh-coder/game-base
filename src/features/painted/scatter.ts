@@ -38,9 +38,38 @@ function boulder(seed: number, wide: number, tall: number): THREE.BufferGeometry
   return g;
 }
 
+/** A standing stone: a tall slab set on end, wider at its foot, with moss where it meets the ground and on its head. */
+function menhir(): THREE.BufferGeometry {
+  const g = new THREE.CylinderGeometry(0.84, 1.02, 3.7, 7, 5).toNonIndexed(), pos = g.getAttribute('position'), v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const up = (v.y + 1.85) / 3.7, out = 1 + 0.16 * fbm(v.x * 1.1 + 5, v.y * 0.9 + v.z * 1.3, 2, 7);
+    // The head is cut on a slant and the whole stone leans a little.
+    pos.setXYZ(i, v.x * out + up * 0.12, (v.y + 1.75) * (1 - 0.07 * v.x * up), v.z * out * 0.92);
+  }
+  g.computeVertexNormals();
+  const normal = g.getAttribute('normal'), colors = new Float32Array(pos.count * 3);
+  const stone = new THREE.Color('#b9b3a6'), low = new THREE.Color('#8f8c8e'), moss = new THREE.Color('#7fa650'), c = new THREE.Color();
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i);
+    c.copy(low).lerp(stone, THREE.MathUtils.smoothstep(y, 0.2, 2.6));
+    if (normal.getY(i) > 0.6 || y < 0.25 + 0.3 * fbm(pos.getX(i) * 2, pos.getZ(i) * 2, 2, 3)) c.lerp(moss, 0.7);
+    colors.set([c.r, c.g, c.b], i * 3);
+  }
+  g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  g.deleteAttribute('uv');
+  return g;
+}
+
+/** The variant that asks for the standing stone, which no scattered boulder is. */
+export const STANDING_STONE = 100;
+
 interface Stone { x: number; y: number; z: number; turn: number; scale: number; shape: number }
 
-/** Boulders in three shapes: a round one, a long low one and a tall one. `capacity` is how many of each shape. */
+/**
+ * Boulders in three shapes: a round one, a long low one and a tall one. `capacity` is how many of each shape.
+ * A fourth shape is the standing stone, placed only by asking for the variant `STANDING_STONE`.
+ */
 export function createBoulders(textures: Textures, capacity = 384): Scatter {
   const group = new THREE.Group();
   group.name = 'boulders';
@@ -50,8 +79,9 @@ export function createBoulders(textures: Textures, capacity = 384): Scatter {
     fragmentPars: 'uniform sampler2D uRock;',
     fragmentAlbedo: 'diffuseColor.rgb *= 0.6 + 0.8 * texture2D(uRock, vPaintWorld.xz * 0.2 + vPaintWorld.y * 0.13).g;',
   });
-  const batches = [boulder(1, 1.25, 1), boulder(2, 1.7, 0.7), boulder(3, 1.05, 1.35)].map((shape) => {
-    const mesh = new THREE.InstancedMesh(shape, material, capacity);
+  const SCATTERED = 3;
+  const batches = [boulder(1, 1.25, 1), boulder(2, 1.7, 0.7), boulder(3, 1.05, 1.35), menhir()].map((shape, i) => {
+    const mesh = new THREE.InstancedMesh(shape, material, i < SCATTERED ? capacity : 8);
     mesh.count = 0;
     mesh.castShadow = mesh.receiveShadow = true;
     mesh.frustumCulled = false;
@@ -65,7 +95,7 @@ export function createBoulders(textures: Textures, capacity = 384): Scatter {
     group,
     place(x, y, z, turn, scale, variant) {
       const id = next++;
-      stones.set(id, { x, y, z, turn, scale, shape: Math.abs(variant + Math.floor(x * 3 + z * 7)) % batches.length });
+      stones.set(id, { x, y, z, turn, scale, shape: variant === STANDING_STONE ? SCATTERED : Math.abs(variant + Math.floor(x * 3 + z * 7)) % SCATTERED });
       dirty = true;
       return id;
     },
@@ -76,12 +106,12 @@ export function createBoulders(textures: Textures, capacity = 384): Scatter {
       for (const batch of batches) batch.count = 0;
       for (const s of stones.values()) {
         const batch = batches[s.shape] as THREE.InstancedMesh;
-        if (batch.count >= capacity) continue;
+        if (batch.count >= batch.instanceMatrix.count) continue;
         // A boulder sits a little into the ground, so no edge of it floats on a slope.
         m.compose(at.set(s.x, s.y + s.scale * 0.02, s.z), q.setFromAxisAngle(up, s.turn), size.setScalar(s.scale));
         batch.setMatrixAt(batch.count++, m);
       }
-      for (const batch of batches) batch.instanceMatrix.needsUpdate = true;
+      for (const batch of batches) { batch.instanceMatrix.needsUpdate = true; batch.visible = batch.count > 0; }
     },
     get count() { return stones.size; },
   };
