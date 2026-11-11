@@ -12,18 +12,25 @@
 //   - While the kernel steps, `game.player` is the host: the player who has been in the world longest.
 //     Creatures wake and flee around the host, pets and quests follow the host.
 //   - The bag, the quests and the story are the world's, shared by everyone in it.
-import type { Act, ActorState, BodyState, ChunkEdits, Input, PlacedState, Snap, Target } from '../src/engine/net/messages.ts';
+//
+// Each browser in the world is a copy of it (src/game/online/copy.sim.ts). Besides bodies, actors, blocks
+// and placed things, a snap carries the systems' state that changed, the weather, and the events of the
+// step: the world's to everyone, the personal ones (a toast, a panel to open) only to the player whose act
+// made them. A player's own break in progress, conversation and used stations go to that player alone.
+import { AMBIENT_KEYS, BODY_STEPS as WIRE_BODY_STEPS, type Act, type ActorState, type BodyState, type Breaking, type ChunkEdits, type Input, type Line, type PlacedState, type Snap, type StateCopy, type Target, type WireEvent } from '../src/engine/net/messages.ts';
 import { HERO_STEP, HeroBody } from '../src/features/hero/hero.sim.ts';
 import { SOLID, chunkKey, keyX, keyZ } from '../src/features/world/chunk.sim.ts';
 import { World, type RayHit, type WorldSave } from '../src/features/world/world.sim.ts';
 import type { Actor, Game, Placed, Systems, UseContext } from '../src/game/api.sim.ts';
 import { STEP, createKernel, type GameSave, type Kernel } from '../src/game/kernel.sim.ts';
+import { createCopier, LOCAL_EVENTS, PERSONAL_EVENTS, recording } from '../src/game/online/copy.sim.ts';
 import { INSTALLS, KERNEL_SEED, WORLD_SEED } from '../src/game/play/harness.sim.ts';
 
 /** The most players in one world. The plan is 8 (docs/architecture.md). */
 export const MAX_PLAYERS = 8;
 /** Body steps in one kernel step: 60 a second against 20, as in the shell. */
 const BODY_STEPS = Math.round(STEP / HERO_STEP);
+if (BODY_STEPS !== WIRE_BODY_STEPS) throw new Error(`the wire says ${WIRE_BODY_STEPS} body steps a step and the rules ${BODY_STEPS}`);
 /** The hero walks up a one-block ledge, as in the painted world the game draws by default. */
 const STEP_UP = 1;
 /** Faster than this along the ground, in blocks a second, is the walk animation. */
@@ -51,6 +58,10 @@ const MAX_WAITING = 6;
 const MAX_SAVED = 3;
 /** The most inputs of one player used in one step. */
 const MAX_AT_ONCE = 2;
+/** Steps between two looks at the weather: twice a second is smooth for something that changes over a minute. */
+const AIR_EVERY = 10;
+/** The weather's numbers are sent to three places. */
+const round3 = (n: number): number => Math.round(n * 1000) / 1000;
 
 export interface RoomSave {
   version: 1;
@@ -76,6 +87,8 @@ export interface RoomStats {
   placed: number;
   /** Inputs dropped because too many were waiting. */
   inputsDropped: number;
+  /** Events of the rules sent on to players, since the room was made. */
+  events: number;
 }
 
 interface Seen {
@@ -113,6 +126,13 @@ interface RoomPlayer {
   // What the next snap carries.
   tellChunks: ChunkEdits[];
   tellBlocks: number[];
+  tellEvents: WireEvent[];
+  tellUsed: string[];
+  /** True until the player has been given all of the rules' state. */
+  fresh: boolean;
+  /** The break in progress and the conversation this player was last told of, as JSON. */
+  breakingSent: string;
+  talkSent: string;
 }
 
 /** The world, with a note of every block that changes, so each change can be sent to the players near it. */
@@ -145,6 +165,8 @@ export interface Room {
   leave(user: string): void;
   /** Takes one input in. It is used in a later step: one a step, or two when a step before had none. */
   input(user: string, input: Input): void;
+  /** Goes up every time a player changes the world or the rules' state, so the server can save soon after. */
+  readonly changes: number;
   /** One step: each player's next input, their bodies, then every rule. Nothing happens in an empty world. */
   step(): void;
   /** What to send this player after a step. Call it at most once a step for each player: it notes what it told them. */
@@ -159,7 +181,8 @@ export function createRoom(saved: RoomSave | null = null): Room {
   if (saved) world.restore(saved.world);
   const kernel = createKernel(world, KERNEL_SEED);
   const game = kernel.game;
-  for (const [, install] of INSTALLS) install(kernel);
+  const installing = recording(kernel);
+  for (const [, install] of INSTALLS) install(installing.kernel);
   const sys = game.systems;
 
   const players = new Map<string, RoomPlayer>();
@@ -194,6 +217,63 @@ export function createRoom(saved: RoomSave | null = null): Room {
     kernel.load(saved.game);
     placedRev++;
   }
+
+  // ------------------------------------------------------------------------------ what players are told
+  const copier = createCopier(kernel, installing.systems);
+  /** The state that changed in this step, the same for everyone. */
+  let stepState: StateCopy | null = null;
+  /** The player whose act is running, so what it emits is theirs. Null while the kernel steps. */
+  let acting: RoomPlayer | null = null;
+  /** The player who started the conversation that is open, and the one whose hold the break meter is filling. */
+  let talker: RoomPlayer | null = null;
+  let breaker: RoomPlayer | null = null;
+  /** True when an act ran or an event was emitted since the last step ended. */
+  let busy = false;
+  let changes = 0;
+  let eventsSent = 0;
+  const heard: { name: string; data: unknown; by: RoomPlayer | null }[] = [];
+  game.events.onAny((name, data) => {
+    if (name === 'talk.started') talker = acting ?? host() ?? null;
+    else if (name === 'talk.ended') talker = null;
+    busy = true;
+    if (LOCAL_EVENTS.has(name)) return;
+    // A copy now: some events carry a live position that moves on after.
+    heard.push({ name, data: data === undefined ? null : (JSON.parse(JSON.stringify(data)) as unknown), by: acting });
+  });
+  // A workbench or a chest opens its panel for the player who used it. A listener here also makes their
+  // prompts show, as the panels do in the browser.
+  sys.placeables.onUse?.((placed) => {
+    if (acting) acting.tellUsed.push(placed.id);
+  });
+
+  /** Hands the events of this step to the players who should hear them. */
+  function tellEvents(): void {
+    for (const event of heard) {
+      const wire: WireEvent = [event.name, event.data];
+      if (PERSONAL_EVENTS.has(event.name)) {
+        const to = event.by ?? host();
+        if (to) { to.tellEvents.push(wire); eventsSent++; }
+      } else {
+        for (const p of players.values()) { p.tellEvents.push(wire); eventsSent++; }
+      }
+    }
+    heard.length = 0;
+  }
+
+  // The weather: one list of numbers, sent when it changed.
+  let air: number[] = [];
+  let airKey = '';
+  let airChanged = false;
+  function lookAtAir(): void {
+    const a = game.ambient as unknown as Record<string, number>;
+    const next = AMBIENT_KEYS.map((key) => round3(a[key] ?? 0));
+    const key = next.join(',');
+    if (key === airKey) return;
+    airKey = key;
+    air = next;
+    airChanged = true;
+  }
+  lookAtAir();
 
   /** Drops the land no player is near. Its changed blocks stay in the world's save. */
   function unloadFar(): void {
@@ -246,12 +326,57 @@ export function createRoom(saved: RoomSave | null = null): Room {
     return { hit, held: sys.inventory.held(), button };
   }
 
+  /** One build-mode stroke, whole, so two players building at once never share a stroke. */
+  function build(at: Target, to: Target | undefined, turns: number | undefined): void {
+    const b = sys.build;
+    b.setActive(true);
+    b.point(at);
+    if (b.press() && to && b.dragging) {
+      b.point(to);
+      // A piece the player turned stands as they turned it.
+      for (let i = 0; turns !== undefined && i < 4 && (b.plan()?.turns ?? turns) !== turns; i++) b.turn(1);
+      b.release();
+    }
+    b.setActive(false);
+  }
+
   function act(p: RoomPlayer, a: Act): void {
-    if (a.a === 'slot') {
-      p.slot = a.slot;
-      sys.inventory.selected = a.slot;
-    } else if (a.a === 'use') sys.actions.use(contextOf(a, a.button));
-    else sys.actions.hold(contextOf(a, 'primary'), STEP);
+    switch (a.a) {
+      case 'slot':
+        p.slot = a.slot;
+        sys.inventory.selected = a.slot;
+        return;
+      case 'use':
+        sys.actions.use(contextOf(a, a.button));
+        return;
+      case 'hold':
+        breaker = p;
+        sys.actions.hold(contextOf(a, 'primary'), STEP);
+        return;
+      case 'interact':
+        sys.interact.act();
+        return;
+      case 'say': {
+        const line = talker === p ? sys.talk.current() : null;
+        if (!line) return;
+        if (line.choices.length > 0) sys.talk.choose(Math.min(a.choice ?? 0, line.choices.length - 1));
+        else sys.talk.advance();
+        return;
+      }
+      case 'craft':
+        sys.crafting.make(a.recipe);
+        return;
+      case 'move':
+        sys.inventory.move(a.from, a.to, a.count);
+        return;
+      case 'build':
+        build(a.at, a.to, a.turns);
+        return;
+      case 'undo':
+        sys.build.setActive(true);
+        sys.build.undo();
+        sys.build.setActive(false);
+    }
   }
 
   const still = { moveX: 0, moveZ: 0, jump: false };
@@ -269,10 +394,18 @@ export function createRoom(saved: RoomSave | null = null): Room {
       p.ack = input.n;
       if (input.acts) {
         become(p);
+        acting = p;
+        busy = true;
+        changes++;
         for (const a of input.acts) act(p, a);
+        acting = null;
       }
+      const moves = input.moves;
       move.moveX = input.mx; move.moveZ = input.mz; move.jump = input.jump;
-      for (let i = 0; i < BODY_STEPS; i++) body.step(move);
+      for (let i = 0; i < BODY_STEPS; i++) {
+        if (moves) { move.moveX = moves[i * 3]; move.moveZ = moves[i * 3 + 1]; move.jump = moves[i * 3 + 2] === 1; }
+        body.step(move);
+      }
     }
     // No input came for this step: the body still falls and slows down.
     if (used === 0) for (let i = 0; i < BODY_STEPS; i++) body.step(still);
@@ -299,6 +432,8 @@ export function createRoom(saved: RoomSave | null = null): Room {
       // A new object for every change, so a snap that was handed out is never changed after the fact.
       const state: ActorState = { id: actor.id, sprite: actor.sprite, x, y, z, facing, anim: actor.anim };
       if (mark) state.mark = mark;
+      const name = names.get(actor.id);
+      if (name !== undefined) state.name = name;
       if (known) { known.state = state; known.at = steps; }
       else seen.set(actor.id, { state, at: steps, alive: steps, turn: actor.id.startsWith('player:') ? -1 : nextTurn++ % SLOW_EVERY });
     }
@@ -307,12 +442,13 @@ export function createRoom(saved: RoomSave | null = null): Room {
 
   /** Hands every block that changed in this step to the players who know its chunk. */
   function tellBlocks(): void {
-    const changes = world.changes;
-    for (let i = 0; i < changes.length; i += 4) {
-      const key = chunkKey(changes[i] >> 4, changes[i + 2] >> 4);
-      for (const p of players.values()) if (p.chunks.has(key)) p.tellBlocks.push(changes[i], changes[i + 1], changes[i + 2], changes[i + 3]);
+    const edits = world.changes;
+    if (edits.length > 0) changes++;
+    for (let i = 0; i < edits.length; i += 4) {
+      const key = chunkKey(edits[i] >> 4, edits[i + 2] >> 4);
+      for (const p of players.values()) if (p.chunks.has(key)) p.tellBlocks.push(edits[i], edits[i + 1], edits[i + 2], edits[i + 3]);
     }
-    changes.length = 0;
+    edits.length = 0;
   }
 
   const placedState = (p: Placed): PlacedState => ({ id: p.id, kind: p.kind, x: p.x, y: p.y, z: p.z, turns: p.quarterTurns });
@@ -341,18 +477,47 @@ export function createRoom(saved: RoomSave | null = null): Room {
     return undefined;
   }
 
+  /** Players' names by actor id, for the name over their heads. */
+  const names = new Map<string, string>();
+
   function leave(user: string): void {
     const p = players.get(user);
     if (!p) return;
     places.set(user, { x: p.body.x, y: p.body.y, z: p.body.z, facing: p.body.facing });
     game.actors.delete(p.actor.id);
+    names.delete(p.actor.id);
     players.delete(user);
+    if (talker === p) talker = null;
+    if (breaker === p) breaker = null;
+  }
+
+  /** This player's own break, conversation and used stations, when they changed. */
+  function tellOwn(p: RoomPlayer, out: Snap): void {
+    const meter = breaker === p ? sys.actions.breaking() : null;
+    const breaking: Breaking | null = meter ? { x: meter.x, y: meter.y, z: meter.z, progress: Math.round(meter.progress * 1000) / 1000, tree: meter.tree ? { ...meter.tree } : null } : null;
+    const breakingKey = JSON.stringify(breaking);
+    if (breakingKey !== p.breakingSent) {
+      p.breakingSent = breakingKey;
+      out.breaking = breaking;
+    }
+    const current = talker === p ? sys.talk.current() : null;
+    const line: Line | null = current ? { npc: current.npc, name: current.name, portrait: current.portrait, voice: current.voice, text: current.text, choices: [...current.choices] } : null;
+    const talkKey = JSON.stringify(line);
+    if (talkKey !== p.talkSent) {
+      p.talkSent = talkKey;
+      out.talk = line;
+    }
+    if (p.tellUsed.length > 0) {
+      out.used = p.tellUsed;
+      p.tellUsed = [];
+    }
   }
 
   return {
     world, kernel, game, sys,
     get steps() { return steps; },
     get playerCount() { return players.size; },
+    get changes() { return changes; },
     has: (user) => players.has(user),
     who: () => [...players.values()].map((p) => ({ id: p.user, name: p.name })),
 
@@ -376,9 +541,11 @@ export function createRoom(saved: RoomSave | null = null): Room {
         waiting: [], saved: 0, newest: 0, ack: 0,
         chunkX: NaN, chunkZ: NaN,
         chunks: new Set(), actors: new Map(), placed: new Set(), placedAt: -1,
-        tellChunks: [], tellBlocks: [],
+        tellChunks: [], tellBlocks: [], tellEvents: [], tellUsed: [],
+        fresh: true, breakingSent: 'null', talkSent: 'null',
       };
       players.set(user, p);
+      names.set(actor.id, name);
       moved(p, cx, cz);
       return actor.id;
     },
@@ -400,6 +567,7 @@ export function createRoom(saved: RoomSave | null = null): Room {
     step() {
       const first = host();
       if (!first) return;
+      airChanged = false;
       for (const p of players.values()) stepPlayer(p);
       become(first);
       kernel.step();
@@ -408,6 +576,11 @@ export function createRoom(saved: RoomSave | null = null): Room {
       world.dirty.length = 0;
       noteActors();
       tellBlocks();
+      tellEvents();
+      stepState = copier.changes(busy);
+      if (stepState && busy) changes++;
+      busy = false;
+      if (steps % AIR_EVERY === 0 || (game.ambient.flash ?? 0) > 0) lookAtAir();
       if (steps % 20 === 0) unloadFar();
     },
 
@@ -447,6 +620,20 @@ export function createRoom(saved: RoomSave | null = null): Room {
         p.tellBlocks = [];
       }
       if (p.placedAt !== placedRev) tellPlaced(p, out);
+
+      if (p.fresh) {
+        p.fresh = false;
+        out.state = copier.all();
+        out.air = air;
+      } else {
+        if (stepState) out.state = stepState;
+        if (airChanged) out.air = air;
+      }
+      if (p.tellEvents.length > 0) {
+        out.events = p.tellEvents;
+        p.tellEvents = [];
+      }
+      tellOwn(p, out);
       return out;
     },
 
@@ -464,7 +651,7 @@ export function createRoom(saved: RoomSave | null = null): Room {
       return {
         steps, players: players.size, chunks: world.chunks.size, editedChunks,
         actors: game.actors.size, creatures: creatures.length, creaturesAwake: awake,
-        placed: sys.placeables.all().length, inputsDropped,
+        placed: sys.placeables.all().length, inputsDropped, events: eventsSent,
       };
     },
   };
