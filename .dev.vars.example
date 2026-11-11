@@ -1,0 +1,19 @@
+# Copy this file to .dev.vars. Wrangler reads .dev.vars when it runs the world server on this machine,
+# and git ignores it. Nothing here is a real secret. See server/README.md.
+
+# Accept plain dev tokens, `dev:<name>`, with no Clerk set up, and let everyone into every world while
+# CONVEX_URL is empty. Never set this on a deployed server.
+DEV_TOKENS=1
+
+# Turn on /world/<id>/stats and /world/<id>/dev, which the checks and the memory test use.
+DEV_TOOLS=1
+
+# The secret the world server shows Convex when it posts a world's card. Convex holds the same value.
+# Any text works here until Convex is set up.
+WORLD_SERVER_SECRET=dev-secret-not-real
+
+# With Clerk and Convex set up, fill these in and take DEV_TOKENS out:
+# CLERK_ISSUER=https://your-app.clerk.accounts.dev
+# CLERK_AUDIENCE=convex
+# CONVEX_URL=https://your-deployment.convex.cloud
+# CONVEX_SITE_URL=https://your-deployment.convex.site

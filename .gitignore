@@ -10,3 +10,7 @@ play-serve
 # Each agent and check builds into its own dist-<name> folder.
 dist-*
 intro-serve
+
+# The world server on this machine: its local secrets and its storage.
+.dev.vars
+.wrangler
