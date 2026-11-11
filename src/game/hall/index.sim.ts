@@ -40,7 +40,7 @@ type SceneId = (typeof SCENES)[number];
 export const FOX_ID = 'fox:blighted';
 export const CUSTODIAN_ID = 'npc:custodian';
 /** The fox is a leaftail with the lume drained out of it. The Custodian has a sheet of its own. */
-const FOX_SPRITE = 'leaftail', CUSTODIAN_SPRITE = 'custodian';
+const FOX_SPRITE = 'fox-blighted', CUSTODIAN_SPRITE = 'custodian';
 
 /** What one of each living thing adds to the Heartstone. */
 export const HEART_WORTH = { roof: 2, crop: 0.25, beast: 5 } as const;
