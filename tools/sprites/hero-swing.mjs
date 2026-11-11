@@ -3,7 +3,13 @@
 import sharp from 'sharp';
 import {pixels,cell,clean,bounds,snap,fitted,readJSON} from './lib.mjs';
 const p=await pixels('assets-src/raw/hero-swing-3.png');
-const palette=(await readJSON('assets-src/palette.json')).colors;
+// The hero's own colours, so the swing is drawn in exactly the shades of hero.png, plus the palette's greys for the
+// axe head, which the hero sheet has no colour for.
+const hex=(r,g,b)=>'#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+const hero=await pixels('public/assets/sprites/hero.png'),own=new Set();
+for(let i=0;i<hero.data.length;i+=4)if(hero.data[i+3]>=128)own.add(hex(hero.data[i],hero.data[i+1],hero.data[i+2]));
+const greys=(await readJSON('assets-src/palette.json')).colors.filter(h=>{const c=[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));return Math.max(...c)-Math.min(...c)<30;});
+const palette=[...own,...greys];
 const cells=[];
 for(let row=0;row<3;row++)for(let col=0;col<3;col++){
  const q=clean(await cell(p,col,row,3,3));cells.push({q,b:bounds(q),row,col});
