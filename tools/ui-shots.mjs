@@ -75,6 +75,8 @@ const STATES = {
     await t.game(fillBook);
     await t.game(() => window.__game.view.game.events.emit('ui.open', { panel: 'almanac' }));
     await t.frames(2);
+    // New facts ink in over 900 ms.
+    await t.page.waitForTimeout(1100);
   },
   async toast(t) {
     await t.game(() => {

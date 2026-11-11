@@ -430,7 +430,7 @@ export const STYLES = /* css */ `
   .gu-recipe > .gu-pic > .gu-pic-cell { left: 4px; top: 4px; }
   .gu-recipe-act { grid-column: 2; justify-items: start; }
   .gu-why { max-width: none; text-align: left; }
-  .gu-book { grid-template-columns: 1fr; min-height: 0; gap: var(--s4); padding: 18px 16px 20px; }
+  .gu-book { grid-template-columns: minmax(0, 1fr); min-height: 0; gap: var(--s4); padding: 18px 16px 20px; }
   .gu-book:not(.gu-book-blank)::after { display: none; }
   .gu-panel-almanac { padding: 18px 12px 16px; }
   .gu-stamp { position: static; align-self: start; margin-left: auto; }
@@ -440,11 +440,12 @@ export const STYLES = /* css */ `
   .gu-tile-icon { width: 48px; height: 48px; }
   .gu-pause .gu-menu { grid-template-columns: 1fr; }
   .gu-index { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); padding: 0; }
-  .gu-index-group { display: flex; align-items: center; gap: var(--s1); flex: none; }
+  .gu-index-group { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1); flex: 1 1 100%; min-width: 0; }
   .gu-index-group .gu-label { margin: 0; padding: 0 var(--s1) 0 0; }
   .gu-page-link { background: var(--paper-2); white-space: nowrap; }
   .gu-spine { display: none; }
-  .gu-leaf-head { gap: var(--s4); }
+  .gu-leaf-head { flex-wrap: wrap; gap: var(--s4); }
+  .gu-stamp { transform: rotate(-4deg); }
   .gu-leaf-head .gu-pic { zoom: 0.667; }
   .gu-leaf-title { font-size: 26px; }
   .gu-columns { grid-template-columns: 1fr; gap: var(--s5); }

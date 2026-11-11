@@ -161,9 +161,12 @@ export const KIT = /* css */ `
 
 /* A narrow screen has no room for the painted ends on the map's row of tools. */
 @container gu (width < 640px) {
+  .ui-book.ui-kit .gu-panel-almanac { padding: 30px 22px 30px; }
+  .ui-book.ui-kit .gu-panel-almanac::before { border-width: 44px; border-image-width: 44px; }
   .ui-book.ui-kit .gu-settings-side .gu-choices:nth-child(even), .ui-book.ui-kit .gu-settings-side .gu-slider:nth-child(even) { background: none; }
 }
 @media (max-width: 640px) {
+  .ui-book.ui-kit .gb-map-view::after { width: 84px; height: 84px; }
   .ui-book.ui-kit .gb-map-tools button:not(.gb-map-square) { border: 0; padding: 0 10px; border-image: none; background: linear-gradient(180deg, #56607a, #4a5366 55%, #424a5c) !important; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55) !important; }
 }
 
@@ -187,6 +190,34 @@ export const KIT = /* css */ `
 .ui-book.ui-kit .gb-hud-minimap { position: relative; padding: 13.2%; }
 .ui-book.ui-kit .gb-hud-minimap::after { content: ''; position: absolute; inset: 0; background: var(--kit-minimap-ring) center / 100% 100% no-repeat; pointer-events: none; filter: drop-shadow(0 4px 8px rgb(10 12 20 / 0.35)); }
 .ui-book.ui-kit .gb-minimap { border: 0 !important; box-shadow: none !important; }
+
+/* ---- the Almanac: a tooled leather cover, paper pages, the fold and the ribbon ---- */
+.ui-book.ui-kit .gu-panel-almanac { padding: 40px 46px 46px; background: transparent; box-shadow: none; isolation: isolate; }
+.ui-book.ui-kit .gu-panel-almanac::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border: 64px solid transparent; border-image: var(--kit-book-cover) 128 fill / 64px stretch;
+  filter: drop-shadow(0 18px 34px rgb(10 12 20 / 0.55));
+}
+.ui-book.ui-kit .gu-panel-almanac .gu-close { right: -22px; top: -16px; }
+.ui-book.ui-kit .gu-book { background: linear-gradient(90deg, rgb(120 90 50 / 0.12), transparent 5%, transparent 95%, rgb(120 90 50 / 0.12)), var(--kit-page) 0 0 / 256px 256px repeat, #efe6d2; }
+.ui-book.ui-kit .gu-spine { background: var(--kit-gutter) center top / 100% 256px repeat-y; }
+.ui-book.ui-kit .gu-book:not(.gu-book-blank)::after { width: 30px; height: 132px; top: -10px; background: var(--kit-ribbon) center top / 100% 100% no-repeat; clip-path: none; box-shadow: none; }
+
+/* ---- the bag's detail pane: the painted card, amber sky above and cream below ---- */
+.ui-book.ui-kit .gu-detail { background: var(--kit-detail) center / 100% 100% no-repeat; box-shadow: 0 6px 16px rgb(59 66 85 / 0.18); }
+.ui-book.ui-kit .gu-detail-art { height: 200px; background: none; box-shadow: none; }
+.ui-book.ui-kit .gu-detail-art::after { display: none; }
+.ui-book.ui-kit .gu-detail-text { padding: 18px 24px 24px; }
+
+/* ---- the map: painted parchment and a compass rose in the corner ---- */
+.ui-book.ui-kit .gb-map-view {
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(120 84 40 / 0.3) 100%),
+    linear-gradient(rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    var(--kit-map-paper) 0 0 / 256px 256px repeat, #e3d4b0;
+}
+.ui-book.ui-kit .gb-map-view::after { content: ''; position: absolute; right: 16px; bottom: 16px; width: 150px; height: 150px; background: var(--kit-compass) center / contain no-repeat; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(90 60 20 / 0.3)); }
 
 /* ---- tooltips: the painted night card ---- */
 .ui-book.ui-kit .gu-tip, .ui-book.ui-kit .ui-slot-tip { background: transparent; box-shadow: none; isolation: isolate; }
