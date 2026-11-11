@@ -63,14 +63,34 @@ describe('the room', () => {
     expect(snaps).toEqual([1, 2, 2, 2]);
   });
 
+  test('two inputs that arrive together after a step with none are both used, so none waits a step behind', () => {
+    const room = createRoom();
+    room.join('ann', 'Ann');
+    const acks: number[] = [];
+    const step = (): void => {
+      room.step();
+      acks.push((room.snap('ann') as Snap).ack);
+    };
+    room.input('ann', input(1));
+    step();
+    step();
+    room.input('ann', input(2));
+    room.input('ann', input(3));
+    step();
+    room.input('ann', input(4));
+    step();
+    expect(acks).toEqual([1, 1, 3, 4]);
+  });
+
   test('a flood of inputs does not let a player run ahead', () => {
     const room = createRoom();
     room.join('ann', 'Ann');
     for (let n = 1; n <= 100; n++) room.input('ann', input(n, { mx: 1 }));
     const before = (run(room, ['ann'], 1).get('ann') as Snap).you.x;
     const after = (run(room, ['ann'], 19).get('ann') as Snap).you.x;
-    // Twenty steps move a body no farther than twenty steps of walking, however many inputs came.
-    expect(after - before).toBeLessThan(4.5);
+    // All but the newest six are dropped, and those six are used one a step: the body moves no farther
+    // than six steps of walking.
+    expect(after - before).toBeLessThan(1.5);
     expect(room.stats().inputsDropped).toBe(94);
   });
 

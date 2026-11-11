@@ -43,6 +43,14 @@ const ACTOR_RANGE = 56;
 const SLOW_EVERY = 4;
 /** Inputs that may wait for one player. More than this and the oldest are dropped, so nobody runs ahead. */
 const MAX_WAITING = 6;
+/**
+ * A player earns one input a step and may save up this many. A saved one is spent when two inputs arrive
+ * in one step after a step with none, as they do on a line that stutters, so no input sits waiting a step
+ * behind for the rest of the session. Over any stretch a player still uses no more inputs than steps, plus these.
+ */
+const MAX_SAVED = 3;
+/** The most inputs of one player used in one step. */
+const MAX_AT_ONCE = 2;
 
 export interface RoomSave {
   version: 1;
@@ -88,6 +96,8 @@ interface RoomPlayer {
   /** The quick slot this player holds. */
   slot: number;
   waiting: Input[];
+  /** Inputs this player may use: one more every step, up to MAX_SAVED. */
+  saved: number;
   /** The number of the newest input received, and of the last one used. */
   newest: number;
   ack: number;
@@ -133,11 +143,11 @@ export interface Room {
   /** Adds a player where they left, or at the spawn. Returns their actor id, or null when the world is full. */
   join(user: string, name: string): string | null;
   leave(user: string): void;
-  /** Takes one input in. It is used in a later step, one input a step. */
+  /** Takes one input in. It is used in a later step: one a step, or two when a step before had none. */
   input(user: string, input: Input): void;
   /** One step: each player's next input, their bodies, then every rule. Nothing happens in an empty world. */
   step(): void;
-  /** What to send this player after a step. Call it once a step for each player: it notes what it told them. */
+  /** What to send this player after a step. Call it at most once a step for each player: it notes what it told them. */
   snap(user: string): Snap | null;
   save(): RoomSave;
   stats(): RoomStats;
@@ -247,21 +257,25 @@ export function createRoom(saved: RoomSave | null = null): Room {
   const still = { moveX: 0, moveZ: 0, jump: false };
   const move = { moveX: 0, moveZ: 0, jump: false };
 
-  /** One player's step: their next input's clicks, then three steps of their body. */
+  /** One player's step: the clicks of their next input, then three steps of their body. Two inputs when one is owed. */
   function stepPlayer(p: RoomPlayer): void {
-    const input = p.waiting.shift();
-    let steer = still;
-    if (input) {
+    const body = p.body;
+    p.saved = Math.min(MAX_SAVED, p.saved + 1);
+    let used = 0;
+    while (used < MAX_AT_ONCE && p.saved >= 1 && p.waiting.length > 0) {
+      const input = p.waiting.shift() as Input;
+      p.saved--;
+      used++;
       p.ack = input.n;
       if (input.acts) {
         become(p);
         for (const a of input.acts) act(p, a);
       }
       move.moveX = input.mx; move.moveZ = input.mz; move.jump = input.jump;
-      steer = move;
+      for (let i = 0; i < BODY_STEPS; i++) body.step(move);
     }
-    const body = p.body;
-    for (let i = 0; i < BODY_STEPS; i++) body.step(steer);
+    // No input came for this step: the body still falls and slows down.
+    if (used === 0) for (let i = 0; i < BODY_STEPS; i++) body.step(still);
     const actor = p.actor;
     actor.pos.x = body.x; actor.pos.y = body.y; actor.pos.z = body.z;
     actor.facing = body.facing;
@@ -359,7 +373,7 @@ export function createRoom(saved: RoomSave | null = null): Room {
       game.actors.set(actor.id, actor);
       const p: RoomPlayer = {
         user, name, body, actor, slot: 0,
-        waiting: [], newest: 0, ack: 0,
+        waiting: [], saved: 0, newest: 0, ack: 0,
         chunkX: NaN, chunkZ: NaN,
         chunks: new Set(), actors: new Map(), placed: new Set(), placedAt: -1,
         tellChunks: [], tellBlocks: [],
