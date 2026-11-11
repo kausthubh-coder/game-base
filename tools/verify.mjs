@@ -35,7 +35,7 @@ const PARTS = [
     ],
   },
   {
-    name: 'slow', slow: true, what: 'smoke, the interface and all of act 1 in a browser (several minutes)',
+    name: 'slow', slow: true, what: 'smoke, the interface and all of act 1 in a browser',
     run: [['bun', 'tools/play-smoke.mjs'], ['bun', 'tools/play-ui.mjs'], ['bun', 'tools/play-act1.mjs']],
   },
 ];

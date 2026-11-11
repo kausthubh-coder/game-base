@@ -31,6 +31,6 @@ Preconditions: `bun tools/doctor.mjs` is clean. Use the port it printed (`PLAY_P
 ## Gotchas
 
 - Human mode refuses door inputs. Start a second session to mix them.
-- `tools/play-smoke.mjs`, `play-ui.mjs` and `play-act1.mjs` still run on software drawing and take minutes. They are the `slow` part.
+- `tools/play-smoke.mjs`, `play-ui.mjs` and `play-act1.mjs` are the `slow` part: they play the most and take the longest. A check in them waits for state, never for a count of frames (`tools/play/wait.mjs`); `tools/play/frame-checks.md` tells how frame-count waits once hid a real bug.
 - Approved pictures are compared only with the same renderer. A different one warns and checks the budgets alone.
 - The background cache does not register under automation. Add `?sw` to the address to test it.
