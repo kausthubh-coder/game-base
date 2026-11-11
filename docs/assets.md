@@ -181,9 +181,30 @@ The optional `cast` object lists the characters drawn when Characters is "3D mod
 `"hero": {"file":"models/cast-hero.glb","source":"assets-src/cast/sources/hero.blend","triangles":3400,"budget":4000,"bytes":149716}`.
 The verifier reads each GLB and checks the counts, the byte size and that the source exists.
 
+## Recorded sounds
+
+Ambience beds, footsteps, tool strikes, hand sounds and the town's spot sounds. `bun --env-file=.env.local
+tools/sound.ts` makes them ahead of time with ElevenLabs' sound effects model (`eleven_text_to_sound_v3`).
+
+- **The prompts.** `src/content/sound-samples.ts`, one entry a sound: its kind, prompt, length, takes and level.
+  A `bed` is asked for as a loop. `steps` and `hits` are one take of many footfalls or strikes, which the tool
+  cuts into slices. A `shot` is a whole one-shot, several takes. A `grain` is a rustle the engine plays short
+  windows of.
+- **The files.** `public/assets/sound/<id>.mp3`, 44.1 kHz: beds stereo at 96 kbit/s, the rest mono at 64.
+  The tool takes the rumble out, levels each file (beds by LUFS, the rest by peak), folds each bed's end into
+  its start, and lays slices end to end with 80 ms of silence around each.
+- **The list.** `manifest.json` has `"sound": { "list": "sound/sound.json", "model": ... }`. `sound/sound.json`
+  has `sounds`, keyed by id, each with `file`, `kind`, `seconds`, `channels`, `slices` ([start, length] in
+  seconds), and the measured `lufs` and `peak`.
+- **Kept out of the game.** `assets-src/sound/report.json` (each prompt, its hash and its measures). The raw takes
+  go to `assets-src/raw/sound/`, which git ignores; `bun tools/sound.ts --process` cuts and levels again from them
+  without asking ElevenLabs for anything. A prompt that changes is asked for again; nothing else is.
+- **Cost.** 40 credits a second of sound asked for. The tool prices a run first and stops above 30,000 credits.
+  The whole set is about 16,000.
+
 ## Voiced lines
 
-The only sound files the game ships. `bun --env-file=.env.local tools/voice.ts` makes them ahead of time with
+Spoken dialogue. `bun --env-file=.env.local tools/voice.ts` makes them ahead of time with
 ElevenLabs. The game never calls ElevenLabs, and the key never leaves `.env.local`.
 
 - **Who speaks.** `src/game/content/cast.ts` lists each voiced person's ElevenLabs voice and settings, the model

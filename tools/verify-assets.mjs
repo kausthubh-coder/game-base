@@ -257,7 +257,7 @@ export function checkManifest(root) {
   }
   for (const [section, entry] of Object.entries(manifest)) {
     if (section === 'version') continue;
-    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast' && section !== 'voice') {
+    if (doc && doc[section] === undefined && section !== 'models' && section !== 'cast' && section !== 'voice' && section !== 'sound') {
       warnings.push(`manifest.json has a "${section}" section that docs/assets.md does not describe. Add its shape to docs/assets.md.`);
     }
     if (section === 'models') {
@@ -296,6 +296,14 @@ export function checkManifest(root) {
         for (const line of Object.values(list.lines ?? {})) if (typeof line?.file === 'string') used.add(line.file);
       } catch (error) { failures.push(`voice.lines: ${error.message}`); }
       summary.push('voice');
+    } else if (section === 'sound') {
+      // The recordings have a list of their own; the sound check reads it. Here its files count as listed.
+      try {
+        const list = JSON.parse(fs.readFileSync(path.join(assets, entry.list), 'utf8'));
+        used.add(entry.list);
+        for (const sound of Object.values(list.sounds ?? {})) if (typeof sound?.file === 'string') used.add(sound.file);
+      } catch (error) { failures.push(`sound.list: ${error.message}`); }
+      summary.push('sound');
     } else if (section === 'sprites') {
       if (!isObject(entry)) { failures.push('sprites is not an object.'); continue; }
       const example = isObject(doc?.sprites) ? Object.values(doc.sprites)[0] : null;
@@ -688,6 +696,47 @@ export function checkVoice(root, manifest) {
   return { failures, detail: `${plural(listed.size, 'clip')}, ${(seconds / 60).toFixed(1)} minutes, model ${list.model}` };
 }
 
+// ---------------------------------------------------------------------------------------- 9. sound
+
+/** The largest a recording may be, in bytes. A 24 s stereo bed at 96 kbit/s is about 280 KB. */
+const SOUND_BYTES = 400 * 1024;
+
+/** The recordings (docs/assets.md, Recorded sounds): each listed file is there, small, and its slices fit; each file there is listed. */
+export function checkSound(root, manifest) {
+  const failures = [];
+  const assets = path.join(root, 'public/assets');
+  const pointer = manifest?.sound?.list;
+  const folder = path.join(assets, 'sound');
+  const files = fs.existsSync(folder) ? walk(folder).filter((f) => f.endsWith('.mp3')).map((f) => `sound/${f}`) : [];
+  if (pointer === undefined) {
+    if (files.length) failures.push(`public/assets/sound holds ${plural(files.length, 'file')} but manifest.json has no "sound.list" to list them.`);
+    return { failures, detail: 'no recordings' };
+  }
+  let list;
+  try {
+    list = JSON.parse(fs.readFileSync(path.join(assets, pointer), 'utf8'));
+  } catch (error) {
+    failures.push(`manifest.json names ${pointer} for the recordings, and it cannot be read: ${error.message}`);
+    return { failures, detail: pointer };
+  }
+  const listed = new Set();
+  let bytes = 0;
+  for (const [id, sound] of Object.entries(list.sounds ?? {})) {
+    const file = path.join(assets, sound?.file ?? '');
+    if (typeof sound?.file !== 'string' || !fs.existsSync(file)) { failures.push(`${pointer}: the file of ${id} (${sound?.file}) is missing.`); continue; }
+    listed.add(sound.file);
+    const size = fs.statSync(file).size;
+    bytes += size;
+    if (size > SOUND_BYTES) failures.push(`${sound.file} is ${kb(size)} KB, over ${kb(SOUND_BYTES)} KB. Shorten it in src/content/sound-samples.ts.`);
+    if (!['bed', 'steps', 'hits', 'shot', 'grain'].includes(sound.kind)) failures.push(`${pointer}: ${id} has no known kind.`);
+    for (const [start, length] of sound.slices ?? []) {
+      if (!(start >= 0 && length > 0 && start + length <= sound.seconds + 1e-3)) { failures.push(`${pointer}: a slice of ${id} runs past its file.`); break; }
+    }
+  }
+  for (const file of files) if (!listed.has(file)) failures.push(`public/assets/${file} is not in ${pointer}. Run tools/sound.ts, which deletes the files of sounds that are gone.`);
+  return { failures, detail: `${plural(listed.size, 'recording')}, ${(bytes / MB).toFixed(2)} MB, model ${list.model}` };
+}
+
 // ---------------------------------------------------------------------------------------- the run
 
 const USUAL_FIX = {
@@ -699,6 +748,7 @@ const USUAL_FIX = {
   palettes: 'give the palette the missing field or layer, copying the shape from src/content/palettes/meadow.ts.',
   sizes: 'a sheet this heavy is not palette-snapped pixel art. Rebuild it through tools/sprites, or cut its size in pixels.',
   voice: 'run bun --env-file=.env.local tools/voice.ts, which makes the missing clips, deletes the ones no line uses and writes the list again. Never edit voice/ by hand.',
+  sound: 'change the prompt in src/content/sound-samples.ts and run bun --env-file=.env.local tools/sound.ts, which remakes, cuts and lists every recording. Never edit sound/ by hand.',
 };
 
 export async function verify({ root, strict = false, self }) {
@@ -737,6 +787,7 @@ export async function verify({ root, strict = false, self }) {
   const sizes = checkSizes(root);
   add('sizes', sizes);
   add('voice', checkVoice(root, manifest.manifest));
+  add('sound', checkSound(root, manifest.manifest));
 
   if (strict) {
     for (const check of checks) {

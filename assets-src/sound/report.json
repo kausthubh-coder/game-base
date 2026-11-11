@@ -1,0 +1,1248 @@
+{
+  "bed.town.murmur": {
+    "prompt": "Soft distant murmur of a small friendly crowd in a cozy lakeside village square, many people chatting quietly far away, warm and wordless, no clear words, no music, calm afternoon",
+    "hash": "6853f517de",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.murmur.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -26,
+    "peak": -10.2
+  },
+  "bed.town.square": {
+    "prompt": "Gentle everyday activity in a small cobblestone village market square heard from the middle: occasional footsteps on stone, a wooden crate set down, a wicker basket creaking, soft clink of pottery, relaxed and sparse, no voices, no music",
+    "hash": "f2854b45d9",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.square.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -28.7,
+    "peak": -1.5
+  },
+  "bed.town.birds": {
+    "prompt": "Sparrows and small songbirds chirping on the rooftops of a quiet village on a sunny morning, light and sparse, no wind, no voices, no music",
+    "hash": "29a4716536",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.birds.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -29,
+    "peak": -10
+  },
+  "bed.town.water": {
+    "prompt": "Small gentle waves lapping against a stone quay on a calm lake, a moored wooden boat creaking softly, quiet and close, no wind, no voices, no music",
+    "hash": "2d1161cd02",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.water.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -28.2,
+    "peak": -1.5
+  },
+  "bed.town.workshop": {
+    "prompt": "A carpenter at work in a small village workshop, heard from the lane outside: slow hand saw strokes, a few light mallet taps on wood, a plane shaving a board, unhurried, no voices, no music, no power tools",
+    "hash": "a9e3086b35",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.workshop.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -29,
+    "peak": -10.1
+  },
+  "bed.town.night": {
+    "prompt": "Warm summer night in a sleeping village by a lake: crickets chirping steadily, a few frogs far off by the water, very calm, no wind, no voices, no music",
+    "hash": "b64f0e3ddf",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.night.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -29,
+    "peak": -16.4
+  },
+  "bed.town.lantern": {
+    "prompt": "The faint warm hum and soft crackle of a small oil lantern flame burning close by at night, very quiet and steady, no wind, no music",
+    "hash": "a3ae890618",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.town.lantern.mp3",
+    "kind": "bed",
+    "seconds": 14.5,
+    "channels": 1,
+    "lufs": -37,
+    "peak": -13.6
+  },
+  "bed.meadow.day": {
+    "prompt": "Open green meadow on a calm sunny day: a soft breeze through long grass, songbirds singing far apart in the distance, faint insects, peaceful, no voices, no music",
+    "hash": "c3194986fc",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.meadow.day.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -29,
+    "peak": -17.7
+  },
+  "bed.forest.day": {
+    "prompt": "Inside a quiet broadleaf forest on a bright day: leaves rustling softly overhead in a light breeze, a woodpecker far off, small birds calling here and there, peaceful, no voices, no music",
+    "hash": "e061b274b7",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.forest.day.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -28,
+    "peak": -16
+  },
+  "bed.meadow.night": {
+    "prompt": "A grassy meadow at night: crickets and katydids chirping in the long grass, a very light breeze, peaceful and warm, no voices, no music",
+    "hash": "3615a3d9ae",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.meadow.night.mp3",
+    "kind": "bed",
+    "seconds": 22.5,
+    "channels": 2,
+    "lufs": -30,
+    "peak": -17.4
+  },
+  "spot.well": {
+    "prompt": "A wooden bucket on a creaking rope lowered into a stone village well, then a splash and water dripping, heard from a few meters away, no voices, no music",
+    "hash": "a0bcabf95d",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.well.mp3",
+    "kind": "shot",
+    "seconds": 8.5739,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        4.1945
+      ],
+      [
+        4.3545,
+        4.1394
+      ]
+    ],
+    "lufs": -27.5,
+    "peak": -9
+  },
+  "spot.dog": {
+    "prompt": "A friendly village dog barking twice at a distance, outdoors, no other sounds",
+    "hash": "0a5675569c",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 3,
+    "file": "sound/spot.dog.mp3",
+    "kind": "shot",
+    "seconds": 7.3353,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        2.48
+      ],
+      [
+        2.64,
+        2.3253
+      ],
+      [
+        5.0453,
+        2.21
+      ]
+    ],
+    "lufs": -28.7,
+    "peak": -12
+  },
+  "spot.children": {
+    "prompt": "Children laughing and calling to each other while they play far away in a village, brief, distant and happy, no clear words, no music",
+    "hash": "27d7fa7f0c",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.children.mp3",
+    "kind": "shot",
+    "seconds": 8.24,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        4
+      ],
+      [
+        4.16,
+        4
+      ]
+    ],
+    "lufs": -32.4,
+    "peak": -14
+  },
+  "spot.door": {
+    "prompt": "An old wooden cottage door opening with a latch click and closing gently, heard from the street outside, no voices, no music",
+    "hash": "ca7746d743",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.door.mp3",
+    "kind": "shot",
+    "seconds": 5.2,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        2.48
+      ],
+      [
+        2.64,
+        2.48
+      ]
+    ],
+    "lufs": -34.8,
+    "peak": -10
+  },
+  "spot.cart": {
+    "prompt": "A small wooden hand cart with iron rimmed wheels rolling slowly over cobblestones and passing by, no horse, no voices, no music",
+    "hash": "8e3acccf3c",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.cart.mp3",
+    "kind": "shot",
+    "seconds": 12.22,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        6
+      ],
+      [
+        6.16,
+        5.98
+      ]
+    ],
+    "lufs": -34.4,
+    "peak": -12
+  },
+  "spot.stall": {
+    "prompt": "A market seller setting down a wooden crate of apples on a wooden stall table, then a few apples rolling, no voices, no music",
+    "hash": "5b050cd9a7",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.stall.mp3",
+    "kind": "shot",
+    "seconds": 4.2295,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        2
+      ],
+      [
+        2.16,
+        1.9895
+      ]
+    ],
+    "lufs": -31.3,
+    "peak": -10
+  },
+  "spot.boat": {
+    "prompt": "A moored wooden rowing boat knocking gently against a wooden dock, with a rope creaking, on calm water, no voices, no music",
+    "hash": "c91a471801",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.boat.mp3",
+    "kind": "shot",
+    "seconds": 7.6978,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        3.8346
+      ],
+      [
+        3.9946,
+        3.6232
+      ]
+    ],
+    "lufs": -35.3,
+    "peak": -12
+  },
+  "spot.bird": {
+    "prompt": "A single songbird singing one short sweet melodic phrase in a tree nearby, outdoors, no other birds, no wind, no music",
+    "hash": "30c2663ad7",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 3,
+    "file": "sound/spot.bird.mp3",
+    "kind": "shot",
+    "seconds": 8.5969,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        3
+      ],
+      [
+        3.16,
+        2.4054
+      ],
+      [
+        5.6454,
+        2.8715
+      ]
+    ],
+    "lufs": -26.4,
+    "peak": -12
+  },
+  "step.grass": {
+    "prompt": "Footsteps of one person walking at an even pace on short soft grass, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "8631e5dec1",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.grass.mp3",
+    "kind": "steps",
+    "seconds": 4.8236,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.3207
+      ],
+      [
+        0.4807,
+        0.3207
+      ],
+      [
+        0.8815,
+        0.3207
+      ],
+      [
+        1.2822,
+        0.3207
+      ],
+      [
+        1.6829,
+        0.3207
+      ],
+      [
+        2.0836,
+        0.3207
+      ],
+      [
+        2.4844,
+        0.3207
+      ],
+      [
+        2.8851,
+        0.3207
+      ],
+      [
+        3.2858,
+        0.3207
+      ],
+      [
+        3.6865,
+        0.3207
+      ],
+      [
+        4.0873,
+        0.2556
+      ],
+      [
+        4.4228,
+        0.3207
+      ]
+    ],
+    "lufs": -22,
+    "peak": -6
+  },
+  "step.dirt": {
+    "prompt": "Footsteps of one person walking at an even pace on soft dry earth, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "7e60332cc5",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.dirt.mp3",
+    "kind": "steps",
+    "seconds": 3.8159,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.2856
+      ],
+      [
+        0.4456,
+        0.1503
+      ],
+      [
+        0.676,
+        0.1403
+      ],
+      [
+        0.8963,
+        0.1403
+      ],
+      [
+        1.1166,
+        0.1804
+      ],
+      [
+        1.377,
+        0.1403
+      ],
+      [
+        1.5973,
+        0.1954
+      ],
+      [
+        1.8728,
+        0.1353
+      ],
+      [
+        2.0881,
+        0.1203
+      ],
+      [
+        2.2884,
+        0.2405
+      ],
+      [
+        2.6089,
+        0.3057
+      ],
+      [
+        2.9946,
+        0.1203
+      ],
+      [
+        3.1949,
+        0.3207
+      ],
+      [
+        3.5956,
+        0.1403
+      ]
+    ],
+    "lufs": -26.1,
+    "peak": -6
+  },
+  "step.path": {
+    "prompt": "Footsteps of one person walking at an even pace on a packed dirt path with a little loose gravel, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "c362797c52",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.path.mp3",
+    "kind": "steps",
+    "seconds": 4.1315,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.3057
+      ],
+      [
+        0.4657,
+        0.1102
+      ],
+      [
+        0.6559,
+        0.3007
+      ],
+      [
+        1.0366,
+        0.1453
+      ],
+      [
+        1.262,
+        0.0802
+      ],
+      [
+        1.4221,
+        0.1604
+      ],
+      [
+        1.6625,
+        0.3207
+      ],
+      [
+        2.0632,
+        0.2706
+      ],
+      [
+        2.4138,
+        0.1153
+      ],
+      [
+        2.6091,
+        0.1804
+      ],
+      [
+        2.8695,
+        0.1554
+      ],
+      [
+        3.1049,
+        0.1804
+      ],
+      [
+        3.3653,
+        0.3207
+      ],
+      [
+        3.766,
+        0.1002
+      ],
+      [
+        3.9462,
+        0.1052
+      ]
+    ],
+    "lufs": -25.7,
+    "peak": -6
+  },
+  "step.cobble": {
+    "prompt": "Footsteps of one person in soft leather boots walking at an even pace on old cobblestones outdoors, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "b06db0e087",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.cobble.mp3",
+    "kind": "steps",
+    "seconds": 1.9875,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1052
+      ],
+      [
+        0.2652,
+        0.0852
+      ],
+      [
+        0.4304,
+        0.1153
+      ],
+      [
+        0.6257,
+        0.0651
+      ],
+      [
+        0.7708,
+        0.0852
+      ],
+      [
+        0.936,
+        0.1203
+      ],
+      [
+        1.1363,
+        0.1804
+      ],
+      [
+        1.3967,
+        0.1554
+      ],
+      [
+        1.6321,
+        0.1153
+      ],
+      [
+        1.8273,
+        0.0802
+      ]
+    ],
+    "lufs": -25.8,
+    "peak": -6
+  },
+  "step.stone": {
+    "prompt": "Footsteps of one person in soft leather boots walking at an even pace on bare rough rock, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "6cce851021",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.stone.mp3",
+    "kind": "steps",
+    "seconds": 2.6188,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.2105
+      ],
+      [
+        0.3705,
+        0.1353
+      ],
+      [
+        0.5858,
+        0.0952
+      ],
+      [
+        0.761,
+        0.1954
+      ],
+      [
+        1.0364,
+        0.2656
+      ],
+      [
+        1.382,
+        0.1754
+      ],
+      [
+        1.6374,
+        0.1403
+      ],
+      [
+        1.8578,
+        0.1754
+      ],
+      [
+        2.1132,
+        0.0752
+      ],
+      [
+        2.2683,
+        0.1102
+      ],
+      [
+        2.4586,
+        0.0802
+      ]
+    ],
+    "lufs": -24.1,
+    "peak": -6
+  },
+  "step.wood": {
+    "prompt": "Footsteps of one person in soft leather boots walking at an even pace on the hollow wooden planks of a small bridge outdoors, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "9114c45b5c",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.wood.mp3",
+    "kind": "steps",
+    "seconds": 1.5318,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1002
+      ],
+      [
+        0.2602,
+        0.0952
+      ],
+      [
+        0.4354,
+        0.0952
+      ],
+      [
+        0.6107,
+        0.1102
+      ],
+      [
+        0.8009,
+        0.1102
+      ],
+      [
+        0.9912,
+        0.0802
+      ],
+      [
+        1.1513,
+        0.1203
+      ],
+      [
+        1.3516,
+        0.1002
+      ]
+    ],
+    "lufs": -24.5,
+    "peak": -6
+  },
+  "step.floor": {
+    "prompt": "Footsteps of one person in soft leather boots walking at an even pace on old wooden floorboards inside a small cottage room, a slight creak, each step clearly separate, no music, no voices",
+    "hash": "6bd41e7021",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.floor.mp3",
+    "kind": "steps",
+    "seconds": 2.043,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1904
+      ],
+      [
+        0.3504,
+        0.1554
+      ],
+      [
+        0.5858,
+        0.1804
+      ],
+      [
+        0.8462,
+        0.1654
+      ],
+      [
+        1.0916,
+        0.1503
+      ],
+      [
+        1.3219,
+        0.1403
+      ],
+      [
+        1.5422,
+        0.1904
+      ],
+      [
+        1.8127,
+        0.1503
+      ]
+    ],
+    "lufs": -24,
+    "peak": -6
+  },
+  "step.sand": {
+    "prompt": "Footsteps of one person walking at an even pace on damp sand at a lake shore, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "beb7a72076",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.sand.mp3",
+    "kind": "steps",
+    "seconds": 6.9424,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.3107
+      ],
+      [
+        0.4707,
+        0.3408
+      ],
+      [
+        0.8915,
+        0.3408
+      ],
+      [
+        1.3122,
+        0.2907
+      ],
+      [
+        1.6829,
+        0.3408
+      ],
+      [
+        2.1037,
+        0.2556
+      ],
+      [
+        2.4393,
+        0.3408
+      ],
+      [
+        2.86,
+        0.2756
+      ],
+      [
+        3.2156,
+        0.3408
+      ],
+      [
+        3.6364,
+        0.3408
+      ],
+      [
+        4.0572,
+        0.3408
+      ],
+      [
+        4.478,
+        0.3408
+      ],
+      [
+        4.8987,
+        0.3408
+      ],
+      [
+        5.3195,
+        0.3408
+      ],
+      [
+        5.7403,
+        0.3408
+      ],
+      [
+        6.161,
+        0.3408
+      ],
+      [
+        6.5818,
+        0.2806
+      ]
+    ],
+    "lufs": -20.7,
+    "peak": -6
+  },
+  "step.water": {
+    "prompt": "Footsteps of one person wading at an even pace through ankle deep shallow water, each splash clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "1ba3bf8901",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.water.mp3",
+    "kind": "steps",
+    "seconds": 5.3897,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1654
+      ],
+      [
+        0.3254,
+        0.451
+      ],
+      [
+        0.8564,
+        0.1353
+      ],
+      [
+        1.0717,
+        0.2456
+      ],
+      [
+        1.3973,
+        0.4059
+      ],
+      [
+        1.8832,
+        0.2656
+      ],
+      [
+        2.2288,
+        0.451
+      ],
+      [
+        2.7598,
+        0.1854
+      ],
+      [
+        3.0252,
+        0.2456
+      ],
+      [
+        3.3508,
+        0.451
+      ],
+      [
+        3.8818,
+        0.3658
+      ],
+      [
+        4.3276,
+        0.451
+      ],
+      [
+        4.8586,
+        0.451
+      ]
+    ],
+    "lufs": -21,
+    "peak": -6
+  },
+  "step.leaves": {
+    "prompt": "Footsteps of one person walking at an even pace on dry fallen leaves and small twigs on a forest floor, each step clearly separate, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "e0a5125927",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/step.leaves.mp3",
+    "kind": "steps",
+    "seconds": 2.569,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.2155
+      ],
+      [
+        0.3755,
+        0.1253
+      ],
+      [
+        0.5808,
+        0.3157
+      ],
+      [
+        0.9765,
+        0.1303
+      ],
+      [
+        1.1868,
+        0.1153
+      ],
+      [
+        1.382,
+        0.2856
+      ],
+      [
+        1.7477,
+        0.2405
+      ],
+      [
+        2.0682,
+        0.1153
+      ],
+      [
+        2.2635,
+        0.2255
+      ]
+    ],
+    "lufs": -23.6,
+    "peak": -6
+  },
+  "move.cloth": {
+    "prompt": "A person walking while their linen tunic and a small leather satchel rustle softly and a buckle jingles faintly, no footsteps, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "33dc6131b1",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/move.cloth.mp3",
+    "kind": "grain",
+    "seconds": 5.9298,
+    "channels": 1,
+    "lufs": -46.2,
+    "peak": -16
+  },
+  "hit.chop": {
+    "prompt": "A woodcutter's axe chopping into a standing tree trunk, single solid chops with pauses between them, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "1a802a3c7b",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/hit.chop.mp3",
+    "kind": "hits",
+    "seconds": 1.3115,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1203
+      ],
+      [
+        0.2803,
+        0.1052
+      ],
+      [
+        0.4655,
+        0.0952
+      ],
+      [
+        0.6407,
+        0.0902
+      ],
+      [
+        0.8109,
+        0.0902
+      ],
+      [
+        0.9811,
+        0.0752
+      ],
+      [
+        1.1363,
+        0.0952
+      ]
+    ],
+    "lufs": -24.4,
+    "peak": -4
+  },
+  "hit.pick": {
+    "prompt": "An iron pickaxe striking hard rock, single hits with pauses between them, small stone chips falling, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "8fd019f7a2",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/hit.pick.mp3",
+    "kind": "hits",
+    "seconds": 1.3715,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1002
+      ],
+      [
+        0.2602,
+        0.1253
+      ],
+      [
+        0.4655,
+        0.0702
+      ],
+      [
+        0.6157,
+        0.0601
+      ],
+      [
+        0.7558,
+        0.0902
+      ],
+      [
+        0.926,
+        0.0752
+      ],
+      [
+        1.0812,
+        0.0702
+      ],
+      [
+        1.2313,
+        0.0601
+      ]
+    ],
+    "lufs": -25.1,
+    "peak": -5
+  },
+  "hit.dig": {
+    "prompt": "A spade digging into soft garden soil: a crunchy scrape as the blade goes in, then the soil thrown down, five separate scoops with a pause between each, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "fddf67da30",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/hit.dig.mp3",
+    "kind": "hits",
+    "seconds": 1.2516,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1052
+      ],
+      [
+        0.2652,
+        0.0852
+      ],
+      [
+        0.4304,
+        0.0651
+      ],
+      [
+        0.5756,
+        0.1754
+      ],
+      [
+        0.831,
+        0.1353
+      ],
+      [
+        1.0463,
+        0.1253
+      ]
+    ],
+    "lufs": -21.8,
+    "peak": -6
+  },
+  "hit.hoe": {
+    "prompt": "A garden hoe chopping into soft soil, single strokes with pauses between them, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "4f2c645428",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/hit.hoe.mp3",
+    "kind": "hits",
+    "seconds": 0.5856,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1002
+      ],
+      [
+        0.2602,
+        0.0902
+      ],
+      [
+        0.4304,
+        0.0752
+      ]
+    ],
+    "lufs": -25.4,
+    "peak": -6
+  },
+  "hit.plank": {
+    "prompt": "A wooden plank being set down firmly on a wooden floor, single placements with pauses between them, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "950b8ab1e7",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/hit.plank.mp3",
+    "kind": "hits",
+    "seconds": 0.761,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1403
+      ],
+      [
+        0.3003,
+        0.0702
+      ],
+      [
+        0.4505,
+        0.2305
+      ]
+    ],
+    "lufs": -24.1,
+    "peak": -5
+  },
+  "hit.stone": {
+    "prompt": "A heavy stone block being set down on stone, single placements with pauses between them, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "1b78d6d833",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/hit.stone.mp3",
+    "kind": "hits",
+    "seconds": 1.0463,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        0.1203
+      ],
+      [
+        0.2803,
+        0.0802
+      ],
+      [
+        0.4405,
+        0.1804
+      ],
+      [
+        0.7009,
+        0.0752
+      ],
+      [
+        0.856,
+        0.1102
+      ]
+    ],
+    "lufs": -24.6,
+    "peak": -5
+  },
+  "shot.page": {
+    "prompt": "A single page of an old paper book being turned over, a soft papery flip, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "81c1d2e21d",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 3,
+    "file": "sound/shot.page.mp3",
+    "kind": "shot",
+    "seconds": 3.6344,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        1.0346
+      ],
+      [
+        1.1946,
+        1.0998
+      ],
+      [
+        2.3744,
+        1.18
+      ]
+    ],
+    "lufs": -31,
+    "peak": -10
+  },
+  "shot.pour": {
+    "prompt": "A small metal watering can pouring water onto garden soil for two seconds, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "ab866e7689",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/shot.pour.mp3",
+    "kind": "shot",
+    "seconds": 4.8655,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        2.2701
+      ],
+      [
+        2.4301,
+        2.3553
+      ]
+    ],
+    "lufs": -26.7,
+    "peak": -9
+  },
+  "shot.harvest": {
+    "prompt": "Pulling a vegetable up out of the garden soil, leaves rustling and soil crumbling, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "356a2e8a96",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/shot.harvest.mp3",
+    "kind": "shot",
+    "seconds": 3.0096,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        1.3898
+      ],
+      [
+        1.5498,
+        1.3798
+      ]
+    ],
+    "lufs": -32.7,
+    "peak": -8
+  },
+  "shot.bag": {
+    "prompt": "Opening the flap of a small leather satchel with a soft buckle sound, close-up foley recording, dry, no music, no voices, no background noise",
+    "hash": "572fd5de21",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/shot.bag.mp3",
+    "kind": "shot",
+    "seconds": 2.4546,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        1.0948
+      ],
+      [
+        1.2548,
+        1.1198
+      ]
+    ],
+    "lufs": -31.4,
+    "peak": -10
+  },
+  "shot.treefall": {
+    "prompt": "A small tree trunk cracking and creaking as it tips over, then falling and crashing onto soft grass with leaves rustling, outdoors, no voices, no music",
+    "hash": "18ae6c5744",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/shot.treefall.mp3",
+    "kind": "shot",
+    "seconds": 3.4524,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        3.2924
+      ]
+    ],
+    "lufs": -29.6,
+    "peak": -5
+  }
+}

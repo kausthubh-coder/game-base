@@ -8,7 +8,8 @@
 //     block on every cell of a line;
 //   - the soil a sprinkler would keep wet, before it is placed;
 //   - a box around a placed thing that a press would take back into the hand.
-// When a stroke lands, its cells flash and puff one after another outward from the press.
+// When a stroke lands, its cells flash and puff one after another outward from the press, each with the
+// recorded sound of its tool: the hoe, the seed going in, the can.
 //
 // What it does with the keys: the left button down is `build.press()`, up is `build.release()`, and a button
 // the window lost is `build.cancel()`. The right button cancels a stroke. Q and R turn a held chest. Z takes
@@ -42,6 +43,8 @@ const LINES = 0, FILL = 1, FLASH = 2;
 const FLASH_SECONDS = 0.4, LAND_SECONDS = 0.7;
 /** A stroke of more cells than this sounds on every second cell, and so on, so it never roars. */
 const SOUNDS = 14;
+/** The can's pour is a long sound, so a stroke with the can plays it this many times at most. */
+const POURS = 3;
 /** A station's prop may reach this far over its cells, as the stations view lets it. */
 const OVERHANG = 0.4;
 
@@ -258,13 +261,13 @@ export function install(view: GameView): void {
       if (l.sound) view.audio?.emit({ type: 'blockBroken', surface: 'dirt', at: { ...at } });
     } else if (l.kind === 'till') {
       effects.play('dust', top, { color: 0x8a6a45 });
-      if (l.sound) view.audio?.emit({ type: 'blockBroken', surface: 'dirt', at: { ...at } });
+      if (l.sound) view.audio?.emit({ type: 'foley', sound: 'hoe', at: { ...at } });
     } else if (l.kind === 'plant') {
       effects.play('popDust', top, { scale: 0.5 });
-      if (l.sound) view.audio?.emit({ type: 'blockPlaced', surface: 'dirt', at: { ...at } });
+      if (l.sound) view.audio?.emit({ type: 'foley', sound: 'plant', at: { ...at } });
     } else if (l.kind === 'water') {
       effects.play('splash', top, { scale: 0.6 });
-      if (l.sound) view.audio?.emit({ type: 'footstep', surface: 'water', at: { ...at } });
+      if (l.sound) view.audio?.emit({ type: 'foley', sound: 'pour', at: { ...at } });
     } else {
       const surface = l.kind === 'block' ? BLOCKS[sim.getBlock(l.x, l.y, l.z)]?.surface ?? 'wood' : 'wood';
       effects.play('pop', top);
@@ -272,10 +275,10 @@ export function install(view: GameView): void {
     }
   }
 
-  game.events.on('build.applied', ({ undone }) => {
+  game.events.on('build.applied', ({ kind, undone }) => {
     const cells = sys.build?.last() ?? [];
     const calm = view.settings.graphics.reduceMotion;
-    const every = Math.ceil(cells.length / SOUNDS);
+    const every = Math.ceil(cells.length / (kind === 'water' && !undone ? POURS : SOUNDS));
     // The cells land one after another, nearest the press first, and a long stroke lands faster so it ends in time.
     const gap = cells.length > 1 ? Math.min(0.04, LAND_SECONDS / cells.length) : 0;
     for (let i = 0; i < cells.length; i++) {

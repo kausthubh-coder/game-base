@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { palettes } from '../../content/palettes/index.ts';
 import {
-  allowedMasks, blendTempo, countBits, crossoverGains, dayAmount, normalizeWeights, PALETTE_LAYERS, pitchMask, slewWeights, snapToMask,
+  allowedMasks, blendTempo, countBits, crossoverGains, dayAmount, maskNames, normalizeWeights, PALETTE_LAYERS, pitchMask, slewWeights, snapToMask,
 } from './blend.sim.ts';
 
 const ids = palettes.map((p) => p.id);
@@ -79,6 +79,13 @@ test('every pair of neighbors shares at least four notes', () => {
     expect(countBits(a & b)).toBeGreaterThanOrEqual(4);
     expect(countBits(a & (masks[at('center')] as number))).toBeGreaterThanOrEqual(4);
   }
+});
+
+test('the town and the meadow around it share five notes, and their tempos are close enough to glide', () => {
+  const shared = (masks[at('meadow')] as number) & (masks[at('town')] as number);
+  expect(maskNames(shared).split(' ').sort()).toEqual(['A', 'B', 'D', 'E', 'F#']);
+  const meadowTempo = palettes[at('meadow')]?.tempo as number, townTempo = palettes[at('town')]?.tempo as number;
+  expect(Math.abs(townTempo / meadowTempo - 1)).toBeLessThan(0.12);
 });
 
 test('in a border band both lands keep to the notes they share', () => {

@@ -1,7 +1,8 @@
 import { outdoorSound as sound } from '../../content/ambience.ts';
-// The world's air, all made from noise and sine waves: wind with gusts, leaves, water, rain, one bed that
-// belongs to each land, and the creatures that call over them. Beds are continuous and live as long as
-// the engine. Calls are single voices that come and go.
+// The world's air: wind with gusts, leaves, water, rain, one bed that belongs to each land, and the creatures
+// that call over them, all made from noise and sine waves; and the recorded beds (the town's murmur, its
+// birds, the water at the quay, the meadow, the forest, the night) that the game sets by where the player
+// stands. Beds are continuous and live as long as the engine. Calls are single voices that come and go.
 import { chime, glassBell } from '../../content/palettes/instruments.ts';
 import type { Palette, SignatureBed } from '../../content/palettes/types.ts';
 import { ambientLayers, windLevel, gust, lifeRates, nextGap, noise1, type LifeRates } from './ambience.sim.ts';
@@ -9,6 +10,7 @@ import { playDrum, playNote } from './instruments.ts';
 import { Glide, type Mixer } from './mixer.ts';
 import { degreeSemis } from './patterns.sim.ts';
 import { connect, strike, type Rig } from './rig.ts';
+import { BedLoop } from './samples.ts';
 
 /** What the ambience follows. Everything is 0 to 1 except the wind direction. */
 export interface Air {
@@ -55,6 +57,10 @@ export class Ambience {
   private readonly longNoise: AudioBuffer;
   private surfNext = 0;
   private surf?: { gain: AudioParam; tone: AudioParam };
+  /** The recorded beds, by sound id, with the level and the pan the game last asked for. */
+  private readonly recorded = new Map<string, { loop: BedLoop; level: Glide; pan: Glide; now: number }>();
+  /** 0 to 1: how much of the wildlife the recorded beds already carry. The made birds thin out by as much. */
+  private cover = 0;
 
   constructor(private readonly rig: Rig, mixer: Mixer, private readonly palettes: readonly Palette[]) {
     // Shared mono noise is generated once, never downloaded. Every bed has a different offset/rate.
@@ -170,11 +176,11 @@ export class Ambience {
     const life = (air: Air, key: 'birds' | 'crickets' | 'frogs'): number => {
       let m = 0;
       for (let i = 0; i < palettes.length; i++) m += (air.weights[i] as number) * (palettes[i] as Palette).life[key];
-      if (key === 'birds') return m * 0.5 * this.habitat.birds * (1 - 0.4 * air.cloud);
+      if (key === 'birds') return m * 0.5 * this.habitat.birds * (1 - 0.4 * air.cloud) * (1 - 0.8 * this.cover);
       return m * lifeRates(air.day, air.rain, air.trees, air.nearWater, air.indoors, air.cloud, this.rates)[key];
     };
     this.callers.push(
-      ...(['owl', 'murmur', 'bucket', 'stone'] as const).map((kind) => ({ next: 0, rate: () => sound[kind].rate * this.habitat[kind === 'owl' ? 'owl' : 'town'], fire: (t: number) => this.habitatCall(t, kind) })),
+      { next: 0, rate: () => sound.owl.rate * this.habitat.owl, fire: (t: number) => this.owl(t) },
       { next: 0, rate: (air) => life(air, 'birds'), fire: (t) => this.bird(t) },
       { next: 0, rate: (air) => life(air, 'crickets'), fire: (t) => this.cricket(t) },
       { next: 0, rate: (air) => life(air, 'frogs'), fire: (t) => this.frog(t) },
@@ -280,11 +286,39 @@ export class Ambience {
     }
     let audible = 0;
     for (const bed of this.beds) if (bed.now > 0.004) audible++;
+    let carried = 0;
+    for (const bed of this.recorded.values()) {
+      if (bed.now > 0.002) audible++;
+      carried += bed.now;
+    }
+    this.cover = Math.min(1, carried * 1.4);
     this.rig.beds = audible;
+  }
+
+  /** Adds a recorded bed. It is silent until `setRecorded` gives it a level. */
+  addBed(id: string, buffer: AudioBuffer): void {
+    if (this.recorded.has(id)) return;
+    const loop = new BedLoop(this.rig, buffer, this.near, (this.rig.rng() * 2 ** 32) >>> 0);
+    this.recorded.set(id, { loop, level: new Glide(loop.out.gain), pan: new Glide(loop.pan.pan), now: 0 });
+  }
+
+  hasBed(id: string): boolean {
+    return this.recorded.has(id);
+  }
+
+  /** Sets a recorded bed's level, 0 to 1, and where it leans, -1 left to 1 right. Indoors muffles it. */
+  setRecorded(id: string, level: number, pan: number, now: number, indoors: number): void {
+    const bed = this.recorded.get(id);
+    if (!bed) return;
+    bed.now = level * (1 - 0.6 * indoors);
+    bed.level.to(bed.now, now, 0.9);
+    bed.pan.to(Math.max(-0.8, Math.min(0.8, pan)), now, 0.5);
   }
 
   /** Schedules every call due before `horizon`. */
   emit(now: number, horizon: number, air: Air): void {
+    // A bed's stretches are long, so they are laid a second ahead: a slow frame never finds one missing.
+    for (const bed of this.recorded.values()) bed.loop.schedule(now, now + 1, bed.now > 0.002);
     for (const c of this.callers) {
       if (c.next < now) c.next = now + this.rig.rng() * 0.8;
       while (c.next < horizon) {
@@ -346,26 +380,20 @@ export class Ambience {
     b.commit(time, time + seconds);
   }
 
-  /** Sparse distant phrases; the content entry controls pitch, length and level. */
-  private habitatCall(time: number, kind: 'owl' | 'murmur' | 'bucket' | 'stone'): void {
-    const spec = sound[kind], rig = this.rig;
-    const level = spec.gain * this.habitat[kind === 'owl' ? 'owl' : 'town'];
+  /** An owl far off: two soft hoots that fall a little. */
+  private owl(time: number): void {
+    const spec = sound.owl, rig = this.rig;
+    const level = spec.gain * this.habitat.owl;
     const seconds = spec.seconds;
     const b = rig.begin('ambience', 0, time, time + seconds);
     if (!b) return;
     const pitch = spec.pitch + rig.rng() * spec.spread;
     const amp = b.gain(), pan = b.pan(rig.rng() * 1.6 - 0.8);
-    const source = kind === 'stone' ? b.noise('white') : b.osc(kind === 'murmur' ? 'sawtooth' : 'sine', pitch);
-    const filter = b.filter('bandpass', kind === 'murmur' ? 650 : pitch, kind === 'bucket' ? 3 : 0.8);
-    const pulses = kind === 'murmur' ? 6 : 2;
-    for (let i = 0; i < pulses; i++) {
-      const t = time + i * seconds / pulses;
-      strike(amp.gain, t, kind === 'stone' ? 0.012 : 0.06, level * (0.7 + rig.rng() * 0.3), seconds / pulses * 0.8);
-    }
-    if (source instanceof OscillatorNode) {
-      source.frequency.setValueAtTime(pitch, time);
-      source.frequency.exponentialRampToValueAtTime(pitch * (kind === 'owl' ? 0.78 : 0.94), time + seconds);
-    }
+    const source = b.osc('sine', pitch);
+    const filter = b.filter('bandpass', pitch, 0.8);
+    for (let i = 0; i < 2; i++) strike(amp.gain, time + i * seconds / 2, 0.06, level * (0.7 + rig.rng() * 0.3), seconds / 2 * 0.8);
+    source.frequency.setValueAtTime(pitch, time);
+    source.frequency.exponentialRampToValueAtTime(pitch * 0.78, time + seconds);
     connect(source, filter, amp, pan, this.far);
     b.commit(time, time + seconds);
   }

@@ -1,6 +1,9 @@
 # Sound engine notes
 
-Code makes every sound but spoken dialogue. There is no audio library, only the Web Audio API. The one kind of audio file is a voiced line (`public/assets/voice/`, made by `tools/voice.ts`): `speak(clip)` plays it on the voice bus, and while it plays the music drops to 0.55 and the ambience to 0.75, as for the typed blips.
+Code makes the music and most sounds. There is no audio library, only the Web Audio API. Two kinds of audio file come in from outside, both made ahead of time with ElevenLabs:
+
+- A voiced line (`public/assets/voice/`, made by `tools/voice.ts`): `speak(clip)` plays it on the voice bus, and while it plays the music drops to 0.55 and the ambience to 0.75, as for the typed blips.
+- A recording (`public/assets/sound/`, made by `tools/sound.ts` from `src/content/sound-samples.ts`): a bed, a take of footsteps, tool strikes, a one-shot or a rustle. The game decodes each and hands it over with `addSample`. Until it arrives, the made sound plays in its place, so the engine sounds whole with no files at all.
 The public surface is `index.ts`. The demo is `demos/audio`. The checks are `bun tools/audio-check.mjs`.
 
 Nobody has listened to this yet. The checks measure loudness, gaps, tempo, voices and nodes. They cannot say
@@ -14,7 +17,9 @@ audio.start();
 // every frame
 audio.setState({ regions: { meadow: 0.7, desert: 0.3 }, town, indoors, danger, fight, boss, nearWater, trees });
 audio.followAmbient(ambient);        // time of day, rain, wind, fog, wetness from src/engine/types.ts
-audio.setListener(playerPosition);
+audio.setListener(playerPosition, camera.yaw);   // panning turns with the picture
+audio.addSample(id, buffer, info);   // each recording, once decoded (src/game/views/core-sound.view.ts does this)
+audio.setBed('bed.town.murmur', 0.8, at);   // a recorded bed's level, a few times a second
 audio.update(dt);
 // when things happen
 bus.on((event) => audio.onEvent(event));          // the base's GameEvent
@@ -34,12 +39,13 @@ or `voice`. `soloLayer(layer)` plays one music layer alone, for tuning.
 | `blend.sim.ts` | Region weights to a gain per layer per palette, the notes two lands share, one tempo |
 | `patterns.sim.ts` | Palette and bar number to notes. The same bar always gives the same notes. |
 | `ambience.sim.ts` | Gusts, and how often birds, crickets and frogs call |
-| `rig.ts` | Noise buffers, oscillator shapes, the 48-voice budget, the count of live nodes |
+| `rig.ts` | Noise buffers, oscillator shapes, the 64-voice budget, the count of live nodes |
 | `instruments.ts` | Four instrument recipes (pluck, bell, wind, pad) and sixteen drums |
 | `music.ts` | Schedules each beat a quarter of a second ahead and moves the layer gains |
 | `ambience.ts` | Wind, leaves, water, rain, one bed per land, and the creatures |
-| `effects.ts` | Footsteps, blocks, hits, spells, interface, speech blips, the pet, machine ticks |
-| `mixer.ts` | Four buses, a hall, a small room, the limiter |
+| `effects.ts` | Footsteps, blocks, hits, spells, interface, speech blips, the pet, machine ticks, and the recorded slices |
+| `samples.ts` | The bank of recordings (shuffled slices, never the same twice in a row) and `BedLoop` |
+| `mixer.ts` | Four buses, the music's hall, the four world spaces, the limiter |
 | `render-offline.ts` | Runs the engine in an `OfflineAudioContext` for the checks |
 
 The `.sim.ts` files hold no Web Audio and have tests beside them. The rest needs a browser, and
@@ -83,8 +89,9 @@ teleport is over it, so it takes under two seconds to morph.
 ### Voices and nodes
 
 A voice is one note, one hit or one continuous bed. `rig.begin` asks for room before any node is made, and
-returns null when the bus is full. That is how the limit of 48 holds: the engine never makes a sound that
-would break it. The shares are music 30, ambience 10, effects 6 and voice 2. Less important sounds (sparkle,
+returns null when the bus is full. That is how the limit of 64 holds: the engine never makes a sound that
+would break it. The shares are music 30, ambience 18, effects 12 and voice 4. A recording is one buffer, a gain,
+a filter and a pan, so the ambience and the effects have room for townsfolk's feet and the town's spot sounds. Less important sounds (sparkle,
 the town arrangement, far birds) are refused a few voices before a bus is full.
 `rig.sweep` disconnects a voice's nodes when it ends. The fixed graph is 167 nodes.
 
@@ -99,8 +106,33 @@ the town arrangement, far birds) are refused a few voices before a bus is full.
 | highlands | G major pentatonic, with ninths | 120 | light strings | short plucks | chimes, flute | shaker and a wood click |
 | forge | B natural minor, chords with no third | 80 | low reed on B and F#, and a choir pad | strummed low strings | a horn, a reed | deep drum, anvil on two and four |
 | center | D, one chord: D A E B | 60 | one pad that never moves | all six lands' instruments in turn | the six leads in turn, music box | none |
+| town (Hollowmere) | G major pentatonic, chords I vi IV V I IV ii V | 92, swing 0.16 | soft pad that follows the chords | strummed lute | tin whistle and dulcimer trading every two bars, music box | hand drums, shaker, a wood click |
 
 D, E, A and B are in every palette. Neighbors around the ring share at least four notes, and a test checks it.
+The town and the meadow share D E F# A B, and their tempos (92 and 84) are close enough that the clock glides
+from one to the other over the border band. The game sets `regions: { meadow, town }` from the town's zone, so
+walking in through the gate is the same crossfade as any border.
+
+## Recordings, space and placement
+
+- **Steps.** `footstep` takes a `material` (grass, dirt, path, cobble, stone, wood, floor, sand, water, leaves)
+  and a `gait`. Each material is one take of 8 to 17 footfalls, played shuffled, retuned by up to 0.9 of a
+  semitone and releveled by about a decibel. Soft walk is half as loud, lower and duller; a run is louder and
+  higher. Wet ground lays a little water over the step, `litter` lays dry leaves under trees, and `cloth` is the
+  chance of a rustle of tunic and satchel. A landing is both feet and a soft thump. `quiet` and `muffle` are for
+  other people's feet.
+- **Tools.** Breaking and placing play a recorded bite by surface (`BREAK` and `PLACE` in `index.ts`) and then the
+  made crumble at a lower level, so each break still comes apart differently. `foley` covers the hoe, the
+  watering can, harvest, planting, the bag and the Almanac's page.
+- **Beds.** `BedLoop` plays 8 to 14 second stretches from random points of a bed's file, each crossfading into
+  the next with equal power over 2.4 s, so a 22 second file never repeats in the same order. A bed at level 0
+  stops reading. The recorded beds thin out the made birds (`cover` in `ambience.ts`).
+- **Placement.** `locate` pans by how far a sound is to the right of the camera, fades it by distance, darkens it
+  with distance (`tone`), and `muffle` (a wall between, from the game's ray through the blocks) takes off more
+  top and some level.
+- **Spaces.** Effects and placed ambience send to four convolution spaces: open (a faint short ring), forest (a
+  dark diffuse tail), stone (quick bright echoes, 19 to 110 ms) and room. `trees`, `stone` and `indoors` in the
+  state set the share of each. At `low` quality the forest and stone spaces fold into the open one.
 
 ## What to tune first
 
