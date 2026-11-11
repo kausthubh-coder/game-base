@@ -454,7 +454,7 @@ export const REGION: RegionPlan = {
     { kind: 'wildflowers', variant: 0, x: -19.5, y: HALL_GROUND, z: -251.5, rotation: 5.2 },
     { kind: 'bush', variant: 0, x: -23, y: HALL_GROUND, z: -251.4, rotation: 0.9, scale: 0.9 },
     { kind: 'bush', variant: 1, x: -11, y: HALL_GROUND, z: -251.3, rotation: 2.6, scale: 0.8 },
-    { kind: 'bush', variant: 2, x: -26.4, y: HALL_GROUND, z: -258, rotation: 4.1, scale: 1 },
+    { kind: 'bush', variant: 0, x: -26.4, y: HALL_GROUND, z: -258, rotation: 4.1, scale: 1 },
   ],
   noTrees: [
     { x0: GRANT.x - 3, z0: GRANT.z - 3, x1: GRANT.x + GRANT.width + 2, z1: GRANT.z + GRANT.depth + 2 },
