@@ -16,25 +16,31 @@ Read before a large change:
 
 ## Commands
 
+Every task in a new worktree starts with the `worktree-game` skill. Say done only after the `verify-game` skill. Ship only with the `ship-game` skill, when Kausthubh says so.
+
 | Command | What it does |
 |---|---|
-| `bun run check` | Type check, the `.sim.ts` rule and the tests. Run it before you say done. |
+| `bun tools/doctor.mjs` | Makes this checkout run: packages, keys, Chrome, a port of its own. Prints the port to use. |
+| `bun run check` | Types, the `.sim.ts` rule, every test, the world server's types, the Convex tests |
+| `bun run verify` | Every check there is, about two minutes. `--full` adds the slow browser plays, `--list` names the parts. |
+| `bun run lint` | Biome lint. The formatter is not applied to the code yet. |
+| `bun tools/sim.ts scenarios` | Plays the rules with no browser. Also `bot --seed <n> --steps <n>` and `--replay <seed> --until <step>`. |
+| `bun tools/play.mjs start` | One Chrome for this worktree to play in, through the debug door or like a person (`tools/play/README.md`) |
+| `bun tools/shots.mjs all --check` | Six scenes against their approved pictures and the draw budgets (`docs/shots/README.md`) |
+| `bun tools/shot.mjs <url> <out.png>` | One screenshot in headless Chrome. Exits 1 on a console error. |
+| `bun run dev` | The game itself, on port 5300 in the main checkout |
+| `bunx wrangler dev` | The built game and the world server, on port 5540 (`server/README.md`) |
+| `bun server/test/check.ts` | The world server's checks, on its own `wrangler dev` |
+| `bun server/test/live.ts` | Clerk, Convex and the world server together. Needs `.env.local`. |
+| `bunx convex dev --once` | Pushes `convex/` to the dev deployment (`convex/README.md`) |
+| `bun tools/load-measure.mjs` | Bytes and requests before the first playable frame, first and second visit |
+| `bun run deploy --dry-run` | Builds and packages the live copy and sends nothing |
 | `bun tools/typecheck.mjs <feature>` | Type-checks the shared code and one feature only |
-| `bun test src/features/<feature>` | One feature's tests |
-| `bun tools/demo.mjs build <feature>` | Builds `demos/<feature>` into `dist/demos/<feature>` |
-| `bun tools/demo.mjs dev <feature> <port>` | Dev server for one demo. It prints its pid. |
+| `bun tools/demo.mjs dev <feature> <port>` | Dev server for one demo. It prints its pid. `build` builds it into `dist/demos/<feature>`. |
 | `bun tools/serve.mjs <folder> <port>` | Serves a built folder. It prints its pid. |
-| `bun tools/shot.mjs <url> <out.png>` | Screenshot in headless Chrome. Exits 1 on a console error. |
-| `bun run dev` | The game itself, on port 5300 |
-| `bun tools/play-build.mjs` | Plays build mode in the build lab (`?scene=build`) with the real mouse, and writes a screenshot of each step to `.artifacts/build/` |
-| `bun tools/painted-shots.mjs` | Pictures of the painted world from fixed places, into `.artifacts/painted` (see `docs/painted-world.md`) |
-| `bun tools/land-relief.mjs` | Draws the shape of the land from above into `.artifacts/painted/relief.png`, without starting the game |
-| `bun tools/sprite-fringe.mjs` | Measures the pale rim a white background leaves round a sprite. The sprite check fails a sheet that has one |
-| `bun tools/hero-frames.mjs` | Films the hero walking, a twentieth of a second a frame, into `.artifacts/painted/hero-frames.png`, to see a frame that is drawn wrong |
-| `bun tools/hero-ground.mjs` | Walks the hero over sloping ground and fails if the drawn hero is ever off the drawn land |
-| `bun tools/style-lab.mjs --style <name>` | The style lab's shots and motion strips for one art style (see `docs/style-lab/README.md`) |
-| `bun tools/ghibli-assets.mjs` | Remakes the painted meadow test scene's textures from `assets-src/ghibli/raw`, and copies the game's twelve into `public/assets/painted` (see `demos/ghibli/README.md`) |
-| `bun --env-file=.env.local tools/voice.ts` | Makes the voice clips of new or changed lines (`--dry` prices it first). Needs `ELEVENLABS_API_KEY` in `.env.local` |
+| `bun --env-file=.env.local tools/voice.ts` | Makes the voice clips of new or changed lines (`--dry` prices it first). `tools/sound.ts` does the same for recorded sounds. |
+
+The other scripts in `tools/` shoot or measure one thing each. `docs/painted-world.md` lists the ones for the painted world, the land's shape and the hero's frames, `docs/style-lab/README.md` the style lab's, and `demos/ghibli/README.md` the meadow test scene's.
 
 ## Layout
 
@@ -62,7 +68,7 @@ docs/                  plans, briefs, the style sheet, the asset contract
 4. **Sound files are made by tools, never by hand. 3D models are made by code.** Code makes the music and every sound that works better made: the wind, the made creatures, spells, the interface. Two kinds of files are made ahead of time with ElevenLabs. Spoken dialogue: `tools/voice.ts` makes a clip for each line a person in `src/game/content/cast.ts` says, into `public/assets/voice/` with its list `voice/voice.json`. Recorded ambience beds, footsteps, tool strikes and spot sounds: `tools/sound.ts` makes each from its prompt in `src/content/sound-samples.ts`, into `public/assets/sound/` with its list `sound/sound.json`. Both are small mp3s listed in the manifest (see `docs/assets.md`). To change a recorded sound, change its prompt and run the tool. Never add an audio file by hand, and never call ElevenLabs from the game. Simple shapes are TypeScript builders in `src/features/props/builders`. Richer models (trees, rocks, bushes, characters) are `.glb` files listed in `public/assets/manifest.json`, built by a Blender script in `tools/models/`, or modelled by hand with the `.blend` source kept beside an export script that rebuilds the `.glb` and checks its triangles, scale and animation names. Never commit a model that nothing rebuilds. Sprites and textures are PNG files listed there too.
 5. **Space.** y is up. One unit is one block is one meter. North is -z, east is +x.
 6. **Speed is part of done.** The target is 60 frames a second on a mid laptop with integrated graphics, with room to spare: 150 draw calls, 400,000 triangles, 6 ms of script per frame. Allocate nothing per frame. Every view system works at `low`, `medium` and `high` quality.
-7. **This Mac draws WebGL in software.** Use screenshots to check what is drawn. Never report a frame rate measured here.
+7. **Chrome uses the graphics chip.** Browser tools print their renderer; `--software` or `CHROME_SOFTWARE=1` selects software drawing. Compare approved pictures only with the same renderer. Draw calls, triangles and shader counts are exact here. Never report a frame rate measured on this Mac: it says nothing about a Chromebook.
 8. **bun only.** Never npm or npx. Say so before you add a dependency.
 9. **Servers.** Use your own port, and stop a server by the pid it printed, never by port.
 10. Never read, list or write `~/Documents`, `~/Desktop` or `~/Downloads`. Commands there hang forever.
@@ -77,14 +83,13 @@ docs/                  plans, briefs, the style sheet, the asset contract
 - Check your own work with `bun tools/typecheck.mjs <feature>` as well as `bun run check`, since another agent's half-written code can fail the full check.
 - Put screenshots and renders in `.artifacts/<feature>/`.
 
-| Feature | Port |
+Ports. `bun tools/doctor.mjs` gives each worktree one of its own in 5400 to 5999. These are fixed:
+
+| Port | What |
 |---|---|
-| world | 5311 |
-| audio | 5312 |
-| sky | 5313 |
-| sprites | 5314 |
-| props | 5315 |
-| map | 5316 |
-| painted-shots | 5470 |
-| ghibli (the painted meadow test scene) | 5460 |
-| the game | 5300 |
+| 5300 | The game in the main checkout |
+| 5311 to 5316 | The feature demos: world, audio, sky, sprites, props, map |
+| 5361 | The handbook app |
+| 5460, 5470 | The painted meadow test scene, `painted-shots` |
+| 5525, 5526 | `tools/play.mjs` and `tools/shots.mjs` when `PLAY_PORT` is not set |
+| 5540 to 5546 | The world server: `wrangler dev`, its check, its memory test, the live check |
