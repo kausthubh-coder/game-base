@@ -160,7 +160,8 @@ export const STYLES = /* css */ `
 .gu-rail-top::before { content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 76px; pointer-events: none; background: linear-gradient(180deg, rgb(10 12 20 / 0.7), rgb(20 24 38 / 0.55)); box-shadow: 0 1px 0 rgb(211 188 142 / 0.55); }
 .gu-rail-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .gu-rail-icon { display: grid; place-items: center; flex: none; width: 46px; height: 46px; color: var(--gold-bright); }
-.gu-rail-icon > .ui-cell, .gu-tab-icon > .ui-cell { filter: brightness(1.35) drop-shadow(0 0 4px rgb(240 212 138 / 0.45)); }
+.gu-tab-icon > .ui-cell { filter: brightness(1.6) saturate(1.2) drop-shadow(0 0 3px rgb(240 212 138 / 0.55)); }
+.gu-rail-icon > .ui-cell { filter: saturate(1.3) drop-shadow(0 0 4px rgb(240 212 138 / 0.5)); }
 .gu-rail-name .gu-panel-title { overflow: hidden; font-family: var(--display); font-size: 30px; font-weight: 650; line-height: 1.1; letter-spacing: 0.01em; white-space: nowrap; text-overflow: ellipsis; color: var(--paper-light); text-shadow: 0 2px 8px rgb(0 0 0 / 0.5); }
 .gu-rail-top > .gu-close { justify-self: end; width: 44px; height: 44px; margin: 0; }
 .gu-rail-top > .gu-tabs { justify-self: center; }
@@ -176,7 +177,7 @@ export const STYLES = /* css */ `
   transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
 }
 .gu-screen .gu-tab::after { display: none; }
-.gu-tab-icon { display: grid; place-items: center; width: 38px; height: 38px; opacity: 0.7; transition: opacity 140ms var(--ease); }
+.gu-tab-icon { display: grid; place-items: center; width: 50px; height: 50px; opacity: 0.8; transition: opacity 140ms var(--ease); }
 .gu-screen .gu-tab:hover, .gu-screen .gu-tab:focus-visible { transform: translateY(-2px); outline: none; box-shadow: inset 0 0 0 1.5px var(--gold-bright), 0 0 16px rgb(240 212 138 / 0.35), 0 6px 12px rgb(0 0 0 / 0.35); }
 .gu-screen .gu-tab[aria-selected='true'] { background: radial-gradient(circle at 50% 30%, #5b6584, #2b3245 75%); box-shadow: inset 0 0 0 2px var(--gold-bright), 0 0 0 4px rgb(240 212 138 / 0.14), 0 0 24px rgb(240 212 138 / 0.4); }
 .gu-tab:hover .gu-tab-icon, .gu-tab[aria-selected='true'] .gu-tab-icon { opacity: 1; }
@@ -526,7 +527,7 @@ export const STYLES = /* css */ `
   .gu-rail-name .gu-panel-title { font-size: 24px; }
   .gu-screen .gu-tabs { gap: 14px; }
   .gu-screen .gu-tab { width: 50px; height: 50px; }
-  .gu-tab-icon { width: 34px; height: 34px; }
+  .gu-tab-icon { width: 44px; height: 44px; }
   .gu-rail-foot { min-height: 0; padding: 8px 14px 12px; }
   .gu-cues { justify-content: center; gap: 6px 18px; }
   .gu-cue { font-size: 13.5px; }

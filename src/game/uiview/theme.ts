@@ -186,7 +186,6 @@ export const KIT = /* css */ `
   .ui-book.ui-kit .gb-map-head::before { top: 4px; height: 52px; border-width: 0 60px; border-image-width: 0 60px; }
   .ui-book.ui-kit .gb-map-head { padding-top: 12px; }
   .ui-book.ui-kit .gb-map .gb-map-close { top: 8px; right: 50px; }
-  .ui-book.ui-kit .gb-map-view::after { right: 12px; bottom: 96px; width: 84px; height: 84px; }
 }
 
 /* ---- the bag: a filled card is the painted item card with its cream strip; the one the detail column shows wears the gold frame ---- */
@@ -226,6 +225,10 @@ export const KIT = /* css */ `
     var(--kit-map-paper) 0 0 / 256px 256px repeat, #e3d4b0;
 }
 .ui-book.ui-kit .gb-map-view::after { content: ''; position: absolute; right: 20px; bottom: 80px; width: 140px; height: 140px; background: var(--kit-compass) center / contain no-repeat; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(90 60 20 / 0.3)); }
+
+@media (max-width: 640px) {
+  .ui-book.ui-kit .gb-map-view::after { right: 12px; bottom: 96px; width: 84px; height: 84px; }
+}
 
 /* ---- tooltips: the painted night card ---- */
 .ui-book.ui-kit .gu-tip, .ui-book.ui-kit .ui-slot-tip { background: transparent; box-shadow: none; isolation: isolate; }

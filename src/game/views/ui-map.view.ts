@@ -116,11 +116,12 @@ const STYLE = /* css */ `
 @media (max-width: 640px) {
   .ui-book .gb-map-head { padding: 12px 64px 0; }
   .ui-book .gb-map-head::before { height: 62px; }
-  .ui-book .gb-map-head h2 { font-size: 24px; }
+  .ui-book .gb-map-head h2 { font-size: 22px; }
   .ui-book .gb-map-place { margin-top: 14px; font-size: 14px; }
   .ui-book .gb-map .gb-map-close { top: 7px; right: 12px; width: 48px; height: 48px; }
   .ui-book .gb-map-tools { right: 12px; gap: 10px; }
   .ui-book .gb-map-tools button { width: 48px; height: 48px; }
+  .ui-book .gb-map-tools button > .ui-cell { width: 34px; height: 34px; }
   .ui-book .gb-map-north { right: 16px; bottom: 76px; }
   .ui-book .gb-map-foot { justify-content: center; min-height: 0; padding: 8px 12px 12px; gap: 6px 18px; font-size: 13.5px; }
   .ui-book .gb-cue kbd { min-width: 28px; height: 28px; padding: 0 8px; font-size: 12px; }
