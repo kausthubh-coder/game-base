@@ -10,6 +10,8 @@ export const SIZE = 290;
 export const GREAT_TREE = { x: -25, z: -16 };
 export const HOUSE = { x: 30, z: -50, turn: -0.5 };
 export const POND = { x: 22, z: 9, radius: 13 };
+/** A tree that stands alone on the pond's near bank, to judge one tree against a reference. */
+export const SPECIMEN = { x: 19, z: 30 };
 
 function hash(ix: number, iy: number, seed: number): number {
   let n = (ix * 73856093) ^ (iy * 19349663) ^ (seed * 83492791);

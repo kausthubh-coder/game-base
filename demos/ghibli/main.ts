@@ -1,19 +1,19 @@
 // The painted meadow: a test scene for the environment's look, apart from the game. It asks one
 // question: can this engine draw a place that looks like a hand-painted film background?
 //
-// In the address: `?view=wide|tree|pond|house|tilt`, `?mood=noon|evening`, `?trees=fluffy|painted`,
+// In the address: `?view=wide|tree|pond|house|tilt|solo`, `?mood=noon|evening`, `?trees=leafy|painted|fluffy`,
 // `?paint=1` (the paint filter), `?radius=5` (its brush size), `?quality=low|medium|high`, `?t=12` (hold the
-// clock at 12 s, for screenshots), `?panel=0`. Keys: 1 to 5 pick a view, T changes the trees, M the mood,
+// clock at 12 s, for screenshots), `?panel=0`. Keys: 1 to 6 pick a view, T changes the trees, M the mood,
 // P turns the filter on and off. Drag to look round. `window.__ghibli` lets a script wait for the scene and read its counters.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GREAT_TREE, HOUSE, POND, WATER_Y, heightAt } from './land.ts';
+import { GREAT_TREE, HOUSE, POND, SPECIMEN, WATER_Y, heightAt } from './land.ts';
 import { shared } from './paint.ts';
 import { createPost } from './post.ts';
-import { createWorld, type MoodName, type Quality, type TreeLook } from './scene.ts';
+import { TREE_LOOKS, createWorld, type MoodName, type Quality, type TreeLook } from './scene.ts';
 import { loadTextures } from './textures.ts';
 
-type ViewName = 'wide' | 'tree' | 'pond' | 'house' | 'tilt';
+type ViewName = 'wide' | 'tree' | 'pond' | 'house' | 'tilt' | 'solo';
 interface View { from: [number, number, number]; to: [number, number, number]; fov: number }
 
 const eye = (x: number, z: number, lift = 1.7): [number, number, number] => [x, heightAt(x, z) + lift, z];
@@ -28,6 +28,8 @@ const VIEWS: Record<ViewName, View> = {
   pond: { from: eye(4, 22, 1.6), to: [POND.x + 6, WATER_Y + 1, POND.z - 6], fov: 46 },
   house: { from: eye(12, -27, 1.7), to: [HOUSE.x, heightAt(HOUSE.x, HOUSE.z) + 3, HOUSE.z], fov: 44 },
   tilt: tilt(2, 14, 64),
+  // One tree alone with the pond and the sky behind it.
+  solo: { from: eye(SPECIMEN.x + 2, SPECIMEN.z + 21, 1.5), to: [SPECIMEN.x, heightAt(SPECIMEN.x, SPECIMEN.z) + 5, SPECIMEN.z], fov: 42 },
 };
 
 const query = new URLSearchParams(location.search);
@@ -59,9 +61,9 @@ const post = createPost(textures.paper, textures.paperMean);
 post.settings.paint = query.get('paint') === '1';
 post.settings.radius = Number(query.get('radius') ?? (quality === 'high' ? 5 : 3));
 
-let view: ViewName = pick<ViewName>('view', ['wide', 'tree', 'pond', 'house', 'tilt'], 'wide');
+let view: ViewName = pick<ViewName>('view', ['wide', 'tree', 'pond', 'house', 'tilt', 'solo'], 'wide');
 let mood: MoodName = pick<MoodName>('mood', ['noon', 'evening'], 'noon');
-let trees: TreeLook = pick<TreeLook>('trees', ['fluffy', 'painted'], 'painted');
+let trees: TreeLook = pick<TreeLook>('trees', TREE_LOOKS, 'leafy');
 
 function setView(name: ViewName): void {
   view = name;
@@ -114,8 +116,7 @@ label('Light');
 button('noon', () => mood === 'noon', () => setMood('noon'));
 button('evening', () => mood === 'evening', () => setMood('evening'));
 label('Trees');
-button('fluffy', () => trees === 'fluffy', () => setTrees('fluffy'));
-button('painted', () => trees === 'painted', () => setTrees('painted'));
+for (const look of TREE_LOOKS) button(look, () => trees === look, () => setTrees(look));
 label('Filter');
 button('paint', () => post.settings.paint, () => { post.settings.paint = !post.settings.paint; });
 panel.append(stats);
@@ -128,7 +129,7 @@ window.addEventListener('keydown', (e) => {
   if (n >= 1 && n <= names.length) setView(names[n - 1] as ViewName);
   else if (e.key === 'p') { post.settings.paint = !post.settings.paint; refreshPanel(); }
   else if (e.key === 'm') setMood(mood === 'noon' ? 'evening' : 'noon');
-  else if (e.key === 't') setTrees(trees === 'fluffy' ? 'painted' : 'fluffy');
+  else if (e.key === 't') setTrees(TREE_LOOKS[(TREE_LOOKS.indexOf(trees) + 1) % TREE_LOOKS.length] as TreeLook);
 });
 
 // ---------------------------------------------------------------- the loop

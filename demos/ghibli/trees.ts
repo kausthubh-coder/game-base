@@ -28,6 +28,14 @@ export interface TreeSpec {
   inset?: [number, number];
   /** The dark ball inside each blob, as a share of the blob's radius. */
   core?: number;
+  /** The colour of that ball before the light is on it. */
+  coreColor?: string;
+  /** How far up the trunk the boughs leave it, from 0 to 1. A low fork shows long limbs under the crown. */
+  fork?: number;
+  /** How far below the crown's middle its lowest blobs hang, from 0 to -1. Low values make the edge droop. */
+  low?: number;
+  /** Cards sit on a blob down to this height on it, from 1 (the top) to -1 (the bottom). */
+  under?: number;
 }
 
 export interface TreeShape { wood: THREE.BufferGeometry; leaves: THREE.BufferGeometry; cards: number }
@@ -98,7 +106,8 @@ export function buildTree(spec: TreeSpec): TreeShape {
   // ---- blobs: one in the middle, the rest round it and above it
   const blobs: Array<{ c: THREE.Vector3; r: number }> = [{ c: crownCentre.clone(), r: spec.crown * 0.62 }];
   for (let i = 1; i < spec.blobs; i++) {
-    const a = (i / (spec.blobs - 1)) * Math.PI * 2 + r() * 0.8, up = -0.2 + r() * 1.0, flat = Math.sqrt(Math.max(0, 1 - up * up * 0.7));
+    const low = spec.low ?? -0.2;
+    const a = (i / (spec.blobs - 1)) * Math.PI * 2 + r() * 0.8, up = low + r() * (0.8 - low), flat = Math.sqrt(Math.max(0, 1 - up * up * 0.7));
     const d = spec.crown * (0.45 + r() * 0.3);
     blobs.push({ c: new THREE.Vector3(Math.cos(a) * flat * d, up * d * spec.squash, Math.sin(a) * flat * d).add(crownCentre), r: spec.crown * (0.3 + r() * 0.2) });
   }
@@ -114,17 +123,17 @@ export function buildTree(spec: TreeSpec): TreeShape {
     }
     wood.tube(path, radii, 8, BARK_LOW, BARK_HIGH);
     for (const blob of blobs.slice(1, 6)) {
-      const from = (path[4] as THREE.Vector3).clone(), mid = from.clone().lerp(blob.c, 0.5).add(new THREE.Vector3(0, -blob.r * 0.25, 0));
+      const from = (path[Math.round((spec.fork ?? 0.67) * 6)] as THREE.Vector3).clone(), mid = from.clone().lerp(blob.c, 0.5).add(new THREE.Vector3(0, -blob.r * 0.25, 0));
       wood.tube([from, mid, blob.c], [spec.trunk * 0.36, spec.trunk * 0.24, spec.trunk * 0.1], 5, BARK_HIGH, BARK_HIGH);
     }
   }
-  const core = spec.core ?? 0.8;
-  for (const blob of blobs) wood.ball(blob.c, new THREE.Vector3(blob.r * core, blob.r * core * spec.squash, blob.r * core), CORE);
+  const core = spec.core ?? 0.8, coreColor = spec.coreColor ? new THREE.Color(spec.coreColor) : CORE;
+  for (const blob of blobs) wood.ball(blob.c, new THREE.Vector3(blob.r * core, blob.r * core * spec.squash, blob.r * core), coreColor);
 
   // ---- leaf cards on the blobs
   const positions: number[] = [], normals: number[] = [], uvs: number[] = [], cards: number[] = [], index: number[] = [];
   const dir = new THREE.Vector3(), p = new THREE.Vector3(), n = new THREE.Vector3();
-  const spin = spec.spin ?? Math.PI, inset = spec.inset ?? [0.92, 1.08];
+  const spin = spec.spin ?? Math.PI, inset = spec.inset ?? [0.92, 1.08], under = spec.under ?? -0.45;
   let count = 0;
   const crownTop = crownY + spec.crown * spec.squash, crownLow = crownY - spec.crown * spec.squash;
   for (const blob of blobs) {
@@ -133,7 +142,7 @@ export function buildTree(spec: TreeSpec): TreeShape {
       // Even spread over the sphere, then a little scatter.
       const y = 1 - (2 * (k + 0.5)) / wanted, ring = Math.sqrt(1 - y * y), a = k * 2.399963 + r() * 0.5;
       dir.set(Math.cos(a) * ring, y, Math.sin(a) * ring);
-      if (dir.y < -0.45) continue;
+      if (dir.y < under) continue;
       p.set(dir.x * blob.r, dir.y * blob.r * spec.squash, dir.z * blob.r).multiplyScalar(inset[0] + r() * (inset[1] - inset[0])).add(blob.c);
       if (blobs.some((other) => other !== blob && p.distanceTo(other.c) < other.r * 0.78)) continue;
       n.copy(p).sub(crownCentre).normalize().lerp(dir, 0.55).normalize();
@@ -191,7 +200,13 @@ export function cardHooks(shape: [number, number], wobble = 1, push = 1.3): Pain
  * How a crown's leaves are drawn. `fluffy`: many small cards cut by a leaf mask, shaded smoothly through four
  * tones. `painted`: a few large cards, each a painting of a bough of leaves with its own light and shade.
  */
-export type LeafLook = { kind: 'fluffy'; mask: THREE.Texture; tones: Tones } | { kind: 'painted'; map: THREE.Texture };
+export type LeafLook =
+  | { kind: 'fluffy'; mask: THREE.Texture; tones: Tones;
+      /** How far apart in tone neighbouring cards may be. High values make single sprays of leaves stand out. */
+      vary?: number;
+      /** How much lighter the top of the crown is than its foot, whatever the sun does. */
+      top?: number }
+  | { kind: 'painted'; map: THREE.Texture };
 
 export interface Foliage { leaf: THREE.MeshLambertMaterial; depth: THREE.MeshDepthMaterial; wood: THREE.MeshLambertMaterial }
 
@@ -202,13 +217,14 @@ export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
     const hooks = cardHooks([0.62, 0.5], 1, 1.6);
     leaf = paint({
       ...hooks, map: look.mask, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0, wrap: 0.5, brushScale: 0.05,
-      uniforms: { uTones: { value: look.tones.map((t) => new THREE.Color(t)) } },
-      fragmentPars: 'uniform vec3 uTones[4], uLeafSun, uLeafShade; varying vec3 vCard;',
+      uniforms: { uTones: { value: look.tones.map((t) => new THREE.Color(t)) }, uVary: { value: look.vary ?? 0.12 }, uTop: { value: look.top ?? 0 } },
+      fragmentPars: 'uniform vec3 uTones[4], uLeafSun, uLeafShade; uniform float uVary, uTop; varying vec3 vCard;',
       // The tone runs smoothly from deep shade to the sunlit top. The mask's own brush marks shift it a little,
       // so single leaves catch the light, and leaves low in the crown are darker.
       fragmentFinal: /* glsl */ `
         float detail = texture2D(map, vMapUv).r;
-        float lit = paintLit((vCard.x - 0.5) * 0.12 + (detail - 0.85) * 0.7 + vCard.y * 0.06);
+        float lit = paintLit((vCard.x - 0.5) * uVary + (detail - 0.85) * 0.7 + vCard.y * 0.06);
+        lit = clamp(lit + (vCard.z - 0.6) * uTop, 0.0, 1.0);
         vec3 tone = mix(uTones[0], uTones[1], smoothstep(0.08, 0.36, lit));
         tone = mix(tone, uTones[2], smoothstep(0.36, 0.66, lit));
         tone = mix(tone, uTones[3], smoothstep(0.7, 0.96, lit));

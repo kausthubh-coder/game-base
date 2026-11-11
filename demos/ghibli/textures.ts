@@ -18,6 +18,8 @@ export interface Textures {
   leaves: THREE.Texture[];
   tufts: THREE.Texture[];
   clouds: THREE.Texture[];
+  /** Masks of one spray of leaves each: leaflets that fan out from a stem, as on a chestnut. Drawn by code. */
+  rosettes: THREE.Texture[];
   /** Paintings of one bough of leaves each: three broadleaf, one conifer. */
   foliage: THREE.Texture[];
   flower: THREE.Texture;
@@ -92,6 +94,24 @@ function bough(seed: number): HTMLCanvasElement {
     g.fillStyle = `rgb(${Math.round(40 + 140 * light)},${Math.round(92 + 118 * light)},${Math.round(62 + 20 * light)})`;
     g.save(); g.translate(x, y); g.rotate(r() * Math.PI);
     g.beginPath(); g.ellipse(0, 0, 17 + r() * 10, 8 + r() * 4, 0, 0, Math.PI * 2); g.fill();
+    g.restore();
+  }
+  return c;
+}
+
+function rosette(seed: number, leaflets: number): HTMLCanvasElement {
+  const [c, g] = canvas(256);
+  const r = random(seed), start = r() * Math.PI * 2;
+  g.translate(128, 128);
+  for (let i = 0; i < leaflets; i++) {
+    const length = 92 + r() * 28, width = 36 + r() * 10;
+    // A leaflet is darker at the stem and pale at its tip, so every leaf catches a little light.
+    const shade = g.createLinearGradient(0, 0, 0, length);
+    shade.addColorStop(0, 'rgb(168,168,168)'); shade.addColorStop(1, 'rgb(255,255,255)');
+    g.fillStyle = shade;
+    g.save(); g.rotate(start + (i / leaflets) * Math.PI * 2 + (r() - 0.5) * 0.25);
+    // Widest past the middle and blunt at the tip, like a chestnut leaflet.
+    g.beginPath(); g.moveTo(0, 6); g.bezierCurveTo(width * 0.5, length * 0.3, width, length * 0.75, 0, length); g.bezierCurveTo(-width, length * 0.75, -width * 0.5, length * 0.3, 0, 6); g.fill();
     g.restore();
   }
   return c;
@@ -177,6 +197,7 @@ export async function loadTextures(): Promise<Textures> {
     leaves: await many('leaves', 3, false, false, (i) => leafClump(11 + i)),
     tufts: await many('tuft', 2, false, false, (i) => tuft(21 + i)),
     clouds: await many('cloud', 6, false, true, (i) => cloud(31 + i)),
+    rosettes: [[51, 6], [52, 7], [53, 5]].map(([seed, leaflets]) => finish(rosette(seed as number, leaflets as number), false, false)),
     foliage: await many('foliage', 4, false, true, (i) => bough(41 + i)),
     standIns: standIns.filter((n) => n !== 'flower'),
   };
