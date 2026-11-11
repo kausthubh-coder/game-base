@@ -11,7 +11,7 @@ import { createMap, type MapMarker, type PinKind } from '../../features/map/inde
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
 import { clearOfPanels, type MarkBox } from '../uiview/clear.ts';
-import { addStyle, frame } from '../uiview/theme.ts';
+import { addStyle } from '../uiview/theme.ts';
 
 /** Within this many blocks of a named place, it gets its pin. */
 const PIN_RANGE = 30;
@@ -29,6 +29,10 @@ const QUEST_TAG = 'Quest: ';
 const BLANK = 0xd8bf8e;
 /** How much one block of height difference lightens or darkens a column, for relief. */
 const RELIEF = 0.07;
+/** The region's name, at the top of the full map. */
+const REGION_NAME = 'Greenhollow';
+/** Within this many blocks of a named place, the full map names it under the region. */
+const NEAR_PLACE = 40;
 
 const PIN_OF: Readonly<Record<string, PinKind>> = {
   'grant.stone': 'waystone',
@@ -44,48 +48,83 @@ const PIN_OF: Readonly<Record<string, PinKind>> = {
 };
 
 const STYLE = /* css */ `
-/* ---- the minimap: a ring of warm paper and one soft shadow ---- */
-.ui-book .gb-minimap { border: 3px solid var(--ui-paper); background: var(--ui-paper-3); box-shadow: 0 0 0 1px oklch(0.21 0.018 62 / 0.25), var(--ui-glass-shadow); }
-.ui-book .gb-minimap:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 4px; }
-.ui-book .gb-hud-minimap { padding: 5px; }
+/* ---- the minimap: a round window in a gold compass ring ---- */
+.ui-book .gb-minimap { border: 0; background: var(--ui-paper-3); box-shadow: 0 0 0 3px var(--ui-gold), 0 0 0 5px rgb(22 26 38 / 0.55), 0 0 0 6px rgb(211 188 142 / 0.6), 0 6px 16px rgb(10 12 20 / 0.4); }
+.ui-book .gb-minimap:focus-visible { outline: 2px solid var(--ui-gold-bright); outline-offset: 6px; }
+.ui-book .gb-hud-minimap { padding: 8px; }
 
 /* ---- the active waypoint on the screen. It is drawn over the HUD, so its arrow is never lost behind the quick slots. ---- */
 .ui-book .gb-beacon { z-index: 12; }
 /* A panel and the full map have the screen to themselves. */
 .ui-book.ui-covered .gb-beacon { visibility: hidden; }
-.ui-book .gb-beacon-chip { padding: 2px 9px 3px; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums lining-nums; color: var(--ui-glass-ink); background: var(--ui-glass); border: 0; border-radius: var(--ui-radius-sm); box-shadow: var(--ui-glass-shadow); }
-.ui-book .gb-beacon-arrow path { stroke: var(--ui-ink); }
+.ui-book .gb-beacon-chip { padding: 2px 10px 3px; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums lining-nums; color: var(--ui-glass-ink); background: var(--ui-glass); border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--ui-glass-line), var(--ui-glass-shadow); }
+.ui-book .gb-beacon-arrow path { stroke: var(--ui-night); }
 
-/* ---- the full map: a page of the book ---- */
-.ui-book .gb-map { padding: 16px; background: var(--ui-scrim); font-size: 16px; line-height: 1.45; pointer-events: auto; }
-.ui-book .gb-map-page { gap: 16px; padding: 24px 28px 28px; border-radius: 14px; animation: ui-map-in 140ms var(--ui-ease); }
-@keyframes ui-map-in { from { transform: scale(0.97); } }
-.ui-book .gb-map-head { gap: 8px 16px; padding: 0; min-height: 40px; }
-.ui-book .gb-map-head h2 { font-size: 20px; font-weight: 650; letter-spacing: -0.015em; }
-.ui-book .gb-map-count { font-size: 14px; color: var(--ui-ink-2); }
-.ui-book .gb-map-tools { gap: 8px; }
-.ui-book .gb-map button { min-height: 40px; padding: 0 16px; font-weight: 600; color: var(--ui-ink); background: var(--ui-paper-2); border: 0; border-radius: var(--ui-radius); box-shadow: none; transition: transform 80ms var(--ui-ease); }
-.ui-book .gb-map button:hover { background: var(--ui-paper-3); }
-.ui-book .gb-map button:active { background: var(--ui-paper-4); transform: scale(0.98); box-shadow: none; }
+/* ---- the full map: the parchment chart is the whole screen. The menus' rails cross it: the region's name at the top,
+   key prompts at the bottom. Round night tools down the right edge, the compass below them. ---- */
+.ui-book .gb-map { padding: 0; font-size: 16px; line-height: 1.45; pointer-events: auto; }
+.ui-book .gb-map-page { animation: ui-map-in 200ms var(--ui-ease); }
+@keyframes ui-map-in { from { transform: translateY(12px); } }
+.ui-book .gb-map-head { left: 0; right: 0; top: 0; transform: none; isolation: isolate; display: grid; justify-items: center; padding: 14px 80px 0; }
+.ui-book .gb-map-head::before { content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 76px; background: linear-gradient(180deg, rgb(10 12 20 / 0.78), rgb(20 24 38 / 0.62)); box-shadow: 0 1px 0 rgb(211 188 142 / 0.55); }
+.ui-book .gb-map-head h2 { font-family: var(--ui-display); font-size: 30px; font-weight: 650; line-height: 1.2; letter-spacing: 0.02em; color: var(--ui-paper-light); text-shadow: 0 2px 8px rgb(0 0 0 / 0.5); }
+.ui-book .gb-map-place { margin-top: 18px; padding: 3px 16px; font-family: var(--ui-display); font-size: 16px; font-weight: 600; color: var(--ui-ink); background: rgb(246 241 231 / 0.78); border-radius: 999px; box-shadow: inset 0 0 0 1px rgb(166 137 90 / 0.6); }
+/* Round night buttons with gold line icons, like the menus' tabs. */
+.ui-book .gb-map-tools { gap: 12px; }
+.ui-book .gb-map-tools button, .ui-book .gb-map .gb-map-close {
+  width: 52px; height: 52px; color: var(--ui-gold-bright); border: 0;
+  background: radial-gradient(circle at 50% 30%, #3a4460, var(--ui-night) 75%);
+  box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.6), 0 4px 10px rgb(10 12 20 / 0.4); transition: transform 140ms var(--ui-ease), box-shadow 140ms var(--ui-ease);
+}
+.ui-book .gb-map .gb-map-close { top: 10px; right: 20px; width: 52px; height: 52px; }
+.ui-book .gb-map-tools button:hover, .ui-book .gb-map .gb-map-close:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1.5px var(--ui-gold-bright), 0 0 16px rgb(240 212 138 / 0.45), 0 6px 12px rgb(10 12 20 / 0.4); }
+.ui-book .gb-map-tools button:active, .ui-book .gb-map .gb-map-close:active { transform: translateY(0) scale(0.96); }
+.ui-book .gb-map-tools button > .ui-cell, .ui-book .gb-map-close > .ui-cell { width: 36px; height: 36px; filter: brightness(1.35) drop-shadow(0 0 4px rgb(240 212 138 / 0.45)); }
+.ui-book .gb-map-tools svg, .ui-book .gb-map-close svg { width: 26px; height: 26px; }
+.ui-book .gb-map-count { margin-top: 2px; padding: 2px 10px; font-size: 13px; font-weight: 800; color: var(--ui-glass-ink); background: var(--ui-glass); border-radius: 999px; box-shadow: inset 0 0 0 1px var(--ui-glass-line); }
 .ui-book .gb-map button:focus-visible, .ui-book .gb-map canvas:focus-visible, .ui-book .gb-map input:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
-.ui-book .gb-map .gb-map-square { width: 40px; padding: 0; font-size: 20px; }
-.ui-book .gb-map-view { border: 0; border-radius: var(--ui-radius); background: var(--ui-paper-2); box-shadow: inset 0 0 0 1px var(--ui-line); }
-.ui-book .gb-map-note { padding: 8px 16px; border-radius: var(--ui-radius); background: var(--ui-ink); color: var(--ui-paper); }
-.ui-book .gb-map-foot { padding: 0; font-size: 14px; color: var(--ui-ink-2); }
-.ui-book .gb-map-picker { gap: 8px; padding: 12px; border: 0; border-radius: var(--ui-radius); background: var(--ui-paper); box-shadow: var(--ui-lift); }
-.ui-book .gb-map .gb-pick-grid button { min-height: 0; padding: 0; background: var(--ui-paper-2); border: 0; }
+/* The chart: warm parchment, a faint grid of latitude lines, tea-stained edges. */
+.ui-book .gb-map-view {
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 50%, rgb(120 84 40 / 0.32) 100%),
+    linear-gradient(rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    radial-gradient(ellipse at 22% 18%, rgb(255 250 235 / 0.5), transparent 50%),
+    radial-gradient(ellipse at 80% 85%, rgb(150 100 40 / 0.16), transparent 55%),
+    #e6d8b6;
+  box-shadow: inset 0 0 80px rgb(120 84 40 / 0.35);
+}
+/* The land is inked onto the parchment: multiplied, so it takes the paper's warmth and its stains. */
+.ui-book .gb-map-view canvas { mix-blend-mode: multiply; filter: saturate(0.8) contrast(1.05); }
+.ui-book .gb-map-north { right: 26px; bottom: 84px; width: 40px; height: 40px; place-items: center; align-content: center; gap: 0; color: var(--ui-ink); font-family: var(--ui-display); font-size: 12px; background: rgb(246 241 231 / 0.75); border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ui-gold), 0 2px 6px rgb(90 60 20 / 0.25); }
+.ui-book .gb-map-north svg { width: 18px; height: 18px; }
+.ui-book .gb-map-note { bottom: 84px; padding: 8px 16px; border-radius: 999px; background: var(--ui-night); color: var(--ui-paper); box-shadow: inset 0 0 0 1px var(--ui-glass-line); }
+/* The bottom rail of key prompts, as in the menus. */
+.ui-book .gb-map-foot { min-height: 64px; padding: 10px 36px 16px; gap: 10px 30px; font-size: 15px; color: var(--ui-paper-light); text-shadow: 0 1px 2px rgb(0 0 0 / 0.6); background: linear-gradient(0deg, rgb(10 12 20 / 0.7), rgb(10 12 20 / 0)); }
+.ui-book .gb-cue { gap: 10px; }
+.ui-book .gb-cue kbd { min-width: 34px; height: 32px; padding: 0 10px; font-size: 13px; font-weight: 800; color: var(--ui-paper-light); text-shadow: none; border: 0; border-radius: 9px; background: linear-gradient(180deg, #3d4660, #232a3c); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.7), inset 0 -3px 0 rgb(0 0 0 / 0.3), 0 2px 4px rgb(0 0 0 / 0.4); }
+.ui-book .gb-map-picker { gap: 8px; padding: 14px; border: 0; border-radius: var(--ui-radius); background: var(--ui-paper); box-shadow: inset 0 0 0 1px var(--ui-gold), var(--ui-lift); }
+.ui-book .gb-map-picker button { min-height: 40px; padding: 0 12px; font-weight: 700; color: var(--ui-paper-light); background: linear-gradient(180deg, #56607a, #4a5366 55%, #424a5c); border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55); }
+.ui-book .gb-map-picker button:hover { filter: brightness(1.12); }
+.ui-book .gb-map .gb-pick-grid button { min-height: 0; padding: 0; color: var(--ui-ink); background: var(--ui-paper-2); border: 0; box-shadow: none; border-radius: 8px; }
 .ui-book .gb-map .gb-pick-grid button:hover { background: var(--ui-paper-3); }
-.ui-book .gb-map .gb-pick-grid [data-icon][aria-checked='true'] { box-shadow: inset 0 0 0 2px var(--ui-paper); }
+.ui-book .gb-map .gb-pick-grid [data-icon][aria-checked='true'] { color: #fffdf4; box-shadow: inset 0 0 0 2px var(--ui-gold); }
 .ui-book .gb-pick-share { min-height: 40px; font-size: 15px; }
 .ui-book .gb-pick-actions { gap: 8px; }
 .ui-book .gb-pick-actions button { padding: 0 8px; }
 
 @media (max-width: 640px) {
-  .ui-book .gb-map { padding: 8px; }
-  .ui-book .gb-map-page { height: 100%; gap: 12px; padding: 20px 16px 16px; }
-  .ui-book .gb-map-tools { gap: 4px; }
-  .ui-book .gb-map button { min-height: 44px; padding: 0 8px; }
-  .ui-book .gb-map .gb-map-square { flex: 0 0 44px; width: 44px; }
+  .ui-book .gb-map-head { padding: 12px 64px 0; }
+  .ui-book .gb-map-head::before { height: 62px; }
+  .ui-book .gb-map-head h2 { font-size: 22px; }
+  .ui-book .gb-map-place { margin-top: 14px; font-size: 14px; }
+  .ui-book .gb-map .gb-map-close { top: 7px; right: 12px; width: 48px; height: 48px; }
+  .ui-book .gb-map-tools { right: 12px; gap: 10px; }
+  .ui-book .gb-map-tools button { width: 48px; height: 48px; }
+  .ui-book .gb-map-tools button > .ui-cell { width: 34px; height: 34px; }
+  .ui-book .gb-map-north { right: 16px; bottom: 76px; }
+  .ui-book .gb-map-foot { justify-content: center; min-height: 0; padding: 8px 12px 12px; gap: 6px 18px; font-size: 13.5px; }
+  .ui-book .gb-cue kbd { min-width: 28px; height: 28px; padding: 0 8px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ui-book .gb-map-page { animation: none; }
@@ -154,7 +193,22 @@ export function install(view: GameView): void {
       game.events.emit('ui.sound', { sound: open ? 'open' : 'close' });
     },
   });
-  frame(root.querySelector('.gb-map-page'));
+  // The map's round tools take the kit's gold line icons when it has them; the feature's own drawn ones stay otherwise.
+  for (const button of root.querySelectorAll<HTMLElement>('.gb-map [data-icon]')) {
+    const art = book.art.tabElement(button.dataset.icon ?? '');
+    if (art) button.replaceChildren(art);
+  }
+
+  /** The named place nearest the player, when one is near enough to name. */
+  function nearPlace(): string | null {
+    const p = view.playerPosition;
+    let best: string | null = null, bestDistance = NEAR_PLACE;
+    for (const place of sys.region?.places() ?? []) {
+      const distance = Math.hypot(place.at.x - p.x, place.at.z - p.z);
+      if (place.label && distance < bestDistance) { best = place.label; bestDistance = distance; }
+    }
+    return best;
+  }
 
   if (book.minimapSlot) {
     book.minimapSlot.append(map.minimap);
@@ -168,7 +222,9 @@ export function install(view: GameView): void {
   book.map = {
     get isOpen() { return map.isOpen; },
     open() {
-      if (view.started && !book.menuOpen && !(sys.talk?.active ?? false)) map.open();
+      if (!view.started || book.menuOpen || (sys.talk?.active ?? false)) return;
+      map.setTitle(REGION_NAME, nearPlace());
+      map.open();
     },
     close: () => map.close(),
   };

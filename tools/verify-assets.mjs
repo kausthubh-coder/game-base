@@ -320,6 +320,26 @@ export function checkManifest(root) {
         else used.add(file);
       }
       summary.push(plural(textures.length, 'painting'));
+    } else if (section === 'uikit') {
+      // This nested, lazy group is intentionally ignored by the first-frame loader.
+      if (!isObject(entry) || entry.lazy !== true || !isObject(entry.images) || !isObject(entry.tabs)) {
+        failures.push('uikit must have lazy: true, images and tabs.');
+        continue;
+      }
+      for (const [name, file] of Object.entries(entry.images)) image(file, `uikit.images.${name}`);
+      tileSheet('uikit.tabs', entry.tabs, { tile: 96, sheet: '', names: {} });
+      const size = image(entry.tabs.sheet, 'uikit.tabs.sheet');
+      if (entry.tabs.tile !== 96 || size?.width !== 384 || size?.height !== 288) {
+        failures.push('uikit.tabs must be a 384 by 288 PNG with 96 px tiles (4 by 3).');
+      }
+      // More icon sheets beside tabs, such as tabs2: square 96 px tiles, every cell inside the image.
+      const more = Object.entries(entry).filter(([key, value]) => key !== 'tabs' && isObject(value) && 'tile' in value && 'sheet' in value);
+      for (const [key, sheet] of more) {
+        tileSheet(`uikit.${key}`, sheet, { tile: 96, sheet: '', names: {} });
+        const at = image(sheet.sheet, `uikit.${key}.sheet`);
+        if (sheet.tile !== 96 || !at || at.width % 96 || at.height % 96) failures.push(`uikit.${key} must be a PNG of 96 px tiles.`);
+      }
+      summary.push(`uikit: ${Object.keys(entry.images).length} lazy images, ${1 + more.length} icon sheets`);
     } else if (section === 'sprites') {
       if (!isObject(entry)) { failures.push('sprites is not an object.'); continue; }
       const example = isObject(doc?.sprites) ? Object.values(doc.sprites)[0] : null;

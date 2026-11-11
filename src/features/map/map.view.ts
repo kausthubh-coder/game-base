@@ -56,6 +56,8 @@ export interface MapView extends ViewSystem {
   setPlayer(x: number, z: number, facing: number): void;
   /** Friends, a pet, people with a quest. The map reads this list every frame, so change it in place. */
   setMarkers(markers: readonly MapMarker[]): void;
+  /** The name at the top of the full map: the region, and the place the player is near, or null for none. */
+  setTitle(title: string, place: string | null): void;
   /** Redraws part of the map after blocks change. */
   invalidate(x: number, z: number, width: number, depth: number): void;
   open(): void;
@@ -143,6 +145,7 @@ export function createMap(ctx: ViewContext, options: MapOptions): MapView {
     setMarkers(list) {
       markers = list;
     },
+    setTitle: (title, place) => full.setTitle(title, place),
     invalidate(x, z, width, depth) {
       minimap.invalidate(x, z, width, depth);
       full.invalidate(x, z, width, depth);

@@ -1,0 +1,145 @@
+{
+  "files": [
+    {
+      "name": "icons2",
+      "size": [
+        384,
+        384
+      ],
+      "bytes": 13274
+    },
+    {
+      "name": "keycap",
+      "size": [
+        160,
+        128
+      ],
+      "bytes": 6718
+    },
+    {
+      "name": "card-frame",
+      "size": [
+        192,
+        232
+      ],
+      "bytes": 2115
+    },
+    {
+      "name": "rail",
+      "size": [
+        1200,
+        120
+      ],
+      "bytes": 36826
+    },
+    {
+      "name": "leather",
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 11215
+    },
+    {
+      "name": "leather-panel",
+      "size": [
+        512,
+        512
+      ],
+      "bytes": 69165
+    },
+    {
+      "name": "pocket",
+      "size": [
+        160,
+        160
+      ],
+      "bytes": 10212
+    },
+    {
+      "name": "tag",
+      "size": [
+        480,
+        720
+      ],
+      "bytes": 104294
+    },
+    {
+      "name": "roller",
+      "size": [
+        1600,
+        128
+      ],
+      "bytes": 49150
+    },
+    {
+      "name": "bookmark",
+      "size": [
+        96,
+        260
+      ],
+      "bytes": 8467
+    },
+    {
+      "name": "bookmark-red",
+      "size": [
+        96,
+        260
+      ],
+      "bytes": 8607
+    },
+    {
+      "name": "bookmark-green",
+      "size": [
+        96,
+        260
+      ],
+      "bytes": 7434
+    },
+    {
+      "name": "bookmark-blue",
+      "size": [
+        96,
+        260
+      ],
+      "bytes": 8714
+    },
+    {
+      "name": "seal",
+      "size": [
+        192,
+        192
+      ],
+      "bytes": 18255
+    },
+    {
+      "name": "seal-gold",
+      "size": [
+        192,
+        192
+      ],
+      "bytes": 19757
+    },
+    {
+      "name": "page-edges",
+      "size": [
+        64,
+        512
+      ],
+      "bytes": 7121
+    }
+  ],
+  "totalBytes": 381324,
+  "totalKB": 381.324,
+  "existingManifestUnchanged": true,
+  "lazyImages": 47,
+  "loaderImages": [
+    "ui"
+  ],
+  "loaderSheets": [
+    "portraits",
+    "crops",
+    "materials"
+  ],
+  "tabs2Omitted": "Parser accepts it; production packager rejects the duplicate PNG reference as Circular asset list"
+}

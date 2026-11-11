@@ -602,14 +602,17 @@ async function dragAndDrop(t) {
   await page.keyboard.press('ArrowLeft');
   await page.keyboard.press('Enter');
 
-  // A tooltip names the thing under the pointer and says what it is for.
+  // The thing under the pointer is named with what it is for: in the detail pane beside the slots on a wide screen,
+  // in a tooltip on a narrow one.
   const at = await center(slot(await find('axe')));
   await page.mouse.move(at.x, at.y);
   const tip = await game(() => {
+    const pane = document.querySelector('.gu-detail');
+    if (pane && pane.offsetParent !== null) return { name: pane.querySelector('.gu-detail-name')?.textContent ?? '', use: pane.querySelector('.gu-detail-use')?.textContent ?? '', where: 'pane' };
     const e = document.querySelector('.gu-tip');
-    return e && !e.hidden ? { name: e.querySelector('.gu-tip-name')?.textContent ?? '', use: e.querySelector('.gu-tip-use')?.textContent ?? '' } : null;
+    return e && !e.hidden ? { name: e.querySelector('.gu-tip-name')?.textContent ?? '', use: e.querySelector('.gu-tip-use')?.textContent ?? '', where: 'tooltip' } : null;
   });
-  check('the tooltip names the item and says what it is for', tip?.name === 'Axe' && /fell/.test(tip.use), JSON.stringify(tip));
+  check('the bag names the item under the pointer and says what it is for', tip?.name === 'Axe' && /fell/.test(tip.use), JSON.stringify(tip));
   await shot('ui-08-bag-tip.png');
   await page.mouse.move(5, 5);
 

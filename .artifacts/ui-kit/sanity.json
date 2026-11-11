@@ -1,0 +1,266 @@
+{
+  "totalBytes": 354259,
+  "totalKiB": 345.9560546875,
+  "images": [
+    "ui"
+  ],
+  "sheets": [
+    "portraits",
+    "crops",
+    "materials"
+  ],
+  "files": [
+    {
+      "name": "panel",
+      "bytes": 14936,
+      "size": [
+        512,
+        512
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "panel-dark",
+      "bytes": 16254,
+      "size": [
+        512,
+        512
+      ],
+      "alpha": [
+        0,
+        254
+      ]
+    },
+    {
+      "name": "divider",
+      "bytes": 8988,
+      "size": [
+        1024,
+        48
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "button",
+      "bytes": 8984,
+      "size": [
+        384,
+        112
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "button-light",
+      "bytes": 9885,
+      "size": [
+        384,
+        112
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "button-gold",
+      "bytes": 8744,
+      "size": [
+        384,
+        112
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "close",
+      "bytes": 10742,
+      "size": [
+        128,
+        128
+      ],
+      "alpha": [
+        0,
+        254
+      ]
+    },
+    {
+      "name": "back",
+      "bytes": 11425,
+      "size": [
+        128,
+        128
+      ],
+      "alpha": [
+        0,
+        254
+      ]
+    },
+    {
+      "name": "slot",
+      "bytes": 2278,
+      "size": [
+        160,
+        160
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "slot-selected",
+      "bytes": 3676,
+      "size": [
+        160,
+        160
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "slot-hover",
+      "bytes": 3254,
+      "size": [
+        160,
+        160
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "card",
+      "bytes": 23639,
+      "size": [
+        192,
+        232
+      ],
+      "alpha": [
+        0,
+        254
+      ]
+    },
+    {
+      "name": "card-rare",
+      "bytes": 18294,
+      "size": [
+        192,
+        232
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "card-epic",
+      "bytes": 25583,
+      "size": [
+        192,
+        232
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "minimap-ring",
+      "bytes": 134026,
+      "size": [
+        640,
+        640
+      ],
+      "alpha": [
+        0,
+        253
+      ]
+    },
+    {
+      "name": "dial",
+      "bytes": 9449,
+      "size": [
+        160,
+        160
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "name-plate",
+      "bytes": 9246,
+      "size": [
+        512,
+        96
+      ],
+      "alpha": [
+        0,
+        254
+      ]
+    },
+    {
+      "name": "hint",
+      "bytes": 4156,
+      "size": [
+        512,
+        96
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "stars",
+      "bytes": 6436,
+      "size": [
+        512,
+        512
+      ],
+      "alpha": [
+        0,
+        56
+      ]
+    },
+    {
+      "name": "tabs",
+      "bytes": 22401,
+      "size": [
+        384,
+        288
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    },
+    {
+      "name": "tooltip",
+      "bytes": 1863,
+      "size": [
+        256,
+        256
+      ],
+      "alpha": [
+        0,
+        255
+      ]
+    }
+  ]
+}

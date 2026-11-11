@@ -3,46 +3,62 @@
 // `.gu-root`, where the features cannot read them. So the same values are named here on the views' root, and
 // handed to the features through the `--book-*` names they read.
 //
-// Two grounds, from the handbook's direction (design/.critly/direction.md): warm near-white paper for panels
-// and cards, and dark glass for what sits over the world while walking. One sans family from the system,
-// one teal accent from the lume crystal, green for done, amber for new. 10px corners, 1px lines, space first.
+// The look is "Gilded Hearth" (docs/ui-look.md): Genshin's interface language, warmer. Cream parchment and
+// navy ink for panels, fine gold filigree, nothing boxed over the world but soft dark glass, Fraunces for
+// titles and Nunito for the rest. The painted pieces are the `uikit` images in the manifest: `kitStyle()`
+// names each as `--kit-<name>` on the views' root and adds the class `ui-kit`, and KIT below puts them on.
+// Without the kit everything still draws, in CSS alone.
 //
 // Each view adds its own rules with `addStyle`. The rules start with `.ui-book`, so they outrank the
 // feature's own stylesheet whatever order the two are loaded in.
 
+/** The two faces, from public/fonts. Both are variable, 400 to 800, under the SIL Open Font License. */
+export const FONTS = (base: string): string => /* css */ `
+@font-face { font-family: 'Fraunces'; src: url('${base}fonts/fraunces.woff2') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Nunito'; src: url('${base}fonts/nunito.woff2') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
+`;
+
 export const TOKENS = /* css */ `
 .ui-book {
   /* The same values as .gu-root in src/game/ui/styles.ui.ts. */
-  --ui-paper: oklch(0.975 0.014 88);
-  --ui-paper-2: oklch(0.945 0.02 86);
-  --ui-paper-3: oklch(0.91 0.026 84);
-  --ui-paper-4: oklch(0.88 0.03 82);
-  --ui-paper-light: oklch(0.99 0.008 90);
-  --ui-plate: oklch(0.99 0.008 90);
-  --ui-ink: oklch(0.29 0.022 62);
-  --ui-ink-2: oklch(0.47 0.022 68);
-  --ui-line: oklch(0.29 0.022 62 / 0.12);
-  --ui-line-strong: oklch(0.29 0.022 62 / 0.28);
-  --ui-brass: oklch(0.8 0.13 78);
-  --ui-brass-dark: oklch(0.62 0.13 68);
-  --ui-accent: oklch(0.53 0.095 192);
-  --ui-accent-soft: oklch(0.53 0.095 192 / 0.16);
-  --ui-done: oklch(0.56 0.12 150);
-  --ui-new: oklch(0.72 0.15 68);
-  --ui-scrim: oklch(0.18 0.02 60 / 0.55);
-  --ui-shadow: oklch(0.18 0.03 60 / 0.28);
-  --ui-lift: 0 1px 2px oklch(0.18 0.03 60 / 0.14), 0 12px 32px oklch(0.18 0.03 60 / 0.24);
-  /* Dark glass over the world: no blur, so it costs nothing to draw. */
-  --ui-glass: oklch(0.21 0.018 62 / 0.7);
-  --ui-glass-2: oklch(1 0 0 / 0.1);
-  --ui-glass-line: oklch(1 0 0 / 0.14);
-  --ui-glass-ink: oklch(0.985 0.008 88);
-  --ui-glass-ink-2: oklch(0.9 0.012 86);
-  --ui-glass-shadow: 0 2px 10px oklch(0.12 0.02 60 / 0.22);
-  --ui-text-shadow: 0 1px 2px oklch(0.12 0.02 60 / 0.6);
-  --ui-radius: 10px;
-  --ui-radius-sm: 6px;
-  --ui-font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --ui-paper: #ece5d8;
+  --ui-paper-2: #e4dbc9;
+  --ui-paper-3: #d9cdb6;
+  --ui-paper-4: #cdbfa4;
+  --ui-paper-light: #f6f1e7;
+  --ui-plate: #f6f1e7;
+  --ui-ink: #3b4255;
+  --ui-ink-2: #6b6f7e;
+  --ui-line: rgb(59 66 85 / 0.14);
+  --ui-line-strong: rgb(59 66 85 / 0.3);
+  /* Gold: the filigree, the thing picked, the next action. */
+  --ui-gold: #d3bc8e;
+  --ui-gold-bright: #f0d48a;
+  --ui-bronze: #a6895a;
+  --ui-brass: var(--ui-gold);
+  --ui-brass-dark: var(--ui-bronze);
+  --ui-accent: #c9a25e;
+  --ui-accent-soft: rgb(211 188 142 / 0.28);
+  --ui-done: #6f9a54;
+  --ui-done-light: #a9d08a;
+  --ui-new: #e8a33c;
+  --ui-night: #1f2433;
+  --ui-night-2: #2b3245;
+  --ui-scrim: rgb(14 17 27 / 0.62);
+  --ui-shadow: rgb(10 12 20 / 0.35);
+  --ui-lift: 0 2px 4px rgb(10 12 20 / 0.18), 0 18px 48px rgb(10 12 20 / 0.38);
+  /* Over the world: dark night glass with a gold hairline. No blur, so it costs nothing to draw. */
+  --ui-glass: rgb(22 26 38 / 0.62);
+  --ui-glass-2: rgb(255 255 255 / 0.08);
+  --ui-glass-line: rgb(211 188 142 / 0.45);
+  --ui-glass-ink: #f6f1e7;
+  --ui-glass-ink-2: #d9d2c3;
+  --ui-glass-shadow: 0 2px 12px rgb(10 12 20 / 0.28);
+  --ui-text-shadow: 0 1px 2px rgb(10 12 20 / 0.85), 0 0 8px rgb(10 12 20 / 0.45);
+  --ui-radius: 12px;
+  --ui-radius-sm: 7px;
+  --ui-font: 'Nunito', ui-rounded, 'SF Pro Rounded', ui-sans-serif, system-ui, sans-serif;
+  --ui-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --ui-ease: cubic-bezier(0.23, 1, 0.32, 1);
   /* Pixels kept clear at the bottom: the quick slots (the HUD view measures them), or the dialogue box while someone talks (the talk view does). */
   --ui-hud-clear: 96px;
@@ -56,49 +72,177 @@ export const TOKENS = /* css */ `
   --book-parchment-deep: var(--ui-paper-3);
   --book-ink: var(--ui-ink);
   --book-ink-soft: var(--ui-ink-2);
-  --book-brass: var(--ui-brass-dark);
-  --book-brass-light: var(--ui-brass);
+  --book-brass: var(--ui-bronze);
+  --book-brass-light: var(--ui-gold);
   --book-font: var(--ui-font);
 }
 .ui-book .gb-hud, .ui-book .gb-dialogue, .ui-book .gb-map, .ui-book .gb-beacon {
-  color-scheme: light;
+  color-scheme: light; font-family: var(--ui-font);
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
   font-variant-numeric: lining-nums;
 }
 /* One cell of a sheet of pixel art, filling its box. */
 .ui-cell { display: block; width: 100%; height: 100%; background-repeat: no-repeat; image-rendering: pixelated; }
-.ui-letters { display: grid; place-items: center; width: 100%; height: 100%; font-size: 13px; font-weight: 600; line-height: 1; color: var(--ui-ink-2); }
+.ui-cell.ui-smooth { image-rendering: auto; }
+.ui-letters { display: grid; place-items: center; width: 100%; height: 100%; font-size: 13px; font-weight: 700; line-height: 1; color: var(--ui-ink-2); }
 
-/* A large panel: warm paper, 10px corners, one soft shadow. The ui-sheet elements frame() adds are kept for the old nine-slice frame and draw nothing now. */
+/* A large panel: cream paper, a gold hairline inside the edge, one deep shadow. With the kit it is the painted frame. */
 .ui-book .ui-frame {
   position: relative; isolation: isolate;
   border: 0; border-radius: var(--ui-radius); outline: 0;
   background: var(--ui-paper);
-  box-shadow: var(--ui-lift);
+  box-shadow: inset 0 0 0 1px var(--ui-paper-light), inset 0 0 0 5px var(--ui-paper), inset 0 0 0 6px var(--ui-gold), var(--ui-lift);
 }
 .ui-sheet { display: none; }
 /* A small card over the game, on paper: the Almanac's gift card. */
 .ui-book .ui-card {
   border: 0; border-radius: var(--ui-radius); outline: 0;
   background: var(--ui-paper);
-  box-shadow: var(--ui-lift);
+  box-shadow: inset 0 0 0 5px var(--ui-paper), inset 0 0 0 6px var(--ui-gold), var(--ui-lift);
 }
-/* A strip of dark glass over the world: the tracker, the clock, the quick slots. */
+/* A strip of night glass over the world: the hint, the prompt, the toasts. */
 .ui-book .ui-glass {
   color: var(--ui-glass-ink);
   background: var(--ui-glass);
   border: 0; border-radius: var(--ui-radius); outline: 0;
-  box-shadow: var(--ui-glass-shadow);
+  box-shadow: inset 0 0 0 1px var(--ui-glass-line), var(--ui-glass-shadow);
 }
 /* The stack under the pointer while it is dragged, here and in the bag. */
 .ui-book .gu-ghost, .gu-root .gu-ghost {
   position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center;
-  width: 52px; height: 52px; pointer-events: none;
-  background: var(--ui-paper, oklch(0.975 0.014 88)); border-radius: var(--ui-radius, 10px);
-  box-shadow: 0 0 0 2px oklch(0.53 0.095 192), 0 10px 24px oklch(0.18 0.03 60 / 0.35);
+  width: 56px; height: 56px; pointer-events: none;
+  background: var(--ui-night-2, #2b3245); border-radius: var(--ui-radius, 12px);
+  box-shadow: 0 0 0 2px var(--ui-gold-bright, #f0d48a), 0 0 18px rgb(240 212 138 / 0.55), 0 12px 26px rgb(10 12 20 / 0.45);
   will-change: transform;
 }
 `;
+
+/**
+ * The painted pieces. Every rule starts with `.ui-book.ui-kit`, so it applies only once `kitStyle` has found the
+ * kit in the manifest. A nine-slice is drawn by a `::before` that fills its element, at half the image's pixels.
+ */
+export const KIT = /* css */ `
+/* ---- menus: the night sky with gold constellations behind every panel, the title aside ---- */
+.ui-book.ui-kit .gu-stage:not(.gu-stage-title) {
+  background: var(--kit-stars) 0 0 / 384px 384px repeat, radial-gradient(120% 90% at 50% 45%, rgb(20 24 36 / 0.5), rgb(10 12 20 / 0.86));
+}
+/* A full-screen menu: the gold star map over deep night, so the world barely shows. */
+.ui-book.ui-kit .gu-stage.gu-stage-screen {
+  background: var(--kit-stars) 0 0 / 384px 384px repeat, radial-gradient(120% 85% at 50% 0%, rgb(46 54 84 / 0.95), rgb(24 28 43 / 0.97) 55%, rgb(12 14 22 / 0.98));
+}
+/* The top rail is the painted band at its own height: the name, the tabs and the close button on it, the tabs' names under
+   its gold line, and its flowered ends clear of them. The full map's title sits on the same band. */
+.ui-book.ui-kit .gu-rail-top::before, .ui-book.ui-kit .gb-map-head::before { height: 60px; top: 8px; background: transparent; box-shadow: none; border: solid transparent; border-width: 0 100px; border-image: var(--kit-rail) 0 200 fill / 0 100px stretch; }
+.ui-book.ui-kit .gu-rail-top { padding: 10px 92px 30px; }
+.ui-book.ui-kit .gb-map-head { padding-top: 18px; }
+/* The map's close button is the menus' painted one, and its compass gives the north. */
+.ui-book.ui-kit .gb-map .gb-map-close { top: 14px; right: 92px; width: 44px; height: 44px; background: var(--kit-close) center / 100% 100% no-repeat; box-shadow: none; }
+.ui-book.ui-kit .gb-map .gb-map-close > * { visibility: hidden; }
+.ui-book.ui-kit .gb-map-north { display: none; }
+/* Keycaps: the painted navy cap, scaled whole so it never stretches tall. */
+.ui-book.ui-kit .gu-cue kbd, .ui-book.ui-kit .gu-item > .gu-slot-key {
+  background: transparent; box-shadow: none; border: solid transparent; border-width: 0 10px; padding: 0 2px;
+  border-image: var(--kit-keycap) 0 40 fill / 0 10px stretch;
+}
+.ui-book.ui-kit .gu-item > .gu-slot-key { border-width: 0 7px; border-image-width: 0 7px; padding: 0; }
+
+/* ---- panels: the painted frame ---- */
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-screen), .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box), .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; isolation: isolate; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-screen)::before, .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box)::before, .ui-book.ui-kit .ui-card::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  border: 56px solid transparent; border-image: var(--kit-panel) 112 fill / 56px stretch;
+  filter: drop-shadow(0 16px 32px rgb(10 12 20 / 0.5));
+}
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-screen) { padding: 40px 46px 42px; }
+.ui-book.ui-kit .gu-panel-head { justify-content: center; }
+.ui-book.ui-kit .gu-panel-head > .gu-close { position: absolute; right: -14px; top: -10px; margin: 0; }
+.ui-book.ui-kit .gu-panel-head:has(> .gu-tabs) { justify-content: flex-start; }
+.ui-book.ui-kit .gu-panel-head::after {
+  content: ''; position: absolute; left: 50%; right: auto; bottom: -8px; width: min(440px, 86%); height: 24px; transform: translateX(-50%);
+  background: var(--kit-divider) center / 100% 100% no-repeat; pointer-events: none;
+}
+.ui-book.ui-kit .gu-close, .ui-book.ui-kit .gu-card .gu-close { color: transparent !important; background: var(--kit-close) center / 100% 100% no-repeat !important; box-shadow: none !important; }
+.ui-book.ui-kit .gu-close:hover { filter: brightness(1.08); transform: scale(1.06); }
+.ui-book.ui-kit .gu-close[aria-label='Back'] { background-image: var(--kit-back) !important; }
+
+/* ---- buttons: painted pills, navy for most, gold for the next action ---- */
+.ui-book.ui-kit .gu-btn {
+  border: solid transparent; border-width: 0 24px; padding: 0 4px;
+  border-image: var(--kit-button) 0 56 fill / 0 24px stretch; background: transparent !important; box-shadow: none !important;
+  color: var(--ui-paper-light); text-shadow: 0 1px 2px rgb(10 12 20 / 0.5);
+}
+.ui-book.ui-kit .gu-btn.gu-btn-icon { border-left-width: 14px; border-image-width: 0 24px 0 14px; padding-left: 0; }
+.ui-book.ui-kit .gu-btn.gu-primary { border-image-source: var(--kit-button-gold); color: var(--ui-night); text-shadow: 0 1px 0 rgb(255 247 220 / 0.6); }
+.ui-book.ui-kit .gu-btn:hover:not(:disabled) { filter: brightness(1.12); }
+.ui-book.ui-kit .gu-btn:disabled, .ui-book.ui-kit .gu-btn[aria-disabled='true'] { border-image-source: var(--kit-button-light); color: var(--ui-ink-2); text-shadow: none; opacity: 0.55; }
+.ui-book.ui-kit .gu-plate .gu-btn:disabled { opacity: 0.5; }
+
+@container gu (width < 640px) {
+  .ui-book.ui-kit .gu-rail-top::before { top: 4px; height: 52px; border-width: 0 60px; border-image-width: 0 60px; }
+  .ui-book.ui-kit .gu-rail-top { padding: 8px 50px 30px; }
+  .ui-book.ui-kit .gu-settings-side .gu-choices:nth-child(even), .ui-book.ui-kit .gu-settings-side .gu-slider:nth-child(even) { background: none; }
+}
+@media (max-width: 640px) {
+  .ui-book.ui-kit .gb-map-head::before { top: 4px; height: 52px; border-width: 0 60px; border-image-width: 0 60px; }
+  .ui-book.ui-kit .gb-map-head { padding-top: 12px; }
+  .ui-book.ui-kit .gb-map .gb-map-close { top: 8px; right: 50px; }
+}
+
+/* ---- the bag: a filled card is the painted item card with its cream strip; the one the detail column shows wears the gold frame ---- */
+.ui-book.ui-kit .gu-item:not(.gu-slot-empty) { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 4px 10px rgb(0 0 0 / 0.35); }
+.ui-book.ui-kit .gu-item:not(.gu-slot-empty):hover { box-shadow: 0 0 18px rgb(240 212 138 / 0.45), 0 8px 14px rgb(0 0 0 / 0.4); }
+.ui-book.ui-kit .gu-item.is-shown::after { inset: -4px; border-radius: 0; box-shadow: none; background: var(--kit-card-frame) center / 100% 100% no-repeat; filter: brightness(1.25) drop-shadow(0 0 6px rgb(240 212 138 / 0.7)); }
+.ui-book.ui-kit .gu-picked, .ui-book.ui-kit .gu-picked:hover { box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 24px rgb(240 212 138 / 0.7); }
+.ui-book.ui-kit .gu-slot.is-drop:not(.gu-slot-empty) { background: var(--kit-card-epic) center / 100% 100% no-repeat; box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 18px rgb(240 212 138 / 0.7); }
+.ui-book.ui-kit .gu-recipe > .gu-pic { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgb(166 137 90 / 0.7); }
+
+/* ---- over the world: the quick slots are painted wells, the minimap sits in its compass ring ---- */
+/* The rim is drawn by a ::before over the whole slot, so the slot's own box, and the icon and count in it, keep their places. */
+.ui-book.ui-kit .gb-slot { isolation: isolate; background: rgb(22 26 38 / 0.5); box-shadow: none; }
+.ui-book.ui-kit .gb-slot::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border: 20px solid transparent; border-image: var(--kit-slot) 40 fill / 20px stretch; }
+.ui-book.ui-kit .gb-slot:hover::before { border-image-source: var(--kit-slot-hover); }
+.ui-book.ui-kit .gb-slot[aria-pressed='true'], .ui-book.ui-kit .gb-slot.is-drop { box-shadow: 0 0 16px rgb(240 212 138 / 0.55), 0 6px 10px rgb(10 12 20 / 0.35); }
+.ui-book.ui-kit .gb-slot[aria-pressed='true']::before, .ui-book.ui-kit .gb-slot.is-drop::before { border-image-source: var(--kit-slot-selected); }
+.ui-book.ui-kit .gb-hud-minimap { position: relative; padding: 13.2%; }
+.ui-book.ui-kit .gb-hud-minimap::after { content: ''; position: absolute; inset: 0; background: var(--kit-minimap-ring) center / 100% 100% no-repeat; pointer-events: none; filter: drop-shadow(0 4px 8px rgb(10 12 20 / 0.35)); }
+.ui-book.ui-kit .gb-minimap { border: 0 !important; box-shadow: none !important; }
+
+/* ---- the Almanac: the painted divider under the open entry's name ---- */
+.ui-book.ui-kit .gu-leaf-title::after { bottom: -6px; height: 24px; background: var(--kit-divider) left center / 100% 100% no-repeat; }
+
+/* ---- the bag's detail pane: the painted card, amber sky above and cream below ---- */
+.ui-book.ui-kit .gu-detail { background: var(--kit-detail) center / 100% 100% no-repeat; box-shadow: 0 10px 30px rgb(0 0 0 / 0.4); }
+.ui-book.ui-kit .gu-detail-art { background: none; box-shadow: none; }
+.ui-book.ui-kit .gu-detail-art::after { display: none; }
+.ui-book.ui-kit .gu-detail-text { padding: 18px 24px 24px; }
+
+/* ---- the map: painted parchment and a compass rose in the corner ---- */
+.ui-book.ui-kit .gb-map-view {
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(120 84 40 / 0.3) 100%),
+    linear-gradient(rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    var(--kit-map-paper) 0 0 / 256px 256px repeat, #e3d4b0;
+}
+.ui-book.ui-kit .gb-map-view::after { content: ''; position: absolute; right: 20px; bottom: 80px; width: 140px; height: 140px; background: var(--kit-compass) center / contain no-repeat; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(90 60 20 / 0.3)); }
+
+@media (max-width: 640px) {
+  .ui-book.ui-kit .gb-map-view::after { right: 12px; bottom: 96px; width: 84px; height: 84px; }
+}
+
+/* ---- tooltips: the painted night card ---- */
+.ui-book.ui-kit .gu-tip, .ui-book.ui-kit .ui-slot-tip { background: transparent; box-shadow: none; isolation: isolate; }
+.ui-book.ui-kit .gu-tip::before, .ui-book.ui-kit .ui-slot-tip::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; border: 24px solid transparent; border-image: var(--kit-tooltip) 48 fill / 24px stretch;
+  filter: drop-shadow(0 8px 18px rgb(10 12 20 / 0.45));
+}
+`;
+
+/** Names each `uikit` image as `--kit-<name>` on the views' root, and adds the class `ui-kit` when the kit has its panel. */
+export function kitStyle(root: HTMLElement, kit: Readonly<Record<string, string>>): void {
+  for (const [name, url] of Object.entries(kit)) root.style.setProperty(`--kit-${name}`, `url("${url}")`);
+  root.classList.toggle('ui-kit', 'panel' in kit);
+}
 
 /** Gives an element the large panel's frame: the `ui-frame` class and the three sheets of paper that lie inside the frame lines. */
 export function frame(element: Element | null): void {

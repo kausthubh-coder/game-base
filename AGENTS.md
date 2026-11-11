@@ -13,6 +13,7 @@ Read before a large change:
 | Hosting, accounts, the world server, graphics levels, the bake step | `docs/architecture.md` |
 | Frame rate or load time on a weak device | `docs/fast-everywhere.md` |
 | The look of the world | `docs/painted-world.md` |
+| Menus, HUD, dialogue, map or any interface look (with the `make-ui` skill) | `docs/ui-look.md` |
 | Story, art, sound or game design | The handbook: the markdown in `~/dev/sandbox/game-look-test/design`, shown by the app in `game-look-test/handbook` (port 5361) |
 
 ## Commands
@@ -30,6 +31,7 @@ They are in `.agents/skills`. Load the one that fits before you start.
 | Add a check, test something, or a bug was reported | `test-game` |
 | Prove a change works before saying done | `verify-game` |
 | A rule where the order of events is the risk, or "model-check this" | `formal-game`, and `verify-build-stroke` for build mode |
+| A menu, a panel, the HUD, dialogue, the map, or how any of it looks | `make-ui` |
 | A 3D prop, or a sprite, icon, portrait or tile | `make-3d-asset`, `make-sprite`, then `verify-assets` |
 | An art style behind `?style=` | `verify-style-lab` |
 | Work for several agents: design it, brief helpers, merge | `coordinate-game` |

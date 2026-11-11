@@ -4,11 +4,12 @@
 import { levelOf } from '../../content/quality.ts';
 import type { Systems } from '../api.sim.ts';
 import type { GameView } from '../shell/view.ts';
+import { ALMANAC_BOOK } from '../content/almanac.ts';
 import { createGameUi, type GameUi, type PanelName } from '../ui/index.ui.ts';
 import { createUiArt, type UiArt } from './art.ts';
 import { KEY_LIST } from './keys.ts';
 import { markNewGame } from './opening.ts';
-import { TOKENS, addStyle } from './theme.ts';
+import { FONTS, KIT, TOKENS, addStyle, kitStyle } from './theme.ts';
 
 /** Panels that stop the rules while they are up. The bag, the Make panel, the Almanac and the quest log do not. */
 const MENUS: readonly PanelName[] = ['title', 'pause', 'settings', 'account', 'end'];
@@ -68,7 +69,10 @@ function createBook(view: GameView): Book {
   const art = createUiArt(view.assets);
 
   root.classList.add('ui-book');
+  addStyle(root, 'fonts', FONTS(document.baseURI.replace(/[^/]*$/, '')));
   addStyle(root, 'tokens', TOKENS);
+  addStyle(root, 'kit', KIT);
+  kitStyle(root, art.kit);
 
   const panelListeners = new Set<(panel: PanelName | null) => void>();
   const sizeListeners = new Set<(size: number) => void>();
@@ -82,6 +86,10 @@ function createBook(view: GameView): Book {
   const ui = createGameUi(root, game, {
     icon: art.icon,
     picture: art.picture,
+    ornament: art.tabElement,
+    hasAlmanac: () => game.flags.is(ALMANAC_BOOK.flag),
+    // The map is the map view's, set on the book once that view is installed.
+    openMap: () => book.map?.open(),
     project: (x, y, z) => view.project(x, y, z),
     stats: () => view.stats(),
     // A game in progress can always be gone back to, saved or not.
