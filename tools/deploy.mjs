@@ -9,7 +9,7 @@
 // The live copy's settings come from the environment (GitHub Actions) or from .env.live.local on the Mac
 // mini. They are never the dev values in .env.local, so a test build here can never point at the live database.
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..');
@@ -66,6 +66,33 @@ const clerkIssuer = `https://${atob(setting('VITE_CLERK_PUBLISHABLE_KEY').split(
 
 const viteEnv = Object.fromEntries(NEEDED.map((name) => [name, setting(name)]));
 run(['bunx', 'vite', 'build', '--mode', 'live'], { ...viteEnv, BUILD: build });
+
+// The playtest copy: the branch `playtest`, built as a second game into dist/playtest and served at
+// /playtest/. It is a build of its own, so a bug there cannot reach the game at /. See docs/playtest.md.
+// With no such branch, here or on GitHub, there is no playtest copy and the step is skipped.
+function playtestCommit() {
+  const local = git('rev-parse', '--verify', '--quiet', 'refs/heads/playtest');
+  if (local) return local;
+  const fetched = spawnSync('git', ['fetch', '--depth', '1', 'origin', 'playtest'], { cwd: ROOT, encoding: 'utf8' });
+  return fetched.status === 0 ? git('rev-parse', 'FETCH_HEAD') : '';
+}
+const playtest = playtestCommit();
+if (playtest) {
+  const checkout = resolve(ROOT, '.artifacts/deploy/playtest');
+  const inCheckout = (cmd, env = {}) => {
+    console.log(`playtest$ ${cmd.join(' ')}`);
+    const done = spawnSync(cmd[0], cmd.slice(1), { cwd: checkout, stdio: 'inherit', env: { ...process.env, ...env } });
+    if (done.status !== 0) process.exit(done.status ?? 1);
+  };
+  if (existsSync(resolve(checkout, '.git'))) inCheckout(['git', 'checkout', '--force', '--detach', playtest]);
+  else run(['git', 'worktree', 'add', '--force', '--detach', checkout, playtest]);
+  inCheckout(['bun', 'install', '--frozen-lockfile']);
+  inCheckout(['bunx', 'vite', 'build', '--mode', 'live'], { ...viteEnv, BUILD: `playtest-${playtest.slice(0, 7)}` });
+  cpSync(resolve(checkout, 'dist'), resolve(ROOT, 'dist/playtest'), { recursive: true });
+  console.log(`playtest copy ${playtest.slice(0, 7)} is in dist/playtest`);
+} else {
+  console.log('no playtest branch: the live copy has no /playtest/');
+}
 
 const vars = {
   CLERK_ISSUER: clerkIssuer,
