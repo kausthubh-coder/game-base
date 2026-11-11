@@ -2,6 +2,10 @@
 // hero's two bars, the pet's hearts and skills, the kit of rigs, the bar over the beast, the "Again?" card, the
 // log, and the warm edge of the screen when the hero is low. It reads the fight and draws it. Every button calls
 // back into the lab's view, which owns the fight.
+//
+// The card folds itself to its title when a beast wakes, so it never hides the fight, and opens again when the
+// fight ends. A player who opens it by hand during a fight keeps it open. On a narrow window the bars and the
+// "Again?" card sit in the room the card leaves.
 import { BEASTS, FIGHT_PETS, HERO, LOW_HEALTH, RIGS, WAYS, type RigKind, type Way } from '../content/fight.ts';
 import type { BeastState, Fight } from '../fight/fight.sim.ts';
 import { checksOf, type Check } from '../fight/record.sim.ts';
@@ -21,7 +25,8 @@ export interface PanelActions {
   setPet(kind: string): void;
   setQuality(mode: QualityMode): void;
   pickRig(kind: RigKind | null): void;
-  again(): void;
+  /** Replays the fight the "Again?" card names: its way, its pet and its beast. */
+  again(fight: LoggedFight): void;
 }
 
 export interface LabPanel {
@@ -29,8 +34,8 @@ export interface LabPanel {
   update(fight: Fight, held: RigKind | null, quality: QualityMode, beastAt: (beast: BeastState) => { x: number; y: number } | null): void;
   /** Shows "Again?" for a fight that just ended. */
   ask(fight: LoggedFight): void;
-  /** A short line under the bars: why something could not be done. */
-  say(text: string): void;
+  /** A short line over the bars: why something could not be done. It stays `ms` milliseconds. */
+  say(text: string, ms?: number): void;
   /** The name of a gift, floating over the page where it flies. Null `at` hides it. */
   label(text: string, at: { x: number; y: number } | null, alpha: number): void;
   /** True while the pointer is over a part of the interface, so a click there is not a swing. */
@@ -46,7 +51,7 @@ const KEYS: Record<Way, readonly (readonly [string, string])[]> = {
     ['Hold click', 'Charge a spin, let go to strike all round'],
     ['Shift', 'Dodge the way you walk'],
     ['C', "Your pet's pounce"],
-    ['Hold F', 'Hold out the Mark to a dizzy beast'],
+    ['Hold F', 'Hold out the Mark to a dizzy beast to calm it'],
   ],
   pet: [
     ['Click a beast', 'Send your pet at it'],
@@ -54,7 +59,7 @@ const KEYS: Record<Way, readonly (readonly [string, string])[]> = {
     ['Right click', 'Whistle the pet out of an attack'],
     ['Shift', 'Dodge the way you walk'],
     ['C and T', "Your pet's two skills"],
-    ['Hold F', 'Hold out the Mark to a dizzy beast'],
+    ['Hold F', 'Hold out the Mark to a dizzy beast to calm it'],
   ],
   world: [
     ['1 to 4', 'Take a rig in hand, click to set it down'],
@@ -62,7 +67,7 @@ const KEYS: Record<Way, readonly (readonly [string, string])[]> = {
     ['E', 'Wake the beast, or walk up to it'],
     ['C', 'Send your pet to the pointer as a lure'],
     ['Shift', 'Dodge the way you walk'],
-    ['F', 'Spring the plate. Hold it to calm a dizzy beast'],
+    ['F', 'Spring the plate. Hold it near a dizzy beast to calm it'],
   ],
 };
 
@@ -72,11 +77,14 @@ const WHAT_TO_FEEL: Record<Way, string> = {
   world: 'Do you think "I outsmarted it"? Is the setup play or a chore?',
 };
 
+/** Under the keys, for every way: the one word for the state the Mark needs. */
+const DIZZY = 'A beast is dizzy only once its guard bar is empty. The Mark cannot hold it before.';
+
 const AGAIN_WORDS = ['', 'No', 'Not really', 'Maybe', 'Yes', 'Right now'];
 
 const STYLE = /* css */ `
 .ui-book .fl-card {
-  position: absolute; left: 16px; top: 16px; width: 316px; max-height: calc(100% - 32px); overflow: auto; padding: 14px 16px 12px;
+  position: absolute; z-index: 2; left: 16px; top: 16px; width: 348px; max-height: calc(100% - 32px); overflow: auto; padding: 14px 16px 12px; box-sizing: border-box;
   pointer-events: auto; user-select: none; font: 400 13px / 1.45 var(--ui-font); -webkit-font-smoothing: antialiased;
   color: var(--ui-ink); background: var(--ui-paper); border-radius: var(--ui-radius); box-shadow: var(--ui-lift);
 }
@@ -99,14 +107,16 @@ const STYLE = /* css */ `
 .ui-book .fl-rules { margin: 0; padding-left: 16px; color: var(--ui-ink-2); }
 .ui-book .fl-card.is-small > :not(h2) { display: none; }
 .ui-book .fl-card.is-small { width: auto; padding: 8px 12px; }
+.ui-book .fl-card .fl-dizzy { margin-top: 6px; font-size: 12px; }
 .ui-book .fl-card.is-small h2 { margin: 0; }
 .ui-book .fl-note { margin-top: 8px; font-size: 12px; }
 
 .ui-book .fl-hud {
-  position: absolute; left: 50%; bottom: 18px; translate: -50% 0; display: flex; gap: 14px; align-items: flex-end; pointer-events: none;
+  position: absolute; left: var(--fl-hud-x, 50%); bottom: 18px; translate: -50% 0; width: max-content; display: flex; flex-wrap: wrap-reverse; justify-content: center; gap: 10px 14px; align-items: flex-end; pointer-events: none;
   font: 600 12px / 1.2 var(--ui-font); color: var(--ui-glass-ink); text-shadow: var(--ui-text-shadow);
 }
-.ui-book .fl-box { padding: 8px 10px; background: var(--ui-glass); border-radius: var(--ui-radius); box-shadow: var(--ui-glass-shadow); }
+.ui-book .fl-hud.is-wrapped { left: var(--fl-free); right: 16px; width: auto; translate: none; }
+.ui-book .fl-box { flex: none; padding: 8px 10px; background: var(--ui-glass); border-radius: var(--ui-radius); box-shadow: var(--ui-glass-shadow); }
 .ui-book .fl-bars { display: grid; gap: 5px; width: 220px; }
 .ui-book .fl-bar { height: 10px; border-radius: 5px; background: oklch(1 0 0 / 0.16); overflow: hidden; }
 .ui-book .fl-bar i { display: block; height: 100%; width: 100%; border-radius: 5px; transform-origin: left; }
@@ -121,7 +131,7 @@ const STYLE = /* css */ `
 .ui-book .fl-chip.is-held { outline: 2px solid oklch(0.85 0.14 180); background: oklch(0.85 0.14 180 / 0.3); }
 .ui-book .fl-chip.is-gone { opacity: 0.4; }
 .ui-book .fl-hearts { letter-spacing: 2px; font-size: 15px; color: oklch(0.78 0.16 20); }
-.ui-book .fl-say { position: absolute; left: 50%; bottom: 96px; translate: -50% 0; padding: 5px 12px; border-radius: 999px; pointer-events: none;
+.ui-book .fl-say { position: absolute; z-index: 3; left: var(--fl-hud-x, 50%); bottom: calc(var(--fl-hud-h, 60px) + 36px); translate: -50% 0; max-width: calc(100% - var(--fl-free, 16px) - 16px); box-sizing: border-box; text-align: center; padding: 5px 12px; border-radius: 999px; pointer-events: none;
   font: 600 13px / 1.2 var(--ui-font); color: var(--ui-glass-ink); background: var(--ui-glass); opacity: 0; transition: opacity 0.2s; }
 .ui-book .fl-say.is-on { opacity: 1; }
 
@@ -143,7 +153,7 @@ const STYLE = /* css */ `
 .ui-book .fl-beast small { font-size: 11px; font-weight: 600; opacity: 0.85; }
 
 .ui-book .fl-again, .ui-book .fl-log {
-  position: absolute; left: 50%; top: 12%; translate: -50% 0; width: min(460px, calc(100% - 32px)); padding: 16px 18px; pointer-events: auto;
+  position: absolute; z-index: 4; left: 50%; top: 12%; translate: -50% 0; width: min(460px, calc(100% - 32px)); max-height: 84%; overflow: auto; box-sizing: border-box; padding: 16px 18px; pointer-events: auto;
   font: 400 13.5px / 1.45 var(--ui-font); color: var(--ui-ink); background: var(--ui-paper); border-radius: var(--ui-radius); box-shadow: var(--ui-lift);
 }
 .ui-book .fl-again h2, .ui-book .fl-log h2 { margin: 0 0 4px; font: 650 18px / 1.2 var(--ui-font); }
@@ -159,6 +169,7 @@ const STYLE = /* css */ `
 .ui-book .fl-checks td:last-child { white-space: nowrap; font-weight: 650; }
 .ui-book .fl-pass { color: var(--ui-done); }
 .ui-book .fl-fail { color: oklch(0.55 0.17 25); }
+.ui-book .fl-again { left: calc(var(--fl-free, 16px) + (100% - var(--fl-free, 16px) - 16px) / 2); width: min(460px, calc(100% - var(--fl-free, 16px) - 16px)); }
 .ui-book .fl-log { top: 6%; width: min(880px, calc(100% - 32px)); max-height: 86%; overflow: auto; user-select: text; }
 .ui-book .fl-log table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
 .ui-book .fl-log th { text-align: left; font-weight: 600; color: var(--ui-ink-2); padding: 4px 8px 4px 0; }
@@ -171,7 +182,16 @@ const STYLE = /* css */ `
 /* The name of a gift, over it as it flies to the hero. */
 .ui-book .fl-gift { position: absolute; left: 0; top: 0; padding: 3px 10px; translate: -50% -100%; border-radius: 999px; pointer-events: none; white-space: nowrap;
   font: 650 13px / 1.2 var(--ui-font); color: var(--ui-glass-ink); background: var(--ui-glass); text-shadow: var(--ui-text-shadow); will-change: transform, opacity; }
-@container gu (width < 720px) { .ui-book .fl-card { width: 250px; font-size: 12px; } }
+@container gu (width < 720px) { .ui-book .fl-card { width: 282px; font-size: 12px; } }
+/* A short window: the card tightens so it fits at 720 pixels, and below that its scroll bar always shows. */
+.ui-book .fl-card { scrollbar-width: thin; scrollbar-color: var(--ui-line-strong) transparent; }
+@media (max-height: 820px) {
+  .ui-book .fl-card { padding-top: 10px; line-height: 1.32; }
+  .ui-book .fl-card h2 { margin-bottom: 6px; }
+  .ui-book .fl-card h3 { margin: 8px 0 4px; }
+  .ui-book .fl-keys { gap: 2px; }
+  .ui-book .fl-card button, .ui-book .fl-card select { min-height: 27px; }
+}
 `;
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className = '', text = ''): HTMLElementTagNameMap[K] {
@@ -195,7 +215,10 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   // ---------------------------------------------------------------- the card
   const card = el('section', 'fl-card');
   const title = el('h2');
-  const fold = button('Hide', () => { fold.textContent = card.classList.toggle('is-small') ? 'Show' : 'Hide'; });
+  /** True while the card is folded because a beast woke, not because the player folded it. */
+  let foldedForFight = false;
+  const setFolded = (small: boolean): void => { card.classList.toggle('is-small', small); fold.textContent = small ? 'Show' : 'Hide'; };
+  const fold = button('Hide', () => { foldedForFight = false; setFolded(!card.classList.contains('is-small')); });
   title.append('Fight lab', fold);
   const ways = el('div', 'fl-row');
   const wayButtons = new Map<Way, HTMLButtonElement>();
@@ -235,7 +258,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     link.click();
     URL.revokeObjectURL(link.href);
   }));
-  card.append(title, el('h3', '', 'Way to fight'), ways, feel, el('h3', '', 'Bring in'), beasts, control, el('h3', '', 'Keys'), keys, rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
+  card.append(title, el('h3', '', 'Way to fight'), ways, feel, el('h3', '', 'Bring in'), beasts, control, el('h3', '', 'Keys'), keys, el('p', 'fl-dizzy', DIZZY), rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
 
   // ---------------------------------------------------------------- the bars
   const hud = el('div', 'fl-hud');
@@ -293,7 +316,12 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     return table;
   }
 
-  function ask(fight: LoggedFight): void {
+  /** The encounter the open "Again?" card is about: its beast, way and pet. Any change closes the card. */
+  let askedAbout = '';
+  const encounterOf = (fight: Fight): string => `${fight.beasts[0]?.id ?? ''}:${fight.way}:${fight.pet.def.kind}`;
+
+  function showAgain(fight: LoggedFight, about: string): void {
+    askedAbout = about;
     const earlier = log.all().filter((f) => f !== fight && f.at <= fight.at);
     const beast = BEASTS.find((b) => b.kind === fight.enemy);
     again.replaceChildren();
@@ -316,7 +344,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     const hits = Object.entries(fight.hitBy).map(([attack, count]) => `${attack} ${count}`).join(', ');
     const why = el('p', '', hits ? `What hit you: ${hits}.` : 'Nothing hit you.');
     const row = el('div', 'fl-row');
-    row.append(button('Fight it again', () => { again.hidden = true; actions.again(); }), button('Close', () => { again.hidden = true; }));
+    row.append(button('Fight it again', () => { again.hidden = true; actions.again(fight); }), button('Close', () => { again.hidden = true; }));
     again.append(head, sum, rate, why, checkRows(checksOf(fight, earlier)), row);
     again.hidden = false;
     refreshLogButton();
@@ -346,18 +374,43 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     logBox.hidden = false;
   }
 
+  /** The count on the Log button is the log's length, whatever added to it: a fight won, one left, an emptied log. */
+  let shownLogCount = -1;
   function refreshLogButton(): void {
-    logButton.textContent = `Log (${log.all().length})`;
+    const count = log.all().length;
+    if (count === shownLogCount) return;
+    shownLogCount = count;
+    logButton.textContent = `Log (${count})`;
   }
   refreshLogButton();
 
   let sayTimer = 0;
-  function say(text: string): void {
+  function say(text: string, ms = 1600): void {
     line.textContent = text;
     line.classList.add('is-on');
     clearTimeout(sayTimer);
-    sayTimer = window.setTimeout(() => line.classList.remove('is-on'), 1600);
+    sayTimer = window.setTimeout(() => line.classList.remove('is-on'), ms);
   }
+
+  // ---------------------------------------------------------------- the room the card leaves
+  // Centered bars cross the card on a narrow window. They move right of it, and wrap when even that is too narrow.
+  // "Again?" and the short line center in the same room.
+  const hudWidth = (): number => {
+    let width = 0, shown = 0;
+    for (const box of hud.children) if (!(box as HTMLElement).hidden) { width += (box as HTMLElement).offsetWidth; shown++; }
+    return width + Math.max(0, shown - 1) * 14;
+  };
+  function layout(): void {
+    const page = root.clientWidth, free = card.offsetLeft + card.offsetWidth + 16, wide = hudWidth();
+    root.style.setProperty('--fl-free', `${free}px`);
+    const wrapped = free + wide > page - 16;
+    hud.classList.toggle('is-wrapped', wrapped);
+    const middle = wrapped ? free + (page - 16 - free) / 2 : Math.max(page / 2, free + wide / 2);
+    root.style.setProperty('--fl-hud-x', `${Math.round(middle)}px`);
+    root.style.setProperty('--fl-hud-h', `${hud.offsetHeight}px`);
+  }
+  const watcher = new ResizeObserver(layout);
+  for (const part of [root, card, hud]) watcher.observe(part);
 
   // ---------------------------------------------------------------- what was drawn last, so a frame writes only what changed
   let shownWay: Way | null = null, shownBeast = '', shownHealth = -1, shownStamina = -1, shownGuard = -1, shownState = '', shownHearts = -1, shownSegments = 0;
@@ -388,11 +441,11 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     }
   }
 
-  let tick = 0;
+  let tick = 0, encounter = '', shownAwake = false;
 
   function stateOf(beast: BeastState): string {
     if (beast.doing === 'asleep') return 'Asleep. Walk up, or press E';
-    if (beast.doing === 'dizzy') return beast.def.machine ? 'Hold F to shut it down' : 'Hold F to calm it';
+    if (beast.doing === 'dizzy') return beast.def.machine ? 'Dizzy. Hold F to shut it down' : 'Dizzy. Hold F to calm it';
     if (beast.doing === 'calmed') return beast.def.machine ? 'Shut down' : 'Calmed';
     if (beast.doing === 'held') return 'Snared';
     if (beast.doing === 'stun' || beast.doing === 'flung') return 'Helpless';
@@ -401,7 +454,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
 
   return {
     element: root,
-    ask,
+    ask(fight) { showAgain(fight, encounter); },
     say,
     label(text, at, alpha) {
       gift.hidden = !at || alpha <= 0;
@@ -413,6 +466,17 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     },
     update(fight, held, mode, beastAt) {
       const beast = fight.beasts[0];
+      encounter = encounterOf(fight);
+      // "Again?" is about one fight: a new beast, way or pet closes it.
+      if (!again.hidden && encounter !== askedAbout) again.hidden = true;
+      refreshLogButton();
+      // The card folds while a beast is awake, and opens again when it is calmed or gone.
+      const awake = fight.phase === 'fight' && !!beast && beast.doing !== 'calmed';
+      if (awake !== shownAwake) {
+        shownAwake = awake;
+        if (awake && !card.classList.contains('is-small')) { foldedForFight = true; setFolded(true); }
+        else if (!awake && foldedForFight) { foldedForFight = false; setFolded(false); }
+      }
       if (fight.way !== shownWay) {
         shownWay = fight.way;
         for (const [way, b] of wayButtons) b.classList.toggle('is-on', way === fight.way);

@@ -122,7 +122,7 @@ export const BEASTS: readonly BeastDef[] = [
       { id: 'needles', shape: 'circle', reach: 3, width: 0, lead: 0.9, recover: 1.5, damage: 10, heavy: false, charge: 0, from: 0, to: 2.3, rest: 1 },
     ],
     gift: 'Quills',
-    rules: ['It puffs up, then throws needles in a ring around itself.', 'It is dizzy for a moment after it fires.', 'It will not cross water.'],
+    rules: ['It puffs up, then throws needles in a ring around itself.', 'It stands still for a moment after it fires: a time to hit it.', 'It will not cross water.'],
   },
   {
     kind: 'gearling', name: 'Gearling', depth: 2, machine: true,
@@ -247,7 +247,7 @@ export interface RigDef {
 }
 
 export const RIGS: readonly RigDef[] = [
-  { kind: 'lamp', name: 'Lamp', does: 'A beast that charges at light charges at this, and is dazzled when it gets there.' },
+  { kind: 'lamp', name: 'Lamp', does: 'A beast that charges at light charges at this, and is helpless for a moment when it gets there.' },
   { kind: 'snare', name: 'Snare vine', does: 'Holds the beast that steps on it.' },
   { kind: 'plate', name: 'Spring plate', does: 'Throws back the beast that steps on it. F springs it by hand when a beast is close.' },
   { kind: 'channel', name: 'Water channel', does: 'Three blocks of water. No beast walks across, and a charge that reaches it stalls.' },

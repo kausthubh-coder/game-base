@@ -82,8 +82,8 @@ export function install(view: GameView): void {
   let stored: { way?: Way; pet?: string; gentle?: boolean; shake?: boolean } = {};
   try { stored = JSON.parse(localStorage.getItem(STORE) ?? '{}') as typeof stored; } catch { /* the defaults stand */ }
   const asked = WAYS.find((way) => way === params.get('way'));
-  /** The fight that ended last, waiting for the calm to play out before the lab asks about it. */
-  let ended: LoggedFight | null = null, askIn = 0;
+  /** The fight that ended last, waiting for the calm to play out before the lab asks about it, and its beast. */
+  let ended: LoggedFight | null = null, askIn = 0, endedBeast = -1;
   const fight = createFight(stage, {
     way: asked ?? (WAYS.includes(stored.way as Way) ? stored.way : 'hero'),
     pet: stored.pet,
@@ -93,28 +93,46 @@ export function install(view: GameView): void {
     onEnd(record) {
       const logged = log.add(record);
       // "Again?" waits for the moment of calming to play out.
-      if (record.result === 'calmed') { ended = logged; askIn = CALM.end + 0.2; }
+      if (record.result === 'calmed') { ended = logged; askIn = CALM.end + 0.2; endedBeast = fight.beasts[0]?.id ?? -1; }
     },
   });
   const keep = (): void => {
     try { localStorage.setItem(STORE, JSON.stringify({ way: fight.way, pet: fight.pet.def.kind, gentle: fight.gentle, shake: feel.shakes })); } catch { /* it holds for this visit */ }
   };
 
-  let lastKind = '';
+  /**
+   * A new way or pet starts the encounter again: the beast comes back asleep, and the hero to the start. A fight
+   * in progress ends as left, and the lab says so.
+   */
+  function change(what: 'way' | 'pet', apply: () => void): void {
+    const beast = fight.beasts[0], kind = beast && beast.doing !== 'calmed' ? beast.def.kind : '';
+    const fighting = fight.phase === 'fight';
+    keys.held = null;
+    apply();
+    keep();
+    if (kind) bring(kind);
+    if (fighting) say(`A new ${what} ended the fight. It is in the log as left, and the ${kind} is back asleep.`, 3500);
+  }
+
   const panel = createPanel(view.root, log, {
-    setWay(way) { keys.held = null; fight.setWay(way); keep(); },
+    setWay(way) { if (way !== fight.way) change('way', () => fight.setWay(way)); },
     bring(kind) { bring(kind); },
     wake() { fight.wake(); },
     clear() { keys.held = null; fight.clear(); },
     setGentle(on) { fight.setGentle(on); keep(); },
     setShake(on) { feel.shakes = on; keep(); },
     shaking: () => feel.shakes,
-    setPet(kind) { fight.setPet(kind); keep(); },
+    setPet(kind) { if (kind !== fight.pet.def.kind) change('pet', () => fight.setPet(kind)); },
     setQuality(mode) { view.settings.setQuality(mode); },
     pickRig(kind) { keys.held = kind; },
-    again() { if (lastKind) bring(lastKind); },
+    again(logged) {
+      if (logged.way !== fight.way) fight.setWay(logged.way);
+      if (logged.pet !== fight.pet.def.kind) fight.setPet(logged.pet);
+      keep();
+      bring(logged.enemy);
+    },
   });
-  const say = (text: string): void => panel.say(text);
+  const say = (text: string, ms?: number): void => panel.say(text, ms);
   const feel = createFeel(view, fight, { say, groundY, nearest: (x, z) => draw.nearest(x, z) });
   feel.shakes = stored.shake !== false;
   const keys = createKeys(view, fight, { feel, say, groundY });
@@ -122,7 +140,6 @@ export function install(view: GameView): void {
 
   function bring(kind: string): void {
     keys.held = null;
-    lastKind = kind;
     fight.bring(kind);
     // Back to the start, so every fight opens the same way.
     view.hero.teleport(stage.start.x, groundY(stage.start.x, stage.start.z), stage.start.z, 0);
@@ -167,6 +184,8 @@ export function install(view: GameView): void {
     keys.aim();
     feel.frame(dt);
     draw.frame(dt, clock);
+    // A fight that was followed by another before the lab asked is not asked about.
+    if (ended && (fight.beasts[0]?.id ?? -1) !== endedBeast) ended = null;
     if (ended && (askIn -= dt) <= 0) { panel.ask(ended); ended = null; }
     panel.update(fight, keys.held, view.settings.quality, draw.beastAt);
   });
