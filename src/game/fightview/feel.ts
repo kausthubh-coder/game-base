@@ -1,0 +1,129 @@
+// How a fight of the fight lab feels: each event the rules send becomes a freeze of the fight, a jolt on a
+// fighter, a short flash on the ground, particles and a sound. The table is `hear`. Nothing here moves a body
+// or changes the fight: the freeze is a number the body's step reads (`keys.ts`), and the jolts and flashes are
+// numbers `draw.ts` draws.
+import type * as THREE from 'three';
+import { HERO } from '../content/fight.ts';
+import type { Fight, FightEvent } from '../fight/fight.sim.ts';
+import type { GameView } from '../shell/view.ts';
+import { MARK } from './ground.ts';
+import { PALE, TEAL, WHITE } from './looks.ts';
+
+/** What a hit leaves on a fighter for a moment: a white flash, a shake, a squash. Each runs down to 0. */
+export interface Jolt { flash: number; shake: number; squash: number }
+export const jolt = (): Jolt => ({ flash: 0, shake: 0, squash: 0 });
+
+/** Runs a jolt down by one frame. */
+export function settle(j: Jolt, dt: number): void {
+  j.flash = Math.max(0, j.flash - dt * 9);
+  j.shake = Math.max(0, j.shake - dt * 0.9);
+  j.squash = Math.max(0, j.squash - dt * 12);
+}
+
+/** A short mark on the ground: the arc of a cut, the ring of an order. Alive for `span` seconds. */
+export interface Flash { kind: number; x: number; z: number; facing: number; reach: number; width: number; life: number; span: number; color: THREE.Color; grow: number }
+
+/** A drawn fighter, as the feel of a hit needs it: its jolt, and the clock of its colors coming back. */
+export interface Felt { jolt: Jolt; calmT: number }
+
+export interface FeelHooks {
+  /** A short line under the bars. */
+  say(text: string): void;
+  /** The drawn beast nearest a point, or null when none is drawn. */
+  nearest(x: number, z: number): Felt | null;
+  /** The height of the ground a fighter stands on. */
+  groundY(x: number, z: number): number;
+}
+
+export interface Feel {
+  /** Seconds the fight stands still: the freeze of a hit. Only the picture goes on. The body's step spends it. */
+  freeze: number;
+  readonly hero: Jolt;
+  readonly pet: Jolt;
+  /** The short marks on the ground, a fixed few. `life` at or under 0 is a free one. */
+  readonly flashes: readonly Flash[];
+  /** One event of the fight. */
+  hear(e: FightEvent): void;
+}
+
+export function createFeel(view: GameView, fight: Fight, hooks: FeelHooks): Feel {
+  const { say, nearest, groundY } = hooks;
+  const flashes: Flash[] = Array.from({ length: 8 }, () => ({ kind: 0, x: 0, z: 0, facing: 0, reach: 0, width: 0, life: 0, span: 1, color: WHITE, grow: 0 }));
+  function flashAt(kind: number, x: number, z: number, facing: number, reach: number, width: number, span: number, color: THREE.Color, grow = 0): void {
+    let slot = flashes[0] as Flash;
+    for (const f of flashes) if (f.life <= 0 || f.life < slot.life) slot = f;
+    Object.assign(slot, { kind, x, z, facing, reach, width, life: span, span, color, grow });
+  }
+
+  const spot = { x: 0, y: 0, z: 0 };
+  function effect(id: Parameters<GameView['effects']['play']>[0], x: number, z: number, lift = 0.4, color?: number, scale?: number): void {
+    spot.x = x; spot.z = z; spot.y = groundY(x, z) + lift;
+    view.effects.play(id, spot, color === undefined && scale === undefined ? undefined : { color, scale });
+  }
+  const sound = (event: Parameters<NonNullable<GameView['audio']>['emit']>[0]): void => { view.audio?.emit(event); };
+
+  const feel: Feel = {
+    freeze: 0,
+    hero: jolt(),
+    pet: jolt(),
+    flashes,
+    hear,
+  };
+  const stop = (frames: number): void => { feel.freeze = Math.max(feel.freeze, frames / 60); };
+  const heroJolt = feel.hero, petJolt = feel.pet;
+
+  function hear(e: FightEvent): void {
+    spot.x = e.x; spot.z = e.z; spot.y = groundY(e.x, e.z) + 0.5;
+    switch (e.type) {
+      case 'brought': effect('pop', e.x, e.z, 0.05); break;
+      case 'wake': sound({ type: 'pet', mood: 'alert', at: spot }); break;
+      case 'tell': sound({ type: 'pet', mood: 'curious', at: spot }); break;
+      case 'strike': if (e.text === 'needles' || e.text === 'stomp' || e.text === 'spin') { effect('popDust', e.x, e.z, 0.1, undefined, 2); sound({ type: 'land', surface: 'grass', at: spot }); } break;
+      case 'swing': {
+        const h = fight.hero;
+        if (e.n === 3) flashAt(MARK.circle, h.x, h.z, 0, HERO.spin.reach, 0, 0.2, PALE);
+        else flashAt(MARK.cone, h.x, h.z, h.facing, HERO.cut.reach, HERO.cut.arc / 2, 0.14, PALE);
+        sound({ type: 'jump', at: spot });
+        break;
+      }
+      case 'hit': stop(e.n === 3 ? 6 : 4); effect('chips', e.x, e.z, 0.5, 0xfff2c8, 0.5); sound({ type: 'hit', at: spot }); break;
+      case 'guard': { const d = nearest(e.x, e.z); if (d) { d.jolt.flash = 1; d.jolt.shake = 0.12; d.jolt.squash = 1; } break; }
+      case 'charged': effect('trail', e.x, e.z, 0.6, 0xfff2c8, 0.5); sound({ type: 'ui', sound: 'open' }); break;
+      case 'dodge': effect('dust', e.x, e.z, 0.05); sound({ type: 'jump', at: spot }); break;
+      case 'dodged': effect('trail', e.x, e.z, 0.8, 0x9ff5e6, 0.4); break;
+      case 'heroHurt': stop(5); heroJolt.flash = 1; heroJolt.shake = e.n ? 0.2 : 0.12; sound({ type: 'hit', at: spot }); effect('dust', e.x, e.z, 0.3); break;
+      case 'faint': sound({ type: 'pet', mood: 'sad', at: spot }); break;
+      case 'segment': stop(8); effect('pop', e.x, e.z, 0.1); sound({ type: 'blockBroken', surface: 'stone', at: spot }); break;
+      case 'dizzy': stop(6); effect('pop', e.x, e.z, 0.1); sound({ type: 'ui', sound: 'open' }); break;
+      case 'crash': stop(8); effect('chips', e.x, e.z, 0.8, 0xc9c4b6, 1.5); effect('popDust', e.x, e.z, 0.3, undefined, 2); sound({ type: 'blockBroken', surface: 'stone', at: spot }); break;
+      case 'stall': effect('splash', e.x, e.z, 0.1); break;
+      case 'calmed': {
+        stop(10);
+        const d = nearest(e.x, e.z);
+        if (d) d.calmT = 0;
+        effect('trail', e.x, e.z, 0.4, 0x7df0d0, 2);
+        effect('leafBurst', e.x, e.z, 0.6);
+        sound({ type: 'spell', element: 'bloom', at: spot });
+        sound({ type: 'stinger' });
+        say(`It leaves you something: ${e.text}.`);
+        break;
+      }
+      case 'bolt': sound({ type: 'ui', sound: 'click' }); break;
+      case 'boltHit': effect('trail', e.x, e.z, 0.6, 0x7df0d0, 0.35); sound({ type: 'pickup', at: spot }); break;
+      case 'order': flashAt(MARK.ring, e.x, e.z, 0, 1.2, 0.06, 0.35, TEAL, -0.6); break;
+      case 'whistle': flashAt(MARK.ring, e.x, e.z, 0, 0.6, 0.05, 0.45, TEAL, 3); sound({ type: 'pet', mood: 'happy', at: spot }); break;
+      case 'petStrike': stop(2); effect('chips', e.x, e.z, 0.4, 0xbff5d0, 0.3); sound({ type: 'hit', at: spot }); break;
+      case 'petHurt': petJolt.flash = 1; petJolt.shake = 0.1; sound({ type: 'pet', mood: 'sad', at: spot }); break;
+      case 'petFaint': effect('popDust', e.x, e.z, 0.2); say(`${fight.pet.def.name} is down. It rests a while.`); break;
+      case 'petUp': sound({ type: 'pet', mood: 'happy', at: spot }); break;
+      case 'skill': flashAt(MARK.ring, e.x, e.z, 0, 0.9, 0.07, 0.4, TEAL, 1.5); sound({ type: 'pet', mood: 'alert', at: spot }); break;
+      case 'blocked': stop(8); effect('pop', e.x, e.z, 0.2); sound({ type: 'blockBroken', surface: 'stone', at: spot }); break;
+      case 'rigPlaced': sound({ type: 'blockPlaced', surface: 'wood', at: spot }); break;
+      case 'rig': stop(6); effect('pop', e.x, e.z, 0.1); effect('trail', e.x, e.z, 0.5, e.text === 'channel' ? 0x9fd8ff : 0x7df0d0, 0.8); sound({ type: 'machine', at: spot }); break;
+      case 'denied': say(e.text); break;
+      default: break;
+    }
+  }
+
+  return feel;
+}

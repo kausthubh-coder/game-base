@@ -43,13 +43,17 @@ src/game/fight/               the rules (.sim.ts, no drawing, no keys)
   record.sim.ts                 checksOf(record, earlier): note 08's pass checks for one fight
   bot.sim.ts                    createBot(fight, stage): a player made of rules, for tests and the door
 src/game/fightview/           drawing and the interface for the lab
+  keys.ts                       keys and mouse into the fight, the rig in the hand, the hook that steps the fight with the body
+  feel.ts                       a fight event into a freeze, a jolt, a flash on the ground, particles and a sound
+  looks.ts                      which sheet, frame, squash and tint a fighter shows, and the stand-ins
+  draw.ts                       each frame: the fighters where the rules have them, and the marks on the ground
   figures.ts                    one quad per fighter: size, flash, shake, squash, drained grey, colors coming back
   ground.ts                     everything flat on the ground, one draw call
   rigs.ts                       the four rigs as stand-in shapes
   arena.ts                      stamps the arena into the block world and dresses it
   panel.ui.ts                   the card, the bars, the bar over the beast, "Again?", the log
   log.ts                        the fights that ended, kept in the browser
-src/game/views/lab-fight.view.ts   the glue: keys to input, the body, the frame, the door
+src/game/views/lab-fight.view.ts   the glue: the flag, the arena, making the fight, the order of a frame, the door
 tools/fight-sim.ts            the bot against every beast in every way, with no browser
 tools/fight-play.mjs          one fight in headless Chrome, by the bot or by real keys
 ```
@@ -110,8 +114,7 @@ Beasts are drawn in their healthy colors. The drained grey and the colors coming
 
 ## Where the view should be cut
 
-`lab-fight.view.ts` grew to hold five jobs. Cut it along these lines, with no change in behavior, so two
-people can work on it without meeting in one file:
+The view is cut along these lines, so two people can work on it without meeting in one file:
 
 | File | Its one job |
 |---|---|
