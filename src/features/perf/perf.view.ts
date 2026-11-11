@@ -19,7 +19,7 @@ import { FrameStats } from './stats.sim.ts';
 export type PerfSlot = 'frame' | 'sim';
 
 export interface PerfOptions {
-  /** Where the panel goes. The page body by default. */
+  /** Where the panel goes. The page body by default, where it stands in the top left; in any other element it takes its place in the flow. */
   parent?: HTMLElement;
   /** Start in automatic mode. True by default. */
   auto?: boolean;
