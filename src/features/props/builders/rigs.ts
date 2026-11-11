@@ -54,3 +54,26 @@ function snare(spent: boolean): THREE.BufferGeometry {
 
 export function rigSnare(): THREE.BufferGeometry { return snare(false); }
 export function rigSnareSpent(): THREE.BufferGeometry { return snare(true); }
+
+function plate(spent: boolean): THREE.BufferGeometry {
+  const s = new Shape(1627);
+  s.box(0, 0, 0, 0.9, 0.09, 0.9, RAMP.stone, { bevel: 0.025, skip: '-y' });
+  const path: [number, number, number][] = [];
+  for (let i = 0; i <= 14; i++) {
+    const a = i / 14 * Math.PI * 4;
+    path.push([Math.cos(a) * 0.36, 0.095 + i / 14 * (spent ? 0.45 : 0.025), Math.sin(a) * 0.36]);
+  }
+  path.push([0, spent ? 0.54 : 0.135, 0]);
+  s.tube(path, path.map(() => 0.025), 5, P.iron, { cap: 'both' });
+  s.at(0, spent ? 0.54 : 0.135, 0, { rz: spent ? 0.35 : 0 }, () => {
+    s.box(0, 0, 0, 0.68, 0.04, 0.68, P.gold, { bevel: 0.015, top: P.butter });
+    // A broad inset identifies the pressure surface.
+    s.box(0, 0.04, 0, 0.44, 0.012, 0.44, P.ochre);
+  });
+  s.shadowBox(0, 0, 0, 0.9, 0.09, 0.9);
+  if (spent) s.shadowBox(0, 0.54, 0, 0.68, 0.06, 0.68);
+  return s.done();
+}
+
+export function rigPlate(): THREE.BufferGeometry { return plate(false); }
+export function rigPlateSpent(): THREE.BufferGeometry { return plate(true); }

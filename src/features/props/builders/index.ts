@@ -2,7 +2,7 @@
 // A builder gets the variant's index and its entry, and returns one merged geometry from a `Shape`.
 import type * as THREE from 'three';
 import type { PropDef } from '../../../content/props.ts';
-import { rigLamp, rigLampSpent, rigSnare, rigSnareSpent } from './rigs.ts';
+import { rigLamp, rigLampSpent, rigSnare, rigSnareSpent, rigPlate, rigPlateSpent } from './rigs.ts';
 import { barrel, cart, crate, sack } from './clutter.ts';
 import { log, rock, stump } from './ground.ts';
 import { banner, brazier, bunting, elderOak, lantern, noticeBoard, planter, rootFountain, stringLights } from './hollowmere.ts';
@@ -15,7 +15,7 @@ import { pastureFence, footbridge, mossStump, wildflowers, hayBale, harvestStall
 export type PropBuilder = (variant: number, def: PropDef) => THREE.BufferGeometry;
 
 export const BUILDERS: Record<string, PropBuilder> = {
-  rigLamp, rigLampSpent, rigSnare, rigSnareSpent,
+  rigLamp, rigLampSpent, rigSnare, rigSnareSpent, rigPlate, rigPlateSpent,
   pastureFence, footbridge, mossStump, wildflowers, hayBale, harvestStall,
   oak, birch, pine,
   grassTuft, tallGrass, flower, reeds, lilyPad, mushroom, bush, berryBush,

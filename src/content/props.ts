@@ -49,6 +49,9 @@ const SNUG: PropVary = { turn: 0, size: 0, tint: 0.04 };
 const still = { wind: false, light: 0 } as const;
 
 export const PROPS = {
+  rigPlate: { name: 'Spring plate', group: 'station', builder: 'rigPlate', variants: ['armed'], triangles: 290, ...still, vary: SNUG },
+  rigPlateSpent: { name: 'Released spring plate', group: 'station', builder: 'rigPlateSpent', variants: ['spent'], triangles: 290, ...still, vary: SNUG },
+
   rigSnare: { name: 'Snare vine', group: 'station', builder: 'rigSnare', variants: ['armed'], triangles: 180, ...still, vary: WILD },
   rigSnareSpent: { name: 'Closed snare vine', group: 'station', builder: 'rigSnareSpent', variants: ['spent'], triangles: 300, ...still, vary: WILD },
 
