@@ -1,0 +1,11 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "fox-blighted": {
+    "reference": "public/assets/sprites/leaftail.png",
+    "attempts": 1,
+    "prompt": "Edit the approved leaftail sheet into its Blighted form. Preserve four columns, six rows, idle front/back/right with two occupied cells; walk front/back/right with four. Ash grey fur, warm grey cream muzzle, smoky violet brown outline, dull pale grey eyes, sad and tired, faint small cracks. No wounds, frightening teeth, red eyes, accessories or ground shadow. Transparent background.",
+    "source": "assets-src/raw/fox-blighted-generated.png",
+    "processing": "bun tools/sprites/prepare-blighted.mjs; bun tools/sprites/build-story.mjs",
+    "note": "Generated alpha was not transparent. Flooded the pale border background before normal alpha cleanup, palette snap and fit. Approved original sheets remain unchanged."
+  }
+}
