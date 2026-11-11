@@ -81,10 +81,12 @@ describe('the prop library', () => {
       const fx = geometry.getAttribute('aFx');
       let glow = 0;
       for (let i = 0; i < fx.count; i++) glow = Math.max(glow, fx.getY(i));
-      expect(glow > 0, `${label} glows`).toBe(def.light > 0);
-      expect(propExtras(geometry).lights.length > 0, `${label} lists a light`).toBe(def.light > 0);
+      // A lamp that is out is a variant its entry lists as unlit: it must not glow or list a light.
+      const lit = def.light > 0 && !def.unlit?.includes(variant);
+      expect(glow > 0, `${label} glows`).toBe(lit);
+      expect(propExtras(geometry).lights.length > 0, `${label} lists a light`).toBe(lit);
       // 2 marks a light that never goes out.
-      if (def.light > 0) expect(glow === 2, `${label} always lit`).toBe(def.alwaysLit === true);
+      if (lit) expect(glow === 2, `${label} always lit`).toBe(def.alwaysLit === true);
     }
   });
 
