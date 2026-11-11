@@ -255,7 +255,8 @@ test('the build system does what Stroke.tla says, event by event, and keeps its 
   // Random runs that never apply a stroke or never undo one would pass and prove nothing.
   console.log('[build] the runs reached:', JSON.stringify(SEEN));
   for (const [what, least] of Object.entries(AT_LEAST)) expect(SEEN[what as keyof typeof SEEN], what).toBeGreaterThanOrEqual(least);
-});
+  // About 2 s alone. With several agents working on this machine it passed the default 5 s and failed.
+}, 30_000);
 
 test('a pressed stroke that the hand, a panel or the mode drops changes nothing when the button comes up', () => {
   // AppliedWithTheSameHand, by each way the checker found when the release did not ask.
