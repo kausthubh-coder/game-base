@@ -27,6 +27,7 @@ import type { WorldView } from '../../features/world/index.ts';
 import type { Game } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import type { Keys, Press } from './keys.ts';
+import type { PlayerRig } from './player.ts';
 
 /** A point on the page, in CSS pixels from the top left of `view.root`. */
 export interface ScreenPoint {
@@ -167,6 +168,8 @@ export interface GameView {
    * Pass `out` to have it filled and returned, so a call every frame makes no garbage.
    */
   project(x: number, y: number, z: number, out?: ScreenPoint): ScreenPoint | null;
+  /** The hero's body and actor, for a view that moves the hero itself: see `PlayerRig.steer`. */
+  readonly hero: PlayerRig;
   /** Where the player's feet are drawn this frame. Smoother than `game.player.pos`, which moves in steps. */
   readonly playerPosition: Readonly<Vec3>;
   /** The block under the pointer, when it is in reach. The same object every frame. */

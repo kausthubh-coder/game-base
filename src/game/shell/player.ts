@@ -3,7 +3,7 @@
 // landings on as game events. Nothing here draws.
 import { createBus, type GameEvent } from '../../engine/events.ts';
 import type { Vec3 } from '../../engine/types.ts';
-import { HERO_STEP, HeroBody } from '../../features/hero/index.ts';
+import { HERO_STEP, HeroBody, type HeroInput } from '../../features/hero/index.ts';
 import type { World } from '../../features/world/index.ts';
 import type { Actor, Game } from '../api.sim.ts';
 import { facingOf } from '../move.sim.ts';
@@ -28,6 +28,12 @@ export interface PlayerRig {
   /** Sets the drawn position between the last two steps. `blend` is 0 to 1, `dt` the seconds since the last frame. */
   blend(blend: number, dt?: number): void;
   teleport(x: number, y: number, z: number, facing?: number): void;
+  /**
+   * A view that moves the hero itself for a moment (a dodge, a push, a faint) sets this. It is called before
+   * every step of the body with what the keys asked for, and may change that input and the body. Null, the
+   * default, leaves the body to the keys. The fight lab is the one user.
+   */
+  steer: ((input: HeroInput, body: HeroBody) => void) | null;
 }
 
 export interface PlayerOptions {
@@ -93,10 +99,11 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
   }
   write();
 
-  return {
+  const rig: PlayerRig = {
     body,
     position,
     actor,
+    steer: null,
 
     step(yaw, faceView = false) {
       // The way the camera looks along the ground. Yaw 0 looks north and grows counter-clockwise.
@@ -108,6 +115,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       input.moveX = ((fx * forward - fz * right) / length) * pace;
       input.moveZ = ((fz * forward + fx * right) / length) * pace;
       input.jump = !busy && keys.jump;
+      rig.steer?.(input, body);
       previous.x = body.x; previous.y = body.y; previous.z = body.z;
       const stood = body.grounded;
       body.step(input);
@@ -144,6 +152,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       write();
     },
   };
+  return rig;
 }
 
 export { HERO_STEP };

@@ -638,6 +638,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       point.y = ((1 - projected.y) / 2) * size.height;
       return point;
     },
+    hero: player,
     playerPosition: player.position,
     get aim() { return aimed ? hit : null; },
 
