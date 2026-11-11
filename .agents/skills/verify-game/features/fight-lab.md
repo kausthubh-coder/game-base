@@ -10,7 +10,9 @@ A test scene where three ways of fighting are played against the same three beas
 - `poses`: which frame of the real art each fighter shows in each state, timed to the rules (`fightview/looks.ts`).
 - `calming`: the moment a beast is calmed or a machine shut down, from the hold to the gift (`fightview/calm.ts`).
 - `pets`: the leaftail and the pebblepup, picked on the card. The pebblepup's brace takes an attack for the hero.
-- `again`: after a win the lab asks "Again?" and keeps the answer with the fight's numbers. With `&log=1` and `tools/fight-serve.mjs` the answers land in `.artifacts/fight/ratings.jsonl`.
+- `rigs`: the world way's lamp, snare vine, spring plate and water channel, drawn with the game's rig props (`fightview/rigs.ts`), with the lab's rings so they read on grass.
+- `card`: the card folds when a beast wakes and opens when the fight ends, Esc puts back a rig in the hand before it pauses, and the bars move right of the card on a narrow window.
+- `again`: after a win the lab asks "Again?" and keeps the answer with the fight's numbers. The card is about one fight and closes when the beast, way or pet changes. With `&log=1` and `tools/fight-serve.mjs` the answers land in `.artifacts/fight/ratings.jsonl`.
 
 ## How to get to it (user POV)
 
@@ -23,7 +25,9 @@ Preconditions: `bun tools/doctor.mjs` is clean, its `export PORT=â€¦ PLAY_PORT=â
 | You changed | Run |
 |---|---|
 | `src/game/content/fight.ts` or `src/game/fight/*.sim.ts` | `bun test src/game/fight`, `bun tools/fight-sim.ts` (all nine fights won with no browser), `bun tools/boundaries.mjs`, then the nine bot runs below |
-| Anything in `src/game/fightview` or `views/lab-fight.view.ts` | `bun tools/typecheck.mjs`, the nine bot runs, and the three `--keys` runs against the thistlehog |
+| Anything in `src/game/fightview` or `views/lab-fight.view.ts` | `bun tools/typecheck.mjs`, the nine bot runs, the three `--keys` runs against the thistlehog, and `--card` |
+| `panel.ui.ts` | `--card`, and the card at 1280 by 720 and 1024 by 640 with each way and the boar: nothing covers the card or the bars, and every control is reachable |
+| `rigs.ts` or the rigs in `draw.ts` | The world bot runs and the world `--keys` runs, and look at `world-*-rigs.png`, `-ghost.png` and `-helpless.png` at `--quality low`, `medium` and `high` |
 | `looks.ts`, `figures.ts` or a fight sheet | `bun tools/fight-poses.mjs --port $PORT`, and look at every sheet in `.artifacts/fight/poses/` |
 | `calm.ts`, `sparks.ts`, or the calm in `looks.ts` or `feel.ts` | `bun tools/fight-strip.mjs --port $PORT --beast <beast>` for the thistlehog, the boar and the gearling, once more with `--still`, and look at each strip in `.artifacts/fight/strips/` |
 | `tools/fight-play.mjs` or `tools/fight-serve.mjs` | The run that uses it, and the build run below |
@@ -45,6 +49,12 @@ bun tools/fight-play.mjs --port $PORT --way world --beast boar --layout wall
 ```
 
 Real keys and mouse: the same with `--keys`, for each way against the thistlehog and the boar.
+
+The card itself, with real clicks and keys: "Again?" closes when the beast changes and replays the fight it names, the card folds when a beast wakes, the Log button counts a fight that was left, and Esc puts a rig back before it pauses:
+
+```sh
+bun tools/fight-play.mjs --port $PORT --card
+```
 
 The second pet, by the bot against all three beasts and by keys against the thistlehog and the boar. Its key run braces into the beast's next attack and checks the brace took it:
 
@@ -75,6 +85,7 @@ kill <the pid it printed>
 
 - `fight-poses.mjs` and `fight-strip.mjs` drive the lab through `__fight.hold` and `__fight.slow`. They leave the rules running and the picture at full speed when they end, but a page they used is not a clean page for a fight.
 
+- `.artifacts/fight/ratings.jsonl` also holds Kausthubh's own answers. When a served copy is out for him to play, run the build check without `--log` and never open a page with `log=1`.
 - The lab keeps its own save (`greenhollow.save.fight`) and its own log in the browser. `fight-play.mjs` empties the log first.
 - The game's meter gives script time as a mean over the last 2 seconds. `fight-play.mjs` leaves out the first 2.5 seconds of a fight, which still hold the page loading (the meter reads about 16 ms there), so its peak is the worst 2-second mean once settled. A peak over 6 ms from an older copy of the tool is the load, not the lab.
 - A fight played twice in one page counts toward "different layouts that beat the boar". Each run of the tool empties the log, so one run never shows it: the rigs run and the `--layout wall` run are the two layouts.

@@ -51,7 +51,7 @@ src/game/fightview/           drawing and the interface for the lab
   figures.ts                    one quad per fighter: size, flash, shake, squash, roll, drained grey, colors coming back
   ground.ts                     everything flat on the ground, one draw call
   sparks.ts                     small pixel pictures in the air: motes, ash, a heart, flowers, pips, gifts. One draw call
-  rigs.ts                       the four rigs as stand-in shapes
+  rigs.ts                       the four rigs, drawn with the game's rig props
   arena.ts                      stamps the arena into the block world and dresses it
   panel.ui.ts                   the card, the bars, the bar over the beast, "Again?", the log
   log.ts                        the fights that ended, kept in the browser
@@ -94,8 +94,17 @@ The words `window`, `document` and `THREE` may not appear in a `.sim.ts` file, n
 - **One freeze.** The freeze of a hit is in one place, `steer`: the fight's clock and the body wait, the
   picture goes on.
 - **Draw calls.** One for each fighter (at most about eight), one for everything on the ground, one for the
-  sparks in the air, a few for the rigs and the three trees. The game's budget is 150 draw calls, 400,000
+  sparks in the air, one for each kind of rig standing, and a few for the three trees. The game's budget is 150 draw calls, 400,000
   triangles and 6 ms of script a frame.
+- **The card stays out of the fight.** It folds to its title when a beast wakes and opens again when the
+  fight ends. A player who opens it during a fight keeps it open. On a narrow window the bars move right of
+  it, and at 1024 by 640 every control is on the page or one short scroll away.
+- **"Again?" is about one fight.** A new beast, way or pet closes it, and "Fight it again" replays the way,
+  pet and beast it names. A new way or pet in the middle of a fight brings the same beast back asleep, and
+  the lab says that the fight ended and is in the log as left.
+- **One word for one state.** Dizzy is an empty guard, the only state the Mark can hold. A beast standing
+  open after an attack is not dizzy, and a stunned one is helpless. The card says the guard must be empty
+  first.
 - **The door.** `window.__fight` has the fight, `bot(on, layout)`, `state()`, `log()`, `standIns()`,
   `screen(x, z)` and `keysToward(x, z)`. `hold(on)` stops the rules while the picture goes on, so a test can
   set a fighter's state by hand and look at its pose. `slow(k)` plays the picture's own clocks k times as
@@ -149,11 +158,11 @@ end of the release's freeze (`CALM` in `calm.ts`):
 | Seconds | What happens |
 |---|---|
 | The hold | The hero holds out the Mark. A thread of teal light runs along the ground to the beast and fills as the hold grows, and motes rise off it. The ring that closes around the beast stays. |
-| The release, before 0 | 10 frames of freeze. The beast is lit in the Mark's pale teal, never the white of a hit, and a ring of light goes out from under it. The spell sound plays. |
+| The release, before 0 | 10 frames of freeze. The beast is lit in the Mark's pale teal, never the white of a hit, with its drawing still readable under the light, and a ring of light goes out from under it. The spell sound plays. |
 | 0 to 1.5 | The colors come back from the head down behind a bright line. Flecks of grey ash lift off where the line passes and vanish upward. |
 | 1.25 to 2.6 | A ring of fresh green spreads from under the beast and fades, and seven flowers open as it passes them. |
 | 1.5 | It bows: the calm pose with a small settle. A teal heart shows over it, and the stinger plays. |
-| 1.95 to 3.1 | The gift pops out in a small arc, lands, and flies to the hero with its name over it: a quill, a tusk, a spring. |
+| 1.95 to 3.1 | The gift pops out in a small arc, lands, and flies to the hero with its name over it: a quill, a tusk, a spring. The name rises above the hero's head, and above the beast and its heart, wherever it would cross them. |
 | 3.6 | The lab asks "Again?". |
 
 A machine is shut down, not calmed. The gearling stays tipped over and lit for 0.4 seconds while its eye goes
@@ -203,8 +212,12 @@ browser, by the bot and by real keys; the view is cut into `keys`, `feel`, `look
 small beast; the screen shakes, with a switch; the edge warms at low health; `tools/fight-serve.mjs` keeps
 the ratings; and the lab is in `verify-game`'s feature map (`features/fight-lab.md`).
 
-Still open from milestone 2: the four rigs and the marks of an attack as props, with the `make-3d-asset`
-skill. Another helper has that.
+The rigs are the real props now (`rigLamp`, `rigSnare`, `rigPlate`, `rigChannel` and their spent ones). The
+lab adds what they need to read at the fight's zoom: a bright ring where the snare vine lies, pulled tight
+when it goes off and kept around the feet of a beast it holds, the lamp's circle of light and the plate's
+reach. An independent tester's seven problems with the card, the keys and the words are fixed, and
+`fight-play.mjs --card` keeps four of them fixed. Still open from milestone 2: the marks of an attack as
+props.
 
 Milestone 3, the boss tests. Two hooks go into `fight.sim.ts` so a boss can be its own module:
 
@@ -232,9 +245,11 @@ Most serious first. The ones that need a sheet redrawn say so.
   pebblepup's brace read as a crouch and a hop. The pebblepup's brace does not show its stone back clearly
   (the artists' report says so too): a sheet with a clearer brace pose would fix it.
 - The boar's tell holds its head high, where a charge would want it low. The code adds only a small draw back.
-- The release lights the boar so far it reads as a flat pale shape for 10 frames. That is the bright frame the
-  design asks for, but it loses the boar's detail.
-- The gift's name can sit over the hero's head as it arrives.
+- The card folds as a beast wakes. "Take it away" and the way buttons are then one click further, behind
+  Show.
+- The spent lamp's crack and the plate's spring wire are too small to see at the fight's zoom. The lamp reads
+  as spent by its dark globe and its circle of light going out, the plate by standing up on its spring.
+- The snare vine's ring is the lab's own drawing. The vine itself is still hard to see on grass.
 - The warm light of a tell's last quarter second turns the grey boar a warm brown, close to its own healthy
   brown. The gold shape on the ground turning hot orange carries the same warning.
 - Tall grass pokes through the shapes on the ground. Their rims stay readable at every quality, but their

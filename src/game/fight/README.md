@@ -60,7 +60,7 @@ Options: `way`, `pet`, `gentle`, `random`, `onEnd(record)`, `external` (the call
 ## The world fights (`world`)
 
 - The kit holds one lamp, one snare vine, one spring plate and one water channel. A rig goes down within 6 blocks of the hero, on open ground, at least 1.5 blocks from a beast. Z takes back the last one.
-- A beast that steps on a snare is held 2.5 seconds. A plate throws it 4 blocks back. A lamp draws the charge of a beast that charges at light, from 10 blocks, and dazzles it. A charge that reaches a channel stalls, and no beast walks across one.
+- A beast that steps on a snare is held 2.5 seconds. A plate throws it 4 blocks back. A lamp draws the charge of a beast that charges at light, from 10 blocks, and leaves it helpless when it gets there. A charge that reaches a channel stalls, and no beast walks across one.
 - Each rig that goes off, and each crash into the wall, breaks the beast's `rigShare` of the guard.
 - F springs the plate by hand when a beast is within 2.2 blocks of it. C sends the pet to the pointer as a lure for 5 seconds.
 - The pet cannot be hurt in this way or the hero's.

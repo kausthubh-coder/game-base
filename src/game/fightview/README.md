@@ -14,9 +14,9 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 | `figures.ts` | `createFigures(view)` | One quad per fighter: size, flash, shake, squash, roll, warm and teal glow, a mirror, drained grey, colors coming back |
 | `ground.ts` | `createGround(view)`, `MARK` | Every flat mark on the ground in one draw call |
 | `sparks.ts` | `createSparks(view)`, `SPARK` | Small 8 by 8 pixel pictures in the air, turned to the camera, in one draw call: motes, ash, a heart, flowers, pips and the gifts |
-| `rigs.ts` | `createRigViews(view)` | The four rigs and the rig in the hand, as stand-in shapes |
+| `rigs.ts` | `createRigViews(view)` | The four rigs and the rig in the hand, drawn with the game's rig props |
 | `arena.ts` | `stampArena`, `dressArena` | Stamps the arena into the block world and dresses it |
-| `panel.ui.ts` | `createPanel(root, log, actions)` | The card, the bars, the bar over the beast, the warm edge, "Again?" and the log |
+| `panel.ui.ts` | `createPanel(root, log, actions)` | The card, the bars, the bar over the beast, the warm edge, "Again?" and the log. Where the bars go on a narrow window. |
 | `log.ts` | `createLog()` | The fights that ended, kept in the browser, and sent to `fight-log` with `&log=1` |
 
 ## How a frame goes
@@ -37,6 +37,14 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 - The game's reduce motion stills the calming: the colors fade in place, and nothing flies.
 - The hero never blinks out. For the safe moment after a hit it shimmers a cool, brighter light on every other frame.
 - The game's hints are hidden in the lab. A rig refused near a beast shows a red ring at the distance the beast keeps clear.
+- A rig is its prop from `src/content/props.ts`, placed through `worldProps` like the game's stations: the armed prop while it is set, the spent one for the 1.2 seconds after it goes off, and a channel as three pieces in a row. Each kind costs one draw call. The rig in the hand is the armed prop, see-through, pale green where it can go and red where it cannot.
+- The snare vine is leaf green on grass, so `draw.ts` draws a bright ring where it lies, pulls the ring tight when it goes off, and keeps a ring around the feet of a beast it holds. The lamp keeps its circle of teal light, and the plate the pale ring of its hand spring's reach.
+- The card folds to its title when a beast wakes and opens again when the fight ends or the beast is taken away. A player who opens it during a fight keeps it open.
+- "Again?" is about one fight. A new beast, way or pet closes it, and "Fight it again" replays the way, pet and beast it names. A fight that ends while the lab waits to ask is not asked about once another starts.
+- A new way or pet brings the same beast back asleep. If a fight was on, it ends as left and the line over the bars says so.
+- Esc with a rig in the hand puts the rig back and does not pause. `keys.ts` hears Esc first because views install in the order of their file names, and `lab-fight` comes before `ui-panels`.
+- On a window too narrow for centered bars beside the card, the bars move right of it and wrap. "Again?" and the line over the bars center in the same room. Below 820 pixels high the card tightens, and below 720 it scrolls with its bar showing.
+- The Log button's count is the log's length, read each frame.
 - Every view part works at low, medium and high quality. The draw path makes no mesh, material, color or vector per frame; a few small iterators and closures remain.
 
 ## The door
@@ -60,7 +68,7 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 
 ## Checks
 
-- `bun tools/fight-play.mjs --port <port> --way <way> --beast <beast>` plays one fight in headless Chrome through the door. `--keys` plays it with real keys and mouse instead, `--pet pebblepup` picks the second pet, `--layout wall` sets no rigs, `--quality low` holds a quality level, and `--log` turns on `&log=1`. Pictures go to `.artifacts/fight/`. It prints the cost during the fight and through the calming.
+- `bun tools/fight-play.mjs --port <port> --way <way> --beast <beast>` plays one fight in headless Chrome through the door. `--keys` plays it with real keys and mouse instead, `--pet pebblepup` picks the second pet, `--layout wall` sets no rigs, `--quality low` holds a quality level, and `--log` turns on `&log=1`. `--card` checks the card instead of playing one fight: "Again?", Esc with a rig in the hand, the fold and the log's count. Pictures go to `.artifacts/fight/`. It prints the cost during the fight and through the calming.
 - `bun tools/fight-poses.mjs --port <port>` shoots every state of every fighter in three views, one sheet each in `.artifacts/fight/poses/`. `--only hero` shoots one.
 - `bun tools/fight-strip.mjs --port <port> --beast <beast>` shoots nine frames through one calming, in order, into `.artifacts/fight/strips/`. `--still` turns on reduce motion first.
 - `bun tools/fight-serve.mjs <folder> <port>` serves a build and writes what `&log=1` sends to `.artifacts/fight/ratings.jsonl`.
