@@ -28,6 +28,8 @@ export interface PropDef {
   light: number;
   /** It glows by day too, like a forge. Other lights glow only when it is dark. */
   alwaysLit?: boolean;
+  /** Variants that are dark, like a lamp that is out or a gate that is dead: nothing on them glows and they give no light. */
+  unlit?: readonly number[];
   vary: PropVary;
   /** Trees only. For each variant: the height of its top and how far its leaves reach from the trunk, in meters. The builder builds to these, and the scatter rules list tree tops from them. */
   crown?: readonly { top: number; reach: number }[];
@@ -109,6 +111,15 @@ export const PROPS = {
   noticeBoard: { name: 'Notice board', group: 'town', builder: 'noticeBoard', variants: ['notices'], triangles: 140, ...still, vary: SNUG },
   rootFountain: { name: 'Root Fountain', group: 'landmark', builder: 'rootFountain', variants: ['brass'], triangles: 800, wind: false, light: 10, alwaysLit: true, vary: SNUG },
   elderOak: { name: 'Hollow Oak', group: 'landmark', builder: 'elderOak', variants: ['lamps'], triangles: 1400, wind: true, light: 11, vary: SNUG },
+
+  // ---- the ruin: what the Gardeners left in Ilara's Hall. Lume shows only on the variants that are awake.
+  shutDoor: { name: 'Shut Door', group: 'landmark', builder: 'shutDoor', variants: ['shut', 'open'], triangles: 600, ...still, vary: SNUG },
+  heartstone: { name: 'Heartstone', group: 'landmark', builder: 'heartstone', variants: ['dull', 'faint', 'glowing'], triangles: 600, wind: false, light: 10, alwaysLit: true, unlit: [0], vary: SNUG },
+  gateArch: { name: 'Gate arch', group: 'landmark', builder: 'gateArch', variants: ['dead', 'awake'], triangles: 600, wind: false, light: 10, alwaysLit: true, unlit: [0], vary: SNUG },
+  hallLamp: { name: 'Hall lamp', group: 'landmark', builder: 'hallLamp', variants: ['dark', 'lit'], triangles: 240, wind: false, light: 11, alwaysLit: true, unlit: [0], vary: SNUG },
+  muralSlab: { name: 'Mural slab', group: 'landmark', builder: 'muralSlab', variants: ['eight figures'], triangles: 470, ...still, vary: SNUG },
+  ruinPillar: { name: 'Broken pillar', group: 'landmark', builder: 'ruinPillar', variants: ['stump', 'waist high', 'leaning'], triangles: 300, ...still, vary: LOOSE },
+  plinth: { name: 'Plinth', group: 'landmark', builder: 'plinth', variants: ['brass ring'], triangles: 150, ...still, vary: SNUG },
 
   // ---- clutter
   barrel: { name: 'Barrel', group: 'clutter', builder: 'barrel', variants: ['closed', 'open'], triangles: 140, ...still, vary: LOOSE },
