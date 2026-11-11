@@ -126,13 +126,10 @@ The view is cut along these lines, so two people can work on it without meeting 
 
 ## Still to build
 
-Milestone 1, the lab with stand-in art:
-
-- Play every way against every beast in the browser, by the bot and by real keys, and fix what breaks.
-- The rest of note 05's feel list: a small push on a small beast that is cut, a screen shake with a switch, a
-  warm edge at low health.
-- `tools/fight-serve.mjs`: serves a build and writes what `log=1` sends to `.artifacts/fight/ratings.jsonl`.
-- READMEs in `src/game/fight` and `src/game/fightview`, and the lab in `verify-game`'s feature map.
+Milestone 1, the lab with stand-in art, is done: every way plays start to finish against every beast in the
+browser, by the bot and by real keys; the view is cut into `keys`, `feel`, `looks` and `draw`; a cut pushes a
+small beast; the screen shakes, with a switch; the edge warms at low health; `tools/fight-serve.mjs` keeps
+the ratings; and the lab is in `verify-game`'s feature map (`features/fight-lab.md`).
 
 Milestone 2, real assets:
 
@@ -154,7 +151,15 @@ the place and its parts are the targets, and fails when it stops attacking the p
 
 ## Known weak spots
 
-- The shapes on the ground are drawn at ground height, so tall grass covers parts of them.
-- The hero's stand-in cut is the farm tool's swing, and it has no dodge, hurt or calm pose.
+- The hero's stand-in cut is the farm tool's swing, and it has no dodge, hurt or calm pose. The hurt and the
+  dodge are the idle and walk frames squashed and tinted.
+- A hero nobody can hit blinks fully out on every other frame, so for half a second after a hit the hero is
+  gone on half the frames.
+- The marks of thrown light are thin teal rings close around the beast, the same color as the hold of the
+  Mark. They read as one thing at a glance.
+- Tall grass pokes through the shapes on the ground. Their rims stay readable at every quality, but their
+  fill is broken up.
 - A charge that ends at the arena's edge stops as if at water. Nothing shows the edge but a pale ring.
-- The bot never gets hit. Its numbers are a floor for a person's, not a forecast.
+- The bot never gets hit, and the key runs in `fight-play.mjs` never dodge. Neither is a person: the bot's
+  numbers are a floor for a person's, and the key runs' hits and faints are the script's.
+- Note 05's soft heartbeat at low health has no sound yet: only the edge beats.
