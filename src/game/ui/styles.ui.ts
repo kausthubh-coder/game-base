@@ -33,6 +33,7 @@ export const STYLES = /* css */ `
   --accent-light: var(--gold-bright);
   /* a finished thing, and a new one */
   --done: #5e8a4a;
+  --done-light: #a9d08a;
   --new: #c9802a;
   --new-light: #f2c46b;
   --scrim: rgb(14 17 27 / 0.62);
@@ -146,58 +147,130 @@ export const STYLES = /* css */ `
 .gu-section + .gu-section, .gu-choices + .gu-section, .gu-section + .gu-choices { margin-top: var(--s6); }
 .gu-section > .gu-label, .gu-choices > .gu-label { margin-bottom: var(--s3); }
 
-/* ---- bag ---- */
-.gu-tabs { display: flex; gap: 2px; padding: 3px; background: var(--paper-3); border-radius: 999px; box-shadow: inset 0 1px 2px rgb(59 66 85 / 0.15); }
-.gu-tab { position: relative; min-height: calc(var(--target) - 8px); padding: 0 18px; background: none; border: 0; border-radius: 999px; color: var(--ink-2); font-weight: 700; }
-/* The track's padding is part of the target, so a tab answers across the strip's full height. */
-.gu-tab::after { content: ''; position: absolute; inset: -3px 0; }
-.gu-tab:hover { color: var(--ink); }
-.gu-tab[aria-selected='true'] { color: var(--paper-light); background: var(--navy); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.6), 0 1px 3px rgb(10 12 20 / 0.25); }
-.gu-bag-things { display: grid; grid-template-columns: auto 300px; gap: var(--s6); align-items: stretch; }
-.gu-bag-grid { display: grid; gap: var(--s2); align-content: start; }
-.gu-bag-grid > .gu-label:not(:first-child) { margin-top: var(--s4); }
-.gu-bag:not(.gu-bag-things) { width: 640px; max-width: 100%; }
-/* The detail pane: the thing drawn large on a warm card, then its name, how many, its use and what it says of itself. */
-.gu-detail { display: flex; flex-direction: column; min-height: 420px; overflow: hidden; border-radius: 14px; background: var(--paper-light); box-shadow: inset 0 0 0 1px var(--gold), 0 4px 14px rgb(59 66 85 / 0.12); }
-.gu-detail-art { position: relative; display: grid; place-items: center; height: 190px; flex: none; background: radial-gradient(70% 80% at 35% 25%, #f6d79a, #d79b52 55%, #9c6b3a); box-shadow: inset 0 -1px 0 var(--gold); }
-.gu-detail-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 78% 22%, rgb(255 250 230 / 0.6) 0 1.5px, transparent 2.5px), radial-gradient(circle at 20% 70%, rgb(255 250 230 / 0.5) 0 1px, transparent 2px), radial-gradient(circle at 66% 78%, rgb(255 250 230 / 0.45) 0 1px, transparent 2px); pointer-events: none; }
-.gu-detail-art .gu-pic { filter: drop-shadow(0 6px 8px rgb(60 30 10 / 0.45)); }
-.gu-detail-art-empty { background: radial-gradient(70% 80% at 35% 25%, var(--paper-2), var(--paper-3)); }
-.gu-detail-text { display: grid; gap: 6px; align-content: start; padding: 16px 20px 20px; }
-.gu-detail > .gu-empty { padding: 16px 20px; text-align: center; }
-.gu-detail-name { font-family: var(--display); font-size: 26px; font-weight: 650; line-height: 1.1; }
-.gu-detail-count { font-size: 13px; font-weight: 700; color: var(--ink-2); }
-.gu-detail-use { margin-top: 4px; padding: 6px 10px; font-weight: 700; color: var(--ink); background: rgb(211 188 142 / 0.25); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; }
-.gu-detail-desc { color: var(--ink-2); text-wrap: pretty; }
-.gu-slots { display: grid; grid-template-columns: repeat(9, var(--slot)); gap: 8px; }
-/* A slot is a night well with a gold rim, the way a bag of things looks in the hand. */
-.gu-slot {
-  position: relative; display: grid; place-items: center; aspect-ratio: 1; min-width: 0; padding: 0;
-  background: radial-gradient(90% 90% at 30% 20%, #3a4258, var(--night-2)); border: 0; border-radius: var(--radius); touch-action: none;
-  box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55), inset 0 2px 6px rgb(0 0 0 / 0.3);
+/* ---- full-screen menus: the bag and the Almanac. The night sky behind, a rail across the top with the name, the tabs
+   and the close button, and key prompts along the bottom like a console game. ---- */
+.gu-stage.gu-stage-screen { padding: 0; place-items: stretch; background: radial-gradient(120% 85% at 50% 0%, rgb(46 54 84 / 0.95), rgb(24 28 43 / 0.97) 55%, rgb(12 14 22 / 0.98)); }
+.gu-screen {
+  width: 100%; height: 100%; max-width: none; max-height: none; padding: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
+  color: var(--paper-light); background: none; border-radius: 0; box-shadow: none; zoom: 1; animation: gu-screen-in 200ms var(--ease);
 }
-.gu-slot:hover { background: radial-gradient(90% 90% at 30% 20%, #4a5470, #323a50); }
-.gu-slot:active { filter: brightness(0.95); }
-.gu-slot-empty { cursor: default; background: radial-gradient(circle, rgb(166 137 90 / 0.18) 0 2px, transparent 2.5px), rgb(166 137 90 / 0.09); box-shadow: inset 0 0 0 1px rgb(166 137 90 / 0.28), inset 0 2px 4px rgb(59 66 85 / 0.08); }
-.gu-slot-empty:hover { background: radial-gradient(circle, rgb(166 137 90 / 0.3) 0 2px, transparent 2.5px), rgb(166 137 90 / 0.14); }
-.gu-quick { background: radial-gradient(90% 90% at 30% 20%, #4a4434, #34302a); }
-.gu-quick.gu-slot-empty { background: rgb(166 137 90 / 0.16); }
-.gu-quick:hover, .gu-quick.gu-slot-empty:hover { filter: brightness(1.1); }
-.gu-picked, .gu-picked:hover { box-shadow: inset 0 0 0 2px var(--gold-bright), 0 0 0 2px rgb(240 212 138 / 0.35), 0 0 14px rgb(240 212 138 / 0.55); }
-.gu-slot-key { position: absolute; z-index: 1; left: 7px; top: 4px; font-size: 11px; font-weight: 800; line-height: 1.3; color: var(--gold); text-shadow: 0 1px 2px rgb(0 0 0 / 0.6); }
-.gu-slot-empty .gu-slot-key { color: var(--bronze); text-shadow: none; }
-.gu-slot-count, .gu-ghost-count { position: absolute; z-index: 1; right: 4px; bottom: 4px; min-width: 20px; padding: 0 5px; font-size: 12px; font-weight: 800; line-height: 17px; text-align: center; color: var(--ink); background: var(--paper-light); border-radius: 5px; box-shadow: 0 1px 2px rgb(0 0 0 / 0.35); }
+@keyframes gu-screen-in { from { transform: translateY(12px); } }
+.gu-screen > .gu-rail { zoom: var(--gu-size); }
+.gu-rail-top { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s4); padding: 10px 28px 30px; }
+.gu-rail-top::before { content: ''; position: absolute; z-index: -1; left: 0; right: 0; top: 0; height: 76px; pointer-events: none; background: linear-gradient(180deg, rgb(10 12 20 / 0.7), rgb(20 24 38 / 0.55)); box-shadow: 0 1px 0 rgb(211 188 142 / 0.55); }
+.gu-rail-name { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.gu-rail-icon { display: grid; place-items: center; flex: none; width: 46px; height: 46px; color: var(--gold-bright); }
+.gu-rail-icon > .ui-cell, .gu-tab-icon > .ui-cell { filter: brightness(1.35) drop-shadow(0 0 4px rgb(240 212 138 / 0.45)); }
+.gu-rail-name .gu-panel-title { overflow: hidden; font-family: var(--display); font-size: 30px; font-weight: 650; line-height: 1.1; letter-spacing: 0.01em; white-space: nowrap; text-overflow: ellipsis; color: var(--paper-light); text-shadow: 0 2px 8px rgb(0 0 0 / 0.5); }
+.gu-rail-top > .gu-close { justify-self: end; width: 44px; height: 44px; margin: 0; }
+.gu-rail-top > .gu-tabs { justify-self: center; }
+/* Icons drawn in code, until the kit's sheet has the name. */
+.gu-glyph { display: grid; place-items: center; width: 100%; height: 100%; color: var(--gold-bright); }
+.gu-glyph svg { width: 80%; height: 80%; }
+.gu-glyph-letter { border-radius: 50%; box-shadow: inset 0 0 0 1.5px currentColor; font-family: var(--display); font-size: 18px; font-weight: 650; }
+/* The tabs: round night buttons with a gold line icon. The picked one glows, and its name hangs under it. */
+.gu-screen .gu-tabs { display: flex; gap: 20px; padding: 0; background: none; box-shadow: none; }
+.gu-screen .gu-tab {
+  position: relative; display: grid; place-items: center; width: 56px; height: 56px; min-height: 0; padding: 0; border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, #3a4460, var(--night) 75%); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.45), 0 4px 10px rgb(0 0 0 / 0.35);
+  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
+}
+.gu-screen .gu-tab::after { display: none; }
+.gu-tab-icon { display: grid; place-items: center; width: 38px; height: 38px; opacity: 0.7; transition: opacity 140ms var(--ease); }
+.gu-screen .gu-tab:hover, .gu-screen .gu-tab:focus-visible { transform: translateY(-2px); outline: none; box-shadow: inset 0 0 0 1.5px var(--gold-bright), 0 0 16px rgb(240 212 138 / 0.35), 0 6px 12px rgb(0 0 0 / 0.35); }
+.gu-screen .gu-tab[aria-selected='true'] { background: radial-gradient(circle at 50% 30%, #5b6584, #2b3245 75%); box-shadow: inset 0 0 0 2px var(--gold-bright), 0 0 0 4px rgb(240 212 138 / 0.14), 0 0 24px rgb(240 212 138 / 0.4); }
+.gu-tab:hover .gu-tab-icon, .gu-tab[aria-selected='true'] .gu-tab-icon { opacity: 1; }
+.gu-tab-name { position: absolute; top: calc(100% + 7px); left: 50%; transform: translateX(-50%); visibility: hidden; font-family: var(--display); font-size: 14px; font-weight: 650; line-height: 1.2; white-space: nowrap; color: var(--gold-bright); text-shadow: 0 1px 3px rgb(0 0 0 / 0.7); }
+.gu-tab[aria-selected='true'] .gu-tab-name, .gu-tab:hover .gu-tab-name, .gu-tab:focus-visible .gu-tab-name { visibility: visible; }
+.gu-tab-new { position: absolute; top: 3px; right: 3px; }
+/* The bottom rail: key prompts, a keycap and a verb each, at the right. A status, such as what is being moved, sits at the left. */
+.gu-rail-foot { display: flex; align-items: center; min-height: 64px; padding: 10px 36px 16px; background: linear-gradient(0deg, rgb(10 12 20 / 0.65), rgb(10 12 20 / 0)); }
+.gu-cues { flex: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 30px; }
+.gu-cue { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 700; color: var(--paper-light); text-shadow: 0 1px 2px rgb(0 0 0 / 0.6); }
+.gu-cue-verb { margin-left: 4px; }
+.gu-cue kbd {
+  min-width: 34px; height: 32px; padding: 0 10px; font-size: 13px; font-weight: 800; color: var(--paper-light); text-shadow: none;
+  background: linear-gradient(180deg, #3d4660, #232a3c); border-radius: 9px; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.7), inset 0 -3px 0 rgb(0 0 0 / 0.3), 0 2px 4px rgb(0 0 0 / 0.4);
+}
+.gu-cue-status { margin-right: auto; gap: 10px; color: var(--gold-bright); }
+.gu-cue-status::before { content: ''; width: 8px; height: 8px; background: var(--gold-bright); transform: rotate(45deg); box-shadow: 0 0 8px rgb(240 212 138 / 0.8); }
+.gu-cue-coarse { display: none; }
+@media (pointer: coarse) { .gu-cue-fine { display: none; } .gu-cue-coarse { display: inline-flex; } }
+.gu-screen .gu-panel-body { margin: 0; padding: 16px 40px 8px; scrollbar-color: rgb(211 188 142 / 0.35) transparent; }
+.gu-sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ---- bag: item cards in the left two thirds, the detail column in the right third ---- */
+.gu-bag-things, .gu-bag-hand {
+  --gap: 12px; --detail-w: clamp(300px, 27cqw, 400px);
+  --card: min(calc((100cqw - 80px - var(--detail-w) - 56px - 8 * var(--gap)) / 9), calc((100cqh - 290px) / 5), 112px);
+  display: grid; grid-template-columns: minmax(0, 1fr) var(--detail-w); gap: 56px; min-height: 100%;
+}
+.gu-bag-grid { display: grid; gap: var(--gap); align-content: center; justify-content: center; }
+.gu-slots { display: grid; grid-template-columns: repeat(9, var(--card)); gap: var(--gap); }
+/* The quick row sits on a shelf of its own, each card marked with its number key. */
+.gu-slots-quick { margin: -10px; padding: 12px 10px 10px; border-radius: 18px; background: rgb(240 212 138 / 0.06); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.25); }
+.gu-bag-rule { position: relative; height: 28px; margin: 6px 0 0; background: linear-gradient(90deg, transparent, rgb(211 188 142 / 0.5) 20%, rgb(211 188 142 / 0.5) 80%, transparent) center / 100% 1px no-repeat; }
+.gu-bag-rule::after { content: ''; position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px; background: var(--gold); transform: rotate(45deg); }
+/* An item card: the thing on a warm sky, its count on a cream strip at the foot. */
+.gu-item {
+  position: relative; display: grid; place-items: start center; width: var(--card); aspect-ratio: 192 / 232; min-width: 0; padding: 0;
+  border: 0; border-radius: 10px; color: var(--ink);
+  background: linear-gradient(180deg, #7d4f38 0%, #b0754a 45%, #d3a266 80%, var(--paper) 80%);
+  box-shadow: inset 0 0 0 1px rgb(240 212 138 / 0.7), 0 4px 10px rgb(0 0 0 / 0.35);
+  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease), filter 140ms var(--ease);
+}
+.gu-slot { touch-action: none; }
+.gu-item > .gu-pic { margin-top: calc((var(--card) * 1.208 * 0.8 - 64px) / 2); filter: drop-shadow(0 3px 3px rgb(50 25 10 / 0.5)); }
+.gu-item:hover { transform: translateY(-3px); box-shadow: inset 0 0 0 1.5px var(--gold-bright), 0 0 18px rgb(240 212 138 / 0.45), 0 8px 14px rgb(0 0 0 / 0.4); }
+.gu-item:active { transform: translateY(-1px); }
+.gu-item > .gu-slot-count { position: absolute; left: 0; right: 0; bottom: 0; height: 20%; min-width: 0; padding: 0; display: grid; place-items: center; font-size: 13px; font-weight: 800; line-height: 1; color: var(--ink); background: none; border-radius: 0; box-shadow: none; }
+.gu-item > .gu-slot-key { position: absolute; z-index: 1; left: -7px; top: -7px; min-width: 24px; height: 24px; padding: 0 6px; font-size: 12px; color: var(--paper-light); background: linear-gradient(180deg, #3d4660, #232a3c); border-radius: 7px; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.8), 0 2px 4px rgb(0 0 0 / 0.4); }
+.gu-item.gu-slot-empty { cursor: default; background: rgb(255 255 255 / 0.025); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.16); }
+.gu-item.gu-slot-empty:hover { transform: none; background: rgb(255 255 255 / 0.05); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.35); }
+.gu-quick.gu-slot-empty { background: rgb(240 212 138 / 0.05); }
+.gu-slot-empty > .gu-slot-key { color: var(--gold); opacity: 0.75; }
+/* The card the detail column shows wears a frame; the stack picked up to move lifts and glows gold. */
+.gu-item.is-shown::after { content: ''; position: absolute; inset: -5px; border-radius: 14px; pointer-events: none; box-shadow: 0 0 0 2px var(--paper-light), 0 0 14px rgb(240 212 138 / 0.55); }
+.gu-picked, .gu-picked:hover { transform: translateY(-4px); box-shadow: 0 0 0 2px var(--gold-bright), 0 0 24px rgb(240 212 138 / 0.7); }
 /* A drag: the stack it came from fades, the slot under the pointer lights up, and a refused slot says no. */
 .gu-slot.is-drag-from > .gu-pic, .gu-slot.is-drag-from > .gu-slot-count { opacity: 0.3; }
-.gu-slot.is-split-from { box-shadow: inset 0 0 0 2px var(--line-strong); }
-.gu-slot.is-drop { background: radial-gradient(90% 90% at 30% 20%, #6a5a34, #4a3f28); box-shadow: inset 0 0 0 2px var(--gold-bright), 0 0 14px rgb(240 212 138 / 0.6); }
+.gu-slot.is-split-from { box-shadow: inset 0 0 0 2px rgb(240 212 138 / 0.4); }
+.gu-slot.is-drop { background: linear-gradient(180deg, #8a6a2c, #c9a25e 80%, var(--paper) 80%); box-shadow: 0 0 0 2px var(--gold-bright), 0 0 18px rgb(240 212 138 / 0.65); }
+.gu-slot-empty.is-drop { background: rgb(240 212 138 / 0.22); }
 .gu-slot.is-refused { box-shadow: inset 0 0 0 2px #d06a4a; cursor: not-allowed; }
 .gu-ghost { position: absolute; left: 0; top: 0; z-index: 60; display: grid; place-items: center; width: 56px; height: 56px; pointer-events: none; background: var(--night-2); border-radius: var(--radius); box-shadow: 0 0 0 2px var(--gold-bright), 0 0 18px rgb(240 212 138 / 0.55), 0 12px 26px rgb(10 12 20 / 0.45); will-change: transform; }
+.gu-ghost-count { position: absolute; right: 4px; bottom: 4px; min-width: 20px; padding: 0 5px; font-size: 12px; font-weight: 800; line-height: 17px; text-align: center; color: var(--ink); background: var(--paper-light); border-radius: 5px; }
 :root.gu-dragging, :root.gu-dragging * { cursor: grabbing !important; }
-.gu-bag-foot { margin-top: var(--s5); font-size: 14px; color: var(--ink-2); text-wrap: pretty; text-align: center; }
-.gu-foot-coarse { display: none; }
-@media (pointer: coarse) { .gu-foot-fine { display: none; } .gu-foot-coarse { display: inline; } }
-.gu-bag-foot kbd { height: 22px; min-width: 22px; font-size: 12px; vertical-align: 1px; }
+/* By hand: the things that can be made, as cards with their names on the strip. One that lacks something is dimmed. */
+.gu-bag-hand { --card: clamp(96px, 9cqw, 128px); }
+.gu-recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, var(--card)); gap: 18px; align-content: start; padding-top: 12px; }
+.gu-recipe-card > .gu-slot-count { justify-content: center; }
+.gu-item-name { position: absolute; left: 4px; right: 4px; bottom: 0; height: 20%; display: grid; place-items: center; overflow: hidden; font-size: 12.5px; font-weight: 800; line-height: 1; white-space: nowrap; text-overflow: ellipsis; color: var(--ink); }
+.gu-item-short { filter: saturate(0.35) brightness(0.75); }
+.gu-item-short:hover { filter: saturate(0.6) brightness(0.9); }
+.gu-ready::before { content: ''; position: absolute; top: 7px; right: 7px; z-index: 1; width: 8px; height: 8px; background: var(--gold-bright); transform: rotate(45deg); box-shadow: 0 0 6px rgb(240 212 138 / 0.9); }
+/* The detail column: the thing large on a warm sky, then its name, how many, its use and what it says of itself. */
+.gu-detail { display: flex; flex-direction: column; align-self: center; height: min(100%, 600px); min-height: 0; overflow: hidden; border-radius: 16px; color: var(--ink); background: var(--paper-light); box-shadow: inset 0 0 0 1px var(--gold), 0 10px 30px rgb(0 0 0 / 0.4); }
+.gu-detail-art { position: relative; display: grid; place-items: center; flex: 0 0 46%; min-height: 150px; background: radial-gradient(70% 80% at 35% 25%, #f6d79a, #d79b52 55%, #9c6b3a); box-shadow: inset 0 -1px 0 var(--gold); }
+.gu-detail-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 78% 22%, rgb(255 250 230 / 0.6) 0 1.5px, transparent 2.5px), radial-gradient(circle at 20% 70%, rgb(255 250 230 / 0.5) 0 1px, transparent 2px), radial-gradient(circle at 66% 78%, rgb(255 250 230 / 0.45) 0 1px, transparent 2px); pointer-events: none; }
+.gu-detail-art .gu-pic { filter: drop-shadow(0 8px 10px rgb(60 30 10 / 0.45)); }
+.gu-detail-art-empty { background: radial-gradient(70% 80% at 35% 25%, var(--paper-2), var(--paper-3)); }
+.gu-detail-text { display: grid; gap: 8px; align-content: start; min-height: 0; overflow: auto; padding: 20px 26px 16px; }
+.gu-detail > .gu-empty { padding: 20px 26px; text-align: center; }
+.gu-detail-name { font-family: var(--display); font-size: 30px; font-weight: 650; line-height: 1.1; }
+.gu-detail-times { font-family: 'Nunito', sans-serif; font-size: 20px; color: var(--ink-2); }
+.gu-detail-count { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+.gu-detail-use { margin-top: 4px; padding: 7px 12px; font-weight: 700; color: var(--ink); background: rgb(211 188 142 / 0.25); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; }
+.gu-detail-desc { color: var(--ink-2); text-wrap: pretty; }
+.gu-detail-note { font-size: 14px; font-weight: 700; color: var(--new); }
+.gu-detail-sub { margin-top: 8px; padding-bottom: 6px; font-family: var(--display); font-size: 16px; font-weight: 650; color: var(--bronze); border-bottom: 1px solid rgb(166 137 90 / 0.45); }
+.gu-need-lines { display: grid; }
+.gu-need-line { display: grid; grid-template-columns: 32px 1fr auto; gap: 12px; align-items: center; min-height: 44px; border-bottom: 1px solid var(--line); font-weight: 700; }
+.gu-need-count { font-weight: 800; color: var(--ink-2); }
+.gu-need-line.gu-short .gu-need-count { color: var(--new); }
+.gu-detail-act { display: grid; gap: 8px; margin-top: auto; padding: 8px 22px 22px; }
+.gu-detail-act .gu-why { max-width: none; text-align: center; }
+.gu-make-btn { width: 100%; min-height: 54px; font-size: 18px; }
 /* The tooltip: night glass with a gold hairline, so it reads over the paper and stands apart from it. It sits in the stage, so it can leave the panel. */
 .gu-tip {
   position: absolute; left: 0; top: 0; z-index: 50; display: grid; gap: 4px; width: max-content; max-width: 280px; padding: 12px 16px 14px;
@@ -225,48 +298,42 @@ export const STYLES = /* css */ `
 .gu-recipe-act .gu-btn { min-width: 96px; }
 .gu-why { max-width: 22ch; font-size: 13px; color: var(--ink-2); text-align: right; text-wrap: balance; }
 
-/* ---- almanac: a leather book lying open. The index is the left page, the entry the right, a fold between them. ---- */
-.gu-panel-almanac { padding: 26px 30px 30px; background: radial-gradient(120% 100% at 30% 0%, #4a3b2c, #33291f 70%); box-shadow: inset 0 0 0 3px #2a2119, inset 0 0 0 5px var(--bronze), inset 0 0 0 7px #2a2119, var(--lift); }
-.gu-panel-almanac .gu-panel-head { justify-content: center; margin-bottom: var(--s4); padding-bottom: 6px; }
-.gu-panel-almanac .gu-panel-head::after { display: none; }
-.gu-panel-almanac .gu-panel-title { font-size: 26px; color: var(--gold-bright); letter-spacing: 0.06em; text-shadow: 0 1px 0 #1a140e, 0 0 12px rgb(240 212 138 / 0.25); }
-.gu-panel-almanac .gu-close { position: absolute; right: -6px; top: 0; }
-.gu-book {
-  position: relative; display: grid; grid-template-columns: 240px 34px 1fr; gap: 0; width: 920px; max-width: 100%; min-height: 470px; padding: 30px 34px 34px;
-  background: linear-gradient(90deg, rgb(120 90 50 / 0.1), transparent 6%, transparent 94%, rgb(120 90 50 / 0.1)), #efe6d2; border-radius: 6px;
-  box-shadow: 0 1px 0 #d8ccb2, 0 3px 0 #e8dec8, 0 4px 0 #cfc2a6, 0 6px 0 #e2d7bf, 0 7px 0 #c5b797, 0 12px 20px rgb(0 0 0 / 0.45);
+/* ---- almanac: the entries of one category down the left, the open entry large on the right ---- */
+.gu-almanac { display: grid; grid-template-columns: clamp(260px, 24cqw, 340px) minmax(0, 1fr); gap: 56px; min-height: 100%; }
+.gu-almanac-blank { grid-template-columns: 1fr; place-items: center; }
+.gu-almanac-blank .gu-empty { max-width: 36ch; font-family: var(--display); font-size: 22px; text-align: center; color: var(--paper-3); }
+.gu-index { display: flex; flex-direction: column; gap: 10px; padding: 6px 0; }
+.gu-page-link {
+  position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 80px; padding: 8px 18px 8px 8px;
+  color: var(--paper-light); text-align: left; border: 0; border-radius: 40px 14px 14px 40px;
+  background: linear-gradient(90deg, rgb(52 60 84 / 0.95), rgb(31 36 51 / 0.8)); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.3), 0 4px 10px rgb(0 0 0 / 0.25);
+  transition: transform 140ms var(--ease), box-shadow 140ms var(--ease);
 }
-.gu-book-blank { display: grid; grid-template-columns: 1fr; place-items: center; }
-.gu-book-blank .gu-empty { max-width: 36ch; font-family: var(--display); font-size: 20px; font-style: italic; text-align: center; }
-/* The ribbon that marks the open page hangs from the top of the right page. */
-.gu-book:not(.gu-book-blank)::after { content: ''; position: absolute; right: 64px; top: -6px; width: 22px; height: 86px; background: linear-gradient(90deg, #6e2222, #9a3434 50%, #6e2222); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); box-shadow: inset 0 0 0 1px var(--gold); filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.3)); pointer-events: none; }
-.gu-index { display: grid; gap: var(--s5); align-content: start; }
-.gu-index-group { display: grid; gap: 0; }
-.gu-index-group .gu-label { margin-bottom: 4px; padding-left: 2px; color: var(--bronze); font-size: 14px; letter-spacing: 0.04em; }
-.gu-page-link { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: 36px; padding: 0 10px 0 16px; background: none; border: 0; border-radius: 6px; text-align: left; font-family: var(--display); font-size: 17px; font-weight: 500; color: var(--ink); }
-.gu-page-link::before { content: ''; position: absolute; left: 4px; top: 50%; width: 5px; height: 5px; background: var(--paper-4); transform: translateY(-50%) rotate(45deg); }
-.gu-page-link:hover { background: rgb(166 137 90 / 0.12); }
-.gu-page-link[aria-current='page'] { color: var(--ink); background: linear-gradient(90deg, rgb(211 188 142 / 0.45), rgb(211 188 142 / 0)); font-weight: 650; box-shadow: none; }
-.gu-page-link[aria-current='page']::before { width: 7px; height: 7px; background: #9a3434; }
-.gu-new { display: inline-flex; align-items: center; gap: 5px; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--new); }
-.gu-new::before { content: ''; width: 6px; height: 6px; background: currentColor; transform: rotate(45deg); }
-/* The fold between the two pages. */
-.gu-spine { margin: -30px 0 -34px; background: linear-gradient(90deg, transparent, rgb(90 64 30 / 0.1) 30%, rgb(90 64 30 / 0.32) 50%, rgb(90 64 30 / 0.1) 70%, transparent); }
-.gu-leaf { position: relative; padding-left: 8px; }
-.gu-leaf-head { display: flex; align-items: center; gap: var(--s5); padding: 6px 0 var(--s5); }
-.gu-leaf-head .gu-pic { background: radial-gradient(80% 80% at 35% 25%, #fbf6ea, #e2d6bb); border-radius: 50%; box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 5px #f6f0e1, inset 0 0 0 6px rgb(166 137 90 / 0.5), 0 6px 14px rgb(90 64 30 / 0.22); }
-.gu-leaf-head .gu-label { color: var(--bronze); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
-.gu-leaf-head .gu-label::before { display: none; }
-.gu-leaf-title { font-family: var(--display); font-size: 38px; font-weight: 650; line-height: 1.05; text-wrap: balance; }
-.gu-columns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); padding-top: var(--s5); border-top: 0; background: linear-gradient(90deg, transparent, var(--gold) 15%, var(--gold) 85%, transparent) top / 100% 1px no-repeat; }
-.gu-column .gu-label { margin-bottom: var(--s3); }
-.gu-facts { display: grid; gap: var(--s3); }
-.gu-fact { position: relative; min-height: 1.5em; max-width: 34ch; padding-left: 16px; font-family: var(--display); font-size: 16.5px; font-weight: 450; line-height: 1.4; color: #3d3428; text-wrap: pretty; }
-.gu-fact::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border: 1px solid var(--bronze); transform: rotate(45deg); }
-.gu-dashes { display: block; width: 82%; height: 1em; border-bottom: 1.5px dashed rgb(166 137 90 / 0.5); }
+.gu-page-link:hover, .gu-page-link:focus-visible { transform: translateY(-2px); outline: none; box-shadow: inset 0 0 0 1.5px var(--gold-bright), 0 0 16px rgb(240 212 138 / 0.35), 0 6px 12px rgb(0 0 0 / 0.3); }
+.gu-page-link[aria-current='page'] { color: var(--night); background: linear-gradient(90deg, #f3e6c4, #d9c08e); box-shadow: inset 0 0 0 1.5px var(--gold-bright), 0 0 22px rgb(240 212 138 / 0.35); }
+.gu-entry-pic { display: grid; place-items: center; width: 64px; height: 64px; overflow: hidden; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #fbf3dd, #d8c597); box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 4px rgb(255 255 255 / 0.35); }
+.gu-entry-name { overflow: hidden; font-family: var(--display); font-size: 19px; font-weight: 600; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis; }
+.gu-new { display: block; width: 10px; height: 10px; background: var(--new-light); transform: rotate(45deg); box-shadow: 0 0 0 2px rgb(31 36 51 / 0.8), 0 0 10px rgb(242 196 107 / 0.9); }
+.gu-leaf { position: relative; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 40px; align-items: center; min-height: 100%; }
+.gu-leaf-art { position: relative; display: grid; place-items: center; width: 100%; max-width: 440px; aspect-ratio: 1; justify-self: center; }
+.gu-leaf-art::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, rgb(240 212 138 / 0.45), rgb(201 162 94 / 0.16) 42%, transparent 68%); }
+.gu-leaf-art::after { content: ''; position: absolute; inset: 13%; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.35), 0 0 0 10px rgb(211 188 142 / 0.05); }
+.gu-leaf-art .gu-pic { position: relative; z-index: 1; filter: drop-shadow(0 12px 18px rgb(0 0 0 / 0.5)); }
+.gu-leaf-text { position: relative; align-self: center; }
+.gu-leaf-kind { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-family: var(--display); font-size: 17px; font-weight: 600; color: var(--gold); }
+.gu-leaf-known { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: var(--paper-4); }
+.gu-leaf-known::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 10px; vertical-align: 2px; background: var(--gold); transform: rotate(45deg); }
+.gu-leaf-title { position: relative; margin-top: 2px; padding-bottom: 26px; font-family: var(--display); font-size: 54px; font-weight: 650; line-height: 1.05; color: var(--paper-light); text-wrap: balance; text-shadow: 0 2px 10px rgb(0 0 0 / 0.45); }
+.gu-leaf-title::after { content: ''; position: absolute; left: 0; bottom: 6px; width: min(420px, 100%); height: 1px; background: linear-gradient(90deg, var(--gold), rgb(211 188 142 / 0)); }
+.gu-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 18px; }
+.gu-column-head { padding-bottom: 8px; font-family: var(--display); font-size: 18px; font-weight: 650; color: var(--gold-bright); border-bottom: 1px solid rgb(211 188 142 / 0.5); }
+.gu-facts { display: grid; }
+.gu-fact { position: relative; min-height: 50px; padding: 12px 0 12px 22px; font-size: 16.5px; font-weight: 600; line-height: 1.4; color: var(--paper); text-wrap: pretty; border-bottom: 1px solid rgb(211 188 142 / 0.16); }
+.gu-fact::before { content: ''; position: absolute; left: 2px; top: 1.15em; width: 6px; height: 6px; border: 1px solid var(--gold); transform: rotate(45deg); }
+.gu-dashes { display: block; width: 70%; height: 1.2em; border-bottom: 1.5px dashed rgb(211 188 142 / 0.35); }
 .gu-inked { display: inline-block; animation: gu-ink 900ms var(--ease) both; }
 @keyframes gu-ink { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.gu-stamp { position: absolute; right: 40px; top: 96px; padding: 6px 14px; border: 2.5px double var(--done); border-radius: 8px; color: var(--done); font-family: var(--display); font-size: 15px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transform: rotate(-8deg); opacity: 0.85; mix-blend-mode: multiply; }
+.gu-stamp { position: absolute; right: 0; top: 0; padding: 6px 14px; border: 3px double var(--done-light); border-radius: 8px; color: var(--done-light); font-family: var(--display); font-size: 16px; font-weight: 700; letter-spacing: 0.1em; transform: rotate(-8deg); text-shadow: 0 0 10px rgb(169 208 138 / 0.4); }
 .gu-stamped { animation: gu-stamp 160ms var(--ease) both; }
 @keyframes gu-stamp { from { transform: rotate(-8deg) scale(1.3); } }
 
@@ -407,8 +474,14 @@ export const STYLES = /* css */ `
 /* ---- a root too narrow for the wide panels ---- */
 @container gu (width < 1080px) {
   .gu-settings { grid-template-columns: 1fr; gap: var(--s6); width: 560px; }
-  .gu-bag-things { grid-template-columns: 1fr; }
-  .gu-detail { display: none; }
+  /* The bag's cards take the width, and the tooltip names a thing. By hand keeps its column, for the Make button. */
+  .gu-bag-things { --card: min(calc((100cqw - 80px - 8 * var(--gap)) / 9), calc((100cqh - 290px) / 5), 112px); grid-template-columns: 1fr; }
+  .gu-bag-things .gu-detail { display: none; }
+  .gu-bag-hand { --detail-w: 300px; gap: 32px; }
+  .gu-almanac { gap: 32px; }
+  .gu-leaf { grid-template-columns: 1fr; gap: 8px; }
+  .gu-leaf-art { max-width: 240px; }
+  .gu-leaf-art .gu-pic { zoom: 0.6; }
 }
 
 /* ---- a narrow root: bigger targets, one column, six slots across ---- */
@@ -420,35 +493,16 @@ export const STYLES = /* css */ `
   .gu-panel-plate { width: auto; }
   .gu-panel-head { gap: var(--s3); }
   .gu-panel-title { font-size: 22px; }
-  .gu-slots { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
-  .gu-slot .gu-pic { width: 36px !important; height: 36px !important; }
-  .gu-slot .gu-pic-cell { transform: scale(1.125) !important; }
   .gu-tip { max-width: min(260px, 100% - 16px); }
-  .gu-bag:not(.gu-bag-things), .gu-make, .gu-quests, .gu-settings, .gu-book, .gu-end { width: 100%; }
+  .gu-make, .gu-quests, .gu-settings, .gu-end { width: 100%; }
   .gu-recipe { grid-template-columns: 56px 1fr; align-items: start; }
   .gu-recipe > .gu-pic { width: 56px !important; height: 56px !important; padding: 4px; }
   .gu-recipe > .gu-pic > .gu-pic-cell { left: 4px; top: 4px; }
   .gu-recipe-act { grid-column: 2; justify-items: start; }
   .gu-why { max-width: none; text-align: left; }
-  .gu-book { grid-template-columns: minmax(0, 1fr); min-height: 0; gap: var(--s4); padding: 18px 16px 20px; }
-  .gu-book:not(.gu-book-blank)::after { display: none; }
-  .gu-panel-almanac { padding: 18px 12px 16px; }
-  .gu-stamp { position: static; align-self: start; margin-left: auto; }
-  .gu-bag-things { grid-template-columns: 1fr; }
-  .gu-detail { display: none; }
   .gu-tile { min-height: 110px; }
   .gu-tile-icon { width: 48px; height: 48px; }
   .gu-pause .gu-menu { grid-template-columns: 1fr; }
-  .gu-index { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); padding: 0; }
-  .gu-index-group { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1); flex: 1 1 100%; min-width: 0; }
-  .gu-index-group .gu-label { margin: 0; padding: 0 var(--s1) 0 0; }
-  .gu-page-link { background: var(--paper-2); white-space: nowrap; }
-  .gu-spine { display: none; }
-  .gu-leaf-head { flex-wrap: wrap; gap: var(--s4); }
-  .gu-stamp { transform: rotate(-4deg); }
-  .gu-leaf-head .gu-pic { zoom: 0.667; }
-  .gu-leaf-title { font-size: 26px; }
-  .gu-columns { grid-template-columns: 1fr; gap: var(--s5); }
   .gu-settings-side .gu-choices > legend { float: none; width: auto; min-height: 0; padding: 0 0 6px; }
   .gu-settings-side .gu-choices > .gu-strip { margin-left: 0; }
   .gu-slider { grid-template-columns: 96px 1fr 44px; gap: var(--s3); }
@@ -460,10 +514,55 @@ export const STYLES = /* css */ `
   .gu-plate { width: 100%; gap: var(--s5); }
   .gu-chapter { font-size: 40px; }
   .gu-menu { width: 100%; }
+  /* The full-screen menus: the name and the close button on one line of the top rail, the tabs on the next, one column. */
+  .gu-stage.gu-stage-screen { padding: 0; }
+  .gu-screen { padding: 0; border-radius: 0; }
+  .gu-rail-top { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name close' 'tabs tabs'; row-gap: 10px; padding: 8px 14px 30px; }
+  .gu-rail-top::before { height: 62px; }
+  .gu-rail-name { grid-area: name; }
+  .gu-rail-top > .gu-close { grid-area: close; }
+  .gu-rail-top > .gu-tabs { grid-area: tabs; }
+  .gu-rail-icon { width: 38px; height: 38px; }
+  .gu-rail-name .gu-panel-title { font-size: 24px; }
+  .gu-screen .gu-tabs { gap: 14px; }
+  .gu-screen .gu-tab { width: 50px; height: 50px; }
+  .gu-tab-icon { width: 34px; height: 34px; }
+  .gu-rail-foot { min-height: 0; padding: 8px 14px 12px; }
+  .gu-cues { justify-content: center; gap: 6px 18px; }
+  .gu-cue { font-size: 13.5px; }
+  .gu-cue kbd { min-width: 28px; height: 28px; padding: 0 8px; font-size: 12px; }
+  .gu-cue-status { flex-basis: 100%; justify-content: center; margin-right: 0; }
+  .gu-screen .gu-panel-body { padding: 10px 14px; }
+  .gu-bag-things, .gu-bag-hand { --gap: 6px; --card: calc((100cqw - 28px - 5 * var(--gap)) / 6); grid-template-columns: 1fr; gap: 18px; }
+  .gu-bag-grid { align-content: start; }
+  .gu-slots { grid-template-columns: repeat(6, var(--card)); }
+  .gu-slots-quick { margin: -6px; padding: 10px 6px 6px; }
+  .gu-item > .gu-pic { zoom: 0.5; margin-top: calc((var(--card) * 1.208 * 0.8 - 32px) / 2 * 2); }
+  .gu-item > .gu-slot-key { left: -4px; top: -4px; min-width: 18px; height: 18px; padding: 0 4px; font-size: 10.5px; border-radius: 5px; }
+  .gu-item > .gu-slot-count { font-size: 11.5px; }
+  .gu-bag-hand { --card: calc((100cqw - 28px - 3 * 12px) / 4); }
+  .gu-recipe-grid { grid-template-columns: repeat(4, var(--card)); gap: 12px; padding-top: 4px; }
+  .gu-recipe-card > .gu-pic { zoom: 1; margin-top: calc((var(--card) * 1.208 * 0.8 - 64px) / 2); }
+  .gu-item-name { font-size: 11px; }
+  .gu-bag-hand .gu-detail { height: auto; align-self: start; }
+  .gu-bag-hand .gu-detail-art { flex-basis: 150px; }
+  .gu-almanac { grid-template-columns: 1fr; gap: 14px; }
+  .gu-index { flex-direction: row; gap: 8px; margin: 0 -14px; padding: 4px 14px 8px; overflow-x: auto; scrollbar-width: none; }
+  .gu-page-link { flex: none; grid-template-columns: 44px auto auto; gap: 10px; min-height: 56px; padding: 6px 14px 6px 6px; border-radius: 28px; }
+  .gu-entry-pic { width: 44px; height: 44px; }
+  .gu-entry-pic > .gu-pic { zoom: 0.6875; }
+  .gu-entry-name { font-size: 16px; }
+  .gu-leaf { grid-template-columns: 1fr; gap: 4px; align-items: start; }
+  .gu-leaf-art { max-width: 200px; }
+  .gu-leaf-art .gu-pic { zoom: 0.5; }
+  .gu-leaf-title { font-size: 34px; padding-bottom: 20px; }
+  .gu-columns { grid-template-columns: 1fr; gap: 18px; }
+  .gu-stamp { top: -6px; font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .gu-panel, .gu-panel-plate, .gu-hint, .gu-note, .gu-toast, .gu-stamped { animation: none; }
+  .gu-item, .gu-tab, .gu-page-link { transition: none; }
   .gu-inked { animation: gu-fade 300ms linear both; }
   .gu-btn, .gu-close { transition: none; }
 }

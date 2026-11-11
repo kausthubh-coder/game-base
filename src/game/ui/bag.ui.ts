@@ -311,7 +311,7 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
       onclick: () => { chosen = recipe.id; ctx.sound('click'); view.render(); },
     },
       picture(ctx.options.icon(made.icon), made.name, 64),
-      recipe.makes.count > 1 ? h('span', { class: 'gu-slot-count gu-num', 'aria-hidden': true }, `×${recipe.makes.count}`) : null,
+      h('span', { class: 'gu-item-name', 'aria-hidden': true }, made.name, recipe.makes.count > 1 ? ` ×${recipe.makes.count}` : ''),
     );
   };
 

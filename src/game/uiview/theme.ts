@@ -126,20 +126,38 @@ export const KIT = /* css */ `
 .ui-book.ui-kit .gu-stage:not(.gu-stage-title) {
   background: var(--kit-stars) 0 0 / 384px 384px repeat, radial-gradient(120% 90% at 50% 45%, rgb(20 24 36 / 0.5), rgb(10 12 20 / 0.86));
 }
+/* A full-screen menu: the gold star map over deep night, so the world barely shows. */
+.ui-book.ui-kit .gu-stage.gu-stage-screen {
+  background: var(--kit-stars) 0 0 / 384px 384px repeat, radial-gradient(120% 85% at 50% 0%, rgb(46 54 84 / 0.95), rgb(24 28 43 / 0.97) 55%, rgb(12 14 22 / 0.98));
+}
+/* The top rail is the painted band at its own height: the name, the tabs and the close button on it, the tabs' names under
+   its gold line, and its flowered ends clear of them. The full map's title sits on the same band. */
+.ui-book.ui-kit .gu-rail-top::before, .ui-book.ui-kit .gb-map-head::before { height: 60px; top: 8px; background: transparent; box-shadow: none; border: solid transparent; border-width: 0 100px; border-image: var(--kit-rail) 0 200 fill / 0 100px stretch; }
+.ui-book.ui-kit .gu-rail-top { padding: 10px 92px 30px; }
+.ui-book.ui-kit .gb-map-head { padding-top: 18px; }
+/* The map's close button is the menus' painted one, and its compass gives the north. */
+.ui-book.ui-kit .gb-map .gb-map-close { top: 14px; right: 92px; width: 44px; height: 44px; background: var(--kit-close) center / 100% 100% no-repeat; box-shadow: none; }
+.ui-book.ui-kit .gb-map .gb-map-close > * { visibility: hidden; }
+.ui-book.ui-kit .gb-map-north { display: none; }
+/* Keycaps: the painted navy cap, scaled whole so it never stretches tall. */
+.ui-book.ui-kit .gu-cue kbd, .ui-book.ui-kit .gu-item > .gu-slot-key {
+  background: transparent; box-shadow: none; border: solid transparent; border-width: 0 10px; padding: 0 2px;
+  border-image: var(--kit-keycap) 0 40 fill / 0 10px stretch;
+}
+.ui-book.ui-kit .gu-item > .gu-slot-key { border-width: 0 7px; border-image-width: 0 7px; padding: 0; }
 
 /* ---- panels: the painted frame ---- */
-.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-panel-almanac), .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box), .ui-book.ui-kit .gb-map-page, .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; isolation: isolate; }
-.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-panel-almanac)::before, .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box)::before, .ui-book.ui-kit .gb-map-page::before, .ui-book.ui-kit .ui-card::before {
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-screen), .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box), .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; isolation: isolate; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-screen)::before, .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box)::before, .ui-book.ui-kit .ui-card::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   border: 56px solid transparent; border-image: var(--kit-panel) 112 fill / 56px stretch;
   filter: drop-shadow(0 16px 32px rgb(10 12 20 / 0.5));
 }
-.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-panel-almanac) { padding: 40px 46px 42px; }
-.ui-book.ui-kit .gu-panel-almanac .gu-panel-head::after { display: none; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-screen) { padding: 40px 46px 42px; }
 .ui-book.ui-kit .gu-panel-head { justify-content: center; }
 .ui-book.ui-kit .gu-panel-head > .gu-close { position: absolute; right: -14px; top: -10px; margin: 0; }
 .ui-book.ui-kit .gu-panel-head:has(> .gu-tabs) { justify-content: flex-start; }
-.ui-book.ui-kit .gu-panel-head::after, .ui-book.ui-kit .gb-map-head::after {
+.ui-book.ui-kit .gu-panel-head::after {
   content: ''; position: absolute; left: 50%; right: auto; bottom: -8px; width: min(440px, 86%); height: 24px; transform: translateX(-50%);
   background: var(--kit-divider) center / 100% 100% no-repeat; pointer-events: none;
 }
@@ -148,7 +166,7 @@ export const KIT = /* css */ `
 .ui-book.ui-kit .gu-close[aria-label='Back'] { background-image: var(--kit-back) !important; }
 
 /* ---- buttons: painted pills, navy for most, gold for the next action ---- */
-.ui-book.ui-kit .gu-btn, .ui-book.ui-kit .gb-map-tools button:not(.gb-map-square) {
+.ui-book.ui-kit .gu-btn {
   border: solid transparent; border-width: 0 24px; padding: 0 4px;
   border-image: var(--kit-button) 0 56 fill / 0 24px stretch; background: transparent !important; box-shadow: none !important;
   color: var(--ui-paper-light); text-shadow: 0 1px 2px rgb(10 12 20 / 0.5);
@@ -159,25 +177,24 @@ export const KIT = /* css */ `
 .ui-book.ui-kit .gu-btn:disabled, .ui-book.ui-kit .gu-btn[aria-disabled='true'] { border-image-source: var(--kit-button-light); color: var(--ui-ink-2); text-shadow: none; opacity: 0.55; }
 .ui-book.ui-kit .gu-plate .gu-btn:disabled { opacity: 0.5; }
 
-/* A narrow screen has no room for the painted ends on the map's row of tools. */
 @container gu (width < 640px) {
-  .ui-book.ui-kit .gu-panel-almanac { padding: 30px 22px 30px; }
-  .ui-book.ui-kit .gu-panel-almanac::before { border-width: 44px; border-image-width: 44px; }
+  .ui-book.ui-kit .gu-rail-top::before { top: 4px; height: 52px; border-width: 0 60px; border-image-width: 0 60px; }
+  .ui-book.ui-kit .gu-rail-top { padding: 8px 50px 30px; }
   .ui-book.ui-kit .gu-settings-side .gu-choices:nth-child(even), .ui-book.ui-kit .gu-settings-side .gu-slider:nth-child(even) { background: none; }
 }
 @media (max-width: 640px) {
-  .ui-book.ui-kit .gb-map-view::after { width: 84px; height: 84px; }
-  .ui-book.ui-kit .gb-map-tools button:not(.gb-map-square) { border: 0; padding: 0 10px; border-image: none; background: linear-gradient(180deg, #56607a, #4a5366 55%, #424a5c) !important; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55) !important; }
+  .ui-book.ui-kit .gb-map-head::before { top: 4px; height: 52px; border-width: 0 60px; border-image-width: 0 60px; }
+  .ui-book.ui-kit .gb-map-head { padding-top: 12px; }
+  .ui-book.ui-kit .gb-map .gb-map-close { top: 8px; right: 50px; }
+  .ui-book.ui-kit .gb-map-view::after { right: 12px; bottom: 96px; width: 84px; height: 84px; }
 }
 
-/* ---- the bag: a filled slot is a warm item card with a cream strip for its count ---- */
-.ui-book.ui-kit .gu-slot:not(.gu-slot-empty) { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgb(166 137 90 / 0.7), 0 2px 4px rgb(10 12 20 / 0.25); }
-.ui-book.ui-kit .gu-slot:not(.gu-slot-empty):hover { filter: brightness(1.08); }
-.ui-book.ui-kit .gu-slot:not(.gu-slot-empty) > .gu-pic { margin-top: -10px; }
-.ui-book.ui-kit .gu-slot-count { right: 50%; bottom: 1px; transform: translateX(50%); min-width: 0; padding: 0; background: none; box-shadow: none; color: var(--ui-ink); font-size: 12px; line-height: 15px; }
-.ui-book.ui-kit .gu-slot:not(.gu-slot-empty) .gu-slot-key { color: var(--ui-paper-light); }
-.ui-book.ui-kit .gu-picked, .ui-book.ui-kit .gu-picked:hover { box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 16px rgb(240 212 138 / 0.7); }
-.ui-book.ui-kit .gu-slot.is-drop { background: var(--kit-card-epic) center / 100% 100% no-repeat; box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 16px rgb(240 212 138 / 0.7); }
+/* ---- the bag: a filled card is the painted item card with its cream strip; the one the detail column shows wears the gold frame ---- */
+.ui-book.ui-kit .gu-item:not(.gu-slot-empty) { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 4px 10px rgb(0 0 0 / 0.35); }
+.ui-book.ui-kit .gu-item:not(.gu-slot-empty):hover { box-shadow: 0 0 18px rgb(240 212 138 / 0.45), 0 8px 14px rgb(0 0 0 / 0.4); }
+.ui-book.ui-kit .gu-item.is-shown::after { inset: -4px; border-radius: 0; box-shadow: none; background: var(--kit-card-frame) center / 100% 100% no-repeat; filter: brightness(1.25) drop-shadow(0 0 6px rgb(240 212 138 / 0.7)); }
+.ui-book.ui-kit .gu-picked, .ui-book.ui-kit .gu-picked:hover { box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 24px rgb(240 212 138 / 0.7); }
+.ui-book.ui-kit .gu-slot.is-drop:not(.gu-slot-empty) { background: var(--kit-card-epic) center / 100% 100% no-repeat; box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 18px rgb(240 212 138 / 0.7); }
 .ui-book.ui-kit .gu-recipe > .gu-pic { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgb(166 137 90 / 0.7); }
 
 /* ---- over the world: the quick slots are painted wells, the minimap sits in its compass ring ---- */
@@ -191,21 +208,12 @@ export const KIT = /* css */ `
 .ui-book.ui-kit .gb-hud-minimap::after { content: ''; position: absolute; inset: 0; background: var(--kit-minimap-ring) center / 100% 100% no-repeat; pointer-events: none; filter: drop-shadow(0 4px 8px rgb(10 12 20 / 0.35)); }
 .ui-book.ui-kit .gb-minimap { border: 0 !important; box-shadow: none !important; }
 
-/* ---- the Almanac: a tooled leather cover, paper pages, the fold and the ribbon ---- */
-.ui-book.ui-kit .gu-panel-almanac { padding: 40px 46px 46px; background: transparent; box-shadow: none; isolation: isolate; }
-.ui-book.ui-kit .gu-panel-almanac::before {
-  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-  border: 64px solid transparent; border-image: var(--kit-book-cover) 128 fill / 64px stretch;
-  filter: drop-shadow(0 18px 34px rgb(10 12 20 / 0.55));
-}
-.ui-book.ui-kit .gu-panel-almanac .gu-close { right: -22px; top: -16px; }
-.ui-book.ui-kit .gu-book { background: linear-gradient(90deg, rgb(120 90 50 / 0.12), transparent 5%, transparent 95%, rgb(120 90 50 / 0.12)), var(--kit-page) 0 0 / 256px 256px repeat, #efe6d2; }
-.ui-book.ui-kit .gu-spine { background: var(--kit-gutter) center top / 100% 256px repeat-y; }
-.ui-book.ui-kit .gu-book:not(.gu-book-blank)::after { width: 30px; height: 132px; top: -10px; background: var(--kit-ribbon) center top / 100% 100% no-repeat; clip-path: none; box-shadow: none; }
+/* ---- the Almanac: the painted divider under the open entry's name ---- */
+.ui-book.ui-kit .gu-leaf-title::after { bottom: -6px; height: 24px; background: var(--kit-divider) left center / 100% 100% no-repeat; }
 
 /* ---- the bag's detail pane: the painted card, amber sky above and cream below ---- */
-.ui-book.ui-kit .gu-detail { background: var(--kit-detail) center / 100% 100% no-repeat; box-shadow: 0 6px 16px rgb(59 66 85 / 0.18); }
-.ui-book.ui-kit .gu-detail-art { height: 200px; background: none; box-shadow: none; }
+.ui-book.ui-kit .gu-detail { background: var(--kit-detail) center / 100% 100% no-repeat; box-shadow: 0 10px 30px rgb(0 0 0 / 0.4); }
+.ui-book.ui-kit .gu-detail-art { background: none; box-shadow: none; }
 .ui-book.ui-kit .gu-detail-art::after { display: none; }
 .ui-book.ui-kit .gu-detail-text { padding: 18px 24px 24px; }
 
@@ -217,7 +225,7 @@ export const KIT = /* css */ `
     linear-gradient(90deg, rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
     var(--kit-map-paper) 0 0 / 256px 256px repeat, #e3d4b0;
 }
-.ui-book.ui-kit .gb-map-view::after { content: ''; position: absolute; right: 16px; bottom: 16px; width: 150px; height: 150px; background: var(--kit-compass) center / contain no-repeat; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(90 60 20 / 0.3)); }
+.ui-book.ui-kit .gb-map-view::after { content: ''; position: absolute; right: 20px; bottom: 80px; width: 140px; height: 140px; background: var(--kit-compass) center / contain no-repeat; opacity: 0.9; pointer-events: none; filter: drop-shadow(0 2px 3px rgb(90 60 20 / 0.3)); }
 
 /* ---- tooltips: the painted night card ---- */
 .ui-book.ui-kit .gu-tip, .ui-book.ui-kit .ui-slot-tip { background: transparent; box-shadow: none; isolation: isolate; }

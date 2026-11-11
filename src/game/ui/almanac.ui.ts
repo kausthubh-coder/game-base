@@ -20,8 +20,7 @@ export function almanacPanel(ctx: UiContext, startPage: string | undefined): Pan
   const cues = h('div', { class: 'gu-cues' });
   fillCues(cues, [
     { keys: ['↑', '↓'], verb: 'Entry', only: 'fine' },
-    { keys: ['Tab'], verb: 'Close', only: 'fine' },
-    { keys: ['Esc'], verb: 'Close', only: 'fine' },
+    { keys: ['Tab', 'Esc'], verb: 'Close', only: 'fine' },
     { keys: ['Tap'], verb: 'Open an entry', only: 'coarse' },
   ]);
   let open: string | null = startPage ?? null;
@@ -51,7 +50,7 @@ export function almanacPanel(ctx: UiContext, startPage: string | undefined): Pan
   const leaf = (page: AlmanacPage): HTMLElement => {
     const known = page.facts.filter((fact) => fact.known).length;
     const node = h('article', { class: 'gu-leaf', 'aria-live': 'polite' },
-      h('div', { class: 'gu-leaf-art' }, picture(art(page), page.title, 256)),
+      h('div', { class: 'gu-leaf-art' }, picture(art(page), page.title, 320)),
       h('div', { class: 'gu-leaf-text' },
         h('p', { class: 'gu-leaf-kind' }, KIND_NAMES[page.kind], h('span', { class: 'gu-leaf-known gu-num' }, `${known} of ${page.facts.length} known`)),
         h('h2', { class: 'gu-leaf-title' }, page.title),

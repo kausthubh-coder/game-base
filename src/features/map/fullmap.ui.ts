@@ -1,4 +1,4 @@
-// The full map: a page of parchment that fills the screen. Land the player has seen is drawn on it
+// The full map: a chart of parchment that fills the screen. Land the player has seen is drawn on it
 // and the rest stays blank. It pans and zooms, and a click drops a waypoint with a small picker for
 // its icon and color.
 //
@@ -29,6 +29,8 @@ export interface FullMap {
   readonly isOpen: boolean;
   open(): void;
   close(): void;
+  /** The name at the top of the map: the region, and the place the player is near, or null for none. */
+  setTitle(title: string, place: string | null): void;
   /** Repaints part of the land after the world changes. */
   invalidate(x: number, z: number, width: number, depth: number): void;
   /** Forgets the painted land. Call it after the rules load a save. */
@@ -55,6 +57,13 @@ const CELLS_CLOSED = 12, CELLS_OPEN = 256;
 /** Cells whose land had no color yet are tried again this often, in frames. */
 const RETRY_FRAMES = 60;
 const MAX_SCALE = 12;
+// Line icons for the tools, stroked on a 24 grid. A game can put its own art in each button (`data-icon` names it).
+const ZOOM_IN_LINES = '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M10.5 8v5M8 10.5h5"/>';
+const ZOOM_OUT_LINES = '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M8 10.5h5"/>';
+const FIND_ME_LINES = '<circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>';
+const PIN_LINES = '<path d="M12 20.5s-6-5.6-6-10.5a6 6 0 0 1 12 0c0 4.9-6 10.5-6 10.5z"/><path d="M12 7.5v5M9.5 10h5"/>';
+const CLOSE_LINES = '<path d="M6 6l12 12M18 6L6 18"/>';
+const lineIcon = (inner: string): string => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
 const COLOR_CSS = Object.fromEntries(WAYPOINT_COLOR_NAMES.map((name) => [name, hex(WAYPOINT_COLORS[name])])) as Record<WaypointColor, string>;
 
 const paths = new Map<string, Path2D>();
@@ -76,19 +85,10 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-modal', 'true');
   root.setAttribute('aria-label', 'Map');
+  // The chart fills the screen. Over it: the region's name at the top, a column of round tools at the right edge,
+  // the close button in the corner and a rail of key prompts at the bottom.
   root.innerHTML = `
     <div class="gb-map-page">
-      <header class="gb-map-head">
-        <h2>Map</h2>
-        <span class="gb-map-count"></span>
-        <div class="gb-map-tools">
-          <button type="button" data-do="here">Pin where I stand</button>
-          <button type="button" data-do="center">Find me</button>
-          <button type="button" data-do="out" class="gb-map-square" aria-label="Zoom out">&minus;</button>
-          <button type="button" data-do="in" class="gb-map-square" aria-label="Zoom in">+</button>
-          <button type="button" data-do="close">Close</button>
-        </div>
-      </header>
       <div class="gb-map-view">
         <canvas tabindex="0" aria-label="The map. Arrow keys move it, plus and minus zoom, a click drops a waypoint."></canvas>
         <div class="gb-map-north" aria-hidden="true">${svgIcon(ARROW_PATH)}<span>N</span></div>
@@ -108,7 +108,26 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
           </div>
         </div>
       </div>
-      <footer class="gb-map-foot">Click to drop a waypoint. Drag to move, scroll or pinch to zoom. Esc closes.</footer>
+      <header class="gb-map-head">
+        <h2>Map</h2>
+        <p class="gb-map-place" hidden></p>
+      </header>
+      <button type="button" class="gb-map-close" data-do="close" data-icon="close" aria-label="Close the map">${lineIcon(CLOSE_LINES)}</button>
+      <div class="gb-map-tools">
+        <button type="button" data-do="in" data-icon="zoom-in" aria-label="Zoom in">${lineIcon(ZOOM_IN_LINES)}</button>
+        <button type="button" data-do="out" data-icon="zoom-out" aria-label="Zoom out">${lineIcon(ZOOM_OUT_LINES)}</button>
+        <button type="button" data-do="center" data-icon="find-me" aria-label="Find me">${lineIcon(FIND_ME_LINES)}</button>
+        <button type="button" data-do="here" data-icon="pin" aria-label="Pin where I stand">${lineIcon(PIN_LINES)}</button>
+        <span class="gb-map-count"></span>
+      </div>
+      <footer class="gb-map-foot">
+        <span class="gb-cue gb-cue-fine"><kbd>Click</kbd>Waypoint</span>
+        <span class="gb-cue gb-cue-coarse"><kbd>Tap</kbd>Waypoint</span>
+        <span class="gb-cue"><kbd>Drag</kbd>Move</span>
+        <span class="gb-cue gb-cue-fine"><kbd>Wheel</kbd>Zoom</span>
+        <span class="gb-cue gb-cue-coarse"><kbd>Pinch</kbd>Zoom</span>
+        <span class="gb-cue gb-cue-fine"><kbd>Esc</kbd>Close</span>
+      </footer>
     </div>`;
   options.parent.append(root);
 
@@ -116,6 +135,8 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
   const canvas = root.querySelector('canvas')!;
   const g = canvas.getContext('2d')!;
   const count = root.querySelector<HTMLElement>('.gb-map-count')!;
+  const heading = root.querySelector<HTMLElement>('.gb-map-head h2')!;
+  const place = root.querySelector<HTMLElement>('.gb-map-place')!;
   const note = root.querySelector<HTMLElement>('.gb-map-note')!;
   const picker = root.querySelector<HTMLElement>('.gb-map-picker')!;
   const share = picker.querySelector<HTMLInputElement>('input')!;
@@ -381,6 +402,11 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
       returnFocus?.focus?.({ preventScroll: true });
       options.onToggle?.(false);
     },
+    setTitle(title, near) {
+      heading.textContent = title;
+      place.textContent = near ?? '';
+      place.hidden = !near;
+    },
     invalidate(x, z, w, d) {
       const c0x = Math.floor(x / SEEN_CELL), c1x = Math.floor((x + w - 1) / SEEN_CELL), c0z = Math.floor(z / SEEN_CELL), c1z = Math.floor((z + d - 1) / SEEN_CELL);
       for (let cz = c0z; cz <= c1z; cz++) {
@@ -450,7 +476,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
   };
 
   // Buttons and keys.
-  root.querySelector('.gb-map-tools')!.addEventListener('click', (e) => {
+  for (const tools of root.querySelectorAll('.gb-map-tools, .gb-map-close')) tools.addEventListener('click', (e) => {
     const action = (e.target as HTMLElement).closest<HTMLElement>('button')?.dataset.do;
     if (action === 'close') api.close();
     else if (action === 'in') zoomAt(1.5, width / 2, height / 2);
@@ -463,7 +489,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     const step = 80 / scale;
     if (e.code === 'Escape') {
       if (picked) { closePicker(); canvas.focus(); } else api.close();
-    } else if ((e.target as HTMLElement | null)?.closest?.('.gb-map-picker, .gb-map-tools') && e.code !== 'Equal' && e.code !== 'Minus') {
+    } else if ((e.target as HTMLElement | null)?.closest?.('.gb-map-picker, .gb-map-tools, .gb-map-close') && e.code !== 'Equal' && e.code !== 'Minus') {
       // Arrow keys and Enter belong to the buttons while one has the focus.
       return;
     } else if (e.code === 'ArrowLeft') { centerX -= step; dirty = true; }
@@ -665,7 +691,11 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
       else if (w.label) label(w.label, toScreenX(w.x), toScreenY(w.z) + 13);
     }
 
-    count.textContent = `Waypoints ${marks.waypoints.length} of ${WAYPOINT_LIMIT}`;
+    const counted = `${marks.waypoints.length}/${WAYPOINT_LIMIT}`;
+    if (count.textContent !== counted) {
+      count.textContent = counted;
+      count.setAttribute('aria-label', `Waypoints ${marks.waypoints.length} of ${WAYPOINT_LIMIT}`);
+    }
     if (picked) {
       if (!marks.waypoints.includes(picked)) closePicker();
       else { syncPicker(); placePicker(); }
