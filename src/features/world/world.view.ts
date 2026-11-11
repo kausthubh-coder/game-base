@@ -5,7 +5,7 @@
 // All chunk work on the page is metered, and stops for the frame when the budget is spent.
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
-import type { Quality } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import type { WorldQuery } from '../../engine/world-query.ts';
 import { buildBlockTextures, drawBlockAtlas, type AtlasSource } from './atlas.view.ts';
 import { CHUNK, HEIGHT, OPAQUE, PAD_CELLS, chunkKey } from './chunk.sim.ts';
@@ -81,8 +81,6 @@ export interface WorldView extends ViewSystem {
   resetWorst(): void;
 }
 
-/** View distance in chunks at each quality level. */
-const RADIUS: Record<Quality, number> = { low: 4, medium: 5, high: 6 };
 const MAX_IN_FLIGHT = 4;
 const CAP_REACH = 18;
 const CAP_QUADS = (CAP_REACH * 2 + 1) ** 2;
@@ -458,7 +456,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
   }
 
   const lookDir = new THREE.Vector3();
-  setRadius(RADIUS[ctx.quality] * viewScale);
+  setRadius(QUALITY[ctx.quality].viewChunks * viewScale);
 
   return {
     sim,
@@ -466,7 +464,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
     stats,
     atlas: textures.source,
 
-    setViewDistance(scale) { viewScale = scale; setRadius(RADIUS[quality] * viewScale); },
+    setViewDistance(scale) { viewScale = scale; setRadius(QUALITY[quality].viewChunks * viewScale); },
     setFocus(x, z) {
       focusX = x; focusZ = z;
     },
@@ -554,7 +552,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
 
     setQuality(next) {
       quality = next;
-      setRadius(RADIUS[quality] * viewScale);
+      setRadius(QUALITY[quality].viewChunks * viewScale);
     },
 
     dispose() {

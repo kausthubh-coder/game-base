@@ -1,10 +1,11 @@
 // The performance meter: an overlay with the numbers that say whether the game is fast, a button
-// that copies them as text, three quality levels and an automatic mode.
+// that copies them as text, the four quality levels and an automatic mode.
 //
 // The meter reads the renderer's counters itself. The host tells it what it cannot see: how long
 // the rules took (`begin('sim')`, `end('sim')`) and the world's numbers (`counters`).
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
+import type { Level } from '../../content/quality.ts';
 import { Governor, type GovernorOptions } from './governor.sim.ts';
 import { createPerfPanel } from './perf.ui.ts';
 import { FrameStats } from './stats.sim.ts';
@@ -45,7 +46,7 @@ export interface PerfSnapshot {
   textures: number;
   /** JavaScript heap in megabytes, or -1 where the browser does not tell. */
   heapMb: number;
-  quality: Quality;
+  quality: Level;
   renderScale: number;
   auto: boolean;
 }
@@ -56,12 +57,12 @@ export interface PerfView extends ViewSystem {
   readonly snapshot: PerfSnapshot;
   /** `?stress=N` from the address, 1 when absent. Multiply the view distance by it. */
   readonly stress: number;
-  readonly quality: Quality;
+  readonly quality: Level;
   /** Start and stop a timer. Wrap the whole frame in 'frame' and the rules in 'sim'. */
   begin(slot: PerfSlot): void;
   end(slot: PerfSlot): void;
   /** 'auto' or a level to hold. */
-  setMode(mode: 'auto' | Quality): void;
+  setMode(mode: 'auto' | Level): void;
   /** The text the copy button copies. */
   report(): string;
 }
@@ -90,19 +91,20 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
   const debug = gl.getExtension('WEBGL_debug_renderer_info');
   const gpu = String(debug ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
 
-  function apply(quality: Quality, scale: number): void {
+  function apply(quality: Level, scale: number): void {
     if (scale !== snapshot.renderScale) {
       snapshot.renderScale = scale;
       renderer.setPixelRatio(basePixelRatio * scale);
     }
     if (quality !== snapshot.quality) {
       snapshot.quality = quality;
-      ctx.quality = quality;
-      options.onQuality?.(quality);
+      // The engine's `Quality` names three of the four levels, so `ultra` travels under that type. See src/content/quality.ts.
+      ctx.quality = quality as Quality;
+      options.onQuality?.(quality as Quality);
     }
   }
 
-  function setMode(mode: 'auto' | Quality): void {
+  function setMode(mode: 'auto' | Level): void {
     snapshot.auto = mode === 'auto';
     if (mode === 'auto') {
       governor.reset(0);
@@ -154,7 +156,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     }
   }
 
-  const panel = createPerfPanel(options.parent ?? document.body, (mode) => setMode(mode as 'auto' | Quality), () => void copy());
+  const panel = createPerfPanel(options.parent ?? document.body, (mode) => setMode(mode as 'auto' | Level), () => void copy());
   panel.setMode(snapshot.auto ? 'auto' : snapshot.quality);
 
   return {

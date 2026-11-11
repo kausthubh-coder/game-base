@@ -6,7 +6,8 @@
 // in the sun's shadow pass. The bolt, the rainbow and the light shafts share one more draw call.
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
-import type { Quality, Vec3 } from '../../engine/types.ts';
+import type { Vec3 } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import { cloudNoise } from './noise.ts';
 import { arcDirection, dull, emptySkyKey, moonArc, moonLit, sampleSky, sunArc, SUN_DOWN, SUN_UP } from './palette.ts';
 import { createPhenomena, type PhenomenaFrame } from './phenomena.view.ts';
@@ -64,14 +65,6 @@ export interface Sky extends ViewSystem {
   /** Draws a lightning bolt down to this point. The flash itself comes from `ambient.flash`. */
   strike(at: Vec3): void;
 }
-
-const LEVELS: Record<Quality, { shadowMap: number; shadowEvery: number; cloudShadows: boolean; shafts: boolean }> = {
-  low: { shadowMap: 1024, shadowEvery: 2, cloudShadows: false, shafts: false },
-  // Cloud shadows go through the sun's shadow map, so they come out as dark and hard-edged as a tree's: off
-  // unless the Graphics setting turns them on, until they are drawn as a soft tint on the ground instead.
-  medium: { shadowMap: 1536, shadowEvery: 1, cloudShadows: false, shafts: false },
-  high: { shadowMap: 2048, shadowEvery: 1, cloudShadows: false, shafts: true },
-};
 
 /** How far the light sits from the shadow target. */
 const LIGHT_DISTANCE = 120;
@@ -171,7 +164,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   const shadowLayer = options.shadowLayer ?? 30;
   let shadowRange = options.shadowRange ?? 40;
   let fogStart = options.fogStart ?? 30, fogEnd = options.fogEnd ?? 170;
-  let level = LEVELS[ctx.quality];
+  let level = QUALITY[ctx.quality];
 
   // ---- the noise image shared by the clouds and their shadows
   const noiseSize = 128;
@@ -390,7 +383,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
     },
 
     setQuality(quality) {
-      level = LEVELS[quality];
+      level = QUALITY[quality];
       applyShadowSettings();
     },
 
@@ -511,7 +504,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
       showing.rainbowCenter.copy(rainbowAnchor);
       showing.rainbowRadius = 35;
 
-      showing.shafts = level.shafts ? dawn * (1 - overcast) * (1 - a.fog) : 0;
+      showing.shafts = level.lightShafts ? dawn * (1 - overcast) * (1 - a.fog) : 0;
       phenomena.update(dt, showing);
     },
 

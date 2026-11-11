@@ -22,6 +22,7 @@ import * as THREE from 'three';
 import { propDef, type PropDef, type PropKind } from '../../content/props.ts';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality, Vec3 } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import { buildProp, propExtras } from './build.ts';
 import { hash3, jitterAt, type Jitter } from './jitter.sim.ts';
 import { darkness } from './light.sim.ts';
@@ -99,13 +100,6 @@ export interface Props extends ViewSystem {
   lights(): readonly PropLight[];
   stats(): PropsStats;
 }
-
-/** How each quality level trims the work. */
-const LEVELS: Record<Quality, { plants: number; shadows: boolean }> = {
-  low: { plants: 0.45, shadows: false },
-  medium: { plants: 0.8, shadows: true },
-  high: { plants: 1, shadows: true },
-};
 
 /** One instanced mesh and how much of it is filled. */
 interface Batch {
@@ -322,7 +316,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
 
   /** Writes a cell's props out again as rows. It runs once after the cell's props change, when the cell is next in view. */
   function remake(cell: Cell): void {
-    const level = LEVELS[quality];
+    const level = QUALITY[quality];
     for (const rows of cell.rows) rows.count = 0;
     _order.length = 0;
     for (const p of cell.props.values()) _order.push(p);
@@ -332,7 +326,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       const rank = thinRank(p);
       _matrix.compose(_position.set(p.x, p.y, p.z), _turn.setFromAxisAngle(UP, p.rotation), _scale.set(p.scale, p.scale, p.scale));
       addRow(rowsFor(cell, p.model.batch), _matrix, p.r, p.g, p.b, rank);
-      if (!(shadowOverride ?? level.shadows)) continue;
+      if (!(shadowOverride ?? level.propShadows)) continue;
       const { blobs, boxes: boxList } = p.model.extras;
       for (let i = 0; i < blobs.length; i += 16) addRow(rowsFor(cell, balls), _part.fromArray(blobs, i).premultiply(_matrix), 1, 1, 1, rank);
       for (let i = 0; i < boxList.length; i += 16) addRow(rowsFor(cell, boxes), _part.fromArray(boxList, i).premultiply(_matrix), 1, 1, 1, rank);
@@ -344,7 +338,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   /** How many of a cell's rows its share of small plants keeps. They are in rank order, so it is the first ones. */
   function kept(rows: Rows, cell: Cell): number {
     if (cell.keep >= 1) return rows.count;
-    const limit = cell.keep * (plantDensity ?? LEVELS[quality].plants);
+    const limit = cell.keep * (plantDensity ?? QUALITY[quality].plants);
     let n = rows.count;
     while (n > 0 && rows.ranks[n - 1] >= limit) n--;
     return n;
@@ -506,7 +500,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       const camera = frame.camera;
       camera.updateMatrixWorld();
       frustum.setFromProjectionMatrix(_matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-      const shadows = shadowOverride ?? LEVELS[quality].shadows;
+      const shadows = shadowOverride ?? QUALITY[quality].propShadows;
       // Pixels a meter is tall on screen at one meter from the camera, or anywhere for a flat projection.
       const half = frame.renderer ? frame.renderer.getDrawingBufferSize(_drawn).y / 2 : 450;
       const perMeter = camera.projectionMatrix.elements[5] * half;

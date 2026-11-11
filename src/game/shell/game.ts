@@ -8,6 +8,7 @@ import { readGraphics, type Graphics } from './graphics.ts';
 import * as THREE from 'three';
 import type { ViewContext } from '../../engine/system.ts';
 import { calmNoon, type Quality } from '../../engine/types.ts';
+import { LEVELS, QUALITY, levelOf, type Level } from '../../content/quality.ts';
 import { flatWorld } from '../../engine/world-query.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import { LAND_BLOCKS } from '../../content/land.ts';
@@ -52,7 +53,6 @@ const NEXT_CAMERA: Record<CameraMode, CameraMode> = { tilt: 'free', free: 'first
 const READY_REACH = 1;
 /** Chunks loaded on the spot around a teleport or a start, each way, so the rules never see a hole. */
 const LOAD_REACH = 3;
-const LEVELS: readonly Quality[] = ['low', 'medium', 'high'];
 
 export interface ShellOptions {
   canvas: HTMLCanvasElement;
@@ -96,7 +96,7 @@ function readSettings(): StoredSettings {
   const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', mouse: 'drag', tiltTurn: 'quarter', characters: 'sprites' };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
-    if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Quality)) settings.quality = stored!.quality as QualityMode;
+    if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Level)) settings.quality = stored!.quality as QualityMode;
     settings.graphics = readGraphics(stored?.graphics);
     if (CAMERA_MODES.includes(stored?.camera as CameraMode)) settings.camera = stored!.camera as CameraMode;
     if (MOUSE_STYLES.includes(stored?.mouse as MouseStyle)) settings.mouse = stored!.mouse as MouseStyle;
@@ -117,7 +117,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const params = new URLSearchParams(location.search);
   const settings = readSettings();
   // `?quality=low` holds a level for this visit only. It is how a test gets the same picture every time.
-  const asked = LEVELS.find((level) => level === params.get('quality'));
+  const asked = levelOf(params.get('quality'));
   let mode: QualityMode = asked ?? settings.quality;
   // `?camera=free`, `?mouse=lock`, `?turn=smooth` and `?chars=models` hold a camera mode, a mouse style, the 2.5D
   // turning and a character look for this visit, so a test or a comparison shot gets the same picture whatever was stored.
@@ -129,13 +129,16 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // ---------------------------------------------------------------- the renderer and the scene
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-  // A laptop at 150% scaling would draw 2.25 times the pixels of 1080p for little gain in a pixel-art world.
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  const startLevel: Level = mode === 'auto' ? 'high' : mode;
+  // A laptop at 150% scaling would draw 2.25 times the pixels of 1080p for little gain in a pixel-art world,
+  // so the quality table caps the pixels drawn for each CSS pixel.
+  const pixelRatio = (level: Level): number => Math.min(window.devicePixelRatio, QUALITY[level].pixelRatio);
+  renderer.setPixelRatio(pixelRatio(startLevel));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x10141a);
   const lens = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 400);
-  const ctx: ViewContext = { scene, camera: lens, renderer, ambient: calmNoon(), world: flatWorld, quality: mode === 'auto' ? 'high' : mode, time: 0 };
+  const ctx: ViewContext = { scene, camera: lens, renderer, ambient: calmNoon(), world: flatWorld, quality: startLevel as Quality, time: 0 };
 
   const art = await loadArt(options.onProgress);
 
@@ -149,6 +152,9 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     parent: perfHolder,
     auto: mode === 'auto',
     onQuality(quality) {
+      post.setPixelRatio(pixelRatio(quality));
+      // The level may reach shadows further: the sky is told again on the next frame.
+      lastRange = lastZoom = -1;
       world.setQuality?.(quality);
       sky.setQuality?.(quality);
       water.setQuality?.(quality);
@@ -534,14 +540,14 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     if (look) {
       // The free and first-person cameras see the horizon: the fog reaches as far as the view distance asks and is
       // whole before the loaded land ends.
-      const range = settings.graphics.shadowDistance ?? look.shadowRange;
+      const range = settings.graphics.shadowDistance ?? look.shadowRange * QUALITY[ctx.quality].shadowReach;
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       const edge = world.stats.radius * 16 - 8, far = settings.graphics.viewDistance ?? 1;
       // The painted world draws land to the horizon, so its fog is only the air: thin, and whole far past the loaded land.
       if (painted) sky.setFogReach(HAZE.fog[0] as number, HAZE.fog[1] as number);
       else sky.setFogReach(Math.min(look.fogStart * far, edge * 0.45), Math.min(look.fogEnd * far, edge));
     } else if (cam) {
-      const range = settings.graphics.shadowDistance ?? Math.round(camera.stepped(cam.shadowRange));
+      const range = settings.graphics.shadowDistance ?? Math.round(camera.stepped(cam.shadowRange) * QUALITY[ctx.quality].shadowReach);
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       // The fog is whole before the loaded land ends, which is nearer at a lower quality.
       const edge = world.stats.radius * 16 - 8;
@@ -549,7 +555,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       else sky.setFogReach(Math.min(camera.stepped(cam.fogStart), edge * 0.45), Math.min(camera.stepped(cam.fogEnd), edge));
     } else if (camera.zoom !== lastZoom) {
       lastZoom = camera.zoom;
-      sky.setShadowRange(30 + 14 * camera.zoom);
+      sky.setShadowRange((30 + 14 * camera.zoom) * QUALITY[ctx.quality].shadowReach);
     }
     sky.setShadowTarget(p);
     sky.setMoonPhase(3 + game.clock.day);
@@ -614,7 +620,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     }
     sky.setCloudShadows(g.cloudShadows);
     effects.setWeatherEnabled(g.weatherParticles ?? true);
-    post.set({ bloom: g.bloom ?? ctx.quality !== 'low' });
+    post.set({ bloom: g.bloom ?? QUALITY[ctx.quality].bloom });
     // No blur toward the screen's edges, no dark corners and no roll-off: the painted picture is sharp and plain.
     if (painted) post.set({ tiltShift: false, vignette: false, toneMapping: false });
     world.setViewDistance((g.viewDistance ?? 1) * perf.stress * (cam?.load ?? 1));

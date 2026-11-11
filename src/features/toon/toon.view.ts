@@ -13,6 +13,7 @@
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import type { WorldQuery } from '../../engine/world-query.ts';
 import { bake, bakedTexture, type BakeOptions, type Baked, type BakedClip } from './bake.ts';
 
@@ -123,8 +124,6 @@ const GAIT_RATE: readonly [number, number] = [0.55, 1.8];
 const TEXELS = 3 + SLOTS;
 /** Lamp light at full strength, as for sprites and the terrain. */
 const LAMP: readonly [number, number, number] = [1.3, 1.0, 0.62];
-/** How many characters re-read the world's light each frame. */
-const REFRESH: Record<Quality, number> = { low: 4, medium: 8, high: 16 };
 
 // ---------------------------------------------------------------- shaders
 
@@ -652,7 +651,8 @@ varying float vToonGlow;`)
         splitLight = splitLightOf(world);
         for (const c of all) readLight(c);
       }
-      for (let n = Math.min(REFRESH[quality], all.length); n > 0; n--) {
+      // A few characters re-read the world's light each frame.
+      for (let n = Math.min(QUALITY[quality].modelLightRefresh, all.length); n > 0; n--) {
         if (cursor >= all.length) cursor = 0;
         readLight(all[cursor++]);
       }
@@ -682,7 +682,7 @@ varying float vToonGlow;`)
           body.shadow.visible = count > 0;
         }
         // The outline is the first thing to go on a weak machine: it doubles the triangles.
-        body.outline.visible = count > 0 && outlineWidth > 0 && quality !== 'low';
+        body.outline.visible = count > 0 && outlineWidth > 0 && QUALITY[quality].modelOutlines;
         if (count > 0) {
           body.mesh.instanceMatrix.needsUpdate = true;
           body.instanceTexture.needsUpdate = true;

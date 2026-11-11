@@ -1,10 +1,11 @@
 // The meter's panel: a few lines of numbers, the quality buttons and the copy button.
+import { LEVELS } from '../../content/quality.ts';
 
 export interface PerfPanel {
   root: HTMLElement;
   /** Sets the text of the numbers. One string with line breaks. */
   setText(text: string): void;
-  /** Marks the pressed button: 'auto', 'low', 'medium' or 'high'. */
+  /** Marks the pressed button: 'auto' or a level. */
   setMode(mode: string): void;
   /** Shows a short note next to the copy button, for example "copied". */
   flash(note: string): void;
@@ -38,7 +39,7 @@ export function createPerfPanel(parent: HTMLElement, onMode: (mode: string) => v
   const modes = document.createElement('div');
   modes.className = 'row';
   const buttons = new Map<string, HTMLButtonElement>();
-  for (const mode of ['auto', 'low', 'medium', 'high']) {
+  for (const mode of ['auto', ...LEVELS]) {
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = mode;

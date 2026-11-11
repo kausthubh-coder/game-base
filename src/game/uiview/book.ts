@@ -1,6 +1,7 @@
 // What the interface views share: the one `createGameUi`, the pictures, and who has the screen.
 // Each `ui-*.view.ts` asks for it with `bookOf(view)`. The first call makes it, so the views work in
 // any order. It is kept per `GameView`, not as a global.
+import { levelOf } from '../../content/quality.ts';
 import type { Systems } from '../api.sim.ts';
 import type { GameView } from '../shell/view.ts';
 import { createGameUi, type GameUi, type PanelName } from '../ui/index.ui.ts';
@@ -76,7 +77,7 @@ function createBook(view: GameView): Book {
   let size = 1;
   /** `?quality=low` holds a level for this visit, so the stored one is not applied over it when the interface is made. */
   let made = false;
-  const heldQuality = ['low', 'medium', 'high'].includes(params.get('quality') ?? '');
+  const heldQuality = levelOf(params.get('quality')) !== null;
 
   const ui = createGameUi(root, game, {
     icon: art.icon,

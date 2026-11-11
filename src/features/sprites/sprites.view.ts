@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 import type { WorldQuery } from '../../engine/world-query.ts';
 import type { Assets, SpriteAsset, SpriteAtlas } from '../assets/index.ts';
 import { foldStart, frameAt, loopSeconds, seededRandom, startForPhase } from './animation.ts';
@@ -150,8 +151,6 @@ const ATTRIBUTES: readonly (readonly [string, number])[] = [
 const DEFAULT_ALPHA_CUT = 0.35;
 /** Start times are sent to the GPU relative to a moment that moves forward this often, so they stay exact. */
 const REBASE_SECONDS = 512;
-/** How many characters re-read the world's light and ground each frame, so a new lamp or a dug hole shows within a second or so. */
-const REFRESH: Record<Quality, number> = { low: 8, medium: 16, high: 32 };
 
 interface AnimDef {
   name: string;
@@ -333,7 +332,8 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
   };
   let world = ctx.world;
   let splitLight = splitLightOf(world);
-  let refresh = REFRESH[ctx.quality];
+  /** How many characters re-read the world's light and ground each frame, so a new lamp or a dug hole shows within a second or so. */
+  let refresh = QUALITY[ctx.quality].spriteLightRefresh;
   let cursor = 0;
   let sky: SpritesSky | null = null;
   const daylight: Rgb = [1, 1, 1];
@@ -776,7 +776,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
 
     setQuality(quality: Quality) {
       // The drawing costs the same at every level. Only the upkeep changes.
-      refresh = REFRESH[quality];
+      refresh = QUALITY[quality].spriteLightRefresh;
     },
 
     update(_dt, frame) {

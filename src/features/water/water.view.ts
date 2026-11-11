@@ -8,7 +8,8 @@
 // Optional: a `aFlow` attribute (vec2, blocks a second along x and z) makes a river show which way it runs.
 import * as THREE from 'three';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
-import type { Quality, Vec3 } from '../../engine/types.ts';
+import type { Vec3 } from '../../engine/types.ts';
+import { QUALITY } from '../../content/quality.ts';
 
 export interface WaterOptions {
   /** The side of the picture of the land, in blocks. A power of two. Water farther than half of this from the focus is drawn plain. */
@@ -153,8 +154,6 @@ void main() {
   #include <fog_fragment>
 }`;
 
-const RAIN_GRIDS: Record<Quality, number> = { low: 1, medium: 2, high: 2 };
-
 export function createWaterMaterial(ctx: ViewContext, options: WaterOptions = {}): Water {
   const size = options.landSize ?? 128;
   const rowsPerFrame = options.rowsPerFrame ?? 4;
@@ -186,7 +185,7 @@ export function createWaterMaterial(ctx: ViewContext, options: WaterOptions = {}
   const material = new THREE.ShaderMaterial({
     name: 'water',
     uniforms,
-    defines: { RAIN_GRIDS: RAIN_GRIDS[ctx.quality] },
+    defines: { RAIN_GRIDS: QUALITY[ctx.quality].rainRings },
     vertexShader: VERTEX,
     fragmentShader: FRAGMENT,
     transparent: true,
@@ -249,7 +248,7 @@ export function createWaterMaterial(ctx: ViewContext, options: WaterOptions = {}
     refresh,
 
     setQuality(quality) {
-      material.defines.RAIN_GRIDS = RAIN_GRIDS[quality];
+      material.defines.RAIN_GRIDS = QUALITY[quality].rainRings;
       material.needsUpdate = true;
     },
 
