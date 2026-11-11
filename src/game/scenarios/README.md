@@ -51,7 +51,7 @@ Then add it to `all.sim.ts`. A test fails when a file here is missing from that 
   refuses, and the scenario fails with that input and where the game was. `fails: true` expects the refusal.
 - A place is a name from `src/game/content/region.ts`. A block is counted from the block the place stands in:
   `dx` east, `dz` south, and `dy` up, which is -1 when left out, the ground.
-- Only `wait`, `walk`, `dig`, `fell`, `feed`, `keys` and `hold` let time pass.
+- Only `wait`, `walk`, `dig`, `fell`, `feed`, `keys` and `hold` let time pass. One step follows a `reload`, as the first frame after Continue does.
 - `check` asserts something in the middle. `run` takes a function of the play for what the list has no word for.
 - The invariants of `src/game/play/invariants.sim.ts` are checked after every kernel step.
 - No file here is called `index.sim.ts`. `src/game/systems.ts` would install the folder as a system of the game.
