@@ -22,5 +22,5 @@
       "selected": true
     }
   ],
-  "processing": "bun assets-src/rebuild-hero-swing.mjs; slice, alpha cleanup, palette snap, whole-figure nearest-neighbor scaling. Only hero-swing.png written; manifest preserved."
+  "processing": "bun tools/sprites/hero-swing.mjs; slice, alpha cleanup, palette snap, whole-figure nearest-neighbor scaling. Only hero-swing.png written; manifest preserved."
 }

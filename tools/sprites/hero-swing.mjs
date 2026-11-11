@@ -1,7 +1,7 @@
 // Rebuild only the explicitly replaceable hero-swing sheet. The manifest and frozen hero stay untouched.
-// Run from the repo root: bun assets-src/rebuild-hero-swing.mjs
+// Run from the repo root: bun tools/sprites/hero-swing.mjs
 import sharp from 'sharp';
-import {pixels,cell,clean,bounds,snap,fitted,readJSON} from '../tools/sprites/lib.mjs';
+import {pixels,cell,clean,bounds,snap,fitted,readJSON} from './lib.mjs';
 const p=await pixels('assets-src/raw/hero-swing-3.png');
 const palette=(await readJSON('assets-src/palette.json')).colors;
 const cells=[];

@@ -6,7 +6,7 @@ The old swing sheet was a different-looking generated character. The replacement
 
 ## Rebuild
 
-Run `bun assets-src/rebuild-hero-swing.mjs`. This uses the existing story pipeline's slice, clean, palette snap and nearest-neighbor fit operations, followed by whole-figure horizontal scaling to approach the reference width and vertical scaling of the side row to the reference height. It writes only `public/assets/sprites/hero-swing.png`. It bypasses `build-story.mjs`'s skip-existing loop without changing the manifest. No replacement pixels, separate head/body edits or baseline changes.
+Run `bun tools/sprites/hero-swing.mjs`. This uses the existing story pipeline's slice, clean, palette snap and nearest-neighbor fit operations, followed by whole-figure horizontal scaling to approach the reference width and vertical scaling of the side row to the reference height. It writes only `public/assets/sprites/hero-swing.png`. It bypasses `build-story.mjs`'s skip-existing loop without changing the manifest. No replacement pixels, separate head/body edits or baseline changes.
 
 During candidate previews I temporarily removed only the hero-swing manifest entry to run the existing story builder, then restored the exact original manifest. The committed rebuild script needs no such manifest edit.
 
