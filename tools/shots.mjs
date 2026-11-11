@@ -11,7 +11,6 @@ for (const key of selected) if (!scenes[key]) throw new Error(`unknown scene ${k
 const out = resolve(root, '.artifacts/shots'), approved = resolve(root, 'docs/shots/approved');
 mkdirSync(out, { recursive: true }); mkdirSync(approved, { recursive: true });
 const port = Number(process.env.PLAY_PORT || 5526);
-if (port < 5520 || port > 5529) throw new Error('use a port in 5520..5529');
 async function build() {
   const child = spawn('bun', ['run', 'build', '--outDir', join(out, 'site'), '--emptyOutDir'], { cwd: root, stdio: 'inherit' });
   await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error(`build exited ${code}`))); });

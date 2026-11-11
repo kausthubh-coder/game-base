@@ -1,6 +1,6 @@
 # Play in Chrome
 
-`bun tools/play.mjs start --mode human` builds the game and starts one browser for this worktree on port 5525. `--port` accepts 5520 through 5529. The session serves its own build in `.artifacts/play/site`, so another build cannot remove its assets. The session file, log and automatic input recordings live under `.artifacts/play/`. `stop` closes Chrome and the server owned by that session.
+`bun tools/play.mjs start --mode human` builds the game and starts one browser for this worktree on port 5525. `--port` or `PLAY_PORT` selects the worktree's assigned port. The session serves its own build in `.artifacts/play/site`, so another build cannot remove its assets. The session file, log and automatic input recordings live under `.artifacts/play/`. `stop` closes Chrome and the server owned by that session.
 
 Send `do` a JSON object. Human mode supports these inputs:
 
