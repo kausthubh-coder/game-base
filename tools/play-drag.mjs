@@ -2,7 +2,8 @@
 // the real mouse, drags the 2.5D camera and the free camera around with the right button held, checks each turn
 // placed nothing, and checks a right click (and one with a little jitter) still sets a plank down.
 // The 2.5D camera glides to the nearest quarter when let go, and on Smooth stays where it was let go. Then the Mouse
-// setting: Lock to turn takes the mouse on a click, as Genshin does, and Drag to turn gives it back.
+// setting: Lock to turn takes the mouse on a click, as Genshin does, and Drag to turn gives it back. In first person
+// a panel gives the mouse back and takes it again when closed by its key or its close button, not after Esc or Alt.
 //   bun tools/play-drag.mjs [--port 5391] [--dist dist-drag] [--no-build] [--shots <folder>]
 // With --shots it writes before, mid-drag and after frames at the spawn and the town square, the 2.5D view at a
 // quarter turn and between two, and the Settings rows, at 1440 by 900. This Mac draws WebGL in software, so it
@@ -272,6 +273,38 @@ try {
   await game(() => window.__game.setCamera('first'));
   await frames(2);
   check('First person locks the mouse whatever the setting', (await state()).camera.mouse === 'lock');
+
+  // ---- a panel gives the mouse back, and closing it takes the mouse again
+  const lockedNow = async () => { await frames(3); return (await state()).camera.locked; };
+  await page.mouse.click(720, 450);
+  check('First person: a click in the world takes the mouse', await lockedNow());
+  await page.keyboard.press('KeyB');
+  await page.waitForSelector('.gu-panel .gu-close');
+  check('First person: the bag gives the mouse back', !(await lockedNow()));
+  await page.keyboard.press('KeyB');
+  await page.waitForFunction(() => !window.__game.view.game.player.busy);
+  check('First person: closing the bag with its key takes the mouse again', await lockedNow());
+  await page.keyboard.press('KeyB');
+  await page.click('.gu-panel .gu-close');
+  await page.waitForFunction(() => !window.__game.view.game.player.busy);
+  check('First person: closing the bag with its close button takes the mouse again', await lockedNow());
+  await page.keyboard.press('Alt');
+  check('First person: Alt gives the mouse back', !(await lockedNow()));
+  await page.keyboard.press('KeyB');
+  await page.waitForSelector('.gu-panel .gu-close');
+  await page.keyboard.press('KeyB');
+  await page.waitForFunction(() => !window.__game.view.game.player.busy);
+  check('First person: a panel opened after Alt leaves the mouse free when it closes', !(await lockedNow()));
+  // Chrome never grants the lock just after Esc, so a panel closed with it leaves the next click to take the mouse.
+  await page.mouse.click(720, 450);
+  await page.keyboard.press('KeyB');
+  await page.waitForSelector('.gu-panel .gu-close');
+  await page.keyboard.press('Escape');
+  await page.waitForFunction(() => !window.__game.view.game.player.busy);
+  await frames(3);
+  await page.mouse.click(720, 450);
+  check('First person: after a panel closed with Esc, a click in the world takes the mouse', await lockedNow());
+
   await game(() => window.__game.setCamera('tilt'));
   await frames(2);
   check('Back on 2.5D the mouse points again', (await state()).camera.mouse === 'point' && !(await state()).camera.locked);

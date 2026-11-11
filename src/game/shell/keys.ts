@@ -9,8 +9,10 @@
 //   `point` zooms in steps, `drag` smoothly.
 //   `lock` (first person, and the free camera with Lock to turn) works as Genshin does on a PC: a click in the
 //   world hides the cursor and from then on the mouse turns the view. That first click does nothing else, so
-//   the click that takes the mouse never breaks a block. Alt or Esc gives the cursor back, and so does anything
-//   that holds the player (a panel, the map, a conversation, the title). The next click in the world takes it again.
+//   the click that takes the mouse never breaks a block. Alt or Esc gives the cursor back, and the next click in
+//   the world takes it again. Anything that holds the player (a panel, the map, a conversation, the title) gives
+//   it back too, and takes it again when it lets go, if the cursor was locked when it began and the browser
+//   still counts the close as the player's doing (a click or a key, not Esc). Otherwise a click takes it.
 
 import { RightDrag } from './drag.ts';
 
@@ -107,6 +109,8 @@ export function createKeys(canvas: HTMLElement): Keys {
   const dragEnds = new Set<() => void>();
   let primary = false, capture = false;
   let mode: MouseMode = 'point', cursorFree = false, lockFailed = false, lookX = 0, lookY = 0;
+  /** True while something holds the player that took the lock away, so letting go takes it again. */
+  let relock = false, relocking = false;
   const right = new RightDrag();
   const isLocked = (): boolean => document.pointerLockElement === canvas;
   /** True when a click in the world may take the mouse. */
@@ -166,6 +170,13 @@ export function createKeys(canvas: HTMLElement): Keys {
     if (!was) return;
     canvas.style.cursor = '';
     for (const fn of [...dragEnds]) fn();
+  }
+
+  /** Asks the browser for the lock. A refused relock is no reason to stop asking on a click. */
+  function takeLock(again: boolean): void {
+    relocking = again;
+    const asked = canvas.requestPointerLock() as unknown as Promise<void> | undefined;
+    asked?.then?.(() => { relocking = false; }, () => { if (!relocking) lockFailed = true; relocking = false; });
   }
 
   /** A button went down on the world. */
@@ -233,8 +244,7 @@ export function createKeys(canvas: HTMLElement): Keys {
     movePointer(e);
     if (mayLock() && !isLocked()) {
       // This click takes the mouse and does nothing else.
-      const asked = canvas.requestPointerLock() as unknown as Promise<void> | undefined;
-      asked?.catch?.(() => { lockFailed = true; });
+      takeLock(false);
       return;
     }
     buttonDown(e);
@@ -244,7 +254,7 @@ export function createKeys(canvas: HTMLElement): Keys {
     else if (e.button === 2) endRight(e);
   }, on);
   window.addEventListener('pointercancel', () => { letGo('lost'); cancelRight(); }, on);
-  document.addEventListener('pointerlockerror', () => { lockFailed = true; }, on);
+  document.addEventListener('pointerlockerror', () => { if (!relocking) lockFailed = true; }, on);
   document.addEventListener('pointerlockchange', () => { if (!isLocked()) letGo('lost'); }, on);
   document.addEventListener('pointermove', (e) => {
     // Without the lock (a browser that refuses it) the mouse turns the view while it is over the world.
@@ -319,9 +329,18 @@ export function createKeys(canvas: HTMLElement): Keys {
       return () => dragEnds.delete(fn);
     },
     freeCursor(free) {
+      const wasFree = cursorFree;
       cursorFree = free;
       if (free) cancelRight();
-      if (free && isLocked()) document.exitPointerLock();
+      if (free && isLocked()) {
+        relock = true;
+        document.exitPointerLock();
+      }
+      if (free || !wasFree || !relock) return;
+      relock = false;
+      // The browser grants the lock only soon after a click or a key, and never just after Esc.
+      const active = (navigator as { userActivation?: { isActive: boolean } }).userActivation?.isActive ?? true;
+      if (mayLock() && !isLocked() && active) takeLock(true);
     },
     capturePrimary(next) { capture = next; },
     takeLook(out) {
