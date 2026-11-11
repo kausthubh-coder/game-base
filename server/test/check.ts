@@ -35,7 +35,7 @@ try {
   // ---------------------------------------------------------------- the game's files
   const page = await fetch(`${server.http}/`);
   const html = await page.text();
-  const script = /src="\.?\/?(assets\/index-[^"]+\.js)"/.exec(html)?.[1];
+  const script = /src="\.?\/?(assets\/(?:[\w-]+\/)*index-[^"]+\.js)"/.exec(html)?.[1];
   const js = script ? await fetch(`${server.http}/${script}`) : null;
   const jsBytes = js ? (await js.arrayBuffer()).byteLength : 0;
   check('/ serves the built game',

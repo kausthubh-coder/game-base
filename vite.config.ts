@@ -4,6 +4,8 @@ import { assetBuild } from './tools/asset-build.mjs';
 // The game is the index.html at the root. Each demo is its own small page, built by tools/demo.mjs.
 export default defineConfig({
   base: './',
+  // The build's version. The world server refuses a browser whose version differs and tells it to reload.
+  define: { __BUILD__: JSON.stringify(process.env.BUILD ?? 'dev') },
   plugins: [assetBuild()],
   worker: { format: 'es' },
   build: { assetsDir: 'assets/fingerprinted', target: 'es2022', chunkSizeWarningLimit: 1500 },

@@ -10,12 +10,14 @@
     "typecheck": "bun tools/typecheck.mjs",
     "test": "bun test src",
     "boundaries": "bun tools/boundaries.mjs",
-    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && bun test src",
+    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && tsc -p server && tsc -p server/test && bun test src server",
     "demo:build": "bun tools/demo.mjs build",
     "demo:dev": "bun tools/demo.mjs dev",
     "serve": "bun tools/serve.mjs",
     "shot": "bun tools/shot.mjs",
     "doctor": "bun tools/doctor.mjs",
+    "server": "wrangler dev",
+    "server:check": "bun server/test/check.ts",
     "lint": "biome lint ."
   },
   "devDependencies": {
