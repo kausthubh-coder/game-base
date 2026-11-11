@@ -5,7 +5,7 @@
 // with one layer per page, so every character in the world can be drawn in one call.
 import * as THREE from 'three';
 import {
-  AssetError, checkCell, checkSheetSize, parseManifest,
+  AssetError, checkCell, checkSheetSize, parseManifest, wantedFiles,
   type AnimationEntry, type Manifest, type SpriteEntry,
 } from './manifest.ts';
 import { packAtlas } from './pack.ts';
@@ -283,16 +283,7 @@ export async function loadAssets(options: AssetsOptions = {}): Promise<Assets> {
   }
   const manifest = parseManifest(json);
 
-  // Each file once, with the entry that lists it, so a missing file can say who needs it.
-  const wanted = new Map<string, string>();
-  for (const [name, entry] of Object.entries(manifest.sprites)) if (!wanted.has(entry.sheet)) wanted.set(entry.sheet, `the sheet of sprite "${name}"`);
-  if (manifest.blocks && !wanted.has(manifest.blocks.atlas)) wanted.set(manifest.blocks.atlas, 'the block atlas');
-  if (manifest.icons && !wanted.has(manifest.icons.sheet)) wanted.set(manifest.icons.sheet, 'the icon sheet');
-  for (const [name, entry] of Object.entries(manifest.icons?.sheets ?? {})) if (!wanted.has(entry.sheet)) wanted.set(entry.sheet, `the "${name}" icon sheet`);
-  for (const [name, entry] of Object.entries(manifest.sheets)) if (!wanted.has(entry.sheet)) wanted.set(entry.sheet, `the "${name}" sheet`);
-  for (const [group, listed] of Object.entries(manifest.images)) {
-    for (const [name, file] of Object.entries(listed)) if (!wanted.has(file)) wanted.set(file, `the "${name}" image of "${group}"`);
-  }
+  const wanted = wantedFiles(manifest);
 
   const total = wanted.size + 1;
   let loaded = 1;

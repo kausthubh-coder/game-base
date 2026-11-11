@@ -149,6 +149,7 @@ The sprite pipeline writes it. The game never guesses a file name.
 - **Blocks.** One atlas of square tiles. A tile name maps to a list of cells, `[column, row]`. More than one cell means variants, and the game picks one by position.
 - **Icons.** One sheet of square tiles, each named.
 - Paths are relative to `public/assets/`. Every image is a PNG with a transparent background where it needs one.
+- The build (`tools/asset-build.mjs`) ships each PNG as a lossless WebP when that is smaller, with the same pixels, so the built manifest names `.webp` files. It also preloads, in the built page, every file the first frame waits for.
 
 Additional manifest sections use the same PNG contract:
 

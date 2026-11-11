@@ -7,7 +7,7 @@ import { resolve, extname } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import sharp from 'sharp';
 const port=Number(process.env.LOAD_PORT || 5554), root=resolve('.artifacts/load/proof-dist');
-const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.mp3':'audio/mpeg'};
+const types={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2','.mp3':'audio/mpeg'};
 let hits=[];
 const server=createServer(async(req,res)=>{
  const path=new URL(req.url,'http://x').pathname; hits.push(path);

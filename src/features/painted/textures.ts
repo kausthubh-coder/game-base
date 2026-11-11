@@ -178,9 +178,11 @@ function cobbles(): THREE.DataTexture {
 /** `base` is the folder the paintings are served from, with its last slash. */
 export async function loadTextures(base: string): Promise<Textures> {
   const standIns: string[] = [];
+  // Every painting is asked for at once, so they download side by side. They are finished in order below.
+  const files = new Map(['brush', 'meadow', 'bark', 'rock', 'tuft-1', 'tuft-2', 'cloud-1', 'cloud-2', 'cloud-3', 'cloud-4', 'cloud-5', 'cloud-6'].map((name) => [name, image(base, name)]));
   async function one(name: string, repeat: boolean, color: boolean, standIn: () => HTMLCanvasElement, painted = true): Promise<[THREE.Texture, CanvasImageSource]> {
     // A texture that is always drawn by code asks for no file, so nothing fails to load.
-    const img = painted ? await image(base, name) : null;
+    const img = painted ? await (files.get(name) ?? image(base, name)) : null;
     if (!img) standIns.push(name);
     const source = img ?? standIn();
     return [finish(source, repeat, color), source];

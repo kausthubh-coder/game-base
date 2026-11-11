@@ -41,7 +41,7 @@ Nothing on hand can measure it. This Mac draws WebGL in software, and the Window
 
 | Roblox | What it does | Our version | Status |
 |---|---|---|---|
-| Assets by id on its CDN | Each mesh, image and sound has an id. The client downloads it the first time it is needed and keeps it in its cache. | Every asset file gets a content hash in its name and a long cache life. A service worker keeps a copy, so a second visit downloads nothing. | Missing |
+| Assets by id on its CDN | Each mesh, image and sound has an id. The client downloads it the first time it is needed and keeps it in its cache. | Every asset file gets a content hash in its name and a long cache life. A service worker keeps a copy, so a second visit downloads nothing. The built page preloads what the first frame needs, and PNGs ship as lossless WebP. | Done |
 | Instance streaming | The server sends only the part of the world near the player. A minimum radius always stays loaded. A target radius loads when there is room. Far parts are dropped when memory runs low. | The world is cut into regions. The game downloads and builds the regions near the hero, and drops far ones. Props already sit in 32-block cells. | Partly |
 | SLIM and mesh LOD | At publish, Roblox's servers make several detail levels of each model and strip hidden faces. The client picks one by distance and by device. | The bake step makes a far version of every asset. The low tier uses far versions sooner. Far trees and NPCs become flat cards. | Missing |
 | Automatic graphics quality | The client lowers quality on weak devices by itself. | `governor.sim.ts`. It needs a low tier that changes the look on purpose: no leaf cards, blob shadows, no post effects. | Partly |

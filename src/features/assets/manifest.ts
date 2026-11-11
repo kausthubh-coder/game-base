@@ -103,8 +103,14 @@ function positive(value: unknown, path: string): number {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fail(path, 'a number above 0', value);
 }
 
+/**
+ * A sheet or image file. The art is PNG (tools/verify-assets.mjs holds public/assets to that), and the build ships
+ * each PNG as lossless WebP when that is smaller (tools/asset-build.mjs), so the built manifest names `.webp` files.
+ */
+const IMAGE_FILE = /\.(png|webp)$/i;
+
 function filePath(value: unknown, path: string): string {
-  if (typeof value !== 'string' || !/\.png$/i.test(value) || value.startsWith('/') || value.includes('..')) {
+  if (typeof value !== 'string' || !IMAGE_FILE.test(value) || value.startsWith('/') || value.includes('..')) {
     return fail(path, 'the path of a PNG file inside public/assets/', value);
   }
   return value;
@@ -190,7 +196,7 @@ function looksLikeTileSheet(value: unknown): value is Json {
 function looksLikeImages(value: unknown): value is Record<string, string> {
   if (!isObject(value)) return false;
   const files = Object.values(value);
-  return files.length > 0 && files.every((file) => typeof file === 'string' && /\.png$/i.test(file));
+  return files.length > 0 && files.every((file) => typeof file === 'string' && IMAGE_FILE.test(file));
 }
 
 function tileSheet(value: Json, path: string): TileSheetEntry {
@@ -244,6 +250,23 @@ export function parseManifest(json: unknown): Manifest {
     }
   }
   return manifest;
+}
+
+/**
+ * Each file the loader downloads before the first frame, once, with the entry that lists it, so a missing
+ * file can say who needs it. The build preloads the same list (tools/asset-build.mjs). The `uikit` is not here.
+ */
+export function wantedFiles(manifest: Manifest): Map<string, string> {
+  const wanted = new Map<string, string>();
+  for (const [name, entry] of Object.entries(manifest.sprites)) if (!wanted.has(entry.sheet)) wanted.set(entry.sheet, `the sheet of sprite "${name}"`);
+  if (manifest.blocks && !wanted.has(manifest.blocks.atlas)) wanted.set(manifest.blocks.atlas, 'the block atlas');
+  if (manifest.icons && !wanted.has(manifest.icons.sheet)) wanted.set(manifest.icons.sheet, 'the icon sheet');
+  for (const [name, entry] of Object.entries(manifest.icons?.sheets ?? {})) if (!wanted.has(entry.sheet)) wanted.set(entry.sheet, `the "${name}" icon sheet`);
+  for (const [name, entry] of Object.entries(manifest.sheets)) if (!wanted.has(entry.sheet)) wanted.set(entry.sheet, `the "${name}" sheet`);
+  for (const [group, listed] of Object.entries(manifest.images)) {
+    for (const [name, file] of Object.entries(listed)) if (!wanted.has(file)) wanted.set(file, `the "${name}" image of "${group}"`);
+  }
+  return wanted;
 }
 
 /** The sheet size an animation needs, so a sheet that is too small fails with the animation's name. */
