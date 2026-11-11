@@ -17,7 +17,8 @@ async function build() {
   await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error(`build exited ${code}`))); });
 }
 await build();
-const scriptBytes = readdirSync(join(out, 'site/assets')).filter(n => n.endsWith('.js')).reduce((n, file) => n + statSync(join(out, 'site/assets', file)).size, 0);
+// The build keeps its scripts in assets/fingerprinted, so look in every folder under assets.
+const scriptBytes = readdirSync(join(out, 'site/assets'), { recursive: true }).filter(n => String(n).endsWith('.js')).reduce((n, file) => n + statSync(join(out, 'site/assets', String(file))).size, 0);
 console.log(`Built scripts: ${scriptBytes} bytes`);
 const server = spawn('bun', ['tools/serve.mjs', join(out, 'site'), String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
 let browser, failures = [], report = {};
