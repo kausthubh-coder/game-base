@@ -73,9 +73,13 @@ test('an entry that maps names to PNG files is read as a list of images', () => 
 });
 
 test('the interface kit is read but never listed for loading', () => {
-  const uikit = { lazy: true, images: { panel: 'ui/kit/panel.png' }, tabs: { tile: 96, sheet: 'ui/kit/tabs.png', names: { bag: [0, 0], gear: [1, 0] } } };
+  const uikit = { lazy: true, images: { panel: 'ui/kit/panel.png' }, tabs: { tile: 96, sheet: 'ui/kit/tabs.png', names: { bag: [0, 0], gear: [1, 0] } }, tabs2: { tile: 96, sheet: 'ui/kit/icons2.png', names: { pin: [2, 2] } } };
   const manifest = parseManifest({ ...real(), uikit });
-  expect(manifest.uikit).toEqual({ images: { panel: 'ui/kit/panel.png' }, tabs: { tile: 96, sheet: 'ui/kit/tabs.png', names: { bag: [[0, 0]], gear: [[1, 0]] } } });
+  expect(manifest.uikit).toEqual({
+    images: { panel: 'ui/kit/panel.png' },
+    tabs: { tile: 96, sheet: 'ui/kit/tabs.png', names: { bag: [[0, 0]], gear: [[1, 0]] } },
+    sheets: { tabs2: { tile: 96, sheet: 'ui/kit/icons2.png', names: { pin: [[2, 2]] } } },
+  });
   // Neither the images nor the sheet are among what the loader fetches before the first frame.
   expect(manifest.images).toEqual({});
   expect(manifest.sheets).toEqual({});

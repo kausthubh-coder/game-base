@@ -19,7 +19,7 @@ export interface UiArt {
   portraitElement(name: string): HTMLElement | null;
   /** The painted kit by name (`panel`, `slot`, `minimap-ring` …) as URLs. Empty when the manifest has no `uikit`. */
   readonly kit: Readonly<Record<string, string>>;
-  /** A gold line icon from the `uitabs` sheet (`bag`, `settings`, `sun` …) that fills its box, or null. */
+  /** A gold line icon from the kit's icon sheets (`bag`, `settings`, `pin` …) that fills its box, or null. */
   tabElement(name: string): HTMLElement | null;
   /** The `ui` pictures, each left out when the manifest does not list it. */
   readonly frames: { title?: string; panel?: NineSlice; button?: NineSlice };
@@ -84,15 +84,17 @@ export function createUiArt(assets: Assets): UiArt {
     kit,
 
     tabElement(name) {
-      const at = tabs?.names[name]?.[0];
-      if (!tabs || !at) return null;
+      // The first icon sheet of the kit that has the name: `tabs`, then the others such as `tabs2`.
+      const sheet = [tabs, ...Object.values(kitEntry?.sheets ?? {})].find((entry) => entry?.names[name]);
+      const at = sheet?.names[name]?.[0];
+      if (!sheet || !at) return null;
       // The sheet's grid, from the cells it lists: the loader never opens a lazy file, so its size is not known.
-      const cells = Object.values(tabs.names).flat();
+      const cells = Object.values(sheet.names).flat();
       const across = Math.max(...cells.map(([c]) => c)) + 1, down = Math.max(...cells.map(([, r]) => r)) + 1;
       const [column, row] = at;
       const element = document.createElement('span');
       element.className = 'ui-cell ui-smooth';
-      element.style.backgroundImage = `url("${assetBase() + tabs.sheet}")`;
+      element.style.backgroundImage = `url("${assetBase() + sheet.sheet}")`;
       element.style.backgroundSize = `${across * 100}% ${down * 100}%`;
       element.style.backgroundPosition = `${across > 1 ? (column / (across - 1)) * 100 : 0}% ${down > 1 ? (row / (down - 1)) * 100 : 0}%`;
       return element;

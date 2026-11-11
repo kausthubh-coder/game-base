@@ -67,6 +67,8 @@ export interface UiKitEntry {
   images: Record<string, string>;
   /** A sheet of square line icons by name, or undefined. */
   tabs?: TileSheetEntry;
+  /** More sheets of icons: every other entry shaped like a sheet of tiles, such as `tabs2`. */
+  sheets: Record<string, TileSheetEntry>;
 }
 
 /** A problem with the manifest or a file it lists. The message names the entry or the file. */
@@ -212,7 +214,9 @@ function uiKit(value: Json): UiKitEntry {
   const images: Record<string, string> = {};
   for (const name of Object.keys(listed)) images[name] = filePath(listed[name], `uikit.images.${name}`);
   const tabs = value.tabs === undefined ? undefined : tileSheet(object(value.tabs, 'uikit.tabs'), 'uikit.tabs');
-  return { images, tabs };
+  const sheets: Record<string, TileSheetEntry> = {};
+  for (const [name, entry] of Object.entries(value)) if (name !== 'tabs' && looksLikeTileSheet(entry)) sheets[name] = tileSheet(entry, `uikit.${name}`);
+  return { images, tabs, sheets };
 }
 
 /** Checks parsed JSON against the contract and returns it typed. Throws an `AssetError` that names what is wrong. */
