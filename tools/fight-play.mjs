@@ -5,6 +5,7 @@
 //   bun tools/fight-play.mjs --port 5529 --way pet --beast gearling --keys        real keys and mouse only, as a person would press them
 //   bun tools/fight-play.mjs --url http://127.0.0.1:5529/ --log                   a built copy, with the page sending its fights to fight-log
 //   bun tools/fight-play.mjs --port 5529 --way pet --beast boar --pet pebblepup --keys   the second pet: its brace takes an attack for the hero
+//   bun tools/fight-play.mjs --port 5529 --card                                   the card itself: "Again?", Esc with a rig, the fold, the log's count
 //
 // `--quality low`, `medium` or `high` holds a quality level (high by default). `--log` adds `&log=1`, which
 // only `tools/fight-serve.mjs` answers: it checks that the fight and its answer reached `.artifacts/fight/ratings.jsonl`.
@@ -22,9 +23,9 @@ const opt = (name, fallback) => { const i = argv.indexOf('--' + name); return i 
 const flag = (name) => argv.includes('--' + name);
 const port = opt('port', process.env.PLAY_PORT ?? '5525');
 const way = opt('way', 'hero'), beast = opt('beast', 'thistlehog'), layout = opt('layout', 'rigs'), quality = opt('quality', 'high');
-const keys = flag('keys'), limit = Number(opt('limit', 200)), sends = flag('log'), pet = opt('pet', 'leaftail');
+const keys = flag('keys'), card = flag('card'), limit = Number(opt('limit', 200)), sends = flag('log'), pet = opt('pet', 'leaftail');
 const base = opt('url', `http://localhost:${port}/`);
-const name = opt('name', `${way}-${beast}${pet === 'leaftail' ? '' : `-${pet}`}${keys ? '-keys' : layout === 'wall' ? '-wall' : ''}`);
+const name = opt('name', card ? 'card' : `${way}-${beast}${pet === 'leaftail' ? '' : `-${pet}`}${keys ? '-keys' : layout === 'wall' ? '-wall' : ''}`);
 const out = resolve(import.meta.dirname, '..', '.artifacts/fight');
 mkdirSync(out, { recursive: true });
 
@@ -52,6 +53,10 @@ await page.evaluate(() => window.__game.settle());
 // The log starts empty, so the numbers printed are this fight's alone.
 await page.evaluate(() => { localStorage.removeItem('lab.fight.log'); });
 
+const folded = () => page.evaluate(() => document.querySelector('.fl-card').classList.contains('is-small'));
+const cardButton = (text) => page.locator('.fl-card button').getByText(text, { exact: true });
+if (card) await cardRun();
+
 await page.click(`.fl-card button:text-is("${WAY_BUTTON[way]}")`);
 await page.selectOption('.fl-card select:has(option[value="leaftail"])', pet);
 await page.click(`.fl-card button:text-is("${BEAST_BUTTON[beast]}")`);
@@ -60,6 +65,19 @@ check(`the card picked the way "${way}" and the ${pet}, and brought in the ${bea
 await sleep(600);
 await shot('start');
 settledAt = Date.now() + 2500;
+/** The card folds itself when the beast wakes. A bot run opens it by hand and it stays open; a key run leaves it folded. */
+let foldChecked = false;
+async function checkFold() {
+  if (foldChecked || s.phase !== 'fight') return;
+  foldChecked = true;
+  await sleep(100);
+  check('the card folded itself when the beast woke', await folded());
+  if (!keys) {
+    await page.click('.fl-card h2 button');
+    await sleep(1200);
+    check('opened by hand during the fight, it stays open', !(await folded()));
+  }
+}
 
 /**
  * The most draw calls, triangles and script milliseconds seen while the fight ran, once the scene has settled.
@@ -119,6 +137,7 @@ async function watch() {
   while (Date.now() - from < limit * 1000) {
     s = await state();
     await sample();
+    await checkFold();
     if (s.shapes > 0) await shotOnce('tell');
     if (s.beast?.doing === 'dizzy') await shotOnce(s.beast.calm > 0.2 ? 'calming' : 'dizzy');
     if (s.beast?.doing === 'stun' || s.beast?.doing === 'held') await shotOnce('helpless');
@@ -304,6 +323,7 @@ if (!keys) {
   }
   // Every way ends the same: walk up to the dizzy beast and hold F.
   s = await state();
+  await checkFold();
   check('the guard was emptied with keys and mouse alone', s.beast.doing === 'dizzy' || s.phase === 'won');
   for (let tries = 0; tries < 6 && s.phase !== 'won'; tries++) {
     await shotOnce('dizzy');
@@ -325,6 +345,71 @@ if (!keys) {
   }
 }
 
+/**
+ * The card, with real clicks and keys: "Again?" belongs to one fight, Esc puts a rig back before it pauses, the
+ * card folds for a fight and opens after it, and the Log button counts a fight that was left.
+ */
+async function cardRun() {
+  let s;
+  const again = page.locator('.fl-again:not([hidden])');
+  /** The rule-made player wins one fight; the card is answered by hand. */
+  async function win() {
+    await page.evaluate(() => window.__fight.bot(true));
+    await page.waitForSelector('.fl-again:not([hidden])', { timeout: 90000 });
+    await page.evaluate(() => window.__fight.bot(false));
+  }
+  await cardButton('Hero').click();
+  await cardButton('Thistlehog').click();
+  await win();
+  check('the card opened again when the fight ended', !(await folded()));
+  await cardButton('Boar').click();
+  await sleep(100);
+  check('"Again?" closed when another beast was brought in', (await again.count()) === 0);
+  await cardButton('Thistlehog').click();
+  await cardButton('Pet').click();
+  await page.selectOption('.fl-card select:has(option[value="leaftail"])', 'pebblepup');
+  await cardButton('Thistlehog').click();
+  await win();
+  await shot('again');
+  const named = await page.evaluate(() => window.__fight.log().at(-1));
+  await page.locator('.fl-again button').getByText('Fight it again', { exact: true }).click();
+  s = await state();
+  check(`"Fight it again" replayed the fight the card names (${named.way}, ${named.pet}, ${named.enemy})`, s.way === named.way && s.pet.kind === named.pet && s.beast?.kind === named.enemy && s.beast.doing === 'asleep');
+
+  const count = async () => Number((await page.locator('.fl-card button').filter({ hasText: /^Log/ }).innerText()).match(/\d+/)?.[0]);
+  await cardButton('Wake it').click();
+  await sleep(200);
+  check('the card folded itself when the beast woke', await folded());
+  await shot('folded');
+  await page.click('.fl-card h2 button');
+  await cardButton('Take it away').click();
+  await sleep(100);
+  const logged = await page.evaluate(() => window.__fight.log());
+  check('the Log button counts the fight that was left', (await count()) === logged.length && logged.at(-1)?.result === 'left');
+
+  await cardButton('World').click();
+  await cardButton('Boar').click();
+  await page.keyboard.press('Digit2');
+  await sleep(100);
+  const paused = () => page.evaluate(() => window.__game.state().paused ?? [...document.querySelectorAll('.gu-panel')].some((e) => e.offsetParent !== null && /Resume/.test(e.textContent)));
+  await page.keyboard.press('Escape');
+  await sleep(300);
+  s = await state();
+  check('Esc with a rig in the hand put it back and did not pause', s.held === null && !(await paused()));
+  await page.keyboard.press('Escape');
+  await sleep(300);
+  check('Esc with nothing in the hand paused', await paused());
+  await shot('paused');
+  await page.keyboard.press('Escape');
+  await sleep(300);
+  check('and Esc again closed the pause menu', !(await paused()));
+
+  await browser.close();
+  console.log(errors.length ? 'console errors:\n' + errors.join('\n') : 'no console errors');
+  if (failed.length) console.log('failed:\n  ' + failed.join('\n  '));
+  process.exit(errors.length || failed.length ? 1 : 0);
+}
+
 s = await state();
 check('the fight was won', s.phase === 'won' && s.record.result === 'calmed');
 // The moment of calming: the grey running out, then the bow, the green and the gift. The meter's 2-second
@@ -339,6 +424,7 @@ await sleep(300);
 await shot('again');
 const asked = await page.locator('.fl-again:not([hidden])').count();
 check('the lab asked "Again?"', asked === 1);
+if (keys) check('the card opened again when the fight ended', !(await folded()));
 if (asked) {
   await page.click('.fl-rate button:nth-child(4)');
   const log = await page.evaluate(() => window.__fight.log());
