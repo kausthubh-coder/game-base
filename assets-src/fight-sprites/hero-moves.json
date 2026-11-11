@@ -1,0 +1,17 @@
+{
+  "name": "hero-moves",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "public/assets/sprites/hero.png"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted 1-2px outlines, chunky pixel clusters, large head and small feet, matching the reference. Genuine transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT uniform grid FOUR columns THREE rows, 12 equal square cells. Row 0 FRONT, row 1 BACK (no face), row 2 right-facing SIDE. Each row shows the same four poses left to right in its own direction. Same character, clothes, accessories and proportions throughout. Feet baseline equal in each cell. Full body visible, ample transparent padding, nothing crosses cell boundaries. Output 4:3 aspect ratio. Reference hero.png is the exact hero identity, preserve chestnut tousled hair, ochre short cloak, cream collar, brown tunic, belt, satchel and boots. Standing height 106-110 drawn pixels in final 128x128 cell, head about 50x42 and torso within 2 pixels of reference idle. Do not enlarge the head. No weapon. Teal ONLY on explicitly requested magic. Columns: 0 dodge, low forward lean cloak trailing; 1 hurt flinching backward eyes SHUT; 2 reach raising open RIGHT hand; 3 calm arm straight out palm open with small bright teal SEVEN-pointed mark on palm. Preserve hero body proportions even while leaning.",
+      "source": "assets-src/fight-sprites/hero-moves-attempt-1.png",
+      "selected": true
+    }
+  ],
+  "raw": "assets-src/raw/hero-moves-3.png",
+  "processing": "bun tools/sprites/build-story.mjs"
+}

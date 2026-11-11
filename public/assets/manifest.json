@@ -920,6 +920,153 @@
           }
         }
       }
+    },
+    "hero-cut": {
+      "sheet": "sprites/hero-cut.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "cut": {
+          "frames": 4,
+          "fps": 10,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
+    },
+    "hero-moves": {
+      "sheet": "sprites/hero-moves.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
+    },
+    "hero-call": {
+      "sheet": "sprites/hero-call.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
+    },
+    "leaftail-fight": {
+      "sheet": "sprites/leaftail-fight.png",
+      "frame": [
+        96,
+        96
+      ],
+      "anchor": [
+        48,
+        88
+      ],
+      "worldHeight": 0.85,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
+    },
+    "pebblepup": {
+      "sheet": "sprites/pebblepup.png",
+      "frame": [
+        96,
+        96
+      ],
+      "anchor": [
+        48,
+        88
+      ],
+      "worldHeight": 0.9,
+      "animations": {
+        "idle": {
+          "frames": 2,
+          "fps": 4,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        },
+        "walk": {
+          "frames": 4,
+          "fps": 10,
+          "rows": {
+            "front": 3,
+            "back": 4,
+            "side": 5
+          }
+        }
+      }
+    },
+    "pebblepup-fight": {
+      "sheet": "sprites/pebblepup-fight.png",
+      "frame": [
+        96,
+        96
+      ],
+      "anchor": [
+        48,
+        88
+      ],
+      "worldHeight": 0.9,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
     }
   },
   "blocks": {
