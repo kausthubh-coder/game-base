@@ -1,0 +1,2474 @@
+{
+  "generated_utc": "2026-11-10T19:16:24.406013+00:00",
+  "root": "/workspace/shared/hollowmere",
+  "validator_version": 2,
+  "renders_skipped": false,
+  "limits": {
+    "triangles": {
+      "landmark": 8000,
+      "building": 4000,
+      "street": 800
+    },
+    "glb_bytes_strictly_less_than": 400000
+  },
+  "tolerances_m": {
+    "ground": 0.025,
+    "center": 0.12,
+    "dimensions": 0.02
+  },
+  "errors": [],
+  "assets": [
+    {
+      "name": "granary-hall",
+      "category": "landmark",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 359072,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 7714,
+      "vertices_exported": 15502,
+      "bounds_min": [
+        -6.975,
+        0.0,
+        -5.035
+      ],
+      "bounds_max": [
+        6.975,
+        13.1201,
+        5.035
+      ],
+      "dimensions": [
+        13.950001,
+        13.1201,
+        10.07
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 7628,
+        "Glow": 86
+      },
+      "body_unique_colors": 47,
+      "footprint": [
+        14,
+        12
+      ],
+      "source": {
+        "bytes": 258032,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 632734,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 650715,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 654380,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "rootworks-gate",
+      "category": "landmark",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 236936,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 5312,
+      "vertices_exported": 10116,
+      "bounds_min": [
+        -5.471669,
+        0.0,
+        -2.95
+      ],
+      "bounds_max": [
+        5.471669,
+        7.49,
+        2.95
+      ],
+      "dimensions": [
+        10.943338,
+        7.49,
+        5.9
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 5260,
+        "Glow": 52
+      },
+      "body_unique_colors": 57,
+      "footprint": [
+        12,
+        8
+      ],
+      "source": {
+        "bytes": 185064,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 596321,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 631266,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 636435,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "town-well",
+      "category": "landmark",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 122824,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 2800,
+      "vertices_exported": 5164,
+      "bounds_min": [
+        -2.045,
+        0.0,
+        -1.87
+      ],
+      "bounds_max": [
+        2.045,
+        5.1201,
+        1.87
+      ],
+      "dimensions": [
+        4.09,
+        5.1201,
+        3.74
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 2760,
+        "Glow": 40
+      },
+      "body_unique_colors": 33,
+      "footprint": [
+        6,
+        6
+      ],
+      "source": {
+        "bytes": 141552,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 630670,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 636591,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 632171,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "bakery",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 140248,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 2893,
+      "vertices_exported": 6007,
+      "bounds_min": [
+        -4.385,
+        0.0,
+        -3.307641
+      ],
+      "bounds_max": [
+        4.385,
+        6.3265,
+        3.307641
+      ],
+      "dimensions": [
+        8.77,
+        6.3265,
+        6.615282
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 2844,
+        "Glow": 49
+      },
+      "body_unique_colors": 48,
+      "footprint": [
+        10,
+        8
+      ],
+      "source": {
+        "bytes": 144791,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 627946,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 634456,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 636192,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "lodge",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 187456,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 3923,
+      "vertices_exported": 8059,
+      "bounds_min": [
+        -5.77,
+        0.0,
+        -4.4625
+      ],
+      "bounds_max": [
+        5.77,
+        8.7665,
+        4.4625
+      ],
+      "dimensions": [
+        11.54,
+        8.7665,
+        8.924999
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 3816,
+        "Glow": 107
+      },
+      "body_unique_colors": 39,
+      "footprint": [
+        12,
+        10
+      ],
+      "source": {
+        "bytes": 168508,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 649092,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 659115,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 659328,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "workshop",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 125644,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 2629,
+      "vertices_exported": 5355,
+      "bounds_min": [
+        -4.525,
+        0.0,
+        -2.99
+      ],
+      "bounds_max": [
+        4.525,
+        6.4265,
+        2.99
+      ],
+      "dimensions": [
+        9.05,
+        6.4265,
+        5.98
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 2594,
+        "Glow": 35
+      },
+      "body_unique_colors": 33,
+      "footprint": [
+        10,
+        8
+      ],
+      "source": {
+        "bytes": 140752,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 639997,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 660089,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 629185,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "kennel",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 146564,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 3031,
+      "vertices_exported": 6281,
+      "bounds_min": [
+        -4.53,
+        0.0,
+        -3.345
+      ],
+      "bounds_max": [
+        4.53,
+        6.1665,
+        3.345
+      ],
+      "dimensions": [
+        9.06,
+        6.1665,
+        6.69
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 2996,
+        "Glow": 35
+      },
+      "body_unique_colors": 45,
+      "footprint": [
+        10,
+        8
+      ],
+      "source": {
+        "bytes": 143256,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 606711,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 636560,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 620103,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "ferry-house",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 167800,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 3507,
+      "vertices_exported": 7199,
+      "bounds_min": [
+        -4.3875,
+        0.0,
+        -4.5225
+      ],
+      "bounds_max": [
+        4.3875,
+        6.3165,
+        4.5225
+      ],
+      "dimensions": [
+        8.775,
+        6.3165,
+        9.045
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 3428,
+        "Glow": 79
+      },
+      "body_unique_colors": 42,
+      "footprint": [
+        10,
+        10
+      ],
+      "source": {
+        "bytes": 152415,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 619678,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 633874,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 615146,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "house-a",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 121684,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 2463,
+      "vertices_exported": 5211,
+      "bounds_min": [
+        -2.875,
+        0.0,
+        -2.525
+      ],
+      "bounds_max": [
+        2.875,
+        5.1765,
+        2.525
+      ],
+      "dimensions": [
+        5.75,
+        5.1765,
+        5.05
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 2404,
+        "Glow": 59
+      },
+      "body_unique_colors": 40,
+      "footprint": [
+        7,
+        6
+      ],
+      "source": {
+        "bytes": 136688,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 705393,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 677200,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 669468,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "house-b",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 173936,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 3603,
+      "vertices_exported": 7479,
+      "bounds_min": [
+        -3.97,
+        0.0,
+        -3.375
+      ],
+      "bounds_max": [
+        3.97,
+        6.5065,
+        3.375
+      ],
+      "dimensions": [
+        7.94,
+        6.5065,
+        6.75
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 3532,
+        "Glow": 71
+      },
+      "body_unique_colors": 47,
+      "footprint": [
+        9,
+        8
+      ],
+      "source": {
+        "bytes": 159066,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 671874,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 661622,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 660224,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "house-c",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 159272,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 3294,
+      "vertices_exported": 6838,
+      "bounds_min": [
+        -4.275,
+        0.0,
+        -3.1
+      ],
+      "bounds_max": [
+        4.275,
+        5.6865,
+        3.1
+      ],
+      "dimensions": [
+        8.55,
+        5.6865,
+        6.2
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 3232,
+        "Glow": 62
+      },
+      "body_unique_colors": 41,
+      "footprint": [
+        10,
+        7
+      ],
+      "source": {
+        "bytes": 148524,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 626786,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 646086,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 645621,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "house-d",
+      "category": "building",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 160008,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 3255,
+      "vertices_exported": 6887,
+      "bounds_min": [
+        -3.46,
+        0.0,
+        -3.42
+      ],
+      "bounds_max": [
+        3.46,
+        8.6965,
+        3.42
+      ],
+      "dimensions": [
+        6.92,
+        8.6965,
+        6.84
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 3184,
+        "Glow": 71
+      },
+      "body_unique_colors": 38,
+      "footprint": [
+        8,
+        8
+      ],
+      "source": {
+        "bytes": 147212,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 666249,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 699137,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 691491,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "market-stall-a",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 32592,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 684,
+      "vertices_exported": 1344,
+      "bounds_min": [
+        -1.325,
+        0.0,
+        -0.9475
+      ],
+      "bounds_max": [
+        1.325,
+        2.510832,
+        0.9475
+      ],
+      "dimensions": [
+        2.65,
+        2.510832,
+        1.895
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 684
+      },
+      "body_unique_colors": 17,
+      "footprint": [
+        3,
+        3
+      ],
+      "source": {
+        "bytes": 107505,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 649153,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 687526,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 615305,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "market-stall-b",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 34872,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 684,
+      "vertices_exported": 1458,
+      "bounds_min": [
+        -1.325,
+        0.0,
+        -0.9475
+      ],
+      "bounds_max": [
+        1.325,
+        2.510832,
+        0.9475
+      ],
+      "dimensions": [
+        2.65,
+        2.510832,
+        1.895
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 684
+      },
+      "body_unique_colors": 19,
+      "footprint": [
+        3,
+        3
+      ],
+      "source": {
+        "bytes": 106465,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 648624,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 688546,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 619047,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "cart",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 30496,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 660,
+      "vertices_exported": 1248,
+      "bounds_min": [
+        -1.1,
+        0.0,
+        -1.465
+      ],
+      "bounds_max": [
+        1.1,
+        1.564549,
+        1.465
+      ],
+      "dimensions": [
+        2.2,
+        1.564549,
+        2.93
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 660
+      },
+      "body_unique_colors": 14,
+      "footprint": [
+        3,
+        4
+      ],
+      "source": {
+        "bytes": 102846,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 672718,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 694361,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 648965,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "barrels-crates",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 26540,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 552,
+      "vertices_exported": 1080,
+      "bounds_min": [
+        -1.17025,
+        0.0,
+        -0.682488
+      ],
+      "bounds_max": [
+        1.17025,
+        1.421669,
+        0.682488
+      ],
+      "dimensions": [
+        2.3405,
+        1.421669,
+        1.364976
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 552
+      },
+      "body_unique_colors": 9,
+      "footprint": [
+        3,
+        2
+      ],
+      "source": {
+        "bytes": 105024,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 673488,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 697734,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 655580,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "bench",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 24444,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 512,
+      "vertices_exported": 990,
+      "bounds_min": [
+        -1.17,
+        0.0,
+        -0.504705
+      ],
+      "bounds_max": [
+        1.17,
+        1.28,
+        0.504705
+      ],
+      "dimensions": [
+        2.34,
+        1.28,
+        1.00941
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 512
+      },
+      "body_unique_colors": 19,
+      "footprint": [
+        3,
+        2
+      ],
+      "source": {
+        "bytes": 100332,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 639481,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 725214,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 681925,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "signpost",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 19740,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 400,
+      "vertices_exported": 788,
+      "bounds_min": [
+        -1.225,
+        0.0,
+        -0.406292
+      ],
+      "bounds_max": [
+        1.225,
+        2.57,
+        0.406292
+      ],
+      "dimensions": [
+        2.45,
+        2.57,
+        0.812583
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 400
+      },
+      "body_unique_colors": 25,
+      "footprint": [
+        3,
+        2
+      ],
+      "source": {
+        "bytes": 98017,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 663189,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 679077,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 659393,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "lamp-post",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 31580,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 652,
+      "vertices_exported": 1248,
+      "bounds_min": [
+        -1.1924,
+        0.0,
+        -0.3
+      ],
+      "bounds_max": [
+        1.1924,
+        2.78,
+        0.3
+      ],
+      "dimensions": [
+        2.3848,
+        2.78,
+        0.6
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 648,
+        "Glow": 4
+      },
+      "body_unique_colors": 12,
+      "footprint": [
+        3,
+        2
+      ],
+      "source": {
+        "bytes": 104370,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 627105,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 661232,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 665606,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "string-lights",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 36132,
+      "extensions": [
+        "KHR_materials_emissive_strength",
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body",
+        "Glow"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 754,
+      "vertices_exported": 1444,
+      "bounds_min": [
+        -2.8916,
+        0.0,
+        -0.138564
+      ],
+      "bounds_max": [
+        2.8916,
+        3.09,
+        0.138564
+      ],
+      "dimensions": [
+        5.7832,
+        3.09,
+        0.277128
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 740,
+        "Glow": 14
+      },
+      "body_unique_colors": 17,
+      "footprint": [
+        6,
+        2
+      ],
+      "source": {
+        "bytes": 105802,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 573402,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 641326,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 670714,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "banner-pole",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 19072,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 352,
+      "vertices_exported": 768,
+      "bounds_min": [
+        -0.85755,
+        0.0,
+        -0.34
+      ],
+      "bounds_max": [
+        0.85755,
+        3.275,
+        0.34
+      ],
+      "dimensions": [
+        1.7151,
+        3.275,
+        0.68
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 352
+      },
+      "body_unique_colors": 18,
+      "footprint": [
+        2,
+        2
+      ],
+      "source": {
+        "bytes": 99413,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 656757,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 676322,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 658637,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "flower-planter",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 40144,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 728,
+      "vertices_exported": 1708,
+      "bounds_min": [
+        -1.26,
+        0.0,
+        -0.6185
+      ],
+      "bounds_max": [
+        1.26,
+        1.4076,
+        0.6185
+      ],
+      "dimensions": [
+        2.52,
+        1.4076,
+        1.237
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 728
+      },
+      "body_unique_colors": 21,
+      "footprint": [
+        3,
+        2
+      ],
+      "source": {
+        "bytes": 106789,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 651715,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 698144,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 685423,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "fence-straight",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 15684,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 308,
+      "vertices_exported": 612,
+      "bounds_min": [
+        -1.488,
+        0.0,
+        -0.2135
+      ],
+      "bounds_max": [
+        1.488,
+        1.32,
+        0.2135
+      ],
+      "dimensions": [
+        2.976,
+        1.32,
+        0.427
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 308
+      },
+      "body_unique_colors": 15,
+      "footprint": [
+        3,
+        1
+      ],
+      "source": {
+        "bytes": 97829,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 594604,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 676574,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 643483,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "fence-corner",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 17048,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 336,
+      "vertices_exported": 672,
+      "bounds_min": [
+        -1.488,
+        0.0,
+        -1.488
+      ],
+      "bounds_max": [
+        1.488,
+        1.32,
+        1.488
+      ],
+      "dimensions": [
+        2.976,
+        1.32,
+        2.976
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 336
+      },
+      "body_unique_colors": 9,
+      "footprint": [
+        3,
+        3
+      ],
+      "source": {
+        "bytes": 98225,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 591072,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 654330,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 620187,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "stone-bridge",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 31876,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 692,
+      "vertices_exported": 1308,
+      "bounds_min": [
+        -3.0,
+        0.0,
+        -1.49
+      ],
+      "bounds_max": [
+        3.0,
+        1.38,
+        1.49
+      ],
+      "dimensions": [
+        6.0,
+        1.38,
+        2.98
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 692
+      },
+      "body_unique_colors": 9,
+      "footprint": [
+        6,
+        3
+      ],
+      "source": {
+        "bytes": 105827,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 559016,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 646589,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 651737,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "dock-segment",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 34260,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 728,
+      "vertices_exported": 1416,
+      "bounds_min": [
+        -1.493,
+        0.0,
+        -1.5
+      ],
+      "bounds_max": [
+        1.493,
+        0.83,
+        1.5
+      ],
+      "dimensions": [
+        2.986,
+        0.83,
+        3.0
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 728
+      },
+      "body_unique_colors": 8,
+      "footprint": [
+        3,
+        3
+      ],
+      "source": {
+        "bytes": 104892,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 582561,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 667584,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 617597,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    },
+    {
+      "name": "statue-gardener-warden",
+      "category": "street",
+      "status": "pass",
+      "errors": [],
+      "warnings": [],
+      "bytes": 36716,
+      "extensions": [
+        "KHR_mesh_quantization"
+      ],
+      "materials": [
+        "Body"
+      ],
+      "node_world_matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "triangles": 768,
+      "vertices_exported": 1524,
+      "bounds_min": [
+        -0.86,
+        0.0,
+        -0.86
+      ],
+      "bounds_max": [
+        0.86,
+        2.48,
+        0.86
+      ],
+      "dimensions": [
+        1.72,
+        2.48,
+        1.72
+      ],
+      "horizontal_center": [
+        0.0,
+        0.0
+      ],
+      "triangles_by_material": {
+        "Body": 768
+      },
+      "body_unique_colors": 28,
+      "footprint": [
+        3,
+        3
+      ],
+      "source": {
+        "bytes": 107638,
+        "version_header": "403",
+        "compression": "zstandard"
+      },
+      "renders": {
+        "front": {
+          "bytes": 681657,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "three-quarter": {
+          "bytes": 689985,
+          "dimensions": [
+            640,
+            640
+          ]
+        },
+        "night": {
+          "bytes": 686642,
+          "dimensions": [
+            640,
+            640
+          ]
+        }
+      }
+    }
+  ],
+  "asset_count": 27,
+  "passed": 27,
+  "status": "pass",
+  "totals": {
+    "triangles": 53234,
+    "glb_bytes": 2532640
+  }
+}

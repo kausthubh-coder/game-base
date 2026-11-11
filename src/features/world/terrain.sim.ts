@@ -5,7 +5,7 @@
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import { REGION } from '../../game/content/region.ts';
-import { built, chunkInBounds, inBounds, onPath, shapeGround, shaped, stampStructures, treeAllowed } from '../../game/region/land.sim.ts';
+import { built, chunkInBounds, inBounds, onPath, placedModels, shapeGround, shaped, stampStructures, treeAllowed } from '../../game/region/land.sim.ts';
 import { CHUNK, HEIGHT, cellIndex } from './chunk.sim.ts';
 import { clamp, fbm2, hash2, hash3, noise3, smoothstep } from './noise.sim.ts';
 
@@ -35,10 +35,14 @@ export function spawnPoint(): Vec3 {
   return feetAt(REGION.spawn.x, REGION.spawn.y, REGION.spawn.z);
 }
 
-/** One block west of the lamp that hangs in the middle of the lodge. */
+/** One block west of the lamp that hangs in the middle of the lodge. A lodge of the town kit has no inside, so it is its doorstep. */
 function insideLodge(): Vec3 {
   const lodge = built().find((b) => b.plan.id === 'lodge');
-  if (!lodge) throw new Error('the region plan has no lodge');
+  if (!lodge) {
+    const model = placedModels().find((m) => m.plan.id === 'lodge');
+    if (!model) throw new Error('the region plan has no lodge');
+    return feetAt(model.outside.x, model.outside.y, model.outside.z);
+  }
   return feetAt(lodge.x0 + ((lodge.x1 - lodge.x0 + 1) >> 1) - 1, REGION.townGround, lodge.z0 + ((lodge.z1 - lodge.z0 + 1) >> 1));
 }
 

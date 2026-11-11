@@ -4,7 +4,7 @@
 //
 // This file holds no Three.js, so the scatter rules can read it on a server.
 
-export type PropGroup = 'tree' | 'plant' | 'ground' | 'town' | 'clutter' | 'station';
+export type PropGroup = 'tree' | 'plant' | 'ground' | 'town' | 'clutter' | 'station' | 'landmark';
 
 /** How much each placed copy differs from the next: a turn in radians, and size and tint as a share of 1. */
 export interface PropVary {
@@ -33,8 +33,11 @@ export interface PropDef {
   crown?: readonly { top: number; reach: number }[];
 }
 
-/** The triangle caps from docs/style-sheet.md. A kind's own budget is never above its cap. */
-export const TRIANGLE_CAP: Record<PropGroup, number> = { tree: 1500, plant: 300, ground: 300, town: 300, clutter: 300, station: 300 };
+/**
+ * The triangle caps from docs/style-sheet.md. A kind's own budget is never above its cap. A landmark is one
+ * of a kind in its region, such as a town's great tree or fountain, and is capped like a building.
+ */
+export const TRIANGLE_CAP: Record<PropGroup, number> = { tree: 1500, plant: 300, ground: 300, town: 300, clutter: 300, station: 300, landmark: 6000 };
 
 /** Things that grow or lie about: any turn, and a clear spread of size and tint. */
 const WILD: PropVary = { turn: Math.PI, size: 0.16, tint: 0.1 };
@@ -95,6 +98,17 @@ export const PROPS = {
   lampPost: { name: 'Lamp post', group: 'town', builder: 'lampPost', variants: ['standing'], triangles: 150, wind: false, light: 14, vary: SNUG },
   signpost: { name: 'Signpost', group: 'town', builder: 'signpost', variants: ['two ways', 'three ways'], triangles: 140, ...still, vary: SNUG },
   bench: { name: 'Bench', group: 'town', builder: 'bench', variants: ['plain'], triangles: 90, ...still, vary: LOOSE },
+
+  // ---- Hollowmere: the arms of Greenhollow, the town's lights, and its landmarks
+  banner: { name: 'Banner', group: 'town', builder: 'banner', variants: ['crown', 'harvest', 'hedge'], triangles: 170, wind: true, light: 0, vary: SNUG },
+  lantern: { name: 'Lantern', group: 'town', builder: 'lantern', variants: ['post', 'double', 'ground'], triangles: 280, wind: false, light: 13, vary: SNUG },
+  stringLights: { name: 'String of lanterns', group: 'town', builder: 'stringLights', variants: ['warm'], triangles: 300, wind: true, light: 10, vary: SNUG },
+  bunting: { name: 'Bunting', group: 'town', builder: 'bunting', variants: ['festival'], triangles: 290, wind: true, light: 0, vary: SNUG },
+  brazier: { name: 'Brazier', group: 'town', builder: 'brazier', variants: ['lit'], triangles: 140, wind: true, light: 12, vary: SNUG },
+  planter: { name: 'Flower planter', group: 'clutter', builder: 'planter', variants: ['flowers'], triangles: 220, wind: true, light: 0, vary: LOOSE },
+  noticeBoard: { name: 'Notice board', group: 'town', builder: 'noticeBoard', variants: ['notices'], triangles: 140, ...still, vary: SNUG },
+  rootFountain: { name: 'Root Fountain', group: 'landmark', builder: 'rootFountain', variants: ['brass'], triangles: 800, wind: false, light: 10, alwaysLit: true, vary: SNUG },
+  elderOak: { name: 'Hollow Oak', group: 'landmark', builder: 'elderOak', variants: ['lamps'], triangles: 1400, wind: true, light: 11, vary: SNUG },
 
   // ---- clutter
   barrel: { name: 'Barrel', group: 'clutter', builder: 'barrel', variants: ['closed', 'open'], triangles: 140, ...still, vary: LOOSE },

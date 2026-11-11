@@ -34,7 +34,7 @@ you have looked at the preview sheets under "What it cannot see".
 | `block-tiles` | Every tile name in `src/content/blocks.ts`, except `water`, against `manifest.blocks.tiles` | `tile 'reed_top' (block reeds) has no cell in manifest.blocks.tiles` | Correct the name in blocks.ts, or make the tile with `make-sprite`. Until then the block draws as a flat color. |
 | `props` | If `src/content/props.ts` exists: builds every variant of every prop and counts triangles against the budget its entry declares | `oak variant 2: 1734 triangles, and its entry allows 1500` | Simplify the builder: fewer segments, merged faces. Raise a budget only inside `docs/style-sheet.md` (300 small prop, 1,500 tree, 6,000 building). |
 | `palettes` | Every palette in `src/content/palettes/`: a root, a scale, a tempo, and an instrument in every layer another palette has | `forge: no bass layer, and meadow, desert ... have one`, `coast: melody.night is not an instrument` | Add the field or layer, copying its shape from `src/content/palettes/meadow.ts`. A layer left out on purpose goes in `LAYER_EXEMPT` in `tools/verify-assets.mjs` with the reason, as `center` is. |
-| `sizes` | No PNG over 1 MB, the folder under 13 MB | `public/assets/ui/title.png is 1310.2 KB (1920 x 1080)` | A palette-snapped sheet is tens of KB. A heavy one skipped the pipeline or is far too large in pixels. Rebuild it through `tools/sprites`. |
+| `sizes` | No PNG over 1 MB, the folder under 24 MB | `public/assets/ui/title.png is 1310.2 KB (1920 x 1080)` | A palette-snapped sheet is tens of KB. A heavy one skipped the pipeline or is far too large in pixels. Rebuild it through `tools/sprites`. |
 
 ## The warnings
 

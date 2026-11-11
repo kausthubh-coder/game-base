@@ -1,0 +1,302 @@
+{
+  "all_passed": true,
+  "assets": [
+    {
+      "name": "granary-hall",
+      "triangles": 7714,
+      "dimensions_gltf_m": [
+        13.950000762939453,
+        13.120100021362305,
+        10.069999694824219
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "rootworks-gate",
+      "triangles": 5312,
+      "dimensions_gltf_m": [
+        10.943338394165039,
+        7.489999771118164,
+        5.900000095367432
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "town-well",
+      "triangles": 2800,
+      "dimensions_gltf_m": [
+        4.090000152587891,
+        5.120100021362305,
+        3.740000009536743
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "bakery",
+      "triangles": 2893,
+      "dimensions_gltf_m": [
+        8.770000457763672,
+        6.326499938964844,
+        6.61528205871582
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "lodge",
+      "triangles": 3923,
+      "dimensions_gltf_m": [
+        11.539999961853027,
+        8.766500473022461,
+        8.924999237060547
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "workshop",
+      "triangles": 2629,
+      "dimensions_gltf_m": [
+        9.050000190734863,
+        6.426499843597412,
+        5.980000019073486
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "kennel",
+      "triangles": 3031,
+      "dimensions_gltf_m": [
+        9.0600004196167,
+        6.166500091552734,
+        6.689999580383301
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "ferry-house",
+      "triangles": 3507,
+      "dimensions_gltf_m": [
+        8.774999618530273,
+        6.316500186920166,
+        9.045000076293945
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "house-a",
+      "triangles": 2463,
+      "dimensions_gltf_m": [
+        5.75,
+        5.176499843597412,
+        5.050000190734863
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "house-b",
+      "triangles": 3603,
+      "dimensions_gltf_m": [
+        7.940000057220459,
+        6.506499767303467,
+        6.75
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "house-c",
+      "triangles": 3294,
+      "dimensions_gltf_m": [
+        8.550000190734863,
+        5.686500072479248,
+        6.199999809265137
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "house-d",
+      "triangles": 3255,
+      "dimensions_gltf_m": [
+        6.919999599456787,
+        8.696499824523926,
+        6.840000152587891
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "market-stall-a",
+      "triangles": 684,
+      "dimensions_gltf_m": [
+        2.6500000953674316,
+        2.5108323097229004,
+        1.8949999809265137
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "market-stall-b",
+      "triangles": 684,
+      "dimensions_gltf_m": [
+        2.6500000953674316,
+        2.5108323097229004,
+        1.8949999809265137
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "cart",
+      "triangles": 660,
+      "dimensions_gltf_m": [
+        2.200000047683716,
+        1.564549446105957,
+        2.929999828338623
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "barrels-crates",
+      "triangles": 552,
+      "dimensions_gltf_m": [
+        2.3404998779296875,
+        1.421668529510498,
+        1.364976406097412
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "bench",
+      "triangles": 512,
+      "dimensions_gltf_m": [
+        2.3399999141693115,
+        1.28000009059906,
+        1.0094095468521118
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "signpost",
+      "triangles": 400,
+      "dimensions_gltf_m": [
+        2.450000047683716,
+        2.569999933242798,
+        0.812583327293396
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "lamp-post",
+      "triangles": 652,
+      "dimensions_gltf_m": [
+        2.3847999572753906,
+        2.7799999713897705,
+        0.6000000238418579
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "string-lights",
+      "triangles": 754,
+      "dimensions_gltf_m": [
+        5.783199787139893,
+        3.0899999141693115,
+        0.277128130197525
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "banner-pole",
+      "triangles": 352,
+      "dimensions_gltf_m": [
+        1.7151000499725342,
+        3.2749998569488525,
+        0.6800000071525574
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "flower-planter",
+      "triangles": 728,
+      "dimensions_gltf_m": [
+        2.5199999809265137,
+        1.4076000452041626,
+        1.2369999885559082
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "fence-straight",
+      "triangles": 308,
+      "dimensions_gltf_m": [
+        2.9759998321533203,
+        1.3200000524520874,
+        0.4269999861717224
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "fence-corner",
+      "triangles": 336,
+      "dimensions_gltf_m": [
+        2.9759998321533203,
+        1.3200000524520874,
+        2.9759998321533203
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "stone-bridge",
+      "triangles": 692,
+      "dimensions_gltf_m": [
+        6.0,
+        1.3799999952316284,
+        2.9800000190734863
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "dock-segment",
+      "triangles": 728,
+      "dimensions_gltf_m": [
+        2.9860000610351562,
+        0.8300000429153442,
+        3.0
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    },
+    {
+      "name": "statue-gardener-warden",
+      "triangles": 768,
+      "dimensions_gltf_m": [
+        1.7200000286102295,
+        2.4800000190734863,
+        1.7200000286102295
+      ],
+      "ground_z_blender": 0.0,
+      "passed": true
+    }
+  ]
+}

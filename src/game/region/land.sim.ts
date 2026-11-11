@@ -7,7 +7,8 @@ import { blockId } from '../../content/blocks.ts';
 import { BLUEPRINTS } from '../../content/blueprints.ts';
 import { stamp } from '../../features/buildings/stamp.sim.ts';
 import type { RegionProp } from '../api.sim.ts';
-import { REGION, type PlanBuilding, type Rect } from '../content/region.ts';
+import { TOWN_MODELS } from '../../content/town-kit.ts';
+import { REGION, type PlanBuilding, type PlanModel, type Rect } from '../content/region.ts';
 
 /** A building of the plan after it was turned and put down. */
 export interface Built {
@@ -42,6 +43,7 @@ export const BOUNDS: Rect = (() => {
   for (const f of REGION.fills) { take(f.x0, f.z0); take(f.x1, f.z1); }
   for (const p of REGION.paths) for (const [x, z] of p.points) take(x, z);
   for (const t of [...REGION.trees, ...REGION.bushes]) take(t.x, t.z);
+  for (const m of REGION.models) { const [w, d] = TOWN_MODELS[m.model].footprint; take(m.x, m.z); take(m.x + Math.max(w, d), m.z + Math.max(w, d)); }
   return { x0: b.x0 - MARGIN, z0: b.z0 - MARGIN, x1: b.x1 + MARGIN, z1: b.z1 + MARGIN };
 })();
 
@@ -197,6 +199,58 @@ export function regionProps(): readonly RegionProp[] {
   return propList;
 }
 
+// ------------------------------------------------------------------------------------------ models
+
+/** A kit model of the plan after it was turned and put down. */
+export interface PlacedModel {
+  plan: PlanModel;
+  /** The middle of its footprint, where the model's origin stands, and how far it is turned around y in radians. */
+  x: number;
+  z: number;
+  rotation: number;
+  /** Its footprint, both ends inside. */
+  x0: number; z0: number; x1: number; z1: number;
+  /** The columns a body cannot walk through, as x, z pairs. */
+  solid: Int32Array;
+  /** The block in front of the middle of its front, and the one past that. */
+  door: { x: number; y: number; z: number };
+  outside: { x: number; y: number; z: number };
+}
+
+let placedList: PlacedModel[] | null = null;
+
+/** Every kit model of the plan, turned and put down. Worked out once. */
+export function placedModels(): readonly PlacedModel[] {
+  if (placedList) return placedList;
+  const y = REGION.townGround;
+  placedList = REGION.models.map((plan) => {
+    const def = TOWN_MODELS[plan.model];
+    const [w, d] = def.footprint;
+    const turns = ((plan.turns % 4) + 4) % 4;
+    const [tw, td] = turns % 2 === 0 ? [w, d] : [d, w];
+    const x = plan.x + tw / 2, z = plan.z + td / 2;
+    /** Turns a point of the model's own space, front toward +z, into the world. */
+    const turn = (lx: number, lz: number): [number, number] => {
+      for (let i = 0; i < turns; i++) [lx, lz] = [lz, -lx];
+      return [x + lx, z + lz];
+    };
+    const solid: number[] = [];
+    for (const cell of def.solid) {
+      const [wx, wz] = turn((cell % w) + 0.5 - w / 2, Math.floor(cell / w) + 0.5 - d / 2);
+      solid.push(Math.floor(wx), Math.floor(wz));
+    }
+    const [dx, dz] = turn(0.01, d / 2 + 0.5), [ox, oz] = turn(0.01, d / 2 + 1.5);
+    return {
+      plan, x, z, rotation: (turns * Math.PI) / 2,
+      x0: plan.x, z0: plan.z, x1: plan.x + tw - 1, z1: plan.z + td - 1,
+      solid: Int32Array.from(solid),
+      door: { x: Math.floor(dx), y, z: Math.floor(dz) },
+      outside: { x: Math.floor(ox), y, z: Math.floor(oz) },
+    };
+  });
+  return placedList;
+}
+
 // ------------------------------------------------------------------------------------------ blocks
 
 const FILL_IDS = REGION.fills.map((f) => blockId(f.block));
@@ -204,7 +258,7 @@ const FILL_IDS = REGION.fills.map((f) => blockId(f.block));
 export type Put = (x: number, y: number, z: number, id: number) => void;
 
 /**
- * Writes the plan's fills and buildings that fall in the chunk whose lowest corner is (ox, oz).
+ * Writes the plan's fills, buildings and the bodies of its models that fall in the chunk whose lowest corner is (ox, oz).
  * `put` may be handed blocks outside the chunk and drops them.
  */
 export function stampStructures(ox: number, oz: number, size: number, put: Put): void {
@@ -221,5 +275,12 @@ export function stampStructures(ox: number, oz: number, size: number, put: Put):
     if (b.x1 < ox || b.x0 > x1 || b.z1 < oz || b.z0 > z1) continue;
     const c = b.cells;
     for (let i = 0; i < c.length; i += 4) put(c[i], c[i + 1], c[i + 2], c[i + 3]);
+  }
+  // A kit model is drawn by a view; in the world it is two blocks of barrier over each solid column.
+  const barrier = blockId('barrier'), y = REGION.townGround;
+  for (const m of placedModels()) {
+    if (m.x1 < ox || m.x0 > x1 || m.z1 < oz || m.z0 > z1) continue;
+    const c = m.solid;
+    for (let i = 0; i < c.length; i += 2) { put(c[i], y, c[i + 1], barrier); put(c[i], y + 1, c[i + 1], barrier); }
   }
 }

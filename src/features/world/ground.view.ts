@@ -120,12 +120,12 @@ export function buildSoftTiles(source: AtlasSource): SoftTiles {
   return { texture, kinds, dirtLayer };
 }
 
-/** Blocks the ground map looks through to find the ground under them: trees and invisible barriers. */
+/** Blocks the ground map looks through to find the ground under them: trees and invisible blocks, such as barriers and lantern light. */
 const SEE_THROUGH = new Uint8Array(256);
 /** The top block counts as grass for blending. */
 const GRASSY = new Uint8Array(256);
 for (const b of BLOCKS) {
-  SEE_THROUGH[b.id] = b.key.endsWith('_log') || b.key.endsWith('_leaves') || b.key === 'pine_needles' || b.key === 'barrier' ? 1 : 0;
+  SEE_THROUGH[b.id] = b.key.endsWith('_log') || b.key.endsWith('_leaves') || b.key === 'pine_needles' || b.key === 'barrier' || b.key === 'lantern_light' ? 1 : 0;
   GRASSY[b.id] = b.key === 'grass' ? 1 : 0;
 }
 

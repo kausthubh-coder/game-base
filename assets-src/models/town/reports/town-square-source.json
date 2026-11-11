@@ -1,0 +1,10 @@
+{
+  "source_opened": true,
+  "mesh_objects": 4712,
+  "camera": "PREVIEW capital camera",
+  "scene_lights": 12,
+  "string_lights_min_z": 0.07999995350837708,
+  "string_lights_max_z": 3.169999837875366,
+  "cast_objects": 36,
+  "render_engine": "CYCLES"
+}
