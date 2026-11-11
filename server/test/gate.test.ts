@@ -46,7 +46,7 @@ describe('the Convex gate', () => {
 
   test('the card is posted to /world-server/card with the shared secret', async () => {
     const { fetcher, calls } = convex(() => new Response(null, { status: 200 }));
-    const card = { worldId: 'w1', playersNow: ['p1'], lastPlayedAt: 1_800_000_000_000 };
+    const card = { worldId: 'w1', playersNow: ['p1'], lastPlayedAt: 1_800_000_000_000, sentAt: 1_800_000_000_001 };
     await convexGate(config, fetcher).postCard(card);
     expect(calls).toEqual([{
       url: 'https://happy-otter-123.convex.site/world-server/card',
@@ -58,9 +58,9 @@ describe('the Convex gate', () => {
 
   test('a card that cannot be posted does not throw', async () => {
     const refused = convex(() => new Response('no', { status: 401 }));
-    await convexGate(config, refused.fetcher).postCard({ worldId: 'w1', playersNow: [], lastPlayedAt: 0 });
+    await convexGate(config, refused.fetcher).postCard({ worldId: 'w1', playersNow: [], lastPlayedAt: 0, sentAt: 0 });
     const down = (async () => { throw new Error('no network'); }) as unknown as typeof fetch;
-    await convexGate(config, down).postCard({ worldId: 'w1', playersNow: [], lastPlayedAt: 0 });
+    await convexGate(config, down).postCard({ worldId: 'w1', playersNow: [], lastPlayedAt: 0, sentAt: 0 });
   });
 });
 

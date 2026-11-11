@@ -36,6 +36,10 @@ const PARTS = [
     ],
   },
   {
+    name: 'signed', slow: true, what: 'three players sign in through Clerk and join one world by invite link (needs .env.local)',
+    run: [['bun', 'tools/play-together-signed-in.mjs']],
+  },
+  {
     name: 'slow', slow: true, what: 'smoke, the interface and all of act 1 in a browser',
     run: [['bun', 'tools/play-smoke.mjs'], ['bun', 'tools/play-ui.mjs'], ['bun', 'tools/play-act1.mjs']],
   },

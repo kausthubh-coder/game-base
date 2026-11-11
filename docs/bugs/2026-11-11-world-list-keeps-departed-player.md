@@ -1,6 +1,8 @@
 # The world list can keep a player after everyone leaves
 
-Found on 2026-11-11 while testing signed-in multiplayer at `85295d1`. Not fixed. No game code changed.
+Found on 2026-11-11 while testing signed-in multiplayer at `85295d1`. Fixed the same day: every card now
+says when it was made (`sentAt`), and Convex drops one made before the card it holds. A test in
+`convex/http.test.ts` posts the two cards in the wrong order.
 
 ## What happened
 

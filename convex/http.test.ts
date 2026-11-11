@@ -41,6 +41,28 @@ describe('the world server posts a card', () => {
     expect((await ada.session.query(api.worlds.list, {}))[0]).toMatchObject({ name: 'Hollow Oak, rebuilt', lastPlayedAt: before + 5_000, playersNow: [] });
   });
 
+  test('a card made before the one already written does not put a departed player back', async () => {
+    const t = newBackend();
+    const ada = await player(t, 'user_ada');
+    const bo = await player(t, 'user_bo');
+    const worldId = await ada.session.mutation(api.worlds.create, { name: 'Hollow Oak' });
+    const now = Date.now();
+    const players = async () => (await ada.session.query(api.worlds.list, {}))[0].playersNow.map((p) => p.playerId);
+
+    expect((await post(t, { worldId, lastPlayedAt: now, playersNow: [ada.id, bo.id], sentAt: 100 })).status).toBe(200);
+    // Ada left, then Bo. The empty card arrives first, and the one-player card after it.
+    expect((await post(t, { worldId, lastPlayedAt: now + 2, playersNow: [], sentAt: 102 })).status).toBe(200);
+    expect((await post(t, { worldId, lastPlayedAt: now + 1, playersNow: [bo.id], sentAt: 101 })).status).toBe(200);
+    expect(await players()).toEqual([]);
+    expect((await ada.session.query(api.worlds.list, {}))[0].lastPlayedAt).toBe(now + 2);
+
+    // A later card is taken as before, and so is one with the same stamp.
+    expect((await post(t, { worldId, lastPlayedAt: now + 3, playersNow: [bo.id], sentAt: 103 })).status).toBe(200);
+    expect(await players()).toEqual([bo.id]);
+    expect((await post(t, { worldId, lastPlayedAt: now + 3, playersNow: 'x', sentAt: 104 })).status).toBe(400);
+    expect((await post(t, { worldId, lastPlayedAt: now + 3, playersNow: [], sentAt: 'soon' })).status).toBe(400);
+  });
+
   test('without the secret, or with a wrong one, nothing is written', async () => {
     const t = newBackend();
     const ada = await player(t, 'user_ada');

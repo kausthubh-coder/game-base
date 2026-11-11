@@ -33,6 +33,8 @@ Every task in a new worktree starts with the `worktree-game` skill. Say done onl
 | `bunx wrangler dev` | The built game and the world server, on port 5540 (`server/README.md`) |
 | `bun server/test/check.ts` | The world server's checks, on its own `wrangler dev` |
 | `bun server/test/live.ts` | Clerk, Convex and the world server together. Needs `.env.local`. |
+| `bun tools/play-together.mjs` | Two browsers in one world with dev tokens: walk, build, farm, leave, a server restart (`src/game/online/README.md`) |
+| `bun tools/play-together-signed-in.mjs` | The same with three real Clerk sign-ins and the invite link (`tools/play/signed-in.md`). `--url <address>` plays a deployed copy. |
 | `bunx convex dev --once` | Pushes `convex/` to the dev deployment (`convex/README.md`) |
 | `bun tools/load-measure.mjs` | Bytes and requests before the first playable frame, first and second visit |
 | `bun run deploy --dry-run` | Builds and packages the live copy and sends nothing. GitHub does the real deploy. |
@@ -94,4 +96,5 @@ Ports. `bun tools/doctor.mjs` gives each worktree one of its own in 5400 to 5999
 | 5361 | The handbook app |
 | 5460, 5470 | The painted meadow test scene, `painted-shots` |
 | 5525, 5526 | `tools/play.mjs` and `tools/shots.mjs` when `PLAY_PORT` is not set |
-| 5540 to 5546 | The world server: `wrangler dev`, its check, its memory test, the live check |
+| 5540 to 5548 | The world server: `wrangler dev`, its check, its memory test, the live check, `play-together` |
+| 5570 to 5578 | `play-together-signed-in` |

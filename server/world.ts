@@ -93,6 +93,8 @@ export class WorldServer extends DurableObject<Env> {
   private savedChanges = 0;
   private changedAt = -1;
   private cardAt = 0;
+  /** `sentAt` of the last card posted. */
+  private cardStamp = 0;
   private stepErrors = 0;
 
   private readonly stepMs = new Timed();
@@ -354,7 +356,10 @@ export class WorldServer extends DurableObject<Env> {
       const id = this.profiles.get(player.id);
       if (id) playersNow.push(id);
     }
-    this.ctx.waitUntil(this.gate.postCard({ worldId: this.worldId, playersNow, lastPlayedAt: Date.now() }));
+    // Posts can cross on the way to Convex, so each card says when it was made, and never the same time twice.
+    const now = Date.now();
+    this.cardStamp = Math.max(now, this.cardStamp + 1);
+    this.ctx.waitUntil(this.gate.postCard({ worldId: this.worldId, playersNow, lastPlayedAt: now, sentAt: this.cardStamp }));
   }
 
   // ---------------------------------------------------------------------------------------- for the checks

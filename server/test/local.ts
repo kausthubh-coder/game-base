@@ -4,7 +4,7 @@
 // The server is `bunx wrangler dev` on its own port with its own storage folder, so a script never touches
 // the storage of a server someone else has running. It is stopped by the pid this file started.
 import { spawn, type Subprocess } from 'bun';
-import { mkdirSync, openSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { Act } from '../../src/engine/net/messages.ts';
 import { createNet, type Net } from '../../src/features/net/index.ts';
@@ -51,8 +51,12 @@ export async function startServer(options: ServerOptions): Promise<LocalServer> 
   const logPath = resolve(ARTIFACTS, `${options.name}.log`);
   const out = openSync(logPath, options.fresh ? 'w' : 'a');
   const inspectorPort = options.port + 1;
-  const vars = Object.entries({ DEV_TOKENS: '1', DEV_TOOLS: '1', WORLD_SERVER_SECRET: 'dev-secret-not-real', ...options.vars })
-    .flatMap(([name, value]) => ['--var', `${name}:${value}`]);
+  // The variables go in a file only this user can read, not on the command line, where `ps` shows them:
+  // a real run's WORLD_SERVER_SECRET was once printed that way.
+  const varsPath = resolve(ARTIFACTS, `${options.name}.vars`);
+  const all = { DEV_TOKENS: '1', DEV_TOOLS: '1', WORLD_SERVER_SECRET: 'dev-secret-not-real', ...options.vars };
+  writeFileSync(varsPath, Object.entries(all).map(([name, value]) => `${name}=${JSON.stringify(value)}\n`).join(''), { mode: 0o600 });
+  const vars = ['--env-file', varsPath];
   const child: Subprocess = spawn({
     // The project's own wrangler, as `bunx wrangler` finds it. Run directly, so the pid is wrangler's own.
     cmd: [

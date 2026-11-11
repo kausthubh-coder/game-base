@@ -23,6 +23,8 @@ export default defineSchema({
     lastPlayedAt: v.number(),
     /** Who is in it now. Only the world server writes this, and a world holds a handful of players. */
     playersNow: v.array(v.id('profiles')),
+    /** When the world server made the card that `playersNow` came from. A card made before it is dropped. */
+    cardAt: v.optional(v.number()),
   }).index('by_ownerId', ['ownerId']),
 
   /** Who may enter a world beside its owner. The owner is `worlds.ownerId` and has no row here. */

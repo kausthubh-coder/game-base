@@ -9,6 +9,8 @@ export interface WorldCard {
   playersNow: string[];
   /** When someone last played here, in milliseconds since 1970. */
   lastPlayedAt: number;
+  /** When this card was made, higher for every card a world makes. Convex drops a card made before the one it holds. */
+  sentAt: number;
 }
 
 /** What Convex says about a player it lets in. The open gate knows none of it. */

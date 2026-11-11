@@ -198,11 +198,12 @@ POST <CONVEX_SITE_URL>/world-server/card
 Authorization: Bearer <WORLD_SERVER_SECRET>
 Content-Type: application/json
 
-{ "worldId": "<id>", "playersNow": ["<playerId>"], "lastPlayedAt": 1794412800000 }
+{ "worldId": "<id>", "playersNow": ["<playerId>"], "lastPlayedAt": 1794412800000, "sentAt": 1794412800000 }
 ```
 
 `playersNow` is the `playerId` of everyone in the world now, and empty after the last one left. `lastPlayedAt`
-is milliseconds since 1970. Any 2xx answer is fine. A failed post is logged and not tried again. The world's
+is milliseconds since 1970. `sentAt` is when the card was made and rises with every card, so Convex can
+drop one that arrives after a newer one. Any 2xx answer is fine. A failed post is logged and not tried again. The world's
 name is Convex's: the menu that makes a world gives it there, so the server sends none.
 
 ## What the rules cannot do yet

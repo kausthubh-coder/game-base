@@ -172,6 +172,7 @@ Content-Type: application/json
   "worldId": "<world id>",
   "lastPlayedAt": 1794398400000,
   "playersNow": ["<playerId>", "<playerId>"],
+  "sentAt": 1794398400123,
   "name": "Hollow Oak"
 }
 ```
@@ -181,9 +182,10 @@ Content-Type: application/json
 | `worldId` | yes | The world's id, a string |
 | `lastPlayedAt` | yes | Milliseconds since 1970. Convex keeps the later of this and what it has. |
 | `playersNow` | yes | The `playerId` of everyone in the world now, at most 64. Send `[]` when the world goes to sleep. A repeat is dropped. |
+| `sentAt` | no | When the server made this card, higher for each card a world makes. A card made before the one Convex holds is answered 200 and its players are dropped, so two posts that cross cannot put a departed player back. |
 | `name` | no | A new name for the card. Left out, the name stays. |
 
-Each post replaces `playersNow` whole. The world list in every member's menu updates by itself.
+Each post replaces `playersNow` whole, unless its `sentAt` is older than the last one taken. The world list in every member's menu updates by itself.
 
 | Status | Body | When |
 |---|---|---|

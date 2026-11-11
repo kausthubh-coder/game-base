@@ -185,6 +185,7 @@ export const writeCard = internalMutation({
     lastPlayedAt: v.number(),
     playersNow: v.array(v.string()),
     name: v.optional(v.string()),
+    sentAt: v.optional(v.number()),
   },
   returns: v.union(v.literal('ok'), v.literal('noWorld'), v.literal('soloWorld'), v.literal('badPlayer'), v.literal('badName')),
   handler: async (ctx, args) => {
@@ -203,7 +204,14 @@ export const writeCard = internalMutation({
     const name = args.name === undefined ? world.name : cleanName(args.name, MAX_WORLD_NAME);
     if (!name) return 'badName';
     // Two posts can cross on the way here, so the later time of the two stands.
-    await ctx.db.patch('worlds', world._id, { name, playersNow, lastPlayedAt: Math.max(world.lastPlayedAt, args.lastPlayedAt) });
+    const lastPlayedAt = Math.max(world.lastPlayedAt, args.lastPlayedAt);
+    // A card made before the one already written is old news. Taking its players would put back someone
+    // who has left, and a sleeping world sends no later card to put that right.
+    if (args.sentAt !== undefined && world.cardAt !== undefined && args.sentAt < world.cardAt) {
+      await ctx.db.patch('worlds', world._id, { lastPlayedAt });
+      return 'ok';
+    }
+    await ctx.db.patch('worlds', world._id, { name, playersNow, lastPlayedAt, ...(args.sentAt === undefined ? {} : { cardAt: args.sentAt }) });
     return 'ok';
   },
 });

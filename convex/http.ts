@@ -24,12 +24,13 @@ interface Card {
   lastPlayedAt: number;
   playersNow: string[];
   name?: string;
+  sentAt?: number;
 }
 
 /** The body as a card, or null when a field is missing or of the wrong kind. */
 function readCard(body: unknown): Card | null {
   if (typeof body !== 'object' || body === null) return null;
-  const { worldId, lastPlayedAt, playersNow, name } = body as Record<string, unknown>;
+  const { worldId, lastPlayedAt, playersNow, name, sentAt } = body as Record<string, unknown>;
   if (typeof worldId !== 'string' || worldId.length === 0 || worldId.length > 64) return null;
   if (typeof lastPlayedAt !== 'number' || !Number.isFinite(lastPlayedAt) || lastPlayedAt < 0) return null;
   if (!Array.isArray(playersNow) || playersNow.length > MAX_PLAYERS_NOW) return null;
@@ -39,7 +40,11 @@ function readCard(body: unknown): Card | null {
     players.push(player);
   }
   if (name !== undefined && (typeof name !== 'string' || name.length > 200)) return null;
-  return name === undefined ? { worldId, lastPlayedAt, playersNow: players } : { worldId, lastPlayedAt, playersNow: players, name };
+  if (sentAt !== undefined && (typeof sentAt !== 'number' || !Number.isFinite(sentAt) || sentAt < 0)) return null;
+  const card: Card = { worldId, lastPlayedAt, playersNow: players };
+  if (name !== undefined) card.name = name;
+  if (sentAt !== undefined) card.sentAt = sentAt;
+  return card;
 }
 
 const http = httpRouter();
