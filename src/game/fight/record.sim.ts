@@ -1,6 +1,7 @@
 // What a fight's record says about the experiments' checks. Each way to fight has its own checks, from
 // research note 08, section 7. A check is a line of words, the number measured, and whether it passed. Some
 // checks need more than one fight: how many tries the first calm took, how many layouts beat the boar.
+import { STAG } from '../content/fight.ts';
 import type { FightRecord } from './fight.sim.ts';
 
 export interface Check {
@@ -25,6 +26,19 @@ export function checksOf(record: FightRecord, earlier: readonly FightRecord[] = 
   const boar = record.enemy === 'boar', won = record.result === 'calmed';
   const same = earlier.filter((r) => r.way === record.way && r.enemy === record.enemy);
   const checks: Check[] = [];
+  // ---- milestone 3: the Stag's hall. Note 08: a giant fails when it stops attacking you.
+  if (record.way === 'stag') {
+    const boss = record.boss, freed = record.result === 'calmed';
+    for (const [i, name] of STAG.phases.entries()) {
+      checks.push({ what: `${name}: seconds, and the longest wait for an attack`, got: `${seconds(boss?.phases[i] ?? 0)}, ${seconds(boss?.quietByPhase[i] ?? 0)}`, want: 'a wait of at most 4 s', pass: (boss?.phases[i] ?? 0) > 0 ? (boss?.quietByPhase[i] ?? 0) <= 4 : null });
+    }
+    const by = Object.entries(record.hitBy).map(([attack, n]) => `${attack} ${n}`).join(', ');
+    checks.push({ what: 'Hits taken, by attack', got: `${record.hitsTaken}${by ? ` (${by})` : ''}`, want: 'any', pass: null });
+    checks.push({ what: 'Faints, and falls from the vines', got: `${record.faints}, ${boss?.counts.falls ?? 0}`, want: 'any', pass: null });
+    checks.push({ what: 'Length of the fight', got: seconds(record.length), want: 'under 300 s', pass: freed ? record.length < 300 : null });
+    return checks;
+  }
+  // ---- end of the Stag's hall
   if (record.way === 'hero') {
     // Tries count until the first calm of this beast this way.
     const firstWin = same.findIndex((r) => r.result === 'calmed');

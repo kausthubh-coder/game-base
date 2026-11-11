@@ -365,3 +365,18 @@ describe('the Stag keeps attacking', () => {
     }
   });
 });
+
+describe("the hall's checks on the card", () => {
+  test('a freed Stag gets a line for each phase, the hits by attack, and its length', async () => {
+    const { checksOf } = await import('./record.sim.ts');
+    const r = room();
+    r.until(() => r.hall.stag.doing !== 'asleep', 5, hold(r, 0.5, 8));
+    r.run(8, () => r.fight.placeHero(-3, 6));
+    const checks = checksOf(r.hall.record());
+    expect(checks.map((c) => c.what)).toContain('Hits taken, by attack');
+    expect(checks[0]?.what).toContain('The chains');
+    expect(checks[0]?.pass).toBe(true);
+    expect(checks[1]?.pass).toBeNull();
+    expect(checks.find((c) => c.what === 'Hits taken, by attack')?.got).toContain('sweep');
+  });
+});
