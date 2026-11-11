@@ -174,6 +174,11 @@ export interface PanelView {
   body: HTMLElement;
   /** False hides the heading row and the close button, for the title and the end card. */
   framed?: boolean;
+  /**
+   * A full-screen menu instead of a card: the night sky behind, a top rail with the line icon `icon`, the title,
+   * `head` in the middle and the close button, and a bottom rail holding `cues`, the key prompts the view keeps up to date.
+   */
+  screen?: { icon: string; cues: HTMLElement };
   render(): void;
   /** Returns true when the panel used the key. */
   onKey?(event: KeyboardEvent): boolean;
