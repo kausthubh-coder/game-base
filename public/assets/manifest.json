@@ -778,6 +778,52 @@
           }
         }
       }
+    },
+    "hero-moves": {
+      "sheet": "sprites/hero-moves.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
+    },
+    "hero-call": {
+      "sheet": "sprites/hero-call.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
     }
   },
   "blocks": {
