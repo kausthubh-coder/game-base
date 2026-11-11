@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "mode": "human",
+  "seed": 7,
+  "inputs": [
+    {
+      "type": "click",
+      "text": "New game"
+    },
+    {
+      "type": "press",
+      "key": "Escape"
+    },
+    {
+      "type": "check",
+      "path": "player.busy",
+      "equals": false,
+      "timeout": 15000
+    },
+    {
+      "type": "hold",
+      "key": "KeyD",
+      "ms": 180
+    },
+    {
+      "type": "hold",
+      "key": "KeyS",
+      "ms": 210
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "check",
+      "path": "talk.npc",
+      "equals": "tamsin"
+    }
+  ]
+}
