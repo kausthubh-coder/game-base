@@ -4,7 +4,7 @@
 import { AIR, BLOCKS } from '../../content/blocks.ts';
 import { SOLID } from '../../features/world/chunk.sim.ts';
 import type { RayHit } from '../../features/world/world.sim.ts';
-import type { ActionsApi, ItemId, Placed, Player, Stack, Systems, ToolKind, UseContext } from '../api.sim.ts';
+import type { ActionsApi, ItemId, Placed, PlaceablesApi, Player, Stack, Systems, ToolKind, UseContext } from '../api.sim.ts';
 import { BREAKING, DEFAULT_BREAK, FELLING, PLACEABLE_BREAK_SECONDS, type BreakRule } from '../content/drops.ts';
 import { findTree, type Tree, type TreeRules } from './tree.sim.ts';
 import { footprint } from '../content/placeables.ts';
@@ -44,6 +44,17 @@ export function reachDistance(player: Player, x0: number, y0: number, z0: number
 /** True when a standing body with its feet at (px, py, pz) reaches into the block cell at (x, y, z). */
 export function bodyInCell(px: number, py: number, pz: number, x: number, y: number, z: number): boolean {
   return px + BODY_HALF > x && px - BODY_HALF < x + 1 && pz + BODY_HALF > z && pz - BODY_HALF < z + 1 && py + BODY_TALL > y && py < y + 1;
+}
+
+/** True when another placed thing stands on this one. Taking this one back would leave that one in the air. */
+export function carriesAnother(placeables: PlaceablesApi, placed: Placed): boolean {
+  const def = placeables.defs().find((d) => d.kind === placed.kind);
+  if (!def) return false;
+  const [sx, sy, sz] = footprint(def.size, placed.quarterTurns);
+  for (let x = placed.x; x < placed.x + sx; x++) {
+    for (let z = placed.z; z < placed.z + sz; z++) if (placeables.at(x, placed.y + sy, z)) return true;
+  }
+  return false;
 }
 
 export function install(kernel: Kernel): void {
@@ -231,6 +242,10 @@ export function install(kernel: Kernel): void {
         stop();
         return false;
       }
+    } else if (others.placeables && carriesAnother(others.placeables, placed)) {
+      // A placed thing with another standing on it stays too.
+      stop();
+      return false;
     }
     if (!active || meter.x !== x || meter.y !== y || meter.z !== z) {
       meter.x = x;
@@ -288,6 +303,11 @@ export function install(kernel: Kernel): void {
           }
           if (!SOLID[world.getBlock(cx, y - 1, cz)]) {
             toast(NO_GROUND_TOAST);
+            return false;
+          }
+          // The cell over a growing crop stays open, for a placed thing as for a block.
+          if (others.crops?.at(cx, y - 1, cz)) {
+            toast(NO_ROOM_TOAST);
             return false;
           }
         }

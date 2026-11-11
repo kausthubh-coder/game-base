@@ -14,7 +14,7 @@
 // a release can come before the step that would have cancelled.
 import { AIR, blockId } from '../../content/blocks.ts';
 import { SOLID } from '../../features/world/chunk.sim.ts';
-import { BAG_FULL_TOAST } from '../actions/index.sim.ts';
+import { BAG_FULL_TOAST, carriesAnother } from '../actions/index.sim.ts';
 import type { BuildApi, BuildChange, BuildPlan, BuildPoint, BuildTool, ItemId, PlanCell, Placed, StrokeKind, Systems } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { NO_TOOL, cornerOf, judge, snapTurns, strokeCells, toolOf } from './plan.sim.ts';
@@ -177,7 +177,8 @@ export function install(kernel: Kernel): void {
     }
     if (e.kind === 'place') {
       const placed = sys.placeables?.all().find((p) => p.id === e.placed);
-      if (!placed || !e.item || !bag || bag.add(e.item, 1) > 0) return false;
+      if (!placed || !sys.placeables || carriesAnother(sys.placeables, placed)) return false;
+      if (!e.item || !bag || bag.add(e.item, 1) > 0) return false;
       sys.placeables?.remove(placed.id);
       return true;
     }
@@ -189,6 +190,8 @@ export function install(kernel: Kernel): void {
     const bag = sys.inventory;
     const item = game.systems.items.all().find((def) => def.placeable === placed.kind);
     if (!bag || !item) return false;
+    // A placed thing with another standing on it stays, so nothing is left in the air.
+    if (sys.placeables && carriesAnother(sys.placeables, placed)) return false;
     if (bag.add(item.id, 1, { x: placed.x + 0.5, y: placed.y + 0.5, z: placed.z + 0.5 }) > 0) {
       events.emit('toast', { text: BAG_FULL_TOAST });
       return false;

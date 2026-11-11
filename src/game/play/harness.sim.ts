@@ -7,15 +7,20 @@
 //   - The land. The shell keeps only the chunks around the player. So does this: 3 chunks each way
 //     are made when the player's chunk changes (the shell's LOAD_REACH), and a chunk further than 7 is
 //     dropped (the view's reach at low quality). A system that reads blocks beyond that gets air, as in the game.
-//   - The body. The player is moved along a nav path at walking speed, 4.4 blocks a second, or 2.0 when
-//     `soft` is asked (Shift). The hero's own body is not stepped.
+//   - The body. `walkTo` moves the player along a nav path at walking speed, 4.4 blocks a second, or 2.0 when
+//     `soft` is asked (Shift), and does not step the hero's own body. `tick` does: it steps the body three
+//     times and the kernel once, as the shell does, so the hero walks, jumps, swims and stops at walls.
+//   - The pointer. `use`, `hit` and `dig` name a block and a face. `aim` casts a ray from the hero's eyes,
+//     and `click` and `hold` take what it hit, as the shell's pointer does.
 //   - The panels. Crafting is `crafting.make`, which is what the bag panel calls. Something listens to
 //     `placeables.onUse`, as the panels view does, so "E: Craft" shows at a workbench as it does in the game.
 
 import { install as installTrees } from '../trees/index.sim.ts';
+import { createBus, type GameEvent } from '../../engine/events.ts';
 import type { Vec3 } from '../../engine/types.ts';
-import { World, type RayHit, type WorldSave } from '../../features/world/world.sim.ts';
-import { install as installActions } from '../actions/index.sim.ts';
+import { HERO_STEP, HeroBody } from '../../features/hero/hero.sim.ts';
+import { World, emptyHit, type RayHit, type WorldSave } from '../../features/world/world.sim.ts';
+import { EYE_HEIGHT, REACH, install as installActions, reachDistance } from '../actions/index.sim.ts';
 import { install as installAlmanac } from '../almanac/index.sim.ts';
 import { install as installBuild } from '../build/index.sim.ts';
 import type { EventName, Game, GameEvents, ItemId, Systems, UseContext } from '../api.sim.ts';
@@ -46,6 +51,11 @@ export const KERNEL_SEED = 7;
 /** Blocks a second: the hero's walk, and the walk with Shift held. */
 export const WALK_SPEED = 4.4;
 export const SOFT_SPEED = 2.0;
+
+/** Body steps in one kernel step: 60 a second against 20, as in the shell. */
+const BODY_STEPS = Math.round(STEP / HERO_STEP);
+/** How far the pointer's ray goes in build mode, where a stroke may start beyond the hero's reach. */
+const FAR_AIM = 24;
 
 /** Chunks made around the player each way, as the shell does on a start, a teleport and in `advance`. */
 const LOAD_REACH = 3;
@@ -104,11 +114,29 @@ export interface WalkOptions {
   until?: () => boolean;
 }
 
+/** What the movement keys hold during one step. `x` is east and `z` is south, each -1 to 1. */
+export interface BodyKeys {
+  x?: number;
+  z?: number;
+  jump?: boolean;
+  /** Shift: 2.0 blocks a second. */
+  soft?: boolean;
+}
+
+export interface PlayOptions {
+  /** The kernel's seed, for `game.random()`. The shell's 7 when not given. */
+  seed?: number;
+  /** Keep only about this many of the last events in `heard` and `said`, for a play of many thousand steps. All of them when not given. */
+  remember?: number;
+}
+
 export interface Play {
   readonly world: World;
   readonly kernel: Kernel;
   readonly game: Game;
   readonly sys: Systems;
+  /** The kernel's seed. */
+  readonly seed: number;
   /** Kernel steps since the new game began, across saves and loads. */
   readonly steps: number;
   /** Every event but footsteps, bag changes and flag changes, in order. */
@@ -120,6 +148,21 @@ export interface Play {
   advance(seconds: number): void;
   /** Advances until `done()` holds or `seconds` have passed. Returns whether it holds. */
   until(done: () => boolean, seconds: number): boolean;
+  /**
+   * One kernel step with the hero's own body under these keys: three steps of the body, then the kernel, as the
+   * shell does. The body starts where the player stands, so `tick` may follow `teleport` or `walkTo`.
+   */
+  tick(keys?: BodyKeys): void;
+  /**
+   * What a ray from the hero's eyes hits: a block or a tree within reach, or null. `yaw` turns like a facing,
+   * 0 north and clockwise seen from above. `pitch` is up from level, in radians. With `far` the ray goes on
+   * past the hero's reach, as the pointer does in build mode, and trees do not stop it.
+   */
+  aim(yaw: number, pitch: number, far?: boolean): RayHit | null;
+  /** One click on what the pointer is on, as `aim` gave it. */
+  click(button: 'primary' | 'secondary', hit: RayHit | null): boolean;
+  /** The primary button held on what the pointer is on, for the step to come. True when the block broke. */
+  hold(hit: RayHit | null): boolean;
   /** Puts the player at a named place or on the ground at x, z, at once. The land is made there. */
   teleport(to: string | { x: number; z: number }): Vec3;
   /** Walks to a named place or a point along nav paths. True when it got within `within` of it. */
@@ -146,13 +189,17 @@ export interface Play {
   onStep(fn: () => void): () => void;
   /** The game as the shell would write it to its save file, as plain JSON. */
   save(): PlaySave;
+  /** This game saved and loaded into a fresh world and a fresh kernel on the same seed, as Continue does. This play is left as it is. */
+  reload(): Play;
 }
 
-function build(save: PlaySave | null): Play {
+function build(save: PlaySave | null, options: PlayOptions): Play {
   const world = new World(WORLD_SEED);
   // As the shell's continueGame does: the world first, so a station's cells match the blocks around it.
   if (save) world.restore(save.world);
-  const kernel = createKernel(world, KERNEL_SEED);
+  const seed = options.seed ?? KERNEL_SEED;
+  const remember = options.remember ?? Infinity;
+  const kernel = createKernel(world, seed);
   const game = kernel.game;
   for (const [, install] of INSTALLS) install(kernel);
   const sys = game.systems;
@@ -164,6 +211,8 @@ function build(save: PlaySave | null): Play {
     if (name === 'footstep' || name === 'inventory.changed' || name === 'flag.changed') return;
     heard.push({ name, data, at: game.clock.seconds });
     if (name === 'toast' || name === 'hint') said.push((data as GameEvents['toast']).text);
+    if (heard.length > 2 * remember) heard.splice(0, heard.length - remember);
+    if (said.length > 2 * remember) said.splice(0, said.length - remember);
   });
   // The panels view listens here, and that is what makes a workbench show its prompt.
   sys.placeables.onUse?.(() => undefined);
@@ -216,6 +265,18 @@ function build(save: PlaySave | null): Play {
 
   const TOP: readonly [number, number, number] = [0, 1, 0];
 
+  // The hero's own body, made the first time `tick` is called. It tells the game about its steps, jumps and
+  // landings, as the shell's player does.
+  let body: HeroBody | null = null;
+  const bodyKeys = { moveX: 0, moveZ: 0, jump: false };
+  const bus = createBus<GameEvent>();
+  bus.on((event) => {
+    if (event.type === 'footstep') game.events.emit('footstep', { surface: event.surface, at: event.at });
+    else if (event.type === 'jump') game.events.emit('jump', { at: event.at });
+    else if (event.type === 'land') game.events.emit('land', { surface: event.surface, at: event.at });
+  });
+  const ray = { x: 0, y: 0, z: 0 }, eye = { x: 0, y: 0, z: 0 };
+
   function placeOf(to: string | Vec3): Vec3 {
     return typeof to === 'string' ? sys.region.place(to).at : to;
   }
@@ -256,8 +317,50 @@ function build(save: PlaySave | null): Play {
   }
 
   const play: Play = {
-    world, kernel, game, sys, heard, said,
+    world, kernel, game, sys, heard, said, seed,
     get steps() { return steps; },
+
+    tick(keys = {}) {
+      stream();
+      // The painted world draws a one-block rise as a slope, so the hero walks up it: the shell's `stepUp` of 1.
+      body ??= new HeroBody(world, player.pos, bus, { stepUp: 1 });
+      // Something else moved the player: a teleport, a walk along a path, a load.
+      if (body.x !== player.pos.x || body.y !== player.pos.y || body.z !== player.pos.z) body.teleport(player.pos.x, player.pos.y, player.pos.z);
+      body.facing = player.facing;
+      const busy = player.busy;
+      const x = busy ? 0 : keys.x ?? 0, z = busy ? 0 : keys.z ?? 0;
+      const pace = (keys.soft ? SOFT_SPEED / body.tuning.walkSpeed : 1) / (Math.hypot(x, z) || 1);
+      bodyKeys.moveX = x * pace;
+      bodyKeys.moveZ = z * pace;
+      bodyKeys.jump = !busy && keys.jump === true;
+      for (let i = 0; i < BODY_STEPS; i++) body.step(bodyKeys);
+      player.pos.x = body.x; player.pos.y = body.y; player.pos.z = body.z;
+      player.facing = body.facing;
+      player.onGround = body.grounded;
+      player.inWater = body.swimming;
+      stepOnce();
+    },
+
+    aim(yaw, pitch, far = false) {
+      const level = Math.cos(pitch);
+      ray.x = Math.sin(yaw) * level; ray.y = Math.sin(pitch); ray.z = -Math.cos(yaw) * level;
+      eye.x = player.pos.x; eye.y = player.pos.y + EYE_HEIGHT; eye.z = player.pos.z;
+      const hit = emptyHit();
+      const max = far ? FAR_AIM : REACH;
+      const onBlock = world.raycast(eye.x, eye.y, eye.z, ray.x, ray.y, ray.z, max, hit);
+      const onTree = sys.trees.raycast(eye, ray, onBlock ? hit.distance : max, hit);
+      // In build mode a tree in front of the ground is nowhere to build.
+      if (far) return onBlock && !onTree ? hit : null;
+      if (!onBlock && !onTree) return null;
+      const tree = sys.trees.at(hit.x, hit.y, hit.z);
+      const away = tree
+        ? reachDistance(player, tree.box.x0, tree.box.y0, tree.box.z0, tree.box.x1, tree.box.y1, tree.box.z1)
+        : reachDistance(player, hit.x, hit.y, hit.z, hit.x + 1, hit.y + 1, hit.z + 1);
+      return away <= REACH ? hit : null;
+    },
+
+    click: (button, hit) => sys.actions.use({ hit, held: sys.inventory.held(), button }),
+    hold: (hit) => sys.actions.hold({ hit, held: sys.inventory.held(), button: 'primary' }, STEP),
 
     advance(seconds) {
       const count = Math.max(0, Math.round(seconds / STEP));
@@ -351,6 +454,8 @@ function build(save: PlaySave | null): Play {
     save() {
       return JSON.parse(JSON.stringify({ world: world.save(), game: kernel.save(), steps })) as PlaySave;
     },
+
+    reload: () => build(play.save(), options),
   };
 
   if (save) {
@@ -369,13 +474,13 @@ function build(save: PlaySave | null): Play {
 }
 
 /** A new game at the region's spawn point, at dawn of day 1. */
-export function newPlay(): Play {
-  return build(null);
+export function newPlay(options: PlayOptions = {}): Play {
+  return build(null, options);
 }
 
 /** A saved game in a fresh world and a fresh kernel, as Continue does after the page reloads. */
-export function loadPlay(save: PlaySave): Play {
-  return build(save);
+export function loadPlay(save: PlaySave, options: PlayOptions = {}): Play {
+  return build(save, options);
 }
 
 /** The direction from one point to another, as a facing. */
