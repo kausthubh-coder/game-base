@@ -4,7 +4,7 @@
 //     [--chars models|sprites] [--anim idle|walk|tool|talk] [--cam shoulder|horizon] [--turn 0..3] [--quality high]
 //     [--clip x,y,w,h]   crops the shot to that part of the page
 // It fails on a console error. It prints the cast's draw calls and triangles.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
@@ -16,10 +16,9 @@ const cam = opt('cam', '');
 const turn = Number(opt('turn', 0));
 const quality = opt('quality', 'high');
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
 const page = await (await browser.newContext({ viewport: { width: Number(opt('w', 1440)), height: Number(opt('h', 900)) } })).newPage();
 page.setDefaultTimeout(300000);

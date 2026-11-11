@@ -6,7 +6,7 @@
 // It needs the built demo served: bun tools/demo.mjs build props, then bun tools/serve.mjs dist/demos/props 5315.
 // (bun tools/props-preview.mjs <kind> builds, serves and runs --only in one go.)
 // Exits 1 when the page logged an error. This Mac draws WebGL in software: use it to look, never to time.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -42,10 +42,9 @@ const shots = [
   ['turntable-stall', '?only=stall', { angle: 0.4, time: DAY }, 1],
 ];
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const WIDE = Number(value('w', 1600)), TALL = Number(value('h', 900));
 const page = await (await browser.newContext({ viewport: { width: WIDE, height: TALL }, colorScheme: 'dark' })).newPage();

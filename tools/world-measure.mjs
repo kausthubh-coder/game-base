@@ -4,7 +4,7 @@
 //   bun tools/world-measure.mjs walk [seconds]   chunks and live geometries during a long scripted walk
 // Options: --url http://127.0.0.1:5311/   --out .artifacts/world
 // This Mac draws WebGL in software. Counts and script times are real. Frame rates are not, so none are reported.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -16,10 +16,9 @@ const out = resolve(opt('out', '.artifacts/world'));
 mkdirSync(out, { recursive: true });
 if (!['budget', 'edits', 'walk'].includes(mode)) { console.error('usage: bun tools/world-measure.mjs budget | edits | walk [seconds]'); process.exit(2); }
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const errors = [];
 async function open(query, width = 1920, height = 1080) {

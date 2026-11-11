@@ -10,7 +10,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
@@ -55,10 +55,9 @@ const errors = [];
 const timeline = [];
 let browser;
 try {
-  browser = await chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  browser = await launchChrome({
     headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+    args: ['--autoplay-policy=no-user-gesture-required'],
   });
   const page = await (await browser.newContext({ viewport: { width: 800, height: 500 } })).newPage();
   page.setDefaultTimeout(300000);

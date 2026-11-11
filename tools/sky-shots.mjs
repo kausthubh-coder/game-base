@@ -5,7 +5,7 @@
 //   bun tools/sky-shots.mjs --soak 5        minutes of storm, with the live counts each minute
 // It needs the built demo served: bun tools/demo.mjs build sky, then bun tools/serve.mjs dist/demos/sky 5313.
 // Exits 1 when the page logged an error. This Mac draws WebGL in software: use it to look, never to time.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -52,10 +52,9 @@ const shots = [
   ['quality-high', { view: 'game', time: 0.5, weather: 'clear', quality: 'high' }, 2],
 ];
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const page = await (await browser.newContext({ viewport: { width: Number(value('w', 1280)), height: Number(value('h', 720)) }, colorScheme: 'dark' })).newPage();
 const errors = [];

@@ -8,7 +8,7 @@
 // draws WebGL in software, so it reads draw calls and triangles, never frames a second.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
@@ -50,10 +50,9 @@ const quality = opt('quality', 'high');
 /** More of the address, such as `&stress=1.34` to load land farther out. */
 const query = opt('query', '');
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
 const jsonPath = resolve(out, 'shots.json');
 let results = {};

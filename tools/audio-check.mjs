@@ -10,7 +10,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { centroid, decodeWav, likeness, loudestHz, mono, onsets, peakOf, rmsDb, spectrogram, windowsDb } from './audio-analyze.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -68,7 +68,7 @@ const stopServer = () => {
   try { process.kill(serverPid); } catch { /* already gone */ }
 };
 
-const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+const browser = await launchChrome({ headless: true });
 const fail = async (error) => {
   console.error(error);
   await browser.close();

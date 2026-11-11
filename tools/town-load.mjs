@@ -3,17 +3,16 @@
 // browser, starts a new game, waits for the land at the spawn to be drawn, and sums every response. Then it
 // walks the hero into town by teleport and sums what comes after, until the town kit's models are drawn.
 //   bun tools/town-load.mjs --town a [--url http://127.0.0.1:5391/]
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const url = opt('url', 'http://127.0.0.1:5391/');
 const town = opt('town', 'now');
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const phases = { start: new Map(), town: new Map() };
 let phase = phases.start;

@@ -19,7 +19,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 
 const args = process.argv.slice(2);
@@ -43,10 +43,9 @@ if (!args.includes('--skip-places')) {
 }
 
 // 2. The motion. Frames are cropped around whoever moves, at a close zoom.
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
 // Each motion frame is a 150 px square around the subject, scaled up to 300 so the figure is big enough to judge.
 const VW = 1200, VH = 800, CROP = 150, C = 300;

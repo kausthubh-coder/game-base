@@ -6,7 +6,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
@@ -43,10 +43,13 @@ const errors = [];
 let browser;
 
 try {
-  browser = await chromium.launch({
+  // Fixed-frame input assertions assume slow software frames (four frames must walk >0.5m).
+  // Metal also moves the projected pointer target before this test samples aim.
+  browser = await launchChrome({
+    software: true,
     executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+    args: ['--autoplay-policy=no-user-gesture-required'],
   });
   const page = await (await browser.newContext({ viewport: { width: Number(opt('w', 1280)), height: Number(opt('h', 800)) } })).newPage();
   page.setDefaultTimeout(180000);

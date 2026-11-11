@@ -5,7 +5,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 
 const args = process.argv.slice(2);
@@ -31,9 +31,8 @@ const errors = [], bad = [], crops = [];
 const SIZE = 150;
 let browser;
 try {
-  browser = await chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  browser = await launchChrome({ headless: true,
+    args: ['--autoplay-policy=no-user-gesture-required'],
   });
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
   page.setDefaultTimeout(900000);
