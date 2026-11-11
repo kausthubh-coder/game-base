@@ -93,6 +93,7 @@ async function serveSession() {
   let closing = false;
   const cleanup = async () => {
     if (closing) return; closing = true; save();
+    if (named) writeFileSync(named, readFileSync(recording));
     await browser?.close(); server.kill();
     if (existsSync(socket)) unlinkSync(socket);
     if (existsSync(pidFile)) unlinkSync(pidFile);
@@ -122,7 +123,7 @@ async function serveSession() {
             await fresh(scenario.mode, scenario.seed); entries = []; save();
             for (const step of scenario.inputs) await input(step);
             clean(); result = { pass: true, inputs: entries.length, state: await state() };
-          } else if (command === 'stop') { result = { stopped: true }; }
+          } else if (command === 'stop') { result = { stopped: true, recording: named || recording }; }
           else throw new Error(`unknown command ${command}`);
           client.end(JSON.stringify(result));
           if (command === 'stop') { ipc.close(); await cleanup(); }

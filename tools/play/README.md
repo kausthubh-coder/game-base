@@ -14,7 +14,7 @@ Send `do` a JSON object. Human mode supports these inputs:
 
 Door mode additionally accepts `{"type":"door","method":"skipTo","args":["festival"]}`. It restricts calls to the documented mutation methods. Human mode rejects all door inputs. `state` prints JSON; `shot .artifacts/play/example.png` captures the page.
 
-`record name` starts a named recording; `record stop` saves it. Automatic recordings capture every input, including failed attempts. Copy useful recordings into `tools/play/scenarios/`. `replay tools/play/scenarios/first-talk.json` starts a session if needed, opens a clean browser context at the recorded seed, plays inputs serially and fails on console errors or failed checks. Replay resets local storage. No previous save is used.
+`record name` starts a named recording; `record stop` saves it. Stopping the session also saves an active named recording. Automatic recordings capture every input, including failed attempts. Copy useful recordings into `tools/play/scenarios/`. `replay tools/play/scenarios/first-talk.json` starts a session if needed, opens a clean browser context at the recorded seed, plays inputs serially and fails on console errors or failed checks. Replay resets local storage. No previous save is used.
 
 `CHROME_SOFTWARE=1` or `start --software` selects software drawing; the default uses the available GPU. Stop and restart to change mode or renderer. The renderer is printed in the session log and stored in the session file.
 
