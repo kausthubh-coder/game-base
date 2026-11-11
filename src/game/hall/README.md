@@ -36,7 +36,7 @@ A game that skips past the night (`quests.skipTo`) gets every flag at once. The 
 
 ## The Heartstone
 
-`heart()` returns `{ level, parts }`. A bed is a roof worth 2, a growing crop is worth a quarter, a bonded pet is worth 5. The level is the sum, rounded down. It is the first form of the number the story calls how alive the land is. The Gates and the kingdom's steps will read it.
+`heart()` returns `{ level, parts }`. A bed is a roof worth 2, a growing crop is worth a quarter, a bonded pet is worth 5. The level is the sum, rounded down. Once `heart.seen` is set the HUD shows it (`views/ui-heart.view.ts`). Once the Custodian is awake, the level rising past 3, 6 and 10 in play gets one line from it each, as a toast (`CUSTODIAN_HEART` in `content/dialogue.ts`), and sets `heart.said.<level>` so it is said once. It is the first form of the number the story calls how alive the land is. The Gates and the kingdom's steps will read it.
 
 ## The api
 
@@ -71,7 +71,6 @@ Save holds the fox's position and how long ago it was calmed, or null. Everythin
 ## Not done yet
 
 - The fox is drawn with the leaftail's sheet. A grey, dull-eyed sheet of its own is still to make.
-- The Heartstone has no gauge on the HUD. Its number shows only when the stone is touched.
 - The Custodian stays on its plinth. It does not follow the player.
 
 ## Tests
