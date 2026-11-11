@@ -13,6 +13,7 @@ Read before a large change:
 | Hosting, accounts, the world server, graphics levels, the bake step | `docs/architecture.md` |
 | Frame rate or load time on a weak device | `docs/fast-everywhere.md` |
 | The look of the world | `docs/painted-world.md` |
+| Menus, HUD, dialogue, map or any interface look (with the `make-ui` skill) | `docs/ui-look.md` |
 | Story, art, sound or game design | The handbook: the markdown in `~/dev/sandbox/game-look-test/design`, shown by the app in `game-look-test/handbook` (port 5361) |
 
 ## Commands
