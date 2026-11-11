@@ -3,16 +3,18 @@
 // hand and the rigs that stand. What pose a fighter holds is `looks.ts`; what a hit adds to it is `feel.ts`.
 // It reads the fight and never writes it.
 import { ARENA, type Stage } from '../fight/arena.sim.ts';
-import { PET, RIG, SHAPE_AFTER } from '../content/fight.ts';
+import { HERO, PET, RIG, SHAPE_AFTER } from '../content/fight.ts';
 import type { BeastState, Fight } from '../fight/fight.sim.ts';
 import { dirX, dirZ } from '../fight/shapes.sim.ts';
 import type { GameView, ScreenPoint } from '../shell/view.ts';
+import { CALM, createCalming } from './calm.ts';
 import { jolt, settle, type Feel, type Felt, type Jolt } from './feel.ts';
 import { createFigures, type Figure, type Figures } from './figures.ts';
 import { MARK, createGround, type Ground } from './ground.ts';
 import type { Keys } from './keys.ts';
 import { GOLD, HOT, PALE, RED, SHADE, TEAL, createLooks, type Look, type Looks } from './looks.ts';
 import { createRigViews } from './rigs.ts';
+import { SPARK, createSparks, type Sparks } from './sparks.ts';
 
 /** The height of the ground a fighter stands on: the painted ground where there is one, the blocks otherwise. */
 export function heightOf(view: GameView): (x: number, z: number) => number {
@@ -29,18 +31,32 @@ export interface Draw {
   beastAt(beast: BeastState): ScreenPoint | null;
   /** The drawn beast nearest a point, for the feel of a hit. */
   nearest(x: number, z: number): Felt | null;
+  /** Seconds into a beast's moment of calming (below 0 during the release), or null before it. */
+  momentOf(beast: BeastState): number | null;
   readonly figures: Figures;
   readonly ground: Ground;
+  readonly sparks: Sparks;
   readonly looks: Looks;
 }
 
-interface Drawn extends Felt { figure: Figure; look: Look; x: number; z: number; id: number }
+export interface DrawHooks {
+  /** The name of a gift over the page, or none when `at` is null. */
+  label(text: string, at: ScreenPoint | null, alpha: number): void;
+}
+
+/** A drawn beast: its figure, where it is drawn, and how many pips of thrown light it showed last frame. */
+interface Drawn extends Felt { figure: Figure; look: Look; x: number; z: number; id: number; marks: number }
+
+/** The pips of thrown light, in the Mark's teal. Spent ones flash brighter as they go into the beast. */
+const PIP = TEAL.clone().multiplyScalar(1.35), SPENT = TEAL.clone().multiplyScalar(1.9);
 
 /** `floor` is the height of the arena's ground, where its edge is drawn. */
-export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: number, keys: Keys, feel: Feel): Draw {
+export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: number, keys: Keys, feel: Feel, hooks: DrawHooks): Draw {
   const groundY = heightOf(view);
   const figures = createFigures(view);
   const ground = createGround(view);
+  const sparks = createSparks(view);
+  const calming = createCalming(view, ground, sparks, { groundY, label: hooks.label });
   const rigViews = createRigViews(view);
   const looks = createLooks(figures);
   const input = fight.input;
@@ -69,9 +85,15 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
     f.face(h.facing);
     f.flash = j.flash;
     f.shake = j.shake * Math.sin(clock * 90);
-    looks.hero(f, h, Math.hypot(body.vx, body.vz) > 0.4);
-    // A hero nothing can hit blinks, so the safe moment after a hit is seen.
-    f.visible = !(h.safe > 0 && h.act !== 'dodge' && h.act !== 'faint' && Math.floor(clock * 14) % 2 === 0 && j.flash <= 0);
+    // Just after a calm the hero keeps holding the Mark out, through the release.
+    let holding = false;
+    for (const d of drawn.values()) if (d.calmOn && d.calmT < 0.5) holding = true;
+    looks.hero(f, h, Math.hypot(body.vx, body.vz) > 0.4, clock, feel.pointing > 0, holding);
+    // The arc of a cut, at its true angle, from the moment it lands: three frames, fading (note 05's feel list).
+    if (h.act === 'cut') {
+      const k = (h.t - HERO.cut.startup + 1 / 120) / 0.1;
+      if (k >= 0 && k < 1) ground.draw(MARK.cone, p.x, groundY(p.x, p.z), p.z, h.facing, HERO.cut.reach, HERO.cut.arc / 2, 1, PALE, 1 - k, 0.6);
+    }
 
     // The afterimages of a dodge: two places the hero just left.
     for (let i = 0; i < 2; i++) {
@@ -123,7 +145,7 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
       let d = drawn.get(b.id);
       if (!d) {
         const look = looks.of(b.def.kind);
-        d = { figure: figures.add(look.sheet), look, jolt: jolt(), x: b.x, z: b.z, calmT: -1, id: b.id };
+        d = { figure: figures.add(look.sheet), look, jolt: jolt(), x: b.x, z: b.z, calmT: 0, calmOn: false, id: b.id, marks: 0 };
         drawn.set(b.id, d);
       }
       const f = d.figure;
@@ -137,17 +159,45 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
       f.shake = d.jolt.shake * Math.sin(clock * 95);
       f.squashX = 1 + 0.15 * d.jolt.squash;
       f.squashY = 1 - 0.1 * d.jolt.squash;
-      const lift = looks.beast(f, b, d.look, d, dt, clock);
+      const lift = looks.beast(f, b, d.look, d, dt, clock, view.settings.graphics.reduceMotion);
       f.place(d.x, y + lift, d.z);
 
       const r = b.def.radius;
       ground.draw(MARK.shadow, d.x, y, d.z, 0, r * 1.25, 0, 0, SHADE, 0.5 / (1 + lift));
-      // The hold of the Mark: a teal ring that closes around the beast.
+      // The hold of the Mark: a teal ring that closes around the beast, and the thread from the hero to it.
       if (b.doing === 'dizzy') {
         ground.draw(MARK.ring, d.x, y, d.z, 0, r + 0.7, 0.04, 1, TEAL, 0.35 + 0.2 * Math.sin(clock * 6));
         if (b.calm > 0) ground.draw(MARK.ring, d.x, y, d.z, 0, r + 0.7, 0.1, b.calm, TEAL, 1, 0.3);
+        if (b.calm > 0 && fight.hero.act === 'calm') calming.hold(b, d, dt);
       }
-      for (let m = 0; m < b.marks; m++) ground.draw(MARK.ring, d.x, y, d.z, 0, r + 0.25 + m * 0.16, 0.035, 1, TEAL, 0.9);
+      if (b.doing === 'calmed' && d.calmOn && d.calmT < CALM.end + 2) calming.moment(b, d, f.height, dt);
+      pips(b, d, y + lift + f.height, clock);
+    }
+  }
+
+  /**
+   * The marks of thrown light: small pips over the beast's head, never a ring on the ground (that is the hold
+   * of the Mark). The pet's strike spends them: they dive into the beast. Marks that run out float off.
+   */
+  function pips(b: BeastState, d: Drawn, top: number, clock: number): void {
+    const yaw = view.camera.yaw, rx = Math.cos(yaw), rz = -Math.sin(yaw), y = top + 0.22;
+    const at = (i: number, n: number): number => (i - (n - 1) / 2) * 0.32;
+    if (b.marks < d.marks) {
+      const struck = fight.pet.strikeT > 0;
+      for (let i = b.marks; i < d.marks; i++) {
+        const o = at(i, d.marks), px = d.x + rx * o, pz = d.z + rz * o;
+        if (struck) {
+          sparks.spawn(SPARK.pip, px, y, pz, -rx * o * 2, -4.5, -rz * o * 2, 0.22, 0.3, SPENT);
+          for (let k = 0; k < 3; k++) sparks.spawn(SPARK.mote, d.x, top * 0.5 + y * 0.5 - 0.4, d.z, Math.cos(i * 2 + k * 2.1) * 1.4, 0.8, Math.sin(i * 2 + k * 2.1) * 1.4, 0.4, 0.12, SPENT, 2, 2);
+        } else {
+          sparks.spawn(SPARK.pip, px, y, pz, 0, 0.5, 0, 0.4, 0.24, PIP);
+        }
+      }
+    }
+    d.marks = b.marks;
+    for (let i = 0; i < b.marks; i++) {
+      const o = at(i, b.marks);
+      sparks.draw(SPARK.pip, d.x + rx * o, y + Math.sin(clock * 4 + i * 1.7) * 0.04, d.z + rz * o, 0.26, PIP, 1, 1);
     }
   }
 
@@ -192,6 +242,10 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
       if (beast) alongX = Math.abs(beast.z - cz) >= Math.abs(beast.x - cx);
       rigViews.ghost(held, cx, groundY(cx, cz), cz, alongX, why === null);
       ground.draw(MARK.cell, cx, groundY(cx, cz), cz, 0, 0.5, 0, 0, why === null ? TEAL : RED, 0.9);
+      // Refused for being too near a beast, the cell is under its body: the ring it keeps clear says why.
+      if (why !== null && beast && Math.hypot(beast.x - cx, beast.z - cz) < beast.def.radius + RIG.clear + 0.8) {
+        ground.draw(MARK.ring, beast.x, groundY(beast.x, beast.z), beast.z, 0, beast.def.radius + RIG.clear, 0.06, 1, RED, 0.9);
+      }
       ground.draw(MARK.ring, p.x, groundY(p.x, p.z), p.z, 0, RIG.reach, 0.04, 1, PALE, 0.4);
       if (held === 'lamp') ground.draw(MARK.ring, cx, groundY(cx, cz), cz, 0, RIG.lure, 0.04, 1, TEAL, 0.3);
     } else {
@@ -219,11 +273,14 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
     frame(dt, now) {
       clock = now;
       ground.begin();
+      sparks.begin();
       drawGround(dt);
       drawHero(dt);
       drawPet(dt);
       drawBeasts(dt);
+      calming.end();
       ground.end();
+      sparks.end(dt);
       rigViews.sync(fight.rigs, groundY);
       figures.update(dt);
     },
@@ -232,8 +289,10 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
       return d ? view.project(d.x, groundY(d.x, d.z) + d.figure.height + 0.35, d.z, point) : null;
     },
     nearest,
+    momentOf(beast) { const d = drawn.get(beast.id); return d && d.calmOn ? d.calmT : null; },
     figures,
     ground,
+    sparks,
     looks,
   };
 }

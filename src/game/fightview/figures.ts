@@ -35,6 +35,14 @@ export interface Figure {
   /** Width and height it is stretched by, about the feet. */
   squashX: number;
   squashY: number;
+  /** Radians it is tipped over about its feet, in the picture's plane: a faint, a tumble. Positive falls toward its back. */
+  roll: number;
+  /** 0 to 1: a warm glow, the last moment before an attack lands. Warmer light, not a darker color. */
+  warm: number;
+  /** 0 to 1: the pale teal light of the Mark, for the moment of calming. Not the white of a hit. */
+  glow: number;
+  /** True mirrors the drawing seen from the front or the back, for a swing that goes the other way. A side view is never mirrored by it. */
+  mirror: boolean;
   /** 0 to 1. Below 1 only for a figure made with `ghost`. */
   alpha: number;
   visible: boolean;
@@ -59,6 +67,7 @@ uniform vec2 uSize;
 uniform vec2 uAnchor;
 uniform vec4 uRect;
 uniform vec3 uMove;
+uniform float uRoll;
 uniform vec2 uBody;
 varying vec2 vUv;
 varying float vDown;
@@ -71,8 +80,12 @@ void main() {
   // 0 at the top of the drawn body, 1 at its feet.
   vDown = ((1.0 - position.y) - uBody.x) / max(uBody.y - uBody.x, 0.001);
   // uMove is the flip (1 or -1) times the squash across, the squash up, and the shake.
-  float across = (position.x - uAnchor.x) * uSize.x * uMove.x + uMove.z;
-  float up = (position.y - uAnchor.y) * uSize.y * uMove.y;
+  float across0 = (position.x - uAnchor.x) * uSize.x * uMove.x;
+  float up0 = (position.y - uAnchor.y) * uSize.y * uMove.y;
+  // Tipped over about the feet, in the picture's plane.
+  float cr = cos(uRoll), sr = sin(uRoll);
+  float across = across0 * cr - up0 * sr + uMove.z;
+  float up = across0 * sr + up0 * cr;
   vec3 right = normalize(vec3(viewMatrix[0][0], 0.0, viewMatrix[2][0]));
   float lean = max(asin(clamp(viewMatrix[1][2], -1.0, 1.0)) - LEAN_FROM, 0.0);
   vec3 rise = vec3(right.z * sin(lean), cos(lean), -right.x * sin(lean));
@@ -89,6 +102,8 @@ uniform vec3 uLight;
 uniform vec3 uGlow;
 // Drained, the sweep, the flash and the alpha.
 uniform vec4 uLook;
+// The warm glow of a tell and the teal glow of the Mark.
+uniform vec2 uHeat;
 varying vec2 vUv;
 varying float vDown;
 #include <fog_pars_fragment>
@@ -107,6 +122,8 @@ void main() {
   // The line itself is light.
   float line = (1.0 - smoothstep(0.0, 0.08, abs(vDown - uLook.y))) * step(0.004, uLook.y) * step(uLook.y, 0.996) * uLook.x;
   color += uGlow * line;
+  color += vec3(0.42, 0.17, 0.0) * uHeat.x;
+  color = mix(color, vec3(0.78, 1.0, 0.95), uHeat.y);
   color = mix(color, vec3(1.0), uLook.z);
   gl_FragColor = vec4(color, uLook.w);
   #include <tonemapping_fragment>
@@ -155,6 +172,10 @@ export function createFigures(view: GameView): Figures {
     shake = 0;
     squashX = 1;
     squashY = 1;
+    roll = 0;
+    warm = 0;
+    glow = 0;
+    mirror = false;
     alpha = 1;
     visible = true;
     private sheet: Sheet;
@@ -170,6 +191,8 @@ export function createFigures(view: GameView): Figures {
       uAnchor: { value: new THREE.Vector2(0.5, 0) },
       uRect: { value: new THREE.Vector4(0, 0, 1, 1) },
       uMove: { value: new THREE.Vector3(1, 1, 0) },
+      uRoll: { value: 0 },
+      uHeat: { value: new THREE.Vector2(0, 0) },
       uBody: { value: new THREE.Vector2(0, 1) },
       uTint: { value: this.tint },
       uLight: { value: light },
@@ -236,6 +259,7 @@ export function createFigures(view: GameView): Figures {
       let row = rows.front, flip = 1;
       if (this.seen === VIEW_BACK) row = rows.back ?? rows.front;
       else if (this.seen !== VIEW_FRONT && rows.side !== undefined) { row = rows.side; if (this.seen === VIEW_SIDE_LEFT) flip = -1; }
+      if (this.mirror && (this.seen === VIEW_FRONT || this.seen === VIEW_BACK)) flip = -flip;
       const frame = this.frame >= 0 ? Math.min(this.frame, anim.frames - 1) : Math.floor(this.clock * anim.fps) % anim.frames;
       const w = a.pixels.width, h = a.pixels.height, fw = a.frame[0], fh = a.frame[1];
       const u = this.uniforms;
@@ -247,6 +271,9 @@ export function createFigures(view: GameView): Figures {
       u.uAnchor.value.set(a.anchor[0] / fw, 1 - a.anchor[1] / fh);
       u.uBody.value.set(a.body[1] / fh, a.body[3] / fh);
       u.uMove.value.set(flip * this.squashX, this.squashY, this.shake);
+      // A roll tips it toward its back whichever way the drawing faces.
+      u.uRoll.value = this.roll * flip;
+      u.uHeat.value.set(this.warm, this.glow);
       u.uLook.value.set(this.drained, this.sweep, this.flash, this.alpha);
     }
 

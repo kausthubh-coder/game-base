@@ -20,6 +20,7 @@ import { arenaStage } from '../fight/arena.sim.ts';
 import { createBot } from '../fight/bot.sim.ts';
 import { createFight, type Fight } from '../fight/fight.sim.ts';
 import { dressArena, stampArena } from '../fightview/arena.ts';
+import { CALM } from '../fightview/calm.ts';
 import { createDraw, heightOf } from '../fightview/draw.ts';
 import { createFeel } from '../fightview/feel.ts';
 import { createKeys } from '../fightview/keys.ts';
@@ -46,6 +47,12 @@ interface FightDoor {
   screen(x: number, z: number): { x: number; y: number } | null;
   /** The walking keys that take the hero toward a point, with the camera as it stands: some of `KeyW`, `KeyA`, `KeyS`, `KeyD`. */
   keysToward(x: number, z: number): string[];
+  /** True holds the rules still while the picture goes on, so a test can set a fighter's state and look at its pose. */
+  hold(on: boolean): void;
+  /** Plays the picture's own clocks (poses, the calming, flashes) this much slower than the rules, for a strip of screenshots. 1 is normal. */
+  slow(scale: number): void;
+  /** Turns the game's reduce motion setting on or off. It is stored, as the settings screen stores it. */
+  reduceMotion(on: boolean): void;
 }
 
 declare global {
@@ -85,7 +92,8 @@ export function install(view: GameView): void {
     random: () => game.random(),
     onEnd(record) {
       const logged = log.add(record);
-      if (record.result === 'calmed') { ended = logged; askIn = 2.2; }
+      // "Again?" waits for the moment of calming to play out.
+      if (record.result === 'calmed') { ended = logged; askIn = CALM.end + 0.2; }
     },
   });
   const keep = (): void => {
@@ -110,7 +118,7 @@ export function install(view: GameView): void {
   const feel = createFeel(view, fight, { say, groundY, nearest: (x, z) => draw.nearest(x, z) });
   feel.shakes = stored.shake !== false;
   const keys = createKeys(view, fight, { feel, say, groundY });
-  const draw = createDraw(view, fight, stage, oy, keys, feel);
+  const draw = createDraw(view, fight, stage, oy, keys, feel, { label: (text, at, alpha) => panel.label(text, at, alpha) });
 
   function bring(kind: string): void {
     keys.held = null;
@@ -142,7 +150,8 @@ export function install(view: GameView): void {
   // ---------------------------------------------------------------- one frame
   let clock = 0;
   let started = false;
-  view.onFrame((dt) => {
+  view.onFrame((frameDt) => {
+    const dt = frameDt * keys.slow;
     if (!view.started) {
       // The title holds the start. The lab goes straight in: its own save when there is one, a new game otherwise.
       if (!started) { started = true; if (!view.continueGame()) view.newGame(); }
@@ -172,7 +181,7 @@ export function install(view: GameView): void {
         way: fight.way, phase: fight.phase, clock: fight.clock, gentle: fight.gentle,
         hero: { x: h.x, z: h.z, health: h.health, stamina: h.stamina, act: h.act },
         pet: { kind: fight.pet.def.kind, mode: fight.pet.mode, hearts: fight.pet.hearts, x: fight.pet.x, z: fight.pet.z },
-        beast: b ? { kind: b.def.kind, doing: b.doing, guard: b.guard, x: b.x, z: b.z, calm: b.calm, marks: b.marks } : null,
+        beast: b ? { kind: b.def.kind, doing: b.doing, guard: b.guard, x: b.x, z: b.z, calm: b.calm, marks: b.marks, moment: draw.momentOf(b) } : null,
         rigs: fight.rigs.map((r) => ({ kind: r.kind, x: r.x, z: r.z, armed: r.armed })),
         shapes: fight.shapes.filter((s) => s.live).length,
         record: { ...fight.record },
@@ -197,5 +206,8 @@ export function install(view: GameView): void {
       return at ? { x: at.x, y: at.y } : null;
     },
     standIns: () => draw.looks.standIns(),
+    hold(on) { keys.paused = on; },
+    slow(scale) { keys.slow = Math.max(0.01, Math.min(1, scale)); },
+    reduceMotion(on) { view.settings.setGraphics({ reduceMotion: on }); },
   };
 }

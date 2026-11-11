@@ -25,6 +25,10 @@ export interface Keys {
   bot: Bot | null;
   /** False until the lab has set the arena up: nothing reads a key or steps the fight before. */
   ready: boolean;
+  /** True holds the fight still: the rules are not stepped, and the picture goes on. For the door, to look at a pose. */
+  paused: boolean;
+  /** Below 1 the picture runs this much slower, and a freeze lasts as long in the picture: for the door's strips of screenshots. */
+  slow: number;
   /** Once a frame: where the pointer is on the ground, into the fight's aim. */
   aim(): void;
 }
@@ -34,7 +38,7 @@ export function createKeys(view: GameView, fight: Fight, hooks: KeysHooks): Keys
   const { game } = view;
   const lens = view.ctx.camera;
   const input = fight.input;
-  const keys: Keys = { held: null, bot: null, ready: false, aim };
+  const keys: Keys = { held: null, bot: null, ready: false, paused: false, slow: 1, aim };
 
   const down = new Set<string>();
   const typing = (target: EventTarget | null): boolean => target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
@@ -80,9 +84,10 @@ export function createKeys(view: GameView, fight: Fight, hooks: KeysHooks): Keys
   function steer(wish: HeroInput, body: HeroBody): void {
     if (!keys.ready) return;
     body.tuning.walkSpeed = walkSpeed;
+    if (keys.paused) return;
     if (feel.freeze > 0) {
       // The freeze of a hit: nobody moves, and the fight's clock waits.
-      feel.freeze -= HERO_STEP;
+      feel.freeze -= HERO_STEP * keys.slow;
       wish.moveX = wish.moveZ = 0;
       wish.jump = false;
       body.vx = body.vz = 0;

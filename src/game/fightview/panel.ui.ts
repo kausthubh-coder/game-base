@@ -31,6 +31,8 @@ export interface LabPanel {
   ask(fight: LoggedFight): void;
   /** A short line under the bars: why something could not be done. */
   say(text: string): void;
+  /** The name of a gift, floating over the page where it flies. Null `at` hides it. */
+  label(text: string, at: { x: number; y: number } | null, alpha: number): void;
   /** True while the pointer is over a part of the interface, so a click there is not a swing. */
   readonly element: HTMLElement;
 }
@@ -163,9 +165,12 @@ const STYLE = /* css */ `
 .ui-book .fl-log td { padding: 4px 8px 4px 0; border-top: 1px solid var(--ui-line); }
 /* A part that is switched off stays off, whatever display its class gives it. */
 .ui-book .fl-card [hidden], .ui-book .fl-hud [hidden], .ui-book .fl-beast[hidden], .ui-book .fl-again[hidden], .ui-book .fl-log[hidden] { display: none !important; }
-/* The game's own quest card, quick slots, waypoint and the marks over people's heads have no place in the lab. */
+/* The game's own quest card, quick slots, waypoint, hints and the marks over people's heads have no place in the lab. */
 .ui-book.lab-fight .gb-hud-quest, .ui-book.lab-fight .gb-hud-slots, .ui-book.lab-fight .gb-beacon, .ui-book.lab-fight .ui-bookbtn,
-.ui-book.lab-fight .marks, .ui-book.lab-fight .watch-ring { display: none !important; }
+.ui-book.lab-fight .marks, .ui-book.lab-fight .watch-ring, .ui-book.lab-fight .gu-hint { display: none !important; }
+/* The name of a gift, over it as it flies to the hero. */
+.ui-book .fl-gift { position: absolute; left: 0; top: 0; padding: 3px 10px; translate: -50% -100%; border-radius: 999px; pointer-events: none; white-space: nowrap;
+  font: 650 13px / 1.2 var(--ui-font); color: var(--ui-glass-ink); background: var(--ui-glass); text-shadow: var(--ui-text-shadow); will-change: transform, opacity; }
 @container gu (width < 720px) { .ui-book .fl-card { width: 250px; font-size: 12px; } }
 `;
 
@@ -273,7 +278,10 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   again.hidden = true;
   const logBox = el('section', 'fl-log');
   logBox.hidden = true;
-  root.append(edge, card, hud, line, over, again, logBox);
+  const gift = el('div', 'fl-gift');
+  gift.hidden = true;
+  root.append(edge, card, hud, line, over, gift, again, logBox);
+  let giftText = '', giftAlpha = -1;
 
   function checkRows(checks: Check[]): HTMLTableElement {
     const table = el('table', 'fl-checks');
@@ -395,6 +403,14 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     element: root,
     ask,
     say,
+    label(text, at, alpha) {
+      gift.hidden = !at || alpha <= 0;
+      if (gift.hidden || !at) return;
+      if (text !== giftText) { giftText = text; gift.textContent = text; }
+      const a = Math.round(alpha * 20) / 20;
+      if (a !== giftAlpha) { giftAlpha = a; gift.style.opacity = String(a); }
+      gift.style.transform = `translate(${Math.round(at.x)}px, ${Math.round(at.y)}px)`;
+    },
     update(fight, held, mode, beastAt) {
       const beast = fight.beasts[0];
       if (fight.way !== shownWay) {
@@ -436,7 +452,8 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
       }
       // The skills and the kit are asked for ten times a second: each answer is a small new object.
       if (tick++ % 6 === 0) refreshSlow(fight, held);
-      const at = beast ? beastAt(beast) : null;
+      // A calmed beast needs no bar: the heart and the gift say it.
+      const at = beast && beast.doing !== 'calmed' ? beastAt(beast) : null;
       over.hidden = !at;
       if (beast && at) {
         over.style.transform = `translate(${Math.round(at.x)}px, ${Math.round(at.y)}px)`;
