@@ -43,6 +43,12 @@ The air is `paintAir` in `paint.ts`, with its numbers in `HAZE` (`src/content/pa
 meters, then blue, then the colour of the horizon. It is thicker in low ground, so a hilltop stands out of it,
 and it glows toward the sun. Rain and fog bring it in close.
 
+## The final picture
+
+The painted world is finished as it is drawn, like the test scene. In this look the game's final pass
+(`src/features/post`) keeps only the glow around lamps: no blur toward the screen's edges, no dark corners,
+no tone curve and no added saturation. `src/game/shell/game.ts` sets that.
+
 ## The three ways to draw the ground
 
 | Address | Ground | Getting up a one-block step |
@@ -58,7 +64,8 @@ how far, and the people, the pets and the props are drawn that much higher or lo
 
 - `src/features/painted/`: the look. `paint.ts` is the one painted light every material uses.
 - `src/content/painted.ts`: the tree shapes, the colour of the light and the air through the day, the great oak.
-- `src/content/land.ts`: which blocks are land, and their colours.
+- `src/content/land.ts`: which blocks are land, their colours, and which made ground is painted as soil or paving.
+- `src/game/content/region.ts`: the plan. Its `vales` keep hills off the path and its `knolls` are the rises beside it.
 - `src/game/views/world-painted.view.ts`: feeds the feature from the game.
 - `public/assets/painted/`: twelve paintings (see `docs/assets.md`).
 - `bun tools/painted-shots.mjs`: pictures from fixed places, to judge a change. `--query "look=steps" --tag steps`
