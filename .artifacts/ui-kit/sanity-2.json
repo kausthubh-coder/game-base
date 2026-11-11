@@ -1,0 +1,95 @@
+{
+  "files": [
+    {
+      "name": "book-cover",
+      "width": 640,
+      "height": 640,
+      "bytes": 35028,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "name": "page",
+      "width": 512,
+      "height": 512,
+      "bytes": 21431,
+      "minAlpha": 255,
+      "maxAlpha": 255
+    },
+    {
+      "name": "gutter",
+      "width": 128,
+      "height": 512,
+      "bytes": 29626,
+      "minAlpha": 0,
+      "maxAlpha": 91
+    },
+    {
+      "name": "ribbon",
+      "width": 72,
+      "height": 320,
+      "bytes": 18228,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "name": "map-paper",
+      "width": 512,
+      "height": 512,
+      "bytes": 34690,
+      "minAlpha": 255,
+      "maxAlpha": 255
+    },
+    {
+      "name": "compass",
+      "width": 480,
+      "height": 480,
+      "bytes": 51659,
+      "minAlpha": 0,
+      "maxAlpha": 254
+    },
+    {
+      "name": "map-fog",
+      "width": 512,
+      "height": 512,
+      "bytes": 42560,
+      "minAlpha": 79,
+      "maxAlpha": 167
+    },
+    {
+      "name": "tile",
+      "width": 320,
+      "height": 320,
+      "bytes": 4364,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "name": "tile-hover",
+      "width": 320,
+      "height": 320,
+      "bytes": 6914,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    },
+    {
+      "name": "detail",
+      "width": 640,
+      "height": 880,
+      "bytes": 136383,
+      "minAlpha": 0,
+      "maxAlpha": 254
+    },
+    {
+      "name": "slot-empty",
+      "width": 160,
+      "height": 160,
+      "bytes": 9709,
+      "minAlpha": 0,
+      "maxAlpha": 255
+    }
+  ],
+  "totalBytes": 390592,
+  "totalKB": 390.592,
+  "existingManifestUnchanged": true
+}

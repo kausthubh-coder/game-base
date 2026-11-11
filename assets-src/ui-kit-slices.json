@@ -190,5 +190,99 @@
       48,
       48
     ]
+  },
+  "book-cover": {
+    "size": [
+      640,
+      640
+    ],
+    "slice": [
+      128,
+      128,
+      128,
+      128
+    ]
+  },
+  "page": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both"
+  },
+  "gutter": {
+    "size": [
+      128,
+      512
+    ],
+    "repeat": "vertical"
+  },
+  "ribbon": {
+    "size": [
+      72,
+      320
+    ]
+  },
+  "map-paper": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both"
+  },
+  "compass": {
+    "size": [
+      480,
+      480
+    ]
+  },
+  "map-fog": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both"
+  },
+  "tile": {
+    "size": [
+      320,
+      320
+    ],
+    "slice": [
+      80,
+      80,
+      80,
+      80
+    ]
+  },
+  "tile-hover": {
+    "size": [
+      320,
+      320
+    ],
+    "slice": [
+      80,
+      80,
+      80,
+      80
+    ]
+  },
+  "detail": {
+    "size": [
+      640,
+      880
+    ]
+  },
+  "slot-empty": {
+    "size": [
+      160,
+      160
+    ],
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ]
   }
 }
