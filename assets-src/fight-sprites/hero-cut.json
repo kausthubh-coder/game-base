@@ -1,0 +1,18 @@
+{
+  "name": "hero-cut",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "public/assets/sprites/hero.png",
+    "public/assets/sprites/hero-swing.png"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: stylized-concept. Production pixel-art RPG sprite sheet HERO-CUT. Reference image 1 hero.png is the exact SAME person to preserve: tousled chestnut hair, ochre short cloak and cream collar, brown tunic, belt, satchel and brown boots; reference image 2 hero-swing.png shows only an action example. Create ONLY a STRICT FOUR columns THREE rows uniform rectangular grid, 12 equal SQUARE cells, transparent background, no text/grid/ground/shadows. Row 0 FRONT, row 1 BACK with NO face, row 2 SIDE facing RIGHT. Each row repeats the same four sword-action phases left to right: windup sword drawn back, strike blade mid-arc with short STEEL GREY smear, follow-through, recovery. Short one-handed plain steel sword wooden grip. Keep reference hero head/hair/torso silhouette and scale, head 50x42 at final 128 frame, standing body 106-110px tall, head and torso within 2px of idle. Sword fits inside padding without shrinking hero. Warm top-left light, dark brown 1-2px outline #302529 #493335 #65453a, chunky pixel clusters, warm cream highlights and brown/violet shadows. NO teal. Feet baseline identical, ample padding, whole figure in each cell. Output 4:3 aspect ratio, 1024x768 if possible. Do not copy farm tool. Generate the actual twelve distinct poses.",
+      "source": "assets-src/fight-sprites/hero-cut-attempt-1.png",
+      "selected": true
+    }
+  ],
+  "raw": "assets-src/raw/hero-cut-3.png",
+  "processing": "bun tools/sprites/build-story.mjs"
+}

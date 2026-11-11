@@ -8,3 +8,7 @@ storySprites['hero-swing']={size:128,anchor:[64,120],height:110,worldHeight:2,co
 for (const name of ['pell','corin','hesper','dunn','isolde','nessa','roan','pip']) {
   storySprites['town-' + name] = {size:128,anchor:[64,120],height:name==='pip'?94:110,worldHeight:2,idle:2,walk:4,cols:4,rows:6};
 }
+
+// BEGIN fight-lab hero and pets: append-only contract for lab/fight.
+storySprites['hero-cut'] = {size:128,anchor:[64,120],height:110,worldHeight:2,cols:4,rows:3,animations:{cut:{frames:4,fps:10,rows:{front:0,back:1,side:2}}}};
+// END fight-lab hero and pets.
