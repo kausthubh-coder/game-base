@@ -62,7 +62,8 @@ export function readScreen() {
     if (press || text) {
       const r = el.getBoundingClientRect();
       const inView = r.right > 0 && r.bottom > 0 && r.left < W && r.top < H;
-      if (r.width >= 1 && r.height >= 1 && inView) {
+      // 2 px or less is a line kept for screen readers (the visually hidden pattern), not something a player sees.
+      if (r.width > 2 && r.height > 2 && inView) {
         const item = {
           text, press, kind: press ? (el.getAttribute('role') || el.tagName.toLowerCase()) : 'text',
           disabled: press && (el.disabled === true || el.getAttribute('aria-disabled') === 'true'),
@@ -72,7 +73,12 @@ export function readScreen() {
         if (press) {
           const cx = Math.min(W - 1, Math.max(0, r.left + r.width / 2)), cy = Math.min(H - 1, Math.max(0, r.top + r.height / 2));
           const hit = document.elementFromPoint(cx, cy);
-          if (hit && hit !== el && !el.contains(hit)) item.coveredBy = describe(hit);
+          if (hit && hit !== el && !el.contains(hit)) {
+            // A layer over most of the screen is a modal doing its job: what is under it is blocked, not wrong.
+            const h = hit.getBoundingClientRect();
+            const share = (Math.max(0, Math.min(h.right, W) - Math.max(h.left, 0)) * Math.max(0, Math.min(h.bottom, H) - Math.max(h.top, 0))) / (W * H);
+            if (share >= 0.5) item.blockedBy = describe(hit); else item.coveredBy = describe(hit);
+          }
         }
         items.push(item);
       }
@@ -102,7 +108,8 @@ const inside = (a, b) => a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a
 /**
  * What looks wrong, each with its kind, the piece and its box:
  * `cut` text clipped by its box, `off` partly outside the viewport, `over` a pressable thing covered at its
- * centre or two pressable things that overlap, `small` a pressable thing under 24 px on a side.
+ * centre, two pressable things that overlap, or two pieces of text drawn over each other, `small` a pressable
+ * thing under 24 px on a side.
  */
 export function findWrong(items, viewport, { minSize = 24 } = {}) {
   const wrong = [];
@@ -130,6 +137,14 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
       const [one, other] = a.coveredBy ? [b, a] : [a, b];
       if (one.coveredBy) continue;
       wrong.push({ kind: 'over', what: name(one), box: one.box, why: `overlaps ${name(other)} at ${other.box.x},${other.box.y} ${other.box.w}x${other.box.h}` });
+    }
+  }
+  const text = items.filter((item) => !item.press && item.text);
+  for (let i = 0; i < text.length; i++) {
+    for (let j = i + 1; j < text.length; j++) {
+      const a = text[i], b = text[j];
+      if (!overlap(a.box, b.box) || inside(a.box, b.box) || inside(b.box, a.box)) continue;
+      wrong.push({ kind: 'over', what: name(a), box: a.box, why: `text over text: ${name(b)} at ${b.box.x},${b.box.y} ${b.box.w}x${b.box.h}` });
     }
   }
   return wrong;

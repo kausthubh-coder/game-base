@@ -109,7 +109,7 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     const changed = changes(lastState, current);
     lastState = current;
     return {
-      screen: items.map(({ text, kind, press, disabled, box }) => ({ text, kind, press, disabled, box })),
+      screen: items.map(({ text, kind, press, disabled, box, blockedBy }) => ({ text, kind, press, disabled, box, ...(blockedBy ? { blockedBy } : {}) })),
       wrong,
       ...(blind ? {} : { changed, now: now(current) }),
       problems: problems.splice(0),

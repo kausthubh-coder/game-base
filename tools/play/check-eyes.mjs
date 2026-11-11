@@ -29,9 +29,10 @@ session('wrong.html', () => {
   expect(kinds('cut').includes('A quest name far too long for its box'), `look flags cut: ${JSON.stringify(kinds('cut'))}`);
   expect(kinds('off').includes('Off the edge'), `look flags off: ${JSON.stringify(kinds('off'))}`);
   expect(kinds('over').includes('Covered') && kinds('over').some((w) => w === 'First' || w === 'Second'), `look flags over: ${JSON.stringify(kinds('over'))}`);
+  expect(look.wrong.some((w) => w.kind === 'over' && w.what === 'A hint across the corner' && w.why.includes('Quest title')), 'look flags text over text');
   expect(kinds('small').includes('x'), `look flags small: ${JSON.stringify(kinds('small'))}`);
   expect(!look.wrong.some((w) => ['Fine', 'Break', 'Hello there'].includes(w.what)), 'look leaves the fine buttons and the text alone');
-  expect(!look.screen.some((s) => s.text === 'Not shown'), 'look leaves out hidden text');
+  expect(!look.screen.some((s) => s.text === 'Not shown' || s.text.startsWith('For screen readers')), 'look leaves out hidden text and visually hidden text');
   const seen = json('act', '{"type":"see","text":"Hello there","timeout":2000}', 'see-present');
   expect(!seen.failed, 'see passes on text that is there');
   const absent = json('act', '{"type":"see","text":"Nobody wrote this","timeout":1000}', 'see-absent');

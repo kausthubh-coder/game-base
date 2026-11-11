@@ -110,6 +110,11 @@ describe('wrong', () => {
     expect(both.map((w) => [w.kind, w.what])).toEqual([['over', 'A']]);
     expect(both[0].why).toBe('overlaps B at 60,20 100x40');
   });
+  test('over: two pieces of text drawn over each other', () => {
+    const clip = { clips: false, sw: 0, cw: 0, sh: 0, ch: 0 };
+    const wrong = findWrong([label('Move with W, A, S and D', 54, 22, 352, 53, clip), label('A plot of your own', 331, 22, 240, 23, clip), label('Day 1', 583, 15, 39, 20, clip)], viewport);
+    expect(wrong.map((w) => [w.kind, w.what, w.why])).toEqual([['over', 'Move with W, A, S and D', 'text over text: A plot of your own at 331,22 240x23']]);
+  });
   test('a button nested inside another pressable box is not an overlap', () => {
     expect(findWrong([button('Card', 10, 10, 200, 100), button('x', 170, 15, 30, 30)], viewport)).toEqual([]);
   });

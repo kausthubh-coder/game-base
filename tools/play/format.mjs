@@ -12,13 +12,14 @@ export function screenLines(items) {
     if (item.press) {
       let j = i;
       while (j + 1 < items.length && items[j + 1].press && Math.abs(items[j + 1].box.y - item.box.y) <= 8
-        && items[j + 1].box.w === item.box.w && items[j + 1].box.h === item.box.h && !items[j + 1].disabled === !item.disabled) j++;
+        && items[j + 1].box.w === item.box.w && items[j + 1].box.h === item.box.h && !items[j + 1].disabled === !item.disabled
+        && items[j + 1].blockedBy === item.blockedBy) j++;
       if (j - i >= 3) {
         const row = items.slice(i, j + 1);
-        lines.push(`${row.map((r) => `[${cut(r.text || '?', 14)}]`).join(' ')}  ${row.length}x ${item.box.w}x${item.box.h} from ${item.box.x},${item.box.y} to ${items[j].box.x},${items[j].box.y}`);
+        lines.push(`${row.map((r) => `[${cut(r.text || '?', 14)}]`).join(' ')}${item.blockedBy ? ` blocked by ${cut(item.blockedBy, 40)}` : ''}  ${row.length}x ${item.box.w}x${item.box.h} from ${item.box.x},${item.box.y} to ${items[j].box.x},${items[j].box.y}`);
         i = j; continue;
       }
-      lines.push(`[${cut(item.text || `(${item.kind}, no text)`, 60)}]${item.disabled ? ' disabled' : ''}  ${boxText(item.box)}`);
+      lines.push(`[${cut(item.text || `(${item.kind}, no text)`, 60)}]${item.disabled ? ' disabled' : ''}${item.blockedBy ? ` blocked by ${cut(item.blockedBy, 40)}` : ''}  ${boxText(item.box)}`);
     } else lines.push(`${JSON.stringify(cut(item.text))}  ${boxText(item.box)}`);
   }
   return lines;
