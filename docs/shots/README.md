@@ -8,4 +8,4 @@ Approved PNGs are 960 by 540. Each JSON records the renderer, scene settings, dr
 
 Renderer mismatches warn and skip the image comparison. Budgets and console checks still run. Use `--software` or `CHROME_SOFTWARE=1` to draw in software. Approve and check using the same renderer.
 
-The six scenes cover parts of `painted-shots.mjs`, `world-shots.mjs`, `cam-shots.mjs` and `view-shots.mjs`. Those scripts remain for their other angles and special checks. The new tool does not replace UI, asset, hero motion, style-lab or build-stroke checks.
+The six scenes cover parts of `painted-shots.mjs`, `town-shots.mjs`, `cam-shots.mjs` and `view-shots.mjs`. Those scripts remain for their other angles and special checks. The new tool does not replace UI, asset, hero motion, style-lab or build-stroke checks.
