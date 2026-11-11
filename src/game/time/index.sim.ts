@@ -152,6 +152,8 @@ export function createTime(game: Game): Time {
 
   let curtain: SleepCurtain | null = null;
   let fallingAsleep = false;
+  /** Story moments that may keep the player awake. Each is asked when the player lies down. */
+  const sleepGuards: (() => string | null)[] = [];
 
   function sleepNow(): void {
     const wake = secondAt(MORNING);
@@ -181,6 +183,13 @@ export function createTime(game: Game): Time {
 
     sleep() {
       if (fallingAsleep) return;
+      for (const guard of sleepGuards) {
+        const why = guard();
+        if (why) {
+          events.emit('toast', { text: why });
+          return;
+        }
+      }
       if (!curtain) return sleepNow();
       fallingAsleep = true;
       let woken = false;
@@ -194,6 +203,9 @@ export function createTime(game: Game): Time {
 
     setSleepCurtain(next) {
       curtain = next;
+    },
+    guardSleep(guard) {
+      sleepGuards.push(guard);
     },
     get fallingAsleep() { return fallingAsleep; },
 

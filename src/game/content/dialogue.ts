@@ -41,6 +41,7 @@ export interface Conversation {
 /** Names for the dialogue box when the people system does not know the speaker. */
 export const SPEAKERS: Record<NpcId, string> = {
   tamsin: 'Tamsin', maren: 'Maren', odo: 'Odo', gus: 'Gus', mira: 'Mira', wren: 'Wren', juniper: 'Juniper', brack: 'Brack',
+  custodian: 'The Custodian',
 };
 
 const flag = (name: string): Condition => ({ flag: name });
@@ -49,6 +50,13 @@ const both = (...all: Condition[]): Condition => ({ all });
 const either = (...any: Condition[]): Condition => ({ any });
 const step = (quest: string, id: string): Condition => ({ quest, step: id });
 const narrator = (text: string, when?: Condition): Line => (when ? { by: 'narrator', text, when } : { by: 'narrator', text });
+const custodian = (text: string): Line => ({ by: 'custodian', text });
+
+/**
+ * The speaker of a scene: a conversation a system starts by its id (`talk.start`) at a moment of the story.
+ * Nobody is called this, so `talkTo` never picks one.
+ */
+export const SCENE: NpcId = 'scene';
 
 /** The bonded leaftail is beside the player. */
 const PET: Condition = { beside: 'leaftail' };
@@ -72,6 +80,9 @@ const GUS_GIFT: (string | Line)[] = [
   'Rain\'d do it better. Rain always does it better.',
 ];
 
+/** The morning after the first night: the Mark is on the player's hand and Tamsin has not seen it yet. */
+const MORNING_AFTER = both(flag('mark'), no(flag('night.told')));
+
 const WAIT_FOR_EVENING: Line = narrator('She is asleep before you sit. The light in the door turns gold.');
 
 export const CONVERSATIONS: readonly Conversation[] = [
@@ -90,7 +101,7 @@ export const CONVERSATIONS: readonly Conversation[] = [
         effects: [{ flag: 'has.almanac' }],
       },
       'I only ever looked at things to price them.',
-      narrator('She puts it in your hands. The cover is soft with use. Every page is empty.'),
+      narrator('She found it in a ruin, forty years ago. Every page is still empty.'),
       'Mosslings keep the rocks by the pond. Sit near one and write down what you see.',
       'Two columns. What it needs, and what it gives. Fill both.',
       {
@@ -118,6 +129,22 @@ export const CONVERSATIONS: readonly Conversation[] = [
     ],
   },
   {
+    // The morning after the first night: she is at the grant stone, with a few of the town behind her.
+    id: 'tamsin.mark',
+    npc: 'tamsin',
+    when: step('night', 'tamsin'),
+    lines: [
+      '(looking at your hand) So the door opened. I saw the light from the lodge.',
+      'Forty years I carried that book past that door. Neither one ever moved for me.',
+      narrator('She takes a glove from her belt and puts it in your marked hand.'),
+      'Wear it. In town, and above all near the priests of the Dawn.',
+      {
+        text: 'I will tell you why. Not today. Today you have a fox to feed.',
+        effects: [{ flag: 'night.told' }, { befriend: 'tamsin' }],
+      },
+    ],
+  },
+  {
     // Never stuck: a lost axe is replaced.
     id: 'tamsin.axe',
     npc: 'tamsin',
@@ -137,6 +164,7 @@ export const CONVERSATIONS: readonly Conversation[] = [
       'Forty years I walked past them. I never asked what they wanted.',
       'Most things out here have two columns. The book has room.',
       'Now. The sun is moving. Cut wood, raise a roof, make a bed. Sleep under it.',
+      'That stone door in your hill has never opened. Delvers tried for a century. Leave it be.',
       'There is a dead garden off the path. Something still tends it. Go gently, tomorrow.',
       {
         text: 'I keep the lodge in Hollowmere. Follow the path when you have slept.',
@@ -205,7 +233,7 @@ export const CONVERSATIONS: readonly Conversation[] = [
   {
     id: 'tamsin.bed',
     npc: 'tamsin',
-    when: both({ placed: 'bed' }, { quest: 'roof', state: 'done' }),
+    when: both({ placed: 'bed' }, { quest: 'night', state: 'done' }),
     once: true,
     lines: ['You slept under your own roof. It shows. You stand differently.'],
   },
@@ -248,7 +276,7 @@ export const CONVERSATIONS: readonly Conversation[] = [
   {
     id: 'tamsin.roof.sleep',
     npc: 'tamsin',
-    when: step('roof', 'sleep'),
+    when: step('night', 'bed'),
     lines: ['Roof is on. Then stop working. The dark is for sleeping.'],
   },
   {
@@ -419,6 +447,12 @@ export const CONVERSATIONS: readonly Conversation[] = [
 
   // ------------------------------------------------------------------------------------ Gus
   // Slow, flat. Every problem is a soil problem, and he is right. He wants rain.
+  {
+    id: 'gus.mark',
+    npc: 'gus',
+    when: MORNING_AFTER,
+    lines: ['Door\'s open. Hm. Soil round it looks better already. Could be the light.'],
+  },
   {
     // Never stuck: four more seeds when the harvest cannot reach twenty any more.
     id: 'gus.more',
@@ -725,6 +759,12 @@ export const CONVERSATIONS: readonly Conversation[] = [
   // ------------------------------------------------------------------------------------ Juniper
   // A child. High, fast. She trades secrets for sweets, and a berry counts as a sweet.
   {
+    id: 'juniper.mark',
+    npc: 'juniper',
+    when: MORNING_AFTER,
+    lines: ['There was a LIGHT in the hill. I saw it first. Tell them I saw it first.'],
+  },
+  {
     id: 'juniper.first',
     npc: 'juniper',
     when: no(flag('met.juniper')),
@@ -805,6 +845,12 @@ export const CONVERSATIONS: readonly Conversation[] = [
   // ------------------------------------------------------------------------------------ Brack
   // The ferryman from downriver. Gravel. He smells of reeds and wants his river back.
   {
+    id: 'brack.mark',
+    npc: 'brack',
+    when: MORNING_AFTER,
+    lines: ['Gran said that door would open one day. Gran said a lot of things.'],
+  },
+  {
     // He says the river is lower here, once, as the last line. Nobody answers him and nobody says it again.
     id: 'brack.first',
     npc: 'brack',
@@ -855,6 +901,135 @@ export const CONVERSATIONS: readonly Conversation[] = [
     id: 'brack.fallback',
     npc: 'brack',
     lines: ['Ferry runs when I say. Today I don\'t say. Mind the wet planks.'],
+  },
+
+  // ------------------------------------------------------------------------------------ Ilara's Hall
+  // The scenes of the first night. src/game/hall starts each one by its id, and acts on the flag it sets.
+  {
+    id: 'door.shut',
+    npc: SCENE,
+    lines: [
+      narrator('A door of pale stone in an old wall. Roots have grown across it.'),
+      { by: 'narrator', text: 'You push. It does not move. It has not moved in a thousand years.', effects: [{ flag: 'door.seen' }] },
+    ],
+  },
+  {
+    id: 'night.door',
+    npc: SCENE,
+    lines: [
+      narrator('The fox is grey from nose to tail. Its eyes are dull, and it does not blink.'),
+      narrator('Your back is against the stone door. You raise the axe.'),
+      narrator('It is thin. It is shaking. You let the axe fall.'),
+      { by: 'narrator', text: 'Behind you, stone moves for the first time in a thousand years.', effects: [{ flag: 'door.open' }] },
+    ],
+  },
+  {
+    id: 'hall.mark',
+    npc: SCENE,
+    lines: [
+      narrator('Lamps wake along the walls, one after another, as if someone walked ahead of you.'),
+      narrator('Your hand burns. A mark is rising under the skin: a ring of seven points.'),
+      {
+        by: 'narrator', text: 'It does not hurt for long. It feels like something you had forgotten.',
+        effects: [{ flag: 'mark' }, { flag: 'hall.lit' }],
+      },
+    ],
+  },
+  {
+    id: 'hall.mural',
+    npc: SCENE,
+    lines: [
+      narrator('A king, carved taller than the rest. Beside him stand seven figures.'),
+      { by: 'narrator', text: 'Six are whole. The seventh has been cut away, down to bare stone.', effects: [{ flag: 'mural.seen' }] },
+    ],
+  },
+  {
+    // The same look once the Custodian is awake to be asked.
+    id: 'hall.mural.asked',
+    npc: SCENE,
+    lines: [
+      narrator('A king, carved taller than the rest. Beside him stand seven figures.'),
+      narrator('Six are whole. The seventh has been cut away, down to bare stone.'),
+      { by: 'custodian', text: 'Do not ask me yet. I lost most of it. I only know that I am angry.', effects: [{ flag: 'mural.seen' }] },
+    ],
+  },
+  {
+    id: 'hall.gate',
+    npc: SCENE,
+    lines: [narrator('A stone arch, three paces wide. It leads nowhere.')],
+  },
+  {
+    id: 'hall.gate.asked',
+    npc: SCENE,
+    lines: [
+      narrator('A stone arch, three paces wide. It leads nowhere.'),
+      { by: 'custodian', text: 'A Gate. It is dead. It wants more than one roof and a fox.' },
+    ],
+  },
+  {
+    id: 'fox.calm',
+    npc: SCENE,
+    lines: [
+      narrator('You hold out your marked hand. The fox stops shaking.'),
+      narrator('Grey runs out of its fur like water. Under it, red fur and a leaf for a tail.'),
+      { by: 'narrator', text: 'It looks at you. Then it slips out of the door, west, toward the old garden.', effects: [{ flag: 'fox.calmed' }] },
+    ],
+  },
+
+  // ------------------------------------------------------------------------------------ the Custodian
+  // Ilara's own beast: small, patched with brass, a thousand years old and short of patience. It counts things.
+  {
+    id: 'custodian.wake',
+    npc: SCENE,
+    lines: [
+      narrator('A small beast of moss and brass sleeps on a plinth. There is a keyhole in its back.'),
+      narrator('The key on your cord has never fitted any lock. It fits this one.'),
+      custodian('(one eye opening) You\'re late.'),
+      custodian('A thousand years late. I counted. There was nothing else to do.'),
+      custodian('Show me the hand. Yes. That is her mark. So it is you, then.'),
+      custodian('I am the Custodian. I kept this hall for Ilara. Now I keep it for you.'),
+      { by: 'custodian', text: 'The fox, first. It is Blighted, not wicked. Hold out the hand.', effects: [{ flag: 'custodian.awake' }] },
+    ],
+  },
+  {
+    id: 'heart.first',
+    npc: SCENE,
+    lines: [
+      custodian('That is the Heartstone. It runs on what is alive up there, on your land.'),
+      custodian('Every roof. Every field. Every beast that trusts you. It all comes down here.'),
+      custodian('(squinting at it) So far: one roof. I have seen brighter puddles.'),
+      custodian('Fill it, and that arch wakes. Then I will have something to explain.'),
+      { by: 'custodian', text: 'Sleep now. You look the way the fox did.', effects: [{ flag: 'heart.seen' }] },
+    ],
+  },
+  {
+    id: 'custodian.fox',
+    npc: 'custodian',
+    when: no(flag('fox.calmed')),
+    lines: ['The fox, first. Hold out the hand. It remembers that mark.'],
+  },
+  {
+    id: 'custodian.heart',
+    npc: 'custodian',
+    when: no(flag('heart.seen')),
+    lines: ['Now the stone. Go and touch it. It does not bite. I checked.'],
+  },
+  {
+    id: 'custodian.sleep',
+    npc: 'custodian',
+    when: step('night', 'sleep'),
+    lines: ['Sleep. Up there, under your roof. I have slept enough for both of us.'],
+  },
+  {
+    id: 'custodian.leaftail',
+    npc: 'custodian',
+    when: { quest: 'leaftail' },
+    lines: ['The fox went home to its garden. Feed it. A pact starts with food.'],
+  },
+  {
+    id: 'custodian.fallback',
+    npc: 'custodian',
+    lines: ['(lining pebbles up in a row) Three hundred and sixty-five thousand days. Ask me a number.'],
   },
 ];
 

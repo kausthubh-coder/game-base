@@ -29,8 +29,7 @@ function playToDelivery(s: Stage, waitForEvening: boolean): void {
   s.game.systems.placeables.place('bed', 5, GROUND, 5, 0);
   s.game.world.setBlock(5, GROUND + 2, 5, 12);
   s.run(0.6);
-  s.game.systems.time.sleep();
-  s.run(0.1);
+  passNight(s);
 
   // 3. Leaf and tail
   s.moveTo('dead.garden');
@@ -68,7 +67,17 @@ function playToDelivery(s: Stage, waitForEvening: boolean): void {
   s.run(0.05);
 }
 
-test('a full run of all five quests, through talk, events and flags, reaches act.ended', () => {
+/** The first night, as src/game/hall would play it: each scene's flag, a night of sleep, then Tamsin at the stone. */
+function passNight(s: ReturnType<typeof stage>): void {
+  for (const flag of ['night.fox', 'door.open', 'mark', 'custodian.awake', 'fox.calmed', 'heart.seen']) s.game.flags.set(flag, true);
+  s.run(0.6);
+  s.game.systems.time.sleep();
+  s.run(0.1);
+  s.talk('tamsin');
+  s.run(0.1);
+}
+
+test('a full run of all six quests, through talk, events and flags, reaches act.ended', () => {
   const s = stage();
   s.run(0.1);
   expect(s.game.systems.quests.tracked()!.id).toBe('plot');
@@ -108,12 +117,18 @@ test('a full run of all five quests, through talk, events and flags, reaches act
   s.game.systems.placeables.place('bed', 5, GROUND, 5, 0);
   s.game.world.setBlock(5, GROUND + 2, 5, 12);
   s.run(0.6);
-  expect(step(s, 'roof')).toBe('sleep');
-  s.game.systems.time.sleep();
-  s.run(0.1);
   expect(s.game.flags.is('quest.roof.done')).toBe(true);
 
-  // 3. Leaf and tail
+  // 3. The Shut Door
+  expect(s.game.systems.quests.tracked()!.id).toBe('night');
+  expect(step(s, 'night')).toBe('bed');
+  s.talk('tamsin');
+  expect(s.lastConversation()).toBe('tamsin.roof.sleep');
+  passNight(s);
+  expect(s.lastConversation()).toBe('tamsin.mark');
+  expect(s.game.flags.is('quest.night.done')).toBe(true);
+
+  // 4. Leaf and tail
   expect(s.game.systems.quests.tracked()!.id).toBe('leaftail');
   s.talk('wren');
   expect(s.lastConversation()).toBe('wren.first');
@@ -214,9 +229,9 @@ test('a full run of all five quests, through talk, events and flags, reaches act
   ]);
   expect(s.events('act.ended')).toEqual([{ act: 1 }]);
   s.run(0.1);
-  expect(s.game.systems.quests.all().map((q) => q.state)).toEqual(['done', 'done', 'done', 'done', 'done']);
+  expect(s.game.systems.quests.all().map((q) => q.state)).toEqual(['done', 'done', 'done', 'done', 'done', 'done']);
   expect(s.game.systems.quests.tracked()).toBeNull();
-  expect((s.events('quest.completed') as GameEvents['quest.completed'][]).map((e) => e.quest)).toEqual(['plot', 'roof', 'leaftail', 'bread', 'festival']);
+  expect((s.events('quest.completed') as GameEvents['quest.completed'][]).map((e) => e.quest)).toEqual(['plot', 'roof', 'night', 'leaftail', 'bread', 'festival']);
   expect(s.marks.get('tamsin')).toBe('');
 
   // The act ends once. The lamp Tamsin handed over floats too, and the game goes on.
@@ -550,7 +565,9 @@ test('each hint is sent once, the first time it matters, and never during a conv
   expectNext('use');
   s.game.systems.placeables.place('bed', 5, GROUND, 5, 0);
   expectNext('sleep');
-  s.game.systems.time.sleep();
+  s.game.world.setBlock(5, GROUND + 2, 5, 12);
+  s.run(0.6);
+  passNight(s);
   expectNext('map');
   s.moveTo('dead.garden');
   expectNext('soft');

@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import type { GameEvents } from '../api.sim.ts';
-import { CONVERSATIONS, VILLAGER_LINES, type Conversation, type Line } from '../content/dialogue.ts';
+import { CONVERSATIONS, SCENE, VILLAGER_LINES, type Conversation, type Line } from '../content/dialogue.ts';
 import { QUESTS, type Condition } from '../content/quests.ts';
 import { holds } from '../quests/rules.sim.ts';
 import { GROUND, stage, type Stage } from '../story/fakes.ts';
@@ -360,6 +360,8 @@ const BASES: ((s: Stage) => void)[] = [
 test('every conversation an NPC can start is reachable through talkTo', () => {
   const unreachable: string[] = [];
   for (const c of CONVERSATIONS) {
+    // A scene is started by its id, by the system that runs that moment. src/game/hall tests its own.
+    if (c.npc === SCENE) continue;
     let reached = false;
     for (const base of BASES) {
       for (const met of [false, true]) {

@@ -1,6 +1,6 @@
 # quests
 
-The five quests of the first part. It implements `QuestsApi`. The quests are data in `src/game/content/quests.ts`, with the ids of `docs/play/act1.md`.
+The six quests of the first part. It implements `QuestsApi`. The quests are data in `src/game/content/quests.ts`, with the ids of `docs/play/act1.md`.
 
 ## What it exports
 
@@ -12,9 +12,9 @@ The five quests of the first part. It implements `QuestsApi`. The quests are dat
 
 ## How it runs
 
-- The quest `plot` starts by itself on the first step of a new game. `leaftail` starts when `roof` is done. Conversations start `roof`, `bread` and `festival`.
+- The quest `plot` starts by itself on the first step of a new game. `night` starts when `roof` is done, and `leaftail` when `night` is. Conversations start `roof`, `bread` and `festival`.
 - The open step's condition is checked twice a second, and on the step after any event except footsteps and toasts.
-- A step that is not a gate also counts as done when a later step is. A workbench set down passes "cut 12 logs", a bonded leaftail passes "pick 3 berries", a night's sleep passes the whole roof quest. The talks are gates.
+- A step that is not a gate also counts as done when a later step is. A workbench set down passes "cut 12 logs", a bonded leaftail passes "pick 3 berries". The talks are gates.
 - `tracked()` is the first quest that is active, or null. `all()` is every quest with its state. Both return the same objects until the next check, so the HUD may read them every frame. `all()` is empty before the first step.
 - Only the open step has `at`. It is the nearest person to talk to, or the pet, or the named place from `region.place(name)`. `have` and `need` are set on steps that count.
 - The person the open step sends the player to carries the mark `quest`, through `people.setMark`. It is set again at every check and cleared when the step is done.

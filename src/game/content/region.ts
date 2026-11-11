@@ -167,6 +167,8 @@ export interface RegionPlan {
   town: Rect;
   /** The middle of the town and how far it reaches, for the sound and the map. */
   townCenter: { x: number; z: number; radius: number };
+  /** Ruins of the ancients. Like the town, nothing inside can be dug or built on by the player. */
+  sealed: readonly Rect[];
 }
 
 // ------------------------------------------------------------------------------------------ the sites
@@ -256,11 +258,80 @@ const BOULDERS: readonly (readonly [x: number, z: number, high: number])[] = [[8
   [1, 1, 0, 0, 0, 0, 1, 1, 2].forEach((high, i) => wall(hx0 + i, hz1, high, i === 0 || i === 8 ? 'oak_log' : 'oak_plank'));
 }
 
+// ---- Ilara's Hall: a walled court of the ancients against the foot of the hill north of the grant, open
+// to the sky. Its one way in is the Shut Door in the south wall, which src/game/hall opens. North and west
+// are the tall sides, away from the camera. The low south and east walls carry invisible barrier above
+// them, so nobody climbs in. The Heartstone, the Gate and the plinth are props drawn by a view; here they
+// are barrier, so they are solid.
+const HALL_GROUND = GRANT_GROUND;
+/** The court's walls: x0 and x1 are the west and east walls, z0 and z1 the north and south walls. */
+const COURT: Rect = { x0: -25, z0: -265, x1: -9, z1: -253 };
+/** The doorway in the south wall: three columns, three blocks high. */
+const DOOR = { x0: -18, x1: -16, z: COURT.z1, high: 3 };
+{
+  const g = HALL_GROUND, { x0, z0, x1, z1 } = COURT;
+  // The floor: old paving, with moss where the roots came through.
+  box(x0 + 1, g - 1, z0 + 1, x1 - 1, g - 1, z1 - 1, 'cobble');
+  for (const [mx, mz] of [[-23, -262], [-22, -262], [-12, -256], [-11, -256], [-11, -257], [-20, -258], [-14, -263], [-21, -255]] as const) one(mx, g - 1, mz, 'mossy_stone');
+  // North and west walls, standing. Every third column is mossy.
+  for (let x = x0; x <= x1; x++) box(x, g, z0, x, g + 3, z0, x % 3 === 0 ? 'mossy_stone' : 'stone_brick');
+  for (let z = z0 + 1; z <= z1; z++) box(x0, g, z, x0, g + 2, z, z % 3 === 0 ? 'mossy_stone' : 'stone_brick');
+  // East and south walls, fallen to one course, with the old seal still over them.
+  for (let z = z0 + 1; z <= z1; z++) {
+    one(x1, g, z, z % 4 === 0 ? 'mossy_stone' : 'stone_brick');
+    box(x1, g + 1, z, x1, g + 3, z, 'barrier');
+  }
+  for (let x = x0 + 1; x < x1; x++) {
+    if (x >= DOOR.x0 - 1 && x <= DOOR.x1 + 1) continue;
+    one(x, g, z1, x % 4 === 0 ? 'mossy_stone' : 'stone_brick');
+    box(x, g + 1, z1, x, g + 3, z1, 'barrier');
+  }
+  // The door's posts, and the door itself: solid until the hall system opens it.
+  box(DOOR.x0 - 1, g, z1, DOOR.x0 - 1, g + DOOR.high, z1, 'stone_brick');
+  box(DOOR.x1 + 1, g, z1, DOOR.x1 + 1, g + DOOR.high, z1, 'stone_brick');
+  box(DOOR.x0, g, z1, DOOR.x1, g + DOOR.high - 1, z1, 'barrier');
+}
+
+/**
+ * Ilara's Hall for the systems and views that run it: the door's cells, and where its things stand.
+ * Every point is the middle of a block, with y the height of the feet.
+ */
+export const HALL = {
+  ground: HALL_GROUND,
+  court: COURT,
+  /** The cells the shut door fills. Opening it clears them. */
+  door: { x0: DOOR.x0, x1: DOOR.x1, y0: HALL_GROUND, y1: HALL_GROUND + DOOR.high - 1, z: DOOR.z },
+  /** The middle of the doorway, for the door's prop: it faces south. */
+  doorAt: { x: (DOOR.x0 + DOOR.x1 + 1) / 2, y: HALL_GROUND, z: DOOR.z + 0.5 },
+  heartstone: { x: -16.5, y: HALL_GROUND, z: -262.5 },
+  gate: { x: -22.5, y: HALL_GROUND, z: -259.5 },
+  plinth: { x: -11.5, y: HALL_GROUND, z: -261.5 },
+  mural: { x: -20.5, y: HALL_GROUND, z: -264 },
+  lamps: [
+    { x: -23.5, y: HALL_GROUND, z: -254.5 }, { x: -10.5, y: HALL_GROUND, z: -254.5 },
+    { x: -23.5, y: HALL_GROUND, z: -263.5 }, { x: -10.5, y: HALL_GROUND, z: -263.5 },
+  ],
+} as const;
+// Solid cells under the props a view draws: the Heartstone (two columns), the Gate's two feet, the plinth.
+{
+  const g = HALL_GROUND;
+  box(-17, g, -263, -16, g + 1, -263, 'barrier');
+  box(-23, g, -261, -23, g + 2, -261, 'barrier');
+  box(-23, g, -258, -23, g + 2, -258, 'barrier');
+}
+
 const PLACES: readonly PlanPlace[] = [
   { name: 'grant.stone', x: STONE.x + 1, y: GRANT_GROUND, z: STONE.z, label: 'Grant stone' },
   { name: 'grant.center', x: GRANT.x + 14, y: GRANT_GROUND, z: GRANT.z + 14, label: 'Your plot' },
   { name: 'grant.rocks', x: 8, y: GRANT_GROUND, z: -228, label: 'Mossy rocks' },
   { name: 'dead.garden', x: GARDEN.x, y: GARDEN_GROUND, z: GARDEN.z, label: 'Dead garden' },
+  // Outside the Shut Door, and four spots inside the Hall. The inside ones stay off the map.
+  { name: 'shut.door', x: -17, y: HALL_GROUND, z: -251, label: 'Stone door' },
+  { name: 'hall.door', x: -17, y: HALL_GROUND, z: -255, label: '' },
+  { name: 'hall.heart', x: -17, y: HALL_GROUND, z: -261, label: '' },
+  { name: 'hall.custodian', x: -13, y: HALL_GROUND, z: -261, label: '' },
+  { name: 'hall.gate', x: -21, y: HALL_GROUND, z: -260, label: '' },
+  { name: 'hall.mural', x: -20, y: HALL_GROUND, z: -263, label: '' },
   ...HOLLOWMERE.places,
 ];
 
@@ -269,11 +340,11 @@ const TREES: readonly PlanTree[] = [
   { x: 7, z: -233, kind: 'oak', size: 0.8 },
   { x: 3, z: -229, kind: 'oak', size: 0.6 },
   { x: 12, z: -233, kind: 'oak', size: 0.9 },
-  // North and east of the grant, never south-east of it, so the plot stays in view.
-  { x: -27, z: -253, kind: 'oak', size: 0.3 },
-  { x: -20, z: -255, kind: 'birch', size: 0.6 },
-  { x: -12, z: -253, kind: 'oak', size: 0.7 },
-  { x: -5, z: -255, kind: 'oak', size: 0.2 },
+  // North and east of the grant, never south-east of it, so the plot stays in view. They stand clear of the Hall.
+  { x: -30, z: -256, kind: 'oak', size: 0.3 },
+  { x: -29, z: -268, kind: 'birch', size: 0.6 },
+  { x: -5, z: -258, kind: 'oak', size: 0.7 },
+  { x: -4, z: -266, kind: 'oak', size: 0.2 },
   { x: 1, z: -249, kind: 'birch', size: 0.4 },
   { x: 3, z: -242, kind: 'oak', size: 0.5 },
   // The lone oak on its hill, with two smaller trees for company, and the old oaks on the rise behind the grant.
@@ -330,6 +401,8 @@ export const REGION: RegionPlan = {
     { x0: GRANT.x - 2, z0: GRANT.z - 2, x1: GRANT.x + GRANT.width + 1, z1: GRANT.z + GRANT.depth + 1, ground: GRANT_GROUND, blend: 9 },
     { x0: 0, z0: -237, x1: 15, z1: -225, ground: GRANT_GROUND, blend: 7 },
     { x0: GARDEN.x - 13, z0: GARDEN.z - 17, x1: GARDEN.x + 13, z1: GARDEN.z + 12, ground: GARDEN_GROUND, blend: 8 },
+    // The Hall's court and the ground in front of its door, level with the grant.
+    { x0: COURT.x0 - 1, z0: COURT.z0 - 1, x1: COURT.x1 + 1, z1: COURT.z1 + 4, ground: HALL_GROUND, blend: 6 },
     { x0: 137, z0: -190, x1: 203, z1: -129, ground: TOWN_GROUND, blend: 8 },
     // The ground the gate stands on.
     { x0: 130, z0: -179, x1: 137, z1: -169, ground: TOWN_GROUND, blend: 9 },
@@ -360,6 +433,7 @@ export const REGION: RegionPlan = {
     { x0: GRANT.x - 3, z0: GRANT.z - 3, x1: GRANT.x + GRANT.width + 2, z1: GRANT.z + GRANT.depth + 2 },
     { x0: -1, z0: -238, x1: 16, z1: -224 },
     { x0: GARDEN.x - 13, z0: GARDEN.z - 17, x1: GARDEN.x + 13, z1: GARDEN.z + 12 },
+    { x0: COURT.x0 - 2, z0: COURT.z0 - 2, x1: COURT.x1 + 2, z1: COURT.z1 + 4 },
     { x0: 128, z0: -193, x1: 206, z1: -118 },
     ...BUSHES.map((b) => around(b.x, b.z, 2)),
   ],
@@ -370,6 +444,8 @@ export const REGION: RegionPlan = {
     { x0: 3, z0: -233, x1: 14, z1: -226 },
     // The garden's beds and fence, and the ruin.
     { x0: GARDEN.x - 7, z0: GARDEN.z - 14, x1: GARDEN.x + 7, z1: GARDEN.z + 6 },
+    // The Hall, its walls and the doorstep.
+    { x0: COURT.x0, z0: COURT.z0, x1: COURT.x1, z1: COURT.z1 + 2 },
     { x0: 131, z0: -190, x1: 203, z1: -119 },
     ...TREES.map((t) => around(t.x, t.z, 1)),
     ...BUSHES.map((b) => around(b.x, b.z, 1)),
@@ -379,8 +455,10 @@ export const REGION: RegionPlan = {
     { x0: GRANT.x - 8, z0: GRANT.z - 4, x1: GRANT.x + GRANT.width + 20, z1: GRANT.z + GRANT.depth + 14, fade: 10 },
     { x0: GARDEN.x - 14, z0: GARDEN.z - 15, x1: GARDEN.x + 22, z1: GARDEN.z + 20, fade: 8 },
     { x0: 125, z0: -196, x1: 210, z1: -114, fade: 8 },
+    { x0: COURT.x0 - 2, z0: COURT.z0 - 1, x1: COURT.x1 + 6, z1: COURT.z1 + 5, fade: 6 },
   ],
   pathOpen: 4,
   town: { x0: 131, z0: -192, x1: 206, z1: -118 },
   townCenter: { x: 170, z: -158, radius: 46 },
+  sealed: [COURT],
 };

@@ -181,6 +181,7 @@ export interface Systems {
   talk: TalkApi;
   quests: QuestsApi;
   region: RegionApi;
+  hall: HallApi;
 }
 
 // ---------------------------------------------------------------------------------------- items
@@ -509,6 +510,12 @@ export interface TimeApi {
    * It is optional so that a fake without it still fits. The real system always has it.
    */
   onThunder?(listener: (at: Vec3) => void): () => void;
+  /**
+   * Asks before the player sleeps. `sleep()` calls each guard, and the first that returns words keeps the
+   * player awake: the words go out as a toast. For a story moment that will not let the night pass yet.
+   * It is optional so that a fake without it still fits. The real system always has it.
+   */
+  guardSleep?(guard: () => string | null): void;
 }
 
 // ---------------------------------------------------------------------------------------- living things
@@ -689,6 +696,20 @@ export interface Place {
   at: Vec3;
   /** A short label for the map, or empty to keep it off the map. */
   label: string;
+}
+
+/** How alive the player's land is: the number the Heartstone shows, and what it is made of. */
+export interface Heart {
+  level: number;
+  /** Each kind of living thing on the land: how many there are, and what one is worth. */
+  parts: readonly { label: string; count: number; worth: number }[];
+}
+
+/** Ilara's Hall: the Shut Door, the first night, the Mark, the Custodian and the Heartstone. */
+export interface HallApi {
+  heart(): Heart;
+  /** Where the Blighted fox of the first night is, or null when it is not about. */
+  fox(): Vec3 | null;
 }
 
 export interface RegionApi {

@@ -316,13 +316,16 @@ describe('the joins', () => {
     if (at >= 1) expect([p.game.flags.is('has.almanac'), p.count('axe')]).toEqual([true, 1]);
     expect(p.sys.inventory.slots.some((slot) => slot?.id === 'almanac')).toBe(false);
     const pet = p.sys.pets.all()[0];
-    expect(pet.bonded).toBe(at >= 3);
-    if (at >= 3) {
+    const past = (id: string): boolean => at > QUEST_ORDER.indexOf(id);
+    expect(pet.bonded).toBe(past('leaftail'));
+    // Past the first night the door stands open and the Mark is on the player's hand.
+    expect([p.game.flags.is('door.open'), p.game.flags.is('mark')]).toEqual([past('night'), past('night')]);
+    if (past('leaftail')) {
       expect(p.sys.pets.companion()?.id).toBe(pet.id);
       expect(distance2d(pet.pos, p.game.player.pos)).toBeLessThanOrEqual(3);
       expect(p.sys.almanac.page('leaftail')?.complete).toBe(true);
     }
-    if (at >= 4) expect([p.count('hoe'), p.count('watering_can')]).toEqual([1, 1]);
+    if (past('bread')) expect([p.count('hoe'), p.count('watering_can')]).toEqual([1, 1]);
 
     run(p, STEPS.findIndex((step) => step.quest === quest), STEPS.length);
     expectEnded(p);

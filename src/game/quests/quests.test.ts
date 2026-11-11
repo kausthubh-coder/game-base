@@ -3,16 +3,17 @@ import { QUESTS } from '../content/quests.ts';
 import { GROUND, PLACES, stage } from '../story/fakes.ts';
 import { holds } from './rules.sim.ts';
 
-test('the five quests and their steps have the ids in act1.md', () => {
+test('the six quests and their steps have the ids in act1.md', () => {
   expect(QUESTS.map((q) => [q.id, q.steps.map((s) => s.id)])).toEqual([
     ['plot', ['meet', 'watch', 'tell']],
-    ['roof', ['wood', 'bench', 'shelter', 'sleep']],
+    ['roof', ['wood', 'bench', 'shelter']],
+    ['night', ['bed', 'door', 'mark', 'key', 'calm', 'heart', 'sleep', 'tamsin']],
     ['leaftail', ['find', 'berries', 'trust', 'show']],
     ['bread', ['town', 'queen', 'seeds', 'grow', 'deliver']],
     ['festival', ['evening', 'lamp', 'end']],
   ]);
   expect(QUESTS.map((q) => q.title)).toEqual([
-    'A plot of your own', 'A roof before dark', 'Leaf and tail', 'The queen\'s bread', 'The harvest festival',
+    'A plot of your own', 'A roof before dark', 'The Shut Door', 'Leaf and tail', 'The queen\'s bread', 'The harvest festival',
   ]);
 });
 
@@ -33,7 +34,7 @@ test('a new game starts the first quest, tracks it and marks Tamsin', () => {
   expect(tracked.steps[0].at).toEqual({ x: PLACES['grant.stone'][0] + 0.5, y: GROUND, z: PLACES['grant.stone'][1] + 0.5 });
   expect(tracked.steps[1].at).toBeUndefined();
   expect(s.marks.get('tamsin')).toBe('quest');
-  expect(quests.all().map((q) => q.state)).toEqual(['active', 'hidden', 'hidden', 'hidden', 'hidden']);
+  expect(quests.all().map((q) => q.state)).toEqual(['active', 'hidden', 'hidden', 'hidden', 'hidden', 'hidden']);
   // The same objects come back until something changes, so the HUD can read them every frame.
   expect(quests.tracked()).toBe(tracked);
 });
@@ -96,7 +97,7 @@ test('conditions without an event are found by the check twice a second', () => 
   expect(s.game.systems.quests.tracked()!.steps[0]).toMatchObject({ done: true, have: 12, need: 12 });
 });
 
-test('the roof quest: a workbench, a bed with a block over it, a night of sleep, then the leaftail quest starts', () => {
+test('the roof quest: a workbench, a bed with a block over it, then the night quest starts', () => {
   const s = stage({ story: false });
   s.run(0.05);
   s.game.systems.quests.skipTo('roof');
@@ -112,26 +113,45 @@ test('the roof quest: a workbench, a bed with a block over it, a night of sleep,
   expect(s.game.flags.get('quest.roof.step')).toBe('shelter');
   s.game.world.setBlock(5, GROUND + 2, 5, 12);
   s.run(0.6);
-  expect(s.game.flags.get('quest.roof.step')).toBe('sleep');
+  expect(s.events('quest.completed')).toEqual([{ quest: 'roof' }]);
+  expect(s.events('quest.started').at(-1)).toEqual({ quest: 'night' });
+  expect(s.game.systems.quests.tracked()!.id).toBe('night');
+  expect(s.game.flags.get('quest.night.step')).toBe('bed');
+});
 
+test('the night quest: each scene\'s flag passes a step, a night of sleep the next, and Tamsin the last', () => {
+  const s = stage({ story: false });
+  s.run(0.05);
+  s.game.systems.quests.skipTo('night');
+  const { flags } = s.game;
+  for (const [flag, next] of [['night.fox', 'door'], ['door.open', 'mark'], ['mark', 'key'], ['custodian.awake', 'calm'], ['fox.calmed', 'heart'], ['heart.seen', 'sleep']] as const) {
+    flags.set(flag, true);
+    s.run(0.05);
+    expect(flags.get('quest.night.step')).toBe(next);
+  }
   s.game.systems.time.sleep();
   s.run(0.05);
-  expect(s.events('quest.completed')).toEqual([{ quest: 'roof' }]);
-  expect(s.events('quest.started').at(-1)).toEqual({ quest: 'leaftail' });
+  expect(flags.get('quest.night.step')).toBe('tamsin');
+  // The last step is a talk: nothing but Tamsin passes it.
+  expect(s.game.systems.quests.tracked()!.steps.at(-1)).toMatchObject({ id: 'tamsin', done: false });
+  s.talk('tamsin');
+  s.run(0.05);
+  expect(s.events('quest.completed')).toEqual([{ quest: 'night' }]);
   expect(s.game.systems.quests.tracked()!.id).toBe('leaftail');
 });
 
-test('sleeping passes the roof quest even when the bed step was never seen, and only while the quest is open', () => {
+test('a night of sleep counts for the night quest only while that quest is open', () => {
   const s = stage({ story: false });
   s.run(0.05);
   s.game.systems.time.sleep();
-  s.game.systems.quests.skipTo('roof');
+  s.game.systems.quests.skipTo('night');
+  for (const flag of ['night.fox', 'door.open', 'mark', 'custodian.awake', 'fox.calmed', 'heart.seen']) s.game.flags.set(flag, true);
   s.run(0.6);
   // The sleep before the quest began does not count.
-  expect(s.game.flags.get('quest.roof.step')).toBe('wood');
+  expect(s.game.flags.get('quest.night.step')).toBe('sleep');
   s.game.systems.time.sleep();
   s.run(0.05);
-  expect(s.game.flags.is('quest.roof.done')).toBe(true);
+  expect(s.game.flags.get('quest.night.step')).toBe('tamsin');
 });
 
 test('the leaftail quest: feeding berry by berry never leaves a step open, and the waypoint follows the pet', () => {
@@ -200,9 +220,9 @@ test('skipTo(\'bread\') gives a state the bread quest can finish from', () => {
   s.run(0.05);
   s.game.systems.quests.skipTo('bread');
   const quests = s.game.systems.quests;
-  expect(quests.all().map((q) => q.state)).toEqual(['done', 'done', 'done', 'active', 'hidden']);
+  expect(quests.all().map((q) => q.state)).toEqual(['done', 'done', 'done', 'done', 'active', 'hidden']);
   expect(quests.tracked()!.id).toBe('bread');
-  for (const flag of ['quest.plot.done', 'quest.roof.done', 'quest.leaftail.done', 'quest.bread.started', 'plot.met', 'plot.told', 'leaftail.shown', 'has.almanac']) {
+  for (const flag of ['quest.plot.done', 'quest.roof.done', 'quest.night.done', 'quest.leaftail.done', 'quest.bread.started', 'plot.met', 'plot.told', 'door.open', 'mark', 'custodian.awake', 'night.told', 'leaftail.shown', 'has.almanac']) {
     expect(s.game.flags.is(flag)).toBe(true);
   }
   expect(s.game.flags.is('quest.bread.done')).toBe(false);
@@ -268,7 +288,7 @@ test('quests are saved and loaded: the open step, the event already seen and the
   b.kernel.load(save);
   b.run(0.05);
   const quests = b.game.systems.quests;
-  expect(quests.all().map((q) => q.state)).toEqual(['done', 'active', 'hidden', 'hidden', 'hidden']);
+  expect(quests.all().map((q) => q.state)).toEqual(['done', 'active', 'hidden', 'hidden', 'hidden', 'hidden']);
   expect(quests.tracked()!.id).toBe('roof');
   expect(b.game.flags.get('quest.roof.step')).toBe('shelter');
   // Loading sends no quest events of its own.

@@ -8,14 +8,15 @@
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import type { NpcId, PetState } from '../api.sim.ts';
-import { REGION } from '../content/region.ts';
+import { HALL, REGION } from '../content/region.ts';
 import { distance2d } from '../move.sim.ts';
+import { heartWords } from '../hall/index.sim.ts';
 import { TOO_EARLY_TOAST } from '../placeables/index.sim.ts';
 import { EVENING } from '../time/index.sim.ts';
 import type { Play } from './harness.sim.ts';
 
 export interface Step {
-  /** The quest this step belongs to: `plot`, `roof`, `leaftail`, `bread` or `festival`. */
+  /** The quest this step belongs to: `plot`, `roof`, `night`, `leaftail`, `bread` or `festival`. */
   quest: string;
   name: string;
   run(p: Play): void;
@@ -71,6 +72,14 @@ export const openStep = (p: Play): string => {
   const quest = p.sys.quests.tracked();
   return quest ? `${quest.id}.${String(p.game.flags.get(`quest.${quest.id}.step`))}` : '';
 };
+
+/**
+ * `expectStep` for the steps that build the hut. A game that skipped to the night has the roof quest done
+ * and no hut, so the night's first step builds one with these same steps, and the quest has nothing to say.
+ */
+function expectRoofStep(p: Play, step: string): void {
+  if (!p.game.flags.is('quest.roof.done') || step === 'night.bed') expectStep(p, step);
+}
 
 function expectStep(p: Play, step: string): void {
   // The quest system checks on the step after an event, and twice a second besides.
@@ -142,6 +151,19 @@ function gather(p: Play, logs: number, fiber: number): void {
 function hut(p: Play): { x: number; y: number; z: number } {
   const g = p.sys.region.grant();
   return { x: g.x + g.width - 6, y: p.sys.region.place('grant.center').at.y, z: g.z + g.depth - 8 };
+}
+
+/** Walks up to the foot of the bed in the hut. The bed fills its two blocks, so the player stands in the open doorway. */
+function toBed(p: Play): void {
+  const h = hut(p);
+  must(p, p.walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 180 }), 'could not walk up to the bed');
+}
+
+/** True while every cell of the stone door is still solid. */
+function doorShut(p: Play): boolean {
+  const door = HALL.door;
+  for (let x = door.x0; x <= door.x1; x++) for (let y = door.y0; y <= door.y1; y++) if (p.world.getBlock(x, y, door.z) === 0) return false;
+  return true;
 }
 
 /** Uses the held item on a block face and checks that a block of `id` now stands in front of that face. */
@@ -278,9 +300,9 @@ export const STEPS: readonly Step[] = [
   {
     quest: 'roof', name: 'cut 12 logs and pick 3 fiber',
     run(p) {
-      expectStep(p, 'roof.wood');
+      expectRoofStep(p, 'roof.wood');
       gather(p, 12, 3);
-      expectStep(p, 'roof.bench');
+      expectRoofStep(p, 'roof.bench');
     },
   },
   {
@@ -294,7 +316,7 @@ export const STEPS: readonly Step[] = [
       must(p, p.take('workbench'), 'the workbench is not in the bag');
       must(p, p.use(h.x - 3, h.y - 1, h.z + 1), 'the workbench did not go down');
       must(p, p.sys.placeables.at(h.x - 3, h.y, h.z + 1)?.kind === 'workbench', 'no workbench stands where it was set down');
-      expectStep(p, 'roof.shelter');
+      expectRoofStep(p, 'roof.shelter');
     },
   },
   {
@@ -316,18 +338,29 @@ export const STEPS: readonly Step[] = [
       must(p, p.sys.placeables.at(h.x, g, h.z)?.kind === 'bed' && p.sys.placeables.at(h.x, g, h.z + 1)?.kind === 'bed', 'no bed two blocks long stands where it was set down');
       // Under open sky the quest still waits.
       p.advance(1);
-      must(p, openStep(p) === 'roof.shelter', 'a bed under open sky should not pass the shelter step');
+      must(p, p.game.flags.is('quest.roof.done') || openStep(p) === 'roof.shelter', 'a bed under open sky should not pass the shelter step');
       // The roof is what the quest asks for: one block over the bed, set out from the top of the west wall.
       set(p, 'plank', h.x - 1, g + 2, h.z, [1, 0, 0], PLANK);
-      expectStep(p, 'roof.sleep');
+      // The roof quest ends with the roof. The night that follows is a quest of its own.
+      expectRoofStep(p, 'night.bed');
     },
   },
+
+  // ---------------------------------------------------------------- 3. The Shut Door
   {
-    quest: 'roof', name: 'wait for evening and sleep',
+    quest: 'night', name: 'lie down at evening, and something comes out of the dark',
     run(p) {
-      const h = hut(p), clock = p.game.clock;
-      // The bed fills its two blocks, so the player stands at its foot, in the open doorway.
-      must(p, p.walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 120 }), 'could not walk up to the bed');
+      const clock = p.game.clock;
+      expectStep(p, 'night.bed');
+      // A game that skipped here has no hut. The night needs a bed under a roof, so it is built now.
+      if (!p.sys.placeables.all().some((placed) => placed.kind === 'bed')) for (const step of STEPS) if (step.quest === 'roof') step.run(p);
+      // By day the stone door is only a door: it gives a prompt, two lines, and does not move.
+      must(p, p.walkTo('shut.door', { within: 1.2, seconds: 120 }), 'could not walk to the stone door');
+      must(p, p.prompt() === 'Push the door', `at the stone door the prompt should be "Push the door" and is "${String(p.prompt())}"`);
+      p.interact();
+      const pushed = p.talkThrough();
+      must(p, pushed.some((line) => line.includes('It does not move')) && doorShut(p), 'pushing the stone door by day should say it does not move, and leave it shut');
+      toBed(p);
       must(p, p.prompt() === 'Sleep', `beside the bed the prompt should be "Sleep" and is "${String(p.prompt())}"`);
       if (clock.timeOfDay < EVENING) {
         // Too early: the bed says so and the day goes on.
@@ -337,12 +370,120 @@ export const STEPS: readonly Step[] = [
       }
       must(p, p.sys.time.canSleep(), 'it is evening, the player stands beside a bed with a block over it, and canSleep() is false');
       const day = clock.day;
+      if (!p.game.flags.is('night.fox')) {
+        p.interact();
+        must(p, p.said.at(-1) === 'Something is moving outside. You cannot sleep.', `the first night the bed should say something is outside, and said "${String(p.said.at(-1))}"`);
+      }
+      must(p, clock.day === day && p.game.flags.is('night.fox'), 'the player slept through the first night, or the fox did not come');
+      expectStep(p, 'night.door');
+      p.advance(1);
+      const fox = p.sys.hall.fox();
+      must(p, fox && distance2d(fox, p.game.player.pos) < 14, 'no fox stands near the player after it was heard');
+      // It will not let the player sleep it away.
       p.interact();
-      must(p, clock.day === day + 1 && p.heard.some((event) => event.name === 'slept'), 'E beside the bed in the evening did not sleep to the next morning');
+      must(p, clock.day === day && p.said.at(-1) === 'Not with that thing outside.', `with the fox outside the bed said "${String(p.said.at(-1))}"`);
+    },
+  },
+  {
+    quest: 'night', name: 'back away to the stone door, and it opens',
+    run(p) {
+      must(p, doorShut(p), 'the stone door is open before the player reached it');
+      must(p, p.walkTo('shut.door', { within: 1.5, seconds: 180, until: () => p.sys.talk.active }), 'could not walk to the stone door');
+      must(p, p.until(() => p.sys.talk.active, 3), 'with the fox behind the player at the stone door, nothing happened');
+      const lines = p.talkThrough();
+      must(p, lines.at(-1) === 'Behind you, stone moves for the first time in a thousand years.', `the scene at the door ended on "${String(lines.at(-1))}"`);
+      p.advance(0.6);
+      must(p, p.game.flags.is('door.open') && !doorShut(p), 'the scene at the door ended and the door is still shut');
+      expectStep(p, 'night.mark');
+    },
+  },
+  {
+    quest: 'night', name: 'go through the door, and the Mark comes',
+    run(p) {
+      must(p, p.walkTo('hall.heart', { within: 1.5, seconds: 120, until: () => p.sys.talk.active }), 'could not walk through the open door');
+      must(p, p.until(() => p.sys.talk.active, 3), 'inside the Hall nothing happened');
+      const lines = p.talkThrough();
+      must(p, lines.some((line) => line.includes('a ring of seven points')) && p.game.flags.is('mark'), 'the scene in the Hall did not give the Mark');
+      // The fox does not follow past the threshold.
+      p.advance(3);
+      const fox = p.sys.hall.fox();
+      must(p, fox && fox.z > HALL.door.z + 0.9, `the fox should wait outside the door and is at ${fox ? `${fox.x.toFixed(1)}, ${fox.z.toFixed(1)}` : 'nowhere'}`);
+      expectStep(p, 'night.key');
+    },
+  },
+  {
+    quest: 'night', name: 'turn the key, and the Custodian wakes',
+    run(p) {
+      must(p, p.walkTo('hall.custodian', { within: 0.6, seconds: 60 }), 'could not walk to the plinth');
+      must(p, p.prompt() === 'Turn the key', `at the plinth the prompt should be "Turn the key" and is "${String(p.prompt())}"`);
+      p.interact();
+      const lines = p.talkThrough();
+      must(p, lines.includes('(one eye opening) You\'re late.') && p.game.flags.is('custodian.awake'), 'turning the key did not wake the Custodian');
+      p.advance(0.1);
+      must(p, p.prompt() === 'Talk to the Custodian', `beside the woken Custodian the prompt is "${String(p.prompt())}"`);
+      p.interact();
+      const said = p.talkThrough();
+      must(p, said[0] === 'The fox, first. Hold out the hand. It remembers that mark.', `the Custodian should send the player to the fox and said "${said[0]}"`);
+      expectStep(p, 'night.calm');
+    },
+  },
+  {
+    quest: 'night', name: 'hold out a hand to the fox',
+    run(p) {
+      // The doorway itself: the fox stands a block and a half outside it.
+      must(p, p.walkTo({ x: HALL.doorAt.x, y: HALL.ground, z: HALL.door.z + 0.5 }, { within: 0.4, seconds: 60 }), 'could not walk to the doorway');
+      must(p, p.until(() => p.prompt() === 'Hold out your hand', 6), `in the doorway the prompt should be "Hold out your hand" and is "${String(p.prompt())}"`);
+      p.interact();
+      const lines = p.talkThrough();
+      must(p, lines.length === 3 && p.game.flags.is('fox.calmed'), 'holding out the marked hand did not calm the fox');
+      // It thanks the player for a moment, then goes home.
+      must(p, p.until(() => p.sys.hall.fox() === null, 24) && p.game.flags.is('fox.gone'), 'the calmed fox never left');
+      expectStep(p, 'night.heart');
+    },
+  },
+  {
+    quest: 'night', name: 'touch the Heartstone',
+    run(p) {
+      must(p, p.walkTo('hall.heart', { within: 0.6, seconds: 60 }), 'could not walk to the Heartstone');
+      must(p, p.prompt() === 'Touch the Heartstone', `at the Heartstone the prompt should be "Touch the Heartstone" and is "${String(p.prompt())}"`);
+      p.interact();
+      const lines = p.talkThrough();
+      must(p, lines[0].startsWith('That is the Heartstone.') && p.game.flags.is('heart.seen'), 'touching the Heartstone the first time should have the Custodian explain it');
+      // After that it gives its number: one roof so far.
+      p.interact();
+      must(p, p.sys.hall.heart().level >= 2 && p.said.at(-1) === heartWords(p.sys.hall.heart()), `the Heartstone said "${String(p.said.at(-1))}"`);
+      expectStep(p, 'night.sleep');
+    },
+  },
+  {
+    quest: 'night', name: 'sleep until morning',
+    run(p) {
+      const clock = p.game.clock;
+      toBed(p);
+      must(p, p.sys.time.canSleep(), 'after the Hall the player should be able to sleep');
+      const day = clock.day;
+      p.interact();
+      must(p, clock.day === day + 1 && p.heard.some((event) => event.name === 'slept'), 'E beside the bed did not sleep to the next morning');
+      expectStep(p, 'night.tamsin');
+    },
+  },
+  {
+    quest: 'night', name: 'show Tamsin the Mark at the grant stone',
+    run(p) {
+      p.advance(1);
+      const stone = p.sys.region.place('grant.stone').at;
+      for (const id of ['tamsin', 'juniper', 'gus', 'brack']) {
+        const npc = p.sys.people.get(id);
+        must(p, npc && distance2d(npc.pos, stone) < 6, `${id} should be at the grant stone the morning after and is at ${npc?.place ?? 'nowhere'}`);
+      }
+      const lines = talkTo(p, 'tamsin');
+      must(p, lines[0] === '(looking at your hand) So the door opened. I saw the light from the lodge.' && p.game.flags.is('night.told'), `Tamsin's first words the morning after were "${lines[0]}"`);
+      p.advance(0.6);
+      must(p, p.game.flags.is('quest.night.done'), 'showing Tamsin the Mark did not end the night quest');
     },
   },
 
-  // ---------------------------------------------------------------- 3. Leaf and tail
+  // ---------------------------------------------------------------- 4. Leaf and tail
   {
     quest: 'leaftail', name: 'walk to the dead garden',
     run(p) {
@@ -543,4 +684,4 @@ export const STEPS: readonly Step[] = [
 ];
 
 /** The quests in order. */
-export const QUEST_ORDER: readonly string[] = ['plot', 'roof', 'leaftail', 'bread', 'festival'];
+export const QUEST_ORDER: readonly string[] = ['plot', 'roof', 'night', 'leaftail', 'bread', 'festival'];
