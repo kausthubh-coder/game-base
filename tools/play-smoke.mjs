@@ -1,8 +1,7 @@
 // The game's smoke test: builds it, serves dist on port 5330, opens it in headless Chrome and plays a
 // little through the debug door (window.__game). It fails on any console error or failed check.
 //   bun tools/play-smoke.mjs [--port 5330] [--no-build] [--quality low|medium|high] [--w 1280] [--h 800]
-// Screenshots go to .artifacts/play/: the start, after a camera turn, night. This Mac draws WebGL in
-// software, so it checks what is drawn and what the rules do, never how fast.
+// Screenshots go to .artifacts/play/: the start, after a camera turn, night.
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -199,7 +198,7 @@ try {
   await page.mouse.up();
   check('holding the real left button breaks it', gone);
 
-  // The real keyboard: hold W for a few frames.
+  // The real keyboard: hold W until the player has walked half a block.
   const beforeKeys = await game(() => window.__game.state().player);
   await page.keyboard.down('KeyW');
   await page.waitForFunction((p) => { const q = window.__game.state().player; return Math.hypot(q.x - p.x, q.z - p.z) > 0.5; }, beforeKeys, { timeout: 15000 });

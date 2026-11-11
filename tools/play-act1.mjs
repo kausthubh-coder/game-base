@@ -22,7 +22,6 @@
 // In four conversations (Tamsin's first and last, Maren's first, Gus's first) it waits instead of pressing:
 // each voiced line must decode to the length the list gives, play to its end, and type its last letter
 // within a frame or so of the moment the clip says it (this Mac draws about a frame a second).
-// This Mac draws WebGL in software, so it checks what the game does and draws, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';

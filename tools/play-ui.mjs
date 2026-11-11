@@ -11,7 +11,6 @@
 // The build is copied to .artifacts/play/ui-site and served from there, because another tool's build
 // empties dist/ while this one is still loading pages from it.
 //
-// This Mac draws WebGL in software, so this checks what is drawn and what the keys do, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
