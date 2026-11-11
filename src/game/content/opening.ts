@@ -2,9 +2,10 @@
 // real camera over the real world before the player has control. src/game/views/story-opening.view.ts
 // plays it and src/game/uiview/opening.ts times it.
 //
-// The lines set up who the player is and why they are here, from docs/play/act1.md and the lore: the
-// Delvers' Guild grants ground nobody wants, Hollowmere's harvests shrink, and Tamsin is waiting at the
-// grant stone. Nobody states the theme.
+// The lines set up who the player is and what the world believes, from docs/play/act1.md and the handbook's
+// story chapter: the old people are said to have followed the Ascended into heaven, their ruins have been
+// shut ever since, the Delvers' Guild raised the player and grants its wards ground nobody wants, and Tamsin
+// is waiting at the grant stone. The lines say what people believe. None of them says what is true.
 //
 // Every point is blocks east, up and south of a named place of the region, so the shots follow the region
 // when it moves. The last shot ends on the hero, where the game's own camera takes over.
@@ -55,7 +56,18 @@ export const OPENING: readonly OpeningShot[] = [
     look: [28, 0, -6],
     lookTo: [36, 0, -6],
     fov: 30,
-    line: 'Down the path, Hollowmere brings in its harvest. A little smaller every year.',
+    line: 'A thousand years ago, they say, the Ascended led the old people up into heaven.',
+  },
+  {
+    id: 'door',
+    seconds: 6,
+    place: 'shut.door',
+    from: [13, 9, 13],
+    to: [7, 6, 9],
+    look: [0, 1.5, -3],
+    lookTo: [0, 1.5, -4],
+    fov: 26,
+    line: 'They left their ruins shut behind them. Nobody has opened one since.',
   },
   {
     id: 'grant',
@@ -66,7 +78,7 @@ export const OPENING: readonly OpeningShot[] = [
     look: [-8, 0, -14],
     lookTo: [0, 0, -11],
     fov: 30,
-    line: 'The Delvers\' Guild grants land nobody else wants. You asked for this plot.',
+    line: 'The Delvers\' Guild raised you. At sixteen, every ward is granted land nobody else wants.',
   },
   {
     id: 'stone',
