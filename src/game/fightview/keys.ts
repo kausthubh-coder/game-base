@@ -49,8 +49,15 @@ export function createKeys(view: GameView, fight: Fight, hooks: KeysHooks): Keys
     else if (e.code === 'KeyF') fight.press('use');
     else if (e.code === 'KeyC') fight.press('skill1');
     else if (e.code === 'KeyT') fight.press('skill2');
-    else if (e.code === 'Escape') keys.held = null;
   });
+  // Esc with a rig in the hand puts it back and does nothing else. This view is installed before the panels'
+  // (views install in the order of their names), so in the capture phase it hears Esc before the pause menu does.
+  window.addEventListener('keydown', (e) => {
+    if (e.code !== 'Escape' || e.repeat || !keys.held || !keys.ready || view.paused) return;
+    keys.held = null;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }, { capture: true });
   window.addEventListener('keyup', (e) => { down.delete(e.code); });
   window.addEventListener('blur', () => down.clear());
 
