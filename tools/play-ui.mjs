@@ -11,10 +11,10 @@
 // The build is copied to .artifacts/play/ui-site and served from there, because another tool's build
 // empties dist/ while this one is still loading pages from it.
 //
-// This Mac draws WebGL in software, so this checks what is drawn and what the keys do, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { cameraStill } from './play/wait.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
@@ -175,7 +175,7 @@ async function desktop(browser) {
     seconds: window.__game.state().clock.seconds,
   }));
   check('the game opens on the title and nothing has started', title.started === false);
-  check('the title shows the picture from the manifest, ui/title.png', title.art.includes('ui/title.png'), title.art.slice(0, 90));
+  check('the title shows the picture from the manifest, ui/title.png', /ui\/title(?:\.[a-f0-9]+)?\.png/.test(title.art), title.art.slice(0, 90));
   check('Continue is off without a save', title.continueOff === true);
   check('the HUD is hidden behind the title', title.hud === false);
   await frames(3);
@@ -282,7 +282,8 @@ async function desktop(browser) {
     busy: window.__game.state().player.busy,
   }));
   check('the box shows the talk system\'s line, with the name', mid.name === 'Tamsin' && mid.whole === mid.line, `${mid.name}: ${mid.whole}`);
-  check('the portrait comes from the manifest\'s portraits sheet', mid.portrait.includes('portraits/portraits.png'), mid.portrait.slice(0, 80));
+  check('the portrait comes from the manifest\'s portraits sheet', /portraits\/portraits(?:\.[a-f0-9]+)?\.png/.test(mid.portrait), mid.portrait.slice(0, 80));
+  await page.waitForFunction(() => window.__typing.partial || window.__typing.full, null, { timeout: 15000 });
   const typing = await game(() => window.__typing);
   if (typing.partial || typing.frames > 2) check('the line types out a letter at a time', typing.partial, `partly typed in some frame: ${typing.partial}; ${typing.frames} frames until now`);
   else note(`Typing could not be seen: the whole line showed within ${typing.frames} drawn frame(s) (${Math.round(typing.full - typing.opened)} ms), so this machine is too slow to watch it.`);
@@ -707,6 +708,7 @@ async function keysTheHintsName(t) {
   check('hint "map": M opens the map, and closes it', m && !(await mapOpen()));
 
   // "Hold the left button on a tree or a block to gather it." and "The right button uses or sets down what you hold."
+  await cameraStill(page);
   const spot = await game(() => {
     const g = window.__game, p = g.state().player, sim = g.view.world.sim;
     // The first open column near the hero whose top the pointer can reach.
@@ -730,7 +732,7 @@ async function keysTheHintsName(t) {
   const target = aim ?? spot;
   const blockBefore = await game((at) => window.__game.block(at.x, at.y, at.z).key, target);
   await page.mouse.down();
-  await game(() => window.__game.advance(4));
+  await page.waitForFunction(at => window.__game.block(at.x, at.y, at.z).id === 0, target, { timeout: 15000 }).catch(() => {});
   await page.mouse.up();
   const blockAfter = await game((at) => window.__game.block(at.x, at.y, at.z).key, target);
   check('hint "gather": holding the left button breaks the block under the pointer', blockBefore !== 'air' && blockAfter === 'air', `${blockBefore} to ${blockAfter}`);
@@ -819,10 +821,7 @@ async function worldTitle(browser) {
 
 let browser;
 try {
-  // Metal misses the fixed-frame typewriter sample; command delays also break click-to-move.
-  // Preserve software for this existing scenario until its input timing checks are rewritten.
   browser = await launchChrome({
-    software: true,
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
