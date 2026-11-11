@@ -5,10 +5,12 @@
 // the rules took (`begin('sim')`, `end('sim')`) and the world's numbers (`counters`).
 // `costs` splits the draw calls and triangles by feature (cost.view.ts).
 // `warm` compiles shaders before the things that wear them are seen (warm.view.ts).
+// `flight` holds the log of the fixed flight (flight.sim.ts) for whoever flies it.
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
 import type { Level } from '../../content/quality.ts';
 import { createCostMeter, type CostMeter } from './cost.view.ts';
+import { FlightLog } from './flight.sim.ts';
 import { createWarm, type Warm } from './warm.view.ts';
 import { Governor, type GovernorOptions } from './governor.sim.ts';
 import { createPerfPanel } from './perf.ui.ts';
@@ -71,6 +73,8 @@ export interface PerfView extends ViewSystem {
   readonly costs: CostMeter;
   /** Shader warm-up. It does nothing until the host calls `warm.start()` or `warm.finish()`. */
   readonly warm: Warm;
+  /** The log of the fixed flight. Empty until something flies it. */
+  readonly flight: FlightLog;
   /** The graphics chip's name, as the browser gives it. */
   readonly gpu: string;
   /** Start and stop a timer. Wrap the whole frame in 'frame' and the rules in 'sim'. */
@@ -99,6 +103,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
   };
   const costs = createCostMeter(renderer, ctx.scene);
   const warm = createWarm(ctx, { costs });
+  const flight = new FlightLog();
   const stress = Math.max(0.25, Number(new URLSearchParams(location.search).get('stress')) || 1);
   const started: Record<PerfSlot, number> = { frame: 0, sim: 0 };
   let simThisFrame = 0, sinceText = 1, warmup = 3, worstMesh = 0;
@@ -185,6 +190,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     get quality() { return snapshot.quality; },
     costs,
     warm,
+    flight,
     gpu,
 
     begin(slot) {
