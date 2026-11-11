@@ -12,6 +12,7 @@
 
 import type { Vec3 } from '../../engine/types.ts';
 import type { Actor, Game, HallApi, Heart, Interactable, NpcId, SimSystem } from '../api.sim.ts';
+import { CUSTODIAN_HEART, SPEAKERS } from '../content/dialogue.ts';
 import { HALL } from '../content/region.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { distance2d } from '../move.sim.ts';
@@ -284,6 +285,26 @@ export function createHall(game: Game): Hall {
     return { level: Math.floor(parts.reduce((sum, part) => sum + part.count * part.worth, 0)), parts };
   }
 
+  /** The level at the last tick, or -1 before a look. A level only counts as risen from one seen in play. */
+  let heartWas = -1;
+
+  /** Once the Custodian is awake, the stone rising past 3, 6 or 10 gets a line from it, once each. */
+  function stepHeart(): void {
+    if (!flags.is('custodian.awake')) {
+      heartWas = -1;
+      return;
+    }
+    const level = heart().level;
+    if (heartWas >= 0) {
+      for (const [at, text] of CUSTODIAN_HEART) {
+        if (heartWas >= at || level < at || flags.is(`heart.said.${at}`)) continue;
+        flags.set(`heart.said.${at}`, true);
+        events.emit('toast', { text: `${SPEAKERS.custodian}: ${text}` });
+      }
+    }
+    heartWas = level;
+  }
+
   // ------------------------------------------------------------------------------------ prompts
 
   const fixed = (at: Vec3): (() => Vec3) => () => at;
@@ -354,6 +375,7 @@ export function createHall(game: Game): Hall {
       sinceTick = 0;
       syncDoor();
       stepNight();
+      stepHeart();
     },
     save: (): HallSave => ({ fox: fox ? { x: fox.pos.x, y: fox.pos.y, z: fox.pos.z, calm: Math.round(fox.calm * 100) / 100 } : null }),
     load(data) {
@@ -361,6 +383,7 @@ export function createHall(game: Game): Hall {
       const good = saved && [saved.x, saved.y, saved.z, saved.calm].every((n) => Number.isFinite(n)) ? saved : null;
       doorCleared = false;
       dropFox();
+      heartWas = -1;
       if (!ready) {
         pending = { fox: good };
         return;

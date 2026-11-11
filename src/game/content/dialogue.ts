@@ -1033,6 +1033,16 @@ export const CONVERSATIONS: readonly Conversation[] = [
   },
 ];
 
+/**
+ * What the Custodian says, once awake, when the Heartstone rises past a level: one line each, said once,
+ * as a toast. The hall sets the flag `heart.said.<level>` when it says one.
+ */
+export const CUSTODIAN_HEART: readonly (readonly [level: number, text: string])[] = [
+  [3, 'Three. The stone noticed. So did I, eventually.'],
+  [6, 'Six. Ilara would have called that a start. She called most things a start.'],
+  [10, 'Ten. The arch hummed just now. First time in a thousand years. Do not let it go to your head.'],
+];
+
 export interface VillagerLine {
   id: string;
   text: string;
