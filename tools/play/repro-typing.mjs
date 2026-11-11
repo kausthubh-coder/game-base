@@ -1,6 +1,7 @@
 import { launchChrome } from '../lib/chrome.mjs';
 const browser = await launchChrome({ args: ['--autoplay-policy=no-user-gesture-required'] });
 let missed = 0;
+const fixed = process.argv.includes('--fixed');
 try {
  for (let run=1;run<=5;run++) {
   const page=await browser.newPage();
@@ -19,10 +20,13 @@ try {
    window.__game.view.game.systems.talk.start('tamsin.meet','tamsin');
   });
   const early=await page.evaluate(async ()=>{await window.__game.frames(3); return {...window.__sample};});
-  if(!early.partial)missed++;
+
   await page.waitForFunction(()=>window.__sample.partial||window.__sample.full,null,{timeout:15000});
-  console.log(JSON.stringify({run,early,eventual:await page.evaluate(()=>({...window.__sample,voice:window.__voice?.log.at(-1)}))}));
+  const eventual = await page.evaluate(()=>({...window.__sample,voice:window.__voice?.log.at(-1)}));
+  if (!(fixed ? eventual : early).partial) missed++;
+  console.log(JSON.stringify({run,early,eventual}));
   await page.close();
  }
 } finally {await browser.close();}
-console.log(`Fixed-frame sample missed partial typing in ${missed}/5 trials`);
+console.log(`${missed ? "FAIL" : "PASS"}: ${missed}/5 typing samples missed partial text`);
+process.exitCode = missed ? 1 : 0;

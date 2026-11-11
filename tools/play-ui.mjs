@@ -15,6 +15,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { cameraStill } from './play/wait.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
@@ -708,6 +709,7 @@ async function keysTheHintsName(t) {
   check('hint "map": M opens the map, and closes it', m && !(await mapOpen()));
 
   // "Hold the left button on a tree or a block to gather it." and "The right button uses or sets down what you hold."
+  await cameraStill(page);
   const spot = await game(() => {
     const g = window.__game, p = g.state().player, sim = g.view.world.sim;
     // The first open column near the hero whose top the pointer can reach.
@@ -731,7 +733,7 @@ async function keysTheHintsName(t) {
   const target = aim ?? spot;
   const blockBefore = await game((at) => window.__game.block(at.x, at.y, at.z).key, target);
   await page.mouse.down();
-  await game(() => window.__game.advance(4));
+  await page.waitForFunction(at => window.__game.block(at.x, at.y, at.z).id === 0, target, { timeout: 15000 }).catch(() => {});
   await page.mouse.up();
   const blockAfter = await game((at) => window.__game.block(at.x, at.y, at.z).key, target);
   check('hint "gather": holding the left button breaks the block under the pointer', blockBefore !== 'air' && blockAfter === 'air', `${blockBefore} to ${blockAfter}`);

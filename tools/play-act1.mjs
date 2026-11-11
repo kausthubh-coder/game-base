@@ -515,7 +515,8 @@ const until = (code, seconds, every) => p.until(code, seconds, every);
 
 /** The voiced lines over the whole play: every clip answered 200, and each line waited through played in time. */
 async function checkVoice() {
-  const list = await (await fetch(`http://127.0.0.1:${PORT}/assets/voice/voice.json`)).json();
+  const manifest = await (await fetch(`http://127.0.0.1:${PORT}/assets/manifest.json`)).json();
+  const list = await (await fetch(`http://127.0.0.1:${PORT}/assets/${manifest.voice.lines}`)).json();
   must(clipFiles.size > 0, 'the game asked for no voice clip');
   const bad = [...clipFiles].filter(([, status]) => status !== 200);
   must(bad.length === 0, `clips that did not answer 200: ${bad.map(([f, s]) => `${f} ${s}`).join(', ')}`);
@@ -1021,7 +1022,7 @@ try {
   page.setDefaultTimeout(180000);
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
-  page.on('response', (r) => { const m = /\/assets\/(voice\/.+\.mp3)$/.exec(r.url()); if (m) clipFiles.set(m[1], r.status()); });
+  page.on('response', (r) => { const m = /\/assets\/((?:fingerprinted\/)?voice\/.+\.mp3)$/.exec(r.url()); if (m) clipFiles.set(m[1], r.status()); });
   for (const quest of ['plot', 'roof', 'leaftail', 'bread', 'festival']) await QUESTS[quest]();
   await step('voice', 'voiced lines fetched their clips and typed in time with them', checkVoice);
   const end = await state();
