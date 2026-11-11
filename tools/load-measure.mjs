@@ -15,7 +15,7 @@ const immutable = new Set([...headers.matchAll(/^([^\n *]+)\n  Cache-Control: pu
 let hits = [], timeline = [], visitStart = Date.now();
 const server = createServer(async (req,res) => {
   const path = new URL(req.url, 'http://local').pathname;
-  hits.push(path); timeline.push({url:path,startMs:Date.now()-visitStart});
+  hits.push(path); const transfer={url:path,startMs:Date.now()-visitStart,startEpochMs:Date.now(),bytes:0,status:0}; timeline.push(transfer);
   try {
     const file = resolve(folder, '.' + (path === '/' ? '/index.html' : path));
     if (!file.startsWith(folder+'/')) throw Error('outside');
@@ -23,8 +23,8 @@ const server = createServer(async (req,res) => {
     const type = types[extname(file)] || 'application/octet-stream';
     const h = { 'content-type':type, 'cache-control':(immutable.has(path) || (headers.includes('/assets/fingerprinted/*') && path.startsWith('/assets/fingerprinted/'))) ? 'public, max-age=31536000, immutable' : 'no-cache' };
     if (/javascript|json|text\/|svg/.test(type) && /gzip/.test(req.headers['accept-encoding'] || '')) { body = gzipSync(body); h['content-encoding']='gzip'; }
-    res.writeHead(200,h).end(body);
-  } catch { res.writeHead(404).end('missing'); }
+    transfer.bytes=body.length; transfer.status=200; res.writeHead(200,h).end(body);
+  } catch { transfer.bytes=7; transfer.status=404; res.writeHead(404).end('missing'); }
 });
 await new Promise(r => server.listen(port,'127.0.0.1',r));
 const browser = await chromium.launch({ executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless:true, args:['--enable-unsafe-swiftshader','--use-angle=swiftshader','--autoplay-policy=no-user-gesture-required'] });
@@ -53,12 +53,15 @@ try {
       await page.evaluate(() => { window.__game.newGame(); window.__loadOrigin=window.__game.state().player; window.__game.key('w',true); });
       await page.waitForFunction(() => window.__loadFrame !== null,null,{timeout:180000});
       const first = await page.evaluate(() => { window.__game.key('w',false); return window.__loadFrame; });
+      await page.evaluate(() => window.__game.settle());
       await page.waitForLoadState('networkidle', {timeout:60000});
       await page.waitForTimeout(1500);
       const resources=await page.evaluate(() => [...performance.getEntriesByType('navigation'),...performance.getEntriesByType('resource')].map(r => ({url:r.name,start:r.startTime,end:r.responseEnd,transfer:r.transferSize,encoded:r.encodedBodySize,decoded:r.decodedBodySize})).sort((a,b)=>a.start-b.start));
       const before=resources.filter(r=>r.start<=first);
-      // Count full responses for requests initiated before the frame, including any in flight at it.
-      const row={run:run+1,visit,firstFrameMs:first,bytes:before.reduce((s,r)=>s+r.transfer,0),requests:before.length,network:[...hits],networkTimeline:[...timeline],errors,resources};
+      const firstEpoch=await page.evaluate(t=>performance.timeOrigin+t,first);
+      const networkBefore=timeline.filter(r=>r.startEpochMs<=firstEpoch);
+      // Count actual server response bodies, including worker fetches and the favicon. ResourceTiming hides network bytes forwarded by a worker.
+      const row={run:run+1,visit,firstFrameMs:first,bytes:networkBefore.reduce((s,r)=>s+r.bytes,0),requests:networkBefore.length,resourceBytes:before.reduce((s,r)=>s+r.transfer,0),resourceRequests:before.length,network:[...hits],networkTimeline:[...timeline],errors,resources};
       runs.push(row);
       console.log(JSON.stringify({run:row.run,visit,bytes:row.bytes,requests:row.requests,network:row.network.length,errors}));
       page.off('pageerror',onError); page.off('response',badResponse);
@@ -69,6 +72,6 @@ try {
     await context.close();
   }
   await mkdir(resolve(output,'..'),{recursive:true});
-  await writeFile(output,JSON.stringify({method:'Chrome 1280x800, local gzip server, no throttling; first drawn RAF after horizontal player movement from held W proves input and near-terrain simulation work; collect later requests through network idle plus 1.5 seconds; full transferSize of requests begun by that callback; fresh context per pair',runs},null,2));
+  await writeFile(output,JSON.stringify({method:'Chrome 1280x800, local gzip server, no throttling; first drawn RAF after horizontal player movement from held W proves input and near-terrain simulation work; collect later requests through terrain settle, network idle and 1.5 seconds before revisiting; server gzip response-body bytes and network requests begun by that callback, excluding HTTP headers; resource timings also included; fresh context per pair',runs},null,2));
   if(runs.some(r=>r.errors.length || r.resources.some(x=>x.encoded===0 && x.transfer>300))) process.exitCode=1;
 } finally { await browser.close(); await new Promise(r=>server.close(r)); }
