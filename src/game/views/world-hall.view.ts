@@ -25,6 +25,8 @@ const MOTES = 0.6;
 const BRIGHT = 10;
 /** The hall's lamps stand a little taller than a town lantern's post. */
 const LAMP_SIZE = 1.25;
+/** How strongly the Heartstone lights the floor when it is dull, faint and awake. */
+const HEART_SHINE = [0, 0.45, 1] as const;
 /** Lume, the ancients' teal, as light on the ground. */
 const LUME = new THREE.Color(0.16, 0.95, 0.82);
 
@@ -96,7 +98,8 @@ export function install(view: GameView): void {
     ({ kind, x: at.x, y: at.y, z: at.z, rotation, scale, variant, handle: 0, shown: -1 });
   /** When the lamps began to wake, on the view's clock. Infinity while they are dark, long ago in a loaded game. */
   let woke = Infinity, looked = false;
-  const lit = (i: number) => (): number => (view.ctx.time - woke >= i * WAKE ? 1 : 0);
+  /** For each lamp, whether it has woken: the pair by the door first. */
+  const lit = HALL.lamps.map((_, i) => (): number => (view.ctx.time - woke >= i * WAKE ? 1 : 0));
   const level = (): number => (game.systems as Partial<Systems>).hall?.heart().level ?? 0;
   // Dull until the Mark is on the player's hand, faint with it, and awake once the player has touched it.
   const glow = (): number => {
@@ -110,7 +113,7 @@ export function install(view: GameView): void {
     piece('gateArch', HALL.gate, () => 0, EAST),
     piece('muralSlab', HALL.mural, () => 0),
     piece('plinth', HALL.plinth, () => 0),
-    ...HALL.lamps.map((at, i) => piece('hallLamp', at, lit(i), 0, LAMP_SIZE)),
+    ...HALL.lamps.map((at, i) => piece('hallLamp', at, lit[i], 0, LAMP_SIZE)),
     ...HALL.pillars.map((at, i) => piece('ruinPillar', at, () => at.variant, i * 1.3)),
   ];
 
@@ -118,9 +121,9 @@ export function install(view: GameView): void {
   const pool = (at: { x: number; y: number; z: number }, wide: number, strength: () => number, dz = 0): Pool =>
     ({ x: at.x, y: at.y, z: at.z + dz, wide, strength });
   const pools: Pool[] = [
-    ...HALL.lamps.map((at, i) => pool(at, 7, lit(i))),
+    ...HALL.lamps.map((at, i) => pool(at, 7, lit[i])),
     // The Heartstone: a breath of light with the Mark, the whole floor before it once it has been touched.
-    pool(HALL.heartstone, 11, () => [0, 0.45, 1][glow()] + Math.min(0.5, level() / (BRIGHT * 2)), 1.2),
+    pool(HALL.heartstone, 11, () => HEART_SHINE[glow()] + Math.min(0.5, level() / (BRIGHT * 2)), 1.2),
     // The doorstep: a thread of lume under the shut door, and the hall's light through it once it stands open.
     pool(HALL.doorAt, 5, () => (flags.is('door.open') ? (flags.is('hall.lit') ? 0.8 : 0.4) : 0.3), 1.6),
     // The Gate is dead. Only the Mark, near it, finds a little light left in its stone.
@@ -183,7 +186,7 @@ export function install(view: GameView): void {
       if (glow() === 0) return;
       from.x = HALL.heartstone.x; from.y = HALL.heartstone.y + 0.6; from.z = HALL.heartstone.z + 0.4;
     } else {
-      if (lit(lamp)() === 0) return;
+      if (lit[lamp]() === 0) return;
       const at = HALL.lamps[lamp];
       from.x = at.x; from.y = at.y + 1.2; from.z = at.z;
     }
