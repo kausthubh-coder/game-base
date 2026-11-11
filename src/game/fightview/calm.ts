@@ -68,6 +68,8 @@ export interface CalmingHooks {
   groundY(x: number, z: number): number;
   /** The name of the gift over the page, or none when `at` is null. */
   label(text: string, at: ScreenPoint | null, alpha: number): void;
+  /** How tall the hero is drawn, so the gift's name keeps clear of the head. */
+  heroHeight(): number;
 }
 
 export interface Calming {
@@ -79,6 +81,9 @@ export interface Calming {
   end(): void;
 }
 
+/** Half the width of the gift's name on the page, in pixels, and a little room. */
+const LABEL_HALF = 64;
+
 const ease = (k: number): number => 1 - (1 - k) * (1 - k);
 const clamp01 = (k: number): number => Math.max(0, Math.min(1, k));
 /** True in the frame the clock passed `at`. */
@@ -87,7 +92,7 @@ const passed = (t: number, dt: number, at: number): boolean => t >= at && t - dt
 export function createCalming(view: GameView, ground: Ground, sparks: Sparks, hooks: CalmingHooks): Calming {
   const { groundY, label } = hooks;
   const hero = view.playerPosition;
-  const point: ScreenPoint = { x: 0, y: 0 };
+  const point: ScreenPoint = { x: 0, y: 0 }, head: ScreenPoint = { x: 0, y: 0 }, feet: ScreenPoint = { x: 0, y: 0 };
   const spot = { x: 0, y: 0, z: 0 };
   let labelled = false;
 
@@ -196,8 +201,22 @@ export function createCalming(view: GameView, ground: Ground, sparks: Sparks, ho
       if (a > 0) sparks.draw(glyph, x, gy, z, 0.55, color, a, 1);
     }
     const shown = view.project(x, gy + 0.45, z, point);
+    if (shown) {
+      // The name never covers the hero or the beast: over either of them it rises above the head.
+      above(shown, hero.x, hero.y, hero.y + hooks.heroHeight(), hero.z);
+      // Over the beast, it rises above the heart too.
+      above(shown, d.x, y, y + height + (b.def.machine ? 0 : 0.8), d.z);
+    }
     label(b.def.gift, shown, Math.min(1, t * 5) * Math.min(1, (span - t) * 3));
     labelled = true;
+  }
+
+  /** Lifts the foot of a label at `at` above a figure standing from `foot` to `top`, as far as they overlap on the page. */
+  function above(at: ScreenPoint, x: number, foot: number, top: number, z: number): void {
+    if (!view.project(x, top + 0.12, z, head) || !view.project(x, foot, z, feet)) return;
+    const reach = (feet.y - head.y) * 0.45 + LABEL_HALF;
+    const k = clamp01((reach - Math.abs(at.x - head.x)) / 24);
+    if (k > 0 && at.y > head.y) at.y += (head.y - at.y) * k;
   }
 
   return {

@@ -124,7 +124,8 @@ void main() {
   color += uGlow * line;
   // Warmer light, a little brighter: the drawing stays readable under it.
   color = color * (1.0 + vec3(0.22, 0.04, -0.08) * uHeat.x) + vec3(0.07, 0.025, 0.0) * uHeat.x;
-  color = mix(color, vec3(0.78, 1.0, 0.95), uHeat.y);
+  // The Mark's pale teal light: brighter and cooler, with the drawing still under it. A flat teal hid every line.
+  color = mix(color, color * vec3(0.5, 0.62, 0.6) + vec3(0.42, 0.56, 0.52), uHeat.y);
   color = mix(color, vec3(1.0), uLook.z);
   gl_FragColor = vec4(color, uLook.w);
   #include <tonemapping_fragment>

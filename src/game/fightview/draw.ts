@@ -56,7 +56,7 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
   const figures = createFigures(view);
   const ground = createGround(view);
   const sparks = createSparks(view);
-  const calming = createCalming(view, ground, sparks, { groundY, label: hooks.label });
+  const calming = createCalming(view, ground, sparks, { groundY, label: hooks.label, heroHeight: () => heroFigure.height });
   const rigViews = createRigViews(view);
   const looks = createLooks(figures);
   const input = fight.input;
