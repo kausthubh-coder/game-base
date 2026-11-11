@@ -7,5 +7,6 @@ export { createGrass, type Grass } from './grass.ts';
 export { createBackdrop, type Backdrop, type SkyWeather } from './sky.ts';
 export { buildTree, createStand, foliageMaterials, type Foliage, type Placement, type Stand, type Tones, type TreeShape, type TreeSpec } from './trees.ts';
 export * from './scatter.ts';
+export { createWater, type PaintedWater, type WaterLook, type WaterRings } from './water.ts';
 export { createFarLand, type FarLand, type FarSource } from './far.ts';
 export { createImpostors, type Impostors, type Sitter } from './impostors.ts';

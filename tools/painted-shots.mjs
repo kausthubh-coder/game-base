@@ -46,6 +46,10 @@ const VIEWS = {
   // Up at the sky, from the hero's own eyes.
   sky: { at: [20, -236], camera: 'first', yaw: 200, pitch: -14 },
   skyline: { at: [20, -236], camera: 'first', yaw: 20, pitch: -6 },
+  // Water: a pond in the meadow, and the river's bank.
+  lake: { at: [-119, -226], camera: 'free', yaw: 92, pitch: 13, distance: 15 },
+  bank: { at: [60, -160], camera: 'free', yaw: 165, pitch: 9, distance: 13 },
+  quay: { at: [150, -130], camera: 'free', yaw: 250, pitch: 15, distance: 9 },
   // The town.
   green: { at: [173, -142], camera: 'free', yaw: 0, pitch: 7, distance: 15 },
   street: { at: [143, -174], camera: 'free', yaw: 272, pitch: 6, distance: 10 },
@@ -127,7 +131,8 @@ try {
       g.advance(0.1);
       await g.frames(frames);
       await g.settle();
-      await g.frames(6);
+      // The water's sheets are made two a frame, nearest first, after the land under them.
+      await g.frames(50);
       const c = g.counters();
       return { drawCalls: c.drawCalls, triangles: c.triangles };
     }, { view, home, frames: settleFrames, t: moment.time, weather: moment.weather });

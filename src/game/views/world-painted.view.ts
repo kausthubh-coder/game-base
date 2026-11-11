@@ -7,7 +7,7 @@
 // clock gives the colour of the light.
 import * as THREE from 'three';
 import { EMERALD, FAR_TREES, GREAT_OAK, HAZE, PAINTED_WATER, SKY, MOODS, PAINTED_TREES, TREE_NEAR, TREE_REACH, type Mood } from '../../content/painted.ts';
-import { STANDING_STONE, buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Sitter, type SkyWeather, type Stand, type TreeSpec } from '../../features/painted/index.ts';
+import { STANDING_STONE, buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, createWater, foliageMaterials, loadTextures, shared, type LandBlocks, type Placement, type Sitter, type SkyWeather, type Stand, type TreeSpec } from '../../features/painted/index.ts';
 import { WATER_LEVEL, forestAt, groundHeight, landHeight, surfaceAt, treesInArea } from '../../features/world/index.ts';
 import { REGION } from '../content/region.ts';
 import type { ModelTree } from '../trees/index.sim.ts';
@@ -43,13 +43,19 @@ export async function install(view: GameView): Promise<void> {
   shared.uBrush.value = textures.brush;
 
   // ---------------------------------------------------------------- the land and what grows on it
-  const land = createLand({
+  const blocks: LandBlocks = {
     getBlock: (x, y, z) => sim.getBlock(x, y, z),
     heightAt: (x, z) => sim.heightAt(x, z),
     groundAt: (x, z) => groundHeight(sim.seed, x, z),
     glowAt: (x, y, z) => sim.blockLightAt(x, y, z) / 15,
     revision: (cx, cz) => sim.chunkAt(cx, cz)?.rev ?? -1,
-  }, textures, view.look === 'steps');
+  };
+  const land = createLand(blocks, textures, view.look === 'steps');
+  // The water is a sheet at its own level that the land rises through. The block world's square water is left
+  // out, and the rings the game starts on it (a foot, a thrown stone) spread on this water instead.
+  const waterRings = view.water.material.uniforms as { uRipples?: { value: THREE.Vector4[] }; uTime?: { value: number } };
+  const water = createWater(blocks, land, PAINTED_WATER, waterRings.uRipples && waterRings.uTime ? { rings: waterRings.uRipples, time: waterRings.uTime } : undefined);
+  view.water.material.visible = false;
   const grass = createGrass(land, textures, view.ctx.quality);
   const backdrop = createBackdrop(textures);
   // Past the land the game holds in memory, the same hills and rivers drawn from the land's shape alone.
@@ -60,7 +66,7 @@ export async function install(view: GameView): Promise<void> {
     waterLevel: WATER_LEVEL,
     water: PAINTED_WATER.far,
   }, textures);
-  view.scene.add(land.group, grass.group, backdrop.group, farLand.group);
+  view.scene.add(land.group, grass.group, backdrop.group, farLand.group, water.group);
   view.setGround((x, z) => land.heightAt(x, z));
 
   // ---------------------------------------------------------------- the trees
@@ -292,6 +298,7 @@ export async function install(view: GameView): Promise<void> {
     weather.windX = Math.cos(a.windDir); weather.windZ = Math.sin(a.windDir);
     weather.drift = SKY.drift[0] + (SKY.drift[1] - SKY.drift[0]) * Math.min(1, a.wind);
     backdrop.setSky(weather);
+    water.setSky(view.sky.look.horizon, view.sky.look.zenith, a.rain);
   }
 
   const look = new THREE.Vector3(), seen = new THREE.Frustum(), projection = new THREE.Matrix4();
@@ -313,6 +320,7 @@ export async function install(view: GameView): Promise<void> {
     seen.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
     land.update(p.x, p.z, reach, seen);
     farLand.update(p.x, p.z, edge - 15);
+    water.update(p.x, p.z, reach);
     plantFar();
     grass.update(p.x, p.z);
     for (let i = falling.length - 1; i >= 0; i--) {

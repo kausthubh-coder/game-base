@@ -87,8 +87,8 @@ export const SKY = {
   drift: [0.0006, 0.0052] as [number, number],
 };
 
-/** The colour of water over a shallow bed and over a deep one, and of water on the far land. */
-export const PAINTED_WATER = { shallow: '#8fd6c4', deep: '#3c88b4', far: '#74b9d4' };
+/** The colour of water over a shallow bed and over a deep one, of its foam, and of water on the far land. */
+export const PAINTED_WATER = { shallow: '#8fd6c4', deep: '#3c88b4', foam: '#f6fbf8', far: '#86bfd9' };
 
 /** How far from the hero a tree is drawn leaf by leaf. Past it a tree is a picture of itself. The rules know trees this far at least. */
 export const TREE_REACH = 62;

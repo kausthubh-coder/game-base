@@ -13,6 +13,7 @@ of blocks, and farming and building still snap to that grid.
 | A block put above the natural ground | A block | A block, as before |
 | A floor of planks let into the ground | Blocks | Blocks. The land lies 0.08 under their tops |
 | The wall of a cave | Blocks | Blocks |
+| Water | Water blocks | One smooth sheet a chunk at the water's own level, `water.ts`. It runs a cell past the last water block, so the land rises through it and the shore is the land's own curve. The block world's square water is left out |
 | A tree | A trunk to fell, with a box | A leafy tree, `trees.ts`, that tips over when it is felled |
 | A scattered rock or bush | A prop | A painted boulder or a mound of leaves, `scatter.ts` |
 | A column of stone the plan stands in the wild (the grant's standing stone, the boulders by the pool) | Blocks | A painted stone large enough to hold its blocks |
@@ -72,6 +73,17 @@ toward the sun or the moon, and `SKY` there says how cover, rain and wind show. 
 
 `bun tools/painted-shots.mjs --views sky --moments 0.5:clear,0.5:rain,0.9:clear` shoots the sky at several
 hours and weathers in one go.
+
+## The water
+
+`water.ts` draws ponds, rivers and anything the player floods. Everything comes from how deep the water is at
+a spot (the sheet's height less the land's): its colour from shallow to deep, how much of the bed shows, the
+pale line that breathes at the bank, and where the painted ripples slide. The sky lies on it, more the flatter
+you look across, so it turns with the hour and the weather. Rings spread from feet (the game's own
+`water.ripple`) and from rain. Its colours are `PAINTED_WATER` in `src/content/painted.ts`.
+
+A sheet is made after its chunk's land and again whenever a block near it changes. Past the near world the
+far land carries the water on as one flat colour.
 
 ## The final picture
 
