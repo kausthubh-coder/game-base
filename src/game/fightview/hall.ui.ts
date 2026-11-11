@@ -8,7 +8,9 @@ import { addStyle } from '../uiview/theme.ts';
 
 const STYLE = /* css */ `
 .ui-book .fl-hall {
-  position: absolute; left: 50%; top: 16px; translate: -50% 0; min-width: 300px; max-width: min(560px, calc(100% - 32px)); padding: 9px 16px 10px;
+  /* Centered in the room between the lab's card (--fl-free, from panel.ui.ts) and the minimap, 216 pixels from the right. */
+  position: absolute; left: calc(var(--fl-free, 16px) + (100% - var(--fl-free, 16px) - 216px) / 2); top: 16px; translate: -50% 0; box-sizing: border-box;
+  width: max-content; max-width: min(560px, calc(100% - var(--fl-free, 16px) - 232px)); padding: 9px 16px 10px;
   pointer-events: none; text-align: center; font: 600 13px / 1.35 var(--ui-font); color: var(--ui-glass-ink); text-shadow: var(--ui-text-shadow);
   background: var(--ui-glass); border-radius: var(--ui-radius); box-shadow: var(--ui-glass-shadow);
 }

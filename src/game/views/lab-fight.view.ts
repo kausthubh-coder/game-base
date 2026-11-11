@@ -117,7 +117,8 @@ export function install(view: GameView): void {
     onEnd,
   });
   const keep = (): void => {
-    try { localStorage.setItem(STORE, JSON.stringify({ way: fight.way, pet: fight.pet.def.kind, gentle: fight.gentle, shake: feel.shakes })); } catch { /* it holds for this visit */ }
+    // The hall is always the hero's way: it keeps the meadow's way as it was.
+    try { localStorage.setItem(STORE, JSON.stringify({ way: inHall ? stored.way : fight.way, pet: fight.pet.def.kind, gentle: fight.gentle, shake: feel.shakes })); } catch { /* it holds for this visit */ }
   };
 
   /**
@@ -153,7 +154,8 @@ export function install(view: GameView): void {
       bring(logged.enemy);
     },
   };
-  // ---- the Stag's hall: the hall is fought the hero's way, has no beasts to bring, and "Again?" starts it over
+  // ---- the Stag's hall: fought the hero's way, with no beasts to bring. The card shows only what works there.
+  // "Start over", "Fight it again" and a new pet start the hall over.
   let hall: Hall | null = null, hallView: HallView | null = null;
   if (inHall) {
     const hallOnly = (): void => say('The hall is its own fight. "Back to the meadow" has the beasts.');
@@ -162,15 +164,25 @@ export function install(view: GameView): void {
     actions.wake = hallOnly;
     actions.clear = () => restartHall();
     actions.again = () => restartHall();
+    actions.setPet = (kind) => {
+      if (kind === fight.pet.def.kind) return;
+      const fighting = !!hall && hall.stag.doing !== 'asleep' && !hall.freed;
+      // A new pet clears the fight, and with it the hall's targets: the hall starts over.
+      fight.setPet(kind);
+      keep();
+      restartHall();
+      if (fighting) say('A new pet started the hall over. The fight is in the log as left.', 3500);
+    };
   }
   function restartHall(): void {
     if (!hall) return;
+    keys.held = null;
     hall.restart();
     view.hero.teleport(stage.start.x, groundY(stage.start.x, stage.start.z), stage.start.z, 0);
     fight.placeHero(stage.start.x, stage.start.z);
   }
   // ---- end of the Stag's hall
-  const panel = createPanel(view.root, log, actions);
+  const panel = createPanel(view.root, log, actions, { hall: inHall });
   const say = (text: string, ms?: number): void => panel.say(text, ms);
   const feel = createFeel(view, fight, { say, groundY, nearest: (x, z) => draw.nearest(x, z) });
   feel.shakes = stored.shake !== false;
@@ -203,7 +215,7 @@ export function install(view: GameView): void {
       view.hero.steer = (wish, body) => {
         const frozen = feel.freeze > 0;
         steer?.(wish, body);
-        if (!keys.ready || frozen || !hall) return;
+        if (!keys.ready || keys.paused || frozen || !hall) return;
         hall.step(HERO_STEP);
         hallView?.afterStep();
       };
@@ -258,7 +270,7 @@ export function install(view: GameView): void {
     // A fight that was followed by another before the lab asked is not asked about.
     if (ended && encounter() !== endedEncounter) ended = null;
     if (ended && (askIn -= dt) <= 0) { panel.ask(ended); ended = null; }
-    panel.update(fight, keys.held, view.settings.quality, draw.beastAt);
+    panel.update(fight, keys.held, view.settings.quality, draw.beastAt, hall);
   });
 
   // ---------------------------------------------------------------- the door

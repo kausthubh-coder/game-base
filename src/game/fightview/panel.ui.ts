@@ -6,8 +6,13 @@
 // The card folds itself to its title when a beast wakes, so it never hides the fight, and opens again when the
 // fight ends. A player who opens it by hand during a fight keeps it open. On a narrow window the bars and the
 // "Again?" card sit in the room the card leaves.
+//
+// In the Stag's hall the card shows only what works there: no ways and no beasts, a "Start over" for the hall,
+// the hero's keys without the Mark and the pet's skill, and the hall's three phases as its rules. It folds when
+// the Stag wakes and opens when it is freed.
 import { BEASTS, FIGHT_PETS, HERO, LOW_HEALTH, RIGS, WAYS, type RigKind, type Way } from '../content/fight.ts';
 import type { BeastState, Fight } from '../fight/fight.sim.ts';
+import type { Hall } from '../fight/hall.sim.ts';
 import { checksOf, type Check } from '../fight/record.sim.ts';
 import type { QualityMode } from '../shell/view.ts';
 import { addStyle } from '../uiview/theme.ts';
@@ -29,9 +34,17 @@ export interface PanelActions {
   again(fight: LoggedFight): void;
 }
 
+export interface PanelOptions {
+  /** True in the Stag's hall (`?scene=stag`). */
+  hall?: boolean;
+}
+
 export interface LabPanel {
-  /** Once a frame. `held` is the rig in the hand. `beastAt` is where the bar over a beast goes on the page, or null when it is out of view. */
-  update(fight: Fight, held: RigKind | null, quality: QualityMode, beastAt: (beast: BeastState) => { x: number; y: number } | null): void;
+  /**
+   * Once a frame. `held` is the rig in the hand. `beastAt` is where the bar over a beast goes on the page, or null
+   * when it is out of view. `hall` is the Stag's hall, or null in the meadow.
+   */
+  update(fight: Fight, held: RigKind | null, quality: QualityMode, beastAt: (beast: BeastState) => { x: number; y: number } | null, hall?: Hall | null): void;
   /** Shows "Again?" for a fight that just ended. */
   ask(fight: LoggedFight): void;
   /** A short line over the bars: why something could not be done. It stays `ms` milliseconds. */
@@ -45,6 +58,21 @@ export interface LabPanel {
 // Milestone 3: `stag` is the Stag's hall, fought the hero's way.
 const WAY_NAMES: Record<Way | 'stag', string> = { hero: 'The hero fights', pet: 'The pet fights', world: 'The world fights', stag: 'The hero frees the Stag' };
 const WAY_SHORT: Record<Way, string> = { hero: 'Hero', pet: 'Pet', world: 'World' };
+
+/** The hall is fought the hero's way, without the Mark or the pet's skill: neither has anything to go for there. */
+const HALL_KEYS: readonly (readonly [string, string])[] = [
+  ['Click', 'Cut. Click again for a second cut'],
+  ['Hold click', 'Charge a spin, let go to strike all round'],
+  ['Shift', 'Dodge the way you walk'],
+];
+
+const HALL_RULES = [
+  'The chains: break the four pins. It sweeps its antlers across the floor and stamps when you come close.',
+  'The overgrowth: light the lamps. Seed pods grow only in the dark; cut them before they burst.',
+  'The collar: climb the vines up its flank and cut the collar. It shakes the vines under you.',
+];
+
+const HALL_FEEL = 'Does the Stag read as one great body? Is it a fight, or are you waiting on it?';
 
 const KEYS: Record<Way, readonly (readonly [string, string])[]> = {
   hero: [
@@ -81,7 +109,17 @@ const WHAT_TO_FEEL: Record<Way, string> = {
 /** Under the keys, for every way: the one word for the state the Mark needs. */
 const DIZZY = 'A beast is dizzy only once its guard bar is empty. The Mark cannot hold it before.';
 
+/** The width of the game's minimap and clock in the top right corner, with their margin. */
+const MAP_CORNER = 232;
+
 const AGAIN_WORDS = ['', 'No', 'Not really', 'Maybe', 'Yes', 'Right now'];
+
+/** The word for how a fight ended: a beast is calmed, a machine shut down, and the Stag freed. */
+function endedWord(fight: LoggedFight): string {
+  if (fight.result !== 'calmed') return fight.result;
+  if (fight.way === 'stag') return 'freed';
+  return BEASTS.find((b) => b.kind === fight.enemy)?.machine ? 'shut down' : 'calmed';
+}
 
 const STYLE = /* css */ `
 .ui-book .fl-card {
@@ -170,7 +208,7 @@ const STYLE = /* css */ `
 .ui-book .fl-checks td:last-child { white-space: nowrap; font-weight: 650; }
 .ui-book .fl-pass { color: var(--ui-done); }
 .ui-book .fl-fail { color: oklch(0.55 0.17 25); }
-.ui-book .fl-again { left: calc(var(--fl-free, 16px) + (100% - var(--fl-free, 16px) - 16px) / 2); width: min(460px, calc(100% - var(--fl-free, 16px) - 16px)); }
+.ui-book .fl-again { left: calc(var(--fl-free, 16px) + (100% - var(--fl-free, 16px) - var(--fl-right, 16px)) / 2); width: min(460px, calc(100% - var(--fl-free, 16px) - var(--fl-right, 16px))); }
 .ui-book .fl-log { top: 6%; width: min(880px, calc(100% - 32px)); max-height: 86%; overflow: auto; user-select: text; }
 .ui-book .fl-log table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
 .ui-book .fl-log th { text-align: left; font-weight: 600; color: var(--ui-ink-2); padding: 4px 8px 4px 0; }
@@ -209,7 +247,8 @@ function button(text: string, act: () => void): HTMLButtonElement {
   return b;
 }
 
-export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActions): LabPanel {
+export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActions, scene: PanelOptions = {}): LabPanel {
+  const inHall = scene.hall ?? false;
   addStyle(root, 'lab-fight', STYLE);
   root.classList.add('lab-fight');
 
@@ -234,7 +273,9 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   for (const beast of BEASTS) beasts.append(button(beast.kind === 'boar' ? 'Boar' : beast.name.replace('Blighted ', '').replace(/^./, (c) => c.toUpperCase()), () => actions.bring(beast.kind)));
   const control = el('div', 'fl-row');
   const wake = button('Wake it', () => actions.wake());
-  control.append(wake, button('Take it away', () => actions.clear()));
+  // In the hall "Take it away" is "Start over": the hall's clear starts it again from the chains.
+  control.append(wake, button(inHall ? 'Start over' : 'Take it away', () => actions.clear()));
+  wake.hidden = inHall;
   const options = el('div', 'fl-row');
   const gentle = button('Gentle', () => actions.setGentle(!gentle.classList.contains('is-on')));
   gentle.title = 'Longer warnings and half the hurt';
@@ -260,7 +301,6 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     URL.revokeObjectURL(link.href);
   }));
   // ---- milestone 3: one entry on the card, the Stag's hall (`?scene=stag`) and the way back to the meadow
-  const inHall = new URLSearchParams(location.search).get('scene') === 'stag';
   const hallRow = el('div', 'fl-row');
   hallRow.append(button(inHall ? 'Back to the meadow' : 'The Stag hall', () => {
     const address = new URLSearchParams(location.search);
@@ -268,7 +308,14 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     location.search = address.toString();
   }));
   // ---- end of the Stag's entry
-  card.append(title, el('h3', '', 'Way to fight'), ways, feel, el('h3', '', 'Bring in'), beasts, control, el('h3', '', 'Boss'), hallRow, el('h3', '', 'Keys'), keys, el('p', 'fl-dizzy', DIZZY), rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
+  if (inHall) {
+    feel.textContent = HALL_FEEL;
+    keys.replaceChildren(...HALL_KEYS.map(([key, words]) => { const li = el('li'); li.append(el('b', '', key), words); return li; }));
+    rules.replaceChildren(...HALL_RULES.map((rule) => el('li', '', rule)));
+    card.append(title, el('h3', '', 'The Verdant Stag'), feel, control, el('h3', '', 'Boss'), hallRow, el('h3', '', 'Keys'), keys, rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
+  } else {
+    card.append(title, el('h3', '', 'Way to fight'), ways, feel, el('h3', '', 'Bring in'), beasts, control, el('h3', '', 'Boss'), hallRow, el('h3', '', 'Keys'), keys, el('p', 'fl-dizzy', DIZZY), rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
+  }
 
   // ---------------------------------------------------------------- the bars
   const hud = el('div', 'fl-hud');
@@ -295,6 +342,8 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     return { kind: rig.kind, chip };
   });
   hud.append(bars, petBox, kitBox);
+  // The hall is fought the hero's way: no rigs, and no pet's hearts to watch.
+  kitBox.hidden = hearts.hidden = inHall;
   const line = el('div', 'fl-say');
   const edge = el('div', 'fl-edge');
   edge.append(el('i'));
@@ -334,7 +383,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     const beast = BEASTS.find((b) => b.kind === fight.enemy);
     again.replaceChildren();
     const head = el('h2', '', 'Again?');
-    const sum = el('p', '', `${beast?.name ?? fight.enemy}, ${fight.result === 'calmed' ? (beast?.machine ? 'shut down' : 'calmed') : 'left'} in ${fight.length.toFixed(1)} s. ${WAY_NAMES[fight.way]}. Hits taken: ${fight.hitsTaken}${fight.faints ? `, fainted ${fight.faints} time${fight.faints > 1 ? 's' : ''}` : ''}.`);
+    const sum = el('p', '', `${beast?.name ?? fight.enemy}, ${endedWord(fight)} in ${fight.length.toFixed(1)} s. ${WAY_NAMES[fight.way]}. Hits taken: ${fight.hitsTaken}${fight.faints ? `, fainted ${fight.faints} time${fight.faints > 1 ? 's' : ''}` : ''}.`);
     const rate = el('div', 'fl-rate');
     const buttons: HTMLButtonElement[] = [];
     for (let n = 1; n <= 5; n++) {
@@ -371,8 +420,10 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
         ? `${fight.whiffs} of ${fight.swings} swings hit nothing, ${fight.dodges} dodges`
         : fight.way === 'pet'
           ? `${(fight.length > 0 ? (fight.inputs / fight.length) * 10 : 0).toFixed(1)} presses in 10 s, gap ${fight.longestGap.toFixed(1)} s, ${fight.whistles} whistles, pet hit ${fight.petHits}, fainted ${fight.petFaints}`
-          : `setup ${fight.setup.toFixed(1)} s, ${fight.rigsTriggered} of ${fight.rigsPlaced} rigs set off, ${fight.crashes} crashes, ${fight.layout.join(' ') || 'no rigs'}`;
-      for (const text of [new Date(fight.at).toLocaleTimeString(), fight.way, fight.enemy, fight.result, fight.length.toFixed(1), String(fight.hitsTaken), String(fight.faints), fight.again ? String(fight.again) : '', numbers]) row.append(el('td', '', text));
+          : fight.way === 'stag'
+            ? `phases ${(fight.boss?.phases ?? []).map((p) => p.toFixed(0)).join(', ')} s, longest wait ${(fight.boss?.quiet ?? 0).toFixed(1)} s, ${fight.boss?.counts.falls ?? 0} falls`
+            : `setup ${fight.setup.toFixed(1)} s, ${fight.rigsTriggered} of ${fight.rigsPlaced} rigs set off, ${fight.crashes} crashes, ${fight.layout.join(' ') || 'no rigs'}`;
+      for (const text of [new Date(fight.at).toLocaleTimeString(), fight.way, fight.enemy, endedWord(fight), fight.length.toFixed(1), String(fight.hitsTaken), String(fight.faints), fight.again ? String(fight.again) : '', numbers]) row.append(el('td', '', text));
       table.append(row);
     }
     const row = el('div', 'fl-row');
@@ -402,7 +453,8 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
 
   // ---------------------------------------------------------------- the room the card leaves
   // Centered bars cross the card on a narrow window. They move right of it, and wrap when even that is too narrow.
-  // "Again?" and the short line center in the same room.
+  // "Again?" and the short line center in the same room. "Again?" also keeps clear of the minimap and the clock in
+  // the top right corner, 232 pixels wide, when it would reach them.
   const hudWidth = (): number => {
     let width = 0, shown = 0;
     for (const box of hud.children) if (!(box as HTMLElement).hidden) { width += (box as HTMLElement).offsetWidth; shown++; }
@@ -411,6 +463,8 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   function layout(): void {
     const page = root.clientWidth, free = card.offsetLeft + card.offsetWidth + 16, wide = hudWidth();
     root.style.setProperty('--fl-free', `${free}px`);
+    const room = page - free - 16, card460 = Math.min(460, room);
+    root.style.setProperty('--fl-right', `${free + (room + card460) / 2 > page - MAP_CORNER ? MAP_CORNER : 16}px`);
     const wrapped = free + wide > page - 16;
     hud.classList.toggle('is-wrapped', wrapped);
     const middle = wrapped ? free + (page - 16 - free) / 2 : Math.max(page / 2, free + wide / 2);
@@ -437,7 +491,8 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
       const cover = skill ? Math.round((skill.left / skill.rest) * 50) : 0;
       if (cover !== shownCover[i]) { shownCover[i] = cover; slot.cover.style.transform = `scaleX(${cover / 50})`; }
     }
-    petBox.hidden = !fight.skill(0) && fight.way !== 'pet';
+    // The pet's skill has nothing to go for in the hall.
+    petBox.hidden = inHall || (!fight.skill(0) && fight.way !== 'pet');
     if (fight.way === 'world') {
       const left = fight.kit();
       kit.forEach((slot, i) => {
@@ -472,21 +527,21 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
       if (a !== giftAlpha) { giftAlpha = a; gift.style.opacity = String(a); }
       gift.style.transform = `translate(${Math.round(at.x)}px, ${Math.round(at.y)}px)`;
     },
-    update(fight, held, mode, beastAt) {
+    update(fight, held, mode, beastAt, hall = null) {
       const beast = fight.beasts[0];
-      // "Again?" is about one fight: a new beast, way or pet closes it.
-      const beastId = beast?.id ?? -1;
-      if (again.hidden) { asked.beast = beastId; asked.way = fight.way; asked.pet = fight.pet.def.kind; }
-      else if (beastId !== asked.beast || fight.way !== asked.way || fight.pet.def.kind !== asked.pet) again.hidden = true;
+      // "Again?" is about one fight: a new beast, way or pet closes it. In the hall, the hall starting over does.
+      const encounter = hall ? hall.round : beast?.id ?? -1;
+      if (again.hidden) { asked.beast = encounter; asked.way = fight.way; asked.pet = fight.pet.def.kind; }
+      else if (encounter !== asked.beast || fight.way !== asked.way || fight.pet.def.kind !== asked.pet) again.hidden = true;
       refreshLogButton();
-      // The card folds while a beast is awake, and opens again when it is calmed or gone.
-      const awake = fight.phase === 'fight' && !!beast && beast.doing !== 'calmed';
+      // The card folds while a beast or the Stag is awake, and opens again when it is calmed, freed or gone.
+      const awake = hall ? hall.stag.doing !== 'asleep' && !hall.freed : fight.phase === 'fight' && !!beast && beast.doing !== 'calmed';
       if (awake !== shownAwake) {
         shownAwake = awake;
         if (awake && !card.classList.contains('is-small')) { foldedForFight = true; setFolded(true); }
         else if (!awake && foldedForFight) { foldedForFight = false; setFolded(false); }
       }
-      if (fight.way !== shownWay) {
+      if (fight.way !== shownWay && !inHall) {
         shownWay = fight.way;
         for (const [way, b] of wayButtons) b.classList.toggle('is-on', way === fight.way);
         feel.textContent = WHAT_TO_FEEL[fight.way];
@@ -495,7 +550,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
         hearts.hidden = fight.way !== 'pet';
       }
       const kind = beast?.def.kind ?? '';
-      if (kind !== shownBeast) {
+      if (kind !== shownBeast && !inHall) {
         shownBeast = kind;
         rulesTitle.hidden = rules.hidden = !beast;
         rules.replaceChildren(...(beast?.def.rules ?? []).map((rule) => el('li', '', rule)));
