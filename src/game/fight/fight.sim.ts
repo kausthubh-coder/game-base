@@ -757,6 +757,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
   // ------------------------------------------------ the pet
 
   function order(b: Beast): void {
+    dropOrder();
     pet.mode = 'engage';
     pet.target = b;
     pet.back = null;
@@ -781,6 +782,16 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     pet.mode = 'recall';
     pet.target = null;
     pet.pounce = false;
+    dropOrder();
+  }
+
+  /**
+   * Ends the order in flight that never got the pet there. One cut short within its 2 seconds, by a whistle, a
+   * skill, a faint or the beast going dizzy, is not counted: it says nothing about how fast the pet answers.
+   * One that ran past 2 seconds stays counted, as late.
+   */
+  function dropOrder(): void {
+    if (pet.ordered >= 0 && pet.ordered <= 2) record.orders--;
     pet.ordered = -1;
   }
 
@@ -900,6 +911,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     p.moving = false;
     p.safe = way !== 'pet';
     if (p.ordered >= 0) p.ordered += dt;
+    if (p.ordered >= 0 && p.mode !== 'engage') dropOrder();
     p.sinceWhistle += dt;
     if (p.back && (p.mode === 'recall' || p.mode === 'heel') && p.sinceWhistle > 0.5 && !busyAttacking(p.back)) {
       if (stillUp(p.back)) { p.mode = 'engage'; p.target = p.back; p.toStrike = PET.firstStrike; }

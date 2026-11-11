@@ -408,6 +408,26 @@ describe('the pet fights', () => {
     expect(b.guard).toBeLessThan(b.def.guard);
   });
 
+  test('an order the hero whistles back before the pet gets there is not counted, and the next one is', () => {
+    const l = lab('pet'), b = l.fight.bring('thistlehog');
+    stand(l, b.x, b.z + 9);
+    l.fight.press('attack');
+    l.run(0.5);
+    expect(l.fight.record.orders).toBe(1);
+    l.fight.press('whistle');
+    l.run(0.1);
+    expect(l.fight.record.orders).toBe(0);
+    // It goes back in by itself, which is no new order. A new click once it is at heel is one.
+    l.until(() => l.fight.pet.mode === 'heel' || l.fight.pet.mode === 'engage', 5);
+    l.fight.press('whistle');
+    l.until(() => l.fight.pet.mode === 'heel', 5);
+    l.run(0.5);
+    l.fight.press('attack');
+    l.until(() => l.count('petStrike') > 0, 5);
+    expect(l.fight.record.orders).toBe(1);
+    expect(l.fight.record.ordersInTime).toBe(1);
+  });
+
   test('thrown light chips the guard and marks the beast, and the next strike spends the marks', () => {
     const l = lab('pet'), b = l.fight.bring('boar');
     stand(l, b.x, b.z + 8);
