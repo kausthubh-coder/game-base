@@ -170,7 +170,7 @@ export function install(view: GameView): void {
     if (shown >= 0) {
       const s = perf.snapshot, now = perf.costs.compiles().inDraw;
       const heaviest = perf.flight.frame(shown, shownPlace, shownStop >= 0 ? (stops[shownStop] as FlightStop).name : null, {
-        ms: s.lastFrameMs, cpuMs: s.lastCpuMs, drawCalls: s.drawCalls, triangles: s.triangles, level: s.quality, scale: s.renderScale, compiles: now - compiled,
+        ms: s.lastFrameMs, cpuMs: s.lastCpuMs, drawCalls: s.drawCalls, triangles: s.triangles, level: s.quality, scale: view.post.settings.renderScale, compiles: now - compiled,
       });
       compiled = now;
       // The heaviest frame of a hold stands for the stop in the cost by feature.

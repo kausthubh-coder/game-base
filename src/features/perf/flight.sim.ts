@@ -87,7 +87,7 @@ export interface FlightFrame {
   cpuMs: number;
   drawCalls: number;
   triangles: number;
-  /** The quality level and the render size in use. */
+  /** The quality level in use, and the share of the screen's width and height the 3D picture is drawn at. */
   level: string;
   scale: number;
   /** Shader programs compiled in the middle of this frame's draw. Each is a stall. */
