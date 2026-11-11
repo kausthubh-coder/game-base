@@ -101,11 +101,13 @@ async function serveSession() {
     await fresh(mode); save();
     let queue = Promise.resolve();
     const ipc = createServer({ allowHalfOpen: true }, client => {
+      client.on('error', () => {});
       let data = ''; client.on('data', chunk => data += chunk);
       client.on('end', () => { queue = queue.then(async () => {
         try {
           const { command, args } = JSON.parse(data); let result;
-          if (command === 'state') { clean(); result = await state(); }
+          if (command === 'ping') result = { alive: true };
+          else if (command === 'state') { clean(); result = await state(); }
           else if (command === 'shot') { clean(); const path = resolve(args[0] || out + '/shot.png'); mkdirSync(resolve(path, '..'), { recursive: true }); await page.screenshot({ path }); result = { path }; }
           else if (command === 'do') result = await input(JSON.parse(args.join(' ')));
           else if (command === 'record') {
@@ -156,7 +158,7 @@ else if (argv[0] === 'start') {
     }
   }
 } else if (argv[0] === 'replay') {
-  try { await request('state'); } catch (error) {
+  try { await request('ping'); } catch (error) {
     if (!['ENOENT', 'ECONNREFUSED'].includes(error.code)) throw error;
     const child = spawn('bun', [import.meta.filename, 'start'], { cwd: root, stdio: 'inherit' });
     await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error('start failed'))); });
