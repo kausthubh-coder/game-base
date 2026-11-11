@@ -4,6 +4,7 @@
 //   bun tools/fight-play.mjs --port 5529 --way world --beast boar --layout wall   the world way with no rigs, baiting charges into the wall
 //   bun tools/fight-play.mjs --port 5529 --way pet --beast gearling --keys        real keys and mouse only, as a person would press them
 //   bun tools/fight-play.mjs --url http://127.0.0.1:5529/ --log                   a built copy, with the page sending its fights to fight-log
+//   bun tools/fight-play.mjs --port 5529 --way pet --beast boar --pet pebblepup --keys   the second pet: its brace takes an attack for the hero
 //
 // `--quality low`, `medium` or `high` holds a quality level (high by default). `--log` adds `&log=1`, which
 // only `tools/fight-serve.mjs` answers: it checks that the fight and its answer reached `.artifacts/fight/ratings.jsonl`.
@@ -21,9 +22,9 @@ const opt = (name, fallback) => { const i = argv.indexOf('--' + name); return i 
 const flag = (name) => argv.includes('--' + name);
 const port = opt('port', process.env.PLAY_PORT ?? '5525');
 const way = opt('way', 'hero'), beast = opt('beast', 'thistlehog'), layout = opt('layout', 'rigs'), quality = opt('quality', 'high');
-const keys = flag('keys'), limit = Number(opt('limit', 200)), sends = flag('log');
+const keys = flag('keys'), limit = Number(opt('limit', 200)), sends = flag('log'), pet = opt('pet', 'leaftail');
 const base = opt('url', `http://localhost:${port}/`);
-const name = opt('name', `${way}-${beast}${keys ? '-keys' : layout === 'wall' ? '-wall' : ''}`);
+const name = opt('name', `${way}-${beast}${pet === 'leaftail' ? '' : `-${pet}`}${keys ? '-keys' : layout === 'wall' ? '-wall' : ''}`);
 const out = resolve(import.meta.dirname, '..', '.artifacts/fight');
 mkdirSync(out, { recursive: true });
 
@@ -52,9 +53,10 @@ await page.evaluate(() => window.__game.settle());
 await page.evaluate(() => { localStorage.removeItem('lab.fight.log'); });
 
 await page.click(`.fl-card button:text-is("${WAY_BUTTON[way]}")`);
+await page.selectOption('.fl-card select:has(option[value="leaftail"])', pet);
 await page.click(`.fl-card button:text-is("${BEAST_BUTTON[beast]}")`);
 let s = await state();
-check(`the card picked the way "${way}" and brought in the ${beast}`, s.way === way && s.beast?.kind === beast && s.beast.doing === 'asleep');
+check(`the card picked the way "${way}" and the ${pet}, and brought in the ${beast}`, s.way === way && s.pet.kind === pet && s.beast?.kind === beast && s.beast.doing === 'asleep');
 await sleep(600);
 await shot('start');
 settledAt = Date.now() + 2500;
@@ -65,9 +67,12 @@ settledAt = Date.now() + 2500;
  * fight starts are left out: they still hold the page loading. The peak is the worst of those 2-second means.
  */
 const seen = { drawCalls: 0, triangles: 0, scriptMs: 0, simMs: 0, samples: 0, scriptSum: 0 };
-async function sample() {
+/** The same, through the moment of calming that plays after the fight is won. */
+const calming = { drawCalls: 0, triangles: 0, scriptMs: 0, simMs: 0, samples: 0, scriptSum: 0 };
+async function sample(into = seen) {
   if (Date.now() < settledAt) return;
   const c = await page.evaluate(() => window.__game.counters());
+  const seen = into;
   seen.drawCalls = Math.max(seen.drawCalls, c.drawCalls);
   seen.triangles = Math.max(seen.triangles, c.triangles);
   seen.scriptMs = Math.max(seen.scriptMs, c.scriptMs);
@@ -208,6 +213,29 @@ if (!keys) {
     await sleep(300);
     s = await state();
     check('C and T called two skills', s.record.skills === 2);
+    if (pet === 'pebblepup') {
+      // The brace: stand where the beast's next attack will land, and press C as its shape shows. The pebblepup
+      // plants itself between the hero and the beast and takes the attack on its back.
+      const from = Date.now();
+      while (Date.now() - from < 60000 && s.record.blocks === 0 && s.beast.doing !== 'dizzy') {
+        s = await state();
+        await sample();
+        if (s.pet.mode === 'brace') await shotOnce('brace');
+        const rested = await page.evaluate(() => (window.__fight.fight.skill(0)?.left ?? 1) <= 0);
+        if (s.shapes > 0 && rested && s.pet.mode !== 'down') {
+          await page.keyboard.press('KeyC');
+          await sleep(150);
+          await shotOnce('brace');
+          await sleep(1200);
+          continue;
+        }
+        const near = s.beast.kind === 'boar' ? 3 : 1.8;
+        if (Math.hypot(s.hero.x - s.beast.x, s.hero.z - s.beast.z) > near + 0.6) await walkTo(s.beast.x, s.beast.z + near, 0.5, 1200);
+        else await sleep(60);
+      }
+      s = await state();
+      check('the pebblepup braced and took an attack on its back for the hero', s.record.blocks >= 1);
+    }
     const from = Date.now();
     while (Date.now() - from < limit * 1000) {
       s = await state();
@@ -299,8 +327,13 @@ if (!keys) {
 
 s = await state();
 check('the fight was won', s.phase === 'won' && s.record.result === 'calmed');
-await sleep(700);
+// The moment of calming: the grey running out, then the bow, the green and the gift. The meter's 2-second
+// mean is sampled through it.
+for (const until = Date.now() + 700; Date.now() < until;) { await sample(calming); await sleep(80); }
 await shot('colors-return');
+for (const until = Date.now() + 1300; Date.now() < until;) { await sample(calming); await sleep(80); }
+await shot('bow');
+for (const until = Date.now() + 1400; Date.now() < until;) { await sample(calming); await sleep(80); }
 await page.waitForSelector('.fl-again:not([hidden])', { timeout: 8000 }).catch(() => undefined);
 await sleep(300);
 await shot('again');
@@ -329,8 +362,9 @@ const game = await page.evaluate(() => { const g = window.__game.state(); return
 check('no view or system of the game failed', game.viewErrors.length === 0 && Object.keys(game.failed).length === 0);
 const standIns = await page.evaluate(() => window.__fight.standIns());
 const r = s.record;
-console.log('\nrecord:', JSON.stringify({ way: r.way, enemy: r.enemy, result: r.result, seconds: +r.length.toFixed(1), setup: +r.setup.toFixed(1), hitsTaken: r.hitsTaken, hitBy: r.hitBy, faints: r.faints, swings: r.swings, whiffs: r.whiffs, dodges: r.dodges, inputs: r.inputs, longestGap: +r.longestGap.toFixed(1), throws: r.throws, orders: `${r.ordersInTime}/${r.orders}`, whistles: r.whistles, petHits: r.petHits, petFaints: r.petFaints, rigs: `${r.rigsTriggered}/${r.rigsPlaced}`, crashes: r.crashes, layout: r.layout }));
+console.log('\nrecord:', JSON.stringify({ way: r.way, enemy: r.enemy, pet: r.pet, result: r.result, seconds: +r.length.toFixed(1), setup: +r.setup.toFixed(1), hitsTaken: r.hitsTaken, hitBy: r.hitBy, faints: r.faints, swings: r.swings, whiffs: r.whiffs, dodges: r.dodges, inputs: r.inputs, longestGap: +r.longestGap.toFixed(1), throws: r.throws, orders: `${r.ordersInTime}/${r.orders}`, whistles: r.whistles, blocks: r.blocks, petHits: r.petHits, petFaints: r.petFaints, rigs: `${r.rigsTriggered}/${r.rigsPlaced}`, crashes: r.crashes, layout: r.layout }));
 console.log(`drawn at quality ${game.quality} on ${browser.gameRenderer}, once settled: at most ${seen.drawCalls} draw calls, ${seen.triangles} triangles, script ${(seen.scriptSum / Math.max(1, seen.samples)).toFixed(2)} ms a frame on average and ${seen.scriptMs.toFixed(2)} ms in the worst 2 seconds, ${seen.simMs.toFixed(2)} ms of rules, over ${seen.samples} samples`);
+console.log(`through the calming: at most ${calming.drawCalls} draw calls, ${calming.triangles} triangles, script ${(calming.scriptSum / Math.max(1, calming.samples)).toFixed(2)} ms a frame on average and ${calming.scriptMs.toFixed(2)} ms in the worst 2 seconds, over ${calming.samples} samples`);
 console.log('stand-in art:', standIns.join(', ') || 'none');
 console.log(`pictures: ${out}/${name}-*.png`);
 await browser.close();
