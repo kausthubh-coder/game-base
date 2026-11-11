@@ -64,6 +64,8 @@ export interface GameUiOptions {
   icon(name: string): IconRef | null;
   /** A sprite frame from the manifest for an Almanac page. When it is missing or returns null, `icon` is tried. */
   picture?(name: string): PictureRef | null;
+  /** A small line icon for a menu button (`resume`, `settings`, `account`, `save-quit` …) that fills its box, or null for none. */
+  ornament?(name: string): HTMLElement | null;
   /** Where a point in the world is on screen, in CSS pixels from the root's top left, or null when it is off screen. */
   project(x: number, y: number, z: number): { x: number; y: number } | null;
   /** The numbers for the end card, read when the card opens. */

@@ -7,6 +7,17 @@ import type { PanelView, Quality, UiContext, VolumeChannel } from './types.ui.ts
 const button = (label: string, onclick: () => void, extra: Record<string, string | boolean | null> = {}): HTMLButtonElement =>
   h('button', { class: 'gu-btn', type: 'button', onclick, ...extra }, label);
 
+/** A menu button with a line icon before its label, when the options give one. */
+const iconButton = (ctx: UiContext, icon: string, label: string, onclick: () => void, extra: Record<string, string | boolean | null> = {}): HTMLButtonElement => {
+  const element = button(label, onclick, extra);
+  const art = ctx.options.ornament?.(icon);
+  if (art) {
+    element.classList.add('gu-btn-icon');
+    element.prepend(h('span', { class: 'gu-btn-ornament', 'aria-hidden': true }, art));
+  }
+  return element;
+};
+
 export function titlePanel(ctx: UiContext): PanelView {
   const body = h('div', { class: 'gu-plate' });
   /** True while New game waits for a second click, because a save would be replaced. */
@@ -41,7 +52,7 @@ export function titlePanel(ctx: UiContext): PanelView {
           button('Continue', () => { ctx.sound('click'); ctx.options.continueGame(); ctx.ui.close(); },
             { 'data-key': 'title:continue', class: saved ? 'gu-btn gu-primary' : 'gu-btn', disabled: !saved, 'aria-describedby': saved ? null : 'gu-no-save' }),
           saved ? null : h('p', { class: 'gu-menu-note', id: 'gu-no-save' }, 'Nothing saved yet.'),
-          button('Settings', () => ctx.ui.open('settings'), { 'data-key': 'title:settings' }),
+          iconButton(ctx, 'settings', 'Settings', () => ctx.ui.open('settings'), { 'data-key': 'title:settings' }),
         );
       }
       body.replaceChildren(h('h1', { class: 'gu-chapter' }, 'A plot of your own'), menu);
@@ -60,10 +71,10 @@ export function pausePanel(ctx: UiContext, account: boolean): PanelView {
     render() {
       body.replaceChildren();
       add(body,
-        button('Resume', () => ctx.ui.close(), { class: 'gu-btn gu-primary' }),
-        button('Settings', () => ctx.ui.open('settings')),
-        account && button('Account', () => ctx.ui.open('account'), { 'data-key': 'pause:account' }),
-        button('Save and return to title', () => { ctx.sound('click'); ctx.options.saveAndQuit(); ctx.ui.open('title'); }),
+        iconButton(ctx, 'resume', 'Resume', () => ctx.ui.close(), { class: 'gu-btn gu-primary' }),
+        iconButton(ctx, 'settings', 'Settings', () => ctx.ui.open('settings')),
+        account && iconButton(ctx, 'account', 'Account', () => ctx.ui.open('account'), { 'data-key': 'pause:account' }),
+        iconButton(ctx, 'save-quit', 'Save and return to title', () => { ctx.sound('click'); ctx.options.saveAndQuit(); ctx.ui.open('title'); }),
       );
     },
   };

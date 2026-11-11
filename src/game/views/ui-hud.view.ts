@@ -24,75 +24,83 @@ const LOOK_EVERY = 0.25;
 const SLOT_GAP = 12;
 
 const STYLE = /* css */ `
-.ui-book .gb-hud { line-height: 1.35; color: var(--ui-glass-ink); }
+.ui-book .gb-hud { line-height: 1.35; color: var(--ui-glass-ink); font-family: var(--ui-font); }
 .ui-book .gb-hud-vitals { display: none; }
-/* Every HUD piece is a strip of dark glass: the world shows around it, and the text is near-white. */
-.ui-book .gb-hud .gb-panel { color: var(--ui-glass-ink); background: var(--ui-glass); border: 0; border-radius: var(--ui-radius); outline: 0; box-shadow: var(--ui-glass-shadow); }
+/* Over the world nothing is boxed but the quick slots: the clock and the tracker are cream text with a soft shadow. */
+.ui-book .gb-hud .gb-panel { color: var(--ui-glass-ink); background: none; border: 0; border-radius: 0; outline: 0; box-shadow: none; }
 
-/* ---- quick slots: nine wells on a glass rail. The held one is lit in the lume's teal. ---- */
-.ui-book .gb-hud-slots { gap: 6px; padding: 6px; border-radius: 14px !important; }
-.ui-book .gb-slot { width: 52px; height: 52px; color: var(--ui-glass-ink); background: var(--ui-glass-2); border: 0; border-radius: var(--ui-radius); transition: none; touch-action: none; }
-.ui-book .gb-slot:hover { background: oklch(1 0 0 / 0.18); }
-.ui-book .gb-slot:active { background: oklch(1 0 0 / 0.24); }
-.ui-book .gb-slot[aria-pressed='true'] { background: oklch(1 0 0 / 0.22); transform: none; box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
-.ui-book .gb-slot:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
-.ui-book .gb-slot-key { z-index: 1; top: 3px; left: 6px; padding: 0; font-size: 11px; font-weight: 500; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
+/* ---- quick slots: nine night wells with gold rims on a faint rail. The held one glows gold. ---- */
+.ui-book .gb-hud-slots { gap: 6px; padding: 6px 10px; border-radius: 999px !important; background: linear-gradient(180deg, rgb(22 26 38 / 0.18), rgb(22 26 38 / 0.48)) !important; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.28) !important; }
+.ui-book .gb-slot {
+  width: 54px; height: 54px; color: var(--ui-glass-ink); border: 0; border-radius: var(--ui-radius); transition: transform 120ms var(--ui-ease); touch-action: none;
+  background: radial-gradient(90% 90% at 30% 20%, rgb(58 66 88 / 0.86), rgb(31 36 51 / 0.86));
+  box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55), inset 0 2px 6px rgb(0 0 0 / 0.3), 0 2px 6px rgb(10 12 20 / 0.3);
+}
+.ui-book .gb-slot:hover { filter: brightness(1.15); }
+.ui-book .gb-slot:active { filter: brightness(0.95); }
+.ui-book .gb-slot[aria-pressed='true'] { transform: translateY(-4px); box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 0 2px rgb(240 212 138 / 0.3), 0 0 16px rgb(240 212 138 / 0.65), 0 6px 10px rgb(10 12 20 / 0.35); }
+.ui-book .gb-slot:focus-visible { outline: 2px solid var(--ui-gold-bright); outline-offset: 2px; }
+.ui-book .gb-slot-key { z-index: 1; top: 3px; left: 6px; padding: 0; font-size: 11px; font-weight: 800; line-height: 1.3; color: var(--ui-gold); background: none; text-shadow: var(--ui-text-shadow); }
 /* An icon is 32 pixels of pixel art, so it is drawn at exactly that. */
 .ui-book .gb-slot-icon { inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
-.ui-book .gb-slot-count { z-index: 1; right: 4px; bottom: 2px; padding: 0; font-size: 13px; font-weight: 700; line-height: 1.3; color: var(--ui-glass-ink); background: none; text-shadow: var(--ui-text-shadow); }
+.ui-book .gb-slot-count { z-index: 1; right: 3px; bottom: 3px; min-width: 18px; padding: 0 4px; font-size: 11px; font-weight: 800; line-height: 16px; text-align: center; color: var(--ui-ink); background: var(--ui-paper-light); border-radius: 5px; box-shadow: 0 1px 2px rgb(0 0 0 / 0.4); }
 /* A drag between quick slots: the slot it came from fades and the one under the pointer lights up. */
 .ui-book .gb-slot.is-drag-from .gb-slot-icon, .ui-book .gb-slot.is-drag-from .gb-slot-count { opacity: 0.3; }
-.ui-book .gb-slot.is-drop { background: oklch(0.53 0.095 192 / 0.45); box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
-.ui-book .gb-slot.is-refused { box-shadow: inset 0 0 0 2px var(--ui-new); }
-.ui-book .gu-ghost-count { position: absolute; right: 3px; bottom: 3px; min-width: 20px; padding: 0 5px; font-size: 13px; font-weight: 700; line-height: 18px; text-align: center; color: var(--ui-ink); background: var(--ui-paper-light); border-radius: var(--ui-radius-sm); }
+.ui-book .gb-slot.is-drop { box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 16px rgb(240 212 138 / 0.7); }
+.ui-book .gb-slot.is-refused { box-shadow: inset 0 0 0 2px #d06a4a; }
+.ui-book .gu-ghost-count { position: absolute; right: 3px; bottom: 3px; min-width: 20px; padding: 0 5px; font-size: 12px; font-weight: 800; line-height: 17px; text-align: center; color: var(--ui-ink); background: var(--ui-paper-light); border-radius: 5px; }
 :root.gu-dragging, :root.gu-dragging * { cursor: grabbing !important; }
 /* The name and use of a quick slot's item, above it. */
 .ui-slot-tip {
-  position: absolute; left: 0; top: 0; z-index: 13; display: grid; gap: 2px; width: max-content; max-width: 240px; padding: 8px 12px 10px;
-  font-family: var(--ui-font); font-size: 14px; line-height: 1.4; color: var(--ui-glass-ink); background: oklch(0.26 0.02 62); border-radius: var(--ui-radius);
-  box-shadow: var(--ui-glass-shadow); pointer-events: none;
+  position: absolute; left: 0; top: 0; z-index: 13; display: grid; gap: 2px; width: max-content; max-width: 240px; padding: 10px 14px 12px;
+  font-family: var(--ui-font); font-size: 14px; line-height: 1.4; color: var(--ui-glass-ink); background: linear-gradient(180deg, #2c3346, #232838); border-radius: var(--ui-radius);
+  box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55), var(--ui-glass-shadow); pointer-events: none;
 }
 .ui-slot-tip[hidden] { display: none; }
-.ui-slot-tip b { font-weight: 650; }
-.ui-slot-tip span { color: oklch(0.89 0.07 188); }
+.ui-slot-tip b { font-family: var(--ui-display); font-size: 16px; font-weight: 650; color: var(--ui-gold-bright); }
+.ui-slot-tip span { color: var(--ui-glass-ink-2); }
 
-/* ---- top right: the minimap, then the day and the clock, then the quest ---- */
-.ui-book .gb-hud-right { gap: 8px; }
-.ui-book .gb-hud-sky { flex: none; gap: 8px; padding: 5px 12px; white-space: nowrap; }
-.ui-book .gb-hud-weather svg { width: 1.2em; height: 1.2em; }
-.ui-book .gb-hud-clock { font-size: 15px; font-weight: 650; letter-spacing: 0; }
-.ui-day { white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--ui-glass-ink); }
-/* The tracker: the quest, how far it has come, and only the step to do now. The quest log (J) has the rest. */
-.ui-book .gb-hud-quest { width: 260px; margin-top: 4px; padding: 12px 14px 13px; }
-.ui-book .gb-hud-quest h3 { margin: 0; padding: 0; font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--ui-glass-ink-2); border: 0; text-wrap: balance; }
-.ui-pips { display: flex; gap: 4px; margin: 8px 0 10px; }
-.ui-pips i { flex: 1; height: 3px; border-radius: 2px; background: oklch(1 0 0 / 0.2); }
-.ui-pips i.is-done { background: oklch(0.89 0.07 188); }
-.ui-pips i.is-now { background: oklch(1 0 0 / 0.55); }
+/* ---- top right: the minimap in its ring, then the day and the clock, then the quest ---- */
+.ui-book .gb-hud-right { gap: 4px; width: 184px; }
+.ui-book .gb-hud-sky { flex: none; gap: 8px; padding: 2px 4px; white-space: nowrap; text-shadow: var(--ui-text-shadow); }
+.ui-book .gb-hud-weather { color: var(--ui-gold-bright); filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.6)); }
+.ui-book .gb-hud-weather svg { width: 1.25em; height: 1.25em; }
+.ui-book .gb-hud-clock { font-size: 17px; font-weight: 800; letter-spacing: 0.02em; }
+.ui-day { white-space: nowrap; font-family: var(--ui-display); font-size: 15px; font-weight: 600; color: var(--ui-glass-ink); }
+/* The tracker: a gold diamond, the quest, how far it has come, and only the step to do now. The quest log (J) has the rest. */
+.ui-book .gb-hud-quest { position: relative; width: 270px; margin-top: 6px; padding: 4px 4px 4px 26px; text-shadow: var(--ui-text-shadow); }
+.ui-book .gb-hud-quest::before { content: ''; position: absolute; left: 6px; top: 9px; width: 10px; height: 10px; background: var(--ui-gold-bright); transform: rotate(45deg); box-shadow: 0 0 10px rgb(240 212 138 / 0.9), 0 0 0 2px rgb(22 26 38 / 0.5); }
+.ui-book .gb-hud-quest h3 { margin: 0; padding: 0; font-family: var(--ui-display); font-size: 17px; font-weight: 650; letter-spacing: 0; color: var(--ui-gold-bright); border: 0; text-wrap: balance; }
+.ui-pips { display: flex; gap: 4px; margin: 6px 0 6px; max-width: 160px; }
+.ui-pips i { flex: 1; height: 3px; border-radius: 2px; background: rgb(246 241 231 / 0.3); box-shadow: 0 1px 2px rgb(0 0 0 / 0.4); }
+.ui-pips i.is-done { background: var(--ui-gold-bright); }
+.ui-pips i.is-now { background: rgb(246 241 231 / 0.75); }
 .ui-book .gb-hud-quest ul { gap: 0; }
-.ui-book .gb-hud-quest li { display: none; grid-template-columns: 1fr auto; gap: 0 12px; align-items: baseline; padding-left: 0; font-size: 15px; font-weight: 600; color: var(--ui-glass-ink); text-wrap: pretty; text-shadow: var(--ui-text-shadow); }
+.ui-book .gb-hud-quest li { display: none; grid-template-columns: 1fr auto; gap: 0 12px; align-items: baseline; padding-left: 0; font-size: 15px; font-weight: 700; color: var(--ui-glass-ink); text-wrap: pretty; }
 .ui-book .gb-hud-quest li::before { content: none; }
 /* The step to do now is the one line shown. */
 .ui-book .gb-hud-quest li:first-child:not(.is-done), .ui-book .gb-hud-quest li.is-done + li:not(.is-done) { display: grid; }
-.ui-count { font-size: 14px; font-weight: 650; color: oklch(0.89 0.07 188); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+.ui-count { font-size: 14px; font-weight: 800; color: var(--ui-gold-bright); font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
 
 /* ---- the Almanac: a button of its own at the left of the quick slots, never a slot. It shows once Tamsin has given the book. */
-.ui-bookbtn { position: absolute; right: 100%; bottom: 0; margin-right: 8px; padding: 6px; pointer-events: auto; border-radius: 14px !important; }
+.ui-bookbtn { position: absolute; right: 100%; bottom: 0; margin-right: 10px; padding: 6px; pointer-events: auto; border-radius: 999px !important; background: linear-gradient(180deg, rgb(22 26 38 / 0.18), rgb(22 26 38 / 0.48)) !important; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.28) !important; }
 .ui-bookbtn[hidden] { display: none; }
 .ui-bookbtn button {
-  position: relative; display: block; width: 52px; height: 52px; margin: 0; padding: 0;
-  font: inherit; color: var(--ui-glass-ink); background: var(--ui-glass-2); border: 0; border-radius: var(--ui-radius); cursor: pointer;
+  position: relative; display: block; width: 54px; height: 54px; margin: 0; padding: 0;
+  font: inherit; color: var(--ui-glass-ink); border: 0; border-radius: 50%; cursor: pointer;
+  background: radial-gradient(90% 90% at 30% 20%, rgb(74 68 52 / 0.92), rgb(46 40 30 / 0.92));
+  box-shadow: inset 0 0 0 1.5px var(--ui-gold), 0 2px 6px rgb(10 12 20 / 0.3);
 }
-.ui-bookbtn button:hover { background: oklch(1 0 0 / 0.18); }
-.ui-bookbtn button:active { background: oklch(1 0 0 / 0.24); }
-.ui-bookbtn button[aria-expanded='true'] { box-shadow: inset 0 0 0 2px oklch(0.89 0.07 188); }
-.ui-bookbtn button:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
+.ui-bookbtn button:hover { filter: brightness(1.15); }
+.ui-bookbtn button:active { filter: brightness(0.95); }
+.ui-bookbtn button[aria-expanded='true'] { box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 14px rgb(240 212 138 / 0.6); }
+.ui-bookbtn button:focus-visible { outline: 2px solid var(--ui-gold-bright); outline-offset: 2px; }
 .ui-bookbtn .ui-bookbtn-icon { position: absolute; inset: 50% auto auto 50%; width: 32px; height: 32px; margin: -15px 0 0 -16px; }
-.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: 3px; left: 5px; font-size: 10px; font-weight: 500; line-height: 1.3; color: var(--ui-glass-ink-2); }
+.ui-bookbtn .ui-bookbtn-key { position: absolute; z-index: 1; top: -4px; left: 50%; transform: translateX(-50%); padding: 0 5px; font-size: 10px; font-weight: 800; line-height: 14px; color: var(--ui-night); background: var(--ui-gold); border-radius: 4px; }
 /* The first time it shows, it glows twice so the eye finds it. */
 .ui-bookbtn.is-new button { animation: ui-book-glow 1.1s var(--ui-ease) 2; }
-@keyframes ui-book-glow { 0% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 0 oklch(0.8 0.13 78 / 0.7); } 100% { box-shadow: inset 0 0 0 2px var(--ui-brass), 0 0 0 12px oklch(0.8 0.13 78 / 0); } }
-@media (prefers-reduced-motion: reduce) { .ui-bookbtn.is-new button { animation: none; box-shadow: inset 0 0 0 2px var(--ui-brass); } }
+@keyframes ui-book-glow { 0% { box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 0 0 rgb(240 212 138 / 0.75); } 100% { box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 0 14px rgb(240 212 138 / 0); } }
+@media (prefers-reduced-motion: reduce) { .ui-bookbtn.is-new button { animation: none; box-shadow: inset 0 0 0 2px var(--ui-gold-bright); } .ui-book .gb-slot { transition: none; } }
 @media (max-width: 560px) {
   .ui-bookbtn { right: auto; left: 0; bottom: 100%; margin: 0 0 8px; }
 }
@@ -102,13 +110,14 @@ const STYLE = /* css */ `
 
 /* A phone held upright: the corner is narrow and the slots wrap to five and four. */
 @media (max-width: 560px) {
+  .ui-book .gb-hud-right { width: 140px; }
   .ui-book .gb-slot { width: 48px; height: 48px; }
-  .ui-book .gb-hud-slots { width: calc(5 * 48px + 4 * 6px + 12px); }
-  .ui-book .gb-hud-quest { width: 13.5em; padding: 10px 12px 11px; }
+  .ui-book .gb-hud-slots { width: calc(5 * 48px + 4 * 6px + 20px); border-radius: 18px !important; }
+  .ui-book .gb-hud-quest { width: 13.5em; }
   .ui-book .gb-hud-quest li { font-size: 14px; }
-  .ui-pips { margin: 6px 0 8px; }
+  .ui-pips { margin: 4px 0 6px; }
   /* The day and the clock are wider than the corner here, so they keep its right edge. */
-  .ui-book .gb-hud-sky { align-self: flex-end; padding: 4px 10px; }
+  .ui-book .gb-hud-sky { align-self: flex-end; }
 }
 `;
 

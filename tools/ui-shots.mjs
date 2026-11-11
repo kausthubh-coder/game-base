@@ -3,12 +3,14 @@
 // sets the scene through the debug door and saves a screenshot.
 //   bun tools/ui-shots.mjs <out-folder> [--port 5372] [--no-build] [--only hud,bag,...]
 //
-// The states: the HUD while walking, the bag in the middle of a drag, Make, the Almanac, the tracker with a toast,
-// pause and Settings, each at 1440 by 900 and 390 by 844. Files are named <state>-<width>.png.
+// The states: the title, the HUD while walking, a line from Tamsin, a choice, the bag in the middle of a drag, Make,
+// the Almanac, the quest log, the full map, the tracker with a toast, pause, Settings and the end card, each at
+// 1440 by 900 and 390 by 844. Files are named <state>-<width>.png, and sheet-<width>.png puts them all on one page.
 // This Mac draws WebGL in software, so the pictures show what is drawn, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import sharp from 'sharp';
 import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
@@ -47,6 +49,7 @@ const fillBook = () => {
 };
 
 const STATES = {
+  async title() { },
   async hud(t) {
     await t.game(() => { const g = window.__game; g.view.setPaused('show', false); });
     await t.page.keyboard.down('w');
@@ -83,16 +86,23 @@ const STATES = {
     });
     await t.frames(3);
   },
+  async talk(t) { await t.frames(30); },
+  async choice() { },
+  async quests() { },
+  async map() { },
   async pause() { },
   async settings() { },
+  async end() { },
 };
-/** The `?show=` state each picture starts from. */
-const SHOW = { hud: 'hud', bag: 'bag', make: 'make', almanac: 'hud', toast: 'hud', pause: 'pause', settings: 'settings' };
+/** The `?show=` state each picture starts from. The title has none: it is what a fresh visit opens on. */
+const SHOW = { title: null, hud: 'hud', talk: 'talk', choice: 'choice', bag: 'bag', make: 'make', almanac: 'hud', quests: 'quests', map: 'map', toast: 'hud', pause: 'pause', settings: 'settings', end: 'end' };
 
 const browser = await launchChrome({
   headless: true,
   args: [],
 });
+/** Every picture taken, for the sheets. */
+const shots = [];
 try {
   for (const [width, height] of [[1440, 900], [390, 844]]) {
     for (const [name, arrange] of Object.entries(STATES)) {
@@ -101,18 +111,33 @@ try {
       const page = await context.newPage();
       page.setDefaultTimeout(180000);
       page.on('pageerror', (e) => console.log(`  page error ${width} ${name}: ${e}`));
-      await page.goto(`http://127.0.0.1:${PORT}/?quality=high&show=${SHOW[name]}`, { waitUntil: 'load' });
-      await page.waitForSelector('[data-show]', { timeout: 180000 });
+      const show = SHOW[name];
+      await page.goto(`http://127.0.0.1:${PORT}/?quality=high${show ? `&show=${show}` : ''}`, { waitUntil: 'load' });
+      await page.waitForSelector(show ? '[data-show]' : '.gu-stage-title', { timeout: 180000 });
       const game = (js, arg) => page.evaluate(js, arg);
       const frames = (n = 2) => game((count) => window.__game.frames(count), n);
-      await game(() => window.__game.settle());
-      await frames(2);
+      if (show) await game(() => window.__game.settle());
+      // The fonts and the painted kit load as CSS first asks for them.
+      await game(() => document.fonts.ready.then(() => true));
+      await page.waitForTimeout(400);
+      if (show) await frames(2);
       await arrange({ page, game, frames, width });
       const file = resolve(out, `${name}-${width}.png`);
       await page.screenshot({ path: file });
       console.log(`wrote ${file}`);
+      shots.push({ file, width, height });
       await context.close();
     }
+  }
+  // One page per width with every state on it, three across, to judge the set as one look.
+  for (const width of [1440, 390]) {
+    const set = shots.filter((shot) => shot.width === width);
+    if (set.length === 0) continue;
+    const cellW = width > 600 ? 720 : 260, cellH = Math.round(cellW * set[0].height / width), across = width > 600 ? 3 : 5;
+    const tiles = await Promise.all(set.map((shot, i) => sharp(shot.file).resize(cellW, cellH).toBuffer().then((input) => ({ input, left: (i % across) * cellW, top: Math.floor(i / across) * cellH }))));
+    const sheet = resolve(out, `sheet-${width}.png`);
+    await sharp({ create: { width: cellW * Math.min(across, set.length), height: cellH * Math.ceil(set.length / across), channels: 3, background: '#000' } }).composite(tiles).png().toFile(sheet);
+    console.log(`wrote ${sheet}`);
   }
 } finally {
   await browser.close();
