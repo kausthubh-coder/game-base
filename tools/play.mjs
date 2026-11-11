@@ -25,7 +25,7 @@ function request(command, args = []) {
   });
 }
 async function build() {
-  const child = spawn('bun', ['run', 'build'], { cwd: root, stdio: 'inherit' });
+  const child = spawn('bun', ['run', 'build', '--outDir', resolve(out, 'site'), '--emptyOutDir'], { cwd: root, stdio: 'inherit' });
   await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error(`build exited ${code}`))); });
 }
 
@@ -37,7 +37,7 @@ async function serveSession() {
   await build();
   const port = Number(opt('port', process.env.PLAY_PORT || 5525));
   if (port < 5520 || port > 5529) throw new Error('use a port in 5520..5529');
-  const server = spawn('bun', ['tools/serve.mjs', 'dist', String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
+  const server = spawn('bun', ['tools/serve.mjs', resolve(out, 'site'), String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
   let browser, context, page, errors = [], entries = [], mode = opt('mode', 'door'), seed = 7, named = null;
   const recording = resolve(out, 'recordings', `${Date.now()}-${process.pid}.json`);
   const save = () => writeFileSync(recording, JSON.stringify({ version: 1, mode, seed, inputs: entries }, null, 2));
