@@ -144,7 +144,7 @@ export function createSlotDrag(options: SlotDragOptions): SlotDrag {
     document.documentElement.classList.remove('gu-dragging');
     window.removeEventListener('keydown', onKey, { capture: true });
     swallowClick = true;
-    setTimeout(() => { swallowClick = false; }, 0);
+    // Keep suppressing the release click after Escape, even when the hand lets go later.
     if (dropAt) {
       const to = indexOf(dropAt);
       const from = options.stackAt(was.from);
@@ -154,6 +154,8 @@ export function createSlotDrag(options: SlotDragOptions): SlotDrag {
   };
 
   area.addEventListener('pointerdown', (event) => {
+    // A new physical press cannot be the click from the cancelled or completed drag.
+    swallowClick = false;
     if (press || (event.button !== 0 && event.button !== 2)) return;
     const source = slotOf(event.target as Element);
     if (!source || !area.contains(source)) return;
