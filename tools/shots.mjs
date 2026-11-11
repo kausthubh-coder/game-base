@@ -10,7 +10,8 @@ const selected = name === 'all' ? Object.keys(scenes) : [name];
 for (const key of selected) if (!scenes[key]) throw new Error(`unknown scene ${key}`);
 const out = resolve(root, '.artifacts/shots'), approved = resolve(root, 'docs/shots/approved');
 mkdirSync(out, { recursive: true }); mkdirSync(approved, { recursive: true });
-const port = Number(process.env.PLAY_PORT || 5526);
+const portIndex = args.indexOf('--port');
+const port = Number(portIndex >= 0 ? args[portIndex + 1] : process.env.SHOTS_PORT || (process.env.PLAY_PORT ? Number(process.env.PLAY_PORT) + 1 : 5526));
 async function build() {
   const child = spawn('bun', ['run', 'build', '--outDir', join(out, 'site'), '--emptyOutDir'], { cwd: root, stdio: 'inherit' });
   await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error(`build exited ${code}`))); });
