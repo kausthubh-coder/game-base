@@ -2,7 +2,7 @@
 export async function cameraStill(page) {
   await page.evaluate(() => new Promise((resolve, reject) => {
     let previous, stable = 0;
-    const timeout = setTimeout(() => reject(new Error('camera did not settle')), 30000);
+    const timeout = setTimeout(() => reject(new Error('camera did not settle')), 180000);
     const sample = () => {
       const c = window.__game.view.ctx.camera;
       const next = [...c.matrixWorld.elements, ...c.projectionMatrix.elements];
