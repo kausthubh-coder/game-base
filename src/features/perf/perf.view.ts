@@ -3,9 +3,11 @@
 //
 // The meter reads the renderer's counters itself. The host tells it what it cannot see: how long
 // the rules took (`begin('sim')`, `end('sim')`) and the world's numbers (`counters`).
+// `costs` splits the draw calls and triangles by feature (cost.view.ts).
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
 import type { Level } from '../../content/quality.ts';
+import { createCostMeter, type CostMeter } from './cost.view.ts';
 import { Governor, type GovernorOptions } from './governor.sim.ts';
 import { createPerfPanel } from './perf.ui.ts';
 import { FrameStats } from './stats.sim.ts';
@@ -40,6 +42,11 @@ export interface PerfSnapshot {
   meshMs: number;
   drawCalls: number;
   triangles: number;
+  /** The last frame alone: milliseconds since the frame before it, and milliseconds of the main thread it took. */
+  lastFrameMs: number;
+  lastCpuMs: number;
+  /** Shader programs the renderer holds. */
+  programs: number;
   chunks: number;
   meshQueue: number;
   geometries: number;
@@ -58,6 +65,10 @@ export interface PerfView extends ViewSystem {
   /** `?stress=N` from the address, 1 when absent. Multiply the view distance by it. */
   readonly stress: number;
   readonly quality: Level;
+  /** Draw calls and triangles by feature, and shader programs compiled in the middle of a draw. */
+  readonly costs: CostMeter;
+  /** The graphics chip's name, as the browser gives it. */
+  readonly gpu: string;
   /** Start and stop a timer. Wrap the whole frame in 'frame' and the rules in 'sim'. */
   begin(slot: PerfSlot): void;
   end(slot: PerfSlot): void;
@@ -79,9 +90,10 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
   const governor = new Governor(options.governor);
   const counters: PerfCounters = { chunks: 0, meshQueue: 0, meshMs: 0 };
   const snapshot: PerfSnapshot = {
-    fps: 0, low1Fps: 0, frameMs: 0, scriptMs: 0, simMs: 0, meshMs: 0, drawCalls: 0, triangles: 0, chunks: 0, meshQueue: 0,
-    geometries: 0, textures: 0, heapMb: -1, quality: ctx.quality, renderScale: 1, auto: options.auto !== false,
+    fps: 0, low1Fps: 0, frameMs: 0, scriptMs: 0, simMs: 0, meshMs: 0, drawCalls: 0, triangles: 0, lastFrameMs: 0, lastCpuMs: 0, programs: 0,
+    chunks: 0, meshQueue: 0, geometries: 0, textures: 0, heapMb: -1, quality: ctx.quality, renderScale: 1, auto: options.auto !== false,
   };
+  const costs = createCostMeter(renderer, ctx.scene);
   const stress = Math.max(0.25, Number(new URLSearchParams(location.search).get('stress')) || 1);
   const started: Record<PerfSlot, number> = { frame: 0, sim: 0 };
   let simThisFrame = 0, sinceText = 1, warmup = 3, worstMesh = 0;
@@ -131,6 +143,8 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
       `chunk work: ${fixed(s.meshMs, 2)} ms this frame, ${fixed(worstMesh, 2)} ms worst frame`,
       `draw calls: ${s.drawCalls}`,
       `triangles: ${s.triangles}`,
+      ...costs.read().features.map((f) => `  ${f.feature}: ${f.drawCalls} draw calls (${f.shadowCalls} for shadows), ${f.triangles} triangles (${f.shadowTriangles} for shadows)`),
+      `shader programs: ${s.programs}, ${costs.compiles().inDraw} of them compiled in the middle of a draw`,
       `chunks: ${s.chunks} loaded, ${s.meshQueue} waiting`,
       `gpu objects: ${s.geometries} geometries, ${s.textures} textures`,
       `memory: ${s.heapMb < 0 ? 'not reported by this browser' : fixed(s.heapMb) + ' MB of script heap'}`,
@@ -164,6 +178,8 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     snapshot,
     stress,
     get quality() { return snapshot.quality; },
+    costs,
+    gpu,
 
     begin(slot) {
       started[slot] = performance.now();
@@ -172,7 +188,10 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     end(slot) {
       const ms = performance.now() - started[slot];
       if (slot === 'sim') simThisFrame += ms;
-      else script.push(ms);
+      else {
+        script.push(ms);
+        snapshot.lastCpuMs = ms;
+      }
     },
 
     setMode,
@@ -181,6 +200,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     update(dt) {
       const now = performance.now();
       stats.push(now - last);
+      snapshot.lastFrameMs = now - last;
       last = now;
       sim.push(simThisFrame);
       simThisFrame = 0;
@@ -188,6 +208,8 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
       const info = renderer.info, s = snapshot;
       s.drawCalls = info.render.calls;
       s.triangles = info.render.triangles;
+      s.programs = info.programs ? info.programs.length : 0;
+      costs.latch();
       info.reset();
       s.meshMs = counters.meshMs;
       if (counters.meshMs > worstMesh) worstMesh = counters.meshMs;
@@ -229,6 +251,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     },
 
     dispose() {
+      costs.dispose();
       renderer.info.autoReset = true;
       renderer.setPixelRatio(basePixelRatio);
       panel.dispose();
