@@ -16,6 +16,7 @@
     "serve": "bun tools/serve.mjs",
     "shot": "bun tools/shot.mjs",
     "doctor": "bun tools/doctor.mjs",
+    "sim": "bun tools/sim.ts",
     "server": "wrangler dev",
     "server:check": "bun server/test/check.ts",
     "lint": "biome lint ."
