@@ -30,7 +30,7 @@ describe('the hero in an online world', () => {
     // Twenty steps of walking with a turn and a jump; the server is five inputs behind.
     for (let n = 1; n <= 20; n++) {
       for (let b = 0; b < 3; b++) {
-        const steer: Steer = { moveX: n < 10 ? 1 : 0.7071, moveZ: n < 10 ? 0 : 0.7071, jump: n === 12 && b === 0 };
+        const steer: Steer = { moveX: n < 10 ? 1 : Math.SQRT1_2, moveZ: n < 10 ? 0 : Math.SQRT1_2, jump: n === 12 && b === 0 };
         wireSteer(steer);
         mine.step(steer);
         predictor.stepped(steer);
@@ -69,9 +69,9 @@ describe('the hero in an online world', () => {
   });
 
   test('steering goes on the wire to a thousandth, and the hero takes the same numbers', () => {
-    const steer: Steer = { moveX: 0.70710678, moveZ: -0.00001, jump: false };
+    const steer: Steer = { moveX: Math.SQRT1_2, moveZ: -0.00001, jump: false };
     wireSteer(steer);
-    expect(steer).toEqual({ moveX: 0.707, moveZ: 0, jump: false });
+    expect(steer).toEqual({ moveX: Math.round(Math.SQRT1_2 * 1000) / 1000, moveZ: 0, jump: false });
     expect(Object.is(steer.moveZ, -0)).toBe(false);
   });
 });

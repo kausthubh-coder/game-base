@@ -28,6 +28,14 @@ export interface AccountOptions {
   worldName: string;
   /** The host's class names for a button, a section and so on, so the panel takes the host's look. */
   look?: Partial<AccountLook>;
+  /**
+   * Online worlds: the address that opens one, with an invite in it when there is one, and going there. Left
+   * out, the panel has no Play together and no way into an online world.
+   */
+  online?: {
+    address(worldId: string, invite?: string): string;
+    enter(worldId: string): void;
+  };
   /** Loads Clerk and Convex. A test hands in a stand-in. Left out, it is `connect` in session.ts, by dynamic import. */
   connect?: (keys: SessionKeys) => Promise<Session>;
   /** The time in milliseconds since 1970. `Date.now` when left out. */
@@ -50,7 +58,9 @@ export interface AccountState {
   /** The player's worlds, live from Convex. Null until the first answer. */
   worlds: WorldCard[] | null;
   /** What is under way. The panel's buttons wait for it. */
-  busy: 'backup' | 'restore' | 'rename' | 'signOut' | null;
+  busy: 'backup' | 'restore' | 'rename' | 'signOut' | 'world' | null;
+  /** The last link made to let a friend into an online world, or null. */
+  link: { worldId: string; url: string } | null;
   /** The last thing that went well or wrong, for the line under the buttons. */
   note: { kind: 'done' | 'problem'; text: string } | null;
 }
@@ -77,6 +87,18 @@ export interface Account extends ViewSystem {
   restore(): Promise<boolean>;
   /** The facts of the save in this browser, or null when there is none. */
   localSave(): SaveFacts | null;
+  /** Makes an online world the player owns and a link that lets a friend in. True when both were made. */
+  playTogether(): Promise<boolean>;
+  /** Makes a new link to the player's online world, for one more friend. True when it was made. */
+  inviteTo(worldId: string): Promise<boolean>;
+  /** Opens an online world. */
+  enter(worldId: string): void;
+  /** Takes the player into the world an invite is for. True when they are in it now. */
+  acceptInvite(code: string): Promise<boolean>;
+  /** The signed-in player's token, for the world server. Null when nobody is signed in. */
+  token(): Promise<string | null>;
+  /** True when online worlds can be made and entered from here. */
+  readonly online: boolean;
   /** The panel's element. It redraws itself on every change. Put it where the panel goes. */
   readonly panel: HTMLElement;
 }
@@ -87,7 +109,7 @@ export function createAccount(_ctx: ViewContext, options: AccountOptions): Accou
   const connectTo = options.connect ?? (async (to: SessionKeys) => (await import('./session.ts')).connect(to));
   const now = options.now ?? Date.now;
 
-  const state: AccountState = { status: keys ? 'guest' : 'off', name: null, email: null, ready: false, worlds: null, busy: null, note: null };
+  const state: AccountState = { status: keys ? 'guest' : 'off', name: null, email: null, ready: false, worlds: null, busy: null, link: null, note: null };
   const listeners = new Set<(state: Readonly<AccountState>) => void>();
   const set = (next: Partial<AccountState>): void => {
     Object.assign(state, next);
@@ -123,7 +145,7 @@ export function createAccount(_ctx: ViewContext, options: AccountOptions): Accou
     stopWorlds = null;
     database = null;
     if (!user) {
-      set({ status: 'signedOut', name: null, email: null, ready: false, worlds: null, busy: null });
+      set({ status: 'signedOut', name: null, email: null, ready: false, worlds: null, busy: null, link: null });
       return;
     }
     set({ status: 'signedIn', name: user.name, email: user.email, ready: false, worlds: null, busy: null, note: null });
@@ -244,6 +266,52 @@ export function createAccount(_ctx: ViewContext, options: AccountOptions): Accou
     localSave() {
       const text = stored();
       return text === null ? null : readSaveText(text);
+    },
+    get online() { return options.online !== undefined; },
+    async playTogether() {
+      const online = options.online;
+      if (!database || !online || state.busy) return false;
+      const mine = turn;
+      set({ busy: 'world', note: null });
+      try {
+        const worldId = await database.createWorld(`${state.name ?? 'Your'}'s world`);
+        const code = await database.invite(worldId);
+        if (mine !== turn) return false;
+        set({ busy: null, link: { worldId, url: online.address(worldId, code) }, note: { kind: 'done', text: 'Your world is ready. Send the link to a friend, then enter it.' } });
+        return true;
+      } catch (error) {
+        return mine === turn && problem(refusalText(error, 'The world could not be made. Check the connection and try again.'));
+      }
+    },
+    async inviteTo(worldId) {
+      const online = options.online;
+      if (!database || !online || state.busy) return false;
+      const mine = turn;
+      set({ busy: 'world', note: null });
+      try {
+        const code = await database.invite(worldId);
+        if (mine !== turn) return false;
+        set({ busy: null, link: { worldId, url: online.address(worldId, code) }, note: { kind: 'done', text: 'A new link, for one more friend.' } });
+        return true;
+      } catch (error) {
+        return mine === turn && problem(refusalText(error, 'The link could not be made. Try again.'));
+      }
+    },
+    enter(worldId) {
+      options.online?.enter(worldId);
+    },
+    async acceptInvite(code) {
+      if (!database) return false;
+      try {
+        await database.acceptInvite(code);
+        return true;
+      } catch (error) {
+        problem(refusalText(error, 'The invite could not be used.'));
+        return false;
+      }
+    },
+    async token() {
+      return session ? await session.token() : null;
     },
     get panel() {
       panel ??= createPanel(account, { look: options.look, slot: save.key, now });

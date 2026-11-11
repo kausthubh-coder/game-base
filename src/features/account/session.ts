@@ -40,6 +40,12 @@ export interface Database {
   uploadSave(text: string, label: BackupLabel): Promise<BackupResult>;
   /** The text of the backup of the player's own world. */
   downloadSave(worldId: string): Promise<string>;
+  /** Makes an online world the player owns, with this name. Returns its id: the `<id>` of `/world/<id>`. */
+  createWorld(name: string): Promise<string>;
+  /** Makes an invite to the player's online world. Returns its code, which lets one friend in, once. */
+  invite(worldId: string): Promise<string>;
+  /** Takes the player into the world an invite is for. Using one for a world they are already in changes nothing. */
+  acceptInvite(code: string): Promise<{ worldId: string; name: string }>;
 }
 
 export interface Session {
@@ -50,6 +56,8 @@ export interface Session {
   signOut(): Promise<void>;
   /** Convex as the signed-in player, once it has accepted Clerk's token. It throws when it does not. */
   database(): Promise<Database>;
+  /** The signed-in player's token, the one Convex takes. The world server takes the same one. Null when signed out. */
+  token(): Promise<string | null>;
   dispose(): void;
 }
 
@@ -141,6 +149,15 @@ function openDatabase(client: ConvexClient): Database {
       const got = await fetch(address);
       if (!got.ok) throw new Error(`the download was refused with status ${got.status}`);
       return await got.text();
+    },
+    async createWorld(name) {
+      return await client.mutation(api.worlds.create, { name });
+    },
+    async invite(worldId) {
+      return (await client.mutation(api.invites.create, { worldId: worldId as Id<'worlds'> })).code;
+    },
+    async acceptInvite(code) {
+      return await client.mutation(api.invites.accept, { code });
     },
   };
 }
@@ -252,6 +269,7 @@ export async function connect(keys: SessionKeys): Promise<Session> {
       });
       return mine;
     },
+    token: () => convexToken(clerk, false),
     dispose() {
       for (const stop of stops) stop();
       stops.clear();

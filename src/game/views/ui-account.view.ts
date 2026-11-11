@@ -4,7 +4,11 @@
 // Guest first. This file is all of it that is in the game's first script. The feature, and Clerk and
 // Convex behind it, load by dynamic import: when the player opens the panel, or once the game is drawing
 // and this browser was signed in the last time. With no keys in `.env.local` nothing is ever fetched.
+//
+// An online world (`?world=<id>`) needs the signed-in player, so there the account loads at once. Its
+// token is handed to the world server, and an invite in the link (`&invite=<code>`) is used first.
 import type { Account } from '../../features/account/index.ts';
+import { worldAddress } from '../online/join.ts';
 import { SAVE_KEY, reloadInto } from '../shell/save.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
@@ -35,6 +39,10 @@ export function install(view: GameView): void {
       clerkKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,
       convexUrl: import.meta.env.VITE_CONVEX_URL,
       worldName: WORLD_NAME,
+      online: {
+        address: (worldId, invite) => `${worldAddress(location.origin, worldId)}${invite ? `&invite=${encodeURIComponent(invite)}` : ''}`,
+        enter: (worldId) => location.assign(worldAddress(location.origin, worldId)),
+      },
       look: { button: 'gu-btn', primary: 'gu-btn gu-primary', section: 'gu-section', label: 'gu-label', note: 'gu-menu-note' },
       save: {
         key: SAVE_KEY,
@@ -85,6 +93,34 @@ export function install(view: GameView): void {
       });
     },
   }));
+
+  const online = view.online;
+  if (online && !online.dev) {
+    // The world server takes the same token Convex does. An invite in the link lets this player in first.
+    let invite = new URLSearchParams(location.search).get('invite');
+    void load().then((made) => {
+      made.onChange((state) => {
+        if (state.status !== 'signedIn') {
+          online.setToken(null);
+          return;
+        }
+        if (!state.ready) return;
+        const code = invite;
+        invite = null;
+        void (code ? made.acceptInvite(code) : Promise.resolve(true)).then(() => {
+          if (code) {
+            const url = new URL(location.href);
+            url.searchParams.delete('invite');
+            history.replaceState(history.state, '', url);
+          }
+          online.setToken(async () => (await made.token()) ?? Promise.reject(new Error('signed out')));
+        });
+      });
+      void made.connect();
+      if (made.state.status === 'off') online.setToken(null);
+    }, () => { loading = null; });
+    return;
+  }
 
   // A browser that was signed in signs in again by itself, but only after the game has drawn a few frames.
   if (!remembered()) return;
