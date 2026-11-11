@@ -49,6 +49,9 @@ const SNUG: PropVary = { turn: 0, size: 0, tint: 0.04 };
 const still = { wind: false, light: 0 } as const;
 
 export const PROPS = {
+  rigSnare: { name: 'Snare vine', group: 'station', builder: 'rigSnare', variants: ['armed'], triangles: 180, ...still, vary: WILD },
+  rigSnareSpent: { name: 'Closed snare vine', group: 'station', builder: 'rigSnareSpent', variants: ['spent'], triangles: 300, ...still, vary: WILD },
+
   rigLamp: { name: 'Lure lamp', group: 'station', builder: 'rigLamp', variants: ['armed'], triangles: 170, wind: false, light: 13, alwaysLit: true, vary: SNUG },
   rigLampSpent: { name: 'Spent lure lamp', group: 'station', builder: 'rigLampSpent', variants: ['spent'], triangles: 190, ...still, vary: SNUG },
 

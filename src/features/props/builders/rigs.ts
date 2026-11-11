@@ -26,3 +26,31 @@ function lamp(spent: boolean): THREE.BufferGeometry {
 
 export function rigLamp(): THREE.BufferGeometry { return lamp(false); }
 export function rigLampSpent(): THREE.BufferGeometry { return lamp(true); }
+
+function snare(spent: boolean): THREE.BufferGeometry {
+  const s = new Shape(1613);
+  const path: [number, number, number][] = [];
+  const count = spent ? 20 : 12;
+  for (let i = 0; i <= count; i++) {
+    const a = i / count * Math.PI * (spent ? 4 : 2);
+    const radius = spent ? 0.125 + 0.015 * Math.cos(a * 1.5) : 0.39;
+    path.push([Math.cos(a) * radius, spent ? 0.055 + i / count * 0.07 : 0.055, Math.sin(a) * radius]);
+  }
+  s.tube(path, path.map(() => spent ? 0.05 : 0.055), 5, RAMP.bushLeaf, { cap: 'both' });
+  if (spent) s.tube([[-0.13, 0.08, -0.08], [0, 0.14, 0], [0.13, 0.08, 0.08]], [0.05, 0.055, 0.05], 5, P.moss, { cap: 'both' });
+  for (const a of [0.5, 2.5, 4.5]) {
+    const radius = spent ? 0.14 : 0.39;
+    const x = Math.cos(a) * radius, z = Math.sin(a) * radius;
+    s.tube([[x, 0.075, z], [x * 1.1, 0.17, z * 1.1]], [0.035, 0], 5, P.pine, { cap: 'none' });
+  }
+  for (const side of [-1, 1]) {
+    s.at(side * (spent ? 0.13 : 0.38), 0.06, 0.08, side * 0.5, () => {
+      s.poly([[0, 0, 0], [side * 0.1, 0.035, -0.06], [side * 0.17, 0.015, 0.04], [side * 0.08, 0, 0.1]], P.leaf, { two: true, toward: [0, 1, 0] });
+    });
+  }
+  s.shadowBlob(0, 0.04, 0, spent ? 0.2 : 0.44, 0.045, spent ? 0.2 : 0.44);
+  return s.done();
+}
+
+export function rigSnare(): THREE.BufferGeometry { return snare(false); }
+export function rigSnareSpent(): THREE.BufferGeometry { return snare(true); }
