@@ -33,7 +33,12 @@ try {
     // Pin visual randomness too: rain and foliage use Math.random outside the seeded kernel.
     await page.addInitScript(seed => {
       const raf = window.requestAnimationFrame.bind(window);
-      window.requestAnimationFrame = callback => raf(time => { if (!window.__freezeShots) callback(time); });
+      let stamp = null;
+      window.requestAnimationFrame = callback => raf(time => {
+        if (window.__freezeShots) return;
+        stamp = window.__shotSteady && stamp !== null ? stamp + 1000 / 60 : time;
+        callback(stamp);
+      });
       let x = seed >>> 0;
       Math.random = () => { x = (Math.imul(x, 1664525) + 1013904223) >>> 0; return x / 4294967296; };
     }, scene.seed);
@@ -49,14 +54,13 @@ try {
       if (s.camera.mode !== 'tilt') g.look(s.camera.yaw, s.camera.pitch, s.camera.distance);
       g.view.root.style.visibility = 'hidden';
       const beam = g.view.scene.getObjectByName('waypoint-beam'); if (beam) beam.material.visible = false;
-      await g.settle(); await g.frames(60);
+      await g.settle();
+      g.view.ctx.time = 0; window.__shotSteady = true;
+      await g.frames(60);
+      window.__freezeShots = true;
       const c = g.counters();
       return { drawCalls: c.drawCalls, triangles: c.triangles, quality: c.quality };
     }, scene);
-    // Freeze the draw loop at an exact visual time, independent of renderer speed.
-    await page.evaluate(async () => {
-      window.__freezeShots = true;
-    });
     const image = await page.screenshot({ path: join(out, key + '.png') });
     if (!(Number(counters.drawCalls) > 0) || !(Number(counters.triangles) > 0) || counters.drawCalls > 150 || counters.triangles > 400000) failures.push(`${key}: budget exceeded or empty render`);
     const metadata = { renderer: browser.gameRenderer, scene, counters, scriptBytes };
