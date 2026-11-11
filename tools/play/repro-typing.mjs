@@ -10,7 +10,8 @@ try {
   await page.evaluate(()=>window.__game.newGame());
   await page.keyboard.press('KeyQ');
   await page.evaluate(()=>window.__game.settle());
-  await page.route('**/*.mp3', async route => { await new Promise(resolve=>setTimeout(resolve,300)); await route.continue(); });
+  const clipDelay = Number(process.env.TYPING_DELAY_MS ?? 300);
+  if (clipDelay > 0) await page.route('**/*.mp3', async route => { await new Promise(resolve=>setTimeout(resolve,clipDelay)); await route.continue(); });
   await page.evaluate(()=>{
    window.__sample={partial:false,full:false,frames:0};
    const tick=()=>{const s=window.__sample,t=document.querySelector('.gb-dialogue-typed')?.textContent??'',r=document.querySelector('.gb-dialogue-untyped')?.textContent??'';
@@ -19,7 +20,7 @@ try {
    };requestAnimationFrame(tick);
    window.__game.view.game.systems.talk.start('tamsin.meet','tamsin');
   });
-  const early=await page.evaluate(async ()=>{await window.__game.frames(3); return {...window.__sample};});
+  const early=await page.evaluate(async ()=>{await window.__game.frames(3); return {...window.__sample,voiceStatus:window.__voice?.log.at(-1)?.status};});
 
   await page.waitForFunction(()=>window.__sample.partial||window.__sample.full,null,{timeout:15000});
   const eventual = await page.evaluate(()=>({...window.__sample,voice:window.__voice?.log.at(-1)}));
