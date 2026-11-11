@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>One frame flicker</title>
+<style>body { margin: 0; background: #284; } canvas { display: block; }</style></head>
+<body>
+<canvas id="c"></canvas>
+<script>
+  // A dot drifts every frame, so frames keep coming. F swaps the "hero" for another colour for exactly one drawn frame.
+  const c = document.getElementById('c'), g = c.getContext('2d');
+  c.width = innerWidth; c.height = innerHeight;
+  let t = 0, flash = 0;
+  addEventListener('keydown', (e) => { if (e.code === 'KeyF') flash = 1; });
+  function draw() {
+    t++;
+    g.fillStyle = '#3a6'; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(100 + (t % 600), 100, 6, 0, 7); g.fill();
+    g.fillStyle = flash === 1 ? '#c22' : '#842'; g.fillRect(450, 230, 40, 60);
+    if (flash === 1) flash = 2;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+</script>
+</body></html>

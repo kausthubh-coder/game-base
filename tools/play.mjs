@@ -1,10 +1,12 @@
-// Persistent browser session. See tools/play/README.md for the command protocol.
+// Persistent browser session. See tools/play/README.md for the commands and inputs.
 import { spawn } from 'node:child_process';
-import { createServer, createConnection } from 'node:net';
-import { mkdirSync, readFileSync, writeFileSync, existsSync, unlinkSync, openSync, closeSync } from 'node:fs';
+import { createConnection } from 'node:net';
+import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync, unlinkSync, openSync, closeSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
-import { launchChrome } from './lib/chrome.mjs';
+import { formatLook } from './play/format.mjs';
+import { latest, render } from './play/journal.mjs';
+import { serveSession } from './play/session.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const out = resolve(root, '.artifacts/play');
@@ -13,132 +15,29 @@ const socket = `/tmp/game-play-${createHash('sha256').update(root).digest('hex')
 const pidFile = resolve(out, 'session.json');
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf('--' + name); return i < 0 ? fallback : argv[i + 1]; };
+const flag = (name) => argv.includes('--' + name);
 const delay = ms => new Promise(r => setTimeout(r, ms));
 function request(command, args = []) {
   return new Promise((yes, no) => {
     const client = createConnection(socket); let data = '';
-    client.setTimeout(120000, () => client.destroy(new Error('play command timed out')));
+    client.setTimeout(300000, () => client.destroy(new Error('play command timed out')));
     client.on('connect', () => client.end(JSON.stringify({ command, args })));
     client.on('data', chunk => data += chunk);
     client.on('error', no);
-    client.on('end', () => { try { const result = JSON.parse(data); result.error ? no(new Error(result.error)) : yes(result); } catch (error) { no(error); } });
+    client.on('end', () => { try { const result = JSON.parse(data); result?.error ? no(new Error(result.error)) : yes(result); } catch (error) { no(error); } });
   });
 }
-async function build() {
-  const child = spawn('bun', ['run', 'build', '--outDir', resolve(out, 'site'), '--emptyOutDir'], { cwd: root, stdio: 'inherit' });
-  await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error(`build exited ${code}`))); });
+const session = () => (existsSync(pidFile) ? JSON.parse(readFileSync(pidFile, 'utf8')) : null);
+async function ensureSession() {
+  try { await request('ping'); } catch (error) {
+    if (!['ENOENT', 'ECONNREFUSED'].includes(error.code)) throw error;
+    const child = spawn('bun', [import.meta.filename, 'start'], { cwd: root, stdio: 'inherit' });
+    await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error('start failed'))); });
+  }
 }
 
-async function serveSession() {
-  if (existsSync(socket)) {
-    try { await request('state'); throw new Error('a play session is already running'); }
-    catch (e) { if (!['ECONNREFUSED', 'ENOENT'].includes(e.code)) throw e; unlinkSync(socket); }
-  }
-  await build();
-  const port = Number(opt('port', process.env.PLAY_PORT || 5525));
-  const server = spawn('bun', ['tools/serve.mjs', resolve(out, 'site'), String(port)], { cwd: root, stdio: ['ignore', 'pipe', 'inherit'] });
-  let browser, context, page, errors = [], entries = [], mode = opt('mode', 'door'), seed = 7, named = null;
-  const recording = resolve(out, 'recordings', `${Date.now()}-${process.pid}.json`);
-  const save = () => writeFileSync(recording, JSON.stringify({ version: 1, mode, seed, inputs: entries }, null, 2));
-  const state = () => page.evaluate(() => window.__game.state());
-  const clean = () => { if (errors.length) throw new Error(errors.join('\n')); };
-  async function fresh(nextMode, nextSeed = 7) {
-    if (!['door', 'human'].includes(nextMode)) throw new Error('mode must be door or human');
-    mode = nextMode; seed = nextSeed;
-    if (existsSync(pidFile)) {
-      const info = JSON.parse(readFileSync(pidFile, 'utf8'));
-      if (info.pid === process.pid) writeFileSync(pidFile, JSON.stringify({ ...info, mode, seed }, null, 2));
-    }
-    await context?.close(); errors = [];
-    context = await browser.newContext({ viewport: { width: 960, height: 540 } });
-    page = await context.newPage(); page.setDefaultTimeout(60000);
-    page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-    page.on('pageerror', error => errors.push(String(error)));
-    await page.goto(`http://127.0.0.1:${port}/?hold=1&quality=high&seed=${seed}`);
-    await page.waitForFunction(() => window.__game !== undefined);
-  }
-  async function input(step) {
-    entries.push(step); save();
-    if (step.type === 'door') {
-      if (mode !== 'door') throw new Error('human mode forbids door writes');
-      const allowed = ['newGame','teleport','give','skipTo','advance','setTime','setCamera','look','interact','talkThrough','manual','turn'];
-      if (!allowed.includes(step.method)) throw new Error('unknown door command');
-      await page.evaluate(async s => { await window.__game[s.method](...(s.args || [])); }, step);
-    } else if (step.type === 'press') await page.keyboard.press(step.key);
-    else if (step.type === 'hold') {
-      await page.keyboard.down(step.key);
-      try { if (step.until) await page.waitForFunction(checkState, step.until, { timeout: step.timeout || 15000 }); else await delay(step.ms ?? 250); }
-      finally { await page.keyboard.up(step.key); }
-    } else if (step.type === 'click') {
-      if (step.text) await page.getByRole('button', { name: step.text, exact: true }).click();
-      else await page.mouse.click(step.x, step.y, { button: step.button || 'left' });
-    } else if (step.type === 'mouseDown') await page.mouse.down({ button: step.button || 'left' });
-    else if (step.type === 'mouseUp') await page.mouse.up({ button: step.button || 'left' });
-    else if (step.type === 'wheel') await page.mouse.wheel(step.x || 0, step.y || 0);
-    else if (step.type === 'move') await page.mouse.move(step.x, step.y);
-    else if (step.type === 'wait') await delay(step.ms ?? 250);
-    else if (step.type === 'check') await page.waitForFunction(checkState, step, { timeout: step.timeout || 10000 });
-    else throw new Error(`unknown input type ${step.type}`);
-    clean(); return state();
-  }
-  // A serializable state predicate. Human mode only reads the debug door.
-  function checkState(s) {
-    const value = s.path.split('.').reduce((v, k) => v?.[k], window.__game.state());
-    if ('equals' in s) return JSON.stringify(value) === JSON.stringify(s.equals);
-    if ('min' in s) return value >= s.min;
-    if ('max' in s) return value <= s.max;
-    return Boolean(value);
-  }
-  let closing = false;
-  const cleanup = async () => {
-    if (closing) return; closing = true; save();
-    if (named) writeFileSync(named, readFileSync(recording));
-    await browser?.close();
-    // Wait for the server to be gone, so the next tool to bind this port finds it free.
-    const gone = server.exitCode !== null || server.signalCode !== null ? Promise.resolve() : new Promise((done) => server.once('exit', done));
-    server.kill();
-    await Promise.race([gone, delay(5000)]);
-    if (existsSync(socket)) unlinkSync(socket);
-    if (existsSync(pidFile)) unlinkSync(pidFile);
-  };
-  process.on('SIGTERM', () => cleanup().finally(() => process.exit()));
-  process.on('SIGINT', () => cleanup().finally(() => process.exit()));
-  try {
-    await new Promise((yes, no) => { server.stdout.on('data', chunk => { process.stdout.write(chunk); if (/pid \d+/.test(String(chunk))) yes(); }); server.on('exit', code => no(new Error(`server exited ${code}`))); server.on('error', no); });
-    browser = await launchChrome({ args: ['--autoplay-policy=no-user-gesture-required'] });
-    await fresh(mode); save();
-    let queue = Promise.resolve();
-    const ipc = createServer({ allowHalfOpen: true }, client => {
-      client.on('error', () => {});
-      let data = ''; client.on('data', chunk => data += chunk);
-      client.on('end', () => { queue = queue.then(async () => {
-        try {
-          const { command, args } = JSON.parse(data); let result;
-          if (command === 'ping') result = { alive: true };
-          else if (command === 'state') { clean(); result = await state(); }
-          else if (command === 'shot') { clean(); const path = resolve(args[0] || out + '/shot.png'); mkdirSync(resolve(path, '..'), { recursive: true }); await page.screenshot({ path }); result = { path }; }
-          else if (command === 'do') result = await input(JSON.parse(args.join(' ')));
-          else if (command === 'record') {
-            if (args[0] === 'stop') { if (!named) throw new Error('no named recording'); writeFileSync(named, readFileSync(recording)); result = { path: named }; named = null; }
-            else { named = resolve(out, 'recordings', `${args[0] || 'scenario'}.json`); entries = []; save(); result = { path: named }; }
-          } else if (command === 'replay') {
-            const scenario = JSON.parse(readFileSync(resolve(args[0]), 'utf8'));
-            await fresh(scenario.mode, scenario.seed); entries = []; save();
-            for (const step of scenario.inputs) await input(step);
-            clean(); result = { pass: true, inputs: entries.length, state: await state() };
-          } else if (command === 'stop') { result = { stopped: true, recording: named || recording }; }
-          else throw new Error(`unknown command ${command}`);
-          client.end(JSON.stringify(result));
-          if (command === 'stop') { ipc.close(); await cleanup(); }
-        } catch (error) { client.end(JSON.stringify({ error: String(error) })); }
-      }); });
-    });
-    ipc.on('error', error => { console.error(error); cleanup().finally(() => process.exit(1)); });
-    ipc.listen(socket, () => writeFileSync(pidFile, JSON.stringify({ pid: process.pid, serverPid: server.pid, socket, port, renderer: browser.gameRenderer, mode, recording }, null, 2)));
-  } catch (error) { await cleanup(); throw error; }
-}
-
-if (argv[0] === '--daemon') {
+const command = argv[0];
+if (command === '--daemon') {
   const lock = resolve(out, 'session.lock');
   if (existsSync(lock)) {
     const owner = Number(readFileSync(lock, 'utf8'));
@@ -151,30 +50,58 @@ if (argv[0] === '--daemon') {
   process.on('exit', () => {
     if (existsSync(lock) && readFileSync(lock, 'utf8') === String(process.pid)) unlinkSync(lock);
   });
-  await serveSession();
+  await serveSession({ root, out, socket, pidFile, opt, flag, request });
 }
-else if (argv[0] === 'start') {
-  try { console.log(JSON.stringify(await request('state'))); }
+else if (command === 'start') {
+  const print = async () => {
+    const info = session();
+    console.log(JSON.stringify(info?.blind || info?.page ? info : { ...info, state: await request('state') }));
+  };
+  try { await request('ping'); await print(); }
   catch (e) {
     if (!['ENOENT', 'ECONNREFUSED'].includes(e.code)) throw e;
     const log = openSync(resolve(out, 'session.log'), 'a');
     const child = spawn('bun', [import.meta.filename, '--daemon', ...argv.slice(1)], { cwd: root, detached: true, stdio: ['ignore', log, log] }); child.unref(); closeSync(log);
     for (let i = 0; ; i++) {
-      try { const value = await request('state'); console.log(JSON.stringify({ ...JSON.parse(readFileSync(pidFile)), state: value })); break; }
+      try { await request('ping'); if (!session()) throw new Error('no session file yet'); await print(); break; }
       catch (error) { try { process.kill(child.pid, 0); } catch { throw new Error(`session exited. Read ${out}/session.log`); }
         if (i >= 600) throw new Error(`session did not start: ${error}. Read ${out}/session.log`); await delay(100); }
     }
   }
-} else if (argv[0] === 'replay') {
-  try { await request('ping'); } catch (error) {
-    if (!['ENOENT', 'ECONNREFUSED'].includes(error.code)) throw error;
-    const child = spawn('bun', [import.meta.filename, 'start'], { cwd: root, stdio: 'inherit' });
-    await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error('start failed'))); });
+} else if (command === 'replay' && argv[1] === 'all') {
+  await ensureSession();
+  const folder = resolve(root, 'tools/play/scenarios');
+  let failed = 0;
+  for (const name of readdirSync(folder).filter((f) => f.endsWith('.json')).sort()) {
+    const started = Date.now();
+    try {
+      const result = await request('replay', [resolve(folder, name)]);
+      console.log(`pass ${name}  ${result.inputs} inputs, ${((Date.now() - started) / 1000).toFixed(1)} s`);
+    } catch (error) { failed++; console.log(`FAIL ${name}  ${String(error.message).split('\n')[0].slice(0, 300)}`); }
   }
+  console.log(failed ? `replay all: ${failed} failed` : 'replay all: every recording passed');
+  process.exitCode = failed ? 1 : 0;
+} else if (command === 'replay') {
+  await ensureSession();
   console.log(JSON.stringify(await request('replay', argv.slice(1)), null, 2));
-} else if (argv[0] === 'stop') {
+} else if (command === 'stop') {
   console.log(JSON.stringify(await request('stop'), null, 2));
-  // The session answers first and cleans up after; stop returns once it has, with its server and port released.
-  for (let i = 0; i < 100 && existsSync(pidFile); i++) await delay(100);
-} else if (argv[0]) console.log(JSON.stringify(await request(argv[0], argv.slice(1)), null, 2));
-else console.log('usage: bun tools/play.mjs start [--mode human|door] [--port 5525] | state | shot <png> | do <JSON> | record <name|stop> | replay <json> | stop');
+  // The session answers first and cleans up after; stop returns once it has, with its server and port released
+  // and its process gone, so a start right after does not find the worktree still owned.
+  const lock = resolve(out, 'session.lock');
+  for (let i = 0; i < 150 && (existsSync(pidFile) || existsSync(lock)); i++) await delay(100);
+} else if (['look', 'act', 'film'].includes(command)) {
+  const json = flag('json');
+  const result = await request(command, argv.slice(1).filter((a) => a !== '--json'));
+  console.log(json ? JSON.stringify(result, null, 2) : formatLook(result));
+  if (result.failed) process.exitCode = 1;
+} else if (command === 'note') {
+  const result = await request('note', argv.slice(1));
+  console.log(`${result.note} noted on ${result.picture ?? 'no picture yet'}`);
+} else if (command === 'journal') {
+  const folder = argv[1] ? resolve(argv[1]) : session()?.journal ?? latest(resolve(out, 'journal'));
+  if (!folder) throw new Error('no journal yet: look, act or film first');
+  const paths = await render(folder);
+  console.log(`${paths.html}\n${paths.notes}`);
+} else if (command) console.log(JSON.stringify(await request(command, argv.slice(1)), null, 2));
+else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> <words> | journal | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');
