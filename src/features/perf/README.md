@@ -5,7 +5,7 @@ This feature measures, warms the shaders, picks the quality level and flies the 
 
 | File | What it does |
 |---|---|
-| `perf.view.ts` | The meter (F3, or `?perf=1`): frame rate, draw calls, triangles, the level buttons, the copy button. It owns the three parts below. |
+| `perf.view.ts` | The meter (F3, Settings > Debug, or `?perf=1`): frame rate, draw calls, triangles, the level buttons, the copy button. It owns the three parts below. |
 | `governor.sim.ts` | Automatic quality: gives up render size, then effects, when the frame rate drops. Its steps are `QUALITY_LADDER` in `src/content/quality.ts`. |
 | `cost.view.ts` | Draw calls and triangles by feature, and shader programs compiled in the middle of a draw |
 | `warm.view.ts` | Shader warm-up: compiles programs before the things that wear them are seen |

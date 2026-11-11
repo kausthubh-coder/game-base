@@ -192,7 +192,9 @@ export function createKeys(canvas: HTMLElement): Keys {
       if (isLocked()) document.exitPointerLock();
       return;
     }
-    if (e.ctrlKey || e.metaKey || e.altKey || typing(e.target)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // F3 reaches the meter wherever the focus is: a switch just picked in Settings keeps it.
+    if (typing(e.target) && e.code !== 'F3') return;
     // Space and Enter on a focused button belong to the button, not to the hero's legs.
     if ((e.code === 'Space' || e.code === 'Enter') && e.target instanceof HTMLElement && e.target.closest('button, a, [role="button"]')) return;
     if (e.code === 'F3' || e.code === 'Space') e.preventDefault();

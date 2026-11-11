@@ -203,6 +203,21 @@ async function desktop(browser) {
     check(`Graphics ${name} applies`, (await game(name => window.__game.view.settings.graphics[name],name)) === value);
   }
   await page.getByRole('button',{name:'Reset graphics overrides',exact:true}).click();
+  // Settings > Debug: each overlay shows when it is turned on, and F3 flips the meter and the setting with it.
+  const shown = (selector) => game((s) => document.querySelector(s)?.checkVisibility() ?? false, selector);
+  const overlays = [['fps', '.debug-fps'], ['meter', '.perf-meter'], ['info', '.debug-info']];
+  for (const [name, selector] of overlays) check(`Debug ${name} starts hidden`, !(await shown(selector)));
+  for (const [name, selector] of overlays) {
+    await page.locator(`input[name="gu-debug-${name}"][value="on"]`).check();
+    await frames(20);
+    check(`Debug ${name} on shows it`, (await shown(selector)) && (await game((n) => window.__game.view.settings.debug[n], name)));
+  }
+  check('the debug panel says where the hero is', /^x .* y .* z /.test(await game(() => document.querySelector('.debug-info').textContent)));
+  check('the frame-rate counter shows a number', /\d+ fps/.test(await game(() => document.querySelector('.debug-fps').textContent)));
+  await page.keyboard.press('F3');
+  check('F3 hides the meter and turns its setting off', !(await shown('.perf-meter')) && !(await game(() => window.__game.view.settings.debug.meter)));
+  for (const [name] of overlays) await page.locator(`input[name="gu-debug-${name}"][value="off"]`).check();
+  for (const [name, selector] of overlays) check(`Debug ${name} off hides it`, !(await shown(selector)));
   await shot('ui-02-settings.png');
   await key('Escape');
   check('Esc goes back from Settings to the title', (await panel()) === 'title');
