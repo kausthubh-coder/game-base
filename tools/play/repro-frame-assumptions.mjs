@@ -4,14 +4,15 @@ import { launchChrome } from '../lib/chrome.mjs';
 const browser = await launchChrome();
 let failures = 0;
 const fixed = process.argv.includes('--fixed');
+const farm = process.argv.includes('--farm');
 try {
  for (let run = 1; run <= 5; run++) {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
-  await page.goto(`http://127.0.0.1:${process.env.PLAY_PORT || 5995}/?hold=1`);
+  await page.goto(`http://127.0.0.1:${process.env.PLAY_PORT || 5995}/?hold=1${farm ? "#farm" : ""}`);
   await page.waitForFunction(() => window.__game);
-  await page.evaluate(async () => { const g=window.__game; g.newGame(); g.manual(true); await g.settle(); g.turn(1); await g.frames(12); g.turn(-1); await g.settle(); await g.frames(3); });
+  await page.evaluate(async () => { const g=window.__game; g.newGame(); g.manual(true); if (location.hash === '#farm') g.teleport(-17.6, 22, -231.6); await g.settle(); g.turn(1); await g.frames(12); g.turn(-1); await g.settle(); await g.frames(3); });
   if (fixed) await cameraStill(page);
-  const target = await page.evaluate(() => { const g=window.__game,p=g.state().player; const x=Math.floor(p.x)+2,z=Math.floor(p.z)+1,y=g.view.world.sim.heightAt(x,z)-1; return {x,y,z,at:g.view.project(x+.5,y+1,z+.5)}; });
+  const target = await page.evaluate(() => { const g=window.__game,p=g.state().player; const farm=location.hash === "#farm"; const x=farm ? -20 : Math.floor(p.x)+2,z=farm ? -236 : Math.floor(p.z)+1,y=g.view.world.sim.heightAt(x,z)-1; return {x,y,z,at:g.view.project(x+.5,y+1,z+.5)}; });
   await page.mouse.move(target.at.x,target.at.y);
   await page.evaluate(() => window.__game.frames(2));
   const aim = await page.evaluate(t=>({aim:window.__game.state().aim,projectedNow:window.__game.view.project(t.x+.5,t.y+1,t.z+.5)}),target);
