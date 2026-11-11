@@ -163,8 +163,9 @@ const STYLE = /* css */ `
 .ui-book .fl-log td { padding: 4px 8px 4px 0; border-top: 1px solid var(--ui-line); }
 /* A part that is switched off stays off, whatever display its class gives it. */
 .ui-book .fl-card [hidden], .ui-book .fl-hud [hidden], .ui-book .fl-beast[hidden], .ui-book .fl-again[hidden], .ui-book .fl-log[hidden] { display: none !important; }
-/* The game's own quest card, quick slots and waypoint have no place in the lab. */
-.ui-book.lab-fight .gb-hud-quest, .ui-book.lab-fight .gb-hud-slots, .ui-book.lab-fight .gb-beacon, .ui-book.lab-fight .ui-bookbtn { display: none !important; }
+/* The game's own quest card, quick slots, waypoint and the marks over people's heads have no place in the lab. */
+.ui-book.lab-fight .gb-hud-quest, .ui-book.lab-fight .gb-hud-slots, .ui-book.lab-fight .gb-beacon, .ui-book.lab-fight .ui-bookbtn,
+.ui-book.lab-fight .marks, .ui-book.lab-fight .watch-ring { display: none !important; }
 @container gu (width < 720px) { .ui-book .fl-card { width: 250px; font-size: 12px; } }
 `;
 

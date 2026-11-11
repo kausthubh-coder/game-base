@@ -16,9 +16,9 @@ import { PALE, TEAL, WHITE } from './looks.ts';
 export interface Jolt { flash: number; shake: number; squash: number }
 export const jolt = (): Jolt => ({ flash: 0, shake: 0, squash: 0 });
 
-/** Runs a jolt down by one frame. */
+/** Runs a jolt down by one frame. The flash is gone in two frames (note 05's feel list). */
 export function settle(j: Jolt, dt: number): void {
-  j.flash = Math.max(0, j.flash - dt * 9);
+  j.flash = Math.max(0, j.flash - dt * 30);
   j.shake = Math.max(0, j.shake - dt * 0.9);
   j.squash = Math.max(0, j.squash - dt * 12);
 }
