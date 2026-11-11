@@ -16,6 +16,8 @@
     "serve": "bun tools/serve.mjs",
     "shot": "bun tools/shot.mjs",
     "doctor": "bun tools/doctor.mjs",
+    "verify": "bun tools/verify.mjs",
+    "deploy": "bun tools/deploy.mjs",
     "sim": "bun tools/sim.ts",
     "server": "wrangler dev",
     "server:check": "bun server/test/check.ts",
