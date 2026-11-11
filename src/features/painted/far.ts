@@ -43,7 +43,7 @@ const SNAP = 32;
 const ROWS = 16;
 /** How far under the true ground the far land lies, so the near land always covers it where both are drawn. */
 const SINK = 0.7;
-const DEEP = new THREE.Color(LAND_COLORS.grass.deep), CLIFF = new THREE.Color(LAND_COLORS.cliff);
+const DEEP = new THREE.Color(LAND_COLORS.grass.deep), BLADES = new THREE.Color(LAND_COLORS.grass.light), CLIFF = new THREE.Color(LAND_COLORS.cliff);
 
 export function createFarLand(source: FarSource, textures: Textures): FarLand {
   const group = new THREE.Group();
@@ -102,7 +102,8 @@ export function createFarLand(source: FarSource, textures: Textures): FarLand {
       if (wet) color.copy(WATER);
       else {
         const top = source.topAt(x, z);
-        if (top === 'grass') meadowColor(x, z, color).lerp(DEEP, source.forestAt(x, z) * 0.45);
+        // The near land is seen through its grass, whose blades are lighter than the ground. Woods are darker.
+        if (top === 'grass') meadowColor(x, z, color).lerp(BLADES, 0.3).lerp(DEEP, source.forestAt(x, z) * 0.4);
         else color.set((LAND_COLORS as Record<string, unknown>)[top] as string ?? CLIFF);
       }
       const y = wet ? source.waterLevel - 0.25 : Math.max(h - SINK, source.waterLevel - 0.25);

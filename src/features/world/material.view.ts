@@ -12,6 +12,11 @@ export interface TerrainUniforms {
   uCut: { value: THREE.Vector4 };
   /** The width of the circle's faded edge, and 1 when what stands straight above the circle goes too. */
   uCutEdge: { value: THREE.Vector2 };
+  /**
+   * The focus's x and z, and how far from it the blocks begin to thin out and are gone. 0 for the last is off.
+   * The painted world draws land past its loaded chunks, so blocks fade there instead of ending at a chunk's wall.
+   */
+  uEdge: { value: THREE.Vector4 };
   /** The point that must stay visible, and the radius of the tunnel bored toward the camera. Radius 0 is off. */
   uSight: { value: THREE.Vector4 };
   /** From the sight point toward the camera. */
@@ -30,6 +35,7 @@ export function createTerrainUniforms(tiles: THREE.DataArrayTexture): TerrainUni
     uTiles: { value: tiles },
     uCut: { value: new THREE.Vector4(0, 0, 0, 0) },
     uCutEdge: { value: new THREE.Vector2(2, 0) },
+    uEdge: { value: new THREE.Vector4(0, 0, 0, 0) },
     uSight: { value: new THREE.Vector4(0, 0, 0, 0) },
     uSightAxis: { value: new THREE.Vector3(0, 1, 0) },
     uViewDir: { value: new THREE.Vector3(0, -1, 0) },
@@ -87,6 +93,7 @@ const FRAGMENT_PARS = /* glsl */ `
 uniform sampler2DArray uTiles;
 uniform vec4 uCut;
 uniform vec2 uCutEdge;
+uniform vec4 uEdge;
 uniform vec4 uSight;
 uniform vec3 uSightAxis;
 uniform vec3 uViewDir;
@@ -200,6 +207,7 @@ float tSight() {
 
 const FRAGMENT_MAP = /* glsl */ `
 float tThreshold = tDither();
+if (uEdge.w > 0.0 && smoothstep(uEdge.z, uEdge.w, distance(vWorld.xz, uEdge.xy)) > fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))))) discard;
 #ifdef TERRAIN_CAP
   if (tCut() <= tThreshold || tSight() > tThreshold) discard;
 #else
@@ -221,6 +229,7 @@ diffuseColor.rgb *= 1.0 - 0.45 * uWetness * vTile.z * smoothstep(0.9, 1.0, vShad
 // with a lip of turf over the earth, and a rounded rim where a top face drops away.
 const FRAGMENT_MAP_CLEAN = /* glsl */ `
 float tThreshold = tDither();
+if (uEdge.w > 0.0 && smoothstep(uEdge.z, uEdge.w, distance(vWorld.xz, uEdge.xy)) > fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))))) discard;
 #ifdef TERRAIN_CAP
   if (tCut() <= tThreshold || tSight() > tThreshold) discard;
 #else

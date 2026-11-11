@@ -72,6 +72,8 @@ export interface WorldView extends ViewSystem {
   /** Chunks load around this point. Call it with the hero's position. */
   setViewDistance(scale: number): void;
   setFocus(x: number, z: number): void;
+  /** Blocks thin out between `near` and `far` blocks from the focus and are not drawn past it. 0 for `far` draws them all. */
+  setEdge(near: number, far: number): void;
   setCutaway(cutaway: Cutaway | null): void;
   setBlock(x: number, y: number, z: number, id: number): boolean;
   save(): WorldSave;
@@ -152,7 +154,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
   const stats: WorldStats = { chunks: 0, meshes: 0, drawn: 0, queue: 0, meshMs: 0, worstMeshMs: 0, radius: 0 };
 
   let epoch = 0, inFlight = 0, spent = 0;
-  let focusX = 0, focusZ = 0, centerX = NaN, centerZ = NaN;
+  let focusX = 0, focusZ = 0, centerX = NaN, centerZ = NaN, edgeNear = 0, edgeFar = 0;
   let radius = 0;
   let meshOffsets: Int16Array = new Int16Array(0), dataOffsets: Int16Array = new Int16Array(0);
 
@@ -468,6 +470,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
     setFocus(x, z) {
       focusX = x; focusZ = z;
     },
+    setEdge(near, far) { edgeNear = near; edgeFar = far; },
 
     setCutaway(next) {
       if (!next) { cut.radius = 0; cut.sightRadius = 0; return; }
@@ -523,6 +526,7 @@ export function createWorld(ctx: ViewContext, options: WorldOptions = {}): World
       camera.getWorldDirection(lookDir);
       uniforms.uViewDir.value.copy(lookDir);
       uniforms.uWetness.value = frame.ambient.wetness;
+      uniforms.uEdge.value.set(focusX, focusZ, edgeNear, edgeFar);
       uniforms.uCut.value.set(cut.x, cut.z, cut.y, cut.radius);
       uniforms.uCutEdge.value.set(Math.max(0.01, cut.soft), cut.column ? 1 : 0);
       uniforms.uSight.value.set(cut.sightX, cut.sightY, cut.sightZ, cut.sightRadius);

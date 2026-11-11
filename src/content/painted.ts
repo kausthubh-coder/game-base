@@ -44,7 +44,10 @@ export interface Mood {
   /** What the sun and the shade do to the leaves' painted tones. */
   leafSun: [number, number, number];
   leafShade: [number, number, number];
-  cloud: [number, number, number];
+  /** A cloud's sunlit side, its shaded side, and the rim it has toward the sun or the moon. */
+  cloudLight: [number, number, number];
+  cloudShade: [number, number, number];
+  cloudRim: [number, number, number];
   /** The colour far things turn first, before they reach the horizon's colour. */
   air: [number, number, number];
   /** The glow of the air toward the sun or the moon, and how strong it is from 0 to 1. */
@@ -52,10 +55,10 @@ export interface Mood {
   glowing: number;
 }
 
-const NIGHT: Mood = { sunTint: [0.13, 0.2, 0.36], shadeTint: [0.04, 0.065, 0.15], skyAdd: [0.003, 0.006, 0.02], leafSun: [0.22, 0.32, 0.55], leafShade: [0.16, 0.24, 0.46], cloud: [0.2, 0.25, 0.4], air: [0.035, 0.06, 0.15], glow: [0.2, 0.3, 0.55], glowing: 0.35 };
-const DAWN: Mood = { sunTint: [1.22, 0.92, 0.68], shadeTint: [0.27, 0.32, 0.56], skyAdd: [0.022, 0.02, 0.06], leafSun: [1.2, 0.95, 0.7], leafShade: [0.86, 0.78, 1.0], cloud: [1.1, 0.88, 0.8], air: [0.62, 0.52, 0.66], glow: [1.25, 0.72, 0.42], glowing: 0.9 };
-const NOON: Mood = { sunTint: [1.06, 1.0, 0.84], shadeTint: [0.21, 0.37, 0.58], skyAdd: [0.008, 0.022, 0.05], leafSun: [1, 1, 1], leafShade: [1, 1, 1], cloud: [1, 1, 1], air: [0.47, 0.68, 0.87], glow: [1.0, 0.95, 0.8], glowing: 0.45 };
-const EVENING: Mood = { sunTint: [1.3, 0.9, 0.55], shadeTint: [0.3, 0.33, 0.6], skyAdd: [0.03, 0.022, 0.07], leafSun: [1.28, 0.93, 0.6], leafShade: [0.86, 0.74, 1.0], cloud: [1.12, 0.84, 0.74], air: [0.58, 0.42, 0.6], glow: [1.35, 0.66, 0.3], glowing: 1 };
+const NIGHT: Mood = { sunTint: [0.13, 0.2, 0.36], shadeTint: [0.04, 0.065, 0.15], skyAdd: [0.003, 0.006, 0.02], leafSun: [0.22, 0.32, 0.55], leafShade: [0.16, 0.24, 0.46], cloudLight: [0.11, 0.15, 0.3], cloudShade: [0.035, 0.05, 0.125], cloudRim: [0.34, 0.42, 0.66], air: [0.035, 0.06, 0.15], glow: [0.2, 0.3, 0.55], glowing: 0.35 };
+const DAWN: Mood = { sunTint: [1.22, 0.92, 0.68], shadeTint: [0.27, 0.32, 0.56], skyAdd: [0.022, 0.02, 0.06], leafSun: [1.2, 0.95, 0.7], leafShade: [0.86, 0.78, 1.0], cloudLight: [1.18, 0.84, 0.68], cloudShade: [0.4, 0.36, 0.58], cloudRim: [1.3, 0.68, 0.36], air: [0.62, 0.52, 0.66], glow: [1.25, 0.72, 0.42], glowing: 0.9 };
+const NOON: Mood = { sunTint: [1.06, 1.0, 0.84], shadeTint: [0.21, 0.37, 0.58], skyAdd: [0.008, 0.022, 0.05], leafSun: [1, 1, 1], leafShade: [1, 1, 1], cloudLight: [1.0, 0.985, 0.93], cloudShade: [0.58, 0.67, 0.86], cloudRim: [1.0, 0.96, 0.82], air: [0.47, 0.68, 0.87], glow: [1.0, 0.95, 0.8], glowing: 0.45 };
+const EVENING: Mood = { sunTint: [1.3, 0.9, 0.55], shadeTint: [0.3, 0.33, 0.6], skyAdd: [0.03, 0.022, 0.07], leafSun: [1.28, 0.93, 0.6], leafShade: [0.86, 0.74, 1.0], cloudLight: [1.22, 0.8, 0.56], cloudShade: [0.38, 0.32, 0.56], cloudRim: [1.45, 0.62, 0.28], air: [0.58, 0.42, 0.6], glow: [1.35, 0.66, 0.3], glowing: 1 };
 
 /** The moods through the day, by the clock: 0 is midnight, 0.25 sunrise, 0.5 noon, 0.75 sunset. */
 export const MOODS: readonly (readonly [number, Mood])[] = [
@@ -68,7 +71,21 @@ export const MOODS: readonly (readonly [number, Mood])[] = [
  * at the height `low` and clears by `clears` for every meter above it, so a hilltop stands out of it.
  * `fog` is where the fog on what is not painted (blocks, sprites) starts and is whole, measured from the hero.
  */
-export const HAZE = { start: 42, density: 0.0042, most: 0.88, low: 20, clears: 0.05, fog: [60, 420] };
+export const HAZE = { start: 48, density: 0.0026, most: 0.82, low: 20, clears: 0.03, fog: [70, 520] };
+
+/**
+ * How the weather shows in the painted sky. The sky has two layers: the painted clouds (big cumulus, each a
+ * painting) and a high layer over them (streaks on a fair day, a grey deck in rain).
+ *   - `few` and `all`: the share of the painted clouds that stand in a sky with no cloud cover and in a full one.
+ *   - `deckFrom`: the cloud cover at which the high layer starts to close. Rain closes it whatever the cover.
+ *   - `storm`: what the clouds' lit and shaded sides turn to under rain, as a share of their fair colours and a tint.
+ *   - `drift`: how fast the clouds move in still air and in a full wind, in turns of the sky a second.
+ */
+export const SKY = {
+  few: 0.3, all: 1.06, deckFrom: 0.5,
+  storm: { light: 0.52, shade: 0.42, tint: [0.92, 0.96, 1.08] as [number, number, number] },
+  drift: [0.0006, 0.0052] as [number, number],
+};
 
 /** The colour of water over a shallow bed and over a deep one, and of water on the far land. */
 export const PAINTED_WATER = { shallow: '#8fd6c4', deep: '#3c88b4', far: '#74b9d4' };

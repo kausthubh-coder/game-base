@@ -197,7 +197,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
   const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov, mode: cameraMode });
-  const sky = createSky(ctx, { shadowRange: 40 });
+  // The painted world paints its own clouds (src/features/painted/sky.ts), so the sky leaves its flat ones out.
+  const sky = createSky(ctx, { shadowRange: 40, clouds: !painted });
   // The painted world's water is the pale blue of the painted meadow's pond.
   const water = createWaterMaterial(ctx, painted ? { shallow: PAINTED_WATER.shallow, deep: PAINTED_WATER.deep } : {});
   const effects = createEffects(ctx);

@@ -4,7 +4,7 @@ export { createLand, fbm, meadowColor, smoothstep, type Land, type LandBlocks } 
 export { paint, paintDepth, shared, type PaintOptions } from './paint.ts';
 export { loadTextures, type Textures } from './textures.ts';
 export { createGrass, type Grass } from './grass.ts';
-export { createBackdrop, type Backdrop } from './sky.ts';
+export { createBackdrop, type Backdrop, type SkyWeather } from './sky.ts';
 export { buildTree, createStand, foliageMaterials, type Foliage, type Placement, type Stand, type Tones, type TreeShape, type TreeSpec } from './trees.ts';
 export * from './scatter.ts';
 export { createFarLand, type FarLand, type FarSource } from './far.ts';

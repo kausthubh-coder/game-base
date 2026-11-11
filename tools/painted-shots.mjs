@@ -2,8 +2,10 @@
 // it, starts a game through the debug door, hides the interface and shoots each view.
 //   bun tools/painted-shots.mjs [--port 5470] [--dist dist-painted] [--no-build] [--out .artifacts/painted]
 //     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,green,street,town,farm,wide,knoll,south,west,vale,low] [--query "look=blocks"] [--tag blocks] [--time 0.5]
-//     [--frames 30] [--quality high]
+//     [--frames 30] [--quality high] [--at 20,-236] [--weather clear] [--moments 0.5:clear,0.5:rain,0.9:clear]
 // A view is a place, a camera and a zoom. `--tag` goes into the file names, so two looks can sit side by side.
+// `--moments` shoots every view at several hours and weathers in one go: each is an hour of the day (0.5 is
+// noon) and a weather of src/content/weather.ts, and both go into the file names.
 // It fails on a console error. This Mac draws WebGL in software: the pictures say what is drawn, never how fast.
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -21,6 +23,8 @@ const query = opt('query', '');
 const time = Number(opt('time', '0.5'));
 const settleFrames = Number(opt('frames', '30'));
 const quality = opt('quality', 'high');
+const weather = opt('weather', 'clear');
+const moments = opt('moments', '') ? opt('moments', '').split(',').map((m) => { const [t, w] = m.split(':'); return { time: Number(t), weather: w ?? 'clear', name: `-${t}-${w ?? 'clear'}` }; }) : [{ time, weather, name: '' }];
 mkdirSync(out, { recursive: true });
 
 /**
@@ -39,6 +43,9 @@ const VIEWS = {
   river: { at: 'river.bank', camera: 'free', yaw: 30, pitch: 8, distance: 11 },
   gate: { at: [124, -176], camera: 'free', yaw: 275, pitch: 7, distance: 10 },
   square: { at: 'town.square', camera: 'tilt', zoom: 1, quarter: 0 },
+  // Up at the sky, from the hero's own eyes.
+  sky: { at: [20, -236], camera: 'first', yaw: 200, pitch: -14 },
+  skyline: { at: [20, -236], camera: 'first', yaw: 20, pitch: -6 },
   // The town.
   green: { at: [173, -142], camera: 'free', yaw: 0, pitch: 7, distance: 15 },
   street: { at: [143, -174], camera: 'free', yaw: 272, pitch: 6, distance: 10 },
@@ -52,7 +59,11 @@ const VIEWS = {
   vale: { at: [100, -210], camera: 'free', yaw: 250, pitch: 5, distance: 12 },
   low: { at: 'spawn', camera: 'tilt', zoom: 2, quarter: 0 },
 };
-const views = opt('views', Object.keys(VIEWS).join(',')).split(',');
+// Looking round from the hero's own eyes, six ways, to judge the sky and the far land: `--views pano` shoots them all.
+// `--at x,z` says where to stand.
+const stand = opt('at', '20,-236').split(',').map(Number);
+for (let i = 0; i < 6; i++) VIEWS[`pano${i}`] = { at: stand, camera: 'first', yaw: i * 60, pitch: 0 };
+const views = opt('views', Object.keys(VIEWS).filter((k) => !k.startsWith('pano')).join(',')).split(',').flatMap((k) => (k === 'pano' ? [0, 1, 2, 3, 4, 5].map((i) => `pano${i}`) : [k]));
 
 if (!args.includes('--no-build')) {
   const build = spawnSync('bun', ['x', 'vite', 'build', '--outDir', dist, '--emptyOutDir', '--logLevel', 'error'], { cwd: root, stdio: 'inherit' });
@@ -93,11 +104,12 @@ try {
   }, time);
   const home = await page.evaluate(() => window.__game.view.camera.zoom);
 
-  for (const key of views) {
+  for (const moment of moments) for (const key of views) {
     const view = VIEWS[key];
     if (!view) throw new Error(`no view called ${key}`);
-    counts[key] = await page.evaluate(async ({ view, home, frames, t }) => {
+    counts[key + moment.name] = await page.evaluate(async ({ view, home, frames, t, weather }) => {
       const g = window.__game, cam = g.view.camera;
+      g.view.game.systems.time?.setWeather(weather, true);
       if (typeof view.at === 'string') g.teleport(view.at);
       else g.teleport(view.at[0], view.at[1]);
       g.setCamera(view.camera);
@@ -109,7 +121,7 @@ try {
         while (cam.zoom < home) cam.zoomBy(1);
         for (let i = 0; i < (view.zoom ?? 0); i++) cam.zoomBy(-1);
       } else {
-        g.look(view.yaw, view.pitch, view.distance);
+        if (view.camera === 'first') g.look(view.yaw, view.pitch); else g.look(view.yaw, view.pitch, view.distance);
       }
       g.setTime(t);
       g.advance(0.1);
@@ -118,10 +130,10 @@ try {
       await g.frames(6);
       const c = g.counters();
       return { drawCalls: c.drawCalls, triangles: c.triangles };
-    }, { view, home, frames: settleFrames, t: time });
-    const name = `${key}${tag ? '-' + tag : ''}.png`;
+    }, { view, home, frames: settleFrames, t: moment.time, weather: moment.weather });
+    const name = `${key}${moment.name}${tag ? '-' + tag : ''}.png`;
     await page.screenshot({ path: resolve(out, name) });
-    console.log(`${name}  draw calls ${counts[key].drawCalls}  triangles ${counts[key].triangles}`);
+    console.log(`${name}  draw calls ${counts[key + moment.name].drawCalls}  triangles ${counts[key + moment.name].triangles}`);
   }
 } finally {
   await browser?.close();

@@ -19,6 +19,8 @@ export interface SkyOptions {
   /** Meters past the shadow target where the fog starts on a clear day, and where it is whole. 30 and 170 by default. */
   fogStart?: number;
   fogEnd?: number;
+  /** False leaves the sky's own clouds out, for a look that draws its clouds itself. The cloud cover still dims the light. */
+  clouds?: boolean;
 }
 
 /** The sky as other features see it. The same objects are updated in place every frame, so keep the reference. */
@@ -90,7 +92,7 @@ precision highp float;
 varying vec3 vDir;
 uniform vec3 uTop, uMid, uBot, uFog, uSunColor, uMoonColor, uCloudLit, uCloudShade;
 uniform vec3 uSunDir, uMoonDir;
-uniform float uSunShow, uMoonShow, uStars, uCover, uFlash, uPhase, uTime;
+uniform float uSunShow, uMoonShow, uStars, uCover, uFlash, uPhase, uTime, uClouds;
 uniform vec4 uScroll;
 uniform sampler2D uNoise;
 
@@ -133,7 +135,7 @@ void main() {
   }
 
   float sky = smoothstep(0.0, 0.14, h);
-  if (sky > 0.0) {
+  if (sky > 0.0 && uClouds > 0.5) {
     // Both layers lie on flat sheets overhead. The low one is shaded in three flat tones, lit from the sun's side.
     vec2 p = d.xz / (h + 0.18);
     vec2 pa = p * 0.16 + uScroll.xy;
@@ -196,6 +198,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
     uMoonShow: { value: 0 },
     uStars: { value: 0 },
     uCover: { value: 0.2 },
+    uClouds: { value: options.clouds === false ? 0 : 1 },
     uFlash: { value: 0 },
     uPhase: { value: 0.5 },
     uTime: { value: 0 },

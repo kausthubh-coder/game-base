@@ -6,8 +6,8 @@
 // terrain's own functions give the far land and its woods theirs, the trees system says where trees stand, the sky gives the sun's direction and how much of it is shadow, and the
 // clock gives the colour of the light.
 import * as THREE from 'three';
-import { EMERALD, FAR_TREES, GREAT_OAK, HAZE, PAINTED_WATER, MOODS, PAINTED_TREES, TREE_NEAR, TREE_REACH, type Mood } from '../../content/painted.ts';
-import { STANDING_STONE, buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Sitter, type Stand, type TreeSpec } from '../../features/painted/index.ts';
+import { EMERALD, FAR_TREES, GREAT_OAK, HAZE, PAINTED_WATER, SKY, MOODS, PAINTED_TREES, TREE_NEAR, TREE_REACH, type Mood } from '../../content/painted.ts';
+import { STANDING_STONE, buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Sitter, type SkyWeather, type Stand, type TreeSpec } from '../../features/painted/index.ts';
 import { WATER_LEVEL, forestAt, groundHeight, landHeight, surfaceAt, treesInArea } from '../../features/world/index.ts';
 import { REGION } from '../content/region.ts';
 import type { ModelTree } from '../trees/index.sim.ts';
@@ -229,7 +229,13 @@ export async function install(view: GameView): Promise<void> {
   }
 
   // ---------------------------------------------------------------- the light
-  const sunTint = new THREE.Color(), shadeTint = new THREE.Color(), skyAdd = new THREE.Color(), cloud = new THREE.Color(), grey = new THREE.Color();
+  const sunTint = new THREE.Color(), shadeTint = new THREE.Color(), skyAdd = new THREE.Color(), grey = new THREE.Color();
+  /** What the sky is doing, handed to the clouds every frame. */
+  const weather: SkyWeather = {
+    show: 0.5, deck: 0, wisp: 0.5, storm: 0, flash: 0, windX: 1, windZ: 0, drift: 0.001,
+    light: new THREE.Color(), shade: new THREE.Color(), rim: new THREE.Color(), haze: new THREE.Color(), sun: new THREE.Vector3(0, 1, 0),
+  };
+  const ramp = (a: number, b: number, v: number): number => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
   function light(): void {
     const t = ((game.clock.timeOfDay % 1) + 1) % 1, a = game.ambient;
     let i = 1;
@@ -250,7 +256,6 @@ export async function install(view: GameView): Promise<void> {
     shared.uLamp.value.setRGB(1.0, 0.72, 0.4).multiplyScalar(0.95 - 0.8 * day);
     mix3(m0.leafSun, m1.leafSun, k, shared.uLeafSun.value);
     mix3(m0.leafShade, m1.leafShade, k, shared.uLeafShade.value);
-    mix3(m0.cloud, m1.cloud, k, cloud);
     // Far things turn the colour of the air first and the colour the game's own sky has at the horizon last,
     // so the land, the hills and the sky meet there. Toward the sun the air glows.
     shared.uHaze.value.copy(view.sky.look.fog);
@@ -264,8 +269,29 @@ export async function install(view: GameView): Promise<void> {
     shared.uHazeMax.value = HAZE.most + (1 - HAZE.most) * a.fog;
     shared.uHazeLow.value.set(HAZE.low, HAZE.clears * (1 - a.fog));
     shared.uCloudShade.value = 0.55 * (1 - overcast);
+    // More cloud in the sky shades more of the land.
+    shared.uCloudCover.value = 0.22 + 0.5 * ramp(0.1, 0.8, a.cloud);
     shared.uWind.value.set(Math.cos(a.windDir), Math.sin(a.windDir), 0.35 + 1.3 * a.wind);
-    backdrop.setColors(cloud, shared.uHaze.value, 1 - overcast * 0.9);
+    // ---- the sky: how many painted clouds stand in it, how far the high layer has closed, and their colours
+    const storm = Math.min(1, Math.max(a.rain * 1.6, (a.cloud - 0.8) * 3));
+    weather.show = SKY.few + (SKY.all - SKY.few) * ramp(0.08, 0.72, a.cloud);
+    weather.deck = Math.min(0.97, Math.max(ramp(SKY.deckFrom, 1, a.cloud) * 0.7, storm * 0.97, a.fog * 0.9));
+    weather.wisp = ramp(0.04, 0.4, a.cloud) * (1 - storm);
+    weather.storm = storm;
+    mix3(m0.cloudLight, m1.cloudLight, k, weather.light);
+    mix3(m0.cloudShade, m1.cloudShade, k, weather.shade);
+    mix3(m0.cloudRim, m1.cloudRim, k, weather.rim);
+    // Under rain the clouds are greys: darker, and a little cold.
+    const tint = SKY.storm.tint;
+    grey.setRGB(tint[0], tint[1], tint[2]).multiplyScalar((weather.light.r + weather.light.g + weather.light.b) / 3);
+    weather.light.lerp(grey, storm).multiplyScalar(1 - (1 - SKY.storm.light) * storm);
+    weather.shade.multiplyScalar(1 - (1 - SKY.storm.shade) * storm);
+    weather.haze.copy(shared.uHaze.value);
+    weather.sun.copy(view.sky.look.sunDirection);
+    weather.flash = a.flash;
+    weather.windX = Math.cos(a.windDir); weather.windZ = Math.sin(a.windDir);
+    weather.drift = SKY.drift[0] + (SKY.drift[1] - SKY.drift[0]) * Math.min(1, a.wind);
+    backdrop.setSky(weather);
   }
 
   const look = new THREE.Vector3(), seen = new THREE.Frustum(), projection = new THREE.Matrix4();
@@ -278,6 +304,7 @@ export async function install(view: GameView): Promise<void> {
     // The near world thins out over its last few meters, and the far land shows through it there.
     const edge = reach * 16 - 8;
     shared.uEdge.value.set(edge - 14, edge);
+    view.world.setEdge(edge - 14, edge);
     shared.uEdgeTree.value.set(TREE_REACH - 12, TREE_REACH);
     // The camera must see as far as the far land and the ridges behind it.
     const camera = view.ctx.camera as THREE.PerspectiveCamera;

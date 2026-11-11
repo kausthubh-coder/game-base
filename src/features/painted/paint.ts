@@ -187,7 +187,7 @@ vec3 paintAir(vec3 color) {
   float far = length(ray);
   float d = max(0.0, far - uHazeStart);
   float low = exp(-max(0.0, vPaintWorld.y - uHazeLow.x) * uHazeLow.y);
-  float amount = (1.0 - exp(-d * uHazeDensity * (0.3 + 0.7 * low))) * uHazeMax;
+  float amount = (1.0 - exp(-d * uHazeDensity * (0.6 + 0.4 * low))) * uHazeMax;
   float toSun = max(dot(ray / max(far, 0.001), uSunDir), 0.0);
   vec3 air = mix(uHazeNear, uHaze, smoothstep(0.25, 0.85, amount));
   air = mix(air, uHazeSun, toSun * toSun * toSun * uHazeGlow * amount);
