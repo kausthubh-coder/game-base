@@ -5,6 +5,7 @@
 //   bun tools/fight-sim.ts pet boar        one way, one beast
 //   bun tools/fight-sim.ts world boar wall the world way, baiting charges into the rock wall and setting no rigs
 //   bun tools/fight-sim.ts --events hero thistlehog   the same, and every event as it happens
+//   bun tools/fight-sim.ts clumsy          a player still learning (sees shapes late, attacks in bursts, dodges sometimes) against the boar in every way, over 20 seeds
 //   bun tools/fight-sim.ts stag            the Verdant Stag's hall, start to finish, with its numbers
 //   bun tools/fight-sim.ts stag --seeds 20 the hall twenty times over, each with its own pods
 import { BEASTS, STAG, WAYS, type Way } from '../src/game/content/fight.ts';
@@ -17,11 +18,14 @@ import { hallStage } from '../src/game/fight/hall-layout.sim.ts';
 const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const events = process.argv.includes('--events');
 const DT = 1 / 60, LIMIT = 240;
+/** A small repeatable random generator, one per seed. */
+const seeded = (seed: number) => { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); };
 
-export function play(way: Way, kind: string, layout: 'rigs' | 'wall' = 'rigs', log = false): FightRecord {
+export function play(way: Way, kind: string, layout: 'rigs' | 'wall' = 'rigs', log = false, clumsy = 0): FightRecord {
   const stage = arenaStage(0, 0);
-  const fight = createFight(stage, { way });
-  const bot = createBot(fight, stage, { layout });
+  // A clumsy run is seeded: its pauses and dodges, and the beast's own choices.
+  const fight = createFight(stage, { way, random: clumsy ? seeded(clumsy * 7919) : undefined });
+  const bot = createBot(fight, stage, { layout, clumsy: clumsy > 0, random: clumsy ? seeded(clumsy) : undefined });
   fight.bring(kind);
   for (let t = 0; t < LIMIT && fight.phase !== 'won'; t += DT) {
     bot.step(DT);
@@ -33,8 +37,6 @@ export function play(way: Way, kind: string, layout: 'rigs' | 'wall' = 'rigs', l
 }
 
 // ---------------------------------------------------------------- the Stag's hall
-/** A small repeatable random generator, one per seed. */
-const seeded = (seed: number) => { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); };
 
 export function playHall(seed = 1, log = false, limit = 600): FightRecord {
   const stage = hallStage(0, 0);
@@ -68,7 +70,22 @@ function hallRow(r: FightRecord, seed: number): Record<string, string | number> 
   };
 }
 
-if (import.meta.main && args[0] === 'stag') {
+if (import.meta.main && args[0] === 'clumsy') {
+  // Note 08's target: a lone player beats the boar in under three minutes in every way.
+  const at = process.argv.indexOf('--seeds'), seeds = at > 0 ? Number(process.argv[at + 1]) : 20;
+  const rows: Record<string, string | number>[] = [];
+  for (const [way, layout] of [['hero', 'rigs'], ['pet', 'rigs'], ['world', 'rigs'], ['world', 'wall']] as const) {
+    const runs = Array.from({ length: seeds }, (_, i) => play(way, 'boar', layout, false, i + 1));
+    const won = runs.filter((r) => r.result === 'calmed'), secs = won.map((r) => r.length).sort((a, b) => a - b);
+    const mean = (list: number[]) => list.reduce((a, b) => a + b, 0) / Math.max(1, list.length);
+    rows.push({
+      way: layout === 'wall' ? 'world, wall' : way, won: `${won.length} of ${runs.length}`,
+      'mean s': +mean(secs).toFixed(1), 'slowest s': +(secs[secs.length - 1] ?? NaN).toFixed(1), 'under 180 s': `${secs.filter((t) => t < 180).length} of ${runs.length}`,
+      'hits, mean': +mean(runs.map((r) => r.hitsTaken)).toFixed(1), 'faints, mean': +mean(runs.map((r) => r.faints)).toFixed(2), 'faints, most': Math.max(...runs.map((r) => r.faints)),
+    });
+  }
+  console.table(rows);
+} else if (import.meta.main && args[0] === 'stag') {
   const at = process.argv.indexOf('--seeds'), seeds = at > 0 ? Number(process.argv[at + 1]) : 1;
   const rows: Record<string, string | number>[] = [];
   for (let seed = 1; seed <= seeds; seed++) rows.push(hallRow(playHall(seed, events && seeds === 1), seed));
