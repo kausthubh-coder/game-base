@@ -11,6 +11,10 @@ const STYLE = /* css */ `
 }
 .ui-playtest b { font-weight: 650; color: var(--ui-new); }
 .ui-playtest a { color: oklch(0.89 0.07 188); font-weight: 650; }
+.ui-playtest-skip {
+  margin-left: 6px; padding: 2px 8px; font: inherit; font-weight: 650; color: var(--ui-glass-ink); cursor: pointer;
+  background: transparent; border: 1px solid currentColor; border-radius: var(--ui-radius-sm);
+}
 .ui-playtest a:focus-visible { outline: 2px solid oklch(0.89 0.07 188); outline-offset: 2px; }
 /* In play on a narrow screen the quick slots reach the corner, so the badge sits just above them. */
 @container gu (width < 900px) {
@@ -32,4 +36,27 @@ export function install(view: GameView): void {
   link.textContent = '/';
   badge.append(tag, ' Something broke? Play the stable game at ', link);
   view.root.append(badge);
+
+  // A playtester who is stuck before the new story can jump to it: the first night, at dusk, on their plot.
+  // It goes through the debug door, which is the one thing that can move the player.
+  const skip = document.createElement('button');
+  skip.className = 'ui-playtest-skip';
+  skip.textContent = 'Stuck? Skip to the first night';
+  skip.hidden = true;
+  skip.addEventListener('click', () => {
+    const door = window.__game;
+    if (!door) return;
+    door.skipTo('night');
+    door.teleport('grant.center');
+    door.setTime(0.8);
+    skip.hidden = true;
+  });
+  badge.append(' ', skip);
+  let since = 0;
+  view.onFrame((dt) => {
+    since += dt;
+    if (since < 0.5) return;
+    since = 0;
+    skip.hidden = !view.started || view.game.flags.is('night.fox');
+  });
 }
