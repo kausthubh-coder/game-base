@@ -1,23 +1,25 @@
 // The three services together, for real: Clerk signs a test player in, Convex makes a world for them, and
 // the world server on this machine lets them in with Clerk's own token and tells Convex who is there.
 //
-//   bun server/test/live.ts
+//   bun server/test/live.ts                  the dev services and a world server started here
+//   bun server/test/live.ts --url <https>    the live copy at that address, with the live database
 //
-// It needs the keys in .env.local (see .env.example) and a Clerk user to play as. It uses the dev instances
-// only, starts its own `wrangler dev` on port 5546, and removes the world and the session it made.
+// It needs the keys in .env.local (see .env.example) and a Clerk user to play as. Without --url it uses the
+// dev instances only and starts its own `wrangler dev` on port 5546. With --url it reads the live database's
+// address from .env.live.local and starts nothing. Either way it removes the world and the session it made.
 import { ConvexHttpClient } from 'convex/browser';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { api } from '../../convex/_generated/api';
-import { ROOT, join, sleep, startServer } from './local.ts';
+import { ROOT, join, sleep, startServer, type LocalServer } from './local.ts';
 
 const PORT = 5546;
 const TEST_USER = process.env.CLERK_TEST_EMAIL ?? 'ada.tester+clerk_test@example.com';
 
-function keys(): Record<string, string> {
+function keys(file: string): Record<string, string> {
   let text = '';
   try {
-    text = readFileSync(resolve(ROOT, '.env.local'), 'utf8');
+    text = readFileSync(resolve(ROOT, file), 'utf8');
   } catch {
     // No file: the names below are reported as missing.
   }
@@ -29,7 +31,9 @@ function keys(): Record<string, string> {
   return found;
 }
 
-const env = keys();
+const liveUrl = process.argv.includes('--url') ? process.argv[process.argv.indexOf('--url') + 1]?.replace(/\/+$/, '') : undefined;
+// The live copy shares Clerk's development instance with dev, and has its own database.
+const env = liveUrl ? { ...keys('.env.local'), ...keys('.env.live.local') } : keys('.env.local');
 const missing = ['VITE_CONVEX_URL', 'VITE_CONVEX_SITE_URL', 'VITE_CLERK_PUBLISHABLE_KEY', 'CLERK_SECRET_KEY', 'WORLD_SERVER_SECRET'].filter((name) => !env[name]);
 if (missing.length > 0) {
   console.log(`SKIPPED: .env.local lacks ${missing.join(', ')}`);
@@ -73,26 +77,37 @@ const card = async (): Promise<{ playersNow: { playerId: string; name: string }[
   return (await convex.query(api.worlds.list, {})).find((world) => world._id === worldId);
 };
 
-const server = await startServer({
+const local = liveUrl ? null : await startServer({
   port: PORT, name: 'live', fresh: true,
   vars: {
     DEV_TOKENS: '', CLERK_ISSUER: issuer, CLERK_AUDIENCE: 'convex',
     CONVEX_URL: env.VITE_CONVEX_URL!, CONVEX_SITE_URL: env.VITE_CONVEX_SITE_URL!, WORLD_SERVER_SECRET: env.WORLD_SERVER_SECRET!,
   },
 });
-console.log(`world server up on ${server.http}, pid ${server.pid}; Clerk ${issuer}; Convex ${env.VITE_CONVEX_URL}\n`);
+// The live server lets in only the build it was deployed with: `--build <hash>`, or the commit checked out here.
+const flag = process.argv.indexOf('--build');
+const build = !liveUrl ? undefined : flag >= 0 ? process.argv[flag + 1] : Bun.spawnSync(['git', 'rev-parse', '--short', 'HEAD'], { cwd: ROOT }).stdout.toString().trim();
+// `join` needs only the address of the worlds.
+const server = local ?? ({ ws: liveUrl!.replace(/^http/, 'ws') } as LocalServer);
+console.log(`${local ? `world server up on ${local.http}, pid ${local.pid}` : `the live copy at ${liveUrl}`}; Clerk ${issuer}; Convex ${env.VITE_CONVEX_URL}\n`);
 
 try {
   const real = await token();
-  const fake = await join(server, worldId, 'ann', { token: 'dev:ann' });
+  const fake = await join(server, worldId, 'ann', { token: 'dev:ann', build });
   check('a made-up token is refused when dev tokens are off', fake.net.state === 'refused', `state ${fake.net.state}`);
   await fake.leave();
 
-  const stranger = await join(server, 'not-a-world', 'ada', { token: real });
+  const stranger = await join(server, 'not-a-world', 'ada', { token: real, build });
   check('a real player is kept out of a world Convex does not know', stranger.net.state === 'refused', `state ${stranger.net.state}`);
   await stranger.leave();
 
-  const ada = await join(server, worldId, 'ada', { token: real });
+  if (liveUrl) {
+    const old = await join(server, worldId, 'ada', { token: real, build: 'an-older-build' });
+    check('an older build is told to reload', old.net.state === 'refused', `state ${old.net.state}`);
+    await old.leave();
+  }
+
+  const ada = await join(server, worldId, 'ada', { token: real, build });
   check('a real Clerk token gets the player into their own world', ada.net.state === 'open', `state ${ada.net.state}, world ${worldId}`);
 
   let seen = await card();
@@ -110,7 +125,7 @@ try {
   }
   check('Convex shows the world empty after they leave', seen?.playersNow.length === 0, `playersNow ${JSON.stringify(seen?.playersNow)}`);
 } finally {
-  await server.stop();
+  await local?.stop();
   convex.setAuth(await token());
   await convex.mutation(api.worlds.remove, { worldId });
   await clerk(`/sessions/${session.id}/revoke`, {});

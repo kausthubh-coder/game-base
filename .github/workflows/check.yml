@@ -18,3 +18,40 @@ jobs:
       - run: bun run check
       - run: bun test tools/doctor.test.mjs
       - run: bun run lint
+
+  # A push to main that passes the check goes live: the database's functions first, then the game's
+  # files and the world server as one unit. See .agents/skills/ship-game/SKILL.md.
+  deploy:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-live
+      cancel-in-progress: false
+    env:
+      VITE_CONVEX_URL: ${{ vars.VITE_CONVEX_URL }}
+      VITE_CONVEX_SITE_URL: ${{ vars.VITE_CONVEX_SITE_URL }}
+      VITE_CLERK_PUBLISHABLE_KEY: ${{ vars.VITE_CLERK_PUBLISHABLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - name: Deploy the Convex functions
+        run: bunx convex deploy --codegen disable
+        env:
+          CONVEX_DEPLOY_KEY: ${{ secrets.CONVEX_DEPLOY_KEY }}
+      - name: Deploy the game and the world server to Cloudflare
+        run: bun run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: The live page answers and names this build's script
+        run: |
+          script=$(grep -o 'assets/fingerprinted/index-[^"]*\.js' dist/index.html | head -1)
+          for try in 1 2 3 4 5 6; do
+            if curl -fsS https://game-base.kausthubh2007.workers.dev/ | grep -q "$script"; then echo "live: $script"; exit 0; fi
+            sleep 10
+          done
+          echo "the live page does not name $script"; exit 1
