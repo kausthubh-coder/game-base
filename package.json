@@ -14,7 +14,9 @@
     "demo:build": "bun tools/demo.mjs build",
     "demo:dev": "bun tools/demo.mjs dev",
     "serve": "bun tools/serve.mjs",
-    "shot": "bun tools/shot.mjs"
+    "shot": "bun tools/shot.mjs",
+    "doctor": "bun tools/doctor.mjs",
+    "lint": "biome lint ."
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
