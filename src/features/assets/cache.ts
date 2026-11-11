@@ -7,6 +7,15 @@ export const afterFirstFrame: Promise<void> = typeof document === 'undefined' ? 
   requestAnimationFrame(wait);
 });
 
+// Input on the title screen may unlock audio before a game is running.
+export const afterGameFrame: Promise<void> = typeof document === 'undefined' ? Promise.resolve() : afterFirstFrame.then(() => new Promise(resolve => {
+  const wait = (): void => {
+    if (!(window as Window & { __game?: { readonly started: boolean } }).__game?.started) { requestAnimationFrame(wait); return; }
+    requestAnimationFrame(() => resolve());
+  };
+  requestAnimationFrame(wait);
+}));
+
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   const params = new URLSearchParams(location.search);
   const disabled = params.has('nosw') || (navigator.webdriver && !params.has('sw'));

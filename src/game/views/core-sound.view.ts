@@ -4,7 +4,7 @@
 //
 // The dialogue view makes the voice blips itself, one per letter:
 //   view.audio?.emit({ type: 'talk', voice, char })
-import { afterFirstFrame } from '../../features/assets/cache.ts';
+import { afterGameFrame } from '../../features/assets/cache.ts';
 import { treeSounds } from '../../content/tree-sounds.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import type { GameEvent } from '../../engine/events.ts';
@@ -23,7 +23,7 @@ interface SoundList {
 
 /** Fetches and decodes every recording and hands each to the engine as it arrives. The beds come first. */
 async function loadRecordings(audio: AudioSystem): Promise<number> {
-  await afterFirstFrame;
+  await afterGameFrame;
   const base = new URL('assets/', document.baseURI).href;
   try {
     const manifest = await (await fetch(base + 'manifest.json')).json() as { sound?: { list?: string } };
