@@ -15,5 +15,13 @@
     "source": "assets-src/raw/first-night-icons-3.png",
     "processing": "Crop left half to assets-src/raw/heartstone-3.png; bun tools/sprites/build-story-extra.mjs heartstone",
     "note": "Brass notches are simplified at HUD size."
+  },
+  "mark": {
+    "reference": "public/assets/icons/icons-2.png",
+    "attempts": 2,
+    "prompt": "One standalone cozy pixel RPG HUD icon. Magical teal hollow ring with exactly seven evenly spaced outward triangular tips at 12:00, 1:43, 3:26, 5:09, 6:51, 8:34, 10:17. No bottom-center tip. Emblem only, top tip pale mint, other six subdued teal. Warm top-left light, tinted brown outline, transparent background, no haze or text. Designed for 24x24 within 32x32 cell.",
+    "source": "assets-src/raw/mark-3.png",
+    "processing": "bun tools/sprites/build-story-extra.mjs mark",
+    "note": "First hand-and-ring attempt had eight points and was rejected. Shipped standalone ring has seven points."
   }
 }

@@ -1203,6 +1203,16 @@
             0
           ]
         }
+      },
+      "mark": {
+        "tile": 32,
+        "sheet": "icons/mark.png",
+        "names": {
+          "mark": [
+            0,
+            0
+          ]
+        }
       }
     }
   },
