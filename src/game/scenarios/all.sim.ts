@@ -5,6 +5,8 @@ import type { Scenario } from '../play/scenario.sim.ts';
 import { befriendAPet } from './befriend-a-pet.sim.ts';
 import { buildStroke } from './build-stroke.sim.ts';
 import { fellATree } from './fell-a-tree.sim.ts';
+import { nothingLeftFloating } from './nothing-left-floating.sim.ts';
+import { nothingSetDownOnACrop } from './nothing-set-down-on-a-crop.sim.ts';
 import { townIsProtected } from './town-is-protected.sim.ts';
 import { wheatSaveLoad } from './wheat-save-load.sim.ts';
 import { wheatThreeNights } from './wheat-three-nights.sim.ts';
@@ -18,4 +20,7 @@ export const SCENARIOS: readonly Scenario[] = [
   fellATree,
   befriendAPet,
   townIsProtected,
+  // Bugs the bots found, kept as scenarios.
+  nothingSetDownOnACrop,
+  nothingLeftFloating,
 ];
