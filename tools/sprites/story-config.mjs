@@ -13,4 +13,5 @@ for (const name of ['pell','corin','hesper','dunn','isolde','nessa','roan','pip'
 storySprites['hero-cut'] = {size:128,anchor:[64,120],height:110,worldHeight:2,cols:4,rows:3,animations:{cut:{frames:4,fps:10,rows:{front:0,back:1,side:2}}}};
 storySprites['hero-moves'] = {size:128,anchor:[64,120],height:110,worldHeight:2,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
 storySprites['hero-call'] = {size:128,anchor:[64,120],height:110,worldHeight:2,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
+storySprites['leaftail-fight'] = {size:96,anchor:[48,88],height:68,worldHeight:.85,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
 // END fight-lab hero and pets.

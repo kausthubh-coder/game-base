@@ -824,6 +824,29 @@
           }
         }
       }
+    },
+    "leaftail-fight": {
+      "sheet": "sprites/leaftail-fight.png",
+      "frame": [
+        96,
+        96
+      ],
+      "anchor": [
+        48,
+        88
+      ],
+      "worldHeight": 0.85,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
     }
   },
   "blocks": {
