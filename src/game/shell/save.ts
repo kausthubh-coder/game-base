@@ -5,7 +5,10 @@ import type { GameSave } from '../kernel.sim.ts';
 
 /** A test scene (`?scene=build` in the address) keeps its own save, so trying things there never touches the real game's. */
 const scene = typeof location === 'undefined' ? null : new URLSearchParams(location.search).get('scene');
-export const SAVE_KEY = scene ? `greenhollow.save.${scene}` : 'greenhollow.save';
+/** The playtest copy at /playtest/ keeps its own save too, so the game at / still opens on its own save. */
+const playtest = typeof location !== 'undefined' && location.pathname.startsWith('/playtest');
+const SAVE_ROOT = playtest ? 'greenhollow.playtest.save' : 'greenhollow.save';
+export const SAVE_KEY = scene ? `${SAVE_ROOT}.${scene}` : SAVE_ROOT;
 /** What the page should do straight after it reloads: a game already in progress cannot be reset in place. */
 const AFTER_RELOAD_KEY = 'greenhollow.after-reload';
 

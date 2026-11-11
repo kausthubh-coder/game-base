@@ -123,6 +123,7 @@ export function createRegion(game: Game): Region {
       // The grant is the player's, even where the path starts at its corner.
       if (inGrant(fx, fz)) return false;
       if (fx >= town.x0 && fx <= town.x1 && fz >= town.z0 && fz <= town.z1) return true;
+      for (const r of REGION.sealed) if (fx >= r.x0 && fx <= r.x1 && fz >= r.z0 && fz <= r.z1) return true;
       return onPath(fx, fz);
     },
     berryBushes: () => bushes,

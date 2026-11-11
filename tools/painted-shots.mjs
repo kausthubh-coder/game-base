@@ -1,7 +1,7 @@
 // Pictures of the painted world from fixed places, to judge the look after a change. It builds the game, serves
 // it, starts a game through the debug door, hides the interface and shoots each view.
 //   bun tools/painted-shots.mjs [--port 5470] [--dist dist-painted] [--no-build] [--out .artifacts/painted]
-//     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,green,street,town,farm,wide,knoll,south,west,vale,low] [--query "look=blocks"] [--tag blocks] [--time 0.5]
+//     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,green,street,town,farm,wide,knoll,south,west,vale,low,door,hall,court] [--query "look=blocks"] [--tag blocks] [--time 0.5]
 //     [--frames 30] [--quality high] [--at 20,-236] [--weather clear] [--moments 0.5:clear,0.5:rain,0.9:clear]
 // A view is a place, a camera and a zoom. `--tag` goes into the file names, so two looks can sit side by side.
 // `--moments` shoots every view at several hours and weathers in one go: each is an hour of the day (0.5 is
@@ -62,6 +62,10 @@ const VIEWS = {
   west: { at: [30, -221], camera: 'free', yaw: 80, pitch: 4, distance: 10 },
   vale: { at: [100, -210], camera: 'free', yaw: 250, pitch: 5, distance: 12 },
   low: { at: 'spawn', camera: 'tilt', zoom: 2, quarter: 0 },
+  // Ilara's Hall: the stone door from the plot, the court from the game's own camera, and from above.
+  door: { at: 'shut.door', camera: 'free', yaw: 350, pitch: 12, distance: 11 },
+  hall: { at: 'hall.heart', camera: 'tilt', zoom: 1, quarter: 0 },
+  court: { at: 'hall.heart', camera: 'free', yaw: 325, pitch: 30, distance: 17 },
 };
 // Looking round from the hero's own eyes, six ways, to judge the sky and the far land: `--views pano` shoots them all.
 // `--at x,z` says where to stand.

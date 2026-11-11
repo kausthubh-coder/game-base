@@ -28,6 +28,7 @@ const OAK = id('oak_log'), BIRCH = id('birch_log'), TILLED = id('tilled_soil'), 
 const PLACES = [
   'grant.stone', 'grant.center', 'grant.rocks', 'dead.garden', 'town.gate', 'town.square', 'lodge', 'granary',
   'bakery', 'gus.field', 'carpenter', 'kennel', 'river.bank', 'ferry',
+  'shut.door', 'hall.door', 'hall.heart', 'hall.custodian', 'hall.gate', 'hall.mural',
 ];
 const TOWN_PLACES = ['town.square', 'lodge', 'granary', 'bakery', 'gus.field', 'carpenter', 'kennel', 'river.bank', 'ferry'];
 
@@ -66,7 +67,8 @@ describe('places', () => {
     for (const name of PLACES) {
       const p = region.place(name);
       expect(p.name).toBe(name);
-      expect(p.label.length, name).toBeGreaterThan(0);
+      // The spots inside Ilara's Hall are kept off the map: nobody knows what is behind the door.
+      if (!name.startsWith('hall.')) expect(p.label.length, name).toBeGreaterThan(0);
       expect(standable(world, p.at.x, p.at.y, p.at.z), `${name} at ${p.at.x}, ${p.at.y}, ${p.at.z}`).toBe(true);
       // The feet are on the ground there, not on a roof or in a hole.
       expect(Number.isInteger(p.at.y)).toBe(true);

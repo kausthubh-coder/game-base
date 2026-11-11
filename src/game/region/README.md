@@ -36,7 +36,7 @@ A and B are built from the Hollowmere town kit (`src/content/town-kit.ts`, made 
 - `spawn()` is two blocks north of the standing stone. `spawnFacing()` is `Math.PI`, which faces south to the stone.
 - `places()` and `place(name)` give `{ name, at, label }`. `at` is the middle of a block, with `y` the height of the feet. `place` throws for a name it does not know, and the message lists the real names.
 - `grant()` is `{ x: -30, z: -248, width: 28, depth: 28 }`.
-- `isProtected(x, y, z)` is true inside the town's bounds (x 131 to 206, z -192 to -118) and on every column of the path, at any height. It is false in the grant and in the wild.
+- `isProtected(x, y, z)` is true inside the town's bounds (x 131 to 206, z -192 to -118), inside the plan's `sealed` rectangles (the court of Ilara's Hall, x -25 to -9, z -265 to -253) and on every column of the path, at any height. It is false in the grant and in the wild.
 - `berryBushes()` returns the ten bushes as `{ id, x, y, z, ripe }`. They are the same objects on every call, and `ripe` changes in place.
 - `props()` returns every prop to draw as `{ kind, variant, x, y, z, rotation, scale, quarterTurns, building }`. The first seven fields are the arguments of the props feature's `place`. The list holds the doors, windows, signs and furniture of the ten buildings, then a signpost, a gate, two benches and two stalls that stand alone.
 - `scatter()` returns `{ density: 1, blocked(x, z), forest(x, z) }`, the options of the props feature's `scatter`.
@@ -57,6 +57,8 @@ Feet positions at seed 1. All of them are out of doors except `granary`, which i
 | `grant.center` | -16, 22, -234 | The middle of the plot |
 | `grant.rocks` | 8, 22, -228 | Open ground south-east of the pool. The mossy stones are north and west of it under three oaks. |
 | `dead.garden` | -79, 21, -232 | Between the four dry beds |
+| `shut.door` | -17, 22, -251 | Two blocks south of the stone door of Ilara's Hall |
+| `hall.door`, `hall.heart`, `hall.custodian`, `hall.gate`, `hall.mural` | inside the court | The threshold, the Heartstone, the plinth, the Gate and the mural. They have no label, so the map does not show them. |
 | `town.gate` | 134, 20, -174 | On the path between the two gate lamps |
 | `town.square` | 173, 20, -144 | Six blocks south of the well, so nobody who stands near it lands on the well's rim |
 | `lodge` | 161, 20, -162 | The doorstep, on the north side of the square |

@@ -1,4 +1,4 @@
-// The five quests of the first part, as data, with the shapes dialogue and hints share: a condition
+// The six quests of the first part, as data, with the shapes dialogue and hints share: a condition
 // (something true or false about this playthrough) and an effect (something a conversation does).
 // Quest and step ids are the ones in docs/play/act1.md. The engine is src/game/quests.
 
@@ -120,15 +120,35 @@ export const QUESTS: readonly QuestDef[] = [
       { id: 'wood', text: 'Cut 12 oak logs', done: { bag: WOOD, atLeast: 12 }, count: { bag: WOOD, need: 12 } },
       { id: 'bench', text: 'Make a workbench and set it down', done: { placed: 'workbench' } },
       { id: 'shelter', text: 'Set a bed down with a block over it', done: { placed: 'bed', covered: true } },
-      { id: 'sleep', text: 'Sleep until morning', done: { event: 'slept' } },
     ],
     skip: [],
   },
   {
+    // The first night. src/game/hall runs it: each step's flag is set by a scene there.
+    id: 'night',
+    title: 'The Shut Door',
+    summary: 'A stone door in your hill has been shut for a thousand years. Tonight something comes out of the dark.',
+    starts: { after: 'roof' },
+    steps: [
+      { id: 'bed', text: 'Lie down when evening comes', done: { flag: 'night.fox' } },
+      { id: 'door', text: 'Back away to the stone door', done: { flag: 'door.open' }, place: 'shut.door' },
+      { id: 'mark', text: 'Go through the door', done: { flag: 'mark' }, place: 'hall.heart' },
+      { id: 'key', text: 'Find what your key fits', done: { flag: 'custodian.awake' }, place: 'hall.custodian' },
+      { id: 'calm', text: 'Hold out your hand to the fox', done: { flag: 'fox.calmed' }, place: 'hall.door' },
+      { id: 'heart', text: 'Touch the Heartstone', done: { flag: 'heart.seen' }, place: 'hall.heart' },
+      { id: 'sleep', text: 'Sleep until morning', done: { event: 'slept' } },
+      { id: 'tamsin', text: 'Show Tamsin your hand', done: { flag: 'night.told' }, gate: true, npc: ['tamsin'] },
+    ],
+    skip: [
+      { flag: 'night.fox' }, { flag: 'door.open' }, { flag: 'mark' }, { flag: 'hall.lit' }, { flag: 'custodian.awake' },
+      { flag: 'fox.calmed' }, { flag: 'fox.gone' }, { flag: 'heart.seen' }, { flag: 'night.told' },
+    ],
+  },
+  {
     id: 'leaftail',
     title: 'Leaf and tail',
-    summary: 'Something still tends the dead garden. It likes berries and a slow step.',
-    starts: { after: 'roof' },
+    summary: 'The fox went back to the dead garden it keeps. It likes berries and a slow step.',
+    starts: { after: 'night' },
     steps: [
       { id: 'find', text: 'Find what tends the dead garden', done: { any: [{ petNear: 'leaftail', within: 10 }, { place: 'dead.garden', within: 10 }] }, place: 'dead.garden' },
       { id: 'berries', text: 'Pick 3 berries from the bushes', done: { bag: 'berry', atLeast: 3 }, count: { bag: 'berry', need: 3 } },

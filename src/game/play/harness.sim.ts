@@ -42,6 +42,7 @@ import { install as installRegion } from '../region/index.sim.ts';
 import { install as installSprinklers } from '../sprinklers/index.sim.ts';
 import { install as installStory } from '../story/index.sim.ts';
 import { install as installTalk } from '../talk/index.sim.ts';
+import { install as installHall } from '../hall/index.sim.ts';
 import { install as installTime } from '../time/index.sim.ts';
 
 /** The seeds the shell uses: the world's, and the kernel's for `game.random()`. */
@@ -82,6 +83,7 @@ export const INSTALLS: readonly (readonly [name: string, install: (kernel: Kerne
   ['pets', installPets],
   ['people', installPeople],
   ['talk', installTalk],
+  ['hall', installHall],
   ['quests', installQuests],
   ['story', installStory],
 ];

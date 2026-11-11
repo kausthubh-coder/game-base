@@ -34,6 +34,7 @@ export const SYSTEM_ORDER: readonly string[] = [
   'pets',
   'people',
   'talk',
+  'hall',
   'quests',
   'story',
 ];
