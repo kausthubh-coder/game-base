@@ -60,6 +60,60 @@ export function keycaps(keys: readonly string[], joiner = 'or'): HTMLElement {
   return row;
 }
 
+/** One key prompt in a menu's bottom rail: the keys, then a short verb. `only` keeps it to a mouse or to a finger. */
+export interface Cue {
+  keys: readonly string[];
+  verb: string;
+  only?: 'fine' | 'coarse';
+}
+
+/** Puts a row of key prompts in `row`, replacing what was there: `Esc Close`, `Drag Move`. A cue with no keys is a status, in gold. */
+export function fillCues(row: HTMLElement, list: readonly Cue[]): void {
+  row.replaceChildren(...list.map((cue) =>
+    h('span', { class: `gu-cue${cue.only ? ` gu-cue-${cue.only}` : ''}${cue.keys.length ? '' : ' gu-cue-status'}` },
+      ...cue.keys.map((key) => h('kbd', null, key)),
+      h('span', { class: 'gu-cue-verb' }, cue.verb),
+    ),
+  ));
+}
+
+// Gold line icons drawn in code, for when the kit's icon sheet does not have the name yet. Strokes on a 24 grid.
+const GLYPHS: Record<string, string> = {
+  things: '<path d="M9 4.5h6l-1.2 3h-3.6z"/><path d="M8.2 7.5h7.6c1.6 2 3.7 5 3.7 8.3 0 2.6-1.8 4.2-4.6 4.2H9.1c-2.8 0-4.6-1.6-4.6-4.2 0-3.3 2.1-6.3 3.7-8.3z"/><path d="M9.5 13h5"/>',
+  'by-hand': '<path d="M4.5 19.5l8.5-8.5"/><path d="M11.5 6.5l3-3 6 6-3 3z"/><path d="M13 8l3 3"/>',
+  creatures: '<path d="M12 12.5c-3 0-5.5 3.2-5.5 5.4 0 1.4 1.2 2.1 2.4 2.1 1.3 0 1.9-.7 3.1-.7s1.8.7 3.1.7c1.2 0 2.4-.7 2.4-2.1 0-2.2-2.5-5.4-5.5-5.4z"/><ellipse cx="6" cy="10" rx="1.6" ry="2"/><ellipse cx="9.6" cy="6.4" rx="1.6" ry="2.1"/><ellipse cx="14.4" cy="6.4" rx="1.6" ry="2.1"/><ellipse cx="18" cy="10" rx="1.6" ry="2"/>',
+  pets: '<path d="M12 19.5s-7-4.3-7-9.6a3.9 3.9 0 0 1 7-2.4 3.9 3.9 0 0 1 7 2.4c0 5.3-7 9.6-7 9.6z"/>',
+  crops: '<path d="M12 20.5V9"/><path d="M12 14c-3.8 0-6-2.2-6-6 3.8 0 6 2.2 6 6z"/><path d="M12 11c0-3.8 2.2-6 6-6 0 3.8-2.2 6-6 6z"/>',
+  people: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3.1-6.5 7-6.5s7 2.5 7 6.5"/>',
+  places: '<path d="M12 20.5s-6-5.6-6-10.5a6 6 0 0 1 12 0c0 4.9-6 10.5-6 10.5z"/><circle cx="12" cy="10" r="2.2"/>',
+};
+
+/**
+ * A gold line icon by name that fills its box: from the kit's sheets when they have it, else drawn here, else the
+ * name's first letter in a gold ring.
+ */
+export function lineIcon(ornament: ((name: string) => HTMLElement | null) | undefined, name: string, label: string): HTMLElement {
+  const art = ornament?.(name);
+  if (art) return art;
+  const glyph = GLYPHS[name];
+  if (glyph) {
+    const span = h('span', { class: 'gu-glyph' });
+    span.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${glyph}</svg>`;
+    return span;
+  }
+  return h('span', { class: 'gu-glyph gu-glyph-letter' }, label.slice(0, 1).toUpperCase());
+}
+
+/** A round tab with a line icon in a full-screen menu's top rail. Its name shows under it while it is picked or pointed at. */
+export function iconTab(
+  ornament: ((name: string) => HTMLElement | null) | undefined, icon: string, label: string, selected: boolean, attrs: Record<string, Attr>,
+): HTMLButtonElement {
+  return h('button', { class: 'gu-tab', type: 'button', role: 'tab', 'aria-selected': String(selected), 'aria-label': label, ...attrs },
+    h('span', { class: 'gu-tab-icon', 'aria-hidden': true }, lineIcon(ornament, icon, label)),
+    h('span', { class: 'gu-tab-name', 'aria-hidden': true }, label),
+  );
+}
+
 const FOCUSABLE = 'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /** The elements Tab stops at, in order. Of a set of radio buttons only the picked one is a stop. */

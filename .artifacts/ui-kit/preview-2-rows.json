@@ -1,0 +1,54 @@
+[
+  {
+    "n": "book-cover",
+    "y": 40
+  },
+  {
+    "n": "page / 3x3 repeat",
+    "y": 420
+  },
+  {
+    "n": "gutter / 3x3 repeat",
+    "y": 950
+  },
+  {
+    "n": "ribbon",
+    "y": 1630
+  },
+  {
+    "n": "map-paper / 3x3 repeat",
+    "y": 1870
+  },
+  {
+    "n": "compass",
+    "y": 2400
+  },
+  {
+    "n": "map-fog / 3x3 repeat",
+    "y": 2720
+  },
+  {
+    "n": "tile",
+    "y": 3250
+  },
+  {
+    "n": "tile-hover",
+    "y": 3630
+  },
+  {
+    "n": "detail",
+    "y": 4010
+  },
+  {
+    "n": "slot-empty",
+    "y": 4530
+  },
+  {
+    "n": "Open two-page spread",
+    "y": 4910
+  },
+  {
+    "n": "Empty bag / 36 slots",
+    "y": 5510
+  }
+]

@@ -1,5 +1,6 @@
 // Pictures for the interface, all from the manifest through the asset loader: icons by name from either
-// icon sheet, portraits, the first frame of a sprite, and the three `ui` pictures. This is the one file
+// icon sheet, portraits, the first frame of a sprite, the three `ui` pictures, and the painted interface
+// kit: the `uikit` images and the `uitabs` sheet of gold line icons. This is the one file
 // of the interface views that touches src/features/assets.
 import type { Assets, TileCell } from '../../features/assets/index.ts';
 import type { IconRef, NineSlice, PictureRef } from '../ui/index.ui.ts';
@@ -16,6 +17,10 @@ export interface UiArt {
   iconElement(name: string): HTMLElement | null;
   /** An element that draws a portrait and fills the box it is put in, or null when there is none. */
   portraitElement(name: string): HTMLElement | null;
+  /** The painted kit by name (`panel`, `slot`, `minimap-ring` …) as URLs. Empty when the manifest has no `uikit`. */
+  readonly kit: Readonly<Record<string, string>>;
+  /** A gold line icon from the kit's icon sheets (`bag`, `settings`, `pin` …) that fills its box, or null. */
+  tabElement(name: string): HTMLElement | null;
   /** The `ui` pictures, each left out when the manifest does not list it. */
   readonly frames: { title?: string; panel?: NineSlice; button?: NineSlice };
 }
@@ -40,6 +45,11 @@ export function createUiArt(assets: Assets): UiArt {
 
   const image = (name: string): string | undefined => (assets.imageNames('ui').includes(name) ? assets.image('ui', name).url : undefined);
   const panel = image('panel'), button = image('button');
+  // The kit is lazy: nothing here fetches it. CSS asks for each file the first time it draws one.
+  const kitEntry = assets.manifest.uikit;
+  const kit: Record<string, string> = {};
+  for (const [name, file] of Object.entries(kitEntry?.images ?? {})) kit[name] = assetBase() + file;
+  const tabs = kitEntry?.tabs;
 
   return {
     icon(name) {
@@ -69,6 +79,25 @@ export function createUiArt(assets: Assets): UiArt {
     portraitElement(name) {
       const cell = portraits && portraitNames.has(name) ? portraits.cells(name)[0] : undefined;
       return portraits && cell ? cellElement(portraits.url, cell) : null;
+    },
+
+    kit,
+
+    tabElement(name) {
+      // The first icon sheet of the kit that has the name: `tabs`, then the others such as `tabs2`.
+      const sheet = [tabs, ...Object.values(kitEntry?.sheets ?? {})].find((entry) => entry?.names[name]);
+      const at = sheet?.names[name]?.[0];
+      if (!sheet || !at) return null;
+      // The sheet's grid, from the cells it lists: the loader never opens a lazy file, so its size is not known.
+      const cells = Object.values(sheet.names).flat();
+      const across = Math.max(...cells.map(([c]) => c)) + 1, down = Math.max(...cells.map(([, r]) => r)) + 1;
+      const [column, row] = at;
+      const element = document.createElement('span');
+      element.className = 'ui-cell ui-smooth';
+      element.style.backgroundImage = `url("${assetBase() + sheet.sheet}")`;
+      element.style.backgroundSize = `${across * 100}% ${down * 100}%`;
+      element.style.backgroundPosition = `${across > 1 ? (column / (across - 1)) * 100 : 0}% ${down > 1 ? (row / (down - 1)) * 100 : 0}%`;
+      return element;
     },
 
     frames: {

@@ -93,7 +93,11 @@ async function serveSession() {
   const cleanup = async () => {
     if (closing) return; closing = true; save();
     if (named) writeFileSync(named, readFileSync(recording));
-    await browser?.close(); server.kill();
+    await browser?.close();
+    // Wait for the server to be gone, so the next tool to bind this port finds it free.
+    const gone = server.exitCode !== null || server.signalCode !== null ? Promise.resolve() : new Promise((done) => server.once('exit', done));
+    server.kill();
+    await Promise.race([gone, delay(5000)]);
     if (existsSync(socket)) unlinkSync(socket);
     if (existsSync(pidFile)) unlinkSync(pidFile);
   };
@@ -168,5 +172,9 @@ else if (argv[0] === 'start') {
     await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error('start failed'))); });
   }
   console.log(JSON.stringify(await request('replay', argv.slice(1)), null, 2));
+} else if (argv[0] === 'stop') {
+  console.log(JSON.stringify(await request('stop'), null, 2));
+  // The session answers first and cleans up after; stop returns once it has, with its server and port released.
+  for (let i = 0; i < 100 && existsSync(pidFile); i++) await delay(100);
 } else if (argv[0]) console.log(JSON.stringify(await request(argv[0], argv.slice(1)), null, 2));
 else console.log('usage: bun tools/play.mjs start [--mode human|door] [--port 5525] | state | shot <png> | do <JSON> | record <name|stop> | replay <json> | stop');

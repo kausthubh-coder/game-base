@@ -1,0 +1,10 @@
+{
+  "gutter": {
+    "prompt": "One tall narrow book gutter SHADOW overlay, 128x512 intended pixels. Soft dark brown translucent vertical shadow strip, darkest at exact middle fading to REAL transparent at left and right sides. Faint small dark brown dashed stitching line in centre. NO GOLD, NO ORNAMENT, NO DIAMONDS, NO FILIGREE, NO PAPER BACKGROUND. Perfectly uniform darkness down entire height, no top or bottom caps. Vertically seamless repeating texture.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-1c146848-de4d-490e-bb26-37d3ea2129dc.png"
+  },
+  "slot-empty": {
+    "prompt": "One very plain quiet cream inset bag slot 160x160, square with slightly rounded corners. Fill #ddd2bd, barely visible bronze hairline rim. A single tiny 10px diamond exactly at centre at only 30 percent alpha. NO CORNER ORNAMENT, NO LEAVES, NO CURLS, NO EXTRA DIAMONDS, NO double rim. Flat low contrast interior, subtle inset shadow. Transparent exterior. Empty quiet slot repeated 36 times in inventory. Nine slice 40px corners.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-1d9c3626-dfe2-406b-8bda-c15a88f9e2df.png"
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "icons2": {
+    "size": [
+      384,
+      384
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Create icons2.png: a perfectly regular 4 by 4 sheet, 384x384 intended, 96-square cells. Every glyph centred in its own cell with 18px clear padding. Fine single gold outlines with transparent interiors, like existing tabs.png. Row 1: drawstring pouch, open hand palm, small round forest creature with leaf sprout, paw print. Row 2: two-leaf sprout, head and shoulders, little house, magnifier plus. Row 3: magnifier minus, crosshair target, map pin, small flag. Row 4: X close mark, chevron left, chevron right, grabbing hand. All sixteen separate, no dividing lines, no labels. Gold hairline icons on transparency.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-f93075e9-9897-4a3e-9588-f3c499989b58.png",
+        "raw": "assets-src/raw/ui-kit/icons2-1.png"
+      },
+      {
+        "attempt": 2,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-0281338d-47c8-4227-8477-6d96d81b4a43.png",
+        "raw": "assets-src/raw/ui-kit/icons2-2.png",
+        "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Use the attached tabs.png as the exact line-weight and gold colour reference. Create 16 very THIN FLAT GOLD LINE glyphs on ENTIRELY TRANSPARENT canvas, NO CREAM PAPER, NO FILL, NO GRADIENT BACKDROP, NO SHADOW, NO BEVEL. 4x4 equally spaced grid, square output. Row1 pouch, open palm, leaf-sprout forest creature, paw. Row2 sprout, person bust, house, magnifier plus. Row3 magnifier minus, crosshair, map pin, flag. Row4 X, left chevron, right chevron, grabbing hand. Each glyph occupies central 60% of its cell. Gold #D3BC8E uniform hairlines. Background alpha zero including enclosed holes."
+      },
+      {
+        "attempt": 3,
+        "raw": "assets-src/raw/ui-kit/icons2-3.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-c5b631db-61ce-4aad-abd0-f405d6cc6f99.png",
+        "prompt": "Edit this icon sheet. Keep every glyph, grid position, thin gold line weight and transparent ground unchanged EXCEPT the top-left icon: replace the handbag with a SMALL DRAWSTRING POUCH, rounded sack body cinched at neck, two loose cord ends. No handle or flap. All 16 glyphs remain. Remove any background haze so all background pixels and holes are truly transparent. No lettering. Exact gold #D3BC8E."
+      }
+    ],
+    "requestedTabs2": {
+      "tile": 96,
+      "sheet": "ui/kit/icons2.png",
+      "names": {
+        "things": [
+          0,
+          0
+        ],
+        "by-hand": [
+          1,
+          0
+        ],
+        "creatures": [
+          2,
+          0
+        ],
+        "pets": [
+          3,
+          0
+        ],
+        "crops": [
+          0,
+          1
+        ],
+        "people": [
+          1,
+          1
+        ],
+        "places": [
+          2,
+          1
+        ],
+        "zoom-in": [
+          3,
+          1
+        ],
+        "zoom-out": [
+          0,
+          2
+        ],
+        "find-me": [
+          1,
+          2
+        ],
+        "pin": [
+          2,
+          2
+        ],
+        "waypoint": [
+          3,
+          2
+        ],
+        "close": [
+          0,
+          3
+        ],
+        "page-left": [
+          1,
+          3
+        ],
+        "page-right": [
+          2,
+          3
+        ],
+        "drag": [
+          3,
+          3
+        ]
+      }
+    }
+  },
+  "keycap": {
+    "size": [
+      160,
+      128
+    ],
+    "slice": [
+      0,
+      40,
+      0,
+      40
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. A dark navy rounded rectangle game keycap with a fine gold hairline and subtle upper bevel. Empty centre for a key letter added later. Corners fit in 40px end caps. Front view. Fill almost entire canvas, small transparent outer margin.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-4ebbb1b1-1155-4520-94ab-9eef44323bce.png",
+        "raw": "assets-src/raw/ui-kit/keycap-1.png"
+      }
+    ]
+  },
+  "card-frame": {
+    "size": [
+      192,
+      232
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. A thin gold outline frame for a tall item card, rounded corners, one tiny four-point star at top centre. Transparent empty interior and exterior. Aspect 192:232. Match card.png rim silhouette. No fill, no card illustration.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-bd4ac74e-73c0-46e5-8e81-e2eddbef6252.png",
+        "raw": "assets-src/raw/ui-kit/card-frame-1.png"
+      }
+    ]
+  },
+  "rail": {
+    "size": [
+      1200,
+      120
+    ],
+    "slice": [
+      0,
+      200,
+      0,
+      200
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Very wide shallow menu top rail aspect 10:1. Dark navy band across entire width fading into transparency at bottom. Fine gold bottom hairline with tiny diamond precisely centred. Restrained gold filigree only at far left and right within 200px caps. Plain horizontal middle, no text.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-7432fa62-06ef-4e71-aeff-ddf7d4650edf.png",
+        "raw": "assets-src/raw/ui-kit/rail-1.png"
+      }
+    ]
+  },
+  "leather": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both",
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Seamlessly tileable square warm brown satchel leather texture #6b4a2f to #5a3d26. Soft fine leather grain, very low contrast, even lighting. Full bleed opaque texture, no border, seams, ornament or lighting vignette.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-2f32acd1-c8f8-48b5-bdb3-4c3e982992c0.png",
+        "raw": "assets-src/raw/ui-kit/leather-1.png"
+      }
+    ]
+  },
+  "leather-panel": {
+    "size": [
+      512,
+      512
+    ],
+    "slice": [
+      96,
+      96,
+      96,
+      96
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Square stitched warm brown satchel leather panel #6b4a2f to #5a3d26. Darker rolled edge, row of cream stitches 24px inward, small brass rivets at corners. 96px nine-slice corners, perfectly plain straight stretchable edges, blank quiet leather centre. Slight rounded corners, transparency outside only.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-0cb9ac7d-eb67-48c0-8d07-873aca64a187.png",
+        "raw": "assets-src/raw/ui-kit/leather-panel-1.png"
+      }
+    ]
+  },
+  "pocket": {
+    "size": [
+      160,
+      160
+    ],
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Square inventory pocket sewn onto brown leather. Slightly darker inset leather #5a3d26, fine cream stitch row around rim, very subtle top lip shadow. Small rounded corners within 40px nine-slice, plain straight edges and empty quiet leather middle. No objects or ornaments.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-005b38e4-97be-4915-941d-d2e13c592469.png",
+        "raw": "assets-src/raw/ui-kit/pocket-1.png"
+      }
+    ]
+  },
+  "tag": {
+    "size": [
+      480,
+      720
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One tall blank cream paper luggage tag, aspect 2:3. Clipped upper shoulders, rounded lower corners, aged paper edges. Punched hole near top reinforced with brass grommet, small closed loop of twine through hole. All fits canvas. Large completely blank cream field for item details. Real transparency around tag and inside twine loop.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-34957142-122d-49c7-8d34-fccecdcb3de5.png",
+        "raw": "assets-src/raw/ui-kit/tag-1.png"
+      }
+    ]
+  },
+  "roller": {
+    "size": [
+      1600,
+      128
+    ],
+    "slice": [
+      0,
+      200,
+      0,
+      200
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One very wide shallow wooden scroll roller aspect 12.5:1, viewed straight from front. Turned dark brown wood shaft, understated wood grain, brass end caps on left and right within 200px. Plain straight shaft between end caps for horizontal nine-slice stretching. Entire roller fits canvas. No paper, text or other objects.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-72925d18-e63a-4979-9a09-daad425da277.png",
+        "raw": "assets-src/raw/ui-kit/roller-1.png"
+      }
+    ]
+  },
+  "bookmark": {
+    "size": [
+      96,
+      260
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow cream cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view with minimal folds, aspect 96:260. Real alpha outside.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-f315b70e-c043-4f5a-9ce2-d5b33b81e7da.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-1.png"
+      }
+    ]
+  },
+  "bookmark-red": {
+    "size": [
+      96,
+      260
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow deep red #8c2f2f cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view minimal folds, aspect 96:260, real alpha outside.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-37ba80c0-738d-4a9c-8252-29725a9dc8e3.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-red-1.png"
+      }
+    ]
+  },
+  "bookmark-green": {
+    "size": [
+      96,
+      260
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow forest green #3d6b3a cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view minimal folds, aspect 96:260, real alpha outside.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-bba853a2-a8a1-4bac-8641-3c5e3063b8d5.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-green-1.png"
+      }
+    ]
+  },
+  "bookmark-blue": {
+    "size": [
+      96,
+      260
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow navy blue #34507a cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view minimal folds, aspect 96:260, real alpha outside.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-51f14ad9-b2b4-4a5a-b4a8-7fa1c1f362be.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-blue-1.png"
+      }
+    ]
+  },
+  "seal": {
+    "size": [
+      192,
+      192
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One round deep red wax seal button, irregular poured wax edges, pressed four-point star in middle. Soft warm top-left highlights, crisp painted illustration. No letters, crests or other marks, transparent exterior.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-0a933551-ff8d-4729-b5b5-0a0acb2c92b9.png",
+        "raw": "assets-src/raw/ui-kit/seal-1.png"
+      }
+    ]
+  },
+  "seal-gold": {
+    "size": [
+      192,
+      192
+    ],
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One round gold wax seal button #D3BC8E #F0D48A #A6895A, irregular poured wax edges, pressed four-point star in middle. Soft warm top-left highlights, crisp painted illustration. No letters, crests or other marks, transparent exterior.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-a406680e-4983-4d0d-993c-7ece26062726.png",
+        "raw": "assets-src/raw/ui-kit/seal-gold-1.png"
+      }
+    ]
+  },
+  "page-edges": {
+    "size": [
+      64,
+      512
+    ],
+    "repeat": "vertical",
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow vertical strip of stacked page edges of a thick open book, aspect 1:8. Many thin horizontal cream #ECE5D8 paper lines and slight warm gray shading. Full bleed opaque texture, tileable vertically with no border or ornament. Front view flat, no perspective, no curved book silhouette.",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-b5f1b6c8-3519-4fa9-93f8-a207ee4a661a.png",
+        "raw": "assets-src/raw/ui-kit/page-edges-1.png"
+      }
+    ]
+  }
+}

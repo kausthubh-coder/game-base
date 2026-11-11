@@ -1,0 +1,620 @@
+{
+  "panel": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. Create ONE square cream parchment panel, filling square canvas, 512x512 intended pixels. Very faint paper grain and flatish blank centre. Soft rounded outer corners with transparent pixels outside. Inset double gold hairline 20px in. Fine gold curls and small diamonds entirely within each corner's 112x112 pixels. ALL edges between the 112px corners must be plain perfectly straight lines, and centre unadorned, for nine-slice stretching. No ornament on edge middles. Save generated output locally and return path.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/panel-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-20bde551-a285-4f01-9d5f-16d601c08617.png"
+      }
+    ],
+    "kept": 1
+  },
+  "panel-dark": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE square deep navy parchment panel 512x512. Navy #1F2433 fill 88% opacity. Soft rounded outer corners. Inset double gold hairline 20px in. Gold filigree curls and diamond confined to corner 112x112 areas. Plain straight edges between corner areas, blank uniform centre for nine slicing.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/panel-dark-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-3ddfe6d8-837a-4ebf-840a-5a1c1cba765e.png"
+      }
+    ],
+    "kept": 1
+  },
+  "divider": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE horizontal gold filigree divider rule, very wide and shallow aspect 1024x48. Small diamond in middle, restrained curls nearby. Taper and fade to transparent at both ends. Gold #D3BC8E.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/divider-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-4ef52ea3-8efb-4352-b38d-06197333e6a8.png"
+      }
+    ],
+    "kept": 1
+  },
+  "button": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE horizontal pill button 384x112 intended pixels. Navy #4A5366 fill, fine gold inner rim, subtle top highlight. Ends occupy only 56px each side, middle must be plain and horizontally stretchable. No symbols or text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/button-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-0916623b-1fe7-47d6-ad12-d6c3e62023a1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "button-light": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE horizontal pill button 384x112. Cream #ECE5D8 fill with navy thin inner rim and soft top-left highlight. Ends occupy only 56px each side, middle plain horizontally stretchable. No symbols or text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/button-light-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-b056162e-292d-48c6-a123-6975dbe7b6c3.png"
+      }
+    ],
+    "kept": 1
+  },
+  "button-gold": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE horizontal pill button 384x112. Warm gold #F2B84B to #D3BC8E vertical gradient fill, fine bright gold inner rim, subtle top highlight. Ends occupy only 56px each side, middle plain horizontally stretchable. No symbols or text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/button-gold-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-61dfc084-6b16-4c5a-813a-8ea24da193bf.png"
+      }
+    ],
+    "kept": 1
+  },
+  "close": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE round button 128x128, cream disc gold rim and a navy X drawn with two crisp strokes, centred. Transparent outside circle.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/close-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-c471d148-cf09-480f-81db-7d1599322ea4.png"
+      }
+    ],
+    "kept": 1
+  },
+  "back": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE round button 128x128, cream disc gold rim and a navy left pointing arrow drawn in crisp strokes, centred. Transparent outside circle.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/back-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-e91c3f76-b063-4e49-b951-36120ad8ad2e.png"
+      }
+    ],
+    "kept": 1
+  },
+  "slot": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE rounded square inventory slot 160x160, translucent navy #1F2433 fill about 45% alpha, thin gold rim, 6px transparent outer margin. Corners occupy 40px each, straight plain edges and flat centre for nine slice. No symbols.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/slot-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-84884a6b-7836-46d6-81db-9c073cb79cab.png"
+      }
+    ],
+    "kept": 1
+  },
+  "slot-selected": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE rounded square inventory slot 160x160, translucent navy fill about 45% alpha, bright gold double rim, soft warm golden glow OUTSIDE rim but all inside canvas with 10px transparent margin. Corner 40px; straight plain edges, flat centre for nine slice. No symbols.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/slot-selected-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-906ac69c-75fe-4bcf-8d3b-7b5469a9a679.png"
+      }
+    ],
+    "kept": 1
+  },
+  "slot-hover": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE rounded square inventory slot 160x160, translucent navy fill about 45% alpha, lighter bright gold thin rim, subtle cream highlight. 6px transparent outer margin. Corner 40px; straight plain edges, flat centre for nine slice. No symbols.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/slot-hover-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-04bcfa9d-d628-49e5-8de9-2dcad6fef01e.png"
+      }
+    ],
+    "kept": 1
+  },
+  "card": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE blank portrait item card 192x232, rounded top corners, warm bronze-to-amber painted background softly lit upper left, one faint tiny star sparkle, cream strip across bottom 22%. No item object, no text, no numerals. Transparent outside shape.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/card-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-65c71dbc-1401-4d38-8093-58a8260c735b.png"
+      }
+    ],
+    "kept": 1
+  },
+  "card-rare": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE blank portrait item card 192x232, rounded top corners, violet-to-blue painted background softly lit upper left, one faint tiny star sparkle, cream strip across bottom 22%. No item object, no text, no numerals. Transparent outside shape.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/card-rare-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-23994a08-5689-4df4-8c4e-799cf71f7881.png"
+      }
+    ],
+    "kept": 1
+  },
+  "card-epic": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE blank portrait item card 192x232, rounded top corners, rich warm gold painted gradient background softly lit upper left, one faint tiny star sparkle, cream strip across bottom 22%. No item object, no text, no numerals. Transparent outside shape.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/card-epic-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-47a173ac-15fe-43f8-a460-49fda8a3d666.png"
+      }
+    ],
+    "kept": 1
+  },
+  "minimap-ring": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE ornate gold compass ring 640x640, circular hole entirely transparent, inner radius 236px of 320px half canvas. Fine gold filigree on ring, small diamond spike at top, tiny tick marks around ring, soft exterior drop shadow. No letters, no text, no background inside or outside. Keep whole ring inside canvas.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/minimap-ring-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-c784f5b5-12c7-494a-8e34-27fb0b72a461.png"
+      }
+    ],
+    "kept": 1
+  },
+  "dial": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE small round clock dial frame 160x160, fine gold ring with restrained tiny tick marks. Completely transparent centre and exterior. No hands, no numerals, no text. Keep whole ring inside canvas.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/dial-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-c4ade9e4-2eac-477f-a810-9b381884bd2c.png"
+      }
+    ],
+    "kept": 1
+  },
+  "name-plate": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE slim horizontal dialogue speaker name plate 512x96, subtle cream translucent field, transparent fading ends, fine gold rule under blank name area, small diamond each end. Ends each occupy 96px; middle plain horizontally repeatable. No text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/name-plate-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-e7572d78-c104-4a96-a4e7-616ced79fa83.png"
+      }
+    ],
+    "kept": 1
+  },
+  "hint": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE slim horizontal hint banner 512x96. Deep navy #1F2433 fill at 70% alpha, rounded ends, gold hairline rim, tiny diamond confined to leftmost 64px. Middle plain horizontally stretchable, right 64px rounded cap. No text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/hint-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-2805745e-4b6a-4f7d-ad71-0138b9cc0f4c.png"
+      }
+    ],
+    "kept": 1
+  },
+  "stars": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE square 512x512 seamless tile pattern, sparse faint fine gold constellation line art and tiny gold star points, gold strokes only 15-25% opacity on REAL TRANSPARENT ground. Empty transparent space dominates. Edges must tile seamlessly on both axes, no border, no vignette. No text, no letters.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/stars-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-c7af36ae-db28-4afd-a742-70ea064faa59.png"
+      }
+    ],
+    "kept": 1
+  },
+  "tabs": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE sprite sheet 384x288, EXACTLY 4 columns by 3 rows of equally sized 96x96 cells. 12 separate fine gold #D3BC8E line icons with lighter highlights and SAME stroke weight, centred within cells and ample padding. Row 1 left to right: satchel bag; crossed hammer and saw; open book with leaf; scroll with pin. Row 2: folded map; gear; person bust; play triangle. Row 3: door with outward arrow; sun; crescent moon; diamond quest mark. Transparent ground. No cell borders, labels, letters, numbers or text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/tabs-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-e4d57697-e14a-4bed-bb53-135cdc3ba0af.png"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Replace these filled icons with STRICTLY simple thin gold #D3BC8E OUTLINE LINE ART. No solid fills anywhere, no 3D shading, no navy fills, no cream fills, no red/yellow artifacts. Uniform 3px stroke at final 96px. Transparent canvas, exact 4x3 evenly spaced grid. Row1: satchel outline; crossed hammer and saw outlines; book with leaf outlines; scroll with small pin outline. Row2: folded map outline; gear outline; simple generic person bust outline; simple play triangle outline. Row3: door with arrow outline; sun outline; crescent moon outline; plain diamond outline. The final diamond MUST contain no exclamation mark or letters. No text or characters anywhere. Each icon centred with 16px empty padding inside own 96x96 tile. Output sheet aspect 4:3.",
+        "raw": "assets-src/raw/ui-kit/tabs-2.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-ef7cbf46-58a9-4d7a-a691-4c7ff1a74623.png"
+      }
+    ],
+    "kept": 2
+  },
+  "tooltip": {
+    "prompt": "Use case: ui-mockup. Production browser RPG UI asset, Gilded Hearth: cozy Genshin-inspired crisp painted/vector illustration, fine gold filigree, cream parchment #ECE5D8 #F6F1E7 #DCD2BF, navy #3B4255 #1F2433 #141824, gold #D3BC8E #F0D48A #A6895A. Light upper left. No text, no letters, no watermark, no pixel art, no photorealism. Orthographic front view, no perspective. Real transparent ground outside the shape. ONE compact square dark navy tooltip panel 256x256, slightly rounded corners, deep navy #1F2433 opaque fill and thin gold hairline frame. Absolutely no corner ornaments or symbols. Corner 48px, edges straight and plain, flat blank centre for nine slicing.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/tooltip-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-95f18437-6bcc-4bc7-b350-8be92ec6362a.png"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Edit this exact tooltip asset. Keep square rounded outline with fine gold hairline and no ornaments. Fill the ENTIRE interior with solid opaque deep navy #1F2433. The centre MUST be uniformly solid navy, not transparent, no hole, no fading to transparency inside. ONLY exterior of rounded square transparent. Remove stray exterior colored pixels. Crisp simple UI panel, no text.",
+        "raw": "assets-src/raw/ui-kit/tooltip-2.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-5c8760db-30ce-44af-8314-6bfc3c573d3c.png"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Create a compact SQUARE tooltip panel from this reference. Remove ALL corner filigree, leaves, curls, diamonds and decorative marks. Keep only ONE fine gold hairline border. Change fill to perfectly flat SOLID OPAQUE NAVY #3B4255 uniformly across the whole interior including centre. Absolutely NO gradients, NO vignette, NO interior glow, NO interior shadow, NO fade, NO transparent hole. Entire interior must be one solid filled navy shape. Very slightly rounded corners. Real transparent pixels ONLY OUTSIDE the panel silhouette. No text. A flat simple UI rectangle intended 256x256 pixels with 48px nine slice corners, centered and filling canvas with a tiny exterior margin.",
+        "source": "/Users/dabot/.codex/generated_images/01a1cbff-3b02-7aa1-8cc7-f3df76c375aa/exec-7b7d7690-e28f-4222-905c-190377e2927a.png",
+        "raw": "assets-src/raw/ui-kit/tooltip-3.png"
+      }
+    ],
+    "kept": 3
+  },
+  "book-cover": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Square 640x640 book cover backing for an open book seen from above. Deep green-brown leather #2f3a2c to #3e3226, gold-tooled double border line, ornate brass/gold leaf corner caps entirely confined within each 128x128 corner. Centre is flat leather, no spine, no pages. Plain perfectly straight stretchable edges between corners. Small rounded corners, real transparent exterior, tight framing.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/book-cover-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-61bc34b2-6ef5-4387-9ce8-a74d9a13f079.png"
+      }
+    ],
+    "kept": 1
+  },
+  "page": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Square 512x512 seamless tileable cream book paper #efe6d2, very faint fibres, a few extremely soft age speckles. Low contrast uniform illumination. Full bleed opaque texture, no edge, border, vignette, fold or objects. Must repeat without seams on both axes.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/page-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-04db2184-572d-4c21-a357-7da3654608d3.png"
+      }
+    ],
+    "kept": 1
+  },
+  "gutter": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Tall narrow 128x512 open-book gutter fold overlay. Soft brown shadow in middle fading smoothly to REAL TRANSPARENT at left and right edges. A faint vertical stitched line exactly in centre. Uniform repeating vertical profile, seamlessly tileable vertically. No paper, no opaque background.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/gutter-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-bf6dd93b-0b01-4190-8d7a-72c5bbd3cdb4.png"
+      },
+      {
+        "attempt": 2,
+        "raw": "assets-src/raw/ui-kit/gutter-2.png",
+        "prompt": "One tall narrow book gutter SHADOW overlay, 128x512 intended pixels. Soft dark brown translucent vertical shadow strip, darkest at exact middle fading to REAL transparent at left and right sides. Faint small dark brown dashed stitching line in centre. NO GOLD, NO ORNAMENT, NO DIAMONDS, NO FILIGREE, NO PAPER BACKGROUND. Perfectly uniform darkness down entire height, no top or bottom caps. Vertically seamless repeating texture.",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-1c146848-de4d-490e-bb26-37d3ea2129dc.png"
+      }
+    ],
+    "kept": 2
+  },
+  "ribbon": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One narrow hanging bookmark ribbon, intended 72x320, straight vertical deep red #8c2f2f fabric with a thin gold edge on both sides, subtle painted shading, forked swallowtail at bottom, squared off top. Real transparent exterior. Fill canvas tightly, no metal pin or extra objects.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/ribbon-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-38f6ed44-1dee-42a4-8184-fa9e123fdf65.png"
+      }
+    ],
+    "kept": 1
+  },
+  "map-paper": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Square 512x512 seamless tileable aged chart parchment #e3d4b0. Warmer darker than book paper, soft low contrast tea stains. Uniform full bleed opaque texture, no grid, lines, symbols, map drawing, border or vignette. Repeats without seams on both axes.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/map-paper-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-7f189b8d-c3bd-4034-bf9d-df866ed85f12.png"
+      }
+    ],
+    "kept": 1
+  },
+  "compass": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One ornate eight-point compass rose 480x480 for a map corner, gold and navy, north point longer with small diamond at tip. Fine circular ring, fine leaf curls restrained. Entirely transparent ground between and around points, no filled background disc. No letters. Tight framing with tips fully in canvas.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/compass-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-bf827ac8-9550-48cc-9751-18771ecdc78b.png"
+      }
+    ],
+    "kept": 1
+  },
+  "map-fog": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. 512x512 seamless repeating unexplored-map fog texture, soft cloud wisps in warm cream-white at 30 to 70 percent alpha on REAL TRANSPARENT ground. Low contrast soft diffuse clouds, no sharp edge, no border, no vignette. Wisps repeat seamlessly both axes. No objects.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/map-fog-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-47d055bf-5eb4-43df-9eb8-3b93b52b700d.png"
+      }
+    ],
+    "kept": 1
+  },
+  "tile": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One square menu tile 320x320: deep navy #1f2433 fill at about 90 percent alpha, soft slightly lighter radial glow in upper part, fine gold hairline rim, tiny gold diamond accent confined at each of four corners within 80x80 corner area. Plain straight edges between corners, blank centre, subtle rounded corners, real transparent exterior. No icon.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/tile-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-9b5725a9-aff2-4218-b779-8f116205b6c8.png"
+      }
+    ],
+    "kept": 1
+  },
+  "tile-hover": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One square hovered menu tile 320x320: deep navy #1f2433 fill at about 90 percent alpha, warm soft gold radial glow in upper part, brighter DOUBLE gold hairline rim, tiny gold diamond accent confined at each of four corners within 80x80 corner area. Plain straight edges between corners, blank centre, subtle rounded corners, real transparent exterior. No icon.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/tile-hover-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-356a8303-9924-4f98-93fc-112ff1c2b3cd.png"
+      }
+    ],
+    "kept": 1
+  },
+  "detail": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One tall fixed-size item detail card 640x880. Warm amber-to-bronze painted gradient TOP HALF, a soft tiny sparkle and faint star map constellation linework. Fade smoothly into flat cream #ece5d8 LOWER HALF where text will go, absolutely blank lower half. Fine gold hairline rim, rounded top corners, real transparent exterior. No text, no item illustration.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/detail-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-1c12b478-b4fd-4915-beaa-d0a01f02133f.png"
+      }
+    ],
+    "kept": 1
+  },
+  "slot-empty": {
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One very quiet empty bag slot 160x160 on cream paper, subtle inset well in slightly darker cream #ddd2bd, faint bronze hairline rim, tiny diamond in exact centre about 10 pixels at 30 percent alpha. Small rounded corners, transparent exterior. Very low contrast since 36 sit together. Corners within 40px, plain stretchable straight edges.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "raw": "assets-src/raw/ui-kit/slot-empty-1.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-77edaaad-3fef-4ee9-8d65-85a9f0949b3b.png"
+      },
+      {
+        "attempt": 2,
+        "raw": "assets-src/raw/ui-kit/slot-empty-2.png",
+        "prompt": "One very plain quiet cream inset bag slot 160x160, square with slightly rounded corners. Fill #ddd2bd, barely visible bronze hairline rim. A single tiny 10px diamond exactly at centre at only 30 percent alpha. NO CORNER ORNAMENT, NO LEAVES, NO CURLS, NO EXTRA DIAMONDS, NO double rim. Flat low contrast interior, subtle inset shadow. Transparent exterior. Empty quiet slot repeated 36 times in inventory. Nine slice 40px corners.",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-1d9c3626-dfe2-406b-8bda-c15a88f9e2df.png"
+      }
+    ],
+    "kept": 2
+  },
+  "icons2": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Create icons2.png: a perfectly regular 4 by 4 sheet, 384x384 intended, 96-square cells. Every glyph centred in its own cell with 18px clear padding. Fine single gold outlines with transparent interiors, like existing tabs.png. Row 1: drawstring pouch, open hand palm, small round forest creature with leaf sprout, paw print. Row 2: two-leaf sprout, head and shoulders, little house, magnifier plus. Row 3: magnifier minus, crosshair target, map pin, small flag. Row 4: X close mark, chevron left, chevron right, grabbing hand. All sixteen separate, no dividing lines, no labels. Gold hairline icons on transparency.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-f93075e9-9897-4a3e-9588-f3c499989b58.png",
+        "raw": "assets-src/raw/ui-kit/icons2-1.png"
+      },
+      {
+        "attempt": 2,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-0281338d-47c8-4227-8477-6d96d81b4a43.png",
+        "raw": "assets-src/raw/ui-kit/icons2-2.png",
+        "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Use the attached tabs.png as the exact line-weight and gold colour reference. Create 16 very THIN FLAT GOLD LINE glyphs on ENTIRELY TRANSPARENT canvas, NO CREAM PAPER, NO FILL, NO GRADIENT BACKDROP, NO SHADOW, NO BEVEL. 4x4 equally spaced grid, square output. Row1 pouch, open palm, leaf-sprout forest creature, paw. Row2 sprout, person bust, house, magnifier plus. Row3 magnifier minus, crosshair, map pin, flag. Row4 X, left chevron, right chevron, grabbing hand. Each glyph occupies central 60% of its cell. Gold #D3BC8E uniform hairlines. Background alpha zero including enclosed holes."
+      },
+      {
+        "attempt": 3,
+        "raw": "assets-src/raw/ui-kit/icons2-3.png",
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-c5b631db-61ce-4aad-abd0-f405d6cc6f99.png",
+        "prompt": "Edit this icon sheet. Keep every glyph, grid position, thin gold line weight and transparent ground unchanged EXCEPT the top-left icon: replace the handbag with a SMALL DRAWSTRING POUCH, rounded sack body cinched at neck, two loose cord ends. No handle or flap. All 16 glyphs remain. Remove any background haze so all background pixels and holes are truly transparent. No lettering. Exact gold #D3BC8E."
+      }
+    ],
+    "kept": 3
+  },
+  "keycap": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. A dark navy rounded rectangle game keycap with a fine gold hairline and subtle upper bevel. Empty centre for a key letter added later. Corners fit in 40px end caps. Front view. Fill almost entire canvas, small transparent outer margin.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-4ebbb1b1-1155-4520-94ab-9eef44323bce.png",
+        "raw": "assets-src/raw/ui-kit/keycap-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "card-frame": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. A thin gold outline frame for a tall item card, rounded corners, one tiny four-point star at top centre. Transparent empty interior and exterior. Aspect 192:232. Match card.png rim silhouette. No fill, no card illustration.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-bd4ac74e-73c0-46e5-8e81-e2eddbef6252.png",
+        "raw": "assets-src/raw/ui-kit/card-frame-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "rail": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Very wide shallow menu top rail aspect 10:1. Dark navy band across entire width fading into transparency at bottom. Fine gold bottom hairline with tiny diamond precisely centred. Restrained gold filigree only at far left and right within 200px caps. Plain horizontal middle, no text.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-7432fa62-06ef-4e71-aeff-ddf7d4650edf.png",
+        "raw": "assets-src/raw/ui-kit/rail-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "leather": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Seamlessly tileable square warm brown satchel leather texture #6b4a2f to #5a3d26. Soft fine leather grain, very low contrast, even lighting. Full bleed opaque texture, no border, seams, ornament or lighting vignette.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-2f32acd1-c8f8-48b5-bdb3-4c3e982992c0.png",
+        "raw": "assets-src/raw/ui-kit/leather-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "leather-panel": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Square stitched warm brown satchel leather panel #6b4a2f to #5a3d26. Darker rolled edge, row of cream stitches 24px inward, small brass rivets at corners. 96px nine-slice corners, perfectly plain straight stretchable edges, blank quiet leather centre. Slight rounded corners, transparency outside only.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-0cb9ac7d-eb67-48c0-8d07-873aca64a187.png",
+        "raw": "assets-src/raw/ui-kit/leather-panel-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "pocket": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. Square inventory pocket sewn onto brown leather. Slightly darker inset leather #5a3d26, fine cream stitch row around rim, very subtle top lip shadow. Small rounded corners within 40px nine-slice, plain straight edges and empty quiet leather middle. No objects or ornaments.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-005b38e4-97be-4915-941d-d2e13c592469.png",
+        "raw": "assets-src/raw/ui-kit/pocket-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "tag": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One tall blank cream paper luggage tag, aspect 2:3. Clipped upper shoulders, rounded lower corners, aged paper edges. Punched hole near top reinforced with brass grommet, small closed loop of twine through hole. All fits canvas. Large completely blank cream field for item details. Real transparency around tag and inside twine loop.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-34957142-122d-49c7-8d34-fccecdcb3de5.png",
+        "raw": "assets-src/raw/ui-kit/tag-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "roller": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One very wide shallow wooden scroll roller aspect 12.5:1, viewed straight from front. Turned dark brown wood shaft, understated wood grain, brass end caps on left and right within 200px. Plain straight shaft between end caps for horizontal nine-slice stretching. Entire roller fits canvas. No paper, text or other objects.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-72925d18-e63a-4979-9a09-daad425da277.png",
+        "raw": "assets-src/raw/ui-kit/roller-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "bookmark": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow cream cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view with minimal folds, aspect 96:260. Real alpha outside.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-f315b70e-c043-4f5a-9ce2-d5b33b81e7da.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "bookmark-red": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow deep red #8c2f2f cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view minimal folds, aspect 96:260, real alpha outside.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-37ba80c0-738d-4a9c-8252-29725a9dc8e3.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-red-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "bookmark-green": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow forest green #3d6b3a cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view minimal folds, aspect 96:260, real alpha outside.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-bba853a2-a8a1-4bac-8641-3c5e3063b8d5.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-green-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "bookmark-blue": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow navy blue #34507a cloth bookmark tab, flat straight top and swallowtail V-notched bottom. Thin gold edge, faint woven cloth texture, entirely blank face. Front view minimal folds, aspect 96:260, real alpha outside.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-51f14ad9-b2b4-4a5a-b4a8-7fa1c1f362be.png",
+        "raw": "assets-src/raw/ui-kit/bookmark-blue-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "seal": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One round deep red wax seal button, irregular poured wax edges, pressed four-point star in middle. Soft warm top-left highlights, crisp painted illustration. No letters, crests or other marks, transparent exterior.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-0a933551-ff8d-4729-b5b5-0a0acb2c92b9.png",
+        "raw": "assets-src/raw/ui-kit/seal-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "seal-gold": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One round gold wax seal button #D3BC8E #F0D48A #A6895A, irregular poured wax edges, pressed four-point star in middle. Soft warm top-left highlights, crisp painted illustration. No letters, crests or other marks, transparent exterior.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-a406680e-4983-4d0d-993c-7ece26062726.png",
+        "raw": "assets-src/raw/ui-kit/seal-gold-1.png"
+      }
+    ],
+    "kept": 1
+  },
+  "page-edges": {
+    "prompt": "Production browser RPG UI bitmap in the Gilded Hearth kit. Match reference palette and crisp painted finish: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Thin restrained gold linework, warm upper-left light. Orthographic front view, no perspective. NO text, letters, numbers, logos, watermark or pixel art. True alpha outside, no matte, halo or ground shadow. One asset only. Save locally and return path. One narrow vertical strip of stacked page edges of a thick open book, aspect 1:8. Many thin horizontal cream #ECE5D8 paper lines and slight warm gray shading. Full bleed opaque texture, tileable vertically with no border or ornament. Front view flat, no perspective, no curved book silhouette.",
+    "tool": "built-in image_gen",
+    "attempts": [
+      {
+        "attempt": 1,
+        "source": "/Users/dabot/.codex/generated_images/01a1cc48-02c5-7780-b70c-38635b79248d/exec-b5f1b6c8-3519-4fa9-93f8-a207ee4a661a.png",
+        "raw": "assets-src/raw/ui-kit/page-edges-1.png"
+      }
+    ],
+    "kept": 1
+  }
+}

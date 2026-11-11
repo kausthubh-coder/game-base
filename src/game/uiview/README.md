@@ -27,8 +27,8 @@ Each feature is used in one file: hud in `ui-hud`, map in `ui-map`, dialogue in 
 | File | What is in it |
 |---|---|
 | `book.ts` | `bookOf(view)`: the one `createGameUi`, the pictures, which panel is open, `onPanel`, `onStart`, `onSize`. The first view that asks makes it, so the views work in any order. |
-| `art.ts` | Icons by name from either icon sheet, portraits, a sprite's first frame, and the `ui` pictures |
-| `theme.ts` | The look's tokens as `--ui-*` on the views' root (paper, ink, the teal accent, the dark glass for the HUD), the `--book-*` names the features read, and `frame(element)`, which gives an element the panel's paper |
+| `art.ts` | Icons by name from either icon sheet, portraits, a sprite's first frame, the `ui` pictures, and the lazy `uikit`: its image URLs and its gold line icons (`tabElement`) |
+| `theme.ts` | The look's tokens as `--ui-*` on the views' root (paper, ink, gold, the night glass), the two fonts, the `--book-*` names the features read, the painted kit's rules (`KIT`, `kitStyle`) and `frame(element)`, which gives an element the panel's paper. The look is described in `docs/ui-look.md`. |
 | `keys.ts` | `KEY_LIST` for Settings, `PANEL_KEYS` for the panels view, the keys that move a conversation on |
 | `voices.ts` | A sound-engine voice for each speaker's voice id |
 | `opening.ts` | The opening's clock (`createOpening`), its rule (`playsOpening`: fresh, chosen from the title, the flag `story.opening` not set) and the title's mark in sessionStorage |

@@ -1,0 +1,129 @@
+{
+  "book-cover": {
+    "size": [
+      640,
+      640
+    ],
+    "slice": [
+      128,
+      128,
+      128,
+      128
+    ],
+    "text": "Square 640x640 book cover backing for an open book seen from above. Deep green-brown leather #2f3a2c to #3e3226, gold-tooled double border line, ornate brass/gold leaf corner caps entirely confined within each 128x128 corner. Centre is flat leather, no spine, no pages. Plain perfectly straight stretchable edges between corners. Small rounded corners, real transparent exterior, tight framing.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Square 640x640 book cover backing for an open book seen from above. Deep green-brown leather #2f3a2c to #3e3226, gold-tooled double border line, ornate brass/gold leaf corner caps entirely confined within each 128x128 corner. Centre is flat leather, no spine, no pages. Plain perfectly straight stretchable edges between corners. Small rounded corners, real transparent exterior, tight framing.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-61bc34b2-6ef5-4387-9ce8-a74d9a13f079.png"
+  },
+  "page": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both",
+    "text": "Square 512x512 seamless tileable cream book paper #efe6d2, very faint fibres, a few extremely soft age speckles. Low contrast uniform illumination. Full bleed opaque texture, no edge, border, vignette, fold or objects. Must repeat without seams on both axes.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Square 512x512 seamless tileable cream book paper #efe6d2, very faint fibres, a few extremely soft age speckles. Low contrast uniform illumination. Full bleed opaque texture, no edge, border, vignette, fold or objects. Must repeat without seams on both axes.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-04db2184-572d-4c21-a357-7da3654608d3.png"
+  },
+  "gutter": {
+    "size": [
+      128,
+      512
+    ],
+    "repeat": "vertical",
+    "text": "Tall narrow 128x512 open-book gutter fold overlay. Soft brown shadow in middle fading smoothly to REAL TRANSPARENT at left and right edges. A faint vertical stitched line exactly in centre. Uniform repeating vertical profile, seamlessly tileable vertically. No paper, no opaque background.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Tall narrow 128x512 open-book gutter fold overlay. Soft brown shadow in middle fading smoothly to REAL TRANSPARENT at left and right edges. A faint vertical stitched line exactly in centre. Uniform repeating vertical profile, seamlessly tileable vertically. No paper, no opaque background.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-bf6dd93b-0b01-4190-8d7a-72c5bbd3cdb4.png"
+  },
+  "ribbon": {
+    "size": [
+      72,
+      320
+    ],
+    "text": "One narrow hanging bookmark ribbon, intended 72x320, straight vertical deep red #8c2f2f fabric with a thin gold edge on both sides, subtle painted shading, forked swallowtail at bottom, squared off top. Real transparent exterior. Fill canvas tightly, no metal pin or extra objects.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One narrow hanging bookmark ribbon, intended 72x320, straight vertical deep red #8c2f2f fabric with a thin gold edge on both sides, subtle painted shading, forked swallowtail at bottom, squared off top. Real transparent exterior. Fill canvas tightly, no metal pin or extra objects.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-38f6ed44-1dee-42a4-8184-fa9e123fdf65.png"
+  },
+  "map-paper": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both",
+    "text": "Square 512x512 seamless tileable aged chart parchment #e3d4b0. Warmer darker than book paper, soft low contrast tea stains. Uniform full bleed opaque texture, no grid, lines, symbols, map drawing, border or vignette. Repeats without seams on both axes.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. Square 512x512 seamless tileable aged chart parchment #e3d4b0. Warmer darker than book paper, soft low contrast tea stains. Uniform full bleed opaque texture, no grid, lines, symbols, map drawing, border or vignette. Repeats without seams on both axes.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-7f189b8d-c3bd-4034-bf9d-df866ed85f12.png"
+  },
+  "compass": {
+    "size": [
+      480,
+      480
+    ],
+    "text": "One ornate eight-point compass rose 480x480 for a map corner, gold and navy, north point longer with small diamond at tip. Fine circular ring, fine leaf curls restrained. Entirely transparent ground between and around points, no filled background disc. No letters. Tight framing with tips fully in canvas.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One ornate eight-point compass rose 480x480 for a map corner, gold and navy, north point longer with small diamond at tip. Fine circular ring, fine leaf curls restrained. Entirely transparent ground between and around points, no filled background disc. No letters. Tight framing with tips fully in canvas.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-bf827ac8-9550-48cc-9751-18771ecdc78b.png"
+  },
+  "map-fog": {
+    "size": [
+      512,
+      512
+    ],
+    "repeat": "both",
+    "text": "512x512 seamless repeating unexplored-map fog texture, soft cloud wisps in warm cream-white at 30 to 70 percent alpha on REAL TRANSPARENT ground. Low contrast soft diffuse clouds, no sharp edge, no border, no vignette. Wisps repeat seamlessly both axes. No objects.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. 512x512 seamless repeating unexplored-map fog texture, soft cloud wisps in warm cream-white at 30 to 70 percent alpha on REAL TRANSPARENT ground. Low contrast soft diffuse clouds, no sharp edge, no border, no vignette. Wisps repeat seamlessly both axes. No objects.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-47d055bf-5eb4-43df-9eb8-3b93b52b700d.png"
+  },
+  "tile": {
+    "size": [
+      320,
+      320
+    ],
+    "slice": [
+      80,
+      80,
+      80,
+      80
+    ],
+    "text": "One square menu tile 320x320: deep navy #1f2433 fill at about 90 percent alpha, soft slightly lighter radial glow in upper part, fine gold hairline rim, tiny gold diamond accent confined at each of four corners within 80x80 corner area. Plain straight edges between corners, blank centre, subtle rounded corners, real transparent exterior. No icon.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One square menu tile 320x320: deep navy #1f2433 fill at about 90 percent alpha, soft slightly lighter radial glow in upper part, fine gold hairline rim, tiny gold diamond accent confined at each of four corners within 80x80 corner area. Plain straight edges between corners, blank centre, subtle rounded corners, real transparent exterior. No icon.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-9b5725a9-aff2-4218-b779-8f116205b6c8.png"
+  },
+  "tile-hover": {
+    "size": [
+      320,
+      320
+    ],
+    "slice": [
+      80,
+      80,
+      80,
+      80
+    ],
+    "text": "One square hovered menu tile 320x320: deep navy #1f2433 fill at about 90 percent alpha, warm soft gold radial glow in upper part, brighter DOUBLE gold hairline rim, tiny gold diamond accent confined at each of four corners within 80x80 corner area. Plain straight edges between corners, blank centre, subtle rounded corners, real transparent exterior. No icon.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One square hovered menu tile 320x320: deep navy #1f2433 fill at about 90 percent alpha, warm soft gold radial glow in upper part, brighter DOUBLE gold hairline rim, tiny gold diamond accent confined at each of four corners within 80x80 corner area. Plain straight edges between corners, blank centre, subtle rounded corners, real transparent exterior. No icon.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-356a8303-9924-4f98-93fc-112ff1c2b3cd.png"
+  },
+  "detail": {
+    "size": [
+      640,
+      880
+    ],
+    "text": "One tall fixed-size item detail card 640x880. Warm amber-to-bronze painted gradient TOP HALF, a soft tiny sparkle and faint star map constellation linework. Fade smoothly into flat cream #ece5d8 LOWER HALF where text will go, absolutely blank lower half. Fine gold hairline rim, rounded top corners, real transparent exterior. No text, no item illustration.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One tall fixed-size item detail card 640x880. Warm amber-to-bronze painted gradient TOP HALF, a soft tiny sparkle and faint star map constellation linework. Fade smoothly into flat cream #ece5d8 LOWER HALF where text will go, absolutely blank lower half. Fine gold hairline rim, rounded top corners, real transparent exterior. No text, no item illustration.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-1c12b478-b4fd-4915-beaa-d0a01f02133f.png"
+  },
+  "slot-empty": {
+    "size": [
+      160,
+      160
+    ],
+    "slice": [
+      40,
+      40,
+      40,
+      40
+    ],
+    "text": "One very quiet empty bag slot 160x160 on cream paper, subtle inset well in slightly darker cream #ddd2bd, faint bronze hairline rim, tiny diamond in exact centre about 10 pixels at 30 percent alpha. Small rounded corners, transparent exterior. Very low contrast since 36 sit together. Corners within 40px, plain stretchable straight edges.",
+    "prompt": "Use case: ui-mockup. Gilded Hearth production browser RPG UI asset. Crisp painted/vector-like illustration matching existing ornate cream/gold kit: gold #D3BC8E #F0D48A #A6895A, navy #3B4255 #1F2433, cream #ECE5D8. Fine hairline gold, restrained leaf curls and diamonds. Orthographic front view, no perspective, no text, letters, numbers, watermark or pixel art. No matte or halo. Output one asset only, save locally and return file path. One very quiet empty bag slot 160x160 on cream paper, subtle inset well in slightly darker cream #ddd2bd, faint bronze hairline rim, tiny diamond in exact centre about 10 pixels at 30 percent alpha. Small rounded corners, transparent exterior. Very low contrast since 36 sit together. Corners within 40px, plain stretchable straight edges.",
+    "source": "/Users/dabot/.codex/generated_images/01a1cc1a-0852-7b03-ab71-efe687072807/exec-77edaaad-3fef-4ee9-8d65-85a9f0949b3b.png"
+  }
+}

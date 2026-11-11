@@ -55,6 +55,20 @@ export interface Manifest {
   sheets: Record<string, TileSheetEntry>;
   /** Every other entry that is a list of whole images, such as `ui`: a name maps to a file. An entry of any other shape is left out. */
   images: Record<string, Record<string, string>>;
+  /**
+   * The interface's painted kit, `uikit` in the file. It is lazy: the loader never fetches it, so it costs the first
+   * frame nothing. The page asks for each file as CSS draws it. Paths are relative to the manifest's folder.
+   */
+  uikit?: UiKitEntry;
+}
+
+export interface UiKitEntry {
+  /** Whole images by name: `panel`, `slot`, `minimap-ring` … */
+  images: Record<string, string>;
+  /** A sheet of square line icons by name, or undefined. */
+  tabs?: TileSheetEntry;
+  /** More sheets of icons: every other entry shaped like a sheet of tiles, such as `tabs2`. */
+  sheets: Record<string, TileSheetEntry>;
 }
 
 /** A problem with the manifest or a file it lists. The message names the entry or the file. */
@@ -195,6 +209,16 @@ function tileSheet(value: Json, path: string): TileSheetEntry {
   return { tile: wholeAtLeast(value.tile, 1, `${path}.tile`), sheet: filePath(value[file], `${path}.${file}`), names };
 }
 
+function uiKit(value: Json): UiKitEntry {
+  const listed = object(value.images, 'uikit.images');
+  const images: Record<string, string> = {};
+  for (const name of Object.keys(listed)) images[name] = filePath(listed[name], `uikit.images.${name}`);
+  const tabs = value.tabs === undefined ? undefined : tileSheet(object(value.tabs, 'uikit.tabs'), 'uikit.tabs');
+  const sheets: Record<string, TileSheetEntry> = {};
+  for (const [name, entry] of Object.entries(value)) if (name !== 'tabs' && looksLikeTileSheet(entry)) sheets[name] = tileSheet(entry, `uikit.${name}`);
+  return { images, tabs, sheets };
+}
+
 /** Checks parsed JSON against the contract and returns it typed. Throws an `AssetError` that names what is wrong. */
 export function parseManifest(json: unknown): Manifest {
   const root = object(json, 'the file');
@@ -209,6 +233,10 @@ export function parseManifest(json: unknown): Manifest {
   // and one that maps names to PNG files as a list of images. Anything else is not this loader's to judge.
   for (const [name, value] of Object.entries(root)) {
     if (name === 'version' || name === 'sprites' || name === 'blocks' || name === 'icons') continue;
+    if (name === 'uikit') {
+      manifest.uikit = uiKit(object(value, 'uikit'));
+      continue;
+    }
     if (looksLikeTileSheet(value)) manifest.sheets[name] = tileSheet(value, name);
     else if (looksLikeImages(value)) {
       manifest.images[name] = {};

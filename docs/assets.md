@@ -162,6 +162,13 @@ Additional manifest sections use the same PNG contract:
 1 back and 2 right-facing side, three frames at 9 fps, frame 128-square, anchor `[64,120]`,
 world height 2. `sprites.hero` remains approved and unchanged.
 
+## The interface kit
+
+`uikit` lists the painted interface pieces in `public/assets/ui/kit/`: `images` maps a name to a PNG, and `tabs` is a
+sheet of 96 px gold line icons. The loader parses it but never fetches it, so it costs the first frame nothing; the
+page loads each file when CSS first draws it. `docs/ui-look.md` describes the kit, and the `make-ui` skill says how
+to add a piece.
+
 ## Optional Blender models
 
 The look test permits code-generated GLB files under `public/assets/models/`.

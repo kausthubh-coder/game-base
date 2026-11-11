@@ -6,7 +6,7 @@
 import type { Game } from '../api.sim.ts';
 import { almanacPanel } from './almanac.ui.ts';
 import { bagPanel, makePanel } from './bag.ui.ts';
-import { focusables, h } from './dom.ui.ts';
+import { focusables, h, lineIcon } from './dom.ui.ts';
 import { readSettings } from './logic.ui.ts';
 import { endPanel, pausePanel, settingsPanel, titlePanel } from './menus.ui.ts';
 import { createOverlay } from './overlay.ui.ts';
@@ -83,17 +83,27 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
       current = name;
       view = build(name, detail);
       const framed = view.framed !== false;
-      panel = h('div', { class: `gu-panel ${view.className ?? ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': view.title, tabindex: -1 },
-        framed
-          ? h('header', { class: 'gu-panel-head' },
-              h('h2', { class: 'gu-panel-title' }, view.title),
-              view.head ?? null,
-              h('button', { class: 'gu-close', type: 'button', 'aria-label': NESTED.includes(name) && behind ? 'Back' : 'Close', onclick: () => ui.close() }, '×'),
-            )
-          : null,
-        h('div', { class: 'gu-panel-body' }, view.body),
-      );
-      stage.className = `gu-stage gu-stage-${name}`;
+      const close = (): HTMLElement => h('button', { class: 'gu-close', type: 'button', 'aria-label': NESTED.includes(name) && behind ? 'Back' : 'Close', onclick: () => ui.close() }, '×');
+      const { screen } = view;
+      // A full-screen menu: a rail across the top with the name, the tabs and the close button, and one of key prompts at the bottom.
+      panel = screen
+        ? h('div', { class: `gu-panel gu-screen ${view.className ?? ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': view.title, tabindex: -1 },
+            h('header', { class: 'gu-rail gu-rail-top' },
+              h('div', { class: 'gu-rail-name' },
+                h('span', { class: 'gu-rail-icon', 'aria-hidden': true }, lineIcon(options.ornament, screen.icon, view.title)),
+                h('h2', { class: 'gu-panel-title' }, view.title),
+              ),
+              view.head ?? h('span'),
+              close(),
+            ),
+            h('div', { class: 'gu-panel-body' }, view.body),
+            h('footer', { class: 'gu-rail gu-rail-foot' }, screen.cues),
+          )
+        : h('div', { class: `gu-panel ${view.className ?? ''}`, role: 'dialog', 'aria-modal': 'true', 'aria-label': view.title, tabindex: -1 },
+            framed ? h('header', { class: 'gu-panel-head' }, h('h2', { class: 'gu-panel-title' }, view.title), view.head ?? null, close()) : null,
+            h('div', { class: 'gu-panel-body' }, view.body),
+          );
+      stage.className = `gu-stage gu-stage-${name}${screen ? ' gu-stage-screen' : ''}`;
       stage.replaceChildren(panel);
       stage.hidden = false;
       view.render();

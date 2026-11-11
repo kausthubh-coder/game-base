@@ -718,7 +718,10 @@ const QUESTS = {
       await press('KeyB');
       await page.waitForSelector('.gu-stage-bag:not([hidden])');
       await page.click('[data-key="tab:hand"]');
+      // A recipe card puts the thing in the detail column, and its Make button makes it.
+      await page.click('[data-key="recipe:plank"]');
       for (let i = 0; i < 6; i++) await page.click('[data-key="make:plank"]');
+      await page.click('[data-key="recipe:workbench"]');
       await page.click('[data-key="make:workbench"]');
       if (SHOTS) await shot('12-by-hand.png');
       await press('Escape');
