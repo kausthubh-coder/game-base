@@ -43,6 +43,11 @@ export interface DebugDoor {
    * `addsUp` says they are equal.
    */
   costs(): CostReport;
+  /**
+   * Shader programs: how many the renderer holds, how many were compiled in the middle of a draw since the page
+   * loaded (each a possible stall, with the features that caused the latest), and how the warm-up stands.
+   */
+  programs(): { count: number; compiledInDraw: number; latest: string[]; warm: 'cold' | 'warming' | 'warm'; warmRuns: number; late: number; held: number };
 
   // ---- beyond the table: what a test needs around the calls above
   /** True when a game is running. */
@@ -258,6 +263,11 @@ export function createDoor(shell: Shell): DebugDoor {
     },
 
     costs: () => view.perf.costs.read(),
+
+    programs() {
+      const compiles = view.perf.costs.compiles(), warm = view.perf.warm.stats;
+      return { count: compiles.programs, compiledInDraw: compiles.inDraw, latest: compiles.latest, warm: warm.state, warmRuns: warm.runs, late: warm.late, held: warm.held };
+    },
 
     get started() { return view.started; },
     newGame: () => view.newGame(),

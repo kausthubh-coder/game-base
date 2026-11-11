@@ -118,9 +118,10 @@ The calls in `docs/play/act1.md`, and a few more for tests:
 | `aimAt(x, y, z)` | Free and first person: turns the view so the middle of the screen falls on that point |
 | `frames(n)`, `settle()` | Promises: n frames drawn, the land in view loaded and drawn |
 | `costs()` | The last frame's draw calls and triangles by feature (land, grass, trees, town). The rows add up to the totals. |
+| `programs()` | Shader programs held, how many were compiled in the middle of a draw, and the warm-up's state |
 | `view` | The `GameView` |
 
-Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hold a quality level (`low`, `medium`, `high` or `ultra`) and `?perf=1` to show the meter. `src/features/perf/README.md` says what the call gives. `advance` does nothing before a game has started.
+Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hold a quality level (`low`, `medium`, `high` or `ultra`) and `?perf=1` to show the meter. `src/features/perf/README.md` says what the last two calls give. `advance` does nothing before a game has started.
 
 `bun tools/play-act1.mjs --port 5364 --dist dist-trees-act1` runs the five-quest browser check with its own port and build folder. Its save check compares standing and felled trees, the bonded pet, the bag and the tracked quest after Continue.
 

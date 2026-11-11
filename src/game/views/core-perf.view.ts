@@ -1,6 +1,14 @@
-// What the game tells the performance meter (src/features/perf): which feature each object of the scene
-// belongs to, so `window.__game.costs()` can say what the land, the grass, the trees, the town and the rest
-// each cost in draw calls and triangles.
+// What the game tells the performance meter (src/features/perf):
+//
+// - Which feature each object of the scene belongs to, so `window.__game.costs()` can say what the land, the
+//   grass, the trees, the town and the rest each cost in draw calls and triangles.
+// - When to warm the shaders. While the title is up and the land in view has arrived, everything in the scene
+//   is compiled in the background, the hidden things too: the build grid, the lamps, the town across the river.
+//   A start that comes sooner (a reload into the game, a test through the debug door) has it compiled at the
+//   start of the first frame instead, before that frame's picture.
+//
+// The shell has no hook for "a game is about to start", so this view puts itself in front of `view.newGame`
+// and `view.continueGame`. A hook in the shell would be the cleaner place.
 import type { GameView } from '../shell/view.ts';
 
 /** The feature of each named object in the scene. An object with no name here is listed as `other: <its name>`. */
@@ -44,6 +52,29 @@ const FEATURES: Readonly<Record<string, string>> = {
   'waypoint-beam': 'markers',
 };
 
+/** Frames with nothing left to mesh before the land in view counts as arrived. */
+const SETTLED = 3;
+
 export function install(view: GameView): void {
-  view.perf.costs.names(FEATURES);
+  const { costs, warm } = view.perf;
+  costs.names(FEATURES);
+
+  let quiet = 0, asked = false;
+  view.onFrame(() => {
+    if (asked) return;
+    quiet = view.world.stats.queue === 0 ? quiet + 1 : 0;
+    if (quiet < SETTLED) return;
+    asked = true;
+    void warm.start();
+  });
+
+  const newGame = view.newGame, continueGame = view.continueGame;
+  view.newGame = () => {
+    if (!view.started) warm.finish();
+    newGame();
+  };
+  view.continueGame = () => {
+    if (!view.started) warm.finish();
+    return continueGame();
+  };
 }

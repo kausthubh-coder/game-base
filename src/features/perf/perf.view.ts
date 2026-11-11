@@ -4,10 +4,12 @@
 // The meter reads the renderer's counters itself. The host tells it what it cannot see: how long
 // the rules took (`begin('sim')`, `end('sim')`) and the world's numbers (`counters`).
 // `costs` splits the draw calls and triangles by feature (cost.view.ts).
+// `warm` compiles shaders before the things that wear them are seen (warm.view.ts).
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import type { Quality } from '../../engine/types.ts';
 import type { Level } from '../../content/quality.ts';
 import { createCostMeter, type CostMeter } from './cost.view.ts';
+import { createWarm, type Warm } from './warm.view.ts';
 import { Governor, type GovernorOptions } from './governor.sim.ts';
 import { createPerfPanel } from './perf.ui.ts';
 import { FrameStats } from './stats.sim.ts';
@@ -67,6 +69,8 @@ export interface PerfView extends ViewSystem {
   readonly quality: Level;
   /** Draw calls and triangles by feature, and shader programs compiled in the middle of a draw. */
   readonly costs: CostMeter;
+  /** Shader warm-up. It does nothing until the host calls `warm.start()` or `warm.finish()`. */
+  readonly warm: Warm;
   /** The graphics chip's name, as the browser gives it. */
   readonly gpu: string;
   /** Start and stop a timer. Wrap the whole frame in 'frame' and the rules in 'sim'. */
@@ -94,6 +98,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     chunks: 0, meshQueue: 0, geometries: 0, textures: 0, heapMb: -1, quality: ctx.quality, renderScale: 1, auto: options.auto !== false,
   };
   const costs = createCostMeter(renderer, ctx.scene);
+  const warm = createWarm(ctx, { costs });
   const stress = Math.max(0.25, Number(new URLSearchParams(location.search).get('stress')) || 1);
   const started: Record<PerfSlot, number> = { frame: 0, sim: 0 };
   let simThisFrame = 0, sinceText = 1, warmup = 3, worstMesh = 0;
@@ -179,6 +184,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     stress,
     get quality() { return snapshot.quality; },
     costs,
+    warm,
     gpu,
 
     begin(slot) {
@@ -251,6 +257,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     },
 
     dispose() {
+      warm.dispose();
       costs.dispose();
       renderer.info.autoReset = true;
       renderer.setPixelRatio(basePixelRatio);

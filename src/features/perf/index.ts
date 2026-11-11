@@ -3,3 +3,4 @@ export { createPerf, type PerfCounters, type PerfOptions, type PerfSlot, type Pe
 export { FrameStats } from './stats.sim.ts';
 export { Governor, DEFAULT_GOVERNOR, type GovernorOptions, type GovernorStep } from './governor.sim.ts';
 export { createCostMeter, type CompileCount, type CostMeter, type CostReport, type FeatureCost } from './cost.view.ts';
+export { createWarm, type Warm, type WarmOptions, type WarmStats } from './warm.view.ts';
