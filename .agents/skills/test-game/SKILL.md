@@ -35,7 +35,8 @@ A check finds only what it asserts. To find what nobody asserted (how it looks, 
 
 1. Make it happen on demand: a scenario that fails, a bot's replay command, or a recording that fails. Say how often it fails out of how many tries.
 2. Write it to `docs/bugs/<date>-<name>.md`: what you did, what you expected, what happened, the seed and step or the recording, the replay command. Read the files there first, so the same bug is not filed twice.
-3. The fix makes the check pass, and the check stays in the repo.
+3. A check that fails until the fix would turn `bun run verify` red for everyone, so until then a failing recording lives beside its bug file as `docs/bugs/<date>-<name>.json` (`bun tools/play.mjs replay <file>` takes any path), and a failing scenario is written into the bug file.
+4. The fix makes the check pass and moves it to its home (`tools/play/scenarios/`, `src/game/scenarios/`), where it stays.
 
 A tester reports and does not fix game code, unless the brief says so. The fix goes to whoever builds.
 

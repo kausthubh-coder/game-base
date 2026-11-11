@@ -62,7 +62,7 @@ Done playing when the budget is spent or the charter's part is played through, a
 ## 4. Report
 
 1. `bun tools/play.mjs journal` writes the playtest as a page and the notes as a list. `bun tools/play.mjs stop`.
-2. **Each bug becomes a script before anyone fixes it.** Make it happen again and count how often (3 of 3, 1 of 5). Then write the check with the `test-game` skill: a recording with `see` or `check` that fails today, or a scenario. File it in `docs/bugs/` as that skill says.
+2. **Each bug becomes a script before anyone fixes it.** Make it happen again and count how often (3 of 3, 1 of 5). Then write the check with the `test-game` skill: a recording with `see` or `check` that fails today, or a scenario. File it in `docs/bugs/` as that skill says, with the failing recording beside it.
 3. Write `docs/playtests/<date>-<charter>.md`: the charter, the renderer and size, how many actions were played, then the findings, worst for a player first. Each finding has what you did, what you saw, why it reads as wrong, and its picture. `bun tools/play.mjs journal --to docs/playtests/img/<date>-<charter>` copies each noted picture there as a small JPEG; link those. End with what you did not reach.
 4. Set the part's date in `docs/playtests/README.md`.
 
