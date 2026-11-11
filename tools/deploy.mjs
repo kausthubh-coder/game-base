@@ -25,8 +25,10 @@ function readEnvFile(name) {
   return found;
 }
 const live = readEnvFile('.env.live.local');
-/** The environment wins, then the live file. */
-const setting = (name) => process.env[name] || live[name] || '';
+const dev = readEnvFile('.env.local');
+// The live file wins. Bun loads .env.local into this process by itself, so the environment here may hold
+// the dev values; on GitHub there are no files and the environment holds the live ones.
+const setting = (name) => live[name] || process.env[name] || '';
 
 const NEEDED = ['VITE_CONVEX_URL', 'VITE_CONVEX_SITE_URL', 'VITE_CLERK_PUBLISHABLE_KEY'];
 const missing = NEEDED.filter((name) => !setting(name));
@@ -34,8 +36,12 @@ if (missing.length > 0) {
   console.error(`The live copy's settings are missing: ${missing.join(', ')}. Set them in the environment or in .env.live.local.`);
   process.exit(1);
 }
+if (dev.VITE_CONVEX_URL && setting('VITE_CONVEX_URL') === dev.VITE_CONVEX_URL) {
+  console.error(`Refusing to deploy: the database would be the dev one, ${dev.VITE_CONVEX_URL}. The live settings belong in .env.live.local.`);
+  process.exit(1);
+}
 // Wrangler reads its token from the environment. On the Mac mini it is kept in .env.local.
-const cloudflareToken = process.env.CLOUDFLARE_API_TOKEN || readEnvFile('.env.local').CLOUDFLARE_API_TOKEN || '';
+const cloudflareToken = process.env.CLOUDFLARE_API_TOKEN || dev.CLOUDFLARE_API_TOKEN || '';
 if (!dryRun && !cloudflareToken) {
   console.error('CLOUDFLARE_API_TOKEN is not set, in the environment or in .env.local.');
   process.exit(1);
