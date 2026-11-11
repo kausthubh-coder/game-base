@@ -42,7 +42,11 @@ export function install(view: GameView): void {
   // Keep its particles, and wait until that action ends before choosing its sound.
   const pendingBreaks: { x: number; y: number; z: number; sound: GameEvent }[] = [];
   let breaksQueued = false;
+  // A stroke of build mode changes many cells in one step. The build view spreads their sounds and dust over
+  // a moment, so here each of those events is passed over.
+  const inStroke = (): boolean => sys.build?.applying === true;
   game.events.on('block.broken', (e) => {
+    if (inStroke()) return;
     const sound: GameEvent = { type: 'blockBroken', surface: BLOCKS[e.id]?.surface ?? 'dirt', at: center(e.x, e.y, e.z) };
     effects.onEvent(sound);
     pendingBreaks.push({ x: e.x, y: e.y, z: e.z, sound });
@@ -85,8 +89,8 @@ export function install(view: GameView): void {
     }
     previousProgress = breaking.progress;
   });
-  game.events.on('block.placed', (e) => both({ type: 'blockPlaced', surface: BLOCKS[e.id]?.surface ?? 'dirt', at: center(e.x, e.y, e.z) }));
-  game.events.on('placeable.placed', (e) => both({ type: 'blockPlaced', surface: 'wood', at: center(e.x, e.y, e.z) }));
+  game.events.on('block.placed', (e) => { if (!inStroke()) both({ type: 'blockPlaced', surface: BLOCKS[e.id]?.surface ?? 'dirt', at: center(e.x, e.y, e.z) }); });
+  game.events.on('placeable.placed', (e) => { if (!inStroke()) both({ type: 'blockPlaced', surface: 'wood', at: center(e.x, e.y, e.z) }); });
 
   // ---- items: a trail from where the thing was to the player's hands
   game.events.on('item.gained', (e) => {
@@ -99,10 +103,12 @@ export function install(view: GameView): void {
 
   // ---- farming
   game.events.on('soil.tilled', (e) => {
+    if (inStroke()) return;
     view.audio?.emit({ type: 'blockBroken', surface: 'dirt', at: center(e.x, e.y, e.z) });
     effects.play('dust', { x: e.x + 0.5, y: e.y + 1.05, z: e.z + 0.5 }, { color: 0x8a6a45 });
   });
   game.events.on('crop.planted', (e) => {
+    if (inStroke()) return;
     view.audio?.emit({ type: 'blockPlaced', surface: 'dirt', at: center(e.x, e.y, e.z) });
     effects.play('popDust', { x: e.x + 0.5, y: e.y + 1, z: e.z + 0.5 }, { scale: 0.5 });
   });

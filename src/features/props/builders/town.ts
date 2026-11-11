@@ -188,20 +188,24 @@ export function well(): THREE.BufferGeometry {
   return s.done();
 }
 
-/** One meter of fence along x: a post at its left end and two rails. `post` is the post alone, to end a run. */
+/** One meter of fence along x: a post at its left end and two rails. `post` is the post alone, to end a run. `rails` is the rails alone, between two posts. */
 export function fence(variant: number): THREE.BufferGeometry {
   const s = new Shape(971 + variant);
-  const x = variant === 0 ? -0.5 : 0;
-  s.box(x, 0, 0, 0.14, 0.92, 0.14, P.timber, { skip: '-y' });
-  s.cone(x, 0.92, 0, 0.1, 0.08, 4, P.timberLight, { turn: Math.PI / 4 });
-  if (variant === 0) {
+  // `rails` is the two rails on a thin stake, a block long, for the gap between two posts that stand on their own.
+  if (variant === 2) {
+    s.box(0, 0, 0, 0.07, 0.72, 0.07, P.plankDark, { skip: '-y' });
+  } else {
+    const x = variant === 0 ? -0.5 : 0;
+    s.box(x, 0, 0, 0.14, 0.92, 0.14, P.timber, { skip: '-y' });
+    s.cone(x, 0.92, 0, 0.1, 0.08, 4, P.timberLight, { turn: Math.PI / 4 });
+  }
+  if (variant !== 1) {
     for (const y of [0.3, 0.64]) s.box(0, y, 0, 1, 0.09, 0.06, P.plank, { skip: '+x-x' });
     s.shadowBox(0, 0.2, 0, 1, 0.6, 0.08);
   }
   return s.done();
 }
 
-/** A gate one block wide between two tall posts. Variants: closed, open. */
 export function gate(variant: number): THREE.BufferGeometry {
   const s = new Shape(983 + variant);
   for (const x of [-0.5, 0.5]) {

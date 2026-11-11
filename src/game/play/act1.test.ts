@@ -97,7 +97,7 @@ describe('the harness', () => {
     expect(p.game.player.pos).toEqual(spawn);
     expect(p.game.clock.day).toBe(1);
     expect(p.game.clock.timeOfDay).toBeCloseTo(0.27, 2);
-    for (const [name] of INSTALLS) if (name !== 'story') expect(p.sys[name as keyof typeof p.sys], name).toBeDefined();
+    for (const [name] of INSTALLS) if (name !== 'story' && name !== 'sprinklers') expect(p.sys[name as keyof typeof p.sys], name).toBeDefined();
     expect(p.sys.quests.tracked()?.id).toBe('plot');
   });
 });

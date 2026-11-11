@@ -375,9 +375,16 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   game.events.on('quest.step', () => { saveDue = true; });
   window.addEventListener('pagehide', () => { if (started) save(); });
 
+  // ---------------------------------------------------------------- presses a view took for itself
+  const claims = new Map<string, readonly Press['kind'][]>();
+  function claimed(kind: Press['kind']): boolean {
+    for (const kinds of claims.values()) if (kinds.includes(kind)) return true;
+    return false;
+  }
+
   // ---------------------------------------------------------------- one step of the rules
   function simStep(): void {
-    if (keys.primary && !game.player.busy) sys.actions?.hold(useContext('primary'), STEP);
+    if (keys.primary && !game.player.busy && !claimed('use')) sys.actions?.hold(useContext('primary'), STEP);
     kernel.step();
     call(stepListeners, STEP, 'step');
     sinceSave += STEP;
@@ -403,6 +410,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // ---------------------------------------------------------------- the keys
   function onPress(press: Press): void {
+    // A view that claimed this kind of press acts on it itself.
+    if (claimed(press.kind)) return;
     if (press.kind === 'perf') { perfHolder.hidden = !perfHolder.hidden; return; }
     if (press.kind === 'turn') { camera.turn(press.direction); return; }
     if (press.kind === 'zoom') { camera.zoomBy(press.steps); return; }
@@ -651,6 +660,12 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       if (paused) keys.release();
     },
     get paused() { return pauses.size > 0; },
+
+    claim(reason, kinds) {
+      if (kinds) claims.set(reason, kinds);
+      else claims.delete(reason);
+    },
+    claimed,
   };
 
   applyGraphics();

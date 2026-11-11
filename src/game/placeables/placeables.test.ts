@@ -8,12 +8,14 @@ const STONE = blockId('stone');
 
 const named = (s: Stage, name: string) => s.heard.filter((e) => e.name === name).map((e) => e.data);
 
-test('the three kinds are a workbench, a bed and a chest, each with its station', () => {
+test('the kinds are a workbench, a bed and a chest, each with its station, and a fence and a sprinkler with none', () => {
   const { placeables } = makeStage().kernel.game.systems;
   expect(placeables.defs().map((def) => [def.kind, def.station, def.prompt])).toEqual([
     ['workbench', 'workbench', 'Craft'],
     ['bed', 'bed', 'Sleep'],
     ['chest', 'chest', 'Open'],
+    ['fence', undefined, null],
+    ['sprinkler', undefined, null],
   ]);
 });
 

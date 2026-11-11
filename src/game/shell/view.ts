@@ -26,7 +26,7 @@ import type { Water } from '../../features/water/index.ts';
 import type { WorldView } from '../../features/world/index.ts';
 import type { Game } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
-import type { Keys } from './keys.ts';
+import type { Keys, Press } from './keys.ts';
 
 /** A point on the page, in CSS pixels from the top left of `view.root`. */
 export interface ScreenPoint {
@@ -179,6 +179,16 @@ export interface GameView {
   /** While paused the simulation stands still and the picture is still drawn. Each reason is counted on its own. */
   setPaused(reason: string, paused: boolean): void;
   readonly paused: boolean;
+
+  // ---- a view that takes some of the keys for itself
+  /**
+   * Takes presses of these kinds away from the shell: while a reason claims a kind, the shell does nothing for it
+   * and the claimer acts on it from `keys.onPress`. `use` also stops the held left button from breaking blocks.
+   * Build mode claims `use` so a drag paints a field. `null` gives the reason's kinds back.
+   */
+  claim(reason: string, kinds: readonly Press['kind'][] | null): void;
+  /** True while some reason claims presses of this kind. */
+  claimed(kind: Press['kind']): boolean;
 }
 
 /** The shape of a file in src/game/views/. */

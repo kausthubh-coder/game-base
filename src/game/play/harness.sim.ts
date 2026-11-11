@@ -17,6 +17,7 @@ import type { Vec3 } from '../../engine/types.ts';
 import { World, type RayHit, type WorldSave } from '../../features/world/world.sim.ts';
 import { install as installActions } from '../actions/index.sim.ts';
 import { install as installAlmanac } from '../almanac/index.sim.ts';
+import { install as installBuild } from '../build/index.sim.ts';
 import type { EventName, Game, GameEvents, ItemId, Systems, UseContext } from '../api.sim.ts';
 import { install as installCrafting } from '../crafting/index.sim.ts';
 import { install as installCreatures } from '../creatures/index.sim.ts';
@@ -33,6 +34,7 @@ import { install as installPets } from '../pets/index.sim.ts';
 import { install as installPlaceables } from '../placeables/index.sim.ts';
 import { install as installQuests } from '../quests/index.sim.ts';
 import { install as installRegion } from '../region/index.sim.ts';
+import { install as installSprinklers } from '../sprinklers/index.sim.ts';
 import { install as installStory } from '../story/index.sim.ts';
 import { install as installTalk } from '../talk/index.sim.ts';
 import { install as installTime } from '../time/index.sim.ts';
@@ -62,6 +64,8 @@ export const INSTALLS: readonly (readonly [name: string, install: (kernel: Kerne
   ['placeables', installPlaceables],
   ['crafting', installCrafting],
   ['crops', installCrops],
+  ['build', installBuild],
+  ['sprinklers', installSprinklers],
   ['nav', installNav],
   ['almanac', installAlmanac],
   ['creatures', installCreatures],

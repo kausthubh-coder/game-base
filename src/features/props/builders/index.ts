@@ -6,7 +6,7 @@ import type { PropDef } from '../../../content/props.ts';
 import { barrel, cart, crate, sack } from './clutter.ts';
 import { log, rock, stump } from './ground.ts';
 import { berryBush, bush, flower, grassTuft, lilyPad, mushroom, reeds, tallGrass } from './plants.ts';
-import { bed, chest, forge, stove, workbench } from './stations.ts';
+import { bed, chest, forge, sprinkler, stove, workbench } from './stations.ts';
 import { awning, bench, chimney, door, fence, gate, lampPost, sign, signpost, stall, townWindow, well } from './town.ts';
 import { birch, oak, pine } from './trees.ts';
 
@@ -19,5 +19,5 @@ export const BUILDERS: Record<string, PropBuilder> = {
   rock, log, stump,
   door, window: townWindow, chimney, sign, awning, stall, well, fence, gate, lampPost, signpost, bench,
   barrel, crate, cart, sack,
-  workbench, forge, stove, chest, bed,
+  workbench, forge, stove, chest, bed, sprinkler,
 };

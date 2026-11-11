@@ -20,6 +20,7 @@ Read `15-system-design.md`, `12-art.md` and `13-sound.md` there before a large c
 | `bun tools/serve.mjs <folder> <port>` | Serves a built folder. It prints its pid. |
 | `bun tools/shot.mjs <url> <out.png>` | Screenshot in headless Chrome. Exits 1 on a console error. |
 | `bun run dev` | The game itself, on port 5300 |
+| `bun tools/play-build.mjs` | Plays build mode in the build lab (`?scene=build`) with the real mouse, and writes a screenshot of each step to `.artifacts/build/` |
 | `bun --env-file=.env.local tools/voice.ts` | Makes the voice clips of new or changed lines (`--dry` prices it first). Needs `ELEVENLABS_API_KEY` in `.env.local` |
 
 ## Layout

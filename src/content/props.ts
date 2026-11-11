@@ -90,7 +90,7 @@ export const PROPS = {
   awning: { name: 'Awning', group: 'town', builder: 'awning', variants: ['teal', 'red'], triangles: 80, wind: true, light: 0, vary: SNUG },
   stall: { name: 'Market stall', group: 'town', builder: 'stall', variants: ['produce', 'bread', 'cloth'], triangles: 240, ...still, vary: SNUG },
   well: { name: 'Well', group: 'town', builder: 'well', variants: ['roofed'], triangles: 200, ...still, vary: SNUG },
-  fence: { name: 'Fence', group: 'town', builder: 'fence', variants: ['run', 'post'], triangles: 40, ...still, vary: SNUG },
+  fence: { name: 'Fence', group: 'town', builder: 'fence', variants: ['run', 'post', 'rails'], triangles: 40, ...still, vary: SNUG },
   gate: { name: 'Gate', group: 'town', builder: 'gate', variants: ['closed', 'open'], triangles: 90, ...still, vary: SNUG },
   lampPost: { name: 'Lamp post', group: 'town', builder: 'lampPost', variants: ['standing'], triangles: 150, wind: false, light: 14, vary: SNUG },
   signpost: { name: 'Signpost', group: 'town', builder: 'signpost', variants: ['two ways', 'three ways'], triangles: 140, ...still, vary: SNUG },
@@ -108,6 +108,7 @@ export const PROPS = {
   stove: { name: 'Kitchen stove', group: 'station', builder: 'stove', variants: ['pot'], triangles: 160, wind: false, light: 8, alwaysLit: true, vary: SNUG },
   chest: { name: 'Chest', group: 'station', builder: 'chest', variants: ['closed', 'open'], triangles: 160, ...still, vary: SNUG },
   bed: { name: 'Bed', group: 'station', builder: 'bed', variants: ['teal', 'red'], triangles: 150, ...still, vary: SNUG },
+  sprinkler: { name: 'Sprinkler', group: 'station', builder: 'sprinkler', variants: ['brass'], triangles: 170, ...still, vary: SNUG },
 } as const satisfies Record<string, PropDef>;
 
 export type PropKind = keyof typeof PROPS;

@@ -29,7 +29,16 @@ export type Press =
   | { kind: 'use'; button: 'primary' | 'secondary' }
   /** V: the next camera mode. */
   | { kind: 'camera' }
-  | { kind: 'perf' };
+  | { kind: 'perf' }
+  /** G: build mode on or off. */
+  | { kind: 'build' }
+  /** Z: take back the last stroke of build mode. */
+  | { kind: 'undo' }
+  /**
+   * The left button is no longer down, once for each `use` with `primary`. `up`: the hand let go of it. `lost`:
+   * the window lost it (it lost focus, the pointer left or was cancelled, a panel took the keys), so nobody chose to let go.
+   */
+  | { kind: 'letGo'; why: 'up' | 'lost' };
 
 /** How the mouse turns the camera. See the top of this file. */
 export type MouseMode = 'point' | 'drag' | 'lock';
@@ -66,13 +75,18 @@ export interface Keys {
   onDragEnd(fn: () => void): () => void;
   /** With `true` the cursor is given back and no click takes it. Call it every frame with what holds the player. */
   freeCursor(free: boolean): void;
+  /**
+   * With `true` a left-button press keeps the pointer until the button comes up, so a drag that crosses the HUD or
+   * leaves the window still ends with `letGo` and `up`. Build mode asks for it. Off, the pointer leaving the canvas lets go.
+   */
+  capturePrimary(capture: boolean): void;
   /** Pixels the mouse turned the view by since the last call, right and down, written into `out`: a locked mouse's or a drag's. */
   takeLook(out: { x: number; y: number }): void;
   dispose(): void;
 }
 
 const NAMES: Record<string, string> = {
-  w: 'KeyW', a: 'KeyA', s: 'KeyS', d: 'KeyD', e: 'KeyE', q: 'KeyQ', r: 'KeyR',
+  w: 'KeyW', a: 'KeyA', s: 'KeyS', d: 'KeyD', e: 'KeyE', q: 'KeyQ', r: 'KeyR', g: 'KeyG', z: 'KeyZ',
   up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight',
   shift: 'ShiftLeft', space: 'Space', f3: 'F3', v: 'KeyV',
 };
@@ -91,7 +105,7 @@ export function createKeys(canvas: HTMLElement): Keys {
   const listeners = new Set<(press: Press) => void>();
   const pointer = { x: 0, y: 0, over: false };
   const dragEnds = new Set<() => void>();
-  let primary = false;
+  let primary = false, capture = false;
   let mode: MouseMode = 'point', cursorFree = false, lockFailed = false, lookX = 0, lookY = 0;
   const right = new RightDrag();
   const isLocked = (): boolean => document.pointerLockElement === canvas;
@@ -102,12 +116,21 @@ export function createKeys(canvas: HTMLElement): Keys {
     for (const listener of [...listeners]) listener(press);
   };
 
+  /** The left button is no longer down. It tells the listeners once, however many events say so. */
+  function letGo(why: 'up' | 'lost'): void {
+    if (!primary) return;
+    primary = false;
+    send({ kind: 'letGo', why });
+  }
+
   /** The press a key stands for, or null when the key is only ever held. */
   function pressOf(code: string): Press | null {
     if (code === 'KeyE') return { kind: 'interact' };
     if (code === 'KeyQ') return { kind: 'turn', direction: -1 };
     if (code === 'KeyR') return { kind: 'turn', direction: 1 };
     if (code === 'KeyV') return { kind: 'camera' };
+    if (code === 'KeyG') return { kind: 'build' };
+    if (code === 'KeyZ') return { kind: 'undo' };
     if (code === 'F3') return { kind: 'perf' };
     const digit = /^Digit([1-9])$/.exec(code);
     return digit ? { kind: 'slot', index: Number(digit[1]) - 1 } : null;
@@ -149,6 +172,9 @@ export function createKeys(canvas: HTMLElement): Keys {
   function buttonDown(e: PointerEvent): void {
     if (e.button === 0) {
       primary = true;
+      if (capture) {
+        try { canvas.setPointerCapture(e.pointerId); } catch { /* a synthetic pointer: the window still hears it */ }
+      }
       send({ kind: 'use', button: 'primary' });
     } else if (e.button === 2) {
       if (mode === 'lock') { send({ kind: 'use', button: 'secondary' }); return; }
@@ -180,14 +206,14 @@ export function createKeys(canvas: HTMLElement): Keys {
     // Alt let go on its own would put Windows' focus on the browser's menu.
     if ((e.code === 'AltLeft' || e.code === 'AltRight') && mode === 'lock') e.preventDefault();
   }, on);
-  window.addEventListener('blur', () => { held.clear(); primary = false; cancelRight(); }, on);
+  window.addEventListener('blur', () => { held.clear(); letGo('lost'); cancelRight(); }, on);
 
   canvas.addEventListener('pointermove', (e) => {
     // A second button pressed or let go while another is held comes as a move with `button` set.
     if (e.button === 0 || e.button === 2) {
       const bit = e.button === 0 ? 1 : 2;
       if (e.buttons & bit) { if (!(mayLock() && !isLocked())) buttonDown(e); }
-      else if (e.button === 0) primary = false;
+      else if (e.button === 0) letGo('up');
       else endRight(e);
     }
     if (right.move(e.clientX, e.clientY)) {
@@ -197,7 +223,9 @@ export function createKeys(canvas: HTMLElement): Keys {
     }
     movePointer(e);
   }, on);
-  canvas.addEventListener('pointerleave', () => { pointer.over = false; primary = false; }, on);
+  canvas.addEventListener('pointerleave', () => { pointer.over = false; letGo('lost'); }, on);
+  // A captured pointer that is taken away before the button came up.
+  canvas.addEventListener('lostpointercapture', () => letGo('lost'), on);
   canvas.addEventListener('contextmenu', (e) => e.preventDefault(), on);
   canvas.addEventListener('pointerdown', (e) => {
     movePointer(e);
@@ -210,12 +238,12 @@ export function createKeys(canvas: HTMLElement): Keys {
     buttonDown(e);
   }, on);
   window.addEventListener('pointerup', (e) => {
-    if (e.button === 0) primary = false;
+    if (e.button === 0) letGo('up');
     else if (e.button === 2) endRight(e);
   }, on);
-  window.addEventListener('pointercancel', () => { primary = false; cancelRight(); }, on);
+  window.addEventListener('pointercancel', () => { letGo('lost'); cancelRight(); }, on);
   document.addEventListener('pointerlockerror', () => { lockFailed = true; }, on);
-  document.addEventListener('pointerlockchange', () => { if (!isLocked()) primary = false; }, on);
+  document.addEventListener('pointerlockchange', () => { if (!isLocked()) letGo('lost'); }, on);
   document.addEventListener('pointermove', (e) => {
     // Without the lock (a browser that refuses it) the mouse turns the view while it is over the world.
     if (mode !== 'lock' || cursorFree || !(isLocked() || (lockFailed && e.target === canvas))) return;
@@ -270,7 +298,7 @@ export function createKeys(canvas: HTMLElement): Keys {
 
     release() {
       held.clear();
-      primary = false;
+      letGo('lost');
       cancelRight();
     },
 
@@ -293,6 +321,7 @@ export function createKeys(canvas: HTMLElement): Keys {
       if (free) cancelRight();
       if (free && isLocked()) document.exitPointerLock();
     },
+    capturePrimary(next) { capture = next; },
     takeLook(out) {
       out.x = lookX;
       out.y = lookY;

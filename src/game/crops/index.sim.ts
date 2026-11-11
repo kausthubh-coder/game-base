@@ -179,6 +179,24 @@ export function createCrops(game: Game): Crops {
 
     at: (x, y, z) => soils.get(keyOf(x, y, z))?.crop?.state ?? null,
     all: () => planted,
+
+    soil: () => soilList,
+
+    wet(x, y, z) {
+      if (world.getBlock(x, y, z) !== TILLED) return false;
+      wetSoil(x, y, z);
+      return true;
+    },
+
+    pull(x, y, z) {
+      const soil = soils.get(keyOf(x, y, z));
+      const crop = soil?.crop;
+      // The seed goes back first: a crop whose seed has no room in the bag stays in the ground.
+      if (!soil || !crop || game.systems.inventory.add(crop.def.seed, 1) > 0) return false;
+      unplant(soil);
+      if (soil.wet <= 0) forget(soil);
+      return true;
+    },
   };
 
   /** The tool kind of a held item, from the items system when it is there. */

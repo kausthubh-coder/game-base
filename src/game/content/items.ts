@@ -28,6 +28,9 @@ export const ITEMS: readonly ItemDef[] = [
   { id: 'workbench', name: 'Workbench', icon: 'workbench', stack: 9, description: 'Set it down to craft bigger things beside it.', placeable: 'workbench' },
   { id: 'bed', name: 'Bed', icon: 'bed', stack: 9, description: 'Sleep in it in the evening, under a roof.', placeable: 'bed' },
   { id: 'chest', name: 'Chest', icon: 'chest', stack: 9, description: 'A box with a good lid.', placeable: 'chest' },
+  // These two borrow an icon until they get their own.
+  { id: 'fence', name: 'Fence', icon: 'plank', stack: STACK, description: 'A post and two rails. It joins the fence beside it.', placeable: 'fence' },
+  { id: 'sprinkler', name: 'Sprinkler', icon: 'watering_can', stack: 9, description: 'Keeps tilled soil wet two blocks each way.', placeable: 'sprinkler' },
 
   // blocks
   { id: 'dirt', name: 'Dirt', icon: 'stone', stack: STACK, description: 'A block of earth.', block: blockId('dirt') },
