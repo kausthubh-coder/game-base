@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Wrong on purpose</title>
+<style>
+  body { margin: 0; font: 16px sans-serif; background: #eee; }
+  button { position: absolute; width: 120px; height: 40px; }
+  .cut { position: absolute; left: 20px; top: 20px; width: 80px; overflow: hidden; white-space: nowrap; }
+  .veil { position: absolute; left: 20px; top: 100px; width: 200px; height: 60px; background: rgba(0,0,0,0.2); }
+</style></head>
+<body>
+  <!-- One of each thing look should call wrong, and one fine button. -->
+  <div class="cut">A quest name far too long for its box</div>
+  <button style="left: 20px; top: 110px">Covered</button>
+  <div class="veil">A toast</div>
+  <button style="left: 20px; top: 200px">First</button>
+  <button style="left: 80px; top: 215px">Second</button>
+  <button style="left: 900px; top: 300px">Off the edge</button>
+  <button style="left: 20px; top: 300px; width: 16px; height: 16px">x</button>
+  <button style="left: 400px; top: 400px">Fine</button>
+  <button style="left: 600px; top: 400px" onclick="console.error('broken on purpose')">Break</button>
+  <p style="position: absolute; left: 400px; top: 460px; margin: 0">Hello there</p>
+  <p hidden>Not shown</p>
+  <div style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">For screen readers only, and much too long for its box</div>
+  <p style="position: absolute; left: 600px; top: 100px; margin: 0; width: 200px">A hint across the corner</p>
+  <p style="position: absolute; left: 700px; top: 105px; margin: 0">Quest title</p>
+</body></html>
