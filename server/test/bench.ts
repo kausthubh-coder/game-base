@@ -245,17 +245,37 @@ async function run(index: number): Promise<Run> {
 
     let profile: Run['profile'];
     if (PROFILE) {
-      const result = await inspector.call<{ profile: { nodes: { callFrame: { functionName: string; url: string; lineNumber: number }; hitCount?: number }[] } }>('Profiler.stop');
-      const byFn = new Map<string, number>();
+      interface Node { callFrame: { functionName: string; scriptId: string; lineNumber: number }; hitCount?: number }
+      const result = await inspector.call<{ profile: { nodes: Node[] } }>('Profiler.stop');
+      // Self time by function. The bundle is one file, so a function is named by its own name and by the
+      // text of the line it starts on.
+      const byFn = new Map<string, { hits: number; node: Node }>();
       let total = 0;
       for (const node of result.profile.nodes) {
         const hits = node.hitCount ?? 0;
+        // Time the isolate sat idle is not time spent.
+        if (node.callFrame.functionName === '(idle)') continue;
         total += hits;
-        const frame = node.callFrame;
-        const fn = `${frame.functionName || '(anonymous)'} ${frame.url.split('/').pop() ?? ''}:${frame.lineNumber + 1}`;
-        byFn.set(fn, (byFn.get(fn) ?? 0) + hits);
+        const key = `${node.callFrame.scriptId}:${node.callFrame.lineNumber}:${node.callFrame.functionName}`;
+        const row = byFn.get(key) ?? { hits: 0, node };
+        row.hits += hits;
+        byFn.set(key, row);
       }
-      profile = [...byFn].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([fn, hits]) => ({ fn, percent: round((hits / total) * 100, 1) }));
+      await inspector.call('Debugger.enable');
+      const sources = new Map<string, string[]>();
+      profile = [];
+      for (const { hits, node } of [...byFn.values()].sort((a, b) => b.hits - a.hits).slice(0, 16)) {
+        const frame = node.callFrame;
+        let line = '';
+        if (frame.scriptId !== '0') {
+          if (!sources.has(frame.scriptId)) {
+            const source = await inspector.call<{ scriptSource: string }>('Debugger.getScriptSource', { scriptId: frame.scriptId }).catch(() => ({ scriptSource: '' }));
+            sources.set(frame.scriptId, source.scriptSource.split('\n'));
+          }
+          line = (sources.get(frame.scriptId)?.[frame.lineNumber] ?? '').trim().slice(0, 90);
+        }
+        profile.push({ fn: `${frame.functionName || '(anonymous)'}  ${line}`, percent: round((hits / total) * 100, 1) });
+      }
     }
 
     // After the timed seconds: one save on demand, the live memory after a collection, and the errors.
@@ -311,7 +331,7 @@ for (const key of keys) {
   console.log(`${key.padEnd(width)}  ${String(quantile(values, 0.5)).padStart(8)}  ${String(Math.min(...values)).padStart(8)}  ${String(Math.max(...values)).padStart(8)}   ${values.join(' ')}`);
 }
 if (runs[0].profile) {
-  console.log('\nWhere the isolate spent its time, by function (self time):');
+  console.log('\nWhere the isolate spent its running time, by function (self time, idle time left out):');
   for (const row of runs[0].profile) console.log(`${String(row.percent).padStart(6)}%  ${row.fn}`);
 }
 
