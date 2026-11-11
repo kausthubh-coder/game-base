@@ -1,5 +1,24 @@
 Gilded Hearth UI kit
 
+Round three adds sixteen built-in image-generator assets for the two menu directions. Raw attempts are in raw/ui-kit, with prompts, source paths and the requested tabs2 mapping in ui-kit-round-three.json. Existing art and manifest entries remain unchanged. No src files changed.
+
+Rebuild with `bun assets-src/process-ui-kit-3.mjs`, `bun assets-src/preview-ui-kit-3.mjs`, and `bun assets-src/check-ui-kit-3.mjs`. The processor preserves generated structure, crops transparent padding, resizes, cleans the icon backing and normalizes its gold. Leather repeat edges are blended and matched. Page edges match vertically. Paper and leather-panel grain receive slight smoothing with their original alpha preserved. Sharp compresses the final PNGs to 381,324 bytes, or 381.324 decimal KB.
+
+I inspected preview-3.png on cream and navy, including small, wide and tall nine-slices, the tileables repeated 3x3, 48px and 24px icon cells, a satchel with twelve pockets and a tag, and a paper scroll between rollers. No letters or visible matte remain. Icons used three attempts: the first had a cream backing and bevelled strokes; the second matched the thin linework but drew a handled bag; the third changes that glyph to a drawstring pouch. All other pieces use attempt one.
+
+Round-three limits:
+
+- icons2: the thin gold lines have low contrast on cream at 24px. Prefer navy behind these icons. The person, creature and hand retain more detail than the simple navigation marks.
+- leather: grain is very quiet after colour normalization and compression, almost flat at CSS size.
+- rail, roller and keycap: use the intended CSS heights of 60px, 64px and 64px. The deliberately tall preview distorts their caps and ornament.
+- leather-panel and pocket: stretching changes stitch spacing and the grain's proportions. Use moderate aspect changes as shown in the satchel.
+- bookmarks: the four independent generations have small differences in weave and notch proportions.
+- tabs2: parseManifest accepts the requested additional field and still returns only ui in images and portraits, crops and materials in sheets. However, the production packager fails with `Circular asset list: ui/kit/icons2.png` when the same file is referenced by icons2 and tabs2. To preserve the build without editing code outside this brief, the manifest retains only uikit.images.icons2. The exact requested tabs2 mapping is saved in ui-kit-round-three.json for the coordinator. This is a packager limitation, not a parser rejection.
+
+The pre-existing asset-verifier warning about uikit documentation remains. Sanity checks verify all exact sizes, true transparent exterior pixels, the card frame's empty centre, matching tile edges, the combined byte cap, unchanged earlier manifest entries and lazy loader groups. Final verification logs are in .artifacts/ui-kit, alongside preview-3.png.
+
+Final round-three checks passed: `bun tools/verify-assets.mjs`, `bun run check`, and `bun run verify assets build shots`. The baseline passed the same checks before the change. Nothing was pushed or merged.
+
 Built with the built-in image generator, then cropped, resized, alpha-cleaned and compressed with sharp. No palette snapping to the pixel sprite palette. All 21 finished images are in public/assets/ui/kit/. Raw generations and rejected attempts are in assets-src/raw/ui-kit/. Prompts and selections are in ui-kit-prompts.json.
 
 The coordinator's second correction defines the manifest. Existing ui and every other existing entry remain unchanged. uikit is nested with lazy: true, images and tabs. parseManifest returns only ui in images and portraits, crops and materials in sheets. It ignores uikit. There is no uitabs entry. Game integration belongs to the coordinator.

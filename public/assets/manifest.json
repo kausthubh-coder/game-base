@@ -1657,7 +1657,22 @@
       "tile": "ui/kit/tile.png",
       "tile-hover": "ui/kit/tile-hover.png",
       "detail": "ui/kit/detail.png",
-      "slot-empty": "ui/kit/slot-empty.png"
+      "slot-empty": "ui/kit/slot-empty.png",
+      "keycap": "ui/kit/keycap.png",
+      "card-frame": "ui/kit/card-frame.png",
+      "rail": "ui/kit/rail.png",
+      "leather": "ui/kit/leather.png",
+      "leather-panel": "ui/kit/leather-panel.png",
+      "pocket": "ui/kit/pocket.png",
+      "tag": "ui/kit/tag.png",
+      "roller": "ui/kit/roller.png",
+      "bookmark": "ui/kit/bookmark.png",
+      "bookmark-red": "ui/kit/bookmark-red.png",
+      "bookmark-green": "ui/kit/bookmark-green.png",
+      "bookmark-blue": "ui/kit/bookmark-blue.png",
+      "seal": "ui/kit/seal.png",
+      "seal-gold": "ui/kit/seal-gold.png",
+      "page-edges": "ui/kit/page-edges.png"
     },
     "tabs": {
       "tile": 96,
@@ -1710,6 +1725,76 @@
         "diamond": [
           3,
           2
+        ]
+      }
+    },
+    "tabs2": {
+      "tile": 96,
+      "sheet": "ui/kit/icons2.png",
+      "names": {
+        "things": [
+          0,
+          0
+        ],
+        "by-hand": [
+          1,
+          0
+        ],
+        "creatures": [
+          2,
+          0
+        ],
+        "pets": [
+          3,
+          0
+        ],
+        "crops": [
+          0,
+          1
+        ],
+        "people": [
+          1,
+          1
+        ],
+        "places": [
+          2,
+          1
+        ],
+        "zoom-in": [
+          3,
+          1
+        ],
+        "zoom-out": [
+          0,
+          2
+        ],
+        "find-me": [
+          1,
+          2
+        ],
+        "pin": [
+          2,
+          2
+        ],
+        "waypoint": [
+          3,
+          2
+        ],
+        "close": [
+          0,
+          3
+        ],
+        "page-left": [
+          1,
+          3
+        ],
+        "page-right": [
+          2,
+          3
+        ],
+        "drag": [
+          3,
+          3
         ]
       }
     }
