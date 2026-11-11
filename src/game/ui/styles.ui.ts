@@ -109,8 +109,9 @@ export const STYLES = /* css */ `
 .gu-btn:disabled, .gu-btn[aria-disabled='true'] { color: var(--ink-3); background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--line-strong); cursor: default; transform: none; filter: none; }
 /* A menu button with a line icon: the icon in a round well at the left. */
 .gu-btn-icon { justify-content: flex-start; padding-left: 8px; }
-.gu-btn-ornament { flex: none; display: grid; place-items: center; width: 30px; height: 30px; padding: 4px; border-radius: 50%; background: rgb(14 17 27 / 0.35); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.5); }
-.gu-primary .gu-btn-ornament { background: rgb(59 66 85 / 0.88); }
+.gu-btn-ornament { flex: none; display: grid; place-items: center; width: 36px; height: 36px; padding: 2px; border-radius: 50%; background: var(--night); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.6); }
+/* The line icons are fine gold strokes, so they are lifted to read at this size. */
+.gu-btn-ornament > * { filter: brightness(1.45) drop-shadow(0 0 1.5px rgb(240 212 138 / 0.7)); }
 .gu-close {
   display: grid; place-items: center; flex: none; width: 38px; height: 38px; margin: -4px -6px -4px auto;
   color: var(--ink); background: var(--paper-light); border: 0; border-radius: 50%; font-size: 22px; font-weight: 600; line-height: 1;

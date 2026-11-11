@@ -122,49 +122,76 @@ export const TOKENS = /* css */ `
  * kit in the manifest. A nine-slice is drawn by a `::before` that fills its element, at half the image's pixels.
  */
 export const KIT = /* css */ `
+/* ---- menus: the night sky with gold constellations behind every panel, the title aside ---- */
+.ui-book.ui-kit .gu-stage:not(.gu-stage-title) {
+  background: var(--kit-stars) 0 0 / 384px 384px repeat, radial-gradient(120% 90% at 50% 45%, rgb(20 24 36 / 0.5), rgb(10 12 20 / 0.86));
+}
+
 /* ---- panels: the painted frame ---- */
-.ui-book.ui-kit .gu-panel, .ui-book.ui-kit .ui-frame, .ui-book.ui-kit .gb-map-page, .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; }
-.ui-book.ui-kit .gu-panel::before, .ui-book.ui-kit .ui-frame::before, .ui-book.ui-kit .gb-map-page::before, .ui-book.ui-kit .ui-card::before {
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate), .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box), .ui-book.ui-kit .gb-map-page, .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; isolation: isolate; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate)::before, .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box)::before, .ui-book.ui-kit .gb-map-page::before, .ui-book.ui-kit .ui-card::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   border: 56px solid transparent; border-image: var(--kit-panel) 112 fill / 56px stretch;
-  filter: drop-shadow(0 14px 30px rgb(10 12 20 / 0.45));
+  filter: drop-shadow(0 16px 32px rgb(10 12 20 / 0.5));
 }
-.ui-book.ui-kit .gu-panel, .ui-book.ui-kit .gb-map-page { isolation: isolate; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate) { padding: 40px 46px 42px; }
+.ui-book.ui-kit .gu-panel-head { justify-content: center; }
+.ui-book.ui-kit .gu-panel-head > .gu-close { position: absolute; right: -14px; top: -10px; margin: 0; }
+.ui-book.ui-kit .gu-panel-head:has(> .gu-tabs) { justify-content: flex-start; }
 .ui-book.ui-kit .gu-panel-head::after, .ui-book.ui-kit .gb-map-head::after {
-  content: ''; position: absolute; left: 50%; bottom: -10px; width: min(420px, 80%); height: 24px; transform: translateX(-50%);
-  background: var(--kit-divider) center / contain no-repeat; pointer-events: none;
+  content: ''; position: absolute; left: 50%; right: auto; bottom: -8px; width: min(440px, 86%); height: 24px; transform: translateX(-50%);
+  background: var(--kit-divider) center / 100% 100% no-repeat; pointer-events: none;
 }
-.ui-book.ui-kit .gu-close { color: transparent !important; background: var(--kit-close) center / 36px 36px no-repeat !important; }
+.ui-book.ui-kit .gu-close, .ui-book.ui-kit .gu-card .gu-close { color: transparent !important; background: var(--kit-close) center / 100% 100% no-repeat !important; box-shadow: none !important; }
 .ui-book.ui-kit .gu-close:hover { filter: brightness(1.08); transform: scale(1.06); }
 .ui-book.ui-kit .gu-close[aria-label='Back'] { background-image: var(--kit-back) !important; }
 
-/* ---- buttons: painted pills ---- */
-.ui-book.ui-kit .gu-btn, .ui-book.ui-kit .gb-map button:not(.gb-pick-grid button) {
-  border: 0 solid transparent; border-width: 0 26px; padding: 0 6px;
-  border-image: var(--kit-button) 0 56 fill / 0 26px stretch; background: transparent !important; box-shadow: none !important;
-  color: var(--ui-paper-light);
+/* ---- buttons: painted pills, navy for most, gold for the next action ---- */
+.ui-book.ui-kit .gu-btn, .ui-book.ui-kit .gb-map-tools button:not(.gb-map-square) {
+  border: solid transparent; border-width: 0 24px; padding: 0 4px;
+  border-image: var(--kit-button) 0 56 fill / 0 24px stretch; background: transparent !important; box-shadow: none !important;
+  color: var(--ui-paper-light); text-shadow: 0 1px 2px rgb(10 12 20 / 0.5);
 }
-.ui-book.ui-kit .gu-btn.gu-primary { border-image-source: var(--kit-button-gold); color: var(--ui-night); }
-.ui-book.ui-kit .gu-btn:hover:not(:disabled) { filter: brightness(1.1); }
-.ui-book.ui-kit .gu-btn:disabled, .ui-book.ui-kit .gu-btn[aria-disabled='true'] { border-image-source: var(--kit-button-light); color: var(--ui-ink-2); opacity: 0.6; }
+.ui-book.ui-kit .gu-btn.gu-btn-icon { border-left-width: 14px; border-image-width: 0 24px 0 14px; padding-left: 0; }
+.ui-book.ui-kit .gu-btn.gu-primary { border-image-source: var(--kit-button-gold); color: var(--ui-night); text-shadow: 0 1px 0 rgb(255 247 220 / 0.6); }
+.ui-book.ui-kit .gu-btn:hover:not(:disabled) { filter: brightness(1.12); }
+.ui-book.ui-kit .gu-btn:disabled, .ui-book.ui-kit .gu-btn[aria-disabled='true'] { border-image-source: var(--kit-button-light); color: var(--ui-ink-2); text-shadow: none; opacity: 0.55; }
+.ui-book.ui-kit .gu-plate .gu-btn:disabled { opacity: 0.5; }
 
-/* ---- slots: night wells with a gold rim ---- */
-.ui-book.ui-kit .gu-slot, .ui-book.ui-kit .gb-slot, .ui-book.ui-kit .ui-bookbtn button {
-  background: transparent; box-shadow: none;
-  border: 20px solid transparent; border-image: var(--kit-slot) 40 fill / 20px stretch;
+/* A narrow screen has no room for the painted ends on the map's row of tools. */
+@container gu (width < 640px) {
+  .ui-book.ui-kit .gu-settings-side .gu-choices:nth-child(even), .ui-book.ui-kit .gu-settings-side .gu-slider:nth-child(even) { background: none; }
 }
-.ui-book.ui-kit .gu-slot:hover:not(.gu-slot-empty), .ui-book.ui-kit .gb-slot:hover, .ui-book.ui-kit .ui-bookbtn button:hover { border-image-source: var(--kit-slot-hover); background: transparent; }
-.ui-book.ui-kit .gu-picked, .ui-book.ui-kit .gb-slot[aria-pressed='true'], .ui-book.ui-kit .gu-slot.is-drop, .ui-book.ui-kit .gb-slot.is-drop, .ui-book.ui-kit .ui-bookbtn button[aria-expanded='true'] {
-  border-image-source: var(--kit-slot-selected); background: transparent; box-shadow: none;
+@media (max-width: 640px) {
+  .ui-book.ui-kit .gb-map-tools button:not(.gb-map-square) { border: 0; padding: 0 10px; border-image: none; background: linear-gradient(180deg, #56607a, #4a5366 55%, #424a5c) !important; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55) !important; }
 }
 
-/* ---- over the world: the minimap's ring, the dial, the hint banner, the tooltip ---- */
-.ui-book.ui-kit .gb-hud-minimap { position: relative; padding: 13%; }
-.ui-book.ui-kit .gb-hud-minimap::after { content: ''; position: absolute; inset: 0; background: var(--kit-minimap-ring) center / 100% 100% no-repeat; pointer-events: none; }
+/* ---- the bag: a filled slot is a warm item card with a cream strip for its count ---- */
+.ui-book.ui-kit .gu-slot:not(.gu-slot-empty) { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgb(166 137 90 / 0.7), 0 2px 4px rgb(10 12 20 / 0.25); }
+.ui-book.ui-kit .gu-slot:not(.gu-slot-empty):hover { filter: brightness(1.08); }
+.ui-book.ui-kit .gu-slot:not(.gu-slot-empty) > .gu-pic { margin-top: -10px; }
+.ui-book.ui-kit .gu-slot-count { right: 50%; bottom: 1px; transform: translateX(50%); min-width: 0; padding: 0; background: none; box-shadow: none; color: var(--ui-ink); font-size: 12px; line-height: 15px; }
+.ui-book.ui-kit .gu-slot:not(.gu-slot-empty) .gu-slot-key { color: var(--ui-paper-light); }
+.ui-book.ui-kit .gu-picked, .ui-book.ui-kit .gu-picked:hover { box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 16px rgb(240 212 138 / 0.7); }
+.ui-book.ui-kit .gu-slot.is-drop { background: var(--kit-card-epic) center / 100% 100% no-repeat; box-shadow: 0 0 0 2px var(--ui-gold-bright), 0 0 16px rgb(240 212 138 / 0.7); }
+.ui-book.ui-kit .gu-recipe > .gu-pic { background: var(--kit-card) center / 100% 100% no-repeat; box-shadow: 0 0 0 1px rgb(166 137 90 / 0.7); }
+
+/* ---- over the world: the quick slots are painted wells, the minimap sits in its compass ring ---- */
+/* The rim is drawn by a ::before over the whole slot, so the slot's own box, and the icon and count in it, keep their places. */
+.ui-book.ui-kit .gb-slot { isolation: isolate; background: rgb(22 26 38 / 0.5); box-shadow: none; }
+.ui-book.ui-kit .gb-slot::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border: 20px solid transparent; border-image: var(--kit-slot) 40 fill / 20px stretch; }
+.ui-book.ui-kit .gb-slot:hover::before { border-image-source: var(--kit-slot-hover); }
+.ui-book.ui-kit .gb-slot[aria-pressed='true'], .ui-book.ui-kit .gb-slot.is-drop { box-shadow: 0 0 16px rgb(240 212 138 / 0.55), 0 6px 10px rgb(10 12 20 / 0.35); }
+.ui-book.ui-kit .gb-slot[aria-pressed='true']::before, .ui-book.ui-kit .gb-slot.is-drop::before { border-image-source: var(--kit-slot-selected); }
+.ui-book.ui-kit .gb-hud-minimap { position: relative; padding: 13.2%; }
+.ui-book.ui-kit .gb-hud-minimap::after { content: ''; position: absolute; inset: 0; background: var(--kit-minimap-ring) center / 100% 100% no-repeat; pointer-events: none; filter: drop-shadow(0 4px 8px rgb(10 12 20 / 0.35)); }
 .ui-book.ui-kit .gb-minimap { border: 0 !important; box-shadow: none !important; }
+
+/* ---- tooltips: the painted night card ---- */
 .ui-book.ui-kit .gu-tip, .ui-book.ui-kit .ui-slot-tip { background: transparent; box-shadow: none; isolation: isolate; }
 .ui-book.ui-kit .gu-tip::before, .ui-book.ui-kit .ui-slot-tip::before {
   content: ''; position: absolute; inset: 0; z-index: -1; border: 24px solid transparent; border-image: var(--kit-tooltip) 48 fill / 24px stretch;
+  filter: drop-shadow(0 8px 18px rgb(10 12 20 / 0.45));
 }
 `;
 
