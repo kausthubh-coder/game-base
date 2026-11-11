@@ -31,7 +31,7 @@ const session = () => (existsSync(pidFile) ? JSON.parse(readFileSync(pidFile, 'u
 async function ensureSession() {
   try { await request('ping'); } catch (error) {
     if (!['ENOENT', 'ECONNREFUSED'].includes(error.code)) throw error;
-    const child = spawn('bun', [import.meta.filename, 'start'], { cwd: root, stdio: 'inherit' });
+    const child = spawn('bun', [import.meta.filename, 'start'], { cwd: root, stdio: ['ignore', 'ignore', 'inherit'] });
     await new Promise((yes, no) => { child.on('error', no); child.on('exit', code => code === 0 ? yes() : no(new Error('start failed'))); });
   }
 }

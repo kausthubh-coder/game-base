@@ -21,7 +21,8 @@ export function readScreen() {
       return el.value ? `${name}${name ? ': ' : ''}${words(el.value)}` : name;
     }
     if (tag === 'SELECT') return words(el.selectedOptions?.[0]?.text);
-    return words(el.innerText) || words(el.getAttribute('aria-label') || el.getAttribute('title') || el.querySelector('img[alt]')?.alt);
+    // The accessible name first, as a screen reader says it: a quick slot's label names its item, its text only the key.
+    return words(el.getAttribute('aria-label')) || words(el.innerText) || words(el.getAttribute('title') || el.querySelector('img[alt]')?.alt);
   };
   /** The text in el that is not inside something pressable, for a block of text that holds a button. */
   const ownText = (el) => {
@@ -116,7 +117,8 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
   const name = (item) => item.text || item.what || item.kind;
   for (const item of items) {
     const { box, clip } = item;
-    if (clip && item.text && clip.clips && (clip.sw > clip.cw + 1 || clip.sh > clip.ch + 1)) {
+    // Two pixels of height are a font's descenders reaching past the line box, which draw fine.
+    if (clip && item.text && clip.clips && (clip.sw > clip.cw + 1 || clip.sh > clip.ch + 2)) {
       wrong.push({ kind: 'cut', what: name(item), box, why: clip.sw > clip.cw + 1 ? `text ${clip.sw} px wide in ${clip.cw}` : `text ${clip.sh} px tall in ${clip.ch}` });
     }
     if (box.x < 0 || box.y < 0 || box.x + box.w > viewport.w || box.y + box.h > viewport.h) {

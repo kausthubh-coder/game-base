@@ -16,7 +16,10 @@ export function screenLines(items) {
         && items[j + 1].blockedBy === item.blockedBy) j++;
       if (j - i >= 3) {
         const row = items.slice(i, j + 1);
-        lines.push(`${row.map((r) => `[${cut(r.text || '?', 14)}]`).join(' ')}${item.blockedBy ? ` blocked by ${cut(item.blockedBy, 40)}` : ''}  ${row.length}x ${item.box.w}x${item.box.h} from ${item.box.x},${item.box.y} to ${items[j].box.x},${items[j].box.y}`);
+        // The words every name in the row starts with are said once: "Quick slot [1: Axe, 1] [2: empty]".
+        let prefix = row.reduce((p, r) => { while (!r.text.startsWith(p)) p = p.slice(0, -1); return p; }, row[0].text);
+        prefix = prefix.slice(0, prefix.lastIndexOf(' ') + 1);
+        lines.push(`${prefix}${row.map((r) => `[${cut(r.text.slice(prefix.length) || '?', 18)}]`).join(' ')}${item.blockedBy ? ` blocked by ${cut(item.blockedBy, 40)}` : ''}  ${row.length}x ${item.box.w}x${item.box.h} from ${item.box.x},${item.box.y} to ${items[j].box.x},${items[j].box.y}`);
         i = j; continue;
       }
       lines.push(`[${cut(item.text || `(${item.kind}, no text)`, 60)}]${item.disabled ? ' disabled' : ''}${item.blockedBy ? ` blocked by ${cut(item.blockedBy, 40)}` : ''}  ${boxText(item.box)}`);

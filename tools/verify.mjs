@@ -27,10 +27,12 @@ const PARTS = [
   { name: 'live', what: 'Clerk, Convex and the world server together (needs .env.local)', run: [['bun', 'server/test/live.ts']], skip: 2 },
   { name: 'shots', what: 'six scenes against their approved pictures, and the draw budgets', run: [['bun', 'tools/shots.mjs', 'all', '--check']] },
   {
-    name: 'play', what: 'a person\'s walk to Tamsin with real keys, build mode, camera drag',
+    name: 'play', what: 'every recording in tools/play/scenarios with real keys, the play tool\'s eyes, build mode, camera drag',
     run: [
-      ['bun', 'tools/play.mjs', 'replay', 'tools/play/scenarios/first-talk.json'],
+      ['bun', 'tools/play.mjs', 'replay', 'all'],
       ['bun', 'tools/play.mjs', 'stop'],
+      ['bun', 'test', 'tools/play'],
+      ['bun', 'tools/play/check-eyes.mjs'],
       ['bun', 'tools/play-build.mjs'],
       ['bun', 'tools/play-drag.mjs'],
     ],

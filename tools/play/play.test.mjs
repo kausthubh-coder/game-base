@@ -96,6 +96,10 @@ describe('wrong', () => {
     const wrong = findWrong([label('A very long quest name', 10, 10, 80, 20, { clips: true, sw: 160, cw: 80, sh: 20, ch: 20 })], viewport);
     expect(wrong).toEqual([{ kind: 'cut', what: 'A very long quest name', box: { x: 10, y: 10, w: 80, h: 20 }, why: 'text 160 px wide in 80' }]);
   });
+  test('cut leaves a descender alone: 2 px taller than its box', () => {
+    expect(findWrong([label('Bag', 150, 22, 57, 33, { clips: true, sw: 57, cw: 57, sh: 35, ch: 33 })], viewport)).toEqual([]);
+    expect(findWrong([label('Bag', 150, 22, 57, 20, { clips: true, sw: 57, cw: 57, sh: 35, ch: 20 })], viewport).map((w) => w.why)).toEqual(['text 35 px tall in 20']);
+  });
   test('cut needs a box that clips: overflowing visible text is not cut', () => {
     expect(findWrong([label('Spills', 10, 10, 40, 20, { clips: false, sw: 90, cw: 40, sh: 20, ch: 20 })], viewport)).toEqual([]);
   });
@@ -178,6 +182,12 @@ describe('inputs and the look block', () => {
     const text = formatLook({ title: 'look 001', picture: '/p.png', screen, wrong: [], changed: ['hero moved 1 m north'], now: ['day 1, 06:00'], problems: [] });
     expect(text.split('\n').length).toBeLessThanOrEqual(40);
     expect(text).toContain('… 17 more lines (look --json)');
+  });
+  test('a row of same-sized buttons is one line, its shared words said once', () => {
+    const row = ['Quick slot 1: Axe, 1', 'Quick slot 2: empty', 'Quick slot 3: empty', 'Quick slot 4: empty']
+      .map((text, i) => ({ text, kind: 'button', press: true, disabled: false, box: { x: 200 + i * 60, y: 500, w: 50, h: 60 } }));
+    const text = formatLook({ title: 'look', picture: '/p.png', screen: row, wrong: [], problems: [] });
+    expect(text).toContain('Quick slot [1: Axe, 1] [2: empty] [3: empty] [4: empty]  4x 50x60 from 200,500 to 380,500');
   });
   test('a blind look has no changed or now', () => {
     const text = formatLook({ title: 'look 001', picture: '/p.png', screen: [], wrong: [], problems: [] });
