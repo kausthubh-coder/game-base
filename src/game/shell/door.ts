@@ -72,6 +72,11 @@ export interface DebugDoor {
   block(x: number, y: number, z: number): { id: number; key: string };
   /** The whole view, for poking from the console. */
   readonly view: Shell['view'];
+  /**
+   * The online world, or null in solo play. `debug()` is the connection and the prediction's numbers,
+   * `debug(true)` adds each of the last frames: [seconds, x, y, z of the drawn hero, last input sent, last input the server used].
+   */
+  readonly online: Shell['online'];
 }
 
 export function createDoor(shell: Shell): DebugDoor {
@@ -162,6 +167,7 @@ export function createDoor(shell: Shell): DebugDoor {
         leftOut: shell.systems.leftOut,
         failed: Object.fromEntries(shell.systems.failed),
         viewErrors: shell.errors,
+        online: shell.online ? shell.online.debug() : null,
       };
     },
 
@@ -278,5 +284,6 @@ export function createDoor(shell: Shell): DebugDoor {
       return { id, key: BLOCKS[id]?.key ?? '' };
     },
     view,
+    online: shell.online,
   };
 }

@@ -5,7 +5,7 @@
 // It keeps no timers. `update(dt)` counts the wait before a reconnect and the silence on an open
 // connection, so it runs off the frame loop like every other feature, and a test steps it by hand.
 import { jsonCodec, type Codec, type Wire } from '../../engine/net/codec.ts';
-import { CLOSE, type Act, type Refuse, type Snap, type Welcome } from '../../engine/net/messages.ts';
+import { CLOSE, type Act, type Input, type Refuse, type Snap, type Welcome } from '../../engine/net/messages.ts';
 import { applySnap, createNear, type Near } from '../../engine/net/near.ts';
 import { BUILD } from '../../engine/net/version.ts';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
@@ -51,6 +51,8 @@ export interface NetInput {
   mx: number;
   mz: number;
   jump: boolean;
+  /** The steering of each body step of this step, as `Input.moves` in src/engine/net/messages.ts says. */
+  moves?: number[];
   acts?: Act[];
 }
 
@@ -191,9 +193,10 @@ export function createNet(_ctx: ViewContext | null, options: NetOptions): Net {
     send(input) {
       if (state !== 'open' || !socket) return 0;
       const n = ++sent;
-      socket.send(codec.encode(input.acts && input.acts.length > 0
-        ? { t: 'input', n, mx: input.mx, mz: input.mz, jump: input.jump, acts: input.acts }
-        : { t: 'input', n, mx: input.mx, mz: input.mz, jump: input.jump }));
+      const message: Input = { t: 'input', n, mx: input.mx, mz: input.mz, jump: input.jump };
+      if (input.moves) message.moves = input.moves;
+      if (input.acts && input.acts.length > 0) message.acts = input.acts;
+      socket.send(codec.encode(message));
       return n;
     },
 
