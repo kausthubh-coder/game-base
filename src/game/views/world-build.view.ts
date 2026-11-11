@@ -23,6 +23,7 @@ import type { BuildPlan, CellVerdict, PlaceableDef, StrokeKind, Systems } from '
 import { LINE_SPAN, MAX_CELLS } from '../build/plan.sim.ts';
 import type { Press } from '../shell/keys.ts';
 import type { GameView } from '../shell/view.ts';
+import { KNOWS_BUILD_FLAG } from '../uiview/build.ts';
 import { worldProps } from '../worldview/props.ts';
 
 /** The grid reaches this many cells from the pointer each way, at each quality. */
@@ -285,7 +286,12 @@ export function install(view: GameView): void {
 
   // ---------------------------------------------------------------- the keys
   let lifted = -1;
+  /** True when a panel or a conversation ended build mode, so it comes back when the player is free again. */
+  let resume = false;
   game.events.on('build.mode', ({ active }) => {
+    resume = !active && game.player.busy;
+    // Once the player has used build mode, the chip that names its key has done its work.
+    if (active) game.flags.set(KNOWS_BUILD_FLAG, true);
     view.claim('build', active ? USE : null);
     keys.capturePrimary(active);
     view.audio?.emit({ type: 'ui', sound: active ? 'open' : 'close' });
@@ -304,8 +310,17 @@ export function install(view: GameView): void {
 
   keys.onPress((press) => {
     const build = sys.build;
-    if (!build || !view.started || view.paused) return;
+    if (!build) return;
+    // The button is gone, so the stroke ends, whatever else is going on. A pause takes the keys before this
+    // view hears of it, and a stroke left behind would sit under the pointer with no button to end it.
+    if (press.kind === 'letGo') {
+      if (press.why === 'up' && build.active && view.started && !view.paused) { takePoint(); build.release(); }
+      else build.cancel();
+      return;
+    }
+    if (!view.started || view.paused) return;
     if (press.kind === 'build') {
+      resume = false;
       if (!game.player.busy) build.setActive(!build.active);
       return;
     }
@@ -316,9 +331,6 @@ export function install(view: GameView): void {
       if (!build.press() && !game.player.busy) view.audio?.emit({ type: 'ui', sound: 'click' });
     } else if (press.kind === 'use') {
       build.cancel();
-    } else if (press.kind === 'letGo') {
-      if (press.why === 'up') { takePoint(); build.release(); }
-      else build.cancel();
     } else if (press.kind === 'turn') {
       // Q and R turn the piece only while one is in the hand. Otherwise they are the camera's, and the shell has them.
       if (!turning) return;
@@ -337,6 +349,11 @@ export function install(view: GameView): void {
     const now = view.ctx.time;
     uniforms.uTime.value = now;
     while (landings.length > 0 && landings[0].at <= now) land(landings.shift() as Landing);
+    // Opening the bag to fetch another piece ends build mode in the rules. It is back when the bag closes.
+    if (resume && build && !build.active && !game.player.busy && view.started && !view.paused) {
+      resume = false;
+      build.setActive(true);
+    }
     if (!build?.active || !view.started || view.paused) {
       if (turning) { turning = false; if (build?.active) view.claim('build', USE); }
       // A stroke that is still landing shows its flashes after build mode is left.
@@ -346,8 +363,9 @@ export function install(view: GameView): void {
       finish();
       return;
     }
-    // A drag that turns the camera drops the stroke, as a right click does.
-    if (build.dragging && keys.dragging) build.cancel();
+    // A drag that turns the camera drops the stroke, as a right click does. So does a stroke whose button is
+    // no longer down, however that came about: Stroke.tla's NoStuckStroke, held here as well as by `letGo`.
+    if (build.dragging && (keys.dragging || !keys.primary)) build.cancel();
     takePoint();
     const plan = build.plan();
     const turnable = plan !== null && plan.tool.kind === 'place' && plan.tool.shape === 'one';

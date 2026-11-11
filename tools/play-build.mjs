@@ -234,6 +234,22 @@ try {
   await frames(2);
   check('a window that loses the keys drops the stroke', !afterBlur.dragging && await count('grass', -3, 0, -1, 0) === 3);
 
+  // The pause menu takes the keys in the middle of a stroke. No stroke is left under the pointer when it closes.
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(b.x, b.y);
+  await frames(2);
+  await page.keyboard.press('Escape');
+  await frames(2);
+  const underPause = await build();
+  await page.keyboard.press('Escape');
+  await frames(3);
+  const afterPause = await build();
+  await page.mouse.up();
+  await frames(2);
+  check('the pause menu drops the stroke, and none is left when it closes', !underPause.dragging && !afterPause.dragging && !(await build()).dragging && await count('grass', -3, 0, -1, 0) === 3, `${underPause.dragging} ${afterPause.dragging}`);
+  if (!(await build()).active) { await page.keyboard.press('g'); await frames(2); }
+
   await page.mouse.move(a.x, a.y);
   await page.mouse.down();
   await page.mouse.move(b.x, b.y);
@@ -259,6 +275,14 @@ try {
   await frames(2);
   check('a drag that wanders over the quick slots keeps its stroke until the button comes up', slots !== null && overHud.dragging && !(await build()).dragging, JSON.stringify(overHud));
   check('and it tills what it covered when the pointer left the ground', await count('tilled_soil', -3, 0, -1, 0) === 3);
+
+  // ---- the bag, in the middle of building
+  await page.keyboard.press('i');
+  await frames(3);
+  const underBag = await build();
+  await page.keyboard.press('i');
+  await frames(4);
+  check('the bag ends build mode while it is open, and build mode is back when it closes', !underBag.active && (await build()).active, JSON.stringify(underBag));
 
   // ---- leaving build mode
   await page.keyboard.press('g');

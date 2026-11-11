@@ -1,12 +1,13 @@
 // Build mode's words: a bar above the quick slots that says what the held item does and which keys work, and
 // a line beside the pointer that counts the stroke ("Plant 12 · you have 9") or says why a cell is refused.
-// Outside build mode a small chip names the key, while the hand holds something build mode can use.
+// Until build mode has been used once, a small chip names its key while the hand holds something it can use.
 //
 // Everything it says comes from `game.systems.build.plan()`. The picture in the world is world-build.view.ts.
 import type { BuildPlan, CellVerdict, Systems } from '../api.sim.ts';
 import { reasonOf } from '../build/plan.sim.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
+import { KNOWS_BUILD_FLAG } from '../uiview/build.ts';
 import { addStyle } from '../uiview/theme.ts';
 
 const STYLE = /* css */ `
@@ -127,8 +128,8 @@ export function install(view: GameView): void {
     const tool = plan?.tool ?? null;
 
     if (on !== shownBar) { shownBar = on; bar.hidden = !on; view.canvas.classList.toggle('bd-on', on); }
-    // Outside build mode the chip shows while the hand holds something a stroke can use.
-    const held = on || !view.started || game.player.busy ? null : sys.inventory?.held() ?? null;
+    // Until build mode was used once, the chip shows while the hand holds something a stroke can use.
+    const held = on || !view.started || game.player.busy || game.flags.is(KNOWS_BUILD_FLAG) ? null : sys.inventory?.held() ?? null;
     const def = held ? sys.items?.get(held.id) : undefined;
     const usable = def !== undefined && (def.tool?.kind === 'hoe' || def.tool?.kind === 'can' || def.seed !== undefined || def.block !== undefined || def.placeable !== undefined);
     if (usable !== shownChip) { shownChip = usable; chip.hidden = !usable; }
