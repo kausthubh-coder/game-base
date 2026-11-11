@@ -1,7 +1,8 @@
 # A bed under a tree finishes "A roof before dark" with no wood, no workbench and no roof
 
-Found on 2026-11-11 while teaching the bot to sleep. Not fixed: whether leaves count as a roof is a design
-choice.
+Found on 2026-11-11 while teaching the bot to sleep. Fixed the same day: Kausthubh said leaves are no roof.
+`canSleep()` and the bed's message now ask `roofOver()` for a block overhead, and the scenario
+`leaves-are-no-roof` keeps it.
 
 ## What happens
 

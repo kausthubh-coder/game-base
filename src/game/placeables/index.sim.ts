@@ -6,6 +6,7 @@ import { REACH, reachDistance } from '../actions/index.sim.ts';
 import type { Interactable, Placed, PlaceableDef, PlaceablesApi, Systems, UseContext } from '../api.sim.ts';
 import { PLACEABLES, footprint } from '../content/placeables.ts';
 import type { Kernel } from '../kernel.sim.ts';
+import { roofOver } from '../time/index.sim.ts';
 
 /** The prompt of a placed thing shows within this many blocks of its middle. */
 export const PROMPT_RADIUS = 2;
@@ -71,7 +72,7 @@ export function install(kernel: Kernel): void {
     // Why not: the time system wants evening, and a roof over the bed or over the player. The bed fills its
     // block, so nobody can stand under the block that covers it: a roof over the bed alone is enough.
     const p = e.placed, at = game.player.pos;
-    const roofless = world.openSky(p.x, p.y + e.sy, p.z) && world.openSky(at.x, at.y + 0.5, at.z);
+    const roofless = !roofOver(world, p.x, p.y + e.sy, p.z) && !roofOver(world, at.x, at.y + 0.5, at.z);
     events.emit('toast', { text: roofless ? NO_ROOF_TOAST : TOO_EARLY_TOAST });
   }
 

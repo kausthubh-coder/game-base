@@ -8,6 +8,15 @@ import { footprint } from '../content/placeables.ts';
 import { createWeather, type Weather } from '../../features/weather/weather.sim.ts';
 import type { Game, SimSystem, TimeApi } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
+import type { WorldQuery } from '../../engine/world-query.ts';
+
+/**
+ * True when a block stands over this point. A tree's leaves do not count: `openSky` is false under them,
+ * so a bed under a tree once let the hero sleep with nothing built.
+ */
+export function roofOver(world: WorldQuery, x: number, y: number, z: number): boolean {
+  return y < world.heightAt(x, z);
+}
 
 /** Seconds of real time in one game day. */
 export const DAY_LENGTH = 720;
@@ -145,7 +154,7 @@ export function createTime(game: Game): Time {
       const dy = at.y < placed.y ? placed.y - at.y : at.y > placed.y + sy ? at.y - placed.y - sy : 0;
       const dz = at.z < placed.z ? placed.z - at.z : at.z > placed.z + sz ? at.z - placed.z - sz : 0;
       if (dx * dx + dy * dy + dz * dz > BED_REACH * BED_REACH) continue;
-      if (!game.world.openSky(placed.x, placed.y + sy, placed.z)) return true;
+      if (roofOver(game.world, placed.x, placed.y + sy, placed.z)) return true;
     }
     return false;
   }
@@ -176,7 +185,7 @@ export function createTime(game: Game): Time {
       if (!game.systems.placeables.near('bed', at, BED_REACH)) return false;
       // A roof over the player, or over a bed in reach. A bed fills its block, so nobody can stand under
       // the one block that covers it, and that one block is all the roof quest asks for.
-      return !game.world.openSky(at.x, at.y + 0.5, at.z) || roofedBedNear();
+      return roofOver(game.world, at.x, at.y + 0.5, at.z) || roofedBedNear();
     },
 
     sleep() {

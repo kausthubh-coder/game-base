@@ -55,7 +55,7 @@ installTime(kernel); // before crops and anything else that reads game.ambient i
 kernel.game.systems.time.onThunder?.((at) => sound.thunder(at));
 ```
 
-It calls `game.systems.placeables.near('bed', player.pos, 4)`, `placeables.all()`, `placeables.defs()` and `game.world.openSky`, all inside `canSleep()`. Installing it draws one number from `game.random()` for the weather seed.
+It calls `game.systems.placeables.near('bed', player.pos, 4)`, `placeables.all()`, `placeables.defs()` and `game.world.heightAt` (through `roofOver`, a block overhead; leaves do not count), all inside `canSleep()`. Installing it draws one number from `game.random()` for the weather seed.
 
 The save holds the day, the seconds since dawn, `clock.seconds`, which days were announced, the forced kind and the machine's kind. The machine cannot restart in the middle of a front, so a load settles the saved kind at once: full rain and soaked ground if it rained, dry ground if not.
 
