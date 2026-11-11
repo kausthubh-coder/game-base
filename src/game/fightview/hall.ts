@@ -97,9 +97,9 @@ class Kit {
     this.parts.push(geo.index ? geo.toNonIndexed() : geo);
   }
 
-  /** An egg shape: a sphere of radii `rx`, `ry`, `rz`. */
-  blob(color: number, x: number, y: number, z: number, rx: number, ry: number, rz: number, turn = 0, tip = 0): void {
-    this.add(new THREE.SphereGeometry(1, 8, 6), color, x, y, z, tip, turn, 0, rx, ry, rz);
+  /** An egg shape: a sphere of radii `rx`, `ry`, `rz`. `coarse` is a cheaper one for small parts seen from far off. */
+  blob(color: number, x: number, y: number, z: number, rx: number, ry: number, rz: number, turn = 0, tip = 0, coarse = false): void {
+    this.add(coarse ? new THREE.SphereGeometry(1, 6, 4) : new THREE.SphereGeometry(1, 8, 6), color, x, y, z, tip, turn, 0, rx, ry, rz);
   }
 
   /** A tapered rod from one point to another. */
@@ -161,7 +161,7 @@ function buildBody(): THREE.BufferGeometry {
   // Moss and leaves along the back, and a short tail.
   for (let i = 0; i < 14; i++) {
     const z = -0.5 - i * 0.55, x = (r() - 0.5) * 2.4;
-    k.blob(i % 3 ? C.leaf : C.lime, x, 7.7 + r() * 0.5 - Math.abs(x) * 0.25 + (i < 3 ? 0.6 : 0), z, 0.55 + r() * 0.3, 0.35, 0.5 + r() * 0.3, r() * 3);
+    k.blob(i % 3 ? C.leaf : C.lime, x, 7.7 + r() * 0.5 - Math.abs(x) * 0.25 + (i < 3 ? 0.6 : 0), z, 0.55 + r() * 0.3, 0.35, 0.5 + r() * 0.3, r() * 3, 0, true);
   }
   k.blob(C.straw, 0, 6.9, -8.9, 0.45, 0.6, 0.4, 0, -0.6);
   return k.done();
@@ -278,22 +278,40 @@ function buildRamp(): THREE.BufferGeometry {
   return k.done();
 }
 
-/** The drained grey: a line in the world's height above which the colors are back. Very high, the whole body is grey. */
-type Drain = { uDrain: { value: number } };
+/**
+ * The drained grey: a line in the world's height above which the colors are back. Very high, the whole body is
+ * grey. `uDusk` (0 to 1) is how far the hall's hour is toward dusk: the body keeps a pale rim of light round its
+ * edge and some of its own light, so at dusk it is still a body with a head and antlers, not a black shape.
+ */
+type Drain = { uDrain: { value: number }; uDusk: { value: number } };
+
+/** The rim's color: a cool, pale light, as the sky's last light on the god's edge. */
+const RIM_LIGHT = 'vec3(0.62, 0.74, 0.72)';
+const rimOf = (normal: string, toEye: string): string => /* glsl */ `
+    float hallRim = pow(1.0 - clamp(abs(dot(normalize(${normal}), normalize(${toEye}))), 0.0, 1.0), 2.2);
+    vec3 hallLift = ${RIM_LIGHT} * hallRim * (0.08 + 0.45 * uDusk) + diffuseColor.rgb * 0.22 * uDusk;`;
 
 function bodyMaterial(view: GameView, drain: Drain): THREE.Material {
-  const fragmentPars = 'uniform float uDrain;';
+  const fragmentPars = 'uniform float uDrain, uDusk;';
   const back = (y: string) => /* glsl */ `
     float hallGrey = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11));
     diffuseColor.rgb = mix(vec3(hallGrey) * vec3(0.9, 0.9, 0.95), diffuseColor.rgb, smoothstep(uDrain - 0.9, uDrain + 0.9, ${y}));`;
-  if (view.painted) return paint({ vertexColors: true, uniforms: drain, fragmentPars, fragmentAlbedo: back('vPaintWorld.y') });
+  if (view.painted) {
+    return paint({
+      vertexColors: true, uniforms: drain, fragmentPars, fragmentAlbedo: back('vPaintWorld.y'),
+      fragmentFinal: /* glsl */ `${rimOf('normal', 'vViewPosition')}
+    vec3 outgoingLight = paintHaze(paintShade(diffuseColor.rgb, paintLit(0.0)) + hallLift) + totalEmissiveRadiance;`,
+    });
+  }
   const material = new THREE.MeshLambertMaterial({ vertexColors: true });
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, drain);
     shader.vertexShader = shader.vertexShader.replace('#include <common>', '#include <common>\nvarying float vHallY;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvHallY = (modelMatrix * vec4(transformed, 1.0)).y;');
     shader.fragmentShader = shader.fragmentShader.replace('#include <common>', `#include <common>\nvarying float vHallY;\n${fragmentPars}`)
-      .replace('#include <color_fragment>', `#include <color_fragment>\n${back('vHallY')}`);
+      .replace('#include <color_fragment>', `#include <color_fragment>\n${back('vHallY')}`)
+      .replace('vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;',
+        `${rimOf('normal', 'vViewPosition')}\n    vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance + hallLift;`);
   };
   return material;
 }
@@ -349,7 +367,7 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
   const chest = at(HALL.chest);
 
   // ---------------------------------------------------------------- the Stag
-  const drain: Drain = { uDrain: { value: 1000 } };
+  const drain: Drain = { uDrain: { value: 1000 }, uDusk: { value: 0 } };
   const skin = bodyMaterial(view, drain);
   const stag = new THREE.Group();
   stag.name = 'stag';
@@ -418,7 +436,7 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
 
   // ---------------------------------------------------------------- the chains
   // Big links, few of them: a chain reads from the furthest step, and its shadow adds nothing there.
-  const linkGeo = new THREE.TorusGeometry(0.26, 0.075, 3, 6);
+  const linkGeo = new THREE.TorusGeometry(0.26, 0.075, 3, 5);
   linkGeo.deleteAttribute('uv');
   const links = new THREE.InstancedMesh(linkGeo, view.painted ? paint({ color: C.gold }) : new THREE.MeshLambertMaterial({ color: C.gold }), LINKS * 5);
   links.frustumCulled = false;
@@ -635,6 +653,7 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
       setTime(hour);
       holdFor = 4;
     }
+    drain.uDusk.value = Math.max(0, Math.min(1, (hour - HOURS[0]) / (HOURS[1] - HOURS[0])));
 
     if (freedFor >= 0) {
       freedFor += dt;
