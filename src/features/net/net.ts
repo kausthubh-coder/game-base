@@ -66,7 +66,11 @@ export interface Net extends ViewSystem {
   readonly retryIn: number;
   /** Starts connecting, or starts over after a refusal. */
   connect(): void;
-  /** Sends one step's input. Returns its number, or 0 when the connection is not open and nothing was sent. */
+  /**
+   * Sends one step's input. Returns its number, or 0 when the connection is not open and nothing was sent.
+   * Send one every step, also while the player stands still: the server takes out a player it has not heard
+   * from in 15 seconds.
+   */
   send(input: NetInput): number;
   /** Hears every snap, after it was added to `near`. Returns a function that stops listening. */
   onSnap(listener: (snap: Snap) => void): () => void;

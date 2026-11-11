@@ -23,6 +23,11 @@ const SAVE_EVERY = 30 * STEPS_PER_SECOND;
 const CARD_EVERY = 300 * STEPS_PER_SECOND;
 /** A connection that has not said hello in this long is closed. */
 const HELLO_WITHIN_MS = 10_000;
+/**
+ * A player nothing was heard from for this many steps, 15 seconds, is taken out. A browser sends an input
+ * every step, so silence means the line is dead, and a dead line must not keep a world awake.
+ */
+const QUIET_STEPS = 15 * STEPS_PER_SECOND;
 /** How many of the last steps the timings are kept for: a minute. */
 const TIMED = 60 * STEPS_PER_SECOND;
 
@@ -33,6 +38,8 @@ interface Session {
   user: string | null;
   checking: boolean;
   helloTimer: ReturnType<typeof setTimeout> | null;
+  /** The room's step count when this player was last heard from. */
+  heardAt: number;
 }
 
 /** The last `TIMED` samples of a duration. */
@@ -117,7 +124,7 @@ export class WorldServer extends DurableObject<Env> {
     const client = pair[0], server = pair[1];
     // The hibernation API: an idle connection does not keep the object in memory.
     this.ctx.acceptWebSocket(server);
-    const session: Session = { user: null, checking: false, helloTimer: null };
+    const session: Session = { user: null, checking: false, helloTimer: null, heardAt: 0 };
     session.helloTimer = setTimeout(() => {
       session.helloTimer = null;
       if (session.user === null) this.end(server, CLOSE.quiet, 'no hello');
@@ -137,7 +144,10 @@ export class WorldServer extends DurableObject<Env> {
     }
     const message = codec.decodeClient(data);
     if (session.user !== null) {
-      if (message?.t === 'input') this.room?.input(session.user, message);
+      const room = this.room;
+      if (!room) return;
+      session.heardAt = room.steps;
+      if (message?.t === 'input') room.input(session.user, message);
       return;
     }
     if (session.checking) return;
@@ -162,6 +172,7 @@ export class WorldServer extends DurableObject<Env> {
     if (you === null) return this.refuse(ws, 'full');
     session.checking = false;
     session.user = who.id;
+    session.heardAt = room.steps;
     if (session.helloTimer !== null) clearTimeout(session.helloTimer);
     session.helloTimer = null;
     this.sockets.set(who.id, ws);
@@ -277,16 +288,29 @@ export class WorldServer extends DurableObject<Env> {
 
     if (ran > 0) {
       const started = performance.now();
-      for (const [user, ws] of this.sockets) {
-        const snap = room.snap(user);
-        if (snap) this.send(ws, codec.encode(snap));
-      }
+      this.sendSnaps(room);
       this.snapMs.add(performance.now() - started);
     }
+    if (room.steps % STEPS_PER_SECOND === 0) this.dropQuiet(room);
     if (room.steps - this.savedAt >= SAVE_EVERY) this.save('30 seconds passed');
     if (room.steps - this.cardAt >= CARD_EVERY) this.postCard();
-    this.timer = setTimeout(this.tick, Math.max(0, this.nextDue - Date.now()));
+    // The last player may just have been dropped for silence, and the world put to sleep.
+    if (room.playerCount > 0) this.timer = setTimeout(this.tick, Math.max(0, this.nextDue - Date.now()));
   };
+
+  private sendSnaps(room: Room): void {
+    for (const [user, ws] of this.sockets) {
+      const snap = room.snap(user);
+      if (snap) this.send(ws, codec.encode(snap));
+    }
+  }
+
+  /** Takes out every player whose connection has gone silent. */
+  private dropQuiet(room: Room): void {
+    for (const [ws, session] of [...this.sessions]) {
+      if (session.user !== null && room.steps - session.heardAt > QUIET_STEPS) this.end(ws, CLOSE.quiet, 'nothing heard for 15 seconds');
+    }
+  }
 
   private save(why: string): void {
     const room = this.room;

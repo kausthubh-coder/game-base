@@ -7,7 +7,9 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { blockId } from '../../src/content/blocks.ts';
-import type { Snap } from '../../src/engine/net/messages.ts';
+import { jsonCodec } from '../../src/engine/net/codec.ts';
+import { CLOSE, type Snap } from '../../src/engine/net/messages.ts';
+import { BUILD } from '../../src/engine/net/version.ts';
 import { cellIndex } from '../../src/features/world/chunk.sim.ts';
 import { ROOT, join, sleep, startServer, type FakePlayer } from './local.ts';
 
@@ -141,6 +143,21 @@ try {
     `server pid ${before} stopped, pid ${server.pid} started; a new player's first snaps hold block ${found} at ${placedAt.slice(0, 3).join(', ')} (oak planks are ${plank}); steps went on from ${asleep.steps} to ${restarted.steps}`);
   await cy.leave();
   players.length = 0;
+
+  // ---------------------------------------------------------------- a line that goes dead
+  // A player who joins and then says nothing, as a browser does when its wifi drops without a goodbye.
+  const silent = new WebSocket(`${server.ws}/world/${WORLD}`);
+  const closed = new Promise<{ code: number; after: number }>((done) => {
+    let joined = 0;
+    silent.addEventListener('open', () => silent.send(jsonCodec.encode({ t: 'hello', build: BUILD, token: 'dev:silent' })));
+    silent.addEventListener('message', () => { joined ||= performance.now(); });
+    silent.addEventListener('close', (event) => done({ code: event.code, after: (performance.now() - joined) / 1000 }));
+  });
+  const dropped = await Promise.race([closed, sleep(25_000).then(() => null)]);
+  const afterDrop = await server.stats(WORLD);
+  check('a player who goes silent is taken out after 15 seconds, and the empty world sleeps',
+    dropped !== null && dropped.code === CLOSE.quiet && dropped.after > 14 && dropped.after < 18 && !afterDrop.stepping && afterDrop.players === 0,
+    dropped ? `closed with code ${dropped.code} after ${dropped.after.toFixed(1)} s of silence; stepping ${afterDrop.stepping}, players ${afterDrop.players}` : 'the connection was still open after 25 seconds');
 } catch (error) {
   failed++;
   console.error('FAIL  the check itself threw:', error);

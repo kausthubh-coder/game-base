@@ -1,6 +1,6 @@
 // The world's save in the Durable Object's own SQLite storage.
 //
-// One table, `save`, of keys and JSON text. Each changed chunk is its own row, `chunk:<cx>:<cz>`, and the
+// One table, `save`, of keys and JSON text, made by the first save. Each changed chunk is its own row, `chunk:<cx>:<cz>`, and the
 // rest are `meta`, `game` and `places`. A save writes only the rows whose text changed, in one
 // transaction, and no row comes near the 8 MB a row may hold as the world grows.
 import type { GameSave } from '../src/game/kernel.sim.ts';
@@ -27,13 +27,17 @@ function markOf(text: string): string {
 
 /** `transaction` runs its callback with every write in it kept or dropped together: `ctx.storage.transactionSync`. */
 export function sqlStore(sql: SqlLike, transaction: (run: () => void) => void): SaveStore {
-  sql.exec('CREATE TABLE IF NOT EXISTS save (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
+  // Nothing is written until the first save. A connection that is refused wakes this object for a
+  // moment, and must not leave a table behind for a world that does not exist.
+  let hasTable = false;
   /** The mark of every row as it is stored. */
   const stored = new Map<string, string>();
 
   return {
     read() {
       stored.clear();
+      hasTable = sql.exec("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'save'").toArray().length > 0;
+      if (!hasTable) return null;
       const rows = new Map<string, string>();
       for (const row of sql.exec('SELECT key, value FROM save').toArray()) {
         const key = String(row.key), value = String(row.value);
@@ -72,9 +76,11 @@ export function sqlStore(sql: SqlLike, transaction: (run: () => void) => void): 
       }
       const dropped = [...stored.keys()].filter((key) => !rows.has(key));
       transaction(() => {
+        if (!hasTable) sql.exec('CREATE TABLE IF NOT EXISTS save (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
         for (const [key, value] of changed) sql.exec('INSERT INTO save (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value', key, value);
         for (const key of dropped) sql.exec('DELETE FROM save WHERE key = ?', key);
       });
+      hasTable = true;
       let bytes = 0;
       for (const [key, value, mark] of changed) {
         stored.set(key, mark);
