@@ -15,16 +15,7 @@
   "counters": {
     "drawCalls": 86,
     "triangles": 342573,
-    "frameMs": 16.609999974568684,
-    "scriptMs": 7.104225306443765,
-    "simMs": 0,
-    "chunkMs": 0,
-    "chunks": 129,
-    "quality": "medium",
-    "renderScale": 1,
-    "auto": false,
-    "sprites": 21,
-    "particles": 555
+    "quality": "medium"
   },
   "scriptBytes": 2372161
 }

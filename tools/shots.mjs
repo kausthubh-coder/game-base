@@ -50,7 +50,8 @@ try {
       g.view.root.style.visibility = 'hidden';
       const beam = g.view.scene.getObjectByName('waypoint-beam'); if (beam) beam.material.visible = false;
       await g.settle(); await g.frames(60);
-      return g.counters();
+      const c = g.counters();
+      return { drawCalls: c.drawCalls, triangles: c.triangles, quality: c.quality };
     }, scene);
     // Freeze the draw loop at an exact visual time, independent of renderer speed.
     await page.evaluate(async () => {
