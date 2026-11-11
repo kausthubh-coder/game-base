@@ -35,7 +35,8 @@ export interface LabPanel {
   readonly element: HTMLElement;
 }
 
-const WAY_NAMES: Record<Way, string> = { hero: 'The hero fights', pet: 'The pet fights', world: 'The world fights' };
+// Milestone 3: `stag` is the Stag's hall, fought the hero's way.
+const WAY_NAMES: Record<Way | 'stag', string> = { hero: 'The hero fights', pet: 'The pet fights', world: 'The world fights', stag: 'The hero frees the Stag' };
 const WAY_SHORT: Record<Way, string> = { hero: 'Hero', pet: 'Pet', world: 'World' };
 
 const KEYS: Record<Way, readonly (readonly [string, string])[]> = {

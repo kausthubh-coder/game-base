@@ -154,7 +154,9 @@ export type FightEventType =
   | 'brought' | 'wake' | 'tell' | 'strike' | 'swing' | 'hit' | 'whiff' | 'charged' | 'dodge' | 'dodged' | 'heroHurt' | 'faint' | 'woke'
   | 'guard' | 'segment' | 'dizzy' | 'recovered' | 'crash' | 'stall' | 'calming' | 'calmed' | 'won'
   | 'bolt' | 'boltHit' | 'boltMiss' | 'order' | 'whistle' | 'petStrike' | 'petHurt' | 'petFaint' | 'petUp' | 'skill' | 'blocked'
-  | 'rigPlaced' | 'rigTaken' | 'rig' | 'denied';
+  | 'rigPlaced' | 'rigTaken' | 'rig' | 'denied'
+  // Milestone 3: a target was hit, or broke.
+  | 'targetHit' | 'targetBroken';
 
 /** Something that happened in a step, for the view's sounds, sparks and freezes. `n` and `text` depend on the type. */
 export interface FightEvent {
@@ -167,7 +169,8 @@ export interface FightEvent {
 
 /** What one fight came to: the numbers the experiments' checks ask for. */
 export interface FightRecord {
-  way: Way;
+  /** The way fought, or `stag` for the Stag's hall, which is fought the hero's way. */
+  way: Way | 'stag';
   enemy: string;
   pet: string;
   gentle: boolean;
@@ -210,6 +213,8 @@ export interface FightRecord {
   crashes: number;
   /** The answer to "Again?", 1 to 5, or 0 while there is none. */
   again: number;
+  /** A boss fight's own numbers. Only a boss sets them (`src/game/fight/hall.sim.ts`). */
+  boss?: BossNumbers;
 }
 
 export interface FightOptions {
@@ -268,6 +273,79 @@ export interface Fight {
   skill(slot: 0 | 1): { name: string; left: number; rest: number } | null;
   /** The rigs still in the kit. */
   kit(): RigKind[];
+
+  // ---------------------------------------------------------------------------------- milestone 3: the boss hooks
+  /** Things to hit that are not beasts: a chain's pin, a lamp, a seed pod, the collar. */
+  readonly targets: readonly Target[];
+  /** Makes a target. The hero's cut and spin, thrown light and the pet's strike take its guard while it is `open`. */
+  addTarget(spec: TargetSpec): Target;
+  /** Takes a target away. */
+  removeTarget(target: Target): void;
+  /** Shows a shape on the ground that belongs to no beast. It lands on the hero and the pet like any attack. Null when every slot is in use. */
+  threaten(spec: LooseShape): Telegraph | null;
+  /** Takes a shape that `threaten` made off the ground before it lands. */
+  cancel(shape: Telegraph): void;
+}
+
+/** What `addTarget` is given. */
+export interface TargetSpec {
+  x: number;
+  z: number;
+  radius: number;
+  guard: number;
+  /** Its name in events and the record. */
+  name?: string;
+  /** False makes it wait, unhittable, until something opens it. True by default. */
+  open?: boolean;
+  /** True for a target up on a boss: only the hero's own cut and spin reach it, not thrown light or the pet. */
+  high?: boolean;
+}
+
+/** Something the hero can hit that is not a beast. It loses guard like a beast and breaks at 0. */
+export interface Target {
+  readonly id: number;
+  readonly name: string;
+  x: number;
+  z: number;
+  radius: number;
+  /** Guard left, and the guard it started with. */
+  guard: number;
+  readonly full: number;
+  /** True while it can be hit. The boss that made it opens and shuts it. */
+  open: boolean;
+  /** True once its guard is gone. A broken target cannot be hit. */
+  readonly broken: boolean;
+  readonly high: boolean;
+}
+
+/** What `threaten` is given: a shape, its lead, and what it does where it lands. */
+export interface LooseShape {
+  kind: 'circle' | 'line' | 'cone';
+  x: number;
+  z: number;
+  facing: number;
+  /** A circle's radius, a cone's reach, a line's length. */
+  reach: number;
+  /** A line's width, or half a cone's angle. */
+  width: number;
+  lead: number;
+  damage: number;
+  heavy: boolean;
+  /** The attack's name, for events and `hitBy` in the record. */
+  id: string;
+  /** Blocks a hit pushes the hero, in place of the usual push. A circle or cone pushes away from its middle, a line straight out from its middle line. */
+  push?: number;
+}
+
+/** A boss's numbers in the record. */
+export interface BossNumbers {
+  /** Seconds spent in each phase, in order. */
+  phases: number[];
+  /** The longest stretch, in seconds, in which the boss had no attack of its own on the ground, and the same for each phase. */
+  quiet: number;
+  quietByPhase: number[];
+  /** What else the boss counts, by name: pins broken, pods cut, falls from the ramp. */
+  counts: Record<string, number>;
 }
 
 // ---------------------------------------------------------------------------------------- the rules
@@ -456,6 +534,13 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       const to = facingOf(dx, dz), turn = Math.abs(turnBetween(aim, to));
       if (turn < bestTurn) { bestTurn = turn; best = to; }
     }
+    // Milestone 3: an open target bends the cut as a beast does.
+    for (let i = 0; i < targets.length; i++) {
+      const t = targets[i] as TargetInner, dx = t.x - hero.x, dz = t.z - hero.z;
+      if (!t.open || t.broken || Math.hypot(dx, dz) > grow + t.radius + HERO.magnet.near) continue;
+      const to = facingOf(dx, dz), turn = Math.abs(turnBetween(aim, to));
+      if (turn < bestTurn) { bestTurn = turn; best = to; }
+    }
     return best;
   }
 
@@ -499,6 +584,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       // With the hero fighting, the pet goes for whatever the hero hit last.
       if (way === 'hero' && pet.mode !== 'down' && stillUp(b)) { pet.mode = 'engage'; pet.target = b; }
     }
+    hits += landOnTargets(spin); // Milestone 3: targets.
     if (hits === 0) {
       record.whiffs++;
       emit('whiff', hero.x + dirX(hero.facing) * 1.4, hero.z + dirZ(hero.facing) * 1.4);
@@ -560,7 +646,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
   }
 
   /** A hit on the hero from (fx, fz). False when it passed: a dodge, or the moment after another hit. */
-  function hurtHero(damage: number, heavy: boolean, fx: number, fz: number, attack: string): boolean {
+  function hurtHero(damage: number, heavy: boolean, fx: number, fz: number, attack: string, pushBlocks?: number): boolean {
     if (hero.act === 'faint') return false;
     if (hero.safe > 0) {
       if (hero.act === 'dodge') { record.dodged++; emit('dodged', hero.x, hero.z); }
@@ -570,7 +656,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     record.hitsTaken++;
     record.hitBy[attack] = (record.hitBy[attack] ?? 0) + 1;
     const dx = hero.x - fx, dz = hero.z - fz, away = Math.hypot(dx, dz) || 1;
-    const push = heavy ? HERO.hurt.heavyPush : HERO.hurt.push;
+    const push = pushBlocks ?? (heavy ? HERO.hurt.heavyPush : HERO.hurt.push);
     hero.pushTime = hero.pushLeft = heavy ? HERO.hurt.heavyPushTime : HERO.hurt.pushTime;
     // The push starts fast and slows to a stop, so its first speed is twice its mean.
     hero.pushX = (dx / away) * (2 * push) / hero.pushTime;
@@ -861,16 +947,18 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     }
   }
 
-  /** A hit on the pet. False when it passed. */
-  function hurtPet(b: Beast, attack: string): boolean {
+  /** A hit on the pet. False when it passed. `b` is null for a shape that belongs to no beast. */
+  function hurtPet(b: Beast | null, attack: string): boolean {
     if (pet.mode === 'down') return false;
     if (pet.mode === 'brace') {
       // The braced pet turns the attack: the beast staggers and loses guard.
       const skill = pet.def.skills[0];
       emit('blocked', pet.x, pet.z, 0, attack);
       pet.mode = 'heel';
-      hurtGuard(b, skill.guard, 'pet');
-      if (b.doing !== 'dizzy') { dropShape(b); go(b, 'stun', 1); }
+      if (b) {
+        hurtGuard(b, skill.guard, 'pet');
+        if (b.doing !== 'dizzy') { dropShape(b); go(b, 'stun', 1); }
+      }
       return false;
     }
     if (pet.safe || pet.hurtSafe > 0) return false;
@@ -947,7 +1035,8 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       }
     }
 
-    if (p.mode === 'engage') {
+    if (p.mode === 'engage' && !p.target && petGoal) petAtTarget(dt); // Milestone 3: a target.
+    else if (p.mode === 'engage') {
       const b = p.target;
       if (!b || b.doing === 'calmed' || b.doing === 'dizzy') {
         p.mode = 'heel';
@@ -1014,6 +1103,8 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
         struck.markLeft = HERO.bolt.markTime;
         emit('boltHit', bolt.x, bolt.z, struck.marks);
         hurtGuard(struck, HERO.bolt.guard, 'hero');
+      } else if (boltOnTargets(bolt)) {
+        // Milestone 3: it landed on a target.
       } else if (bolt.left <= 0 || stage.solid(bolt.x, bolt.z)) {
         bolt.live = false;
         emit('boltMiss', bolt.x, bolt.z);
@@ -1377,6 +1468,175 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     return null;
   }
 
+  // ================================================ milestone 3: the boss hooks
+  // Two things a boss needs that a beast fight does not, so a boss can be its own module
+  // (`src/game/fight/hall.sim.ts`). A beast fight never makes either, and plays exactly as before.
+  //
+  // Targets: things the hero can hit that are not beasts. A cut or a spin, thrown light and the pet's strike
+  // take their guard while they are open, as they take a beast's. At 0 one breaks and stays broken.
+  //
+  // Loose shapes: a shape on the ground that belongs to no beast. It shows for its lead and lands on the hero and
+  // the pet like any attack: the same `tell` and `strike` events, the same dodge, the same record.
+
+  interface TargetInner extends Target { broken: boolean }
+  interface Loose { shape: Telegraph; spec: LooseShape; landed: boolean }
+  const targets: TargetInner[] = [];
+  const loose: Loose[] = [];
+  let nextTarget = 1;
+  /** The target the pet goes for with the hero fighting: the one the hero hit last. */
+  let petGoal: TargetInner | null = null;
+
+  function addTarget(spec: TargetSpec): Target {
+    const t: TargetInner = { id: nextTarget++, name: spec.name ?? 'target', x: spec.x, z: spec.z, radius: spec.radius, guard: spec.guard, full: spec.guard, open: spec.open ?? true, broken: false, high: spec.high ?? false };
+    targets.push(t);
+    return t;
+  }
+
+  function removeTarget(target: Target): void {
+    const i = targets.indexOf(target as TargetInner);
+    if (i >= 0) targets.splice(i, 1);
+    if (petGoal === target) petGoal = null;
+  }
+
+  /** Takes guard from a target. It breaks at 0. */
+  function hurtTarget(t: TargetInner, amount: number): void {
+    if (t.broken || !t.open) return;
+    t.guard = Math.max(0, t.guard - amount);
+    emit('targetHit', t.x, t.z, amount, t.name);
+    if (t.guard > 0.001) return;
+    t.guard = 0;
+    t.broken = true;
+    t.open = false;
+    if (petGoal === t) petGoal = null;
+    emit('targetBroken', t.x, t.z, 0, t.name);
+  }
+
+  /** A cut or a spin lands on every open target in its shape. Returns how many it hit. */
+  function landOnTargets(spin: boolean): number {
+    let hits = 0;
+    for (let i = 0; i < targets.length; i++) {
+      const t = targets[i] as TargetInner;
+      if (!t.open || t.broken) continue;
+      const grow = t.radius + 0.25;
+      const inside = spin
+        ? inCircle(t.x, t.z, hero.x, hero.z, HERO.spin.reach + grow)
+        : inCone(t.x, t.z, hero.x, hero.z, hero.facing, HERO.cut.reach, HERO.cut.arc / 2, grow);
+      if (!inside) continue;
+      hits++;
+      hurtTarget(t, spin ? HERO.spin.guard : HERO.cut.guard);
+      // With the hero fighting, the pet goes for it too.
+      if (way === 'hero' && pet.mode !== 'down' && !t.broken && !t.high && petGoal !== t) {
+        pet.mode = 'engage';
+        pet.target = null;
+        petGoal = t;
+        pet.toStrike = PET.firstStrike;
+      }
+    }
+    return hits;
+  }
+
+  /** Thrown light that reaches an open target lands on it. True when it did. */
+  function boltOnTargets(bolt: Bolt): boolean {
+    for (let i = 0; i < targets.length; i++) {
+      const t = targets[i] as TargetInner;
+      if (!t.open || t.broken || t.high || !inCircle(bolt.x, bolt.z, t.x, t.z, t.radius + 0.35)) continue;
+      bolt.live = false;
+      record.throwHits++;
+      emit('boltHit', bolt.x, bolt.z, 0);
+      hurtTarget(t, HERO.bolt.guard);
+      return true;
+    }
+    return false;
+  }
+
+  /** The pet at a target: it runs in and strikes it, as it strikes a beast. */
+  function petAtTarget(dt: number): void {
+    const p = pet, t = petGoal;
+    if (!t || t.broken || !t.open) {
+      p.mode = 'heel';
+      petGoal = null;
+      return;
+    }
+    const d = Math.hypot(t.x - p.x, t.z - p.z), near = t.radius + PET.strikeGap;
+    if (d > near) {
+      p.moving = walk(p, t.x, t.z, p.def.speed, dt, PET.body);
+      // A target out of the pet's reach (up on the boss) is let go.
+      if (!p.moving) { p.mode = 'heel'; petGoal = null; }
+      return;
+    }
+    p.facing = facingOf(t.x - p.x, t.z - p.z);
+    p.toStrike -= dt;
+    if (p.toStrike > 0) return;
+    emit('petStrike', t.x, t.z, 0);
+    p.toStrike = p.def.every * (way === 'hero' ? PET.helperSlow : 1);
+    p.strikeT = 0.001;
+    hurtTarget(t, p.def.strike);
+  }
+
+  function threaten(spec: LooseShape): Telegraph | null {
+    for (let i = 0; i < SHAPES; i++) {
+      const s = shapes[i] as Telegraph;
+      if (s.live) continue;
+      s.live = true;
+      s.kind = spec.kind;
+      s.x = spec.x;
+      s.z = spec.z;
+      s.facing = spec.facing;
+      s.reach = spec.reach;
+      s.width = spec.width;
+      s.t = 0;
+      s.lead = spec.lead * (gentle ? GENTLE.lead : 1);
+      // No beast has the id 0.
+      s.owner = 0;
+      s.end = 0;
+      loose.push({ shape: s, spec, landed: false });
+      emit('tell', s.x, s.z, s.lead, spec.id);
+      return s;
+    }
+    return null;
+  }
+
+  function cancelLoose(shape: Telegraph): void {
+    for (let i = loose.length - 1; i >= 0; i--) {
+      if ((loose[i] as Loose).shape !== shape) continue;
+      loose.splice(i, 1);
+      shape.live = false;
+    }
+  }
+
+  /** Each loose shape whose lead has run out lands on what is inside it at that moment. */
+  function landLoose(): void {
+    for (let i = loose.length - 1; i >= 0; i--) {
+      const l = loose[i] as Loose, s = l.shape;
+      if (!s.live) { loose.splice(i, 1); continue; }
+      if (l.landed || s.t < s.lead) continue;
+      l.landed = true;
+      const a = l.spec;
+      emit('strike', s.x, s.z, a.heavy ? 1 : 0, a.id);
+      if (covers(s, hero.x, hero.z, HERO.body)) {
+        // Pushed away from the middle of a circle or a cone, and straight out from the middle line of a line.
+        let fx = s.x, fz = s.z;
+        if (s.kind === 'line') {
+          const ux = dirX(s.facing), uz = dirZ(s.facing), along = (hero.x - s.x) * ux + (hero.z - s.z) * uz;
+          fx = s.x + ux * along;
+          fz = s.z + uz * along;
+        }
+        if (pet.mode === 'brace' && inCircle(hero.x, hero.z, pet.x, pet.z, 1.8)) hurtPet(null, a.id);
+        else hurtHero(a.damage, a.heavy, fx, fz, a.id, a.push);
+      }
+      if (covers(s, pet.x, pet.z, PET.body)) hurtPet(null, a.id);
+      // It stays on the ground a moment as a flash, then the slot is free: the shapes' own clock lets it go.
+      loose.splice(i, 1);
+    }
+  }
+
+  function clearBossHooks(): void {
+    targets.length = 0;
+    loose.length = 0;
+    petGoal = null;
+  }
+  // ================================================ end of the boss hooks
+
   // ------------------------------------------------ the fight's life
 
   function endOpen(): void {
@@ -1409,6 +1669,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     pet.rests[0] = pet.rests[1] = 0;
     pet.lureRest = 0;
     pet.ordered = -1;
+    clearBossHooks(); // Milestone 3.
     phase = 'idle';
     clock = 0;
     setupFrom = -1;
@@ -1437,6 +1698,7 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
       stepPet(dt);
       stepBolts(dt);
       for (let i = 0; i < beasts.length; i++) stepBeast(beasts[i] as Beast, dt);
+      landLoose(); // Milestone 3: loose shapes.
       for (let i = 0; i < SHAPES; i++) {
         const s = shapes[i] as Telegraph;
         if (!s.live) continue;
@@ -1542,6 +1804,12 @@ export function createFight(stage: Stage, options: FightOptions = {}): Fight {
     },
 
     kit: () => RIG_KINDS.filter((kind) => !usedKinds.has(kind)),
+
+    targets,
+    addTarget,
+    removeTarget,
+    threaten,
+    cancel: cancelLoose,
   };
   return fight;
 }
