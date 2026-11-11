@@ -4,6 +4,10 @@
 //
 // Nothing is sent when a save is loaded, so the flags are read twice a second and a prop whose look has
 // changed is set down again.
+//
+// The lume lights the ground too: one mesh of soft teal pools, under each lit lamp, round the Heartstone and
+// on the doorstep, where a little of it leaks under the shut door at night. They breathe slowly.
+import * as THREE from 'three';
 import type { Systems } from '../api.sim.ts';
 import { HALL } from '../content/region.ts';
 import type { GameView } from '../shell/view.ts';
@@ -11,8 +15,47 @@ import { worldProps } from '../worldview/props.ts';
 
 /** Seconds between two looks at the flags. */
 const EVERY = 0.5;
-/** From this level the Heartstone glows fully. Below it, with the Mark on the player's hand, it glows faintly. */
+/** From this level the Heartstone lights the whole court. */
 const BRIGHT = 10;
+/** The hall's lamps stand a little taller than a town lantern's post. */
+const LAMP_SIZE = 1.25;
+/** Lume, the ancients' teal, as light on the ground. */
+const LUME = new THREE.Color(0.16, 0.95, 0.82);
+
+const POOL_VERTEX = /* glsl */ `
+varying vec2 vAt;
+varying float vStrength;
+#include <fog_pars_vertex>
+void main() {
+  vAt = position.xz;
+  // The red of an instance's colour is how strongly its pool shines.
+  vStrength = instanceColor.r;
+  vec4 mvPosition = viewMatrix * instanceMatrix * vec4(position, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  #include <fog_vertex>
+}
+`;
+
+const POOL_FRAGMENT = /* glsl */ `
+uniform vec3 uColor;
+uniform float uStrength;
+varying vec2 vAt;
+varying float vStrength;
+#include <fog_pars_fragment>
+void main() {
+  // A soft round pool of light, brightest under the lamp.
+  float d = length(vAt) * 2.0;
+  float pool = pow(max(1.0 - d, 0.0), 2.0) * uStrength * vStrength;
+  #ifdef USE_FOG
+    #ifdef FOG_EXP2
+      pool *= exp(-fogDensity * fogDensity * vFogDepth * vFogDepth);
+    #else
+      pool *= 1.0 - smoothstep(fogNear, fogFar, vFogDepth);
+    #endif
+  #endif
+  gl_FragColor = vec4(uColor * pool, 1.0);
+}
+`;
 /** The Gate's opening faces east. A prop's front faces south at no rotation. */
 const EAST = Math.PI / 2;
 
@@ -22,10 +65,20 @@ interface Piece {
   y: number;
   z: number;
   rotation: number;
+  scale: number;
   /** The variant to show now. */
   variant: () => number;
   handle: number;
   shown: number;
+}
+
+/** One pool of light on the ground: where, how wide, and how strongly it shines now, from 0 to 1. */
+interface Pool {
+  x: number;
+  y: number;
+  z: number;
+  wide: number;
+  strength: () => number;
 }
 
 export function install(view: GameView): void {
@@ -33,13 +86,14 @@ export function install(view: GameView): void {
   const { flags } = game;
   const props = worldProps(view);
 
-  const piece = (kind: string, at: { x: number; y: number; z: number }, variant: () => number, rotation = 0): Piece =>
-    ({ kind, x: at.x, y: at.y, z: at.z, rotation, variant, handle: 0, shown: -1 });
+  const piece = (kind: string, at: { x: number; y: number; z: number }, variant: () => number, rotation = 0, scale = 1): Piece =>
+    ({ kind, x: at.x, y: at.y, z: at.z, rotation, scale, variant, handle: 0, shown: -1 });
   const lit = (): number => (flags.is('hall.lit') ? 1 : 0);
+  const level = (): number => (game.systems as Partial<Systems>).hall?.heart().level ?? 0;
+  // Dull until the Mark is on the player's hand, faint with it, and awake once the player has touched it.
   const glow = (): number => {
     if (!flags.is('mark')) return 0;
-    const level = (game.systems as Partial<Systems>).hall?.heart().level ?? 0;
-    return level >= BRIGHT ? 2 : 1;
+    return flags.is('heart.seen') || level() >= BRIGHT ? 2 : 1;
   };
 
   const pieces: Piece[] = [
@@ -48,12 +102,74 @@ export function install(view: GameView): void {
     piece('gateArch', HALL.gate, () => 0, EAST),
     piece('muralSlab', HALL.mural, () => 0),
     piece('plinth', HALL.plinth, () => 0),
-    ...HALL.lamps.map((at) => piece('hallLamp', at, lit)),
+    ...HALL.lamps.map((at) => piece('hallLamp', at, lit, 0, LAMP_SIZE)),
     ...HALL.pillars.map((at, i) => piece('ruinPillar', at, () => at.variant, i * 1.3)),
   ];
 
+  // ---------------------------------------------------------------- the pools of light
+  const pool = (at: { x: number; y: number; z: number }, wide: number, strength: () => number, dz = 0): Pool =>
+    ({ x: at.x, y: at.y, z: at.z + dz, wide, strength });
+  const pools: Pool[] = [
+    ...HALL.lamps.map((at) => pool(at, 7, lit)),
+    // The Heartstone: a breath of light with the Mark, the whole floor before it once it has been touched.
+    pool(HALL.heartstone, 11, () => [0, 0.45, 1][glow()] + Math.min(0.5, level() / (BRIGHT * 2)), 1.2),
+    // The doorstep: a thread of lume under the shut door, and the hall's light through it once it stands open.
+    pool(HALL.doorAt, 5, () => (flags.is('door.open') ? (flags.is('hall.lit') ? 0.8 : 0.4) : 0.3), 1.6),
+    // The Gate is dead. Only the Mark, near it, finds a little light left in its stone.
+    pool(HALL.gate, 4, () => (flags.is('mark') ? 0.25 : 0), 0),
+  ];
+  const uniforms = {
+    ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+    uColor: { value: LUME },
+    uStrength: { value: 0 },
+  };
+  const material = new THREE.ShaderMaterial({
+    name: 'hall-glow',
+    uniforms,
+    vertexShader: POOL_VERTEX,
+    fragmentShader: POOL_FRAGMENT,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: true,
+    toneMapped: false,
+  });
+  const mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), material, pools.length);
+  mesh.name = 'hall-glow';
+  mesh.renderOrder = 2;
+  // The pools are few and in one place. One box around them all is not worth keeping up to date.
+  mesh.frustumCulled = false;
+  mesh.matrixAutoUpdate = false;
+  mesh.visible = false;
+  view.scene.add(mesh);
+  const matrix = new THREE.Matrix4(), at = new THREE.Vector3(), size = new THREE.Vector3(), FLAT = new THREE.Quaternion();
+  const shine = new THREE.Color();
+  /** Further than this from the door, in blocks, nothing of the Hall's light is drawn. */
+  const FAR = 96;
+
+  function setPools(): void {
+    let any = false;
+    for (let i = 0; i < pools.length; i++) {
+      const p = pools[i], strength = p.strength();
+      if (strength > 0) any = true;
+      // Just over the paving, or over the painted ground outside the door.
+      at.set(p.x, p.y + view.lift(p.x, p.y, p.z) + 0.04, p.z);
+      mesh.setMatrixAt(i, matrix.compose(at, FLAT, size.set(p.wide, 1, p.wide)));
+      mesh.setColorAt(i, shine.setRGB(strength, 0, 0));
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    lightUp = any;
+  }
+  let lightUp = false;
+  setPools();
+
   let since = EVERY;
   view.onFrame((dt) => {
+    // By day the lume is faint. At night it is what you see first. It breathes, slowly.
+    const player = game.player.pos;
+    mesh.visible = lightUp && Math.abs(player.x - HALL.doorAt.x) < FAR && Math.abs(player.z - HALL.doorAt.z) < FAR;
+    uniforms.uStrength.value = (0.1 + 0.5 * view.sky.look.night) * (1 + 0.12 * Math.sin(view.ctx.time * 0.9));
     since += dt;
     if (since < EVERY) return;
     since = 0;
@@ -62,8 +178,9 @@ export function install(view: GameView): void {
       const variant = p.variant();
       if (variant === p.shown) continue;
       props.remove(p.handle);
-      p.handle = props.place(p.kind, variant, p.x, p.y, p.z, p.rotation, 1, true);
+      p.handle = props.place(p.kind, variant, p.x, p.y, p.z, p.rotation, p.scale, true);
       p.shown = variant;
     }
+    setPools();
   });
 }

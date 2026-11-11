@@ -357,7 +357,7 @@ const TREES: readonly PlanTree[] = [
   // North and east of the grant, never south-east of it, so the plot stays in view. They stand clear of the Hall.
   { x: -30, z: -256, kind: 'oak', size: 0.3 },
   { x: -29, z: -268, kind: 'birch', size: 0.6 },
-  { x: -5, z: -258, kind: 'oak', size: 0.7 },
+  { x: 4, z: -259, kind: 'oak', size: 0.7 },
   { x: -4, z: -266, kind: 'oak', size: 0.2 },
   { x: 1, z: -249, kind: 'birch', size: 0.4 },
   { x: 3, z: -242, kind: 'oak', size: 0.5 },
@@ -458,8 +458,8 @@ export const REGION: RegionPlan = {
     { x0: 3, z0: -233, x1: 14, z1: -226 },
     // The garden's beds and fence, and the ruin.
     { x0: GARDEN.x - 7, z0: GARDEN.z - 14, x1: GARDEN.x + 7, z1: GARDEN.z + 6 },
-    // The Hall, its walls and the doorstep.
-    { x0: COURT.x0, z0: COURT.z0, x1: COURT.x1, z1: COURT.z1 + 2 },
+    // The Hall, its walls, and the few steps of open grass between its door and the grant.
+    { x0: COURT.x0, z0: COURT.z0, x1: COURT.x1, z1: COURT.z1 + 4 },
     { x0: 131, z0: -190, x1: 203, z1: -119 },
     ...TREES.map((t) => around(t.x, t.z, 1)),
     ...BUSHES.map((b) => around(b.x, b.z, 1)),
