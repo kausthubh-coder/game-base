@@ -25,6 +25,8 @@ test('the recipes are the ones in the design', () => {
     'workbench: 6 plank + 3 fiber -> 1 bed',
     'workbench: 8 plank -> 1 chest',
     'workbench: 1 plank + 1 moss_tuft -> 1 lamp',
+    'workbench: 2 plank + 1 fiber -> 4 fence',
+    'workbench: 4 plank + 2 moss_tuft -> 1 sprinkler',
   ]);
 });
 
@@ -32,9 +34,9 @@ test('available() lists hand recipes, and station recipes only within 5 blocks o
   const { crafting, placeables, game } = setup();
   expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench']);
   placeables.stand('workbench', WORKBENCH);
-  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench', 'bed', 'chest', 'lamp']);
+  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench', 'bed', 'chest', 'lamp', 'fence', 'sprinkler']);
   game.player.pos.x = -2;
-  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench', 'bed', 'chest', 'lamp']);
+  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench', 'bed', 'chest', 'lamp', 'fence', 'sprinkler']);
   game.player.pos.x = -2.5;
   expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench']);
 });

@@ -8,6 +8,9 @@ export const recipes: readonly Recipe[] = [
   { id: 'bed', makes: { id: 'bed', count: 1 }, needs: [{ id: 'plank', count: 6 }, { id: 'fiber', count: 3 }], station: 'workbench' },
   { id: 'chest', makes: { id: 'chest', count: 1 }, needs: [{ id: 'plank', count: 8 }], station: 'workbench' },
   { id: 'lamp', makes: { id: 'lamp', count: 1 }, needs: [{ id: 'plank', count: 1 }, { id: 'moss_tuft', count: 1 }], station: 'workbench' },
+  // The pieces of build mode. A fence is cheap, so a pen costs a few logs. A sprinkler asks for the mosslings' tufts.
+  { id: 'fence', makes: { id: 'fence', count: 4 }, needs: [{ id: 'plank', count: 2 }, { id: 'fiber', count: 1 }], station: 'workbench' },
+  { id: 'sprinkler', makes: { id: 'sprinkler', count: 1 }, needs: [{ id: 'plank', count: 4 }, { id: 'moss_tuft', count: 2 }], station: 'workbench' },
 ];
 
 /** How far from the player a station may stand, in blocks. */
