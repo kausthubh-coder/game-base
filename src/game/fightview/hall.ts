@@ -19,7 +19,7 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { AIR, blockId } from '../../content/blocks.ts';
 import { SHAPE_AFTER, STAG } from '../content/fight.ts';
-import type { Fight, FightEvent, Target } from '../fight/fight.sim.ts';
+import type { Fight, FightEvent, Target, Telegraph } from '../fight/fight.sim.ts';
 import { HALL, type RampCell } from '../fight/hall-layout.sim.ts';
 import type { Hall, HallEvent } from '../fight/hall.sim.ts';
 import { paint } from '../../features/painted/index.ts';
@@ -327,6 +327,8 @@ export interface HallView {
   hear(e: FightEvent): void;
   /** The target the hero hit last, for the hall's bar. */
   readonly lastHit: Target | null;
+  /** True for the shape of a shake, which the hall draws on its vines: `draw.ts` leaves it out. */
+  owns(shape: Telegraph): boolean;
   /** Seconds since the Stag was freed, or -1. */
   readonly freedFor: number;
   /** The Stag's group, for a test that wants to know it is there. */
@@ -687,21 +689,30 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
       ground.draw(MARK.ring, cx, h, cz, 0, 0.9, 0.05, 1, hall.collar.open ? TEAL : PALE, 0.8);
       ground.draw(MARK.ring, cx, h, cz, 0, 0.9, 0.14, hall.collar.guard / hall.collar.full, GOLD, 1, (flashes.get(hall.collar.id) ?? 0) > 0 ? 1 : 0.2);
     }
-    // A shake on the vines is drawn on the vines, at the height of the hero's feet.
-    const s = hall.stag.shape;
-    if (s && s.live && hall.stag.attack === 'shake') {
+    // A shake is drawn where it lands: on each step of the vines it covers, at that step's height, over the
+    // ramp's two cells. It runs north from `s.z`, and fills the same way.
+    const s = shake;
+    if (s && s.live) {
       const landed = s.t >= s.lead, k = landed ? 1 : s.t / s.lead, late = !landed && s.lead - s.t < 0.25;
-      const h = view.playerPosition.y + 0.05;
-      // Only the part over the ramp: from the body's edge out.
-      const sx = ox + 4, length = s.reach, sz = s.z;
-      ground.draw(MARK.line, sx, h, sz, s.facing, length, 2.1, k, late ? HOT : GOLD, landed ? Math.max(0, 1 - (s.t - s.lead) / SHAPE_AFTER) : 1, landed ? 1 : 0);
+      const alpha = landed ? Math.max(0, 1 - (s.t - s.lead) / SHAPE_AFTER) : 1, filledTo = s.reach * k;
+      for (let i = 0; i < HALL.ramp.length; i += 2) {
+        const c = HALL.ramp[i] as RampCell, north = oz + c.z, south = north + 1;
+        const from = Math.min(south, s.z), to = Math.max(north, s.z - s.reach);
+        if (from - to <= 0.01) continue;
+        const along = s.z - from, length = from - to, fill = Math.max(0, Math.min(1, (filledTo - along) / length));
+        ground.draw(MARK.line, ox + c.x + 1, y + c.height + 0.03, from, s.facing, length, 2.1, fill, late ? HOT : GOLD, alpha, landed ? 1 : 0);
+      }
     }
     ground.end();
   }
 
   // ---------------------------------------------------------------- one step of the body
   const hero = view.hero;
+  /** The shape of the Stag's last shake, while it is its latest attack. Shapes are a pool, so the attack says which one it is. */
+  let shake: Telegraph | null = null;
   function afterStep(): void {
+    const st = hall.stag;
+    if (st.shape && st.attack) shake = st.attack === 'shake' ? st.shape : null;
     const want = hall.stage.ramp;
     if (want === rampOn) return;
     rampOn = want;
@@ -731,6 +742,7 @@ export function createHallView(view: GameView, fight: Fight, hall: Hall, ox: num
     frame,
     hear,
     get lastHit() { return lastHit; },
+    owns: (shape) => shape === shake,
     get freedFor() { return freedFor; },
     stag,
     triangles() {

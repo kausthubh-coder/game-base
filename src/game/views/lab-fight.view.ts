@@ -32,7 +32,7 @@ import { createPanel, type PanelActions } from '../fightview/panel.ui.ts';
 // The Stag's hall.
 import { HERO_STEP } from '../../features/hero/index.ts';
 import { createHall, createHallBot, type Hall } from '../fight/hall.sim.ts';
-import { hallStage } from '../fight/hall-layout.sim.ts';
+import { HALL, hallStage, type HallStage } from '../fight/hall-layout.sim.ts';
 import { createHallView, dressHall, stampHall, type HallView } from '../fightview/hall.ts';
 import { createHallLine } from '../fightview/hall.ui.ts';
 import { clearSave } from '../shell/save.ts';
@@ -187,7 +187,16 @@ export function install(view: GameView): void {
   const feel = createFeel(view, fight, { say, groundY, nearest: (x, z) => draw.nearest(x, z) });
   feel.shakes = stored.shake !== false;
   const keys = createKeys(view, fight, { feel, say, groundY });
-  const draw = createDraw(view, fight, stage, oy, keys, feel, { label: (text, at, alpha) => panel.label(text, at, alpha) });
+  const draw = createDraw(view, fight, stage, oy, keys, feel, {
+    label: (text, at, alpha) => panel.label(text, at, alpha),
+    // The Stag's hall: marks lie on its floor or up its vines, never past its wall, and its shakes are drawn by
+    // the hall, step by step up the vines.
+    hall: inHall ? {
+      height: (x, z) => oy + (stage as HallStage).rampAt(x, z),
+      radius: HALL.radius + 0.5,
+      own: (shape) => hallView?.owns(shape) ?? false,
+    } : null,
+  });
 
   function bring(kind: string): void {
     keys.held = null;

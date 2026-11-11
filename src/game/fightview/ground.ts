@@ -4,7 +4,8 @@
 // tilted camera does not.
 //
 // Every mark is one instance of one quad, so all of them cost one draw call. The caller draws the marks it
-// wants each frame, between `begin` and `end`. Nothing is kept from one frame to the next.
+// wants each frame, between `begin` and `end`. Nothing is kept from one frame to the next. `clip` keeps every
+// mark inside a circle on the ground: the Stag's hall cuts its marks at its wall.
 import * as THREE from 'three';
 import type { GameView } from '../shell/view.ts';
 
@@ -32,6 +33,8 @@ export interface Ground {
    */
   draw(kind: number, x: number, y: number, z: number, facing: number, reach: number, width: number, fill: number, color: THREE.Color, alpha: number, hot?: number): void;
   end(): void;
+  /** Nothing is drawn further than `radius` from (x, z). */
+  clip(x: number, z: number, radius: number): void;
   readonly count: number;
 }
 
@@ -46,6 +49,7 @@ varying vec2 vAt;
 varying vec4 vShape;
 varying vec4 vColor;
 varying vec4 vMore;
+varying vec2 vWorld;
 #include <fog_pars_vertex>
 
 void main() {
@@ -58,6 +62,7 @@ void main() {
   vShape = aShape;
   vColor = aColor;
   vMore = aMore;
+  vWorld = world.xz;
   vec4 mvPosition = viewMatrix * vec4(world, 1.0);
   gl_Position = projectionMatrix * mvPosition;
   #include <fog_vertex>
@@ -69,9 +74,12 @@ varying vec2 vAt;
 varying vec4 vShape;
 varying vec4 vColor;
 varying vec4 vMore;
+varying vec2 vWorld;
+uniform vec3 uClip;
 #include <fog_pars_fragment>
 
 void main() {
+  if (distance(vWorld, uClip.xy) > uClip.z) discard;
   float kind = vShape.x, reach = vShape.y, width = vShape.z, fill = vShape.w;
   float d = length(vAt);
   // A pixel is about this many blocks wide here: edges are a pixel or two soft, whatever the zoom.
@@ -138,7 +146,7 @@ export function createGround(view: GameView): Ground {
   geometry.instanceCount = 0;
   const material = new THREE.ShaderMaterial({
     vertexShader: VERTEX, fragmentShader: FRAGMENT, transparent: true, depthWrite: false, fog: true, side: THREE.DoubleSide,
-    uniforms: { fogColor: { value: new THREE.Color() }, fogNear: { value: 1 }, fogFar: { value: 1000 }, fogDensity: { value: 0 } },
+    uniforms: { uClip: { value: new THREE.Vector3(0, 0, 1e9) }, fogColor: { value: new THREE.Color() }, fogNear: { value: 1 }, fogFar: { value: 1000 }, fogDensity: { value: 0 } },
     // Just over the ground, without fighting it for the same pixels.
     polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
   });
@@ -165,6 +173,7 @@ export function createGround(view: GameView): Ground {
       mesh.visible = count > 0;
       place.needsUpdate = shape.needsUpdate = color.needsUpdate = more.needsUpdate = true;
     },
+    clip(x, z, radius) { (material.uniforms.uClip as { value: THREE.Vector3 }).value.set(x, z, radius); },
     get count() { return count; },
   };
 }

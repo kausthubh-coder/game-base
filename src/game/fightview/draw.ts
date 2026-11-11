@@ -4,7 +4,7 @@
 // It reads the fight and never writes it.
 import { ARENA, type Stage } from '../fight/arena.sim.ts';
 import { HERO, PET, RIG, SHAPE_AFTER } from '../content/fight.ts';
-import type { BeastState, Fight } from '../fight/fight.sim.ts';
+import type { BeastState, Fight, Telegraph } from '../fight/fight.sim.ts';
 import { dirX, dirZ } from '../fight/shapes.sim.ts';
 import type { GameView, ScreenPoint } from '../shell/view.ts';
 import { CALM, createCalming } from './calm.ts';
@@ -42,6 +42,18 @@ export interface Draw {
 export interface DrawHooks {
   /** The name of a gift over the page, or none when `at` is null. */
   label(text: string, at: ScreenPoint | null, alpha: number): void;
+  /** The Stag's hall, or null in the meadow: no meadow edge is drawn, and the marks lie where the hall says. */
+  hall?: DrawHall | null;
+}
+
+/** What the drawing needs to know of the Stag's hall. */
+export interface DrawHall {
+  /** The height a mark lies at: the hall's floor, or the top of its vines. */
+  height(x: number, z: number): number;
+  /** Blocks from the hall's middle to its wall. Nothing on the ground is drawn past it. */
+  radius: number;
+  /** True for a shape the hall draws itself: a shake, step by step up the vines. */
+  own(shape: Telegraph): boolean;
 }
 
 /** A drawn beast: its figure, where it is drawn, and how many pips of thrown light it showed last frame. */
@@ -54,9 +66,11 @@ const VINE = TEAL.clone().setRGB(0.78, 1.05, 0.3);
 
 /** `floor` is the height of the arena's ground, where its edge is drawn. */
 export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: number, keys: Keys, feel: Feel, hooks: DrawHooks): Draw {
-  const groundY = heightOf(view);
+  const hall = hooks.hall ?? null;
+  const groundY = hall ? hall.height : heightOf(view);
   const figures = createFigures(view);
   const ground = createGround(view);
+  if (hall) ground.clip(stage.center.x, stage.center.z, hall.radius);
   const sparks = createSparks(view);
   const calming = createCalming(view, ground, sparks, { groundY, label: hooks.label, heroHeight: () => heroFigure.height });
   const rigViews = createRigViews(view);
@@ -207,11 +221,11 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
 
   function drawGround(dt: number): void {
     const y = floor;
-    // The edge of the arena.
-    ground.draw(MARK.ring, stage.center.x, y, stage.center.z, 0, ARENA.radius, 0.06, 1, PALE, 0.35);
+    // The edge of the arena. The hall's wall is its own edge.
+    if (!hall) ground.draw(MARK.ring, stage.center.x, y, stage.center.z, 0, ARENA.radius, 0.06, 1, PALE, 0.35);
     for (let i = 0; i < fight.shapes.length; i++) {
       const s = fight.shapes[i] as (typeof fight.shapes)[number];
-      if (!s.live) continue;
+      if (!s.live || hall?.own(s)) continue;
       const landed = s.t >= s.lead, k = landed ? 1 : s.t / s.lead;
       const kind = s.kind === 'circle' ? MARK.circle : s.kind === 'line' ? MARK.line : MARK.cone;
       const sy = groundY(s.x, s.z);
