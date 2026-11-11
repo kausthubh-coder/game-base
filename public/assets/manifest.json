@@ -1193,6 +1193,16 @@
             3
           ]
         }
+      },
+      "heartstone": {
+        "tile": 32,
+        "sheet": "icons/heartstone.png",
+        "names": {
+          "heartstone": [
+            0,
+            0
+          ]
+        }
       }
     }
   },

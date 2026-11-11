@@ -7,5 +7,13 @@
     "source": "assets-src/raw/fox-blighted-generated.png",
     "processing": "bun tools/sprites/prepare-blighted.mjs; bun tools/sprites/build-story.mjs",
     "note": "Generated alpha was not transparent. Flooded the pale border background before normal alpha cleanup, palette snap and fit. Approved original sheets remain unchanged."
+  },
+  "heartstone": {
+    "reference": "public/assets/icons/icons-2.png",
+    "attempts": 1,
+    "prompt": "Two-column HUD icon sheet, chunky cozy pixel RPG style. Left: upright pale Heartstone with teal crystal inset in an aged brass circular base with seven notches. Right: Mark on hand (rejected: eight points). Dark tinted outlines, top-left highlights, transparent background, no text or shadows, designed for 24 pixels within 32-square cells.",
+    "source": "assets-src/raw/first-night-icons-3.png",
+    "processing": "Crop left half to assets-src/raw/heartstone-3.png; bun tools/sprites/build-story-extra.mjs heartstone",
+    "note": "Brass notches are simplified at HUD size."
   }
 }
