@@ -5,7 +5,7 @@
 //   bun tools/sprites-runtime-shots.mjs --strips     walk cycles: each sprite walking away, toward and across, frame by frame
 // It needs the built demo served: bun tools/demo.mjs build sprites, then bun tools/serve.mjs dist/demos/sprites 5314.
 // Exits 1 when the page logged an error. This Mac draws WebGL in software: use it to look, never to time.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -45,10 +45,9 @@ const shots = [
   ['characters-1000-near', { solo: '', count: 1000, quarter: 1, time: 0.5, zoom: 3, panel: false }, 0],
 ];
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const page = await (await browser.newContext({ viewport: { width: Number(value('w', 1440)), height: Number(value('h', 900)) }, colorScheme: 'dark' })).newPage();
 const errors = [];

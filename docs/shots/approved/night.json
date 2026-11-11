@@ -1,0 +1,21 @@
+{
+  "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+  "scene": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "town.square",
+    "camera": {
+      "mode": "tilt"
+    },
+    "time": 0.9,
+    "weather": "clear",
+    "seed": 7
+  },
+  "counters": {
+    "drawCalls": 75,
+    "triangles": 278392,
+    "quality": "medium"
+  },
+  "scriptBytes": 2372161
+}

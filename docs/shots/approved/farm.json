@@ -1,0 +1,24 @@
+{
+  "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+  "scene": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "gus.field",
+    "camera": {
+      "mode": "free",
+      "yaw": 262,
+      "pitch": 22,
+      "distance": 11
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "counters": {
+    "drawCalls": 104,
+    "triangles": 397508,
+    "quality": "medium"
+  },
+  "scriptBytes": 2372161
+}

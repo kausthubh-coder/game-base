@@ -2,14 +2,13 @@
 // In still air nothing may change. In full wind the leaves must move and the foot of the trunk must not.
 //   bun tools/props-sway.mjs
 // It needs the built demo served: bun tools/demo.mjs build props, then bun tools/serve.mjs dist/demos/props 5315.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 
 const url = process.argv[2] ?? 'http://127.0.0.1:5315/';
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const page = await (await browser.newContext({ viewport: { width: 1200, height: 800 } })).newPage();
 await page.goto(`${url}?only=oak&variant=2&shots=1&panel=0`);

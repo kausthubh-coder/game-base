@@ -1,0 +1,24 @@
+{
+  "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)",
+  "scene": {
+    "flags": {
+      "quality": "medium"
+    },
+    "at": "river.bank",
+    "camera": {
+      "mode": "free",
+      "yaw": 30,
+      "pitch": 8,
+      "distance": 11
+    },
+    "time": 0.5,
+    "weather": "clear",
+    "seed": 7
+  },
+  "counters": {
+    "drawCalls": 87,
+    "triangles": 323303,
+    "quality": "medium"
+  },
+  "scriptBytes": 2372161
+}

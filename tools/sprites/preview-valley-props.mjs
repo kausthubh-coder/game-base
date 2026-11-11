@@ -1,7 +1,7 @@
 // Check the new prop library in the built demo at the task's assigned address.
-import { chromium } from 'playwright-core';
+import { launchChrome } from '../lib/chrome.mjs';
 import fs from 'node:fs/promises';
-const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true,args:['--enable-unsafe-swiftshader','--use-angle=swiftshader']});
+const browser=await launchChrome({headless:true,args:[]});
 const page=await browser.newPage({viewport:{width:1100,height:750}}),errors=[],rows=[];
 page.on('pageerror',e=>errors.push(String(e)));
 page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});

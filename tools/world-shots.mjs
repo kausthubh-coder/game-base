@@ -2,7 +2,7 @@
 //   bun tools/world-shots.mjs [url] [outDir]
 // It drives the page the way a player does (keys, wheel, mouse buttons) and prints the meter's
 // numbers for every view. This Mac draws WebGL in software: the pictures are real, a frame rate is not.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -10,10 +10,9 @@ const url = process.argv[2] ?? 'http://127.0.0.1:5311/';
 const out = resolve(process.argv[3] ?? '.artifacts/world');
 mkdirSync(out, { recursive: true });
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' })).newPage();
 const errors = [];

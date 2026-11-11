@@ -14,7 +14,7 @@
 // It fails on a console error. This Mac draws WebGL in software: counts only, never frames a second.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 
 const args = process.argv.slice(2);
@@ -46,10 +46,9 @@ const variants = opt('variants', 'sprites=chars=sprites,models=chars=models').sp
 const places = opt('places', Object.keys(PLACES).join(',')).split(',');
 for (const p of places) if (!(p in PLACES)) throw new Error(`no place called ${p}`);
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
 const results = {};
 let failed = false;

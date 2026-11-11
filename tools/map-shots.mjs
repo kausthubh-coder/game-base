@@ -3,7 +3,7 @@
 //   bun tools/demo.mjs build map && bun tools/serve.mjs dist/demos/map 5316
 //   bun tools/map-shots.mjs [http://127.0.0.1:5316/]
 // Pictures go to .artifacts/map/. Exits 1 on a console error or a failed check.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import sharp from 'sharp';
@@ -13,10 +13,9 @@ const out = resolve(import.meta.dirname, '../.artifacts/map');
 mkdirSync(out, { recursive: true });
 const file = (name) => resolve(out, name);
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const errors = [];
 const failures = [];

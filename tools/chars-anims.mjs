@@ -4,7 +4,7 @@
 // It writes <name>.png for each shot and sheet.png, and fails on a console error.
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import sharp from 'sharp';
 
 const args = process.argv.slice(2);
@@ -15,10 +15,9 @@ const chars = opt('chars', 'models');
 const cam = opt('cam', '');
 mkdirSync(out, { recursive: true });
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
 const page = await (await browser.newContext({ viewport: { width: 1200, height: 800 } })).newPage();
 page.setDefaultTimeout(300000);

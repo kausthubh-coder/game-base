@@ -12,7 +12,7 @@
 //   missing    a sprite the manifest lacks shows the placeholder and says so on screen
 //   lost       a sheet that is listed but answers 404 stops the load with a message that names it
 // The results go to .artifacts/sprites-runtime/check.json.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -24,10 +24,9 @@ const want = (name) => named.length === 0 || named.includes(name);
 const out = resolve(import.meta.dirname, '../.artifacts/sprites-runtime');
 mkdirSync(out, { recursive: true });
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: 'dark' });
 const failures = [];

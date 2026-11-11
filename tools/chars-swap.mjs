@@ -3,16 +3,15 @@
 // Models off screen are left out of the draw, so a model count is between the actors on screen and all of them.
 //   bun tools/chars-swap.mjs --url http://127.0.0.1:5384/
 // It exits 1 on a wrong count, a reload or a console error.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const url = opt('url', 'http://127.0.0.1:5384/');
 
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  args: ['--autoplay-policy=no-user-gesture-required'],
 });
 const page = await (await browser.newContext({ viewport: { width: 960, height: 600 } })).newPage();
 page.setDefaultTimeout(300000);

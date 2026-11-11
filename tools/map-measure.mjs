@@ -4,7 +4,7 @@
 //   bun tools/map-measure.mjs [http://127.0.0.1:5316/] [--runs 5] [--frames 600]
 // It reports the median of the runs and their range, at one and two device pixels per CSS pixel.
 // Exits 1 when a median is 1 ms or more, a frame did not draw, or the page logged an error.
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 import { cpus, loadavg } from 'node:os';
 
 const args = process.argv.slice(2);
@@ -13,10 +13,9 @@ const base = args[0] && !args[0].startsWith('--') ? args[0] : 'http://127.0.0.1:
 const runs = opt('runs', 5), frames = opt('frames', 600);
 
 console.log(`machine: ${cpus().length} cores, load average ${loadavg().map((n) => n.toFixed(1)).join(' ')}`);
-const browser = await chromium.launch({
-  executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+const browser = await launchChrome({
   headless: true,
-  args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+  args: [],
 });
 const errors = [];
 let failed = false;

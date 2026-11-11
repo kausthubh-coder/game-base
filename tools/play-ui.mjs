@@ -15,7 +15,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { cpSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
@@ -819,10 +819,12 @@ async function worldTitle(browser) {
 
 let browser;
 try {
-  browser = await chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  // Metal misses the fixed-frame typewriter sample; command delays also break click-to-move.
+  // Preserve software for this existing scenario until its input timing checks are rewritten.
+  browser = await launchChrome({
+    software: true,
     headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader', '--autoplay-policy=no-user-gesture-required'],
+    args: ['--autoplay-policy=no-user-gesture-required'],
   });
   if (!only || only === 'desktop') await desktop(browser);
   if (!only || only === 'phone') await phone(browser);

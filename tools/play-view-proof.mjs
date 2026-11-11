@@ -5,7 +5,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromium } from 'playwright-core';
+import { launchChrome } from './lib/chrome.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 // PLAY_PORT moves it, so several worktrees can run their checks at once.
@@ -36,10 +36,9 @@ export function install(view: GameView): void {
   });
   console.log(`serving dist on http://127.0.0.1:${PORT}/  pid ${pid}`);
 
-  browser = await chromium.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  browser = await launchChrome({
     headless: true,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+    args: [],
   });
   const page = await (await browser.newContext({ viewport: { width: 640, height: 400 } })).newPage();
   page.setDefaultTimeout(120000);
