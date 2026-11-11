@@ -229,7 +229,7 @@ export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
       tone = mix(tone, uTones[2], smoothstep(0.36, 0.66, lit));
       tone = mix(tone, uTones[3], smoothstep(0.7, 0.96, lit));
       tone *= mix(0.78, 1.0, vCard.z);
-      vec3 outgoingLight = paintHaze(tone * mix(uLeafShade, uLeafSun, lit) * diffuseColor.rgb + uSkyAdd * (1.0 - lit) * 0.25);`,
+      vec3 outgoingLight = paintHazeTree(tone * mix(uLeafShade, uLeafSun, lit) * diffuseColor.rgb + uSkyAdd * (1.0 - lit) * 0.25);`,
   });
   const depth = paintDepth({ ...hooks, map: look.mask, alphaTest: 0.5, side: THREE.DoubleSide });
   // With the scene's multisampled target this softens the cut edge of every leaf.
@@ -239,6 +239,7 @@ export function foliageMaterials(textures: Textures, look: LeafLook): Foliage {
     uniforms: { uBark: { value: textures.bark } },
     fragmentPars: 'uniform sampler2D uBark;',
     fragmentAlbedo: 'diffuseColor.rgb *= 0.55 + 0.9 * texture2D(uBark, vec2(vPaintWorld.x + vPaintWorld.z, vPaintWorld.y) * 0.35).g;',
+    fragmentFinal: 'vec3 outgoingLight = paintHazeTree(paintShade(diffuseColor.rgb, paintLit(0.0))) + totalEmissiveRadiance;',
   });
   return { leaf, depth, wood };
 }

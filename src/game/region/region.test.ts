@@ -262,8 +262,8 @@ describe('the path and the town', () => {
 
   test('the path is three blocks wide at both ends and in the middle', () => {
     for (const [x, z] of [[20, -221], [60, -221], [135, -174]] as const) {
-      const y = world.heightAt(x, z) - 1;
-      for (const dz of [-1, 0, 1]) expect(world.getBlock(x, y, z + dz)).toBe(PATH);
+      // The path follows the land, so each of its columns has its own height.
+      for (const dz of [-1, 0, 1]) expect(world.getBlock(x, world.heightAt(x, z + dz) - 1, z + dz)).toBe(PATH);
     }
   });
 

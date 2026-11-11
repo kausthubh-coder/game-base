@@ -63,39 +63,75 @@ export const LANDMARKS = {
   bank: placeOf('river.bank'),
 } as const;
 
+/** The height of one shelf of a hill, in blocks. */
+const SHELF = 6;
+
 const hillMask = (seed: number, x: number, z: number): number => smoothstep(0.57, 0.72, fbm2(x / 170, z / 170, seed + 23, 2));
 
 function naturalHeight(seed: number, x: number, z: number, hills: number): number {
-  let h = 19.5 + fbm2(x / 52, z / 52, seed + 11, 3) * 3 + hills * (2 + 12 * fbm2(x / 44, z / 44, seed + 37, 3));
-  // The river runs along one contour line of a slow noise. Its valley flattens the hills beside it.
+  // Downs: broad swells the eye can follow to the horizon, with smaller ones lying on them.
+  // They rise far more than they dip, so the low ground between them stays a meadow and not a marsh.
+  const swell = fbm2(x / 150, z / 150, seed + 13, 2) - 0.46;
+  let h = 20.6 + swell * (swell > 0 ? 24 : 5) + (fbm2(x / 52, z / 52, seed + 11, 3) - 0.5) * 3;
+  if (hills > 0) {
+    // A hill is a crest along a winding line with shoulders on either side. It climbs in shelves: a bank of
+    // rock, then level ground to stand or build on, then the next bank.
+    const crest = 1 - Math.abs(2 * fbm2(x / 96, z / 96, seed + 41, 2) - 1);
+    let up = hills * (3 + 15 * fbm2(x / 60, z / 60, seed + 37, 3) + 10 * crest * crest);
+    const step = up / SHELF, whole = Math.floor(step);
+    up = up * 0.4 + (whole + smoothstep(0.25, 0.75, step - whole)) * SHELF * 0.6;
+    h += up;
+  }
+  // The river runs along one contour line of a slow noise. Its valley flattens the land beside it.
   const r = Math.abs(fbm2(x / 240 + 7.3, z / 240 - 3.1, seed + 51, 2) - 0.5);
-  const valley = smoothstep(0.06, 0.02, r);
-  if (h > 19.6) h += (19.6 - h) * valley;
+  const valley = smoothstep(0.075, 0.022, r);
+  h += (19.6 - h) * valley;
   h += (14.5 - h) * smoothstep(0.02, 0.007, r);
-  // Ponds sit on a loose grid, in the meadow only.
+  // Ponds sit on a loose grid, in the meadow only. No two have the same outline, and one in five is a small lake.
   const gx = Math.floor(x / 96), gz = Math.floor(z / 96);
-  if (hash2(gx, gz, seed + 61) < 0.6) {
+  if (hash2(gx, gz, seed + 61) < 0.45) {
     const px = gx * 96 + 20 + hash2(gx, gz, seed + 62) * 56, pz = gz * 96 + 20 + hash2(gx, gz, seed + 63) * 56;
-    const radius = 5 + hash2(gx, gz, seed + 64) * 5;
-    h += (15.2 - h) * smoothstep(radius, radius * 0.45, Math.hypot(x - px, z - pz)) * (1 - hills);
+    const size = hash2(gx, gz, seed + 64), radius = (size > 0.8 ? 11 : 4.5) + size * 5;
+    const away = Math.hypot(x - px, z - pz);
+    if (away < radius * 2.2) {
+      const edge = radius * (0.72 + 0.56 * fbm2(x / 9 + 3.1, z / 9 - 1.7, seed + 65, 2));
+      // The land dips toward the water before the bank, so a pond lies in a hollow.
+      h += (18.9 - h) * smoothstep(edge * 2.2, edge, away) * 0.7 * (1 - hills);
+      h += (15.2 - h) * smoothstep(edge, edge * 0.5, away) * (1 - hills);
+    }
   }
   return h;
 }
 
-/** How many blocks of ground a column has. The ground's top face is at this y. */
-export function groundHeight(seed: number, x: number, z: number): number {
+/**
+ * The height of the land at a point before it is cut into blocks. `groundHeight` is this, rounded. What draws
+ * land far from the hero asks this, since no chunk is made there.
+ */
+export function landHeight(seed: number, x: number, z: number): number {
   let h = naturalHeight(seed, x, z, hillMask(seed, x, z));
   if (inBounds(x, z)) h = shapeGround(x, z, h);
-  return clamp(Math.floor(h + 0.5), 2, HEIGHT - 14);
+  return clamp(h, 2, HEIGHT - 14);
+}
+
+/** How many blocks of ground a column has. The ground's top face is at this y. */
+export function groundHeight(seed: number, x: number, z: number): number {
+  return clamp(Math.floor(landHeight(seed, x, z) + 0.5), 2, HEIGHT - 14);
+}
+
+const KEY_OF = new Map<number, 'grass' | 'sand' | 'clay' | 'stone' | 'mossy_stone'>([[B.grass, 'grass'], [B.sand, 'sand'], [B.clay, 'clay'], [B.stone, 'stone'], [B.mossy, 'mossy_stone']]);
+
+/** What the top of the natural ground is at a column, before the region's paths and fills: the key of a block. */
+export function surfaceAt(seed: number, x: number, z: number): 'grass' | 'sand' | 'clay' | 'stone' | 'mossy_stone' {
+  const top = topBlock(seed, x, z, groundHeight(seed, x, z), hillMask(seed, x, z), inBounds(x, z) && shaped(x, z));
+  return KEY_OF.get(top) ?? 'grass';
 }
 
 /** `plain` is true where the region plan shaped the ground: there it is grass, never bare rock. */
 function topBlock(seed: number, x: number, z: number, h: number, hills: number, plain: boolean): number {
   if (h <= WATER_LEVEL) return hash2(x >> 2, z >> 2, seed + 71) > 0.62 ? B.clay : B.sand;
-  if (h <= WATER_LEVEL + 1) return B.sand;
   if (hills > 0.4 && !plain) {
     const rocky = fbm2(x / 9, z / 9, seed + 73, 2);
-    if (h >= 30 || rocky > 0.7) return hash2(x, z, seed + 74) < 0.3 ? B.mossy : B.stone;
+    if (h >= 41 || rocky > 0.72) return hash2(x, z, seed + 74) < 0.3 ? B.mossy : B.stone;
   }
   return B.grass;
 }
@@ -124,7 +160,7 @@ export function treeInCell(seed: number, gx: number, gz: number, at: { x: number
   if (h <= WATER_LEVEL + 1 || topBlock(seed, x, z, h, hills, shaped(x, z)) !== B.grass) return -1;
   if (hills > 0.45 && isCave(seed, x, h - 1, z)) return -1;
   at.x = x; at.z = z; at.h = h;
-  if (h >= 27) return 2;
+  if (h >= 29) return 2;
   return hash2(gx, gz, seed + 105) < 0.3 ? 1 : 0;
 }
 

@@ -8,6 +8,8 @@ import type { Kernel } from '../kernel.sim.ts';
 export interface ModelTree extends TreePlacement { standing: boolean; protected: boolean; box: TreeBox }
 export interface TreesApi {
   all(): readonly ModelTree[];
+  /** True when the tree that grew in this column was felled, however far off it is. */
+  felled(x: number, z: number): boolean;
   at(x: number,y: number,z: number): ModelTree | null;
   fell(x: number,y: number,z: number): boolean;
   raycast(origin: Vec3, direction: Vec3, max: number, hit: RayHit): boolean;
@@ -27,6 +29,7 @@ export function install(kernel: Kernel): void {
   }
   const api: TreesApi = {
     all() { sync(); return list; },
+    felled: (x, z) => felled.has(key(x, z)),
     at(x,y,z) {
       sync();
       for (const t of list) if(t.standing && t.x===x && t.z===z && y>=t.y && y<t.box.y1) return t;

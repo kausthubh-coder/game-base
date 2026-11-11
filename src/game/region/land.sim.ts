@@ -42,6 +42,7 @@ export const BOUNDS: Rect = (() => {
   for (const c of REGION.clearings) { take(c.x0 - c.fade, c.z0 - c.fade); take(c.x1 + c.fade, c.z1 + c.fade); }
   for (const f of REGION.fills) { take(f.x0, f.z0); take(f.x1, f.z1); }
   for (const p of REGION.paths) for (const [x, z] of p.points) take(x, z);
+  for (const v of REGION.vales) for (const [x, z] of v.points) { take(x - v.half - v.fade, z - v.half - v.fade); take(x + v.half + v.fade, z + v.half + v.fade); }
   for (const t of [...REGION.trees, ...REGION.bushes]) take(t.x, t.z);
   for (const m of REGION.models) { const [w, d] = TOWN_MODELS[m.model].footprint; take(m.x, m.z); take(m.x + Math.max(w, d), m.z + Math.max(w, d)); }
   return { x0: b.x0 - MARGIN, z0: b.z0 - MARGIN, x1: b.x1 + MARGIN, z1: b.z1 + MARGIN };
@@ -56,6 +57,19 @@ export const chunkInBounds = (ox: number, oz: number, size: number): boolean =>
 // ------------------------------------------------------------------------------------------ ground
 
 const ease = (t: number): number => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
+
+/** How far a column is from a line through `points`, in blocks. */
+function reachOf(points: readonly (readonly [number, number])[], x: number, z: number): number {
+  let best = Infinity;
+  for (let i = 0; i + 1 < points.length; i++) {
+    const ax = points[i][0], az = points[i][1];
+    const bx = points[i + 1][0] - ax, bz = points[i + 1][1] - az;
+    const along = Math.max(0, Math.min(1, ((x - ax) * bx + (z - az) * bz) / (bx * bx + bz * bz)));
+    const d = Math.hypot(x - ax - bx * along, z - az - bz * along);
+    if (d < best) best = d;
+  }
+  return best;
+}
 
 /** How much of level `i` holds at a column: 1 inside its rectangle, falling to 0 over its blend. */
 function levelWeight(i: number, x: number, z: number): number {
@@ -77,6 +91,11 @@ export function shaped(x: number, z: number): boolean {
 /** The ground height of a column after the plan: `natural` is what the land would be without it. */
 export function shapeGround(x: number, z: number, natural: number): number {
   let h = natural;
+  for (const v of REGION.vales) {
+    const w = ease(1 - (reachOf(v.points, x, z) - v.half) / v.fade);
+    // Only high ground comes down. A river or a pond in the vale keeps its bed.
+    if (w > 0 && h > v.ground) h += (v.ground + (h - v.ground) * v.keep - h) * w;
+  }
   for (let i = 0; i < REGION.levels.length; i++) {
     const w = levelWeight(i, x, z);
     if (w > 0) h += (REGION.levels[i].ground - h) * w;

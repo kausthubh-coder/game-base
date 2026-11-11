@@ -11,6 +11,7 @@ import { calmNoon, type Quality } from '../../engine/types.ts';
 import { flatWorld } from '../../engine/world-query.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import { LAND_BLOCKS } from '../../content/land.ts';
+import { HAZE } from '../../content/painted.ts';
 import type { BusName } from '../../features/audio/index.ts';
 import { cameraProfile, createCamera } from '../../features/camera/index.ts';
 import { createEffects } from '../../features/effects/index.ts';
@@ -508,13 +509,16 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       const range = settings.graphics.shadowDistance ?? look.shadowRange;
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       const edge = world.stats.radius * 16 - 8, far = settings.graphics.viewDistance ?? 1;
-      sky.setFogReach(Math.min(look.fogStart * far, edge * 0.45), Math.min(look.fogEnd * far, edge));
+      // The painted world draws land to the horizon, so its fog is only the air: thin, and whole far past the loaded land.
+      if (painted) sky.setFogReach(HAZE.fog[0] as number, HAZE.fog[1] as number);
+      else sky.setFogReach(Math.min(look.fogStart * far, edge * 0.45), Math.min(look.fogEnd * far, edge));
     } else if (cam) {
       const range = settings.graphics.shadowDistance ?? Math.round(camera.stepped(cam.shadowRange));
       if (range !== lastRange) sky.setShadowRange((lastRange = range));
       // The fog is whole before the loaded land ends, which is nearer at a lower quality.
       const edge = world.stats.radius * 16 - 8;
-      sky.setFogReach(Math.min(camera.stepped(cam.fogStart), edge * 0.45), Math.min(camera.stepped(cam.fogEnd), edge));
+      if (painted) sky.setFogReach(HAZE.fog[0] as number, HAZE.fog[1] as number);
+      else sky.setFogReach(Math.min(camera.stepped(cam.fogStart), edge * 0.45), Math.min(camera.stepped(cam.fogEnd), edge));
     } else if (camera.zoom !== lastZoom) {
       lastZoom = camera.zoom;
       sky.setShadowRange(30 + 14 * camera.zoom);

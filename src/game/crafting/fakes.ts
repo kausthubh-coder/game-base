@@ -6,7 +6,7 @@ import type { ActionsApi, InventoryApi, ItemDef, ItemId, ItemsApi, PlaceablesApi
 import type { Kernel } from '../kernel.sim.ts';
 
 /** The height of the test floor. Soil blocks in tests sit at this y. */
-export const FLOOR = 40;
+export const FLOOR = 54;
 
 /** One chunk with a flat grass floor from (0, 0) to (15, 15) at FLOOR and open sky over it. */
 export function flatStage(): World {

@@ -1,7 +1,6 @@
 // What stands behind the land: three rings of far hills and the painted clouds. The game's own sky draws the
-// blue, the sun, the moon and the stars. The land the game holds in memory ends about a hundred blocks from
-// the hero and fades into haze there, and these hills rise behind that haze, each ring paler and bluer than
-// the one in front. Each cloud is one painting on a card.
+// blue, the sun, the moon and the stars. The far land (far.ts) ends about three hundred blocks from the hero,
+// and these hills rise behind it, each ring paler and bluer than the one in front. Each cloud is one painting on a card.
 //
 // Everything here follows the hero, like a backdrop, and sits inside the camera's far plane.
 import * as THREE from 'three';
@@ -27,8 +26,8 @@ const CLOUDS: Array<[number, number, number, number, number]> = [
   [4, -48, 2, 1000, 760], [4, 22, 2, 1000, 700], [4, 84, 2.5, 1000, 720], [1, 118, 14, 850, 480], [2, 158, 20, 800, 280], [4, 150, 2, 1000, 700],
   [0, -150, 8, 900, 360], [1, -112, 17, 840, 460], [4, -105, 2, 1000, 740], [2, 96, 30, 760, 240], [5, 200, 6, 950, 560], [3, -170, 27, 780, 280],
 ];
-/** The clouds were laid out for a far plane of 3,000. The game's is 400, so they stand nearer and smaller, the same size to the eye. */
-const NEAR = 0.36;
+/** The clouds were laid out for a far plane of 3,000. The game's is 760, so they stand nearer and smaller, the same size to the eye, and still behind the last ridge. */
+const NEAR = 0.7;
 
 /** 0 when the camera looks level and 1 when it looks down on the land: then the far hills are all haze, as the land's edge is. */
 const DOWN = { value: 0 };
@@ -96,9 +95,9 @@ export function createBackdrop(textures: Textures): Backdrop {
   clouds.renderOrder = -6;
   // The three rings are one mesh, so they cost one draw call.
   const ridges = new THREE.Mesh(mergeGeometries([
-    ridge(150, 6, 16, 3, '#7fb356', '#3f8449', 0.34),
-    ridge(235, 10, 36, 11, '#5f9a58', '#3c7a52', 0.52),
-    ridge(330, 14, 70, 23, '#55906a', '#3f7a66', 0.68),
+    ridge(330, 8, 34, 3, '#6fa85a', '#3f8449', 0.6),
+    ridge(440, 12, 70, 11, '#5f9a62', '#3c7a5a', 0.72),
+    ridge(560, 16, 130, 23, '#55906e', '#3f7a6e', 0.82),
   ]), paint({
     vertexColors: true, side: THREE.DoubleSide, keepNormal: true, brush: 0.5, bands: 0.6, wrap: 0.2, brushScale: 0.012, fog: false,
     vertexPars: 'attribute float aHaze; varying float vHazeAmt;',
@@ -107,7 +106,7 @@ export function createBackdrop(textures: Textures): Backdrop {
     fragmentPars: 'varying float vHazeAmt; uniform float uDown;',
     // A far hill is not hazed by its distance, as the land is: it follows the hero. It sinks into the haze by a
     // set amount, all the way at its foot.
-    fragmentFinal: 'vec3 outgoingLight = mix(paintShade(diffuseColor.rgb, paintLit(0.0)), uHaze, clamp(max(vHazeAmt, uDown), 0.0, 1.0));',
+    fragmentFinal: 'float hazed = clamp(max(vHazeAmt, uDown), 0.0, 1.0); vec3 outgoingLight = mix(paintShade(diffuseColor.rgb, paintLit(0.0)), mix(uHazeNear, uHaze, smoothstep(0.55, 0.95, hazed)), hazed);',
   }));
   ridges.name = 'ridges';
   ridges.frustumCulled = false;

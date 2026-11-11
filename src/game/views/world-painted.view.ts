@@ -2,13 +2,13 @@
 // clouds, all lit by one painted light. It is on unless the address says `?look=blocks`, which draws the
 // ground as blocks and the trees as models again.
 //
-// This view feeds the painted feature from the game: the block world gives the land its shape, the trees
-// system says where trees stand, the sky gives the sun's direction and how much of it is shadow, and the
+// This view feeds the painted feature from the game: the block world gives the near land its shape and the
+// terrain's own functions give the far land and its woods theirs, the trees system says where trees stand, the sky gives the sun's direction and how much of it is shadow, and the
 // clock gives the colour of the light.
 import * as THREE from 'three';
-import { EMERALD, HAZE, MOODS, PAINTED_TREES, TREE_NEAR, type Mood } from '../../content/painted.ts';
-import { buildTree, createBackdrop, createBoulders, createBushes, createGrass, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Stand, type TreeSpec } from '../../features/painted/index.ts';
-import { groundHeight } from '../../features/world/index.ts';
+import { EMERALD, FAR_TREES, HAZE, MOODS, PAINTED_TREES, TREE_NEAR, TREE_REACH, type Mood } from '../../content/painted.ts';
+import { buildTree, createBackdrop, createBoulders, createBushes, createFarLand, createGrass, createImpostors, createLand, createStand, foliageMaterials, loadTextures, shared, type Placement, type Sitter, type Stand, type TreeSpec } from '../../features/painted/index.ts';
+import { WATER_LEVEL, forestAt, groundHeight, landHeight, surfaceAt, treesInArea } from '../../features/world/index.ts';
 import type { ModelTree } from '../trees/index.sim.ts';
 import type { Systems } from '../api.sim.ts';
 import type { GameView } from '../shell/view.ts';
@@ -19,6 +19,9 @@ const leafy = (spec: TreeSpec): TreeSpec => ({ ...spec, card: Math.max(0.62, Mat
 const far = (spec: TreeSpec): TreeSpec => ({ ...spec, card: spec.card * 1.9, cover: 1.3 });
 /** The top of a tree's crown, in meters at a scale of 1. */
 const topOf = (spec: TreeSpec): number => Math.max(spec.crown * spec.squash * 0.75, spec.height - spec.crown * spec.squash * 0.5) + spec.crown * spec.squash;
+
+/** How far the camera sees: past the far land to the last ridge. */
+const FAR_PLANE = 760;
 
 /** A number from 0 to 1 that depends only on the column, so a tree keeps its turn and tint. */
 function own(x: number, z: number, salt: number): number {
@@ -48,35 +51,99 @@ export async function install(view: GameView): Promise<void> {
   }, textures, view.look === 'steps');
   const grass = createGrass(land, textures, view.ctx.quality);
   const backdrop = createBackdrop(textures);
-  view.scene.add(land.group, grass.group, backdrop.group);
+  // Past the land the game holds in memory, the same hills and rivers drawn from the land's shape alone.
+  const farLand = createFarLand({
+    heightAt: (x, z) => landHeight(sim.seed, x, z),
+    topAt: (x, z) => surfaceAt(sim.seed, x, z),
+    forestAt: (x, z) => forestAt(sim.seed, x, z),
+    waterLevel: WATER_LEVEL,
+  }, textures);
+  view.scene.add(land.group, grass.group, backdrop.group, farLand.group);
   view.setGround((x, z) => land.heightAt(x, z));
 
   // ---------------------------------------------------------------- the trees
   // Each kind and variant is one shape, drawn leaf by leaf near the hero and in fewer, larger cards far off.
-  interface Kind { near: Stand; far: Stand; top: number; nearPlaces: Placement[]; farPlaces: Placement[] }
+  interface Kind { near: Stand; far: Stand; top: number; nearPlaces: Placement[]; farPlaces: Placement[]; index: number }
   const kinds = new Map<string, Kind>();
+  const sitters: Sitter[] = [];
   const trees = new THREE.Group();
   trees.name = 'painted-trees';
   const foliage = [0, 1, 2].map((spray) => foliageMaterials(textures, { mask: textures.rosettes[spray] as THREE.Texture, tones: [...EMERALD], vary: 0.3, top: 0.25 }));
   for (const [kind, variants] of Object.entries(PAINTED_TREES)) {
     variants.forEach(({ spec, spray }, variant) => {
       const materials = foliage[spray] as (typeof foliage)[number];
-      const near = createStand(buildTree(leafy(spec)), materials, 64, true), distant = createStand(buildTree(far(leafy(spec))), materials, 192, false);
+      const farShape = buildTree(far(leafy(spec)));
+      const near = createStand(buildTree(leafy(spec)), materials, 64, true), distant = createStand(farShape, materials, 192, false);
       trees.add(near.group, distant.group);
-      kinds.set(`${kind}:${variant}`, { near, far: distant, top: topOf(spec), nearPlaces: [], farPlaces: [] });
+      kinds.set(`${kind}:${variant}`, { near, far: distant, top: topOf(spec), nearPlaces: [], farPlaces: [], index: sitters.length });
+      sitters.push({ shape: farShape, stand: distant });
     });
   }
   view.scene.add(trees);
+  // Far trees are pictures of these same trees, taken now.
+  const farTrees = createImpostors(view.renderer, sitters);
+  view.scene.add(farTrees.group);
+  // The trees of the far land, by squares of 64 blocks: five numbers a tree (x, y, z, scale, kind). They come
+  // from the terrain's own rule for where a tree grows, so they are the trees the hero will find there.
+  const SQUARE = 64;
+  const squares = new Map<number, Float32Array>();
+  const squareKey = (sx: number, sz: number): number => (sx + 32768) * 65536 + (sz + 32768);
+  function square(sx: number, sz: number): Float32Array {
+    const list = treesInArea(sim.seed, sx * SQUARE, sz * SQUARE, (sx + 1) * SQUARE, (sz + 1) * SQUARE), out = new Float32Array(list.length * 5);
+    list.forEach((t, i) => {
+      const kind = kinds.get(`${t.kind}:${t.variant}`) ?? (kinds.get('oak:0') as Kind);
+      out.set([t.x + 0.5, t.y - 0.12, t.z + 0.5, ((6.6 * t.size) / kind.top) * 1.2, kind.index], i * 5);
+    });
+    return out;
+  }
+  let farX = NaN, farZ = NaN, farStale = true;
+  /** Lists the far trees again when the hero has walked a few steps, when a square of them arrives or when a tree falls. */
+  function plantFar(): void {
+    const p = view.playerPosition, cx = Math.floor(p.x / SQUARE), cz = Math.floor(p.z / SQUARE), reach = Math.ceil(FAR_TREES / SQUARE);
+    // At most one new square a frame, nearest first.
+    let made = false;
+    for (let ring = 0; ring <= reach && !made; ring++) {
+      for (let dx = -ring; dx <= ring && !made; dx++) {
+        for (let dz = -ring; dz <= ring && !made; dz++) {
+          if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring || squares.has(squareKey(cx + dx, cz + dz))) continue;
+          squares.set(squareKey(cx + dx, cz + dz), square(cx + dx, cz + dz));
+          made = farStale = true;
+        }
+      }
+    }
+    if (squares.size > 400) for (const k of squares.keys()) { if (squares.size <= 300) break; squares.delete(k); farStale = true; }
+    if (!farStale && Math.hypot(p.x - farX, p.z - farZ) < 6) return;
+    farX = p.x; farZ = p.z; farStale = false;
+    farTrees.clear();
+    // A tree nearer than this is always drawn leaf by leaf, wherever the hero walks before the next listing.
+    const inside = TREE_REACH - 12 - 8;
+    for (let ring = 0; ring <= reach; ring++) {
+      for (let dx = -ring; dx <= ring; dx++) {
+        for (let dz = -ring; dz <= ring; dz++) {
+          if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
+          const list = squares.get(squareKey(cx + dx, cz + dz));
+          if (!list) continue;
+          for (let i = 0; i < list.length; i += 5) {
+            const x = list[i] as number, z = list[i + 2] as number, away = Math.hypot(x - p.x, z - p.z);
+            if (away < inside || away > FAR_TREES || sys.trees?.felled(Math.floor(x), Math.floor(z))) continue;
+            if (!farTrees.add(x, list[i + 1] as number, z, list[i + 3] as number, list[i + 4] as number)) break;
+          }
+        }
+      }
+    }
+    farTrees.commit();
+  }
   // A felled tree tips over the way the hero pushed it and is gone a moment later.
   const FALL = 1.1;
   const falling: { tree: ModelTree; time: number; toward: number }[] = [];
   game.events.on('tree.felled', (e) => {
     const tree = sys.trees?.all().find((t) => t.x === e.x && t.z === e.z);
     if (tree) falling.push({ tree, time: 0, toward: Math.atan2(tree.x - view.playerPosition.x, tree.z - view.playerPosition.z) });
+    farStale = true;
   });
   const pool: Placement[] = [];
-  /** How far off a tree is still drawn: the land's edge, and a little more for the hero's next few steps. */
-  let treeReach = 96;
+  /** How far off a tree is still drawn leaf by leaf. Past it the far trees take over. */
+  const treeReach = TREE_REACH + 2;
   let used = 0, lastList: unknown = null, lastStanding = -1, plantedX = NaN, plantedZ = NaN, plantedLand = -1;
 
   function plant(): void {
@@ -115,7 +182,7 @@ export async function install(view: GameView): Promise<void> {
       place.turn = own(t.x, t.z, 1) * Math.PI * 2;
       place.tint.setRGB(1 + warm, 1 + warm * 0.3, 1 - warm);
       const away = Math.hypot(x - p.x, z - p.z);
-      // Past the land's edge a tree is lost in the haze, so it is not drawn. `used` keeps its place in the pool.
+      // Past this a tree is drawn as a far tree. `used` keeps its place in the pool.
       if (!fall && away > treeReach) continue;
       (fall || away < TREE_NEAR ? kind.nearPlaces : kind.farPlaces).push(place);
     }
@@ -154,10 +221,18 @@ export async function install(view: GameView): Promise<void> {
     mix3(m0.leafSun, m1.leafSun, k, shared.uLeafSun.value);
     mix3(m0.leafShade, m1.leafShade, k, shared.uLeafShade.value);
     mix3(m0.cloud, m1.cloud, k, cloud);
-    // The haze is the colour the game's own sky has at the horizon, so the land, the hills and the sky meet in it.
+    // Far things turn the colour of the air first and the colour the game's own sky has at the horizon last,
+    // so the land, the hills and the sky meet there. Toward the sun the air glows.
     shared.uHaze.value.copy(view.sky.look.fog);
-    shared.uHazeStart.value = HAZE.start;
-    shared.uHazeDensity.value = HAZE.density * (1 + 3 * a.fog + 1.2 * a.rain);
+    mix3(m0.air, m1.air, k, shared.uHazeNear.value).lerp(shared.uHaze.value, Math.max(overcast * 0.8, a.fog));
+    mix3(m0.glow, m1.glow, k, shared.uHazeSun.value);
+    shared.uHazeGlow.value = (m0.glowing + (m1.glowing - m0.glowing) * k) * (1 - overcast);
+    shared.uSunDir.value.copy(view.sky.look.sunDirection);
+    // Fog and rain bring the haze in close and make it thick.
+    shared.uHazeStart.value = HAZE.start * (1 - 0.8 * Math.max(a.fog, a.rain * 0.4));
+    shared.uHazeDensity.value = HAZE.density * (1 + 5 * a.fog + 1.6 * a.rain);
+    shared.uHazeMax.value = HAZE.most + (1 - HAZE.most) * a.fog;
+    shared.uHazeLow.value.set(HAZE.low, HAZE.clears * (1 - a.fog));
     shared.uCloudShade.value = 0.55 * (1 - overcast);
     shared.uWind.value.set(Math.cos(a.windDir), Math.sin(a.windDir), 0.35 + 1.3 * a.wind);
     backdrop.setColors(cloud, shared.uHaze.value, 1 - overcast * 0.9);
@@ -170,10 +245,16 @@ export async function install(view: GameView): Promise<void> {
     shared.uTime.value = view.settings.graphics.reduceMotion ? 0 : view.ctx.time;
     shared.uSunRaw.value = sun.color.r * sun.intensity;
     shared.uFocus.value.set(p.x, p.y, p.z);
+    // The near world thins out over its last few meters, and the far land shows through it there.
     const edge = reach * 16 - 8;
-    shared.uEdge.value.set(edge * 0.6, edge);
-    treeReach = edge + 8;
+    shared.uEdge.value.set(edge - 14, edge);
+    shared.uEdgeTree.value.set(TREE_REACH - 12, TREE_REACH);
     land.update(p.x, p.z, reach);
+    farLand.update(p.x, p.z, edge - 15);
+    plantFar();
+    // The camera must see as far as the far land and the ridges behind it.
+    const camera = view.ctx.camera as THREE.PerspectiveCamera;
+    if (camera.far < FAR_PLANE) { camera.far = FAR_PLANE; camera.updateProjectionMatrix(); }
     grass.update(p.x, p.z);
     for (let i = falling.length - 1; i >= 0; i--) {
       const f = falling[i] as (typeof falling)[number];

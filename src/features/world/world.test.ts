@@ -16,8 +16,8 @@ function worldAround(seed: number, cx = 0, cz = 0, radius = 1, reverse = false):
   return world;
 }
 
-// Chunk (6, -4) of seed 1 is flat open meadow, far from the start site.
-const TCX = 6, TCZ = -4, EDGE = TCX * CHUNK + CHUNK - 1, ROW = TCZ * CHUNK + 6;
+// Chunk (4, -1) of seed 1 has flat open meadow in its middle, far from the start site.
+const TCX = 4, TCZ = -1, EDGE = TCX * CHUNK + CHUNK - 1, ROW = TCZ * CHUNK + 6;
 
 /** A flat, open spot in the middle of the test chunk. */
 function openGround(world: World): { x: number; y: number; z: number } {
@@ -35,13 +35,13 @@ function openGround(world: World): { x: number; y: number; z: number } {
 describe('blocks', () => {
   test('get returns what set wrote, also across chunk edges and below zero', () => {
     const world = worldAround(1, 0, 0);
-    for (const [x, y, z] of [[3, 40, 5], [-1, 40, -1], [15, 41, 16], [-16, 42, 0]] as const) {
+    for (const [x, y, z] of [[3, 58, 5], [-1, 58, -1], [15, 59, 16], [-16, 60, 0]] as const) {
       expect(world.getBlock(x, y, z)).toBe(0);
       expect(world.setBlock(x, y, z, STONE)).toBe(true);
       expect(world.getBlock(x, y, z)).toBe(STONE);
       expect(world.setBlock(x, y, z, STONE)).toBe(false);
     }
-    expect(world.getBlock(15, 41, 15)).toBe(0);
+    expect(world.getBlock(15, 59, 15)).toBe(0);
   });
 
   test('outside the loaded world reads as air and cannot be written', () => {

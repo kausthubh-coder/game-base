@@ -192,6 +192,8 @@ describe('the first part', () => {
       expect(p.game.player.pos, after).toEqual(before.game.player.pos);
       expect(p.sys.inventory.slots, after).toEqual(before.sys.inventory.slots);
       expect(new Map(p.kernel.save().flags), after).toEqual(new Map(before.kernel.save().flags));
+      // Before either world moves on: a fact is learned by watching for three seconds, and a watch that is under way is not saved.
+      expect(p.sys.almanac.pages().filter((page) => page.complete).map((page) => page.id), after).toEqual(before.sys.almanac.pages().filter((page) => page.complete).map((page) => page.id));
       p.advance(0.1);
       before.advance(0.1);
       expect(openStep(p), after).toBe(openStep(before));
@@ -199,7 +201,6 @@ describe('the first part', () => {
       expect(p.sys.pets.all().map((pet) => [pet.trust, pet.bonded]), after).toEqual(before.sys.pets.all().map((pet) => [pet.trust, pet.bonded]));
       expect(p.sys.placeables.all(), after).toEqual(before.sys.placeables.all());
       expect(p.sys.crops.all().map((crop) => [crop.x, crop.z, crop.state.stage]), after).toEqual(before.sys.crops.all().map((crop) => [crop.x, crop.z, crop.state.stage]));
-      expect(p.sys.almanac.pages().filter((page) => page.complete).map((page) => page.id), after).toEqual(before.sys.almanac.pages().filter((page) => page.complete).map((page) => page.id));
       expect(p.sys.people.all().map((npc) => [npc.id, npc.place]), after).toEqual(before.sys.people.all().map((npc) => [npc.id, npc.place]));
       // The blocks the player set and broke are in the world again.
       const at = p.game.player.pos;

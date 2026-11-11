@@ -43,14 +43,29 @@ export const shared = {
   uSkyAdd: { value: new THREE.Color(0, 0, 0) },
   /** The colour and strength of lamp light on the land, where a lamp's light reaches it. Strong at night, faint by day. */
   uLamp: { value: new THREE.Color(0, 0, 0) },
+  /** The colour far things sink into: the sky's colour at the horizon. */
   uHaze: { value: new THREE.Color(0.7, 0.8, 0.9) },
+  /** The colour of the air in the middle distance: things turn this blue first, and the horizon's colour only far off. */
+  uHazeNear: { value: new THREE.Color(0.45, 0.62, 0.85) },
+  /** The glow of the air toward the sun, and how strong it is. */
+  uHazeSun: { value: new THREE.Color(1, 0.9, 0.7) },
+  uHazeGlow: { value: 0.5 },
+  /** The way to the sun (or the moon), in the world. */
+  uSunDir: { value: new THREE.Vector3(0.4, 0.8, 0.4) },
   uHazeDensity: { value: 0.004 },
   uHazeMax: { value: 0.9 },
   /** Meters of clear air in front of the camera before the haze begins. */
   uHazeStart: { value: 30 },
-  /** The hero's place, and how far from it along the ground the land begins to fade and is gone. The land ends there. */
+  /** Mist lies in low ground: the height it lies at, and how fast the air clears above it (per meter). */
+  uHazeLow: { value: new THREE.Vector2(20, 0.05) },
+  /**
+   * The hero's place, and how far from it along the ground the near world thins out and is gone. The land in
+   * memory ends there, and the far land (drawn from the land's shape alone) takes over.
+   */
   uFocus: { value: new THREE.Vector3() },
   uEdge: { value: new THREE.Vector2(1e6, 2e6) },
+  /** The same for trees, which the rules know only nearer the hero. Past it a tree is drawn as a picture of itself. */
+  uEdgeTree: { value: new THREE.Vector2(1e6, 2e6) },
   /** How dark a cloud's shadow is, and the share of the land the clouds shade. */
   uCloudShade: { value: 0.55 },
   uCloudCover: { value: 0.44 },
@@ -120,12 +135,14 @@ ${view}
 gl_Position = projectionMatrix * mvPosition;
 `;
 
-const FRAGMENT_PARS = /* glsl */ `
+/** What a painted fragment shader declares: the shared uniforms and the painted light and air. It needs `vPaintWorld`. */
+export const FRAGMENT_PARS = /* glsl */ `
 varying vec3 vPaintWorld;
-uniform vec3 uSunTint, uShadeTint, uSkyAdd, uHaze;
-uniform float uHazeDensity, uHazeMax, uHazeStart, uCloudShade, uCloudCover, uTime, uSunRaw;
+uniform vec3 uSunTint, uShadeTint, uSkyAdd, uHaze, uHazeNear, uHazeSun, uSunDir;
+uniform float uHazeDensity, uHazeMax, uHazeStart, uHazeGlow, uCloudShade, uCloudCover, uTime, uSunRaw;
+uniform vec2 uHazeLow;
 uniform vec3 uFocus;
-uniform vec2 uEdge;
+uniform vec2 uEdge, uEdgeTree;
 uniform vec3 uWind;
 uniform sampler2D uBrush, uCloudMap;
 uniform float uBrushAmt, uBands, uWrap, uBrushScale, uDapple;
@@ -155,11 +172,39 @@ vec3 paintShade(vec3 albedo, float lit) {
   float takes = clamp(dot(albedo, vec3(0.3, 0.6, 0.1)) * 4.0, 0.25, 1.0);
   return albedo * mix(uShadeTint, uSunTint, lit) + uSkyAdd * (1.0 - lit) * takes;
 }
+// A different number for every pixel, to thin a surface out without blending.
+float paintDither() {
+  return fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+}
+// 0 inside the near world, 1 past its edge.
+float paintEdge() {
+  return smoothstep(uEdge.x, uEdge.y, distance(vPaintWorld.xz, uFocus.xz));
+}
+// The air between the eye and a far thing: blue first, the horizon's colour last, thicker in low ground and
+// aglow toward the sun.
+vec3 paintAir(vec3 color) {
+  vec3 ray = vPaintWorld - cameraPosition;
+  float far = length(ray);
+  float d = max(0.0, far - uHazeStart);
+  float low = exp(-max(0.0, vPaintWorld.y - uHazeLow.x) * uHazeLow.y);
+  float amount = (1.0 - exp(-d * uHazeDensity * (0.3 + 0.7 * low))) * uHazeMax;
+  float toSun = max(dot(ray / max(far, 0.001), uSunDir), 0.0);
+  vec3 air = mix(uHazeNear, uHaze, smoothstep(0.25, 0.85, amount));
+  air = mix(air, uHazeSun, toSun * toSun * toSun * uHazeGlow * amount);
+  return mix(color, air, amount);
+}
+// The same, for what stands in the near world: it thins out at the near world's edge.
 vec3 paintHaze(vec3 color) {
-  float d = max(0.0, distance(vPaintWorld, cameraPosition) - uHazeStart);
-  // The land in memory ends some way from the hero. It is all haze before it ends, so no edge shows.
-  float gone = smoothstep(uEdge.x, uEdge.y, distance(vPaintWorld.xz, uFocus.xz));
-  return mix(color, uHaze, max((1.0 - exp(-d * uHazeDensity)) * uHazeMax, gone));
+  if (paintEdge() > paintDither()) discard;
+  return paintAir(color);
+}
+// 0 where a tree is drawn leaf by leaf, 1 where it is a picture of itself.
+float paintTreeEdge() {
+  return smoothstep(uEdgeTree.x, uEdgeTree.y, distance(vPaintWorld.xz, uFocus.xz));
+}
+vec3 paintHazeTree(vec3 color) {
+  if (paintTreeEdge() > paintDither()) discard;
+  return paintAir(color);
 }
 `;
 

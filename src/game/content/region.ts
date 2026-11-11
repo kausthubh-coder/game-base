@@ -106,11 +106,25 @@ export interface PlanPath {
   half: number;
 }
 
+/**
+ * Gentle ground along a line: the vale the path runs through. Within `half` blocks of the line, land above
+ * `ground` keeps only `keep` of its height over it; it has its own shape again `fade` blocks further out.
+ */
+export interface Vale {
+  points: readonly (readonly [x: number, z: number])[];
+  half: number;
+  fade: number;
+  ground: number;
+  keep: number;
+}
+
 export interface RegionPlan {
   /** The player's plot. Blocks placed inside it stay. */
   grant: { x: number; z: number; width: number; depth: number };
   /** The column a new game starts in, the height of the feet, and the way the hero faces (PI is south). */
   spawn: { x: number; y: number; z: number; facing: number };
+  /** Shaped before the levels, so a site's level ground still lies in the vale. */
+  vales: readonly Vale[];
   levels: readonly Level[];
   /** Columns dug down to `ground`, with a sharp edge. Water fills them. */
   basins: readonly (Rect & { ground: number })[];
@@ -269,6 +283,8 @@ export const REGION: RegionPlan = {
   grant: GRANT,
   // Two blocks north of the stone, facing it.
   spawn: { x: STONE.x, y: GRANT_GROUND, z: STONE.z - 2, facing: Math.PI },
+  // The vale of Greenhollow: from the dead garden past the grant and along the path to Hollowmere's gate.
+  vales: [{ points: [[GARDEN.x, GARDEN.z], [GRANT.x + 14, GRANT.z + 14], [STONE.x + 2, STONE.z], [92, -221], [126, -177], [170, -160]], half: 22, fade: 80, ground: 21.2, keep: 0.3 }],
   levels: [
     { x0: GRANT.x - 2, z0: GRANT.z - 2, x1: GRANT.x + GRANT.width + 1, z1: GRANT.z + GRANT.depth + 1, ground: GRANT_GROUND, blend: 5 },
     { x0: 0, z0: -237, x1: 15, z1: -225, ground: GRANT_GROUND, blend: 4 },
