@@ -317,11 +317,9 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
   }
 
   /** The encounter the open "Again?" card is about: its beast, way and pet. Any change closes the card. */
-  let askedAbout = '';
-  const encounterOf = (fight: Fight): string => `${fight.beasts[0]?.id ?? ''}:${fight.way}:${fight.pet.def.kind}`;
+  const asked = { beast: -1, way: '', pet: '' };
 
-  function showAgain(fight: LoggedFight, about: string): void {
-    askedAbout = about;
+  function showAgain(fight: LoggedFight): void {
     const earlier = log.all().filter((f) => f !== fight && f.at <= fight.at);
     const beast = BEASTS.find((b) => b.kind === fight.enemy);
     again.replaceChildren();
@@ -441,7 +439,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     }
   }
 
-  let tick = 0, encounter = '', shownAwake = false;
+  let tick = 0, shownAwake = false;
 
   function stateOf(beast: BeastState): string {
     if (beast.doing === 'asleep') return 'Asleep. Walk up, or press E';
@@ -454,7 +452,7 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
 
   return {
     element: root,
-    ask(fight) { showAgain(fight, encounter); },
+    ask: showAgain,
     say,
     label(text, at, alpha) {
       gift.hidden = !at || alpha <= 0;
@@ -466,9 +464,10 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     },
     update(fight, held, mode, beastAt) {
       const beast = fight.beasts[0];
-      encounter = encounterOf(fight);
       // "Again?" is about one fight: a new beast, way or pet closes it.
-      if (!again.hidden && encounter !== askedAbout) again.hidden = true;
+      const beastId = beast?.id ?? -1;
+      if (again.hidden) { asked.beast = beastId; asked.way = fight.way; asked.pet = fight.pet.def.kind; }
+      else if (beastId !== asked.beast || fight.way !== asked.way || fight.pet.def.kind !== asked.pet) again.hidden = true;
       refreshLogButton();
       // The card folds while a beast is awake, and opens again when it is calmed or gone.
       const awake = fight.phase === 'fight' && !!beast && beast.doing !== 'calmed';
