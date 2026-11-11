@@ -13,6 +13,17 @@ import type { Keys } from './keys.ts';
 export const SOFT_SPEED = 2.0;
 /** Faster than this along the ground, in blocks a second, shows the walk animation. */
 const MOVING = 0.4;
+/** How fast a correction from the server fades from the drawn hero: 30 leaves 5% after a tenth of a second. */
+const CORRECT_RATE = 30;
+
+/** A body as the world server sends it: where it is, how fast it goes, and how it stands. */
+export interface BodyAt {
+  x: number; y: number; z: number;
+  vx: number; vy: number; vz: number;
+  facing: number;
+  ground: boolean;
+  water: boolean;
+}
 
 export interface PlayerRig {
   readonly body: HeroBody;
@@ -28,6 +39,15 @@ export interface PlayerRig {
   /** Sets the drawn position between the last two steps. `blend` is 0 to 1, `dt` the seconds since the last frame. */
   blend(blend: number, dt?: number): void;
   teleport(x: number, y: number, z: number, facing?: number): void;
+  /** How the last body step was steered. The same object every step. */
+  readonly steer: Readonly<{ moveX: number; moveZ: number; jump: boolean }>;
+  /**
+   * Puts the body where the world server says it is now. The drawn hero does not jump there: the difference
+   * is carried and let go over about a tenth of a second.
+   */
+  correct(to: BodyAt): void;
+  /** How far the drawn hero is from the body because of corrections still being let go, in blocks. */
+  readonly correcting: number;
 }
 
 export interface PlayerOptions {
@@ -40,6 +60,8 @@ export interface PlayerOptions {
    * they stand on something built. Left out, the hero is drawn at their block height plus `lift`.
    */
   standAt?: (x: number, y: number, z: number) => number;
+  /** Changes the steering of a body step before the body takes it: an online world rounds it to what goes on the wire. */
+  wire?: (input: { moveX: number; moveZ: number; jump: boolean }) => void;
 }
 
 export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, options: PlayerOptions = {}): PlayerRig {
@@ -66,6 +88,9 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
   const position = { ...spawn };
   const previous = { ...spawn };
   const input = { moveX: 0, moveZ: 0, jump: false };
+  const wire = options.wire;
+  /** The part of a correction not let go yet: the drawn hero is this far from where the body says. */
+  const shift = { x: 0, y: 0, z: 0 };
   const actor: Actor = { id: 'player', sprite: 'hero', pos: position, facing: body.facing, anim: 'idle', visible: true };
   game.actors.set(actor.id, actor);
 
@@ -108,6 +133,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       input.moveX = ((fx * forward - fz * right) / length) * pace;
       input.moveZ = ((fz * forward + fx * right) / length) * pace;
       input.jump = !busy && keys.jump;
+      wire?.(input);
       previous.x = body.x; previous.y = body.y; previous.z = body.z;
       const stood = body.grounded;
       body.step(input);
@@ -134,6 +160,31 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       fresh = false;
       carry *= Math.exp(-dt * 18);
       position.y = drawn = target + carry;
+      if (shift.x !== 0 || shift.y !== 0 || shift.z !== 0) {
+        const keep = Math.exp(-dt * CORRECT_RATE);
+        shift.x *= keep; shift.y *= keep; shift.z *= keep;
+        if (Math.abs(shift.x) + Math.abs(shift.y) + Math.abs(shift.z) < 1e-4) shift.x = shift.y = shift.z = 0;
+        // On the land the hero is drawn on its surface, which the correction does not move.
+        position.x += shift.x; position.z += shift.z;
+        if (!land) position.y += shift.y;
+      }
+    },
+
+    steer: input,
+    get correcting() { return Math.hypot(shift.x, shift.y, shift.z); },
+
+    correct(to) {
+      const dx = to.x - body.x, dy = to.y - body.y, dz = to.z - body.z;
+      body.x = to.x; body.y = to.y; body.z = to.z;
+      body.vx = to.vx; body.vy = to.vy; body.vz = to.vz;
+      body.facing = to.facing;
+      body.grounded = to.ground;
+      body.swimming = to.water;
+      // The last step moves with the body, so the blend between them is not thrown, and the drawn hero keeps
+      // to where it was: the difference is let go in blend().
+      previous.x += dx; previous.y += dy; previous.z += dz;
+      shift.x -= dx; shift.y -= dy; shift.z -= dz;
+      write();
     },
 
     teleport(x, y, z, facing) {
@@ -141,6 +192,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       if (facing !== undefined) body.facing = facing;
       previous.x = position.x = x; previous.y = position.y = drawn = y; previous.z = position.z = z;
       carry = 0; onLand = false; walkedOff = false; fresh = true;
+      shift.x = shift.y = shift.z = 0;
       write();
     },
   };

@@ -1,3 +1,4 @@
+import type { OnlineView } from '../online/online.ts';
 import type { Graphics } from './graphics.ts';
 // What a view file gets. A view is any file in src/game/views/ named `<something>.view.ts` that exports
 // `install(view: GameView)`. src/game/boot.ts finds every one of them, sorts them by file name and calls
@@ -229,6 +230,10 @@ export interface GameView {
   claim(reason: string, kinds: readonly Press['kind'][] | null): void;
   /** True while some reason claims presses of this kind. */
   claimed(kind: Press['kind']): boolean;
+
+  // ---- an online world
+  /** The online world this page plays (`?world=<id>`), or null in solo play. src/game/online/README.md. */
+  readonly online: OnlineView | null;
 }
 
 /** The shape of a file in src/game/views/. */

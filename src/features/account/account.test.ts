@@ -60,6 +60,19 @@ function stage(start: Record<string, string> = {}, keys = true): Stage {
       if (s.download instanceof Error) throw s.download;
       return s.download;
     },
+    async createWorld(name) {
+      s.calls.push(`createWorld ${name}`);
+      return 'world_online';
+    },
+    async invite(worldId) {
+      s.calls.push(`invite ${worldId}`);
+      return `CODE${s.calls.length}`;
+    },
+    async acceptInvite(code) {
+      s.calls.push(`accept ${code}`);
+      if (code === 'USED') throw { data: { code: 'inviteUsed', message: 'That invite was already used.' } };
+      return { worldId: 'world_online', name: 'A world' };
+    },
   };
   const session: Session = {
     onUser(fn) {
@@ -75,6 +88,7 @@ function stage(start: Record<string, string> = {}, keys = true): Stage {
       if (!s.accepts) throw new Error('Convex did not accept the sign-in');
       return database;
     },
+    token: async () => 'token-of-ada',
     dispose: () => { s.calls.push('dispose'); },
   };
   const s: Stage = {
@@ -329,6 +343,48 @@ describe('restoring', () => {
     expect(await restoring).toBe(false);
     expect(s.calls).not.toContain('restart');
     expect(s.items).toEqual({ [KEY]: saveText(5) });
+  });
+});
+
+describe('playing together', () => {
+  const online = (s: Stage, entered: string[]): void => {
+    s.options.online = { address: (world, invite) => `https://game.example/?world=${world}${invite ? `&invite=${invite}` : ''}`, enter: (world) => entered.push(world) };
+  };
+
+  test('Play together makes an online world and a link that lets one friend in', async () => {
+    const s = stage();
+    const entered: string[] = [];
+    online(s, entered);
+    const account = await signedIn(s);
+    expect(await account.playTogether()).toBe(true);
+    expect(s.calls).toContain('createWorld Ada Lovelace (profile)\'s world');
+    expect(s.calls).toContain('invite world_online');
+    expect(account.state.link?.url).toMatch(/^https:\/\/game\.example\/\?world=world_online&invite=CODE\d+$/);
+    const first = account.state.link?.url;
+    expect(await account.inviteTo('world_online')).toBe(true);
+    expect(account.state.link?.url).not.toBe(first);
+    account.enter('world_online');
+    expect(entered).toEqual(['world_online']);
+  });
+
+  test('without a way to open online worlds there is no Play together', async () => {
+    const s = stage();
+    const account = await signedIn(s);
+    expect(account.online).toBe(false);
+    expect(await account.playTogether()).toBe(false);
+    expect(s.calls.some((call) => call.startsWith('createWorld'))).toBe(false);
+  });
+
+  test('an invite that was used says so, and the token is the signed-in player\'s', async () => {
+    const s = stage();
+    const account = await signedIn(s);
+    expect(await account.acceptInvite('USED')).toBe(false);
+    expect(account.state.note?.text).toBe('That invite was already used.');
+    expect(await account.acceptInvite('GOOD')).toBe(true);
+    expect(await account.token()).toBe('token-of-ada');
+    s.sign(null);
+    await settle();
+    expect(account.state.link).toBeNull();
   });
 });
 

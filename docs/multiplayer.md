@@ -12,11 +12,11 @@ the story belong to the world.
 
 - The world server runs the rules 20 times a second on Cloudflare, lets a signed-in player into a world
   Convex says is theirs, sends each player what is near, and saves the world.
-- `src/features/net` connects, sends numbered inputs and hands out snapshots. Nothing in the game uses it.
+- Stage 1 is built on `t3/stage-one-multiplayer-1`: `/?world=<id>` opens an online world, and the browser is a
+  copy of it (below). `bun tools/play-together.mjs` plays it in two real browsers on this machine. It has not
+  been tried against the live copy.
 - The rules know one player: one bag, one set of quests, one break meter. On the server every player has a
   body, and the player who has been in longest is `game.player`.
-- A snapshot carries players, nearby actors, placed things and changed blocks. It does not carry the bag,
-  crops, quests, flags, conversations, toasts or sounds.
 
 ## Stages
 
@@ -35,3 +35,44 @@ Each stage ends with something two people can do together, and a check that play
 - The rules run in one place for an online world: the server. The browser never decides what happened.
 - A stage is done when `bun run verify --full` passes and its two-browser check passes on this machine and
   against the live copy.
+
+## How the copy works (stage 1)
+
+In an online world the browser does not step the rules. It keeps the same kernel and systems as solo play
+and loads into them what the server sends. `src/game/online/README.md` has the details.
+
+| What | How it gets to the browser |
+|---|---|
+| The land | Changed blocks in each snap, laid over the land the seed makes |
+| Bodies and actors | Positions in each snap: players every step, everything else every fourth. Others are drawn 2 or 5 steps in the past, between two real updates |
+| The rules' state | Each system's own `save()`, sent when what a player can see of it changed (`src/game/online/copy.sim.ts`), and loaded into the browser's copy of that system |
+| Clock and weather | `day`, `time` and `game.ambient` in the snap |
+| Events | The rules' events of each step, emitted again on the bus the views hear. A toast, a hint, a panel or a conversation goes only to the player whose act made it |
+| What the player does | An act in the next input. The browser's system methods that change the world send the act instead (`online.ts`), so the shell and the views are the same as in solo play |
+| The player's own hero | Moved at once by the same body rules. Each input carries the steering of its three body steps. The server's answer names the last input it used, and the browser replays the rest on top. A disagreement is let go over a tenth of a second |
+
+Why the state is each system's save: every system already saves and loads all of its state, and the act 1
+test loads a save 20 times in one play. So one path covers every system there is and every system added
+later, with no second description of the state to keep in step. The cost is size: a save goes whole when
+it changes. `copy.sim.ts` keeps counters that tick every step (a crop's growth, a person's place on a path)
+out of what counts as a change, so a quiet world sends no state at all.
+
+Measured with `bun tools/play-together.mjs`, two players, each socket slowed by 100 ms each way, while one
+walks: about 5 KB a second to the walker and 6 KB to the one watching, most of it the other player in
+`actors` and the player's own body in `you`. The prediction matched the server exactly in every answer of
+the run (largest gap 0 blocks): the browser and the server run the same body rules on the same blocks with
+the same numbers. `bun server/test/bench.ts`, with 8 fake players among 300 creatures, still sends 85 KB a
+second to each player, as before stage 1: the creatures' positions in JSON. The binary codec of stage 3 is
+the fix for both.
+
+## What stage 2 changes in the copy
+
+- The bag, the hand, the break meter and the Almanac become each player's, in the rules. The copy then has
+  a part for each player beside the world's part, sent only to that player.
+- `breaking` and `talk` in the snap are stand-ins for player-scoped state the rules do not have yet. They
+  become ordinary state.
+- An item gained goes only to the player who gained it.
+- Each player needs their own conversation and their own `busy`. Today one conversation holds everyone.
+- Invites let one friend in each. A class of 20 to 30 needs a link many can use, and more than 8 players a
+  world: both are Kausthubh's to decide (`convex/model/limits.ts`, `MAX_PLAYERS` in `server/room.ts`).
+

@@ -45,6 +45,7 @@ const STYLE = /* css */ `
   border: 0; border-radius: var(--radius, 10px); background: var(--paper-light, #fff);
   box-shadow: inset 0 0 0 1px var(--line-strong, rgb(0 0 0 / 0.28)); user-select: text; -webkit-user-select: text;
 }
+.acct-worlds .acct-row { margin-top: var(--s2, 8px); }
 .acct-worlds li + li { margin-top: var(--s3, 12px); padding-top: var(--s3, 12px); border-top: 1px solid var(--line, rgb(0 0 0 / 0.12)); }
 .acct-world-name { font-weight: 600; overflow-wrap: anywhere; }
 .acct-status[data-kind='problem'] { color: var(--new, #a25f00); }
@@ -156,12 +157,47 @@ export function createPanel(account: Account, options: PanelOptions): Panel {
     ];
   }
 
+  /** Play together: a world on the server, and the link that lets a friend into it. */
+  function together(state: Readonly<AccountState>): Child[] {
+    if (!account.online) return [];
+    const busy = state.busy !== null;
+    const link = state.link;
+    if (!link) {
+      return [
+        row(button('together', state.busy === 'world' ? 'Making a world' : 'Play together', () => void account.playTogether(), { primary: true, disabled: !state.ready || busy })),
+        note('Makes a world on the server that you and up to seven friends play in at once.'),
+      ];
+    }
+    const field = el('input', { class: 'acct-input', type: 'text', 'data-key': 'link', readonly: true, 'aria-label': 'The link to send', value: link.url, onfocus: (event: FocusEvent) => (event.target as HTMLInputElement).select() });
+    const copyButton = button('copy', 'Copy link', () => {
+      field.select();
+      // Where the clipboard is not allowed, the link is selected for the player to copy by hand.
+      void navigator.clipboard?.writeText(link.url).then(() => { copyButton.textContent = 'Copied'; }, () => undefined);
+    });
+    return [
+      row(field, copyButton),
+      note('The link lets one friend in. Make a new one for each friend.'),
+      row(button('enter', 'Enter the world', () => account.enter(link.worldId), { primary: true }), button('invite', 'New link', () => void account.inviteTo(link.worldId), { disabled: busy })),
+    ];
+  }
+
   function yourWorlds(state: Readonly<AccountState>): Child[] {
     if (state.worlds === null) return [note(state.ready ? 'Reading your worlds.' : 'Reaching your account.')];
-    if (state.worlds.length === 0) return [note('No worlds yet. A world you back up shows here, and so will the worlds friends invite you to.')];
+    const top = together(state);
+    if (state.worlds.length === 0) return [...top, note('No worlds yet. A world you back up shows here, and so will the worlds friends invite you to.')];
     const list = el('ul', { class: 'acct-worlds' });
-    for (const world of state.worlds) list.append(el('li', { 'data-world': world._id }, el('div', { class: 'acct-world-name' }, world.name), el('div', { class: 'acct-quiet' }, worldLine(world, now()))));
-    return [list];
+    for (const world of state.worlds) {
+      const online = world.kind === 'online' && account.online;
+      list.append(el('li', { 'data-world': world._id },
+        el('div', { class: 'acct-world-name' }, world.name),
+        el('div', { class: 'acct-quiet' }, worldLine(world, now())),
+        online ? row(
+          button(`enter-${world._id}`, 'Enter', () => account.enter(world._id)),
+          world.role === 'owner' ? button(`invite-${world._id}`, 'Link for a friend', () => void account.inviteTo(world._id), { disabled: state.busy !== null }) : null,
+        ) : null,
+      ));
+    }
+    return [...top, list];
   }
 
   // ---- the element
@@ -180,7 +216,7 @@ export function createPanel(account: Account, options: PanelOptions): Panel {
   const parts: Part[] = [
     { node: part('you', 'You'), heading: 'You', build: you, shows: (s) => [s.status, s.name, s.email, s.ready, s.busy, draft === null], signedInOnly: false, drawn: '' },
     { node: part('world', 'This world'), heading: 'This world', build: thisWorld, shows: (s, minute) => [s.worlds, s.ready, s.busy, asking, account.localSave(), minute], signedInOnly: true, drawn: '' },
-    { node: part('worlds', 'Your worlds'), heading: 'Your worlds', build: yourWorlds, shows: (s, minute) => [s.worlds, s.ready, minute], signedInOnly: true, drawn: '' },
+    { node: part('worlds', 'Your worlds'), heading: 'Your worlds', build: yourWorlds, shows: (s, minute) => [s.worlds, s.ready, s.busy, s.link, minute], signedInOnly: true, drawn: '' },
   ];
   for (const each of parts) node.append(each.node);
 

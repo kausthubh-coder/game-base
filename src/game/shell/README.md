@@ -53,6 +53,18 @@ What `GameView` gives you is in `view.ts`, with a comment on every member. The p
 - `view.settings.setQuality('auto' | 'low' | 'medium' | 'high' | 'ultra')`, `view.settings.setVolume(bus, value)` and `view.stats()` fit `GameUiOptions` as they are.
 - `view.keys.onPress(fn)` hears E, Q, R, the digits, the wheel and the mouse buttons. Listen there, not on `window`, so the base's input feature can replace `keys.ts` later.
 
+## An online world
+
+With `?world=<id>` in the address the shell plays that world on the world server (`src/game/online/README.md`).
+It makes the same kernel and systems, then cuts the event bus so the systems hear nothing, and makes the
+online copy. From then on:
+
+- A step sends this step's steering and acts and does not step the kernel. Step listeners still run.
+- The hero moves only once the first snap is in, and stands still while the connection is down.
+- `save()` writes nothing, so the solo save in this browser is never touched. `advance` does nothing: the server's clock is the clock.
+- There is no title: `holdStart()` does nothing and the page goes straight into the world.
+- `view.online` is the copy, for a view. It is null in solo play.
+
 ## The title screen
 
 Call `view.holdStart()` in your `install`. Without that call the game starts by itself: the saved game when there is one, a new one otherwise. Then call `view.newGame()` or `view.continueGame()` from your buttons. `view.hasSave()` says whether Continue has anything to load.

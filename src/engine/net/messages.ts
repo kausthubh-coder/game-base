@@ -8,6 +8,8 @@
 
 /** Steps a second, on the server and in the browser. The same as 1 / STEP in src/game/kernel.sim.ts. */
 export const STEPS_PER_SECOND = 20;
+/** Steps of a hero's body in one step of the rules: 60 a second against 20, as in the shell and on the server. */
+export const BODY_STEPS = 3;
 
 /** Why the server closed a connection. A browser reconnects after any other code. */
 export const CLOSE = {
@@ -44,7 +46,23 @@ export type Act =
   /** One click on a block: `primary` breaks or gathers, `secondary` places or uses. */
   | ({ a: 'use'; button: 'primary' | 'secondary' } & Target)
   /** The primary button stayed down on a block for this step. */
-  | ({ a: 'hold' } & Target);
+  | ({ a: 'hold' } & Target)
+  /** The E key: the nearest thing with a prompt. */
+  | { a: 'interact' }
+  /** One click in this player's conversation: the next line, or the choice of this index. */
+  | { a: 'say'; choice?: number }
+  /** A recipe made from the bag. */
+  | { a: 'craft'; recipe: string }
+  /** A stack moved in the bag, or `count` of it. Slots 0 to 35. */
+  | { a: 'move'; from: number; to: number; count?: number }
+  /**
+   * One build-mode stroke, whole: the button went down on `at` and came up on `to`, with the held piece at
+   * `turns` quarter turns. Without `to` it was only the press, which takes a placed thing back into the bag.
+   * Each is what the pointer was given, before build mode works out the cell.
+   */
+  | { a: 'build'; at: Target; to?: Target; turns?: number }
+  /** Takes back the last build-mode stroke. */
+  | { a: 'undo' };
 
 export interface Input {
   t: 'input';
@@ -54,6 +72,12 @@ export interface Input {
   mx: number;
   mz: number;
   jump: boolean;
+  /**
+   * The way the player steered in each body step of this step: mx, mz and jump (0 or 1), three numbers for
+   * each of the `BODY_STEPS`. The browser moves the hero at once and reads the keys at every body step, so
+   * this is what it did. Left out, `mx`, `mz` and `jump` hold for all of them.
+   */
+  moves?: number[];
   /** What else the player did in this step, in order. */
   acts?: Act[];
 }
@@ -117,6 +141,8 @@ export interface ActorState {
   facing: number;
   anim: string;
   mark?: string;
+  /** A player's name, shown over their head. Only players have one. */
+  name?: string;
 }
 
 /** A station or a piece of furniture standing in the world. */
@@ -129,6 +155,37 @@ export interface PlacedState {
 
 /** A chunk and every block in it that differs from the land the seed makes: pairs of cell index and block id. */
 export type ChunkEdits = [cx: number, cz: number, cells: number[]];
+
+/**
+ * The rules' state that is not the land, the bodies or the placed things: each system's own save, as
+ * `save()` gives it, and the flags. Only what changed since the player was last told is in it.
+ */
+export interface StateCopy {
+  /** Every flag, when one of them changed. */
+  flags?: [string, boolean | number | string][];
+  /** A system's save, by the system's name. */
+  systems?: Record<string, unknown>;
+}
+
+/** An event the rules emitted, as the name and what it carries. The browser emits it again on its own bus. */
+export type WireEvent = [name: string, data: unknown];
+
+/** The block this player is breaking and how far along it is, 0 to 1, as `actions.breaking()` gives it. */
+export interface Breaking {
+  x: number; y: number; z: number;
+  progress: number;
+  tree?: { x0: number; y0: number; z0: number; x1: number; y1: number; z1: number } | null;
+}
+
+/** The line of this player's conversation, as `talk.current()` gives it. */
+export interface Line {
+  npc: string | null;
+  name: string;
+  portrait: string;
+  voice: string;
+  text: string;
+  choices: string[];
+}
 
 export interface Snap {
   t: 'snap';
@@ -153,7 +210,22 @@ export interface Snap {
   placed?: PlacedState[];
   /** Ids of placed things that were taken away or went out of range. */
   unplaced?: string[];
+  /** The rules' state that changed. All of it in the first snap after a welcome. */
+  state?: StateCopy;
+  /** The weather and the light: `game.ambient` as `AMBIENT_KEYS` lists it, when it changed. */
+  air?: number[];
+  /** Events of this step this player should hear, in the order they were emitted, after `state` is applied. */
+  events?: WireEvent[];
+  /** This player's break in progress, when it started, moved on or ended (null). */
+  breaking?: Breaking | null;
+  /** This player's conversation, when its line changed or it ended (null). */
+  talk?: Line | null;
+  /** Placed things this player used in this step: a workbench or a chest whose panel opens for them. */
+  used?: string[];
 }
+
+/** The fields of `game.ambient` in `Snap.air`, in order. */
+export const AMBIENT_KEYS = ['timeOfDay', 'rain', 'cloud', 'fog', 'wind', 'windDir', 'wetness', 'flash'] as const;
 
 export type ServerMessage = Welcome | Refuse | Snap;
 
@@ -170,6 +242,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 const isBlock = (n: unknown): n is number => Number.isInteger(n) && Math.abs(n as number) <= MAX_BLOCK;
 const isStep = (n: unknown): n is number => n === -1 || n === 0 || n === 1;
 const isSpeed = (n: unknown): n is number => typeof n === 'number' && n >= -1 && n <= 1;
+const isIndex = (n: unknown, most: number): n is number => Number.isInteger(n) && (n as number) >= 0 && (n as number) <= most;
+/** A recipe's id. Ids are short words; anything longer is nonsense. */
+const isName = (s: unknown): s is string => typeof s === 'string' && s.length > 0 && s.length <= 64;
+/** The slots of the bag: 36. */
+const BAG_SLOTS = 36;
 
 function isTarget(v: Record<string, unknown>): boolean {
   return isBlock(v.x) && isBlock(v.y) && isBlock(v.z) && isStep(v.nx) && isStep(v.ny) && isStep(v.nz);
@@ -180,7 +257,43 @@ function isAct(value: unknown): value is Act {
   if (value.a === 'slot') return Number.isInteger(value.slot) && (value.slot as number) >= 0 && (value.slot as number) <= 8;
   if (value.a === 'use') return (value.button === 'primary' || value.button === 'secondary') && isTarget(value);
   if (value.a === 'hold') return isTarget(value);
+  if (value.a === 'interact' || value.a === 'undo') return true;
+  if (value.a === 'say') return value.choice === undefined || isIndex(value.choice, 8);
+  if (value.a === 'craft') return isName(value.recipe);
+  if (value.a === 'move') return isIndex(value.from, BAG_SLOTS - 1) && isIndex(value.to, BAG_SLOTS - 1) && (value.count === undefined || (isIndex(value.count, 999) && (value.count as number) > 0));
+  if (value.a === 'build') {
+    if (!isRecord(value.at) || !isTarget(value.at)) return false;
+    if (value.to !== undefined && (!isRecord(value.to) || !isTarget(value.to))) return false;
+    return value.turns === undefined || isIndex(value.turns, 3);
+  }
   return false;
+}
+
+/** Copies an act with only the fields it names, so nothing else the browser sent reaches the rules. */
+function cleanAct(act: Act): Act {
+  const target = (t: Target): Target => ({ x: t.x, y: t.y, z: t.z, nx: t.nx, ny: t.ny, nz: t.nz });
+  switch (act.a) {
+    case 'slot': return { a: 'slot', slot: act.slot };
+    case 'use': return { a: 'use', button: act.button, ...target(act) };
+    case 'hold': return { a: 'hold', ...target(act) };
+    case 'interact': return { a: 'interact' };
+    case 'undo': return { a: 'undo' };
+    case 'say': return act.choice === undefined ? { a: 'say' } : { a: 'say', choice: act.choice };
+    case 'craft': return { a: 'craft', recipe: act.recipe };
+    case 'move': return act.count === undefined ? { a: 'move', from: act.from, to: act.to } : { a: 'move', from: act.from, to: act.to, count: act.count };
+    case 'build': {
+      const out: Act = { a: 'build', at: target(act.at) };
+      if (act.to) out.to = target(act.to);
+      if (act.turns !== undefined) out.turns = act.turns;
+      return out;
+    }
+  }
+}
+
+function isMoves(value: unknown): value is number[] {
+  if (!Array.isArray(value) || value.length !== BODY_STEPS * 3) return false;
+  for (let i = 0; i < value.length; i += 3) if (!isSpeed(value[i]) || !isSpeed(value[i + 1]) || (value[i + 2] !== 0 && value[i + 2] !== 1)) return false;
+  return true;
 }
 
 /**
@@ -196,13 +309,17 @@ export function readClientMessage(value: unknown): ClientMessage | null {
     return { t: 'hello', build, token };
   }
   if (value.t === 'input') {
-    const { n, mx, mz, jump, acts } = value;
+    const { n, mx, mz, jump, moves, acts } = value;
     if (!Number.isSafeInteger(n) || (n as number) < 1) return null;
     if (!isSpeed(mx) || !isSpeed(mz) || typeof jump !== 'boolean') return null;
     const input: Input = { t: 'input', n: n as number, mx, mz, jump };
+    if (moves !== undefined) {
+      if (!isMoves(moves)) return null;
+      input.moves = moves.slice();
+    }
     if (acts !== undefined) {
       if (!Array.isArray(acts) || acts.length > MAX_ACTS || !acts.every(isAct)) return null;
-      if (acts.length > 0) input.acts = acts as Act[];
+      if (acts.length > 0) input.acts = (acts as Act[]).map(cleanAct);
     }
     return input;
   }

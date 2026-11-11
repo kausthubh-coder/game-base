@@ -19,6 +19,11 @@ const STEP_MS = 1000 / STEPS_PER_SECOND;
 const MAX_CATCH_UP = 3;
 /** Steps between two saves while players are in: 30 seconds. */
 const SAVE_EVERY = 30 * STEPS_PER_SECOND;
+/**
+ * Steps from a player's change of the world to the save that keeps it: 5 seconds. A Durable Object has no
+ * shutdown hook, so a block placed just before a restart is kept only if a save came after it.
+ */
+const SAVE_SOON = 5 * STEPS_PER_SECOND;
 /** Steps between two cards while players are in: 5 minutes. A join and a leave post one at once. */
 const CARD_EVERY = 300 * STEPS_PER_SECOND;
 /** A connection that has not said hello in this long is closed. */
@@ -84,6 +89,9 @@ export class WorldServer extends DurableObject<Env> {
   /** When the next step is due, in milliseconds since 1970. */
   private nextDue = 0;
   private savedAt = 0;
+  /** The room's count of changes at the last save, and the step the first change after it came in, or -1. */
+  private savedChanges = 0;
+  private changedAt = -1;
   private cardAt = 0;
   private stepErrors = 0;
 
@@ -243,6 +251,8 @@ export class WorldServer extends DurableObject<Env> {
     const save = this.store.read();
     this.room = createRoom(save);
     this.savedAt = this.cardAt = this.room.steps;
+    this.savedChanges = this.room.changes;
+    this.changedAt = -1;
     log('the world loaded', { worldId: this.worldId, saved: save !== null, steps: this.room.steps, ms: Math.round(performance.now() - started) });
     return this.room;
   }
@@ -296,7 +306,9 @@ export class WorldServer extends DurableObject<Env> {
       this.snapMs.add(performance.now() - started);
     }
     if (room.steps % STEPS_PER_SECOND === 0) this.dropQuiet(room);
+    if (room.changes !== this.savedChanges && this.changedAt < 0) this.changedAt = room.steps;
     if (room.steps - this.savedAt >= SAVE_EVERY) this.save('30 seconds passed');
+    else if (this.changedAt >= 0 && room.steps - this.changedAt >= SAVE_SOON) this.save('a player changed the world');
     if (room.steps - this.cardAt >= CARD_EVERY) this.postCard();
     // The last player may just have been dropped for silence, and the world put to sleep.
     if (room.playerCount > 0) this.timer = setTimeout(this.tick, Math.max(0, this.nextDue - Date.now()));
@@ -323,6 +335,8 @@ export class WorldServer extends DurableObject<Env> {
     try {
       const { rows, bytes } = this.store.write(room.save());
       this.savedAt = room.steps;
+      this.savedChanges = room.changes;
+      this.changedAt = -1;
       this.saves++;
       this.lastSave = { ms: Math.round((performance.now() - started) * 100) / 100, rows, bytes, why };
       log('the world saved', { worldId: this.worldId, steps: room.steps, ...this.lastSave });
