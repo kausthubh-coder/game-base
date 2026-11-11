@@ -21,7 +21,7 @@
 // `STAG` in `src/game/content/fight.ts`; where things stand is `hall-layout.sim.ts`.
 import { HERO, STAG, type StagAttack } from '../content/fight.ts';
 import type { BossNumbers, Fight, FightRecord, Target, Telegraph } from './fight.sim.ts';
-import { HALL, type HallStage, type Point, onBody } from './hall-layout.sim.ts';
+import { HALL, type HallStage, type Point } from './hall-layout.sim.ts';
 import { dirX, dirZ } from './shapes.sim.ts';
 
 /** 0 the chains, 1 the overgrowth, 2 the collar. */
@@ -271,7 +271,7 @@ export function createHall(fight: Fight, stage: HallStage, options: HallOptions 
       const angle = random() * Math.PI * 2, d = STAG.pod.near + random() * (STAG.pod.far - STAG.pod.near);
       const x = hero.x + Math.sin(angle) * d, z = hero.z - Math.cos(angle) * d;
       if (!stage.inside(x, z) || Math.hypot(x - stage.center.x, z - stage.center.z) > HALL.radius - 1) continue;
-      if (onBody(x - stage.center.x + 0.5, z - stage.center.z + 0.5) || lit(x, z)) continue;
+      if (stage.solid(x, z) || lit(x, z)) continue;
       let crowded = false;
       for (const p of pods) if (Math.hypot(p.target.x - x, p.target.z - z) < STAG.pod.apart) crowded = true;
       for (const l of lamps) if (Math.hypot(l.x - x, l.z - z) < STAG.pod.apart) crowded = true;
@@ -361,6 +361,13 @@ export function createHall(fight: Fight, stage: HallStage, options: HallOptions 
         if (quiet > quietMost) quietMost = quiet;
         if (quiet > (quietByPhase[phase] as number)) quietByPhase[phase] = quiet;
       }
+      // The antlers and the hooves pass under the vines, and a shake of the vines does not reach the floor: an attack
+      // about to land where the hero no longer is lands on nothing.
+      const shape = stag.shape;
+      if (shape && shape.live && stag.doing === 'windup' && shape.t + dt >= shape.lead && (stag.attack === 'shake') !== onRamp()) {
+        fight.cancel(shape);
+        count('missed');
+      }
       stepStag(dt);
 
       // Phase 1: a broken pin drops its chain and the Stag staggers.
@@ -439,12 +446,16 @@ export function createHallBot(fight: Fight, hall: Hall, options: HallBotOptions 
   const reaction = options.reaction ?? 0.3;
   const { foot, top } = rampWay(hall.stage);
   const out = { x: 0, z: 0 };
+  /** A post in the way: seconds the hero has not moved while walking, and seconds left of stepping round it. */
+  let stuck = 0, round = 0, lastX = 0, lastZ = 0;
 
   function moveTo(x: number, z: number, stop = 0.25): boolean {
     const { hero, input } = fight, dx = x - hero.x, dz = z - hero.z, d = Math.hypot(dx, dz);
     if (d <= stop) return true;
     input.moveX = dx / d;
     input.moveZ = dz / d;
+    // Walking into a post: step round it, a quarter turn to the left, for a moment.
+    if (round > 0) { input.moveX = dz / d; input.moveZ = -dx / d; }
     return false;
   }
 
@@ -467,7 +478,7 @@ export function createHallBot(fight: Fight, hall: Hall, options: HallBotOptions 
 
   function avoid(): boolean {
     const { hero, input } = fight;
-    let worst = 0, left = Infinity, ox = 0, oz = 0, ramp = false;
+    let worst = 0, left = Infinity, ox = 0, oz = 0, ramp = false, floor = false;
     for (const s of fight.shapes) {
       if (!s.live || s.t >= s.lead || s.t < reaction) continue;
       const deep = inside(s, hero.x, hero.z);
@@ -477,8 +488,11 @@ export function createHallBot(fight: Fight, hall: Hall, options: HallBotOptions 
       ox = out.x;
       oz = out.z;
       ramp = s === hall.stag.shape && hall.stag.attack === 'shake';
+      floor = s === hall.stag.shape && hall.stag.attack !== 'shake';
     }
     if (worst <= 0) return false;
+    // At the foot of the vines, up them is the way out of a sweep: nothing on the floor lands on a hero up there.
+    if (floor && hall.phase === 2 && Math.hypot(hero.x - foot.x, hero.z - foot.z) < 2.5) return false;
     if (ramp) {
       // Down the vines, out of the stretch that shakes.
       input.moveX = 0;
@@ -511,8 +525,13 @@ export function createHallBot(fight: Fight, hall: Hall, options: HallBotOptions 
   }
 
   return {
-    step() {
+    step(dt) {
       const { hero, input } = fight;
+      const moved = Math.hypot(hero.x - lastX, hero.z - lastZ);
+      lastX = hero.x;
+      lastZ = hero.z;
+      stuck = Math.hypot(input.moveX, input.moveZ) > 0.5 && moved < 0.005 && hero.act === 'none' ? stuck + dt : 0;
+      round = stuck > 0.25 ? 0.45 : Math.max(0, round - dt);
       input.moveX = input.moveZ = 0;
       input.attackHeld = input.calmHeld = input.placing = false;
       if (hall.freed || hero.act === 'faint') return;

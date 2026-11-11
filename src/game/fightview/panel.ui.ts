@@ -231,7 +231,16 @@ export function createPanel(root: HTMLElement, log: FightLog, actions: PanelActi
     link.click();
     URL.revokeObjectURL(link.href);
   }));
-  card.append(title, el('h3', '', 'Way to fight'), ways, feel, el('h3', '', 'Bring in'), beasts, control, el('h3', '', 'Keys'), keys, rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
+  // ---- milestone 3: one entry on the card, the Stag's hall (`?scene=stag`) and the way back to the meadow
+  const inHall = new URLSearchParams(location.search).get('scene') === 'stag';
+  const hallRow = el('div', 'fl-row');
+  hallRow.append(button(inHall ? 'Back to the meadow' : 'The Stag hall', () => {
+    const address = new URLSearchParams(location.search);
+    address.set('scene', inHall ? 'fight' : 'stag');
+    location.search = address.toString();
+  }));
+  // ---- end of the Stag's entry
+  card.append(title, el('h3', '', 'Way to fight'), ways, feel, el('h3', '', 'Bring in'), beasts, control, el('h3', '', 'Boss'), hallRow, el('h3', '', 'Keys'), keys, rulesTitle, rules, el('h3', '', 'Lab'), options, logRow);
 
   // ---------------------------------------------------------------- the bars
   const hud = el('div', 'fl-hud');

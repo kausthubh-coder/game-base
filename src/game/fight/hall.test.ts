@@ -380,3 +380,19 @@ describe("the hall's checks on the card", () => {
     expect(checks.find((c) => c.what === 'Hits taken, by attack')?.got).toContain('sweep');
   });
 });
+
+describe('the vines and the floor', () => {
+  test('a sweep told at a hero who then climbs the vines lands on nothing', () => {
+    const r = room();
+    r.until(() => r.hall.stag.doing !== 'asleep', 5, hold(r, 0.5, 8));
+    breakPins(r);
+    r.hall.stage.ramp = true;
+    // Force the third phase's ground without playing the second: the hero stands at the foot, a sweep comes.
+    const { foot, top } = rampWay(r.hall.stage);
+    r.until(() => r.hall.stag.attack === 'sweep' && r.hall.stag.doing === 'windup', 10, hold(r, foot.x, foot.z));
+    const hits = r.fight.record.hitsTaken;
+    r.run(STAG.sweep.lead + 0.2, hold(r, top.x, top.z));
+    expect(r.fight.record.hitsTaken).toBe(hits);
+    expect(r.hall.record().boss?.counts.missed).toBe(1);
+  });
+});

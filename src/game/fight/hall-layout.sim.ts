@@ -37,7 +37,7 @@ export const HALL = {
   /** The four pins, two by its front and two toward the door. A chain runs from each to a leg. */
   pins: [{ x: -7.5, z: -2.5 }, { x: 8.5, z: -2.5 }, { x: -6.5, z: 6.5 }, { x: 7.5, z: 6.5 }] as readonly Point[],
   /** The lamps of the second phase. */
-  lamps: [{ x: -8.5, z: 3.5 }, { x: 9.5, z: 2.5 }, { x: -4.5, z: -6.5 }, { x: 0.5, z: 7.5 }] as readonly Point[],
+  lamps: [{ x: -8.5, z: 3.5 }, { x: 9.5, z: 2.5 }, { x: -4.5, z: -6.5 }, { x: -2.5, z: 7.5 }] as readonly Point[],
   /** The vines' ramp, foot first. The last cells stand beside the shoulder, at its top. */
   ramp: rampCells() as readonly RampCell[],
   /** Heights on the ramp from which the collar can be reached. */
@@ -62,6 +62,14 @@ export function onBody(x: number, z: number): boolean {
   return x >= b.x0 && x < b.x1 && z >= b.z0 && z < b.z1;
 }
 
+/** True on the cell of a pin or a lamp: a post stands there, and nobody walks through it. */
+export function onPost(x: number, z: number): boolean {
+  const cx = Math.floor(x), cz = Math.floor(z);
+  for (const p of HALL.pins) if (Math.floor(p.x) === cx && Math.floor(p.z) === cz) return true;
+  for (const p of HALL.lamps) if (Math.floor(p.x) === cx && Math.floor(p.z) === cz) return true;
+  return false;
+}
+
 /** The hall's ground, as the fight asks about it, and whether the vines' ramp stands. */
 export interface HallStage extends Stage {
   /** True once the vines have grown into a ramp. */
@@ -74,7 +82,7 @@ export interface HallStage extends Stage {
 
 /**
  * The hall around a middle point of the world. `x` and `z` are whole numbers: the corner of the middle block.
- * The body is solid. Past the floor's edge is the wall. The ramp counts as water to the fight once it stands:
+ * The body and the posts of the pins and lamps are solid. Past the floor's edge is the wall. The ramp counts as water to the fight once it stands:
  * the hero climbs it, and no pet or beast follows.
  */
 export function hallStage(x: number, z: number): HallStage {
@@ -83,7 +91,7 @@ export function hallStage(x: number, z: number): HallStage {
   const stage: HallStage = {
     ramp: false,
     rampAt: (px, pz) => (stage.ramp ? rampHeight(px - x, pz - z) : 0),
-    solid: (px, pz) => onBody(px - x, pz - z) || out(px, pz) > HALL.radius + 0.5,
+    solid: (px, pz) => onBody(px - x, pz - z) || onPost(px - x, pz - z) || out(px, pz) > HALL.radius + 0.5,
     inside: (px, pz) => out(px, pz) <= HALL.radius,
     water: (px, pz) => stage.ramp && rampHeight(px - x, pz - z) > 0,
     center: { x: x + 0.5, z: z + 0.5 },

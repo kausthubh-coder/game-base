@@ -12,19 +12,28 @@
 // `window.__fight` is the lab's door for tests: the fight itself, `bot(true)` to let the rule-made player
 // fight, and `state()` for plain data.
 //
-// Without `?scene=fight` this file does nothing.
+// `?scene=stag` opens the same lab in the Verdant Stag's hall instead: the first boss test (`fight/hall.sim.ts`,
+// `fightview/hall.ts`). Everything for it here is in blocks marked "the Stag's hall".
+//
+// Without `?scene=fight` or `?scene=stag` this file does nothing.
 import type * as THREE from 'three';
 import { WAYS, type Way } from '../content/fight.ts';
 import type { Systems } from '../api.sim.ts';
 import { arenaStage } from '../fight/arena.sim.ts';
 import { createBot } from '../fight/bot.sim.ts';
-import { createFight, type Fight } from '../fight/fight.sim.ts';
+import { createFight, type Fight, type FightRecord } from '../fight/fight.sim.ts';
 import { dressArena, stampArena } from '../fightview/arena.ts';
 import { createDraw, heightOf } from '../fightview/draw.ts';
 import { createFeel } from '../fightview/feel.ts';
 import { createKeys } from '../fightview/keys.ts';
 import { createLog, type LoggedFight } from '../fightview/log.ts';
-import { createPanel } from '../fightview/panel.ui.ts';
+import { createPanel, type PanelActions } from '../fightview/panel.ui.ts';
+// The Stag's hall.
+import { HERO_STEP } from '../../features/hero/index.ts';
+import { createHall, createHallBot, type Hall } from '../fight/hall.sim.ts';
+import { hallStage } from '../fight/hall-layout.sim.ts';
+import { createHallView, dressHall, stampHall, type HallView } from '../fightview/hall.ts';
+import { createHallLine } from '../fightview/hall.ui.ts';
 import { clearSave } from '../shell/save.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
@@ -35,6 +44,8 @@ const STORE = 'lab.fight.setup';
 /** What the door hands a test. */
 interface FightDoor {
   fight: Fight;
+  /** The Stag's hall's rules, with `?scene=stag`. Null in the meadow. */
+  readonly hall: Hall | null;
   /** Lets the rule-made player fight, or hands the keys back. `layout` is the world way's: `rigs` or `wall`. */
   bot(on: boolean, layout?: 'rigs' | 'wall'): void;
   state(): Record<string, unknown>;
@@ -42,8 +53,8 @@ interface FightDoor {
   log(): readonly LoggedFight[];
   /** Which art is a stand-in right now. */
   standIns(): string[];
-  /** Where a point of the ground is on the page, for a test that clicks it. Null when it is out of view. */
-  screen(x: number, z: number): { x: number; y: number } | null;
+  /** Where a point of the ground is on the page, for a test that clicks it. Null when it is out of view. `y` puts the point at that height instead: the top of the Stag's vines. */
+  screen(x: number, z: number, y?: number): { x: number; y: number } | null;
   /** The walking keys that take the hero toward a point, with the camera as it stands: some of `KeyW`, `KeyA`, `KeyS`, `KeyD`. */
   keysToward(x: number, z: number): string[];
 }
@@ -56,7 +67,10 @@ declare global {
 
 export function install(view: GameView): void {
   const params = new URLSearchParams(location.search);
-  if (params.get('scene') !== 'fight') return;
+  // ---- the Stag's hall: its own scene name, and so its own save
+  const inHall = params.get('scene') === 'stag';
+  if (params.get('scene') !== 'fight' && !inHall) return;
+  // ---- end of the Stag's hall
   bookOf(view);
   const { game } = view;
   const sys = game.systems as Partial<Systems>;
@@ -69,7 +83,7 @@ export function install(view: GameView): void {
   // ---------------------------------------------------------------- the arena and the fight
   const middle = sys.region?.place('grant.center').at ?? game.player.pos;
   const ox = Math.floor(middle.x), oy = Math.floor(middle.y), oz = Math.floor(middle.z);
-  const stage = arenaStage(ox, oz);
+  const stage = inHall ? hallStage(ox, oz) : arenaStage(ox, oz);
   const groundY = heightOf(view);
   const log = createLog();
   let stored: { way?: Way; pet?: string; gentle?: boolean; shake?: boolean } = {};
@@ -77,23 +91,25 @@ export function install(view: GameView): void {
   const asked = WAYS.find((way) => way === params.get('way'));
   /** The fight that ended last, waiting for the calm to play out before the lab asks about it. */
   let ended: LoggedFight | null = null, askIn = 0;
+  const onEnd = (record: FightRecord): void => {
+    const logged = log.add(record);
+    // The Stag's end plays out longer: the freeze, the chains, the grey running out, the head lowered.
+    if (record.result === 'calmed') { ended = logged; askIn = record.way === 'stag' ? 6 : 2.2; }
+  };
   const fight = createFight(stage, {
-    way: asked ?? (WAYS.includes(stored.way as Way) ? stored.way : 'hero'),
+    way: inHall ? 'hero' : asked ?? (WAYS.includes(stored.way as Way) ? stored.way : 'hero'),
     pet: stored.pet,
     gentle: stored.gentle,
     external: true,
     random: () => game.random(),
-    onEnd(record) {
-      const logged = log.add(record);
-      if (record.result === 'calmed') { ended = logged; askIn = 2.2; }
-    },
+    onEnd,
   });
   const keep = (): void => {
     try { localStorage.setItem(STORE, JSON.stringify({ way: fight.way, pet: fight.pet.def.kind, gentle: fight.gentle, shake: feel.shakes })); } catch { /* it holds for this visit */ }
   };
 
   let lastKind = '';
-  const panel = createPanel(view.root, log, {
+  const actions: PanelActions = {
     setWay(way) { keys.held = null; fight.setWay(way); keep(); },
     bring(kind) { bring(kind); },
     wake() { fight.wake(); },
@@ -105,7 +121,25 @@ export function install(view: GameView): void {
     setQuality(mode) { view.settings.setQuality(mode); },
     pickRig(kind) { keys.held = kind; },
     again() { if (lastKind) bring(lastKind); },
-  });
+  };
+  // ---- the Stag's hall: the hall is fought the hero's way, has no beasts to bring, and "Again?" starts it over
+  let hall: Hall | null = null, hallView: HallView | null = null;
+  if (inHall) {
+    const hallOnly = (): void => say('The hall is its own fight. "Back to the meadow" has the beasts.');
+    actions.setWay = (way) => { if (way !== 'hero') say('The hall is fought the hero\'s way.'); };
+    actions.bring = hallOnly;
+    actions.wake = hallOnly;
+    actions.clear = () => restartHall();
+    actions.again = () => restartHall();
+  }
+  function restartHall(): void {
+    if (!hall) return;
+    hall.restart();
+    view.hero.teleport(stage.start.x, groundY(stage.start.x, stage.start.z), stage.start.z, 0);
+    fight.placeHero(stage.start.x, stage.start.z);
+  }
+  // ---- end of the Stag's hall
+  const panel = createPanel(view.root, log, actions);
   const say = (text: string): void => panel.say(text);
   const feel = createFeel(view, fight, { say, groundY, nearest: (x, z) => draw.nearest(x, z) });
   feel.shakes = stored.shake !== false;
@@ -124,6 +158,35 @@ export function install(view: GameView): void {
   // ---------------------------------------------------------------- setting up
   function setUp(): void {
     window.__game?.teleport(stage.start.x, stage.start.z);
+    // ---- the Stag's hall: stamped every time it opens, so a ramp left in the save never stands at the start
+    if (inHall) {
+      stampHall(view, ox, oy, oz);
+      sys.time?.setTimeOfDay(0.42);
+      sys.time?.setWeather('clear', true);
+      dressHall(view, ox, oy, oz);
+      hall = createHall(fight, stage as ReturnType<typeof hallStage>, { random: () => game.random(), onEnd });
+      hallView = createHallView(view, fight, hall, ox, oy, oz, feel, (hour) => sys.time?.setTimeOfDay(hour));
+      const line = createHallLine(view.root);
+      hallFrame = (dt, now) => { hallView?.frame(dt, now); if (hall) line.update(hall, hallView?.lastHit ?? null); };
+      // The hall steps right after the fight, on every step of the body the fight steps on.
+      const steer = view.hero.steer;
+      view.hero.steer = (wish, body) => {
+        const frozen = feel.freeze > 0;
+        steer?.(wish, body);
+        if (!keys.ready || frozen || !hall) return;
+        hall.step(HERO_STEP);
+        hallView?.afterStep();
+      };
+      // A hit on a target is felt as a hit on a beast is.
+      const hear = feel.hear;
+      feel.hear = (e) => { hear(e); hallView?.hear(e); };
+      view.hero.teleport(stage.start.x, oy, stage.start.z, 0);
+      fight.placeHero(stage.start.x, stage.start.z);
+      // As far out as the camera goes: the Stag is the room (research note 08, section 4: pull the camera back).
+      for (let i = 0; i < 6; i++) view.camera.zoomBy(1);
+      return;
+    }
+    // ---- end of the Stag's hall
     if (!game.flags.is(FLAG)) {
       stampArena(view, ox, oy, oz);
       sys.time?.setTimeOfDay(0.42);
@@ -142,6 +205,8 @@ export function install(view: GameView): void {
   // ---------------------------------------------------------------- one frame
   let clock = 0;
   let started = false;
+  /** The Stag's hall's drawing, once a frame. */
+  let hallFrame: ((dt: number, now: number) => void) | null = null;
   view.onFrame((dt) => {
     if (!view.started) {
       // The title holds the start. The lab goes straight in: its own save when there is one, a new game otherwise.
@@ -158,6 +223,7 @@ export function install(view: GameView): void {
     keys.aim();
     feel.frame(dt);
     draw.frame(dt, clock);
+    hallFrame?.(dt, clock);
     if (ended && (askIn -= dt) <= 0) { panel.ask(ended); ended = null; }
     panel.update(fight, keys.held, view.settings.quality, draw.beastAt);
   });
@@ -165,7 +231,8 @@ export function install(view: GameView): void {
   // ---------------------------------------------------------------- the door
   window.__fight = {
     fight,
-    bot(on, layout) { keys.bot = on ? createBot(fight, stage, { layout }) : null; },
+    bot(on, layout) { keys.bot = !on ? null : hall ? createHallBot(fight, hall) : createBot(fight, stage, { layout }); },
+    get hall() { return hall; },
     state() {
       const h = fight.hero, b = fight.beasts[0];
       return {
@@ -180,6 +247,13 @@ export function install(view: GameView): void {
         shaken: feel.shaken,
         figures: draw.figures.count,
         marks: draw.ground.count,
+        // The Stag's hall.
+        hall: hall ? {
+          phase: hall.phase, clock: hall.clock, freed: hall.freed, stag: hall.stag.doing, attack: hall.stag.attack, onRamp: hall.onRamp(),
+          pins: hall.pins.filter((p) => p.broken).length, lamps: hall.lamps.filter((l) => l.broken).length, pods: hall.pods.length,
+          collar: { open: hall.collar.open, guard: hall.collar.guard }, record: hall.record(), freedFor: hallView?.freedFor ?? -1,
+          heroY: view.playerPosition.y, floor: oy, triangles: hallView?.triangles() ?? 0,
+        } : null,
       };
     },
     log: () => log.all(),
@@ -192,8 +266,8 @@ export function install(view: GameView): void {
       if (right > 0.38) keys.push('KeyD'); else if (right < -0.38) keys.push('KeyA');
       return keys;
     },
-    screen(x, z) {
-      const at = view.project(x, groundY(x, z) + 0.4, z);
+    screen(x, z, y) {
+      const at = view.project(x, y ?? groundY(x, z) + 0.4, z);
       return at ? { x: at.x, y: at.y } : null;
     },
     standIns: () => draw.looks.standIns(),

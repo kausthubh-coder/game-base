@@ -4,6 +4,7 @@
 //   bun tools/fight-play.mjs --port 5529 --way world --beast boar --layout wall   the world way with no rigs, baiting charges into the wall
 //   bun tools/fight-play.mjs --port 5529 --way pet --beast gearling --keys        real keys and mouse only, as a person would press them
 //   bun tools/fight-play.mjs --url http://127.0.0.1:5529/ --log                   a built copy, with the page sending its fights to fight-log
+//   bun tools/fight-play.mjs --port 5529 --scene stag [--keys]                     the Verdant Stag's hall (tools/fight-play-stag.mjs)
 //
 // `--quality low`, `medium` or `high` holds a quality level (high by default). `--log` adds `&log=1`, which
 // only `tools/fight-serve.mjs` answers: it checks that the fight and its answer reached `.artifacts/fight/ratings.jsonl`.
@@ -15,6 +16,9 @@
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { launchChrome } from './lib/chrome.mjs';
+
+// `--scene stag` plays the Verdant Stag's hall instead: tools/fight-play-stag.mjs. It ends the process itself.
+if (process.argv[process.argv.indexOf('--scene') + 1] === 'stag' && process.argv.includes('--scene')) await import('./fight-play-stag.mjs');
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback) => { const i = argv.indexOf('--' + name); return i < 0 ? fallback : argv[i + 1]; };
