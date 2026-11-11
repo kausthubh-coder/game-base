@@ -49,6 +49,8 @@ interface Drawn extends Felt { figure: Figure; look: Look; x: number; z: number;
 
 /** The pips of thrown light, in the Mark's teal. Spent ones flash brighter as they go into the beast. */
 const PIP = TEAL.clone().multiplyScalar(1.35), SPENT = TEAL.clone().multiplyScalar(1.9);
+/** The snare vine's ring on the ground: its own leaf green is too close to the grass to read at the fight's zoom. */
+const VINE = TEAL.clone().setRGB(0.78, 1.05, 0.3);
 
 /** `floor` is the height of the arena's ground, where its edge is drawn. */
 export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: number, keys: Keys, feel: Feel, hooks: DrawHooks): Draw {
@@ -170,6 +172,8 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
         if (b.calm > 0) ground.draw(MARK.ring, d.x, y, d.z, 0, r + 0.7, 0.1, b.calm, TEAL, 1, 0.3);
         if (b.calm > 0 && fight.hero.act === 'calm') calming.hold(b, d, dt);
       }
+      // Held by the vine: its ring stays tight around the feet, where the beast's body hides the vine itself.
+      if (b.doing === 'held') ground.draw(MARK.ring, d.x, y, d.z, 0, r * 0.85 + 0.04 * Math.sin(clock * 23), 0.09, 1, VINE, 0.95);
       if (b.doing === 'calmed' && d.calmOn && d.calmT < CALM.end + 2) calming.moment(b, d, f.height, dt);
       pips(b, d, y + lift + f.height, clock);
     }
@@ -251,12 +255,20 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floor: nu
     } else {
       rigViews.ghost(null, 0, 0, 0, true, true);
     }
-    // A lamp's light, and the reach of the plate's hand spring.
+    // A lamp's light, the reach of the plate's hand spring, and a ring that shows where the vine lies. A vine that
+    // went off pulls its ring tight as it goes.
     for (let i = 0; i < fight.rigs.length; i++) {
-      const rig = fight.rigs[i] as (typeof fight.rigs)[number];
+      const rig = fight.rigs[i] as (typeof fight.rigs)[number], ry = groundY(rig.x, rig.z);
+      if (rig.kind === 'snare') {
+        const k = rig.armed ? 0 : Math.min(1, rig.spent / 0.5);
+        if (k < 1) {
+          ground.draw(MARK.ring, rig.x, ry, rig.z, 0, 0.62 - 0.35 * k, 0.07, 1, VINE, 0.9 * (1 - k));
+          ground.draw(MARK.circle, rig.x, ry, rig.z, 0, 0.62 - 0.35 * k, 0, 0, VINE, 0.22 * (1 - k));
+        }
+      }
       if (!rig.armed) continue;
-      if (rig.kind === 'lamp') ground.draw(MARK.circle, rig.x, groundY(rig.x, rig.z), rig.z, 0, 1.4, 0, 0, TEAL, 0.5);
-      else if (rig.kind === 'plate') ground.draw(MARK.ring, rig.x, groundY(rig.x, rig.z), rig.z, 0, RIG.hand, 0.03, 1, PALE, 0.25);
+      if (rig.kind === 'lamp') ground.draw(MARK.circle, rig.x, ry, rig.z, 0, 1.4, 0, 0, TEAL, 0.5);
+      else if (rig.kind === 'plate') ground.draw(MARK.ring, rig.x, ry, rig.z, 0, RIG.hand, 0.03, 1, PALE, 0.25);
     }
     // In the pet's way the pointer shows which beast a click would send the pet at.
     if (fight.way === 'pet') {
