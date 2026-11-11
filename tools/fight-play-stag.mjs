@@ -5,10 +5,13 @@
 //   bun tools/fight-play.mjs --scene stag --port 5529 --keys          real keys and mouse only, as a person would press them
 //   bun tools/fight-play.mjs --scene stag --url http://127.0.0.1:5529/   a built copy
 //
-// `--quality low`, `medium` or `high` holds a quality level (high by default). It takes a picture at each of the
+// `--quality low`, `medium` or `high` holds a quality level (high by default). `--size 1024x640` sets the window
+// (1440 by 900 by default). It checks the lab's card in the hall: it shows only what works there, folds when the
+// Stag wakes and opens when it is freed, and no panel covers another. It checks that a cut on a pin, a lamp, a
+// pod and the collar shows its strike frame through the freeze of the hit, with a picture of each. It takes a picture at each of the
 // camera's zoom steps once the Stag is awake, and one in each phase: the sweep coming, a pin broken, the pods
 // in the dark, the lamps lit, the climb, a shake, the freeing, the colors coming back and "Again?". It prints
-// the hall's record with the draw calls, triangles and script time it saw. Pictures go to
+// the hall's record with the draw calls, triangles and script time it saw, in all and in each phase. Pictures go to
 // `.artifacts/fight/stag-*.png`. It exits 1 on a console error, a hall not freed, or a key that did nothing.
 // This Mac's frame rate says nothing about a Chromebook, so none is printed.
 import { mkdirSync } from 'node:fs';
@@ -20,13 +23,14 @@ const opt = (name, fallback) => { const i = argv.indexOf('--' + name); return i 
 const flag = (name) => argv.includes('--' + name);
 const port = opt('port', process.env.PLAY_PORT ?? '5525');
 const quality = opt('quality', 'high'), keys = flag('keys'), limit = Number(opt('limit', 360));
+const [width, height] = opt('size', '1440x900').split('x').map(Number);
 const base = opt('url', `http://localhost:${port}/`);
-const name = opt('name', `stag${keys ? '-keys' : ''}${quality !== 'high' ? '-' + quality : ''}`);
+const name = opt('name', `stag${keys ? '-keys' : ''}${quality !== 'high' ? '-' + quality : ''}${width !== 1440 ? `-${width}` : ''}`);
 const out = resolve(import.meta.dirname, '..', '.artifacts/fight');
 mkdirSync(out, { recursive: true });
 
 const browser = await launchChrome({ headless: true, args: ['--autoplay-policy=no-user-gesture-required'] });
-const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+const page = await (await browser.newContext({ viewport: { width, height } })).newPage();
 const errors = [], failed = [];
 page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push(String(e)));
@@ -51,12 +55,82 @@ check('the hall opened with the Stag asleep and the camera at its furthest step'
 await sleep(600);
 await shot('start');
 
+// ---------------------------------------------------------------- the card in the hall
+const folded = () => page.evaluate(() => document.querySelector('.fl-card').classList.contains('is-small'));
+const shown = (text) => page.locator('.fl-card button').getByText(text, { exact: true }).isVisible().catch(() => false);
+const offHall = [];
+for (const text of ['Hero', 'Pet', 'World', 'Thistlehog', 'Gearling', 'Boar', 'Wake it', 'Take it away']) if (await shown(text)) offHall.push(text);
+check(`the card shows only what works in the hall: "Start over" and "Back to the meadow"${offHall.length ? `, not ${offHall.join(', ')}` : ''}`, offHall.length === 0 && (await shown('Start over')) && (await shown('Back to the meadow')));
+check('the game\'s movement hint is hidden', await page.evaluate(() => ![...document.querySelectorAll('.gu-hint')].some((e) => e.offsetParent !== null)));
+/** No two of the lab's panels overlap, nor the minimap and clock in the top right corner. */
+async function apart(when) {
+  const boxes = await page.evaluate(() => {
+    const out = [];
+    for (const [what, sel] of [['card', '.fl-card'], ['bars', '.fl-hud'], ['hall line', '.fl-hall'], ['"Again?"', '.fl-again']]) {
+      const e = document.querySelector(sel);
+      if (!e || e.hidden || e.offsetParent === null) continue;
+      const r = e.getBoundingClientRect();
+      out.push({ what, l: r.left, t: r.top, r: r.right, b: r.bottom });
+    }
+    // The minimap and the clock: 232 pixels of the top right corner, 248 tall.
+    out.push({ what: 'minimap', l: innerWidth - 232, t: 0, r: innerWidth, b: 248 });
+    return out;
+  });
+  const crossed = [];
+  for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+    const a = boxes[i], b = boxes[j];
+    if (a.l < b.r - 1 && b.l < a.r - 1 && a.t < b.b - 1 && b.t < a.b - 1) crossed.push(`${a.what} and ${b.what}`);
+  }
+  check(`${when}, at ${width} by ${height}, no panel covers another${crossed.length ? `: ${crossed.join('; ')}` : ''}`, crossed.length === 0);
+}
+await apart('before the fight');
+
+// ---------------------------------------------------------------- a cut on each kind of target
+// The page notes every hit on a target the frame it happens: the hero's act, its seconds and the freeze. The
+// first cut on each kind holds the rules still a moment for a picture of the strike frame.
+await page.evaluate(() => {
+  const last = new Map();
+  window.__hits = [];
+  window.__held = null;
+  const kinds = new Set();
+  const watch = () => {
+    for (const t of window.__fight.fight.targets) {
+      const before = last.get(t.id);
+      last.set(t.id, t.guard);
+      if (before === undefined || t.guard >= before) continue;
+      const s = window.__fight.state(), kind = t.name.replace(/\d+$/, '');
+      // The pet strikes targets too: a hit from its strike, which has just begun, is not the hero's cut.
+      const pet = window.__fight.fight.pet.strikeT;
+      if (pet > 0 && pet < 0.05) continue;
+      window.__hits.push({ kind, act: s.hero.act, t: s.hero.t, freeze: s.freeze });
+      if (s.hero.act === 'cut' && !kinds.has(kind) && window.__held === null) { kinds.add(kind); window.__held = kind; window.__fight.hold(true); }
+    }
+    requestAnimationFrame(watch);
+  };
+  watch();
+});
+async function strikeShots() {
+  const held = await page.evaluate(() => window.__held);
+  if (!held) return;
+  await shot(`strike-${held}`);
+  await page.evaluate(() => { window.__held = null; window.__fight.hold(false); });
+}
+
 // ---------------------------------------------------------------- the measure
 let settledAt = Infinity;
 const seen = { drawCalls: 0, triangles: 0, scriptMs: 0, simMs: 0, samples: 0, scriptSum: 0 };
+/** The same in each phase, and once the Stag is freed. */
+const byPhase = {};
 async function sample() {
   if (Date.now() < settledAt) return;
   const c = await page.evaluate(() => window.__game.counters());
+  const key = s.hall?.freed ? 'freed' : (['chains', 'overgrowth', 'collar'][s.hall?.phase ?? 0]);
+  const p = (byPhase[key] ??= { drawCalls: 0, triangles: 0, scriptMs: 0, scriptSum: 0, samples: 0 });
+  p.drawCalls = Math.max(p.drawCalls, c.drawCalls);
+  p.triangles = Math.max(p.triangles, c.triangles);
+  p.scriptMs = Math.max(p.scriptMs, c.scriptMs);
+  p.scriptSum += c.scriptMs;
+  p.samples++;
   seen.drawCalls = Math.max(seen.drawCalls, c.drawCalls);
   if (c.triangles > seen.triangles) seen.most = `${s.hall?.freed ? 'freed' : `phase ${(s.hall?.phase ?? 0) + 1}`}, the hero at ${s.hero.x.toFixed(0)}, ${s.hero.z.toFixed(0)}`;
   seen.own = Math.max(seen.own ?? 0, s.hall?.triangles ?? 0);
@@ -68,9 +142,12 @@ async function sample() {
 }
 
 /** The pictures of each phase, taken as the hall gets there. */
+let foldChecked = false;
 async function phaseShots() {
   const h = s.hall;
   if (!h) return;
+  await strikeShots();
+  if (!foldChecked && h.stag !== 'asleep' && !h.freed) { foldChecked = true; await sleep(150); check('the card folded itself when the Stag woke', await folded()); }
   if (h.freed) {
     if (h.freedFor > 0) await shotOnce('freed');
     if (h.freedFor > 2.6) await shotOnce('colors-return');
@@ -241,12 +318,25 @@ if (!keys) {
 
 s = await state();
 check('the Stag was freed', s.hall.freed && s.hall.record.result === 'calmed');
+check('the card opened again when the Stag was freed', !(await folded()));
+const hits = await page.evaluate(() => window.__hits);
+for (const kind of ['pin', 'lamp', 'pod', 'collar']) {
+  const cuts = hits.filter((h) => h.kind === kind && h.act === 'cut');
+  // The strike frame shows from the step the cut lands (0.1 s in) through the freeze, which holds the cut's clock.
+  const timed = cuts.filter((h) => Math.abs(h.t - 0.1) < 0.02 && h.freeze > 0);
+  if (kind === 'pod' && cuts.length === 0) { console.log('note no cut landed on a pod in this run'); continue; }
+  check(`a cut on a ${kind} landed on its strike frame with the freeze of a hit (${timed.length} of ${cuts.length})`, cuts.length > 0 && timed.length === cuts.length);
+  for (const h of cuts) if (!timed.includes(h)) console.log(`     off: the cut ${h.t.toFixed(3)} s in, freeze ${h.freeze.toFixed(3)} s`);
+}
 await page.waitForSelector('.fl-again:not([hidden])', { timeout: 12000 }).catch(() => undefined);
 await sleep(300);
 await shot('again');
 const asked = await page.locator('.fl-again:not([hidden])').count();
 check('the lab asked "Again?"', asked === 1);
 if (asked) {
+  const words = await page.locator('.fl-again p').first().innerText();
+  check(`"Again?" says the Stag was freed: "${words.split('.')[0]}"`, /freed/.test(words) && !/calmed/.test(words));
+  await apart('with "Again?" open');
   await page.click('.fl-rate button:nth-child(4)');
   const log = await page.evaluate(() => window.__fight.log());
   check('the answer was kept with the hall, under the way "stag"', log.length === 1 && log[0].again === 4 && log[0].way === 'stag' && log[0].result === 'calmed' && log[0].boss?.phases.length === 3);
@@ -267,6 +357,7 @@ console.log('\nrecord:', JSON.stringify({
 }));
 console.log(`drawn at quality ${game.quality} on ${browser.gameRenderer}, once settled: at most ${seen.drawCalls} draw calls, ${seen.triangles} triangles, script ${(seen.scriptSum / Math.max(1, seen.samples)).toFixed(2)} ms a frame on average and ${seen.scriptMs.toFixed(2)} ms in the worst 2 seconds, ${seen.simMs.toFixed(2)} ms of rules, over ${seen.samples} samples. The most triangles: ${seen.most}. Of them the hall's own meshes, with their shadows, draw at most ${seen.own}.`);
 console.log(`at each zoom step, once: ${byZoom.join('; ')}`);
+for (const [key, p] of Object.entries(byPhase)) console.log(`  ${key}: at most ${p.drawCalls} draw calls, ${p.triangles} triangles, script ${(p.scriptSum / Math.max(1, p.samples)).toFixed(2)} ms a frame on average and ${p.scriptMs.toFixed(2)} ms in the worst 2 seconds, over ${p.samples} samples`);
 console.log(`pictures: ${out}/${name}-*.png`);
 await browser.close();
 console.log(errors.length ? 'console errors:\n' + errors.join('\n') : 'no console errors');

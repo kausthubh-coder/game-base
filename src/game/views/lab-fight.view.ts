@@ -291,7 +291,7 @@ export function install(view: GameView): void {
       const h = fight.hero, b = fight.beasts[0];
       return {
         way: fight.way, phase: fight.phase, clock: fight.clock, gentle: fight.gentle,
-        hero: { x: h.x, z: h.z, health: h.health, stamina: h.stamina, act: h.act },
+        hero: { x: h.x, z: h.z, health: h.health, stamina: h.stamina, act: h.act, t: h.t },
         pet: { kind: fight.pet.def.kind, mode: fight.pet.mode, hearts: fight.pet.hearts, x: fight.pet.x, z: fight.pet.z },
         beast: b ? { kind: b.def.kind, doing: b.doing, guard: b.guard, x: b.x, z: b.z, calm: b.calm, marks: b.marks, moment: draw.momentOf(b) } : null,
         rigs: fight.rigs.map((r) => ({ kind: r.kind, x: r.x, z: r.z, armed: r.armed })),
@@ -299,6 +299,7 @@ export function install(view: GameView): void {
         record: { ...fight.record },
         held: keys.held,
         shaken: feel.shaken,
+        freeze: feel.freeze,
         figures: draw.figures.count,
         marks: draw.ground.count,
         // The Stag's hall.
