@@ -13,4 +13,6 @@ for (const name of ['pell','corin','hesper','dunn','isolde','nessa','roan','pip'
 storySprites.thistlehog={size:96,anchor:[48,88],height:68,worldHeight:1.27,cols:4,rows:6,animations:{idle:{frames:2,fps:4,rows:{front:0,back:1,side:2}},walk:{frames:4,fps:10,rows:{front:3,back:4,side:5}}}};
 storySprites.gearling={size:96,anchor:[48,88],height:68,worldHeight:1.55,cols:4,rows:6,animations:{idle:{frames:2,fps:4,rows:{front:0,back:1,side:2}},walk:{frames:4,fps:10,rows:{front:3,back:4,side:5}}}};
 storySprites['thistlehog-fight']={size:96,anchor:[48,88],height:74,worldHeight:1.27,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
+storySprites.boar={size:192,anchor:[96,176],height:150,worldHeight:3.63,cols:4,rows:6,animations:{idle:{frames:2,fps:4,rows:{front:0,back:1,side:2}},walk:{frames:4,fps:10,rows:{front:3,back:4,side:5}}}};
 storySprites['gearling-fight']={size:96,anchor:[48,88],height:68,worldHeight:1.55,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};
+storySprites['boar-fight']={size:192,anchor:[96,176],height:150,worldHeight:3.63,cols:4,rows:3,animations:{poses:{frames:4,fps:1,rows:{front:0,back:1,side:2}}}};

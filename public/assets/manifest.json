@@ -843,6 +843,38 @@
         }
       }
     },
+    "boar": {
+      "sheet": "sprites/boar.png",
+      "frame": [
+        192,
+        192
+      ],
+      "anchor": [
+        96,
+        176
+      ],
+      "worldHeight": 3.63,
+      "animations": {
+        "idle": {
+          "frames": 2,
+          "fps": 4,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        },
+        "walk": {
+          "frames": 4,
+          "fps": 10,
+          "rows": {
+            "front": 3,
+            "back": 4,
+            "side": 5
+          }
+        }
+      }
+    },
     "gearling-fight": {
       "sheet": "sprites/gearling-fight.png",
       "frame": [
@@ -854,6 +886,29 @@
         88
       ],
       "worldHeight": 1.55,
+      "animations": {
+        "poses": {
+          "frames": 4,
+          "fps": 1,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        }
+      }
+    },
+    "boar-fight": {
+      "sheet": "sprites/boar-fight.png",
+      "frame": [
+        192,
+        192
+      ],
+      "anchor": [
+        96,
+        176
+      ],
+      "worldHeight": 3.63,
       "animations": {
         "poses": {
           "frames": 4,
