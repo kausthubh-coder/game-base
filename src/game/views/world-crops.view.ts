@@ -11,8 +11,8 @@ import { PLANT_STRIDE, WET_STRIDE, createCropMeshes } from '../worldview/crop-me
 
 /** The patch floats this far above the soil's top. */
 const WET_LIFT = 0.012;
-/** One use of the can wets soil for this long. Only bare soil is timed here: a crop says how wet its own soil is. */
-const WATER_SECONDS = 180;
+/** The wet patches are read again at least this often, in frames. */
+const WET_EVERY = 20;
 /** A plant looks at the light around it again this often, in frames. */
 const LIGHT_EVERY = 45;
 const NEVER = -1000;
@@ -54,40 +54,14 @@ export function install(view: GameView): void {
   // What each slot showed last frame.
   let room = 64;
   let seenAt = new Int32Array(room * 3), seenStage = new Int16Array(room);
-  /** Seconds of water each slot's soil had. */
-  let seenWet = new Float32Array(room);
   let drawn = 0, wetCount = 0, frames = 0;
 
-  /** Wet soil with no crop on it. The crops system does not list it, so it is followed from `crop.watered`. */
-  const bare: { x: number; y: number; z: number; until: number }[] = [];
-  let bareChanged = false, nextDry = Infinity;
-
-  game.events.on('crop.watered', ({ x, y, z }) => {
-    const until = game.clock.seconds + WATER_SECONDS;
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dz = -1; dz <= 1; dz++) {
-        if (sim.getBlock(x + dx, y, z + dz) !== tilled) continue;
-        const known = bare.find((spot) => spot.x === x + dx && spot.y === y && spot.z === z + dz);
-        if (known) known.until = until;
-        else bare.push({ x: x + dx, y, z: z + dz, until });
-      }
-    }
-    bareChanged = true;
-  });
-  // The soil is dry in the morning.
-  game.events.on('slept', () => { bare.length = 0; bareChanged = true; });
-  game.events.on('crop.planted', () => { bareChanged = true; });
-  // A harvest leaves the soil as wet as it was. The crop is already gone, so its last frame says how wet.
-  game.events.on('crop.harvested', ({ x, y, z }) => {
-    for (let i = 0; i < drawn; i++) {
-      if (seenAt[i * 3] !== x || seenAt[i * 3 + 1] !== y || seenAt[i * 3 + 2] !== z) continue;
-      if (seenWet[i] > 0) bare.push({ x, y, z, until: game.clock.seconds + seenWet[i] });
-      break;
-    }
-    bareChanged = true;
-  });
-  game.events.on('block.broken', () => { bareChanged = true; });
-  game.events.on('block.placed', () => { bareChanged = true; });
+  // Wet soil is drawn from the crops system's own list, crop or no crop. Nothing tells a view that soil dried
+  // or that rain or a sprinkler wet it, so the list is counted every frame and read again when the count
+  // changes, when something that wets or dries soil was heard, and a few times a second besides.
+  let wetStale = true, wetSeen = -1;
+  const stale = (): void => { wetStale = true; };
+  for (const name of ['crop.watered', 'sprinkler.ran', 'build.applied', 'slept', 'crop.planted', 'crop.harvested', 'block.broken', 'block.placed'] as const) game.events.on(name, stale);
 
   function writeLight(row: number, x: number, y: number, z: number): boolean {
     const data = meshes.plantData;
@@ -105,20 +79,23 @@ export function install(view: GameView): void {
     const now = view.settings.graphics.reduceMotion ? 0 : view.ctx.time;
     if (count > room) {
       while (room < count) room *= 2;
-      const at = new Int32Array(room * 3), stage = new Int16Array(room), wet = new Float32Array(room);
-      at.set(seenAt); stage.set(seenStage); wet.set(seenWet);
-      seenAt = at; seenStage = stage; seenWet = wet;
+      const at = new Int32Array(room * 3), stage = new Int16Array(room);
+      at.set(seenAt); stage.set(seenStage);
+      seenAt = at; seenStage = stage;
     }
-    meshes.reserve(count, count + bare.length);
+    const soil = crops?.soil?.();
+    let wetNow = 0;
+    for (let i = 0; soil && i < soil.length; i++) if (soil[i].wet > 0) wetNow++;
+    meshes.reserve(count, wetNow);
     const data = meshes.plantData;
     const lightPass = ++frames % LIGHT_EVERY === 0;
-    let plantsChanged = false, wetChanged = bareChanged || count !== drawn || game.clock.seconds >= nextDry;
+    let plantsChanged = false;
+    const wetChanged = wetStale || wetNow !== wetSeen || frames % WET_EVERY === 0;
 
     for (let i = 0; list && i < count; i++) {
       const crop = list[i], state = crop.state;
       const row = i * PLANT_STRIDE;
       const same = i < drawn && seenAt[i * 3] === crop.x && seenAt[i * 3 + 1] === crop.y && seenAt[i * 3 + 2] === crop.z;
-      if (!same || (seenWet[i] > 0) !== (state.wet > 0)) wetChanged = true;
       if (!same || seenStage[i] !== state.stage) {
         const cells = tilesOf(state.crop);
         const stage = Math.min(Math.max(state.stage, 0), cells.length / 2 - 1);
@@ -134,32 +111,21 @@ export function install(view: GameView): void {
       }
       seenAt[i * 3] = crop.x; seenAt[i * 3 + 1] = crop.y; seenAt[i * 3 + 2] = crop.z;
       seenStage[i] = state.stage;
-      seenWet[i] = state.wet;
     }
     drawn = count;
 
     if (wetChanged) {
       const spots = meshes.wetData;
       wetCount = 0;
-      nextDry = Infinity;
-      for (let i = 0; list && i < count; i++) {
-        const crop = list[i];
-        if (crop.state.wet <= 0) continue;
-        spots[wetCount * WET_STRIDE] = crop.x + 0.5; spots[wetCount * WET_STRIDE + 1] = crop.y + 1 + WET_LIFT; spots[wetCount * WET_STRIDE + 2] = crop.z + 0.5;
-        wetCount++;
-      }
-      for (let i = bare.length - 1; i >= 0; i--) {
-        const spot = bare[i];
-        // Dry again, dug up, or planted: a crop's own soil is drawn from the crop.
-        if (spot.until <= game.clock.seconds || sim.getBlock(spot.x, spot.y, spot.z) !== tilled || crops?.at(spot.x, spot.y, spot.z)) {
-          bare.splice(i, 1);
-          continue;
-        }
+      for (let i = 0; soil && i < soil.length; i++) {
+        const spot = soil[i];
+        // Soil that was dug up or built over since dries by itself within a step.
+        if (spot.wet <= 0 || sim.getBlock(spot.x, spot.y, spot.z) !== tilled) continue;
         spots[wetCount * WET_STRIDE] = spot.x + 0.5; spots[wetCount * WET_STRIDE + 1] = spot.y + 1 + WET_LIFT; spots[wetCount * WET_STRIDE + 2] = spot.z + 0.5;
         wetCount++;
-        if (spot.until < nextDry) nextDry = spot.until;
       }
-      bareChanged = false;
+      wetStale = false;
+      wetSeen = wetNow;
     }
 
     meshes.commit(count, wetCount, plantsChanged, wetChanged);

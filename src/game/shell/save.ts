@@ -3,7 +3,9 @@
 import type { WorldSave } from '../../features/world/index.ts';
 import type { GameSave } from '../kernel.sim.ts';
 
-export const SAVE_KEY = 'greenhollow.save';
+/** A test scene (`?scene=build` in the address) keeps its own save, so trying things there never touches the real game's. */
+const scene = typeof location === 'undefined' ? null : new URLSearchParams(location.search).get('scene');
+export const SAVE_KEY = scene ? `greenhollow.save.${scene}` : 'greenhollow.save';
 /** What the page should do straight after it reloads: a game already in progress cannot be reset in place. */
 const AFTER_RELOAD_KEY = 'greenhollow.after-reload';
 

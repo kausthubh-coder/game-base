@@ -378,8 +378,10 @@ export interface CropsApi {
   // ---- added for build mode. Each is optional so that a fake without it still fits. The real system always has them.
   /** Wets this one soil block and sends nothing. False when it is not tilled soil. */
   wet?(x: number, y: number, z: number): boolean;
-  /** Pulls the crop out of this soil block and puts its seed back in the bag. False when nothing grows there. */
+  /** Pulls the crop out of this soil block and puts its seed back in the bag. False when nothing grows there, or the seed has no room. */
   pull?(x: number, y: number, z: number): boolean;
+  /** Every soil block that is wet or planted, with the seconds of water it has left. The same array and objects on every call. */
+  soil?(): readonly { readonly x: number; readonly y: number; readonly z: number; readonly wet: number }[];
 }
 
 // ---------------------------------------------------------------------------------------- building

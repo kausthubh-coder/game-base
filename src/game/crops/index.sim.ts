@@ -180,6 +180,8 @@ export function createCrops(game: Game): Crops {
     at: (x, y, z) => soils.get(keyOf(x, y, z))?.crop?.state ?? null,
     all: () => planted,
 
+    soil: () => soilList,
+
     wet(x, y, z) {
       if (world.getBlock(x, y, z) !== TILLED) return false;
       wetSoil(x, y, z);

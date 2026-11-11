@@ -41,7 +41,7 @@ export function install(view: GameView): void {
   view.onFrame(() => {
     const aim = view.aim;
     const game = view.game;
-    outline.visible = aim !== null && view.started && !view.paused && !game.player.busy;
+    outline.visible = aim !== null && view.started && !view.paused && !game.player.busy && !view.claimed('use');
     if (!aim || !outline.visible) return;
     const held = game.systems.inventory?.held() ?? null;
     const axe = held !== null && game.systems.items.get(held.id).tool?.kind === 'axe';

@@ -76,7 +76,8 @@ export function install(view: GameView): void {
     const held = sys.inventory?.held()?.id ?? null;
     if (held !== heldId) hold(held);
     ghost.visible = false;
-    if (!aim || !view.started || view.paused || p.busy || (blockId < 0 && plannedKind === null)) return;
+    // Build mode draws its own picture of what a stroke would do.
+    if (!aim || !view.started || view.paused || p.busy || view.claimed('use') || (blockId < 0 && plannedKind === null)) return;
     if (!(aim.nx || aim.ny || aim.nz)) return;
     const x = aim.x + aim.nx, y = aim.y + aim.ny, z = aim.z + aim.nz;
 

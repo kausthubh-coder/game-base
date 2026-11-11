@@ -90,7 +90,7 @@ export const PROPS = {
   awning: { name: 'Awning', group: 'town', builder: 'awning', variants: ['teal', 'red'], triangles: 80, wind: true, light: 0, vary: SNUG },
   stall: { name: 'Market stall', group: 'town', builder: 'stall', variants: ['produce', 'bread', 'cloth'], triangles: 240, ...still, vary: SNUG },
   well: { name: 'Well', group: 'town', builder: 'well', variants: ['roofed'], triangles: 200, ...still, vary: SNUG },
-  fence: { name: 'Fence', group: 'town', builder: 'fence', variants: ['run', 'post'], triangles: 40, ...still, vary: SNUG },
+  fence: { name: 'Fence', group: 'town', builder: 'fence', variants: ['run', 'post', 'rails'], triangles: 40, ...still, vary: SNUG },
   gate: { name: 'Gate', group: 'town', builder: 'gate', variants: ['closed', 'open'], triangles: 90, ...still, vary: SNUG },
   lampPost: { name: 'Lamp post', group: 'town', builder: 'lampPost', variants: ['standing'], triangles: 150, wind: false, light: 14, vary: SNUG },
   signpost: { name: 'Signpost', group: 'town', builder: 'signpost', variants: ['two ways', 'three ways'], triangles: 140, ...still, vary: SNUG },
