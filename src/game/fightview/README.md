@@ -31,7 +31,7 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 - A fighter is drawn from the sheet named after it when the manifest has one, and from its stand-in otherwise. `window.__fight.standIns()` lists the stand-ins in use. The names the lab asks for are in `docs/fight-lab.md`.
 - Shapes on the ground are gold while they fill, hot orange for the last quarter second, and white as they land. A charge that will crash shows a pale ring where it ends.
 - Teal is the player's magic: the Mark's ring, thrown light, the pet's orders and skills. Grey is a drained beast; its colors come back from the head down when it is calmed. A machine goes dark instead.
-- Every view part works at low, medium and high quality. Nothing is made per frame in the draw path.
+- Every view part works at low, medium and high quality. The draw path makes no mesh, material, color or vector per frame; a few small iterators and closures remain.
 
 ## The door
 
