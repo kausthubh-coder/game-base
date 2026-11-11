@@ -2,6 +2,7 @@
 // manifest names as `voice.lines`) and the clips it lists. A conversation's clips are fetched when it starts,
 // and each one is decoded by the sound engine the first time it is wanted. Nothing here calls ElevenLabs: the
 // clips are files made ahead of time.
+import { afterFirstFrame } from '../../features/assets/cache.ts';
 import type { AudioSystem } from '../../features/audio/index.ts';
 
 /** One voiced line, as the list gives it. */
@@ -67,6 +68,7 @@ export function createSpokenLines(baseUrl: string): SpokenLines {
   let buffers = new Map<string, Promise<AudioBuffer | null>>();
 
   const ready = (async () => {
+    await afterFirstFrame;
     try {
       const assets = await (await fetch(baseUrl + 'manifest.json')).json();
       const file = assets?.voice?.lines;
