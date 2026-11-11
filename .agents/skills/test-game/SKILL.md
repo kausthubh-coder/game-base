@@ -12,7 +12,7 @@ Pick the cheapest check that can fail for the thing you care about. Then see it 
 | A rule: farming, crafting, building, quests, pets | A scenario: a seed, inputs as data, what must be true | `src/game/scenarios/<name>.sim.ts`, listed in `all.sim.ts` | `bun tools/sim.ts scenarios <name>` |
 | Something that must hold always (no count below zero, nothing floating) | An invariant the bots check after every step | `src/game/play/invariants.sim.ts` | `bun tools/sim.ts bot --seed 1,2,3 --steps 100000` |
 | One function's answers | A unit test beside the code | `<file>.test.ts` | `bun test <path>` |
-| What a player hits in a browser: a prompt, a panel, a drag | A recording in human mode, real keys and clicks only | `tools/play/scenarios/<name>.json` | `bun tools/play.mjs replay <file>` |
+| What a player hits in a browser: a prompt, a panel, a drag | A recording in human mode, real keys and clicks only. `see` and `gone` assert on what the screen shows, `check` on the state. | `tools/play/scenarios/<name>.json` | `bun tools/play.mjs replay <file>`, or `replay all` |
 | How a place looks, and its draw calls and triangles | A scene with an approved picture | `tools/shots/scenes.json`, `docs/shots/approved/` | `bun tools/shots.mjs <scene> --check` |
 | Two players in one world | A step in the two-browser check | `tools/play-together.mjs` | `bun tools/play-together.mjs` |
 | Sign-in, the invite link, the live database | A step in the signed-in check | `tools/play-together-signed-in.mjs` | `bun tools/play-together-signed-in.mjs` |
@@ -21,6 +21,8 @@ Pick the cheapest check that can fail for the thing you care about. Then see it 
 | Every order of events in a small design | A model | The `formal-game` skill | |
 
 `src/game/scenarios/README.md` has the scenario inputs. `tools/play/README.md` has the browser inputs.
+
+A check finds only what it asserts. To find what nobody asserted (how it looks, what a new player misses), play it with the `playtest-game` skill, then turn each bug it finds into a check from this table. `docs/testing.md` says how scripts, playtests and models fit together.
 
 ## Rules for a check
 

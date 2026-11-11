@@ -30,7 +30,7 @@ Data first, then rules, then the picture. Each part has one home, and a check fa
 
 1. Write the data and the rule, with a scenario that plays it (`test-game` skill). Run `bun tools/sim.ts scenarios`.
 2. Draw it. Reach it in a browser through the door and look at the screenshot yourself (`verify-game` skill).
-3. Play it like a person once, with real keys.
+3. Play it like a person once, with real keys, and look at the pictures (`playtest-game` skill).
 4. `bun run verify` before you say done. A task that changes what a player sees ends with a before and after picture in `.artifacts/<feature>/`.
 
 A design question that is Kausthubh's taste (a new look, a new mechanic, a name) is shown to him as two options before one is built.

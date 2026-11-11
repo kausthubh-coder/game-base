@@ -31,7 +31,7 @@ Each part prints `pass`, `skip` or `FAIL`. A failed part names its log in `.arti
 
 1. **Rules only**, no browser, thousands of steps a second: `bun tools/sim.ts`. Start here for anything the rules decide.
 2. **The door**, a browser driven through `window.__game`: jumps to any point of the game in one call. Use it to reach the thing you changed.
-3. **Like a person**, real keys and clicks only: use it for what a player would hit, such as a prompt that never shows.
+3. **Like a person**, real keys and clicks only, looking at every picture: the `playtest-game` skill. Use it for anything a player sees, since no script notices a marker drawn over the quick slots.
 
 `features/README.md` lists what to drive for each part of the game.
 

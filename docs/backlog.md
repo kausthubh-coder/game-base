@@ -43,7 +43,8 @@ Written 2026-11-11. Take a row off when it is merged.
 | Task | Where to read first | Notes |
 |---|---|---|
 | Apply Biome's formatter | `biome.json` | 664 files change. Do it when few branches are open |
-| A night playtester on a schedule | `docs/ai-native.md`, step 7 | Bots with new seeds, a human-mode play, bug files |
+| A night playtester on a schedule | `docs/ai-native.md`, step 7; the `playtest-game` skill | Bots with new seeds, one charter from `docs/playtests/README.md`, bug files |
+| Model the save, the bag and an invite | The `formal-game` skill | One model each, in that order |
 | Content views and change cards in the handbook app | `docs/ai-native.md`, "The workbench" | The app is in `~/dev/sandbox/game-look-test/handbook` |
 | One shots tool for the forty one-scene scripts | `docs/shots/README.md` | Sol |
 | The painted-texture loader reads the manifest | `tools/asset-build.mjs` | The build patches one line of the loader today |

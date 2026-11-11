@@ -10,6 +10,7 @@ Read before a large change:
 | When the change touches | Read |
 |---|---|
 | How agents build, play and check the game | `docs/ai-native.md` |
+| How the three ways of testing fit: scripts, playtests, models | `docs/testing.md` |
 | Hosting, accounts, the world server, graphics levels, the bake step | `docs/architecture.md` |
 | Frame rate or load time on a weak device | `docs/fast-everywhere.md` |
 | The look of the world | `docs/painted-world.md` |
@@ -29,8 +30,9 @@ They are in `.agents/skills`. Load the one that fits before you start.
 | A new worktree, or packages, keys or a port look wrong | `worktree-game` |
 | Build or change a rule, a system, something drawn, a panel | `make-feature` |
 | Add a check, test something, or a bug was reported | `test-game` |
+| Play like a person to find what scripts miss: bugs, polish, how it looks and feels | `playtest-game` |
 | Prove a change works before saying done | `verify-game` |
-| A rule where the order of events is the risk, or "model-check this" | `formal-game`, and `verify-build-stroke` for build mode |
+| A rule where the order of events is the risk, or "model-check this" | `formal-game`, then `verify-build-stroke` for build mode, `verify-world-join` for joining and leaving a world |
 | A menu, a panel, the HUD, dialogue, the map, or how any of it looks | `make-ui` |
 | A 3D prop, or a sprite, icon, portrait or tile | `make-3d-asset`, `make-sprite`, then `verify-assets` |
 | An art style behind `?style=` | `verify-style-lab` |
@@ -46,7 +48,7 @@ What to build next, one line a task: `docs/backlog.md`.
 | `bun run verify` | Every check there is, about two minutes. `--full` adds the slow browser plays, `--list` names the parts. |
 | `bun run lint` | Biome lint. The formatter is not applied to the code yet. |
 | `bun tools/sim.ts scenarios` | Plays the rules with no browser. Also `bot --seed <n> --steps <n>` and `--replay <seed> --until <step>`. |
-| `bun tools/play.mjs start` | One Chrome for this worktree to play in, through the debug door or like a person (`tools/play/README.md`) |
+| `bun tools/play.mjs start` | One Chrome for this worktree to play in, through the debug door or like a person, with `act`, `look`, `film` and `note` to see and report (`tools/play/README.md`) |
 | `bun tools/shots.mjs all --check` | Six scenes against their approved pictures and the draw budgets (`docs/shots/README.md`) |
 | `bun tools/shot.mjs <url> <out.png>` | One screenshot in headless Chrome. Exits 1 on a console error. |
 | `bun run dev` | The game itself, on port 5300 in the main checkout |
