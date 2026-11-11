@@ -21,6 +21,8 @@ const STYLE = /* css */ `
   box-shadow: var(--glass-shadow, none); font-size: 15px; font-weight: 500; pointer-events: auto; z-index: 30; }
 .ol-notice[hidden] { display: none; }
 .ol-notice-text { padding: 6px 0; text-wrap: pretty; }
+/* The notice is glass with light words; a plain button on it keeps the paper's dark words. */
+.ol-notice .gu-btn:not(.gu-primary) { color: var(--ink, #3a3128); }
 .ol-notice:not(:has(button)) { padding-right: var(--s4, 16px); }
 `;
 
