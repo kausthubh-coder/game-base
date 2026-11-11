@@ -819,9 +819,10 @@ async function worldTitle(browser) {
 
 let browser;
 try {
-  // Give the typewriter time to reveal letters between browser observations on Metal.
+  // Metal misses the fixed-frame typewriter sample; command delays also break click-to-move.
+  // Preserve software for this existing scenario until its input timing checks are rewritten.
   browser = await launchChrome({
-    slowMo: 100,
+    software: true,
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
