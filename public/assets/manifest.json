@@ -1623,5 +1623,84 @@
       "cloud-5": "painted/cloud-5.webp",
       "cloud-6": "painted/cloud-6.webp"
     }
+  },
+  "uikit": {
+    "lazy": true,
+    "images": {
+      "panel": "ui/kit/panel.png",
+      "panel-dark": "ui/kit/panel-dark.png",
+      "divider": "ui/kit/divider.png",
+      "button": "ui/kit/button.png",
+      "button-light": "ui/kit/button-light.png",
+      "button-gold": "ui/kit/button-gold.png",
+      "close": "ui/kit/close.png",
+      "back": "ui/kit/back.png",
+      "slot": "ui/kit/slot.png",
+      "slot-hover": "ui/kit/slot-hover.png",
+      "slot-selected": "ui/kit/slot-selected.png",
+      "card": "ui/kit/card.png",
+      "card-rare": "ui/kit/card-rare.png",
+      "card-epic": "ui/kit/card-epic.png",
+      "minimap-ring": "ui/kit/minimap-ring.png",
+      "dial": "ui/kit/dial.png",
+      "name-plate": "ui/kit/name-plate.png",
+      "hint": "ui/kit/hint.png",
+      "stars": "ui/kit/stars.png",
+      "tooltip": "ui/kit/tooltip.png"
+    },
+    "tabs": {
+      "tile": 96,
+      "sheet": "ui/kit/tabs.png",
+      "names": {
+        "bag": [
+          0,
+          0
+        ],
+        "make": [
+          1,
+          0
+        ],
+        "almanac": [
+          2,
+          0
+        ],
+        "quests": [
+          3,
+          0
+        ],
+        "map": [
+          0,
+          1
+        ],
+        "settings": [
+          1,
+          1
+        ],
+        "account": [
+          2,
+          1
+        ],
+        "resume": [
+          3,
+          1
+        ],
+        "save-quit": [
+          0,
+          2
+        ],
+        "sun": [
+          1,
+          2
+        ],
+        "moon": [
+          2,
+          2
+        ],
+        "diamond": [
+          3,
+          2
+        ]
+      }
+    }
   }
 }
