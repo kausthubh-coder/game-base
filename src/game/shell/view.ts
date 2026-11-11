@@ -205,6 +205,11 @@ export interface GameView {
   groundAt(x: number, z: number): number;
   /** How far above the block it stands on a thing at this point is drawn. 0 without painted land. */
   lift(x: number, y: number, z: number): number;
+  /**
+   * The same for a body that walks: someone on natural ground is drawn on the land itself, also in the moment
+   * their feet are a block above or below the column under their middle, at a step the smooth land does not show.
+   */
+  liftOnLand(x: number, y: number, z: number): number;
   /** The painted world's view hands its ground in here. */
   setGround(heightAt: (x: number, z: number) => number): void;
   /**

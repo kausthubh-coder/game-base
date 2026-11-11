@@ -25,8 +25,8 @@ export interface PlayerRig {
    * `faceView` the body turns to look where the camera looks, as it does in first person.
    */
   step(yaw: number, faceView?: boolean): void;
-  /** Sets the drawn position between the last two steps. `blend` is 0 to 1. */
-  blend(blend: number): void;
+  /** Sets the drawn position between the last two steps. `blend` is 0 to 1, `dt` the seconds since the last frame. */
+  blend(blend: number, dt?: number): void;
   teleport(x: number, y: number, z: number, facing?: number): void;
 }
 
@@ -35,6 +35,11 @@ export interface PlayerOptions {
   stepUp?: number;
   /** How far above the block it stands on the hero is drawn: the painted land's lift. */
   lift?: (x: number, y: number, z: number) => number;
+  /**
+   * Where the hero is drawn when natural ground holds them up at block height `y`: on the smooth land. NaN when
+   * they stand on something built. Left out, the hero is drawn at their block height plus `lift`.
+   */
+  standAt?: (x: number, y: number, z: number) => number;
 }
 
 export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, options: PlayerOptions = {}): PlayerRig {
@@ -47,6 +52,15 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
 
   const body = new HeroBody(world, spawn, bus, { stepUp: options.stepUp ?? 0 });
   const lift = options.lift ?? (() => 0);
+  const standAt = options.standAt ?? (() => NaN);
+  // The hero is drawn on the land while they stand or walk on it, and at their own height while they jump or
+  // stand on something built. `onLand` says which it was last frame. When it changes, `carry` holds the
+  // difference and lets it go in a sixth of a second, so the hero never snaps from one to the other.
+  // `walkedOff` is true from the step the hero walks off a ledge until they land: down a one-block step they
+  // are drawn walking down the slope, where a jump is drawn as a jump.
+  let onLand = false, carry = 0, drawn = spawn.y, walkedOff = false;
+  /** True after the hero was set down somewhere: the next frame draws them where they are, with nothing carried over. */
+  let fresh = true;
   // South, toward the camera's starting side, so a new game opens on the hero's face.
   body.facing = Math.PI;
   const position = { ...spawn };
@@ -95,23 +109,38 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       input.moveZ = ((fz * forward + fx * right) / length) * pace;
       input.jump = !busy && keys.jump;
       previous.x = body.x; previous.y = body.y; previous.z = body.z;
+      const stood = body.grounded;
       body.step(input);
+      if (body.grounded) walkedOff = false;
+      else if (stood) walkedOff = body.vy <= 0;
       // Facing 0 is north and grows toward the east, the other way round from the camera's yaw.
       if (faceView) body.facing = -yaw;
       write();
     },
 
-    blend(blend) {
+    blend(blend, dt = 1 / 60) {
       position.x = previous.x + (body.x - previous.x) * blend;
-      position.y = previous.y + (body.y - previous.y) * blend - (body.swimming ? 0.25 : 0);
+      const y = previous.y + (body.y - previous.y) * blend - (body.swimming ? 0.25 : 0);
       position.z = previous.z + (body.z - previous.z) * blend;
-      position.y += lift(position.x, position.y, position.z);
+      // On the ground, or stepping down off a ledge one block high: the land under the hero's middle.
+      const stood = body.swimming ? NaN : body.grounded ? standAt(position.x, body.y, position.z) : walkedOff ? standAt(position.x, Math.floor(body.y + 0.001), position.z) : NaN;
+      const land = stood === stood;
+      const target = land ? stood : y + lift(position.x, y, position.z);
+      if (land !== onLand) {
+        onLand = land;
+        const gap = drawn - target;
+        carry = !fresh && Math.abs(gap) < 1.6 ? gap : 0;
+      }
+      fresh = false;
+      carry *= Math.exp(-dt * 18);
+      position.y = drawn = target + carry;
     },
 
     teleport(x, y, z, facing) {
       body.teleport(x, y, z);
       if (facing !== undefined) body.facing = facing;
-      previous.x = position.x = x; previous.y = position.y = y; previous.z = position.z = z;
+      previous.x = position.x = x; previous.y = position.y = drawn = y; previous.z = position.z = z;
+      carry = 0; onLand = false; walkedOff = false; fresh = true;
       write();
     },
   };

@@ -19,7 +19,7 @@ import { createPerf } from '../../features/perf/index.ts';
 import { createPost } from '../../features/post/index.ts';
 import { createSky } from '../../features/sky/index.ts';
 import { createWaterMaterial } from '../../features/water/index.ts';
-import { createWorld, emptyHit, spawnPoint } from '../../features/world/index.ts';
+import { createWorld, emptyHit, spawnPoint, groundHeight } from '../../features/world/index.ts';
 import { reachDistance } from '../actions/index.sim.ts';
 import type { Systems, UseContext } from '../api.sim.ts';
 import { STEP, createKernel } from '../kernel.sim.ts';
@@ -187,6 +187,31 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     const base = world.sim.heightAt(Math.floor(x), Math.floor(z)), d = g - base;
     return Math.abs(d) <= 0.75 && Math.abs(y - base) < 1.7 ? d : 0;
   }
+  /** Half the width of a body, in blocks: how far from its middle a block can still hold it up. */
+  const FOOT = 0.3;
+  /**
+   * Where a body is drawn that stands at (x, z) with its feet at block height `y`: on the painted land, when
+   * natural ground holds it up. A body walks up a one-block step when its leading edge reaches the step, a
+   * third of a block before its middle does, and comes down when its trailing edge leaves it. Between those
+   * moments its feet are a whole block above or below the column under its middle. The land is smooth there,
+   * so the body is drawn on the land and not at its block height. NaN when it stands on something built, or
+   * where the land is not drawn.
+   */
+  function standAt(x: number, y: number, z: number): number {
+    const g = groundAt(x, z);
+    if (!(g === g) || Math.abs(g - y) > 1.3) return NaN;
+    for (let i = 0; i < 4; i++) {
+      const cx = Math.floor(x + (i & 1 ? FOOT : -FOOT)), cz = Math.floor(z + (i & 2 ? FOOT : -FOOT));
+      // The column that holds the body up, when its top is no higher than the land was before anything was built.
+      if (Math.abs(world.sim.heightAt(cx, cz) - y) < 0.01 && y <= groundHeight(world.sim.seed, cx, cz) + 0.01) return g;
+    }
+    return NaN;
+  }
+  /** The same as an offset from the block height, for whoever is drawn that way: people, pets, creatures. */
+  const liftOnLand = (x: number, y: number, z: number): number => {
+    const stood = standAt(x, y, z);
+    return stood === stood ? stood - y : lift(x, y, z);
+  };
   ctx.world = world.query;
   const kernel = createKernel(world.sim, Number(params.get('seed')) || 7);
   const game = kernel.game;
@@ -219,7 +244,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // With Quarter turns the 2.5D camera turns with the hand during a drag and glides to the nearest quarter after it.
   keys.onDragEnd(() => { if (tiltTurn === 'quarter') camera.settle(); });
   const start = sys.region?.spawn() ?? spawnPoint();
-  const player = createPlayer(game, world.sim, keys, start, { stepUp: look === 'smooth' ? 1 : 0, lift });
+  const player = createPlayer(game, world.sim, keys, start, { stepUp: look === 'smooth' ? 1 : 0, lift, standAt: look === 'smooth' ? standAt : undefined });
 
   /**
    * How the mouse works with a camera: the 2.5D camera points and drags, first person locks the mouse, and the free
@@ -485,7 +510,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
         carry -= HERO_STEP;
       }
       perf.end('sim');
-      player.blend(carry / HERO_STEP);
+      player.blend(carry / HERO_STEP, dt);
     }
 
     // A locked mouse or a right-button drag turns the view; the 2.5D camera only along the ground. Anything that
@@ -693,6 +718,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     look,
     groundAt: (x, z) => groundAt(x, z),
     lift,
+    liftOnLand: look === 'smooth' ? liftOnLand : lift,
     setGround(heightAt) { groundAt = heightAt; },
     standIns: new Map(),
 

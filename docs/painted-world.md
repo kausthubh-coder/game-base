@@ -88,7 +88,13 @@ no tone curve and no added saturation. `src/game/shell/game.ts` sets that.
 | `?look=blocks` | The block world as it was, with its model trees | A jump |
 
 On smooth land the drawn ground lies up to half a block from the tops of the blocks. `view.lift(x, y, z)` says
-how far, and the people, the pets and the props are drawn that much higher or lower.
+how far, and the props are drawn that much higher or lower.
+
+A body that walks is drawn on the land itself while natural ground holds it up (`standAt` in
+`src/game/shell/game.ts`, `view.liftOnLand` for people and pets). The rules move a body up a one-block step
+when its leading edge reaches it and down when its trailing edge leaves it, so for a third of a block its feet
+are a whole block off the column under its middle. Drawn at its block height it hovered and dropped at every
+step. `bun tools/hero-ground.mjs` walks the hero over slopes and fails on any gap.
 
 ## Where things are
 
