@@ -19,6 +19,7 @@
     "sim": "bun tools/sim.ts",
     "server": "wrangler dev",
     "server:check": "bun server/test/check.ts",
+    "server:live": "bun server/test/live.ts",
     "lint": "biome lint ."
   },
   "devDependencies": {

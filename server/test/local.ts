@@ -39,6 +39,8 @@ export interface ServerOptions {
   name: string;
   /** Start from empty storage. False keeps what the last run with this name saved. */
   fresh: boolean;
+  /** Variables for the server, over the dev defaults. An empty value switches a default off. */
+  vars?: Record<string, string>;
 }
 
 /** Starts `wrangler dev` and waits until it answers. Dev tokens and the dev tools are switched on from the command line. */
@@ -49,11 +51,13 @@ export async function startServer(options: ServerOptions): Promise<LocalServer> 
   const logPath = resolve(ARTIFACTS, `${options.name}.log`);
   const out = openSync(logPath, options.fresh ? 'w' : 'a');
   const inspectorPort = options.port + 1;
+  const vars = Object.entries({ DEV_TOKENS: '1', DEV_TOOLS: '1', WORLD_SERVER_SECRET: 'dev-secret-not-real', ...options.vars })
+    .flatMap(([name, value]) => ['--var', `${name}:${value}`]);
   const child: Subprocess = spawn({
     // The project's own wrangler, as `bunx wrangler` finds it. Run directly, so the pid is wrangler's own.
     cmd: [
       resolve(ROOT, 'node_modules/.bin/wrangler'), 'dev', '--ip', '127.0.0.1', '--port', String(options.port), '--inspector-port', String(inspectorPort),
-      '--persist-to', state, '--var', 'DEV_TOKENS:1', '--var', 'DEV_TOOLS:1', '--var', 'WORLD_SERVER_SECRET:dev-secret-not-real',
+      '--persist-to', state, ...vars,
     ],
     cwd: ROOT,
     stdout: out,
