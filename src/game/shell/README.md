@@ -20,6 +20,7 @@ The shell starts the game. It makes the renderer, the block world, the kernel wi
 | `door.ts` | `window.__game` |
 | `../views/core-actors.view.ts` | Actors to sprites, and the marks over their heads |
 | `../views/core-aim.view.ts` | The box around the block, tree or station a click would act on |
+| `../views/core-debug.view.ts` | The frame-rate counter and the debug panel, turned on in Settings > Debug |
 | `../views/core-crosshair.view.ts` | The crosshair of a locked mouse: first person, and the free camera with Lock to turn |
 | `../views/core-ghost.view.ts` | A see-through copy of what the right button would place |
 | `../views/core-sound.view.ts` | Game events to sounds and particles |
@@ -94,7 +95,7 @@ A new game while a game is running reloads the page, because systems keep their 
 | E | `interact.act()` |
 | Left button | `actions.use` with `primary`, then `actions.hold` every step while it is down. A break needs a hold of 0.4 seconds or more |
 | Right button, clicked | `actions.use` with `secondary`, when it comes up. A press that moves more than 6 pixels or lasts over half a second is not a click, and uses nothing |
-| F3 | The performance meter |
+| F3 | The performance meter, the same as Settings > Debug > Performance meter |
 
 The mouse works one of three ways (`MouseMode` in `keys.ts`). In 2.5D (`point`) and in the free camera with Drag to turn (`drag`, the default) the cursor stays free and the buttons act on the block under it; a right click acts on the block it went down on. In first person and with Lock to turn (`lock`) they act on the block under the crosshair, in the middle of the screen. Either way reach is measured from the hero's eyes. The click that takes the mouse acts on nothing, and anything that holds the player (a panel, the map, a conversation, the title) gives the cursor back and ends a drag.
 

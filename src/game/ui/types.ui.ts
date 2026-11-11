@@ -91,6 +91,8 @@ export interface GameUiOptions {
   setInterfaceSize?(size: number): void;
   /** The View section of Settings: the camera and how characters are drawn. The game stores both. Left out, there is no View section. */
   view?: ViewChoices;
+  /** The Debug section of Settings: the frame-rate counter, the performance meter and the debug panel. The game stores them. Left out, there is no Debug section. */
+  debug?: DebugChoices;
   /** Pictures from the manifest's `ui` entry. Each one is optional and has a CSS fallback. */
   art?: { title?: string; panel?: NineSlice; button?: NineSlice };
   /** The list of keys in Settings. Defaults to DEFAULT_KEYS. */
@@ -115,6 +117,19 @@ export interface ViewChoices {
   setTiltTurn(turn: ViewTiltTurn): void;
   characters(): ViewCharacters;
   setCharacters(look: ViewCharacters): void;
+}
+/** Which debug overlays are shown. The game owns and stores them; Settings only shows them and passes picks on. */
+export interface DebugChoices {
+  get(): Readonly<DebugShow>;
+  set(show: Partial<DebugShow>): void;
+}
+export interface DebugShow {
+  /** A small frame-rate counter. */
+  fps: boolean;
+  /** The full performance meter, with the quality buttons. F3 flips it too. */
+  meter: boolean;
+  /** Where the hero is, the time, the camera, what is aimed at. */
+  info: boolean;
 }
 export type ViewCamera = 'tilt' | 'free' | 'first';
 /** How the mouse turns the free camera: `drag` with the right button held, as in Roblox, or `lock` it, as in Genshin. */
