@@ -136,12 +136,12 @@ export const QUESTS: readonly QuestDef[] = [
       { id: 'key', text: 'Find what your key fits', done: { flag: 'custodian.awake' }, place: 'hall.custodian' },
       { id: 'calm', text: 'Hold out your hand to the fox', done: { flag: 'fox.calmed' }, place: 'hall.door' },
       { id: 'heart', text: 'Touch the Heartstone', done: { flag: 'heart.seen' }, place: 'hall.heart' },
-      { id: 'sleep', text: 'Sleep until morning', done: { event: 'slept' } },
+      { id: 'sleep', text: 'Sleep until morning', done: { any: [{ event: 'slept' }, { flag: 'night.over' }] } },
       { id: 'tamsin', text: 'Show Tamsin your hand', done: { flag: 'night.told' }, gate: true, npc: ['tamsin'] },
     ],
     skip: [
       { flag: 'night.fox' }, { flag: 'door.open' }, { flag: 'mark' }, { flag: 'hall.lit' }, { flag: 'custodian.awake' },
-      { flag: 'fox.calmed' }, { flag: 'fox.gone' }, { flag: 'heart.seen' }, { flag: 'night.told' },
+      { flag: 'fox.calmed' }, { flag: 'fox.gone' }, { flag: 'heart.seen' }, { flag: 'night.over' }, { flag: 'night.told' },
     ],
   },
   {

@@ -25,7 +25,7 @@ The quest `night` ("The Shut Door") starts when `roof` is done. Each step of it 
 | `key` | "Turn the key" at the plinth | The scene `custodian.wake`. The Custodian's actor goes from `sleep` to `idle`. | `custodian.awake` |
 | `calm` | "Hold out your hand" within 3.6 blocks of the fox | The scene `fox.calm`. The fox carries a heart for 3 seconds, runs out west, and is taken out of the world. | `fox.calmed`, then `fox.gone` |
 | `heart` | "Touch the Heartstone" | The scene `heart.first`. After it, touching the stone gives its number as a toast. | `heart.seen` |
-| `sleep` | Sleeps | The hall no longer objects. In the morning Tamsin, Juniper, Gus and Brack are sent to the grant stone and held there. | |
+| `sleep` | Sleeps, or is still up when dawn comes | The hall no longer objects. In the morning Tamsin, Juniper, Gus and Brack are sent to the grant stone and held there. | `night.over` |
 | `tamsin` | Talks to Tamsin | Her conversation `tamsin.mark`. The four are released to their routines. | `night.told` |
 
 Until `heart.seen` is set the hall keeps the player awake, with a different line for each stage.

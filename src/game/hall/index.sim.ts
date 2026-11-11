@@ -253,9 +253,14 @@ export function createHall(game: Game): Hall {
     for (const [id] of MORNING) people?.hold(id, false);
   }
 
-  events.on('slept', () => {
-    if (flags.is('mark') && !flags.is('night.told')) gather();
-  });
+  /** The night ends when the player sleeps, or when dawn finds them still up after the Heartstone. */
+  function morning(): void {
+    if (!flags.is('heart.seen') || flags.is('night.over')) return;
+    flags.set('night.over', true);
+    if (!flags.is('night.told')) gather();
+  }
+  events.on('slept', morning);
+  events.on('day.started', morning);
 
   events.on('flag.changed', ({ flag, value }) => {
     if (!value) return;

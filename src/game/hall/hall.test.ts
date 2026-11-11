@@ -141,3 +141,18 @@ test('the Custodian says nothing while it sleeps, however high the stone goes', 
   expect(p.sys.hall.heart().level).toBeGreaterThanOrEqual(10);
   expect(p.said.filter((text) => text.startsWith('The Custodian: '))).toEqual([]);
 });
+
+test('dawn ends the night for a player still up after the Heartstone, as a sleep would', () => {
+  const p = newPlay();
+  p.advance(0.5);
+  p.sys.quests.skipTo('night');
+  for (const flag of ['night.fox', 'door.open', 'mark', 'hall.lit', 'custodian.awake', 'fox.calmed', 'fox.gone', 'heart.seen']) p.game.flags.set(flag, true);
+  p.advance(1);
+  expect(p.game.flags.get('quest.night.step')).toBe('sleep');
+  const day = p.game.clock.day;
+  p.advance(p.sys.time.dayLength);
+  expect(p.game.clock.day).toBe(day + 1);
+  p.advance(1);
+  expect(p.game.flags.is('night.over')).toBe(true);
+  expect(p.game.flags.get('quest.night.step')).toBe('tamsin');
+});
