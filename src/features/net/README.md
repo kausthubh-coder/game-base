@@ -6,7 +6,7 @@ messages and the server.
 
 ## Wiring
 
-Nothing in the game uses it yet. This is how the shell would:
+The game's online world uses it in `src/game/online/online.ts`. In short:
 
 ```ts
 import { createNet } from './features/net/index.ts';
@@ -23,7 +23,7 @@ net.connect();
 net.update(dt, ctx);                                   // counts the wait before a reconnect
 
 // every kernel step, 20 a second, also while the player stands still
-const n = net.send({ mx, mz, jump, acts });            // 0 when the connection is not open
+const n = net.send({ mx, mz, jump, moves, acts });     // 0 when the connection is not open
 ```
 
 `net.near` holds the other players, the creatures and the placed things in range, added up from the snaps.

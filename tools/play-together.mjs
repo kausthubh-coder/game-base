@@ -377,6 +377,14 @@ try {
   const solo = await old.page.evaluate(() => ({ started: window.__game.started, online: window.__game.online, url: location.href }));
   check('it can still start a solo game', solo.started && solo.online === null, `Play solo opened ${solo.url}, and New game started a game with no world server`);
 
+  // ------------------------------------------------------------------ a link opened by someone signed out
+  const guest = await open(browser, 'Guest', { url: `http://127.0.0.1:${PORT}/?world=${WORLD}&quality=low` });
+  await until(guest, 'the sign-in notice', () => window.__game?.online?.status === 'signin' && !!document.querySelector('.ol-notice:not([hidden])'));
+  const asked = await guest.page.evaluate(() => ({ notice: document.querySelector('.ol-notice')?.textContent ?? '', started: window.__game.online.debug().ready }));
+  await guest.page.screenshot({ path: resolve(shots, 'signed-out.png') });
+  check('a world\'s link opened signed out asks the player to sign in first', asked.notice.startsWith('Sign in to join this world.') && !asked.started,
+    `${resolve(shots, 'signed-out.png')}; the notice reads "${asked.notice}"`);
+
   for (const entry of pages) check(`no console errors on ${entry.name}'s page`, entry.errors.length === 0, entry.errors.slice(0, 3).join(' | '));
 } catch (error) {
   check('the check ran to the end', false, error instanceof Error ? error.stack ?? error.message : String(error));

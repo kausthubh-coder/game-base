@@ -23,6 +23,7 @@ const PARTS = [
   { name: 'assets', what: 'every asset against the asset contract', run: [['bun', 'tools/verify-assets.mjs']] },
   { name: 'build', what: 'a production build', run: [['bun', 'run', 'build']] },
   { name: 'server', what: 'the world server on wrangler dev, with two fake players', run: [['bun', 'server/test/check.ts']] },
+  { name: 'together', what: 'two browsers on one world: walk, build, farm, leave, a server restart, a wrong build', run: [['bun', 'tools/play-together.mjs']] },
   { name: 'live', what: 'Clerk, Convex and the world server together (needs .env.local)', run: [['bun', 'server/test/live.ts']], skip: 2 },
   { name: 'shots', what: 'six scenes against their approved pictures, and the draw budgets', run: [['bun', 'tools/shots.mjs', 'all', '--check']] },
   {

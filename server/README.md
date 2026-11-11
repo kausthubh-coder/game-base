@@ -61,11 +61,28 @@ The messages are in `src/engine/net/`, and the browser's client is `src/features
 | `hello` | `build`, `token` |
 | `welcome` | `you` (the player's actor id), `build`, `seed`, `step` |
 | `refuse` | `why`, and `text` to show the player |
-| `input` | `n`, `mx`, `mz` (the wanted direction in world space, -1 to 1), `jump`, `acts` |
+| `input` | `n`, `mx`, `mz` (the wanted direction in world space, -1 to 1), `jump`, `moves`, `acts` |
 | `snap` | `step`, `ack`, `you`, `day`, `time`, and what changed near the player (below) |
 
-An act is a click the rules judge on the server: `slot` picks a quick slot, `use` is one click on a block
-face, `hold` keeps the primary button on a block for a step.
+`moves` is how the browser steered in each of the three body steps of the step: mx, mz and jump (0 or 1),
+nine numbers. The browser moves the hero at once and reads the keys every body step, so the server plays
+exactly what the browser played. Without `moves`, `mx`, `mz` and `jump` hold for all three.
+
+An act is something the player did that the rules judge on the server.
+
+| Act | What it is |
+|---|---|
+| `slot` | Picks a quick slot, 0 to 8 |
+| `use` | One click on a block face, `primary` or `secondary` |
+| `hold` | The primary button stays on a block for this step |
+| `interact` | E: the nearest thing with a prompt |
+| `say` | One click in this player's conversation: the next line, or `choice` |
+| `craft` | Makes `recipe` from the bag |
+| `move` | Moves a stack in the bag, `from` and `to` (0 to 35), or `count` of it |
+| `build` | One build-mode stroke, whole: pressed on `at`, let go on `to`, with the piece at `turns`. Without `to`, only the press, which picks a placed thing up |
+| `undo` | Takes the last stroke back |
+
+The server runs an act as the player who sent it, from where they stand.
 
 | The server refuses with | When | The browser should |
 |---|---|---|
@@ -95,6 +112,16 @@ player and new to them.
 | `chunks` | Every changed block of a chunk that came into range | 8 chunks each way | Once, when it comes into range |
 | `blocks` | Blocks that changed in this step | In a chunk the player was told | When it happens |
 | `placed`, `unplaced` | Stations and furniture | 8 chunks each way | When one is set down, taken away or comes into range |
+| `state` | Each copied system's save that changed, and the flags | The whole world | All of it in the first snap. Then when a change shows, at once after an act or an event, otherwise at most twice a second |
+| `air` | `game.ambient`: light, rain, cloud, fog, wind, wetness, lightning | | When it changed, looked at twice a second |
+| `events` | The rules' events of the step, as name and data | Everyone, except a toast, a hint, a panel or a conversation of one player's own | In the step they happen |
+| `breaking` | This player's block or tree being broken, and how far along | This player | When it changed |
+| `talk` | The line of this player's conversation | This player | When it changed |
+| `used` | Stations this player used, whose panels open for them | This player | In the step they happen |
+
+`src/game/online/copy.sim.ts` says which systems are copied and what counts as a change. Time and creatures
+are not copied: the clock, the weather and the actors cover them. `src/game/online/README.md` says how the
+browser takes each part in.
 
 A snap is a difference, so the browser adds them up. `applySnap` in `src/engine/net/near.ts` does that for
 actors and placed things. Changed blocks go into the browser's own world: `chunks` holds pairs of cell
@@ -114,9 +141,9 @@ means the browser ran ahead, and the oldest are dropped.
 
 - The world loads its rules when the first player is let in. A refused connection loads nothing and writes nothing.
 - It steps 20 times a second while a player is in. A late timer runs up to three steps to catch up. Past that the time is let go.
-- It saves every 30 seconds and when the last player leaves. A save writes only the rows that changed: one row per changed chunk, and `meta`, `game` and `places`.
+- It saves every 30 seconds, 5 seconds after a player changed something, and when the last player leaves. A save writes only the rows that changed: one row per changed chunk, and `meta`, `game` and `places`.
 - When the last player leaves it saves, stops its timer and holds nothing that keeps it in memory. Cloudflare then puts it to sleep.
-- A crash loses at most 30 seconds. Durable Objects have no shutdown hook, so there is no save at shutdown.
+- A crash loses at most 5 seconds of what players did. Durable Objects have no shutdown hook, so there is no save at shutdown.
 - After a deploy or a restart the server no longer knows its connections. It closes them with 4002 and the browser says hello again.
 
 ## Who gets in
@@ -186,14 +213,17 @@ The rules know one player: one `game.player`, one bag, one break meter. `room.ts
 - A click runs through the rules as the player who made it. Reach and facing are judged from where they stand.
 - While the rules step, `game.player` is the host, the player who has been in the world longest. Creatures wake, sleep and flee around the host. Pets, people and quests follow the host.
 - The bag, the quests and the story belong to the world. Everyone shares them.
-- Two players who break blocks at once share one break meter.
+- Two players who break blocks at once share one break meter. The player whose hold came last is told of it.
+- One conversation is open at a time, and it is the player's who started it. While it is open the rules hold `game.player.busy`, so nobody else can press E or enter build mode.
+- Build mode is the browser's. A stroke comes as one act and is laid in that act, so two builders never share a stroke. Undo takes back the last stroke anyone made.
 
 Making the rules know many players is its own task, in `src/game`.
 
 ## Not on the wire yet
 
-The bag, crops and wet soil, quests, flags, conversations, toasts and the events that make sound. Drawing
-other players and predicting the hero are the next task.
+Each player's own bag, Almanac and hand: they wait for the rules to know many players (stage 2 in
+`docs/multiplayer.md`). The sleep card: a bed skips the night for everyone at once and the browser shows no
+card. The cells the last stroke changed (`build.last()`), so build mode does not flash them.
 
 ## The 128 MB test
 

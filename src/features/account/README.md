@@ -59,6 +59,11 @@ Clerk's JavaScript quickstart.
 | `backUp()` | Writes the save, then sends it to Convex. True when it arrived. |
 | `restore()` | Fetches the backup, copies the save it replaces to `<key>.before-restore`, writes the backup and calls `save.restart()`. The panel asks before it calls this. |
 | `localSave()` | The day, time and size of the save in this browser, or null |
+| `playTogether()` | Makes an online world the player owns, and a link with an invite in it. The panel shows the link to copy |
+| `inviteTo(worldId)` | A new link to the player's online world, for one more friend. An invite lets one player in, once |
+| `enter(worldId)` | Opens an online world |
+| `acceptInvite(code)` | Lets the player into the world an invite is for. The game calls it for a link with `&invite=` |
+| `token()` | The signed-in player's token, the one Convex takes. The world server takes the same one |
 | `onChange(fn)` | Hears every change of `state` |
 | `panel` | The panel's element. It redraws itself. |
 | `update()`, `dispose()` | As every view system. `update` does nothing. |
@@ -73,6 +78,7 @@ Clerk's JavaScript quickstart.
 | `save.flush()` | yes | Writes the running game to storage now |
 | `save.restart()` | yes | Starts the game again from what is stored |
 | `worldName` | yes | The name on the solo world's card |
+| `online` | no | `address(worldId, invite?)` and `enter(worldId)`. Without it the panel has no Play together and no Enter |
 | `look` | no | The host's class names for a button, the primary button, a section, its heading and a note |
 | `connect` | no | A stand-in for Clerk and Convex, for tests |
 | `now` | no | The clock, for tests |
