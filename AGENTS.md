@@ -1,12 +1,18 @@
 # Game base
 
-The engine base for Kausthubh's untitled 2.5D open-world RPG for the browser: a 3D block world, 2D pixel-art
-characters, an isometric-style camera. This repo holds the general systems that need no story: world, camera,
-sprites, assets, sky and weather, effects, sound, map, performance. It is an experiment in `~/dev/sandbox`
-until the game has a name.
+Kausthubh's untitled 2.5D open-world RPG for the browser: a painted 3D world, 2D pixel-art characters, an
+isometric-style camera, farms and kingdoms the player builds. The name is not picked yet, so the repo keeps
+its working name. `main` is the one true game. It is on GitHub at `kausthubh-coder/game-base` (private).
 
-The design handbook is `~/dev/sandbox/game-look-test/design/design.html`. Its source is the markdown beside it.
-Read `15-system-design.md`, `12-art.md` and `13-sound.md` there before a large change.
+Read before a large change:
+
+| When the change touches | Read |
+|---|---|
+| How agents build, play and check the game | `docs/ai-native.md` |
+| Hosting, accounts, the world server, graphics levels, the bake step | `docs/architecture.md` |
+| Frame rate or load time on a weak device | `docs/fast-everywhere.md` |
+| The look of the world | `docs/painted-world.md` |
+| Story, art, sound or game design | The handbook: the markdown in `~/dev/sandbox/game-look-test/design`, shown by the app in `game-look-test/handbook` (port 5361) |
 
 ## Commands
 
@@ -34,14 +40,18 @@ Read `15-system-design.md`, `12-art.md` and `13-sound.md` there before a large c
 
 ```
 src/engine/            the contract between features: types, events, world-query, system
+src/engine/net/        the messages the browser and the world server send each other
 src/content/           data only: blocks, surfaces, palettes, effects, props
 src/features/<name>/   one folder per feature, with its tests beside the code
+src/game/              the game itself: rules, content, views and the shell that starts it
+server/                the world server, a Cloudflare Durable Object that runs the .sim.ts rules
+convex/                the database's tables and functions
 demos/<name>/          one small page per feature that shows it alone
 public/assets/         finished sprites and textures, and manifest.json (see docs/assets.md)
 assets-src/            raw generated images, prompts and the palette
 tools/                 build, serve, screenshot and check scripts
-docs/                  briefs, the style sheet, the asset contract
-.agents/skills/        skills for making assets
+docs/                  plans, briefs, the style sheet, the asset contract
+.agents/skills/        this repo's skills
 ```
 
 ## Rules
@@ -57,11 +67,14 @@ docs/                  briefs, the style sheet, the asset contract
 9. **Servers.** Use your own port, and stop a server by the pid it printed, never by port.
 10. Never read, list or write `~/Documents`, `~/Desktop` or `~/Downloads`. Commands there hang forever.
 
-## While several agents build here at once
+## Branches and agents
 
-- Write only in the folders your brief names. `src/engine`, `package.json`, `tsconfig.json`, `vite.config.ts`, `index.html` and `src/main.ts` belong to the coordinator. If the contract in `src/engine` is missing something, add what you need inside your own feature and say so in your report.
-- Do not commit, and do not run `bun install` or `bun add`. The coordinator does both.
-- Check your own work with `bun tools/typecheck.mjs <feature>`, since another agent's half-written code can fail the full check.
+- **One task, one branch, one worktree.** Cut the branch from a fresh `origin/main`. Commit there as you go, one commit per slice. It merges back within a day or two.
+- **The coordinator merges.** A helper pushes or merges `main` only when its brief says so.
+- **A look test that will not merge** stays behind a URL flag on `main` (`?style=`, `?ui=`, `?look=`), not on a long branch.
+- **Write only in the folders your brief names.** `src/engine`, `package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `src/main.ts` and this file belong to the coordinator. If the contract in `src/engine` is missing something, add what you need inside your own feature and say so in your report.
+- **Packages.** `bun install` in your own worktree is fine. `bun add` only for a package your brief names.
+- Check your own work with `bun tools/typecheck.mjs <feature>` as well as `bun run check`, since another agent's half-written code can fail the full check.
 - Put screenshots and renders in `.artifacts/<feature>/`.
 
 | Feature | Port |

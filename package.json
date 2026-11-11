@@ -17,14 +17,19 @@
     "shot": "bun tools/shot.mjs"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.6",
+    "@cloudflare/workers-types": "^5.20261110.1",
     "@types/bun": "^1.4.4",
     "@types/three": "^0.187.0",
     "playwright-core": "^1.65.0",
     "sharp": "^0.35.5",
     "typescript": "~7.0.2",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "wrangler": "^4.160.1"
   },
   "dependencies": {
+    "@clerk/clerk-js": "^6.42.3",
+    "convex": "^1.49.0",
     "three": "^0.187.0"
   }
 }
