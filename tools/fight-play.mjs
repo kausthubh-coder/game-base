@@ -3,12 +3,16 @@
 //   bun tools/fight-play.mjs --port 5529 --way hero --beast thistlehog            the rule-made player fights, through the lab's door
 //   bun tools/fight-play.mjs --port 5529 --way world --beast boar --layout wall   the world way with no rigs, baiting charges into the wall
 //   bun tools/fight-play.mjs --port 5529 --way pet --beast gearling --keys        real keys and mouse only, as a person would press them
+//   bun tools/fight-play.mjs --url http://127.0.0.1:5529/ --log                   a built copy, with the page sending its fights to fight-log
+//
+// `--quality low`, `medium` or `high` holds a quality level (high by default). `--log` adds `&log=1`, which
+// only `tools/fight-serve.mjs` answers: it checks that the fight and its answer reached `.artifacts/fight/ratings.jsonl`.
 //
 // It picks the way and the beast with real clicks on the lab's card, plays the fight, answers "Again?", and
 // prints the fight's record with the draw calls, triangles and script time it saw. Screenshots go to
 // `.artifacts/fight/<name>-*.png`. It exits 1 on a console error, a fight that is not won, or a key that did
 // nothing. This Mac's frame rate says nothing about a Chromebook, so none is printed.
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { launchChrome } from './lib/chrome.mjs';
 
@@ -17,7 +21,7 @@ const opt = (name, fallback) => { const i = argv.indexOf('--' + name); return i 
 const flag = (name) => argv.includes('--' + name);
 const port = opt('port', process.env.PLAY_PORT ?? '5525');
 const way = opt('way', 'hero'), beast = opt('beast', 'thistlehog'), layout = opt('layout', 'rigs'), quality = opt('quality', 'high');
-const keys = flag('keys'), limit = Number(opt('limit', 200));
+const keys = flag('keys'), limit = Number(opt('limit', 200)), sends = flag('log');
 const base = opt('url', `http://localhost:${port}/`);
 const name = opt('name', `${way}-${beast}${keys ? '-keys' : layout === 'wall' ? '-wall' : ''}`);
 const out = resolve(import.meta.dirname, '..', '.artifacts/fight');
@@ -33,13 +37,15 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 page.on('pageerror', (e) => errors.push(String(e)));
 
 const state = () => page.evaluate(() => window.__fight.state());
+/** When the scene has settled enough to measure: set once the fight starts. */
+let settledAt = Infinity;
 const shot = (what) => page.screenshot({ path: resolve(out, `${name}-${what}.png`) });
 const check = (what, ok) => { if (!ok) failed.push(what); console.log(`${ok ? 'ok  ' : 'FAIL'} ${what}`); };
 const sleep = (ms) => page.waitForTimeout(ms);
 /** Where a point of the arena's ground is on the page. */
 const screen = (x, z) => page.evaluate(([x, z]) => window.__fight.screen(x, z), [x, z]);
 
-await page.goto(`${base}?scene=fight&quality=${quality}`, { waitUntil: 'load' });
+await page.goto(`${base}?scene=fight&quality=${quality}${sends ? '&log=1' : ''}`, { waitUntil: 'load' });
 await page.waitForFunction(() => window.__fight && window.__game?.started, null, { timeout: 60000 });
 await page.evaluate(() => window.__game.settle());
 // The log starts empty, so the numbers printed are this fight's alone.
@@ -51,10 +57,16 @@ let s = await state();
 check(`the card picked the way "${way}" and brought in the ${beast}`, s.way === way && s.beast?.kind === beast && s.beast.doing === 'asleep');
 await sleep(600);
 await shot('start');
+settledAt = Date.now() + 2500;
 
-/** The most draw calls, triangles and script milliseconds seen while the fight ran. */
+/**
+ * The most draw calls, triangles and script milliseconds seen while the fight ran, once the scene has settled.
+ * The game's meter gives script time as a mean over the last 2 seconds, so the first 2.5 seconds after the
+ * fight starts are left out: they still hold the page loading. The peak is the worst of those 2-second means.
+ */
 const seen = { drawCalls: 0, triangles: 0, scriptMs: 0, simMs: 0, samples: 0, scriptSum: 0 };
 async function sample() {
+  if (Date.now() < settledAt) return;
   const c = await page.evaluate(() => window.__game.counters());
   seen.drawCalls = Math.max(seen.drawCalls, c.drawCalls);
   seen.triangles = Math.max(seen.triangles, c.triangles);
@@ -125,19 +137,29 @@ if (!keys) {
     check('walking up woke the beast', s.beast.doing !== 'asleep');
     const before = s.record;
     await page.keyboard.press('ShiftLeft');
-    await sleep(500);
+    // Mid-dodge: the cool tint and the two afterimages.
+    await sleep(120);
+    await shot('dodge');
+    await sleep(380);
     s = await state();
     check('Shift dodged', s.record.dodges === before.dodges + 1);
     await walkTo(s.beast.x, s.beast.z + 1.6, 0.5);
-    // Hold the button for a charged spin: one cut at the press, the spin at the release.
+    // Hold the button for a charged spin: one cut at the press, the spin at the release. A hit on the hero drops
+    // a charge, so it is held while the beast stands open after an attack, as a person would wait for it.
     s = await state();
+    for (const until = Date.now() + 10000; Date.now() < until && !(s.beast.doing === 'recover' && s.hero.act === 'none'); s = await state()) await sleep(40);
     const swings = s.record.swings;
     let at = await screen(s.beast.x, s.beast.z);
     await page.mouse.move(at.x, at.y);
     await page.mouse.down();
-    await sleep(900);
+    await sleep(800);
+    await shot('charged');
+    await sleep(100);
     await page.mouse.up();
-    await sleep(300);
+    // The spin as it lands: the pale ring on the ground and the shake.
+    await sleep(60);
+    await shot('spin');
+    await sleep(240);
     s = await state();
     check('holding the button made a cut and a charged spin', s.record.swings === swings + 2);
     await page.keyboard.press('KeyC');
@@ -151,7 +173,9 @@ if (!keys) {
       await sample();
       if (s.shapes > 0) await shotOnce('tell');
       if (s.beast.doing === 'dizzy' || s.phase === 'won') break;
-      if (Math.hypot(s.hero.x - s.beast.x, s.hero.z - s.beast.z) > 2.4) await walkTo(s.beast.x, s.beast.z, 2);
+      // Walk back in whenever it is out of reach, and cut only when it is in reach: a person does not swing at air.
+      const reach = 2.2 + (s.beast.kind === 'boar' ? 1.3 : 0.5);
+      if (Math.hypot(s.hero.x - s.beast.x, s.hero.z - s.beast.z) > reach) { await walkTo(s.beast.x, s.beast.z, reach - 0.4, 3000); continue; }
       at = await screen(s.beast.x, s.beast.z);
       if (at) { await page.mouse.move(at.x, at.y); await page.mouse.down(); await sleep(30); await page.mouse.up(); }
       await sleep(120);
@@ -197,14 +221,23 @@ if (!keys) {
     }
   } else {
     // 1, 2 and 3 take a rig in hand and a click sets it down, in a row south of the den. Z takes one back.
-    const cells = [[1, den.z + 3], [2, den.z + 5], [3, den.z + 7]];
+    // Rig 1 is the lamp, which goes last in the row, nearest the hero. Then the snare nearest the den, then the plate.
+    const cells = [[1, den.z + 7], [2, den.z + 3], [3, den.z + 5]];
     await walkTo(den.x, den.z + 7.5, 0.6);
     for (const [key, z] of cells) {
       await page.keyboard.press(`Digit${key}`);
       await sleep(120);
-      if (key === 1) { await clickGround(den.x, z); await sleep(100); await shot('ghost'); await page.keyboard.press(`Digit${key}`); await sleep(100); }
-      // Rig 1 is the lamp, which goes last in the row, nearest the hero.
-      await clickGround(den.x, key === 1 ? den.z + 7 : key === 2 ? den.z + 3 : den.z + 5);
+      if (key === 1) {
+        // The rig in the hand, over a free cell and over one too near the beast, before it is set down.
+        const free = await screen(den.x, den.z + 5), near = await screen(den.x, den.z + 1);
+        await page.mouse.move(free.x, free.y);
+        await sleep(150);
+        await shot('ghost');
+        await page.mouse.move(near.x, near.y);
+        await sleep(150);
+        await shot('ghost-refused');
+      }
+      await clickGround(den.x, z);
       await sleep(150);
     }
     s = await state();
@@ -277,6 +310,18 @@ if (asked) {
   await page.click('.fl-rate button:nth-child(4)');
   const log = await page.evaluate(() => window.__fight.log());
   check('the answer was kept with the fight', log.length === 1 && log[0].again === 4 && log[0].way === way && log[0].enemy === beast && log[0].length > 0);
+  if (sends) {
+    // The page posts the fight when it ends and again with its answer. The server appends each as a line.
+    const ratings = resolve(out, 'ratings.jsonl');
+    let line = null;
+    for (let tries = 0; tries < 20 && !line; tries++) {
+      await sleep(150);
+      const kept = existsSync(ratings) ? readFileSync(ratings, 'utf8').trim().split('\n').filter(Boolean).map((text) => JSON.parse(text)) : [];
+      line = kept.findLast((f) => f.at === log[0]?.at && f.again === 4) ?? null;
+    }
+    check('the fight and its answer reached .artifacts/fight/ratings.jsonl', line !== null && line.way === way && line.enemy === beast);
+    if (line) console.log('ratings.jsonl:', JSON.stringify({ at: line.at, way: line.way, enemy: line.enemy, result: line.result, seconds: +line.length.toFixed(1), again: line.again }));
+  }
   const lines = await page.locator('.fl-checks tr').allInnerTexts();
   console.log('\nchecks on the card:\n  ' + lines.map((line) => line.replace(/\s*\t\s*/g, ' | ')).join('\n  '));
 }
@@ -285,7 +330,7 @@ check('no view or system of the game failed', game.viewErrors.length === 0 && Ob
 const standIns = await page.evaluate(() => window.__fight.standIns());
 const r = s.record;
 console.log('\nrecord:', JSON.stringify({ way: r.way, enemy: r.enemy, result: r.result, seconds: +r.length.toFixed(1), setup: +r.setup.toFixed(1), hitsTaken: r.hitsTaken, hitBy: r.hitBy, faints: r.faints, swings: r.swings, whiffs: r.whiffs, dodges: r.dodges, inputs: r.inputs, longestGap: +r.longestGap.toFixed(1), throws: r.throws, orders: `${r.ordersInTime}/${r.orders}`, whistles: r.whistles, petHits: r.petHits, petFaints: r.petFaints, rigs: `${r.rigsTriggered}/${r.rigsPlaced}`, crashes: r.crashes, layout: r.layout }));
-console.log(`drawn at quality ${game.quality} on ${browser.gameRenderer}: at most ${seen.drawCalls} draw calls, ${seen.triangles} triangles, ${seen.scriptMs.toFixed(2)} ms of script a frame (mean ${(seen.scriptSum / Math.max(1, seen.samples)).toFixed(2)}), ${seen.simMs.toFixed(2)} ms of rules, over ${seen.samples} samples`);
+console.log(`drawn at quality ${game.quality} on ${browser.gameRenderer}, once settled: at most ${seen.drawCalls} draw calls, ${seen.triangles} triangles, script ${(seen.scriptSum / Math.max(1, seen.samples)).toFixed(2)} ms a frame on average and ${seen.scriptMs.toFixed(2)} ms in the worst 2 seconds, ${seen.simMs.toFixed(2)} ms of rules, over ${seen.samples} samples`);
 console.log('stand-in art:', standIns.join(', ') || 'none');
 console.log(`pictures: ${out}/${name}-*.png`);
 await browser.close();
