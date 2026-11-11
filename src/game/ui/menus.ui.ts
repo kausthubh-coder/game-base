@@ -63,19 +63,34 @@ export function titlePanel(ctx: UiContext): PanelView {
 
 /** `account` is true when a view has given the interface an Account panel to open. */
 export function pausePanel(ctx: UiContext, account: boolean): PanelView {
-  const body = h('div', { class: 'gu-menu' });
+  const body = h('div', { class: 'gu-pause' });
+  /** A large tile that leaves the pause menu for another screen: its icon, its name and its key. */
+  const tile = (icon: string, label: string, key: string, onclick: () => void): HTMLElement =>
+    h('button', { class: 'gu-tile', type: 'button', 'data-key': `pause:${icon}`, onclick: () => { ctx.sound('click'); onclick(); } },
+      h('span', { class: 'gu-tile-icon', 'aria-hidden': true }, ctx.options.ornament?.(icon) ?? null),
+      h('span', { class: 'gu-tile-name' }, label),
+      h('kbd', { 'aria-hidden': true }, key),
+    );
   return {
     title: 'Paused',
     className: 'gu-panel-pause',
     body,
     render() {
-      body.replaceChildren();
-      add(body,
+      const tiles = h('nav', { class: 'gu-tiles', 'aria-label': 'Go to' });
+      add(tiles,
+        tile('bag', 'Bag', 'B', () => ctx.ui.open('bag')),
+        ctx.options.hasAlmanac?.() && tile('almanac', 'Almanac', 'Tab', () => ctx.ui.open('almanac')),
+        tile('quests', 'Quests', 'J', () => ctx.ui.open('quests')),
+        ctx.options.openMap && tile('map', 'Map', 'M', () => { ctx.ui.close(); ctx.options.openMap?.(); }),
+      );
+      const menu = h('div', { class: 'gu-menu' });
+      add(menu,
         iconButton(ctx, 'resume', 'Resume', () => ctx.ui.close(), { class: 'gu-btn gu-primary' }),
         iconButton(ctx, 'settings', 'Settings', () => ctx.ui.open('settings')),
         account && iconButton(ctx, 'account', 'Account', () => ctx.ui.open('account'), { 'data-key': 'pause:account' }),
         iconButton(ctx, 'save-quit', 'Save and return to title', () => { ctx.sound('click'); ctx.options.saveAndQuit(); ctx.ui.open('title'); }),
       );
+      body.replaceChildren(tiles, menu);
     },
   };
 }

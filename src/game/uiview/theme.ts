@@ -128,13 +128,14 @@ export const KIT = /* css */ `
 }
 
 /* ---- panels: the painted frame ---- */
-.ui-book.ui-kit .gu-panel:not(.gu-panel-plate), .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box), .ui-book.ui-kit .gb-map-page, .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; isolation: isolate; }
-.ui-book.ui-kit .gu-panel:not(.gu-panel-plate)::before, .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box)::before, .ui-book.ui-kit .gb-map-page::before, .ui-book.ui-kit .ui-card::before {
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-panel-almanac), .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box), .ui-book.ui-kit .gb-map-page, .ui-book.ui-kit .ui-card { background: transparent; box-shadow: none; isolation: isolate; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-panel-almanac)::before, .ui-book.ui-kit .ui-frame:not(.gb-dialogue-box)::before, .ui-book.ui-kit .gb-map-page::before, .ui-book.ui-kit .ui-card::before {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   border: 56px solid transparent; border-image: var(--kit-panel) 112 fill / 56px stretch;
   filter: drop-shadow(0 16px 32px rgb(10 12 20 / 0.5));
 }
-.ui-book.ui-kit .gu-panel:not(.gu-panel-plate) { padding: 40px 46px 42px; }
+.ui-book.ui-kit .gu-panel:not(.gu-panel-plate, .gu-panel-almanac) { padding: 40px 46px 42px; }
+.ui-book.ui-kit .gu-panel-almanac .gu-panel-head::after { display: none; }
 .ui-book.ui-kit .gu-panel-head { justify-content: center; }
 .ui-book.ui-kit .gu-panel-head > .gu-close { position: absolute; right: -14px; top: -10px; margin: 0; }
 .ui-book.ui-kit .gu-panel-head:has(> .gu-tabs) { justify-content: flex-start; }

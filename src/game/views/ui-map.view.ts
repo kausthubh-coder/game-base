@@ -56,18 +56,18 @@ const STYLE = /* css */ `
 .ui-book .gb-beacon-chip { padding: 2px 10px 3px; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums lining-nums; color: var(--ui-glass-ink); background: var(--ui-glass); border: 0; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--ui-glass-line), var(--ui-glass-shadow); }
 .ui-book .gb-beacon-arrow path { stroke: var(--ui-night); }
 
-/* ---- the full map: a painted chart on a page with a gold edge ---- */
-.ui-book .gb-map { padding: 16px; background: radial-gradient(120% 90% at 50% 45%, rgb(20 24 36 / 0.5), rgb(10 12 20 / 0.85)); font-size: 16px; line-height: 1.45; pointer-events: auto; }
+/* ---- the full map: an old painted chart in a gold frame, nearly the whole screen ---- */
+.ui-book .gb-map { padding: 20px; background: radial-gradient(120% 90% at 50% 45%, rgb(20 24 36 / 0.55), rgb(10 12 20 / 0.88)); font-size: 16px; line-height: 1.45; pointer-events: auto; }
 .ui-book .gb-map-page {
-  position: relative; gap: 16px; padding: 28px 32px 30px; border-radius: 16px; animation: ui-map-in 160ms var(--ui-ease);
+  position: relative; width: min(1320px, 100%); height: min(860px, 100%); gap: 14px; padding: 26px 32px 22px; border-radius: 16px; animation: ui-map-in 160ms var(--ui-ease);
   background: radial-gradient(140% 100% at 20% 0%, var(--ui-paper-light), var(--ui-paper) 60%);
   box-shadow: inset 0 0 0 5px var(--ui-paper), inset 0 0 0 6px var(--ui-gold), var(--ui-lift);
 }
 @keyframes ui-map-in { from { transform: scale(0.97) translateY(6px); } }
-.ui-book .gb-map-head { position: relative; gap: 8px 16px; padding: 0 0 12px; min-height: 44px; }
-.ui-book .gb-map-head h2 { font-family: var(--ui-display); font-size: 26px; font-weight: 650; letter-spacing: 0; }
-.ui-book .gb-map-count { font-size: 14px; font-weight: 600; color: var(--ui-ink-2); }
-.ui-book .gb-map-tools { gap: 8px; }
+.ui-book .gb-map-head { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px 16px; padding: 0 0 12px; min-height: 44px; }
+.ui-book .gb-map-head h2 { grid-column: 2; grid-row: 1; font-family: var(--ui-display); font-size: 30px; font-weight: 650; letter-spacing: 0.02em; }
+.ui-book .gb-map-count { grid-column: 1; grid-row: 1; justify-self: start; font-size: 14px; font-weight: 700; color: var(--ui-ink-2); }
+.ui-book .gb-map-tools { grid-column: 3; grid-row: 1; justify-self: end; margin: 0; gap: 8px; }
 .ui-book .gb-map button {
   min-height: 40px; padding: 0 18px; font-weight: 700; color: var(--ui-paper-light);
   background: linear-gradient(180deg, #56607a, #4a5366 55%, #424a5c); border: 0; border-radius: 999px;
@@ -76,10 +76,25 @@ const STYLE = /* css */ `
 .ui-book .gb-map button:hover { filter: brightness(1.12); }
 .ui-book .gb-map button:active { transform: scale(0.97); }
 .ui-book .gb-map button:focus-visible, .ui-book .gb-map canvas:focus-visible, .ui-book .gb-map input:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
-.ui-book .gb-map .gb-map-square { width: 40px; padding: 0; font-size: 20px; }
-.ui-book .gb-map-view { border: 0; border-radius: 12px; background: #c9d6b0; box-shadow: inset 0 0 0 1px var(--ui-bronze), inset 0 0 40px rgb(59 66 85 / 0.25); }
+.ui-book .gb-map .gb-map-square { width: 40px; padding: 0; font-size: 20px; border-radius: 50%; }
+/* The chart: warm parchment, a faint grid of latitude lines, tea-stained edges, and a compass rose in the corner. */
+.ui-book .gb-map-view {
+  border: 0; border-radius: 10px;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgb(120 84 40 / 0.28) 100%),
+    linear-gradient(rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(90deg, rgb(120 84 40 / 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    radial-gradient(ellipse at 22% 18%, rgb(255 250 235 / 0.5), transparent 50%),
+    radial-gradient(ellipse at 80% 85%, rgb(150 100 40 / 0.16), transparent 55%),
+    #e6d8b6;
+  box-shadow: inset 0 0 0 1px var(--ui-bronze), inset 0 0 0 5px rgb(230 216 182 / 0.9), inset 0 0 0 6px rgb(166 137 90 / 0.5), inset 0 0 50px rgb(120 84 40 / 0.3);
+}
+/* The land is inked onto the parchment: multiplied, so it takes the paper's warmth and its stains. */
+.ui-book .gb-map-view canvas { mix-blend-mode: multiply; filter: saturate(0.8) contrast(1.05); }
+.ui-book .gb-map-north { top: 14px; left: 14px; width: 40px; height: 40px; place-items: center; align-content: center; gap: 0; color: var(--ui-ink); font-family: var(--ui-display); font-size: 12px; background: rgb(246 241 231 / 0.75); border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--ui-gold), 0 2px 6px rgb(90 60 20 / 0.25); }
+.ui-book .gb-map-north svg { width: 18px; height: 18px; }
 .ui-book .gb-map-note { padding: 8px 16px; border-radius: 999px; background: var(--ui-night); color: var(--ui-paper); box-shadow: inset 0 0 0 1px var(--ui-glass-line); }
-.ui-book .gb-map-foot { padding: 0; font-size: 14px; color: var(--ui-ink-2); text-align: center; }
+.ui-book .gb-map-foot { padding: 0; font-size: 14px; font-weight: 600; color: var(--ui-ink-2); text-align: center; }
 .ui-book .gb-map-picker { gap: 8px; padding: 14px; border: 0; border-radius: var(--ui-radius); background: var(--ui-paper); box-shadow: inset 0 0 0 1px var(--ui-gold), var(--ui-lift); }
 .ui-book .gb-map .gb-pick-grid button { min-height: 0; padding: 0; background: var(--ui-paper-2); border: 0; box-shadow: none; }
 .ui-book .gb-map .gb-pick-grid button:hover { background: var(--ui-paper-3); }
@@ -91,6 +106,10 @@ const STYLE = /* css */ `
 @media (max-width: 640px) {
   .ui-book .gb-map { padding: 8px; }
   .ui-book .gb-map-page { height: 100%; gap: 12px; padding: 20px 16px 16px; }
+  .ui-book .gb-map-head { grid-template-columns: 1fr auto; }
+  .ui-book .gb-map-head h2 { grid-column: 1; font-size: 24px; }
+  .ui-book .gb-map-count { grid-column: 2; justify-self: end; }
+  .ui-book .gb-map-tools { grid-column: 1 / -1; grid-row: 2; justify-self: stretch; }
   .ui-book .gb-map-tools { gap: 4px; }
   .ui-book .gb-map button { min-height: 44px; padding: 0 10px; }
   .ui-book .gb-map .gb-map-square { flex: 0 0 44px; width: 44px; }

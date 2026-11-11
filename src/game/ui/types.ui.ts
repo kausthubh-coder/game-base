@@ -66,6 +66,10 @@ export interface GameUiOptions {
   picture?(name: string): PictureRef | null;
   /** A small line icon for a menu button (`resume`, `settings`, `account`, `save-quit` …) that fills its box, or null for none. */
   ornament?(name: string): HTMLElement | null;
+  /** True once the player has the Almanac, so the pause menu shows its tile. */
+  hasAlmanac?(): boolean;
+  /** Opens the full map. The pause menu shows a Map tile only when this is given. */
+  openMap?(): void;
   /** Where a point in the world is on screen, in CSS pixels from the root's top left, or null when it is off screen. */
   project(x: number, y: number, z: number): { x: number; y: number } | null;
   /** The numbers for the end card, read when the card opens. */

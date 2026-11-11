@@ -45,6 +45,8 @@ interface Tile {
   painted: Uint8Array;
 }
 
+/** Pixels a block takes when the map opens. */
+const OPEN_SCALE = 6;
 const INK = '#2f2116', PAPER = '#f3e7c9', PAPER_RGB = [0xea, 0xdb, 0xb8];
 /** How much of the parchment shows through the land, so the map reads as ink on paper. */
 const FADE = 0.2;
@@ -363,7 +365,9 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
       root.hidden = false;
       returnFocus = document.activeElement as HTMLElement | null;
       resize();
+      // It opens on the hero's surroundings, close enough to read; the farthest zoom is a scroll away.
       centerX = playerX; centerZ = playerZ;
+      scale = Math.min(MAX_SCALE, Math.max(minScale(), OPEN_SCALE));
       dirty = true;
       canvas.focus({ preventScroll: true });
       options.onToggle?.(true);
@@ -485,7 +489,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     g.restore();
   };
   const label = (text: string, x: number, y: number): void => {
-    g.font = '600 12px ui-serif, Georgia, "Times New Roman", serif';
+    g.font = '600 13px Fraunces, ui-serif, Georgia, "Times New Roman", serif';
     g.textAlign = 'center';
     g.textBaseline = 'top';
     g.lineWidth = 3;
@@ -527,6 +531,33 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     }
   };
 
+  // The edge of what has been seen is a rounded outline that fades into the paper, not a staircase of square cells.
+  // The land is shrunk to a quarter and blurred there (cheap at that size); its alpha, pushed through a steep ramp,
+  // becomes a soft-edged mask with round corners, and the land is kept only inside it.
+  const edge = document.createElement('canvas');
+  const eg = edge.getContext('2d', { willReadFrequently: true });
+  const feather = (): void => {
+    if (!eg) return;
+    const w = Math.max(1, Math.ceil(canvas.width / 4)), h = Math.max(1, Math.ceil(canvas.height / 4));
+    if (edge.width !== w || edge.height !== h) { edge.width = w; edge.height = h; }
+    eg.clearRect(0, 0, w, h);
+    // About half a seen cell, in the quarter-size copy's pixels.
+    eg.filter = `blur(${Math.max(1.5, (scale * dpr * SEEN_CELL) / 4 * 0.45)}px)`;
+    eg.drawImage(canvas, 0, 0, w, h);
+    eg.filter = 'none';
+    const mask = eg.getImageData(0, 0, w, h), px = mask.data;
+    for (let i = 3; i < px.length; i += 4) {
+      const a = (px[i] / 255 - 0.42) / 0.22;
+      px[i] = a <= 0 ? 0 : a >= 1 ? 255 : Math.round(a * a * (3 - 2 * a) * 255);
+    }
+    eg.putImageData(mask, 0, 0);
+    g.save();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.globalCompositeOperation = 'destination-in';
+    g.drawImage(edge, 0, 0, canvas.width, canvas.height);
+    g.restore();
+  };
+
   function draw(x0: number, x1: number, z0: number, z1: number): void {
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, width, height);
@@ -544,6 +575,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     if (tiles.size <= (x1 - x0 + 1) * (z1 - z0 + 1)) for (const key of tiles.keys()) drawTile(key);
     else for (let tz = z0; tz <= z1; tz++) for (let tx = x0; tx <= x1; tx++) drawTile(chunkKey(tx, tz));
     g.imageSmoothingEnabled = true;
+    feather();
 
     // Rumors: a dotted circle, never a point.
     g.strokeStyle = INK;

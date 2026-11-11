@@ -3,6 +3,7 @@
 // any order. It is kept per `GameView`, not as a global.
 import type { Systems } from '../api.sim.ts';
 import type { GameView } from '../shell/view.ts';
+import { ALMANAC_BOOK } from '../content/almanac.ts';
 import { createGameUi, type GameUi, type PanelName } from '../ui/index.ui.ts';
 import { createUiArt, type UiArt } from './art.ts';
 import { KEY_LIST } from './keys.ts';
@@ -85,6 +86,9 @@ function createBook(view: GameView): Book {
     icon: art.icon,
     picture: art.picture,
     ornament: art.tabElement,
+    hasAlmanac: () => game.flags.is(ALMANAC_BOOK.flag),
+    // The map is the map view's, set on the book once that view is installed.
+    openMap: () => book.map?.open(),
     project: (x, y, z) => view.project(x, y, z),
     stats: () => view.stats(),
     // A game in progress can always be gone back to, saved or not.

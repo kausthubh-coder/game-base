@@ -74,12 +74,51 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
       onclick: () => { tab = id; picked = null; ctx.sound('click'); view.render(); },
     }, label);
 
+  // ---- the detail pane, on a wide screen: the thing under the pointer or the focus, drawn large with its name, use and
+  // description. It shows the stack picked up, or the held one, when the pointer is elsewhere.
+  const detail = h('aside', { class: 'gu-detail', 'aria-live': 'polite' });
+  let detailFor: number | null | undefined;
+  /** The slot the pane shows when nothing is pointed at: the stack picked up, the cursor's, the held one, or the first. */
+  const restingSlot = (): number | null => {
+    for (const index of [picked?.index, cursor, inventory.selected]) if (index !== undefined && inventory.slots[index]) return index;
+    const first = inventory.slots.findIndex((stack) => stack !== null);
+    return first >= 0 ? first : null;
+  };
+  const showDetail = (index: number | null): void => {
+    if (detailFor === index) return;
+    detailFor = index;
+    const stack = index === null ? null : inventory.slots[index];
+    if (!stack || index === null) {
+      detail.replaceChildren(h('div', { class: 'gu-detail-art gu-detail-art-empty' }), h('p', { class: 'gu-empty' }, 'Point at a thing to see what it is.'));
+      return;
+    }
+    const def = items.get(stack.id);
+    const use = itemUse(def);
+    detail.replaceChildren();
+    add(detail,
+      h('div', { class: 'gu-detail-art' }, picture(ctx.options.icon(def.icon), def.name, 96)),
+      h('div', { class: 'gu-detail-text' },
+        h('h3', { class: 'gu-detail-name' }, def.name),
+        h('p', { class: 'gu-detail-count gu-num' }, index < QUICK ? `Quick slot ${index + 1} · ${stack.count} held` : `${stack.count} in the bag`),
+        use ? h('p', { class: 'gu-detail-use' }, use) : null,
+        h('p', { class: 'gu-detail-desc' }, def.description),
+        use && index >= QUICK ? h('p', { class: 'gu-tip-note' }, 'Put it in a quick slot to hold it.') : null,
+      ),
+    );
+  };
+  /** True when the pane is on screen. A narrow screen has no room for it, and shows the tooltip instead. */
+  const paneShown = (): boolean => detail.isConnected && detail.offsetParent !== null;
+
   // ---- the tooltip: the name, what it is for, and what the item says of itself. It lives in the stage, outside the panel's zoom.
   const tip = h('div', { class: 'gu-tip', id: 'gu-tip', role: 'tooltip', hidden: true });
   let tipFor = -1;
   /** The focus shows a tooltip only once the keys are in use here, so the slot focused as the bag opens shows none. */
   let keyed = false;
   const showTip = (index: number, anchor: HTMLElement): void => {
+    if (paneShown() && !drag.active) {
+      showDetail(inventory.slots[index] ? index : restingSlot());
+      return;
+    }
     const stack = inventory.slots[index];
     const stage = body.closest<HTMLElement>('.gu-stage');
     if (!stack || !stage || drag.active) return hideTip();
@@ -107,6 +146,7 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
   function hideTip(): void {
     tip.hidden = true;
     tipFor = -1;
+    if (paneShown()) showDetail(restingSlot());
   }
 
   // ---- the line under the slots: how to move things, or what is picked up.
@@ -229,7 +269,9 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
         tabs.replaceChildren(tabButton('things', 'Things'), tabButton('hand', 'By hand'));
         if (tab === 'things') {
           drawFoot();
-          body.replaceChildren(...drawSlots(), foot);
+          detailFor = undefined;
+          showDetail(restingSlot());
+          body.replaceChildren(h('div', { class: 'gu-bag-grid' }, ...drawSlots(), foot), detail);
         } else {
           const byHand = crafting.available().filter((recipe) => recipe.station === 'hand');
           body.replaceChildren(recipeList(ctx, byHand, 'Nothing can be made by hand yet.', () => view.render()));

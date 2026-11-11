@@ -153,9 +153,22 @@ export const STYLES = /* css */ `
 .gu-tab::after { content: ''; position: absolute; inset: -3px 0; }
 .gu-tab:hover { color: var(--ink); }
 .gu-tab[aria-selected='true'] { color: var(--paper-light); background: var(--navy); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.6), 0 1px 3px rgb(10 12 20 / 0.25); }
-.gu-bag-things { display: grid; gap: var(--s2); }
-.gu-bag-things > .gu-label:not(:first-child) { margin-top: var(--s4); }
+.gu-bag-things { display: grid; grid-template-columns: auto 300px; gap: var(--s6); align-items: stretch; }
+.gu-bag-grid { display: grid; gap: var(--s2); align-content: start; }
+.gu-bag-grid > .gu-label:not(:first-child) { margin-top: var(--s4); }
 .gu-bag:not(.gu-bag-things) { width: 640px; max-width: 100%; }
+/* The detail pane: the thing drawn large on a warm card, then its name, how many, its use and what it says of itself. */
+.gu-detail { display: flex; flex-direction: column; min-height: 420px; overflow: hidden; border-radius: 14px; background: var(--paper-light); box-shadow: inset 0 0 0 1px var(--gold), 0 4px 14px rgb(59 66 85 / 0.12); }
+.gu-detail-art { position: relative; display: grid; place-items: center; height: 190px; flex: none; background: radial-gradient(70% 80% at 35% 25%, #f6d79a, #d79b52 55%, #9c6b3a); box-shadow: inset 0 -1px 0 var(--gold); }
+.gu-detail-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 78% 22%, rgb(255 250 230 / 0.6) 0 1.5px, transparent 2.5px), radial-gradient(circle at 20% 70%, rgb(255 250 230 / 0.5) 0 1px, transparent 2px), radial-gradient(circle at 66% 78%, rgb(255 250 230 / 0.45) 0 1px, transparent 2px); pointer-events: none; }
+.gu-detail-art .gu-pic { filter: drop-shadow(0 6px 8px rgb(60 30 10 / 0.45)); }
+.gu-detail-art-empty { background: radial-gradient(70% 80% at 35% 25%, var(--paper-2), var(--paper-3)); }
+.gu-detail-text { display: grid; gap: 6px; align-content: start; padding: 16px 20px 20px; }
+.gu-detail > .gu-empty { padding: 16px 20px; text-align: center; }
+.gu-detail-name { font-family: var(--display); font-size: 26px; font-weight: 650; line-height: 1.1; }
+.gu-detail-count { font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.gu-detail-use { margin-top: 4px; padding: 6px 10px; font-weight: 700; color: var(--ink); background: rgb(211 188 142 / 0.25); border-left: 3px solid var(--gold); border-radius: 0 8px 8px 0; }
+.gu-detail-desc { color: var(--ink-2); text-wrap: pretty; }
 .gu-slots { display: grid; grid-template-columns: repeat(9, var(--slot)); gap: 8px; }
 /* A slot is a night well with a gold rim, the way a bag of things looks in the hand. */
 .gu-slot {
@@ -165,8 +178,8 @@ export const STYLES = /* css */ `
 }
 .gu-slot:hover { background: radial-gradient(90% 90% at 30% 20%, #4a5470, #323a50); }
 .gu-slot:active { filter: brightness(0.95); }
-.gu-slot-empty { cursor: default; background: rgb(59 66 85 / 0.12); box-shadow: inset 0 0 0 1px rgb(166 137 90 / 0.35); }
-.gu-slot-empty:hover { background: rgb(59 66 85 / 0.16); }
+.gu-slot-empty { cursor: default; background: radial-gradient(circle, rgb(166 137 90 / 0.18) 0 2px, transparent 2.5px), rgb(166 137 90 / 0.09); box-shadow: inset 0 0 0 1px rgb(166 137 90 / 0.28), inset 0 2px 4px rgb(59 66 85 / 0.08); }
+.gu-slot-empty:hover { background: radial-gradient(circle, rgb(166 137 90 / 0.3) 0 2px, transparent 2.5px), rgb(166 137 90 / 0.14); }
 .gu-quick { background: radial-gradient(90% 90% at 30% 20%, #4a4434, #34302a); }
 .gu-quick.gu-slot-empty { background: rgb(166 137 90 / 0.16); }
 .gu-quick:hover, .gu-quick.gu-slot-empty:hover { filter: brightness(1.1); }
@@ -212,35 +225,50 @@ export const STYLES = /* css */ `
 .gu-recipe-act .gu-btn { min-width: 96px; }
 .gu-why { max-width: 22ch; font-size: 13px; color: var(--ink-2); text-align: right; text-wrap: balance; }
 
-/* ---- almanac: an open book, the index on the left page and the entry on the right ---- */
-.gu-book { display: grid; grid-template-columns: 220px 22px 1fr; gap: 0 var(--s5); width: 880px; max-width: 100%; min-height: 440px; }
+/* ---- almanac: a leather book lying open. The index is the left page, the entry the right, a fold between them. ---- */
+.gu-panel-almanac { padding: 26px 30px 30px; background: radial-gradient(120% 100% at 30% 0%, #4a3b2c, #33291f 70%); box-shadow: inset 0 0 0 3px #2a2119, inset 0 0 0 5px var(--bronze), inset 0 0 0 7px #2a2119, var(--lift); }
+.gu-panel-almanac .gu-panel-head { justify-content: center; margin-bottom: var(--s4); padding-bottom: 6px; }
+.gu-panel-almanac .gu-panel-head::after { display: none; }
+.gu-panel-almanac .gu-panel-title { font-size: 26px; color: var(--gold-bright); letter-spacing: 0.06em; text-shadow: 0 1px 0 #1a140e, 0 0 12px rgb(240 212 138 / 0.25); }
+.gu-panel-almanac .gu-close { position: absolute; right: -6px; top: 0; }
+.gu-book {
+  position: relative; display: grid; grid-template-columns: 240px 34px 1fr; gap: 0; width: 920px; max-width: 100%; min-height: 470px; padding: 30px 34px 34px;
+  background: linear-gradient(90deg, rgb(120 90 50 / 0.1), transparent 6%, transparent 94%, rgb(120 90 50 / 0.1)), #efe6d2; border-radius: 6px;
+  box-shadow: 0 1px 0 #d8ccb2, 0 3px 0 #e8dec8, 0 4px 0 #cfc2a6, 0 6px 0 #e2d7bf, 0 7px 0 #c5b797, 0 12px 20px rgb(0 0 0 / 0.45);
+}
 .gu-book-blank { display: grid; grid-template-columns: 1fr; place-items: center; }
-.gu-book-blank .gu-empty { font-family: var(--display); font-size: 18px; text-align: center; }
+.gu-book-blank .gu-empty { max-width: 36ch; font-family: var(--display); font-size: 20px; font-style: italic; text-align: center; }
+/* The ribbon that marks the open page hangs from the top of the right page. */
+.gu-book:not(.gu-book-blank)::after { content: ''; position: absolute; right: 64px; top: -6px; width: 22px; height: 86px; background: linear-gradient(90deg, #6e2222, #9a3434 50%, #6e2222); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); box-shadow: inset 0 0 0 1px var(--gold); filter: drop-shadow(0 2px 2px rgb(0 0 0 / 0.3)); pointer-events: none; }
 .gu-index { display: grid; gap: var(--s5); align-content: start; }
-.gu-index-group { display: grid; gap: 2px; }
-.gu-index-group .gu-label { margin-bottom: var(--s1); padding-left: var(--s2); }
-.gu-page-link { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: var(--target); padding: 0 var(--s3); background: none; border: 0; border-radius: var(--radius); text-align: left; font-weight: 600; }
-.gu-page-link:hover { background: rgb(255 255 255 / 0.45); }
-.gu-page-link[aria-current='page'] { color: var(--paper-light); background: var(--navy); font-weight: 700; box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.6); }
-.gu-new { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 800; color: var(--new); }
-.gu-new::before { content: ''; width: 7px; height: 7px; background: currentColor; transform: rotate(45deg); }
-.gu-page-link[aria-current='page'] .gu-new { color: var(--gold-bright); }
-/* The gutter between the two pages: a soft fold. */
-.gu-spine { background: linear-gradient(90deg, transparent, rgb(59 66 85 / 0.1) 40%, rgb(59 66 85 / 0.18) 50%, rgb(59 66 85 / 0.1) 60%, transparent); }
-.gu-leaf { position: relative; }
-.gu-leaf-head { display: flex; align-items: center; gap: var(--s5); padding-bottom: var(--s5); }
-.gu-leaf-head .gu-pic { background: radial-gradient(90% 90% at 30% 20%, #f8f3e8, var(--paper-3)); border-radius: 50%; box-shadow: inset 0 0 0 2px var(--gold), 0 4px 12px rgb(10 12 20 / 0.15); }
-.gu-leaf-title { font-family: var(--display); font-size: 34px; font-weight: 650; line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; }
-.gu-columns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); padding-top: var(--s5); border-top: 1px solid var(--gold); }
+.gu-index-group { display: grid; gap: 0; }
+.gu-index-group .gu-label { margin-bottom: 4px; padding-left: 2px; color: var(--bronze); font-size: 14px; letter-spacing: 0.04em; }
+.gu-page-link { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--s2); min-height: 36px; padding: 0 10px 0 16px; background: none; border: 0; border-radius: 6px; text-align: left; font-family: var(--display); font-size: 17px; font-weight: 500; color: var(--ink); }
+.gu-page-link::before { content: ''; position: absolute; left: 4px; top: 50%; width: 5px; height: 5px; background: var(--paper-4); transform: translateY(-50%) rotate(45deg); }
+.gu-page-link:hover { background: rgb(166 137 90 / 0.12); }
+.gu-page-link[aria-current='page'] { color: var(--ink); background: linear-gradient(90deg, rgb(211 188 142 / 0.45), rgb(211 188 142 / 0)); font-weight: 650; box-shadow: none; }
+.gu-page-link[aria-current='page']::before { width: 7px; height: 7px; background: #9a3434; }
+.gu-new { display: inline-flex; align-items: center; gap: 5px; font-family: 'Nunito', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--new); }
+.gu-new::before { content: ''; width: 6px; height: 6px; background: currentColor; transform: rotate(45deg); }
+/* The fold between the two pages. */
+.gu-spine { margin: -30px 0 -34px; background: linear-gradient(90deg, transparent, rgb(90 64 30 / 0.1) 30%, rgb(90 64 30 / 0.32) 50%, rgb(90 64 30 / 0.1) 70%, transparent); }
+.gu-leaf { position: relative; padding-left: 8px; }
+.gu-leaf-head { display: flex; align-items: center; gap: var(--s5); padding: 6px 0 var(--s5); }
+.gu-leaf-head .gu-pic { background: radial-gradient(80% 80% at 35% 25%, #fbf6ea, #e2d6bb); border-radius: 50%; box-shadow: inset 0 0 0 3px var(--gold), inset 0 0 0 5px #f6f0e1, inset 0 0 0 6px rgb(166 137 90 / 0.5), 0 6px 14px rgb(90 64 30 / 0.22); }
+.gu-leaf-head .gu-label { color: var(--bronze); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+.gu-leaf-head .gu-label::before { display: none; }
+.gu-leaf-title { font-family: var(--display); font-size: 38px; font-weight: 650; line-height: 1.05; text-wrap: balance; }
+.gu-columns { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); padding-top: var(--s5); border-top: 0; background: linear-gradient(90deg, transparent, var(--gold) 15%, var(--gold) 85%, transparent) top / 100% 1px no-repeat; }
 .gu-column .gu-label { margin-bottom: var(--s3); }
 .gu-facts { display: grid; gap: var(--s3); }
-.gu-fact { min-height: 1.5em; max-width: 34ch; text-wrap: pretty; }
-.gu-dashes { display: block; width: 78%; height: 0.95em; border-bottom: 2px dotted var(--paper-4); }
+.gu-fact { position: relative; min-height: 1.5em; max-width: 34ch; padding-left: 16px; font-family: var(--display); font-size: 16.5px; font-weight: 450; line-height: 1.4; color: #3d3428; text-wrap: pretty; }
+.gu-fact::before { content: ''; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border: 1px solid var(--bronze); transform: rotate(45deg); }
+.gu-dashes { display: block; width: 82%; height: 1em; border-bottom: 1.5px dashed rgb(166 137 90 / 0.5); }
 .gu-inked { display: inline-block; animation: gu-ink 900ms var(--ease) both; }
 @keyframes gu-ink { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
-.gu-stamp { margin-left: auto; align-self: start; padding: 5px 14px; border: 2px solid var(--done); border-radius: 999px; color: var(--done); font-family: var(--display); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; transform: rotate(-5deg); box-shadow: inset 0 0 0 2px rgb(94 138 74 / 0.2); }
+.gu-stamp { position: absolute; right: 40px; top: 96px; padding: 6px 14px; border: 2.5px double var(--done); border-radius: 8px; color: var(--done); font-family: var(--display); font-size: 15px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; transform: rotate(-8deg); opacity: 0.85; mix-blend-mode: multiply; }
 .gu-stamped { animation: gu-stamp 160ms var(--ease) both; }
-@keyframes gu-stamp { from { transform: rotate(-5deg) scale(1.3); } }
+@keyframes gu-stamp { from { transform: rotate(-8deg) scale(1.3); } }
 
 /* ---- quests ---- */
 .gu-quests { width: 560px; max-width: 100%; }
@@ -261,8 +289,24 @@ export const STYLES = /* css */ `
 .gu-menu { display: grid; gap: 10px; width: 320px; max-width: 100%; }
 .gu-menu .gu-btn { min-height: 50px; font-size: 16px; }
 .gu-menu-note { font-size: 14px; color: var(--ink-2); text-align: center; }
+/* Pause: big tiles to the bag, the Almanac, the quests and the map, then a row of what leaves the menu. */
 .gu-panel-pause .gu-panel-head { justify-content: center; }
-.gu-panel-pause .gu-panel-title { font-size: 30px; }
+.gu-panel-pause .gu-panel-title { font-size: 34px; }
+.gu-pause { display: grid; gap: var(--s5); width: 640px; max-width: 100%; }
+.gu-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
+.gu-tile {
+  position: relative; display: grid; justify-items: center; align-content: center; gap: 8px; min-height: 150px; padding: 16px 8px 14px;
+  color: var(--paper-light); border: 0; border-radius: 16px;
+  background: radial-gradient(90% 70% at 50% 25%, #3c4560, var(--night) 75%);
+  box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.6), inset 0 0 0 4px var(--night), inset 0 0 0 5px rgb(211 188 142 / 0.25), 0 6px 16px rgb(10 12 20 / 0.3);
+  transition: transform 120ms var(--ease), box-shadow 120ms var(--ease);
+}
+.gu-tile:hover, .gu-tile:focus-visible { transform: translateY(-3px); box-shadow: inset 0 0 0 1.5px var(--gold-bright), inset 0 0 0 4px var(--night), inset 0 0 0 5px rgb(240 212 138 / 0.4), 0 0 22px rgb(240 212 138 / 0.35), 0 10px 20px rgb(10 12 20 / 0.35); outline: none; }
+.gu-tile:active { transform: translateY(-1px) scale(0.98); }
+.gu-tile-icon { display: grid; place-items: center; width: 64px; height: 64px; filter: brightness(1.35) drop-shadow(0 0 6px rgb(240 212 138 / 0.45)); }
+.gu-tile-name { font-family: var(--display); font-size: 19px; font-weight: 650; }
+.gu-tile kbd { min-width: 24px; height: 22px; font-size: 12px; color: var(--gold); background: rgb(255 255 255 / 0.06); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.45); }
+.gu-pause .gu-menu { grid-template-columns: 1fr 1fr; width: 100%; }
 /* Settings: what is seen and heard on the left, the keys on the right. Each row is a band: its name, then its control. */
 .gu-settings { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: var(--s7); width: 960px; max-width: 100%; }
 .gu-settings > .gu-section { margin-top: 0; }
@@ -363,6 +407,8 @@ export const STYLES = /* css */ `
 /* ---- a root too narrow for the wide panels ---- */
 @container gu (width < 1080px) {
   .gu-settings { grid-template-columns: 1fr; gap: var(--s6); width: 560px; }
+  .gu-bag-things { grid-template-columns: 1fr; }
+  .gu-detail { display: none; }
 }
 
 /* ---- a narrow root: bigger targets, one column, six slots across ---- */
@@ -384,7 +430,15 @@ export const STYLES = /* css */ `
   .gu-recipe > .gu-pic > .gu-pic-cell { left: 4px; top: 4px; }
   .gu-recipe-act { grid-column: 2; justify-items: start; }
   .gu-why { max-width: none; text-align: left; }
-  .gu-book { grid-template-columns: 1fr; min-height: 0; gap: var(--s4); }
+  .gu-book { grid-template-columns: 1fr; min-height: 0; gap: var(--s4); padding: 18px 16px 20px; }
+  .gu-book:not(.gu-book-blank)::after { display: none; }
+  .gu-panel-almanac { padding: 18px 12px 16px; }
+  .gu-stamp { position: static; align-self: start; margin-left: auto; }
+  .gu-bag-things { grid-template-columns: 1fr; }
+  .gu-detail { display: none; }
+  .gu-tile { min-height: 110px; }
+  .gu-tile-icon { width: 48px; height: 48px; }
+  .gu-pause .gu-menu { grid-template-columns: 1fr; }
   .gu-index { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); padding: 0; }
   .gu-index-group { display: flex; align-items: center; gap: var(--s1); flex: none; }
   .gu-index-group .gu-label { margin: 0; padding: 0 var(--s1) 0 0; }
