@@ -6,6 +6,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { cameraStill } from './play/wait.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 
 const args = process.argv.slice(2);
@@ -43,10 +44,7 @@ const errors = [];
 let browser;
 
 try {
-  // Projected pointer targets differ on Metal, and four frames are too short for the walking assertion.
-  // Keep this existing smoke scenario on software until its frame-based aim checks are rewritten.
   browser = await launchChrome({
-    software: true,
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
@@ -177,6 +175,7 @@ try {
     turned.camera.quarter === (start.camera.quarter + 1) % 4 ? -1 : 1);
   await game(() => window.__game.settle());
   await game(() => window.__game.frames(3));
+  await cameraStill(page);
   // The first block near the player that may be broken (the road is the town's) and whose spot on the page is
   // bare canvas (the prompt under the hero is HTML).
   const target = await game(() => {
@@ -196,18 +195,14 @@ try {
   check('the pointer aims at the block under it', aim && aim.x === target.x && aim.y === target.y && aim.z === target.z, `wanted ${target.x}, ${target.y}, ${target.z} (${target.key})  got ${JSON.stringify(aim)}`);
   await game(() => window.__game.manual(false));
   await page.mouse.down();
-  let gone = false;
-  for (let i = 0; i < 30 && !gone; i++) {
-    await game(() => window.__game.frames(1));
-    gone = await game((t) => window.__game.block(t.x, t.y, t.z).id === 0, target);
-  }
+  const gone = await page.waitForFunction((t) => window.__game.block(t.x, t.y, t.z).id === 0, target, { timeout: 15000 }).then(() => true, () => false);
   await page.mouse.up();
   check('holding the real left button breaks it', gone);
 
   // The real keyboard: hold W for a few frames.
   const beforeKeys = await game(() => window.__game.state().player);
   await page.keyboard.down('KeyW');
-  await game(() => window.__game.frames(4));
+  await page.waitForFunction((p) => { const q = window.__game.state().player; return Math.hypot(q.x - p.x, q.z - p.z) > 0.5; }, beforeKeys, { timeout: 15000 });
   await page.keyboard.up('KeyW');
   const afterKeys = await game(() => { window.__game.manual(true); return window.__game.state().player; });
   const keyFar = Math.hypot(afterKeys.x - beforeKeys.x, afterKeys.z - beforeKeys.z);

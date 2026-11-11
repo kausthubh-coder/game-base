@@ -26,6 +26,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { cameraStill } from './play/wait.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 import { REGION } from '../src/game/content/region.ts';
 
@@ -350,7 +351,7 @@ async function aimThrough(x, y, z, n) {
 async function point(x, y, z, n = [0, 1, 0]) {
   if (LOCK) return aimThrough(x, y, z, n);
   for (let tries = 0; tries < 8; tries++) {
-    await frames(2);
+    await cameraStill(page);
     const insets = [0.49, 0.3, 0.45];
     for (const inset of insets) {
       const at = await p.face(x, y, z, n, inset);
@@ -1011,9 +1012,7 @@ const QUESTS = {
 };
 
 try {
-  // On Metal, step 16 cannot aim at its projected farm cells; software preserves the existing scenario.
   browser = await launchChrome({
-    software: true,
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
