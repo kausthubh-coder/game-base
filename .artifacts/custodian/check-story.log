@@ -1,0 +1,26 @@
+OK story tamsin: sizes, anchors, transparency, palette
+OK story maren: sizes, anchors, transparency, palette
+OK story odo: sizes, anchors, transparency, palette
+OK story gus: sizes, anchors, transparency, palette
+OK story mira: sizes, anchors, transparency, palette
+OK story wren: sizes, anchors, transparency, palette
+OK story juniper: sizes, anchors, transparency, palette
+OK story brack: sizes, anchors, transparency, palette
+OK story leaftail: sizes, anchors, transparency, palette
+OK story lanternfly: sizes, anchors, transparency, palette
+OK story hero-swing: sizes, anchors, transparency, palette
+OK story custodian: sizes, anchors, transparency, palette
+OK story town-pell: sizes, anchors, transparency, palette
+OK story town-corin: sizes, anchors, transparency, palette
+OK story town-hesper: sizes, anchors, transparency, palette
+OK story town-dunn: sizes, anchors, transparency, palette
+OK story town-isolde: sizes, anchors, transparency, palette
+OK story town-nessa: sizes, anchors, transparency, palette
+OK story town-roan: sizes, anchors, transparency, palette
+OK story town-pip: sizes, anchors, transparency, palette
+PASS story: 339 frames; original entries and files unchanged
+OK portraits: 9 tiles, transparency, palette and padding
+OK crops: 14 tiles, anchors, transparency, palette
+OK icons story: 16 tiles, transparency, palette and padding
+OK UI: panel 96x96, button 96x32, title 480x270, palette and alpha
+PASS all six story sets complete

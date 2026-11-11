@@ -1,0 +1,268 @@
+verify-assets: /Users/dabot/.t3/worktrees/game-base/t3-178abdee-e1173c4105367c1f
+
+PASS  manifest      25 sprites; blocks: 30 names, 40 cells; icons: 16 names, 16 cells; icons.sheets.story: 16 names, 16 cells; portraits: 9 names, 9 cells; crops: 4 names, 14 cells; ui; materials: 1 name, 1 cell; 39 models checked against GLB bytes; 14 cast models checked against GLB bytes and their sources; voice; sound; 12 paintings; 250 files listed and found
+PASS  sprite-check  105 sprite frames; 40 block tiles; 16 icons; all PNG colors in locked palette; story: 339 frames; original entries and files unchanged; all six story sets complete
+PASS  names         36 names in 23 files under src/game/content, 3 more set from a variable and not checked
+PASS  block-tiles   28 tile names from src/content/blocks.ts, water left out
+PASS  props         96 prop shapes built; fullest is Shop sign variant 2 at 140 of 140 triangles
+PASS  palettes      8 palettes; layers drone, harmony, melody, sparkle, bass, perc; on purpose (LAYER_EXEMPT): center has no bass and no perc
+PASS  sizes         34 PNGs, largest 87.6 KB of 1024.0 KB; folder 12.81 MB of 24 MB
+PASS  voice         109 clips, 8.6 minutes, model eleven_v4_turbo
+PASS  sound         40 recordings, 3.43 MB, model eleven_text_to_sound_v3
+
+Sizes in public/assets (1 MB = 1,048,576 bytes)
+  file                                          KB  pixels
+  sound/bed.town.night.mp3                   264.5
+  sound/bed.town.square.mp3                  264.5
+  sound/bed.town.birds.mp3                   264.5
+  sound/bed.meadow.day.mp3                   264.5
+  sound/bed.meadow.night.mp3                 264.5
+  sound/bed.town.water.mp3                   264.5
+  sound/bed.town.murmur.mp3                  264.5
+  sound/bed.forest.day.mp3                   264.5
+  sound/bed.town.workshop.mp3                264.5
+  models/cast-hero.glb                       146.2
+  models/cast-tamsin.glb                     143.2
+  models/tree-41.glb                         137.3
+  models/tree-83.glb                         137.3
+  models/tree-17.glb                         137.3
+  models/cast-maren.glb                      135.0
+  models/cast-brack.glb                      134.3
+  models/cast-wren.glb                       132.0
+  models/cast-villager-b.glb                 128.0
+  models/cast-juniper.glb                    126.9
+  models/cast-villager-a.glb                 123.9
+  models/cast-mira.glb                       123.6
+  models/cast-odo.glb                        123.5
+  models/cast-gus.glb                        123.5
+  painted/cloud-6.webp                       119.7
+  models/pine-41.glb                         119.6
+  models/pine-83.glb                         119.6
+  models/pine-17.glb                         119.6
+  models/birch-41.glb                        118.4
+  models/birch-83.glb                        118.4
+  models/birch-17.glb                        118.3
+  sound/bed.town.lantern.mp3                 113.9
+  painted/cloud-3.webp                        97.2
+  sound/spot.cart.mp3                         96.0
+  painted/cloud-1.webp                        95.5
+  ui/title.png                                87.6  480 x 270
+  painted/cloud-2.webp                        83.1
+  painted/cloud-4.webp                        80.8
+  models/cast-leaftail.glb                    78.7
+  sprites/tamsin.png                          75.1  512 x 768
+  sprites/town-hesper.png                     74.8  512 x 768
+  sprites/town-isolde.png                     74.1  512 x 768
+  sprites/town-pell.png                       74.1  512 x 768
+  sprites/hero.png                            72.4  768 x 896
+  models/cast-lanternfly.glb                  70.7
+  sprites/town-nessa.png                      69.9  512 x 768
+  sprites/brack.png                           69.2  512 x 768
+  sprites/town-corin.png                      68.2  512 x 768
+  sound/spot.bird.mp3                         67.8
+  sound/spot.well.mp3                         67.6
+  sprites/odo.png                             66.8  512 x 768
+  sprites/juniper.png                         66.3  512 x 768
+  models/cast-mossling.glb                    65.0
+  sound/spot.children.mp3                     64.9
+  sprites/maren.png                           63.9  512 x 768
+  sprites/town-dunn.png                       61.1  512 x 768
+  sprites/town-roan.png                       61.0  512 x 768
+  sound/spot.boat.mp3                         60.7
+  voice/maren/0dd9f3718c3b.mp3                60.4
+  sound/spot.dog.mp3                          57.8
+  sprites/villager-b.png                      57.0  512 x 768
+  sprites/gus.png                             56.3  512 x 768
+  voice/tamsin/487db805add5.mp3               56.2
+  voice/gus/c2ff8ac5abcb.mp3                  56.2
+  voice/juniper/02e5316e8d5e.mp3              54.9
+  voice/gus/54dfdc08f761.mp3                  54.9
+  sound/step.sand.mp3                         54.7
+  voice/juniper/24913e605f1a.mp3              54.3
+  sprites/wren.png                            53.5  512 x 768
+  portraits/portraits.png                     53.3  384 x 384
+  voice/voice.json                            52.8
+  voice/maren/c030b50902fe.mp3                51.9
+  voice/juniper/ac1e85647a9b.mp3              51.9
+  voice/gus/71ac6304c335.mp3                  51.9
+  voice/tamsin/ae32ebdde238.mp3               51.3
+  voice/juniper/37ecd108ed7c.mp3              51.3
+  voice/maren/fe9f1d3854fc.mp3                50.4
+  voice/gus/fed220e9a0da.mp3                  50.4
+  models/town/granary-hall.glb                50.4
+  sprites/town-pip.png                        49.8  512 x 768
+  voice/tamsin/92ed56d236ff.mp3               49.2
+  sprites/custodian.png                       49.1  384 x 672
+  sprites/villager-a.png                      48.7  512 x 768
+  sprites/mira.png                            48.4  512 x 768
+  painted/meadow.webp                         47.5
+  voice/maren/feb0ffc5488b.mp3                47.4
+  sound/move.cloth.mp3                        47.0
+  voice/juniper/237d5d50ed79.mp3              46.2
+  voice/gus/505c39753d9e.mp3                  46.2
+  voice/gus/85e5b6e6fbc2.mp3                  46.2
+  voice/juniper/48a86583ec28.mp3              45.6
+  voice/gus/57de3bd1d5b3.mp3                  45.6
+  voice/tamsin/16889ca1b111.mp3               44.9
+  voice/tamsin/091ab5bb1989.mp3               44.9
+  voice/gus/fc5579daad35.mp3                  44.9
+  voice/tamsin/0f15b8960795.mp3               44.3
+  voice/tamsin/ab9e438aedd5.mp3               44.3
+  voice/tamsin/0884e61c8fbc.mp3               44.3
+  voice/juniper/589de06025a4.mp3              44.3
+  voice/tamsin/5a321e646234.mp3               43.7
+  voice/tamsin/4b7c45234a3f.mp3               43.7
+  voice/juniper/7ece90ead463.mp3              43.7
+  voice/gus/146d829b65b4.mp3                  43.7
+  voice/gus/d2d2d77519c1.mp3                  43.7
+  sprites/leaftail.png                        43.4  384 x 576
+  voice/maren/6fe36060a879.mp3                43.1
+  voice/tamsin/08e70b7adb1f.mp3               43.1
+  voice/tamsin/46125bc12bea.mp3               43.1
+  sound/step.water.mp3                        42.7
+  voice/maren/6e88c91e7d2c.mp3                42.5
+  voice/maren/1426c8664fc5.mp3                41.9
+  voice/tamsin/f5d5d74ee45b.mp3               41.9
+  voice/gus/b7da7a1904df.mp3                  41.9
+  voice/tamsin/c1add506dd34.mp3               41.3
+  voice/tamsin/289c16950aa8.mp3               41.3
+  sound/spot.door.mp3                         41.3
+  voice/tamsin/6216cff9dec9.mp3               40.4
+  voice/gus/a12b3c0974ca.mp3                  40.4
+  voice/tamsin/93b8322c7f15.mp3               39.8
+  voice/tamsin/c52eb860085a.mp3               39.8
+  voice/juniper/69c3a609c8fb.mp3              39.8
+  voice/gus/c17997db681a.mp3                  39.8
+  models/town/rootworks-gate.glb              39.5
+  voice/maren/667dcfd33bc4.mp3                39.2
+  voice/maren/26f7517c35c4.mp3                39.2
+  voice/tamsin/3f1269438207.mp3               39.2
+  voice/juniper/c09df1326ab2.mp3              38.6
+  voice/gus/208247933e7d.mp3                  38.6
+  sound/shot.pour.mp3                         38.6
+  sound/step.grass.mp3                        38.2
+  voice/maren/d3b057940499.mp3                38.0
+  voice/tamsin/7d28e2224b04.mp3               38.0
+  voice/tamsin/ba857a7d85c9.mp3               38.0
+  voice/maren/dc323b3cce30.mp3                37.4
+  voice/tamsin/26d9d20142e3.mp3               37.4
+  voice/maren/2c6d845d369f.mp3                36.8
+  voice/tamsin/76941f092152.mp3               36.8
+  voice/tamsin/b2a94a1dafa5.mp3               36.8
+  voice/tamsin/77f55681c60a.mp3               36.8
+  voice/tamsin/91b20c503a09.mp3               36.8
+  voice/juniper/12ad6fbd8731.mp3              36.8
+  voice/gus/b219e98fddba.mp3                  36.2
+  voice/maren/324b7cd18891.mp3                35.6
+  voice/juniper/dce6c08d06be.mp3              35.6
+  voice/maren/f9aa76176bf7.mp3                34.9
+  voice/maren/59dc46d552b1.mp3                34.9
+  voice/tamsin/c047a8974c6d.mp3               34.3
+  voice/tamsin/47bfccd14933.mp3               34.3
+  voice/gus/6c3eaf300022.mp3                  34.3
+  voice/maren/ea99998ab90e.mp3                33.7
+  voice/maren/559735d6fce4.mp3                33.7
+  sound/spot.stall.mp3                        33.5
+  voice/maren/2dcbd5a9bb60.mp3                33.1
+  sound/step.path.mp3                         32.9
+  voice/maren/172d530f92b2.mp3                32.5
+  voice/tamsin/e178520bc4dd.mp3               32.5
+  voice/juniper/10223bad0550.mp3              32.5
+  voice/maren/d53d4bc07824.mp3                31.9
+  voice/gus/747e1d7a1f67.mp3                  31.9
+  painted/tuft-2.webp                         31.4
+  voice/tamsin/c48170f239cf.mp3               31.3
+  voice/tamsin/48a1a41158bc.mp3               31.3
+  voice/maren/86aca5b10145.mp3                30.4
+  voice/maren/bd70449754cd.mp3                30.4
+  voice/gus/6b5254820687.mp3                  30.4
+  sound/step.dirt.mp3                         30.4
+  voice/tamsin/68e271db9438.mp3               29.8
+  voice/maren/421f27a37724.mp3                29.2
+  sound/shot.page.mp3                         29.0
+  manifest.json                               28.7
+  voice/maren/ec997f44e3dd.mp3                28.6
+  voice/tamsin/8e23f2162ac2.mp3               28.6
+  models/bush-29.glb                          28.6
+  voice/maren/4453b1a311b6.mp3                28.0
+  voice/tamsin/b80b76fc4a36.mp3               28.0
+  sound/shot.treefall.mp3                     27.6
+  voice/tamsin/f7edb105bc27.mp3               27.4
+  voice/juniper/d297800c7ef6.mp3              27.4
+  voice/tamsin/0d485f3a891f.mp3               26.8
+  models/town/lodge.glb                       26.7
+  voice/tamsin/927ee9b1a174.mp3               26.2
+  models/town/house-b.glb                     26.1
+  voice/tamsin/6ebed4b5fe5b.mp3               25.6
+  painted/cloud-5.webp                        25.4
+  voice/tamsin/1573f997b9ac.mp3               24.9
+  voice/tamsin/5dc71b8bc88d.mp3               24.9
+  voice/tamsin/37bf0d4718ab.mp3               24.9
+  models/town/ferry-house.glb                 24.8
+  sprites/hero-swing.png                      24.4  384 x 384
+  sprites/pet.png                             24.4  384 x 576
+  models/town/house-c.glb                     24.3
+  sound/shot.harvest.mp3                      24.1
+  models/town/house-d.glb                     23.9
+  models/town/kennel.glb                      23.4
+  models/town/bakery.glb                      23.1
+  painted/tuft-1.webp                         22.6
+  voice/tamsin/59187960eb25.mp3               22.5
+  voice/tamsin/342446e5a44c.mp3               22.5
+  models/town/town-well.glb                   22.2
+  voice/tamsin/81e9f25871f6.mp3               21.9
+  voice/tamsin/da60e435f2e5.mp3               21.9
+  sprites/critter.png                         21.5  384 x 576
+  sound/step.stone.mp3                        21.1
+  sound/step.leaves.mp3                       20.7
+  voice/tamsin/2bceb3301910.mp3               20.4
+  voice/tamsin/834be259fe5f.mp3               20.4
+  painted/bark.webp                           20.4
+  models/town/workshop.glb                    19.8
+  models/town/house-a.glb                     19.7
+  sound/shot.bag.mp3                          19.6
+  painted/rock.webp                           19.0
+  voice/tamsin/74f76033035c.mp3               18.0
+  voice/tamsin/966c52e24bf5.mp3               17.4
+  voice/gus/e8f08c6e1326.mp3                  17.4
+  sound/sound.json                            17.1
+  sound/step.floor.mp3                        16.6
+  voice/tamsin/d443ea458823.mp3               16.2
+  voice/tamsin/8e0495700a75.mp3               16.2
+  sound/step.cobble.mp3                       16.2
+  blocks/atlas.png                            15.8  256 x 160
+  sound/step.wood.mp3                         12.5
+  sound/hit.pick.mp3                          11.3
+  sound/hit.chop.mp3                          10.9
+  sound/hit.dig.mp3                           10.2
+  models/town/statue-gardener-warden.glb       9.6
+  models/town/flower-planter.glb               9.5
+  sound/hit.stone.mp3                          8.8
+  models/town/lamp-post.glb                    8.5
+  models/town/string-lights.glb                8.3
+  models/town/market-stall-b.glb               7.3
+  models/rock-37.glb                           7.2
+  models/rock-11.glb                           7.2
+  sound/hit.plank.mp3                          6.6
+  models/town/market-stall-a.glb               6.4
+  sprites/lanternfly.png                       6.3  384 x 96
+  models/town/cart.glb                         6.2
+  models/town/barrels-crates.glb               6.1
+  icons/icons-2.png                            5.8  128 x 128
+  models/town/dock-segment.glb                 5.6
+  models/town/bench.glb                        5.5
+  models/town/signpost.glb                     5.4
+  icons/icons.png                              5.4  128 x 128
+  models/town/banner-pole.glb                  5.3
+  models/town/stone-bridge.glb                 5.3
+  sound/hit.hoe.mp3                            5.1
+  painted/brush.webp                           4.3
+  models/town/fence-straight.glb               3.8
+  crops/crops.png                              3.6  128 x 128
+  models/town/fence-corner.glb                 3.5
+  ui/panel.png                                 2.5  96 x 96
+  ui/button.png                                0.6  96 x 32
+  blocks/oak-boards.png                        0.4  32 x 32
+  total                                    13121.3  12.81 MB of 24 MB
+
+TOTAL PASS: 9 checks, 9 passed, 0 failed, 0 warnings
