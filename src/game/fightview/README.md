@@ -18,6 +18,8 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 | `arena.ts` | `stampArena`, `dressArena` | Stamps the arena into the block world and dresses it |
 | `panel.ui.ts` | `createPanel(root, log, actions)` | The card, the bars, the bar over the beast, the warm edge, "Again?" and the log. Where the bars go on a narrow window. |
 | `log.ts` | `createLog()` | The fights that ended, kept in the browser, and sent to `fight-log` with `&log=1` |
+| `hall.ts` | `stampHall`, `setRamp`, `dressHall`, `createHallView(...)` | The Verdant Stag's hall in the world, behind `?scene=stag` |
+| `hall.ui.ts` | `createHallLine(root)` | The hall's line at the top: the phase, what to do, and the guard of the thing hit last |
 
 ## How a frame goes
 
@@ -47,6 +49,20 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 - The Log button's count is the log's length, read each frame.
 - Every view part works at low, medium and high quality. The draw path makes no mesh, material, color or vector per frame; a few small iterators and closures remain.
 
+## The Stag's hall
+
+`?scene=stag` opens the lab in the Verdant Stag's hall on the same plot, with its own save. `views/lab-fight.view.ts` keeps everything for it in blocks marked "the Stag's hall".
+
+- **The blocks.** `stampHall` paves the floor with cobble and two rings of stone brick (the painted land draws them as paving), clears the plot, sets a ring of barriers two high for the boulders, a barrier post under each pin and lamp, and the Stag's body as barriers eight high, taller than the top of the ramp. It runs every time the hall opens. `setRamp` adds or takes away the vines' ramp as barrier steps, one block higher every two cells; the painted hero walks up a one-block step.
+- **The Stag.** Two merged meshes built from spheres and rods in the palette: the body (about 8 blocks at the shoulder), and the neck, head and antlers (past 14), which turn and dip with `hall.stag`. A sweep turns the head to the side it comes from, lowers the antlers, and swings them across as it lands. A stamp rears the front up and drops it. A shake rolls the body. A stagger hangs the head. Between phases it throws its head up. Freed, it stands still, then lowers its head to the hero.
+- **Grey and color.** One uniform, `uDrain`, is a height in the world above which the colors are back. It stays above everything until the collar breaks, then falls from the antlers to the hooves in about two and a half seconds. The vines keep their colors: they are alive.
+- **The rest.** The gold chains are one instanced mesh of links on sagging curves; a pin's end drops to the floor when it breaks, and every end on the collar drops when the Stag is freed. The pins topple when broken. The lamp heads glow once lit. The pods are one instanced mesh, growing and warming toward their burst. The roots flood out from the legs over the second phase's rise, and the ramp grows up out of the floor over the third's.
+- **The hour.** The hall keeps its own hour: morning, then dusk while the lamps are dark, then morning again once they are lit. The lit lamps draw warm circles on the floor.
+- **The marks.** The hall's own `ground.ts` batch: a ring round each target it can hit now with its guard as a gold arc, the collar's ring on the top of the ramp, the light of the lamps, and a shake drawn at the height of the hero's feet on the vines. `draw.ts` still draws every loose shape on the floor as it draws any attack.
+- **The feel.** A hit on a target freezes the fight 4 frames (3 for a pod), as a hit on a beast does. A broken pin freezes 8, a phase 10, and the collar 20, note 05's "A Warden phase ends". `feel.hear` is wrapped to hear the targets' events; `feel.ts` itself is unchanged.
+- **The camera** goes to its furthest step when the hall opens. The wheel brings it in as anywhere.
+- The hall's meshes and marks draw about 16,000 triangles with their shadows, and about 12 draw calls.
+
 ## The door
 
 `window.__fight`, only with `?scene=fight`:
@@ -63,12 +79,14 @@ The fight lab's picture, sound and interface, behind `?scene=fight`. `src/game/v
 | `hold(on)` | Holds the rules still while the picture goes on. A test sets a fighter's state by hand through `fight` and looks at the pose. |
 | `slow(k)` | Plays the picture's clocks, and the freeze of a hit, at k times their speed. 1 is normal. |
 | `reduceMotion(on)` | Switches the game's reduce motion setting. It is stored. |
+| `hall` | The Stag's hall's rules with `?scene=stag`, null in the meadow. `bot(true)` then plays the hall, and `state().hall` has its phase, the Stag, what is broken, the record and the hall's own triangles. `screen(x, z, y)` gives a point at a height, for the top of the vines. |
 
 `state().beast.moment` is the seconds into the moment of calming, below 0 during the release, and null before it.
 
 ## Checks
 
 - `bun tools/fight-play.mjs --port <port> --way <way> --beast <beast>` plays one fight in headless Chrome through the door. `--keys` plays it with real keys and mouse instead, `--pet pebblepup` picks the second pet, `--layout wall` sets no rigs, `--quality low` holds a quality level, and `--log` turns on `&log=1`. `--card` checks the card instead of playing one fight: "Again?", Esc with a rig in the hand, the fold and the log's count. Pictures go to `.artifacts/fight/`. It prints the cost during the fight and through the calming.
+- `bun tools/fight-play.mjs --port <port> --scene stag` plays the Stag's hall, by its bot or with `--keys`. It takes a picture at each zoom step and in each phase, and prints the hall's record, draw calls, triangles (and the hall's own) and script time.
 - `bun tools/fight-poses.mjs --port <port>` shoots every state of every fighter in three views, one sheet each in `.artifacts/fight/poses/`. `--only hero` shoots one.
 - `bun tools/fight-strip.mjs --port <port> --beast <beast>` shoots nine frames through one calming, in order, into `.artifacts/fight/strips/`. `--still` turns on reduce motion first.
 - `bun tools/fight-serve.mjs <folder> <port>` serves a build and writes what `&log=1` sends to `.artifacts/fight/ratings.jsonl`.

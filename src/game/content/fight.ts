@@ -277,3 +277,45 @@ export const RIG = {
   /** Nothing is set down this close to a beast. */
   clear: 1.5,
 } as const;
+
+// ---------------------------------------------------------------------------------------- milestone 3: the Verdant Stag
+// The first boss test: a god as tall as an oak, chained in a round hall (`src/game/fight/hall.sim.ts`). Its three
+// phases are the story's (handbook 04d, "How fights work"). The lead times are note 05's for a Warden's big
+// attacks, from 1.5 seconds. Where the hall's things stand is `src/game/fight/hall-layout.sim.ts`.
+
+export type StagAttack = 'sweep' | 'stamp' | 'shake';
+
+export const STAG = {
+  name: 'The Verdant Stag',
+  /** It wakes when the hero comes this close to its chest: a step or two in from the door. */
+  wakes: 13.5,
+  /** The four pins of the chains. Each takes six cuts. */
+  pin: { guard: 60, radius: 0.6 },
+  /** The lamps of the second phase. Two cuts light one, and it lights the floor this far round it. */
+  lamp: { guard: 20, radius: 0.5, light: 4.5 },
+  /**
+   * Seed pods. One comes up every `every` seconds in the dark, between `near` and `far` blocks from the hero, while
+   * a lamp is still dark, never more than `most` at once. It grows for `grow` seconds with a ring of `burst` on the
+   * ground, then bursts. One cut takes it. A pod in a lamp's light withers.
+   */
+  pod: { guard: 10, radius: 0.5, every: 2.2, grow: 3, burst: 1.8, damage: 12, most: 4, near: 2.5, far: 6.5, apart: 2.2 },
+  /** The collar on its neck: only a hero up the vines reaches it, and only the hero's own cut. */
+  collar: { guard: 120, radius: 1.4 },
+  /** Its antlers, swept across the whole floor through where the hero stands. */
+  sweep: { lead: 1.5, width: 3, damage: 16, heavy: true },
+  /** A stamp of the leg nearest a hero who comes within `near` blocks of its body. */
+  stamp: { lead: 1.3, radius: 4.5, damage: 18, heavy: true, near: 3.5 },
+  /** It shakes a stretch of the vines under a hero who climbs them. A hit throws them `push` blocks, off the vines to the floor. */
+  shake: { lead: 1.2, length: 3.2, width: 4, damage: 10, heavy: true, push: 3.5 },
+  /** Seconds it stands after an attack lands, and the seconds it waits after that, by phase. */
+  recover: 1,
+  pause: [0.8, 1.2, 0.8] as readonly number[],
+  /** Seconds it staggers when a pin breaks, and seconds it rears between two phases. */
+  stagger: 1.6,
+  rise: 1.5,
+  /** The names of the phases, in order. */
+  phases: ['The chains', 'The overgrowth', 'The collar'] as readonly string[],
+  /** Frames the picture stands still when the collar breaks (note 05: "A Warden phase ends: 20 frames of stop"). */
+  freeFreeze: 20,
+} as const;
+// ---------------------------------------------------------------------------------------- end of the Verdant Stag

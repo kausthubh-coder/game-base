@@ -11,7 +11,9 @@ There is no `index.sim.ts` on purpose. A folder with one is installed into every
 | `fight.sim.ts` | `createFight(stage, options)` | One fight. It returns a `Fight`. |
 | `arena.sim.ts` | `ARENA`, `arenaStage(x, z)` | The arena as cells, and the `Stage` that answers the fight's questions about it |
 | `bot.sim.ts` | `createBot(fight, stage, options)` | A player made of rules. It writes `fight.input` and calls `press`, as the keys do. |
-| `record.sim.ts` | `checksOf(record, earlier)`, `layoutOf(record)` | Note 08's pass checks for one fight |
+| `record.sim.ts` | `checksOf(record, earlier)`, `layoutOf(record)` | Note 08's pass checks for one fight, and the Stag's hall's |
+| `hall.sim.ts` | `createHall(fight, stage, options)`, `createHallBot(fight, hall)` | The Verdant Stag's hall: its three phases, and a player made of rules that frees it |
+| `hall-layout.sim.ts` | `HALL`, `hallStage(x, z)`, `rampHeight`, `onBody`, `onPost` | The hall as data, and the `Stage` it is fought on |
 | `shapes.sim.ts` | `inCircle`, `inLine`, `inCone`, `dirX`, `dirZ`, `facingOf`, `turnBetween` | Is a point inside a shape. Facing 0 is north, a quarter turn is east. |
 
 `Fight` has the state (`hero`, `pet`, `beasts`, `shapes`, `bolts`, `rigs`, `record`, `phase`, `clock`), the input the caller keeps (`input`), and these calls:
@@ -26,6 +28,8 @@ There is no `index.sim.ts` on purpose. A folder with one is installed into every
 | `placeHero(x, z)` | Where the body is, with `external: true`. |
 | `placeRig(kind, x, z)`, `canPlace(kind, x, z)`, `takeBack()`, `kit()` | The world way's rigs. `placeRig` returns why not, or null when it stands. |
 | `skill(slot)` | The name and rest of the skill on C or T, or null. |
+| `addTarget(spec)`, `removeTarget(t)`, `targets` | Things to hit that are not beasts. See the boss hooks below. |
+| `threaten(spec)`, `cancel(shape)` | A shape on the ground that belongs to no beast. See the boss hooks below. |
 
 Options: `way`, `pet`, `gentle`, `random`, `onEnd(record)`, `external` (the caller moves the hero, as the lab does), and `reach` (the Heartstone, off unless set).
 
@@ -83,11 +87,39 @@ Options: `way`, `pet`, `gentle`, `random`, `onEnd(record)`, `external` (the call
 | `order`, `whistle`, `skill` | The pet was sent, called back, or a skill was called | `text` is the skill's name |
 | `petStrike`, `petHurt`, `petFaint`, `petUp`, `blocked` | The pet struck, was hit, fainted, came back, or turned an attack with a brace | |
 | `rigPlaced`, `rigTaken`, `rig` | A rig went down, came back, or went off | `text` is the rig's kind on `rig` |
+| `targetHit`, `targetBroken` | A target lost guard, or broke | `n` is the guard lost, `text` the target's name |
 
 ## The record
 
 `fight.record` counts what note 08's checks need: the seconds of setup and of the fight, hits taken and by what, swings and whiffs, useful presses and the longest gap, orders and how many were in time, whistles, attacks a braced pet took for the hero, the pet's hits and faints, rigs placed and set off, the layout, crashes, and the answer to "Again?". `onEnd` gets a copy when a fight is won and when one in progress is dropped. `checksOf` turns it into pass or fail lines.
 
+## The boss hooks
+
+Two calls in `fight.sim.ts`, in one marked block, so a boss can be its own module. A beast fight makes neither, and plays as before.
+
+- **Targets.** `addTarget({ x, z, radius, guard, name, open, high })` makes something the hero's cut and spin, thrown light and the pet's strike can hit that is not a beast: a pin, a lamp, a seed pod, a collar. It takes guard only while `open`. At 0 it breaks and stays broken. A cut that lands on one is not a whiff, and a cut bends toward an open one near the pointer as it does to a beast. With the hero fighting, the pet goes for the target the hero hit last. A `high` target is up on the boss: only the hero's own cut and spin reach it.
+- **Loose shapes.** `threaten({ kind, x, z, facing, reach, width, lead, damage, heavy, id, push })` shows a shape that belongs to no beast (its `owner` is 0). It sends `tell` at once and `strike` when its lead runs out, then lands on the hero and the pet like any attack: the same dodge, the same moment of safety after a hit, the same `hitsTaken` and `hitBy[id]`. A circle or a cone pushes away from its middle, a line straight out from its middle line, as far as `push` says when it is given. `cancel(shape)` takes it off the ground before it lands.
+
+The record's `way` may be `stag`, and a boss puts its own numbers in `record.boss`: the seconds in each phase, the longest stretch with no attack of its own on the ground (in all and by phase), and its counts by name.
+
+## The Verdant Stag's hall
+
+`createHall(fight, stage)` holds the first boss test: a god as tall as an oak, chained in a round hall. The lab steps it right after the fight, 60 times a second. Every pin, lamp, pod and the collar is a target, and every attack is a loose shape. The numbers are `STAG` in `content/fight.ts`; where things stand is `HALL` in `hall-layout.sim.ts`.
+
+- The Stag lies across the north end of the hall, facing the door. Its body is solid. It sleeps until the hero comes 13.5 blocks from its chest, a step in from the door.
+- **The chains.** Four pins, 60 guard each. It sweeps its antlers in a line 3 blocks wide across the whole floor through where the hero stands, from one side and then the other, with 1.5 seconds of lead. A hero within 3.5 blocks of its body gets a stamp of the nearest leg instead, a ring of 4.5 with 1.3 seconds of lead. A broken pin drops its chain and the Stag staggers 1.6 seconds, dropping the attack it wound up. The fourth pin ends the phase.
+- **The overgrowth.** Four lamps open, 20 guard each: two cuts light one, and it lights a circle of 4.5 blocks. While a lamp is dark a seed pod comes up every 2.2 seconds, 2.5 to 6.5 blocks from the hero, in the dark, never more than four. It grows for 3 seconds with a ring of 1.8 and bursts for 12. One cut takes it. A pod in a lamp's light withers. The sweeps go on. The phase ends when every lamp is lit and no pod is left.
+- **The collar.** The vines grow a ramp, two cells wide, up the Stag's east flank from the floor to six blocks at its shoulder. It counts as water to the stage, so the pet stays below. A hero on it gets shakes instead of sweeps: a stretch of 3.2 blocks of the ramp, 1.2 seconds of lead, and a hit throws the hero 3.5 blocks out, off the vines to the floor. The collar, 120 guard, opens to a hero five or more blocks up the ramp, and only the hero's own cut reaches it. A floor attack never lands on a hero up the vines, and a shake never lands on the floor.
+- Between two phases the Stag rears for 1.5 seconds. After an attack it stands 1 second, then waits 0.8 seconds (1.2 in the overgrowth). It never goes more than about four seconds without an attack on the ground while the hero is up.
+- A hero who faints wakes at the door. The Stag keeps its phase and everything broken. It waits for the hero to wake before it attacks again.
+- Breaking the collar frees it: the hall sends `freed`, stops, and calls `onEnd` with a record whose `way` is `stag` and whose `result` is `calmed`. `restart()` starts the hall over from the chains and reports one in progress as `left`.
+
+`hall.events` holds the hall's own events for the view: `woke`, `phase`, `pin`, `lamp`, `sprout`, `burst`, `cut`, `wither`, `fall`, `stagger`, `freed`, `restart`.
+
+`createHallBot(fight, hall)` plays the hall the hero's way: out of what is about to land, the nearest pin, the pods near it and the lamps, then up the vines and the collar. On the vines it steps down out of a shake, not sideways off them.
+
 ## Tests
 
-`bun test src/game/fight` runs in well under a second. `fight.test.ts` holds the rules above, one test each, and a bot that wins every fight in every way. `bun tools/fight-sim.ts` prints the bot's numbers for all nine fights.
+`bun test src/game/fight` runs in well under a second. `fight.test.ts` holds the rules above, one test each, and a bot that wins every fight in every way. `hooks.test.ts` holds the two boss hooks, and `hall.test.ts` the Stag's hall and its bot. `bun tools/fight-sim.ts` prints the bot's numbers for all nine fights, `bun tools/fight-sim.ts stag` the hall's, and `bun tools/fight-sim.ts clumsy` a clumsy player's against the boar in every way.
+
+`createBot`'s `clumsy` option is a player still learning: it sees a shape 0.7 seconds late, attacks in bursts with pauses, and dodges four times in ten. The plain bot is never hit, so its times are a floor for a person's.

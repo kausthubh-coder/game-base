@@ -17,6 +17,7 @@ promises the others, and what is still to build. Read it before you change anyth
 | `&beast=thistlehog`, `gearling` or `boar` | Brings that beast in at once. |
 | `&quality=low`, `medium` or `high` | Holds a quality level for the visit, as in the game. |
 | `&log=1` | Also sends every finished fight to `fight-log` beside the page. Only `tools/fight-serve.mjs` answers that. |
+| `?scene=stag` | Opens the lab in the Verdant Stag's hall instead, with its own save (`greenhollow.save.stag`): the first boss test. |
 
 ## The three ways, and what they share
 
@@ -42,6 +43,8 @@ src/game/fight/               the rules (.sim.ts, no drawing, no keys)
   fight.sim.ts                  createFight(stage, options): hero, pet, beasts, shapes, bolts, rigs, the record
   record.sim.ts                 checksOf(record, earlier): note 08's pass checks for one fight
   bot.sim.ts                    createBot(fight, stage): a player made of rules, for tests and the door
+  hall.sim.ts                   createHall(fight, stage): the Verdant Stag's hall, and createHallBot
+  hall-layout.sim.ts            the hall as data, and its Stage
 src/game/fightview/           drawing and the interface for the lab
   keys.ts                       keys and mouse into the fight, the rig in the hand, the hook that steps the fight with the body
   feel.ts                       a fight event into a freeze, a jolt, a flash on the ground, particles and a sound
@@ -54,10 +57,13 @@ src/game/fightview/           drawing and the interface for the lab
   rigs.ts                       the four rigs, drawn with the game's rig props
   arena.ts                      stamps the arena into the block world and dresses it
   panel.ui.ts                   the card, the bars, the bar over the beast, "Again?", the log
+  hall.ts                       the Stag's hall in the world: its blocks, the Stag, chains, pins, lamps, pods, vines
+  hall.ui.ts                    the hall's line at the top of the screen
   log.ts                        the fights that ended, kept in the browser
 src/game/views/lab-fight.view.ts   the glue: the flag, the arena, making the fight, the order of a frame, the door
 tools/fight-sim.ts            the bot against every beast in every way, with no browser
 tools/fight-play.mjs          one fight in headless Chrome, by the bot or by real keys
+tools/fight-play-stag.mjs     the Stag's hall in headless Chrome (fight-play.mjs --scene stag)
 tools/fight-poses.mjs         every pose of every fighter, set through the door, one sheet of pictures each
 tools/fight-strip.mjs         a strip of pictures through one calming, in order
 ```
@@ -219,17 +225,36 @@ reach. An independent tester's seven problems with the card, the keys and the wo
 `fight-play.mjs --card` keeps four of them fixed. Still open from milestone 2: the marks of an attack as
 props.
 
-Milestone 3, the boss tests. Two hooks go into `fight.sim.ts` so a boss can be its own module:
+Milestone 3, the boss tests. The first is built, on `lab/fight-hall`: the Verdant Stag's hall, behind
+`?scene=stag`. The research says a giant works when it is the place and its parts are the targets, and fails
+when it stops attacking the player. The one question it answers: does a giant boss read, and is it a fight,
+with a pixel hero in the tilted camera?
 
-- **Targets.** `fight.addTarget({ x, z, radius, guard })` makes something the hero's cut, a thrown light and
-  the pet's strike can hit that is not a beast: a chain's pin, a seed pod, the collar. It has `open` (can it
-  be hit now) and sends `targetHit` and `targetBroken`.
-- **Loose shapes.** `fight.threaten({ kind, x, z, facing, reach, width, lead, damage, heavy, id })` shows a
-  shape that belongs to no beast and lands on the hero and the pet like any attack: an antler sweep.
+- **Two hooks in `fight.sim.ts`**, in one marked block, so a boss is its own module. Targets:
+  `fight.addTarget({ x, z, radius, guard, name, open, high })` makes something the hero's cut and spin, thrown
+  light and the pet's strike can hit that is not a beast, and sends `targetHit` and `targetBroken`. Loose
+  shapes: `fight.threaten({ kind, x, z, facing, reach, width, lead, damage, heavy, id, push })` shows a shape
+  that belongs to no beast and lands on the hero and the pet like any attack; `fight.cancel` takes it away. A
+  beast fight makes neither, and every test in `fight.test.ts` passes unchanged.
+- **The rules**, `fight/hall.sim.ts` with its layout in `fight/hall-layout.sim.ts` and its numbers as `STAG` in
+  `content/fight.ts`: the chains (four pins, antler sweeps across the floor, a stamp near its legs), the
+  overgrowth (lamps to light, seed pods that grow only in the dark), and the collar (a ramp of vines up its
+  flank, shakes that throw the hero off). The hero fights the hero's way. A hero who faints wakes at the door
+  and the Stag keeps its phase. The record gets the seconds in each phase, the hits by attack, the faints and
+  the longest stretch with no attack of the Stag's on the ground (`record.boss`); the card shows them as checks.
+- **The view**, `fightview/hall.ts` and `hall.ui.ts`: the hall stamped into the block world, the Stag as a
+  code-built body with its head and antlers moving with the rules, drained grey until the collar breaks, gold
+  chains, dusk over the overgrowth, and the end: 20 frames of stop, the chains fall, the grey runs out from the
+  antlers down, it lowers its head to the hero, and the lab asks "Again?" and logs the way `stag`.
+- **The tools.** `createHallBot` plays it, `bun tools/fight-sim.ts stag` prints its numbers,
+  `bun tools/fight-play.mjs --scene stag` plays it in Chrome by the bot or with `--keys`, with a picture at each
+  zoom step and in each phase.
+- **A person against the boar.** `createBot`'s `clumsy` option sees a shape 0.7 seconds late, attacks in
+  bursts and dodges four times in ten. `bun tools/fight-sim.ts clumsy` times it against the boar in every way.
+  Every way was well under three minutes, so the boar's numbers did not change.
 
-With those, `src/game/fight/hall.sim.ts` holds the Verdant Stag's three phases and `fightview/hall.ts` draws
-the god as part of the room, a code-built body as tall as an oak. The research says a giant works when it is
-the place and its parts are the targets, and fails when it stops attacking the player.
+Still to build for milestone 3: whatever Kausthubh's play of the hall says. A giant boss for the game, and
+its final look, are his calls.
 
 ## Known weak spots
 
@@ -258,3 +283,10 @@ Most serious first. The ones that need a sheet redrawn say so.
 - The bot never gets hit, and the key runs in `fight-play.mjs` never dodge. Neither is a person: the bot's
   numbers are a floor for a person's, and the key runs' hits and faints are the script's.
 - Note 05's soft heartbeat at low health has no sound yet: only the edge beats.
+- In the Stag's hall, `draw.ts` still draws the meadow's pale edge ring, 15 blocks out, just outside the hall's
+  wall of 13. Every loose shape is also drawn at floor height, so a shake on the vines shows faintly on the floor
+  under the Stag's belly as well as on the vines.
+- The hall's numbers come from the bot, which is never hit by more than a few attacks. A person's first time
+  through is untested.
+- At high quality, from the top of the vines at the furthest zoom step, a frame draws up to about 400,000
+  triangles: the hall's own meshes are about 16,000 of them, the valley seen from that far out the rest.
