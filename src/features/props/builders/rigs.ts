@@ -44,8 +44,8 @@ function snare(spent: boolean): THREE.BufferGeometry {
     s.tube([[x, 0.075, z], [x * 1.1, 0.17, z * 1.1]], [0.035, 0], 5, P.pine, { cap: 'none' });
   }
   for (const side of [-1, 1]) {
-    s.at(side * (spent ? 0.13 : 0.38), 0.06, 0.08, side * 0.5, () => {
-      s.poly([[0, 0, 0], [side * 0.1, 0.035, -0.06], [side * 0.17, 0.015, 0.04], [side * 0.08, 0, 0.1]], P.leaf, { two: true, toward: [0, 1, 0] });
+    s.at(side * (spent ? 0.025 : 0.27), 0.06, 0.08, side * 0.5, () => {
+      s.poly([[0, 0, 0], [side * 0.1, 0.035, -0.06], [side * 0.13, 0.015, 0.04], [side * 0.08, 0, 0.1]], P.leaf, { two: true, toward: [0, 1, 0] });
     });
   }
   s.shadowBlob(0, 0.04, 0, spent ? 0.2 : 0.44, 0.045, spent ? 0.2 : 0.44);
@@ -77,3 +77,25 @@ function plate(spent: boolean): THREE.BufferGeometry {
 
 export function rigPlate(): THREE.BufferGeometry { return plate(false); }
 export function rigPlateSpent(): THREE.BufferGeometry { return plate(true); }
+
+function channel(spent: boolean): THREE.BufferGeometry {
+  const s = new Shape(1637);
+  // Flush ends at z = +/-.5: callers join copies one block apart along z.
+  s.box(0, 0, 0, 0.85, 0.055, 1, RAMP.stone, { skip: '-y' });
+  for (const x of [-0.36, 0.36]) {
+    s.box(x, 0.045, 0, 0.13, 0.12, 1, RAMP.stone, { bevel: 0.025, skip: '-y+z-z', top: RAMP.stone[4] });
+  }
+  if (spent) {
+    s.box(-0.08, 0.055, 0.08, 0.36, 0.008, 0.62, P.soil, { bevel: 0.003, skip: '-y' });
+    s.box(0.14, 0.055, -0.3, 0.16, 0.008, 0.22, P.timberLight, { skip: '-y' });
+  } else {
+    s.box(0, 0.065, 0, 0.59, 0.025, 1, P.denim, { skip: '-y+z-z', top: P.sky });
+    // Wide short glints, with a gap to each end so they do not mark the joins.
+    for (const z of [-0.26, 0.22]) s.box(-0.04, 0.091, z, 0.31, 0.003, 0.035, P.ice, { skip: '-y' });
+  }
+  s.shadowBox(0, 0, 0, 0.85, 0.16, 1);
+  return s.done();
+}
+
+export function rigChannel(): THREE.BufferGeometry { return channel(false); }
+export function rigChannelSpent(): THREE.BufferGeometry { return channel(true); }
