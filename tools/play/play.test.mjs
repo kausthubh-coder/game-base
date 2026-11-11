@@ -119,6 +119,13 @@ describe('wrong', () => {
     const wrong = findWrong([label('Move with W, A, S and D', 54, 22, 352, 53, clip), label('A plot of your own', 331, 22, 240, 23, clip), label('Day 1', 583, 15, 39, 20, clip)], viewport);
     expect(wrong.map((w) => [w.kind, w.what, w.why])).toEqual([['over', 'Move with W, A, S and D', 'text over text: A plot of your own at 331,22 240x23']]);
   });
+  test('over: text drawn over a pressable thing, but not a block of text that holds the button', () => {
+    const clip = { clips: false, sw: 0, cw: 0, sh: 0, ch: 0 };
+    const marker = findWrong([button('Slot 4, empty', 393, 468, 54, 54), label('!', 428, 471, 26, 26, clip)], viewport);
+    expect(marker.map((w) => [w.kind, w.what, w.why])).toEqual([['over', '!', 'text over Slot 4, empty at 393,468 54x54']]);
+    expect(findWrong([label('Nothing saved yet.', 60, 300, 400, 120, clip), button('Continue', 70, 320, 360, 50)], viewport)).toEqual([]);
+    expect(findWrong([button('Resume', 160, 343, 315, 50, { blockedBy: 'div.gb-dialogue' }), label('!', 428, 350, 26, 26, clip)], viewport)).toEqual([]);
+  });
   test('a button nested inside another pressable box is not an overlap', () => {
     expect(findWrong([button('Card', 10, 10, 200, 100), button('x', 170, 15, 30, 30)], viewport)).toEqual([]);
   });

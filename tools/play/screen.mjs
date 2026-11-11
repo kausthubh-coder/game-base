@@ -109,7 +109,7 @@ const inside = (a, b) => a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a
 /**
  * What looks wrong, each with its kind, the piece and its box:
  * `cut` text clipped by its box, `off` partly outside the viewport, `over` a pressable thing covered at its
- * centre, two pressable things that overlap, or two pieces of text drawn over each other, `small` a pressable
+ * centre, two pressable things that overlap, text drawn over other text or over a pressable thing, `small` a pressable
  * thing under 24 px on a side.
  */
 export function findWrong(items, viewport, { minSize = 24 } = {}) {
@@ -147,6 +147,14 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
       const a = text[i], b = text[j];
       if (!overlap(a.box, b.box) || inside(a.box, b.box) || inside(b.box, a.box)) continue;
       wrong.push({ kind: 'over', what: name(a), box: a.box, why: `text over text: ${name(b)} at ${b.box.x},${b.box.y} ${b.box.w}x${b.box.h}` });
+    }
+  }
+  // Text is never listed from inside a pressable thing, so text over one is a stranger: a world marker
+  // drawn across the quick slots. A block of text that holds the button is left alone.
+  for (const a of text) {
+    for (const b of press) {
+      if (b.blockedBy || !overlap(a.box, b.box) || inside(b.box, a.box)) continue;
+      wrong.push({ kind: 'over', what: name(a), box: a.box, why: `text over ${name(b)} at ${b.box.x},${b.box.y} ${b.box.w}x${b.box.h}` });
     }
   }
   return wrong;

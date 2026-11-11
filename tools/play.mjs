@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync, readdirSync, writeFileSync, existsSync, unlink
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { formatLook } from './play/format.mjs';
-import { latest, render } from './play/journal.mjs';
+import { exportNotes, latest, render } from './play/journal.mjs';
 import { serveSession } from './play/session.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -99,9 +99,15 @@ else if (command === 'start') {
   const result = await request('note', argv.slice(1));
   console.log(`${result.note} noted on ${result.picture ?? 'no picture yet'}`);
 } else if (command === 'journal') {
-  const folder = argv[1] ? resolve(argv[1]) : session()?.journal ?? latest(resolve(out, 'journal'));
+  const to = opt('to');
+  const given = argv.slice(1).find((a, i, all) => !a.startsWith('--') && all[i - 1] !== '--to');
+  const folder = given ? resolve(given) : session()?.journal ?? latest(resolve(out, 'journal'));
   if (!folder) throw new Error('no journal yet: look, act or film first');
   const paths = await render(folder);
   console.log(`${paths.html}\n${paths.notes}`);
+  if (to) {
+    const copied = await exportNotes(folder, resolve(to));
+    console.log(`${copied.notes}\n${copied.pictures.length} pictures in ${resolve(to)}`);
+  }
 } else if (command) console.log(JSON.stringify(await request(command, argv.slice(1)), null, 2));
-else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> <words> | journal | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');
+else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> <words> | journal [--to <folder>] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');

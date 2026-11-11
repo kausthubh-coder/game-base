@@ -1,5 +1,5 @@
 // The playtest journal: one line of journal.jsonl a step, then a page and the notes alone made from it.
-import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, relative, resolve } from 'node:path';
 import sharp from 'sharp';
 
@@ -103,4 +103,30 @@ ${blocks.join('\n')}
   const notesPath = resolve(folder, 'notes.md');
   writeFileSync(notesPath, md.join('\n') + '\n');
   return { html: htmlPath, notes: notesPath };
+}
+
+/**
+ * Copies each noted picture into `to` as a small JPEG, with a notes.md that links them, so a report in the repo
+ * can show its findings. A picture is a 960 px wide JPEG of about 100 KB, where the journal's PNG is about 700 KB.
+ */
+export async function exportNotes(folder, to) {
+  const notes = read(folder).filter((e) => e.kind === 'note');
+  mkdirSync(to, { recursive: true });
+  const md = [`# Notes from ${basename(folder)}`, ''];
+  if (notes.length === 0) md.push('No notes.');
+  const written = new Map();
+  for (const note of notes) {
+    let name = null;
+    if (note.picture && existsSync(note.picture)) {
+      name = written.get(note.picture) ?? basename(note.picture).replace(/\.png$/, '.jpg');
+      if (!written.has(note.picture)) {
+        await sharp(note.picture).resize({ width: 960, withoutEnlargement: true }).jpeg({ quality: 80 }).toFile(resolve(to, name));
+        written.set(note.picture, name);
+      }
+    }
+    md.push(`- **${note.note}** ${note.words}${name ? `  \n  ![${name}](${name})` : ''}`);
+  }
+  const notesPath = resolve(to, 'notes.md');
+  writeFileSync(notesPath, md.join('\n') + '\n');
+  return { notes: notesPath, pictures: [...written.values()].map((name) => resolve(to, name)) };
 }

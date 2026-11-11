@@ -13,7 +13,7 @@ To playtest, start in human mode, then loop `act` and read the block it prints. 
 | `act '<input>' [name]` | Plays the inputs, then looks. An input is one JSON input, a JSON list of them, or a bare key name (`act KeyE` presses E). If an input fails, the block's first line says which one and how many were not played, it still looks, and it exits 1. |
 | `film '<input>' [name] [--fps 10]` | Records every frame Chrome draws while the inputs play and for 0.5 s after, through the screencast (screenshots if that sends nothing; the block says which). It writes a sheet of the frames, each labelled with its time, keeps the full-size frames in a folder beside it, then looks. **flickers** lists runs of 1 to 4 frames drawn unlike both the frame before and the frame after, while those two match: a sprite drawn wrong or dark for a moment, even while the camera scrolls. **jumps** lists the frames that differ from the frame before by over 5 times the film's median difference, such as a panel closing; `and back` means the next frame jumps too. Both are marked in red on the sheet. Open the sheet anyway, since a flicker longer than 4 frames shows only there. |
 | `note <bug\|polish\|question> '<words>'` | Pins a finding to the last picture. |
-| `journal [folder]` | Writes `journal.html` (every step with its input, picture, changes and notes) and `notes.md` (the notes alone) into the session's folder and prints both paths. It works after `stop` too, on the newest session. |
+| `journal [folder] [--to <folder>]` | Writes `journal.html` (every step with its input, picture, changes and notes) and `notes.md` (the notes alone) into the session's folder and prints both paths. It works after `stop` too, on the newest session. `--to docs/playtests/img/<date>-<charter>` also copies each noted picture there as a JPEG of about 100 KB, with a `notes.md` that links them, for a report in the repo. |
 | `do '<input>'` | Plays one JSON input and prints the whole state (`{"done":true}` when blind). It fails on a console error since the last report, once. |
 | `state` | Prints `window.__game.state()`. A blind session refuses. |
 | `shot <png>` | One picture, outside the journal. |
@@ -38,7 +38,7 @@ problems: none
 ```
 
 - **screen**: what a player can read (`"text"`) or press (`[name]`) on the DOM interface, in reading order, with the box in viewport pixels (x,y wxh). It adds `disabled`, or `blocked by …` when a full-screen layer such as the dialogue sits over the button. Text drawn into the 3D canvas is not on this list, so look at the picture for it.
-- **wrong**: `cut` text clipped by its box; `off` partly outside the viewport; `over` a pressable thing covered at its centre, two pressable things that overlap, or text drawn over text; `small` a pressable thing under 24 px.
+- **wrong**: `cut` text clipped by its box; `off` partly outside the viewport; `over` a pressable thing covered at its centre, two pressable things that overlap, or text drawn over other text or over a pressable thing; `small` a pressable thing under 24 px.
 - **changed**: what changed in the game since the last look: hero distance and compass direction (north is -z), prompt, talk line, quests, bag, held item, game time, pause, new `viewErrors` and `failed` systems.
 - **now**: what the HUD tells a player.
 - **problems**: console errors and warnings, failed requests and 4xx or 5xx responses since the last look. Each is reported once.
