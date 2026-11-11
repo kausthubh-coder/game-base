@@ -235,6 +235,8 @@ Most serious first. The ones that need a sheet redrawn say so.
 - The release lights the boar so far it reads as a flat pale shape for 10 frames. That is the bright frame the
   design asks for, but it loses the boar's detail.
 - The gift's name can sit over the hero's head as it arrives.
+- The warm light of a tell's last quarter second turns the grey boar a warm brown, close to its own healthy
+  brown. The gold shape on the ground turning hot orange carries the same warning.
 - Tall grass pokes through the shapes on the ground. Their rims stay readable at every quality, but their
   fill is broken up.
 - A charge that ends at the arena's edge stops as if at water. Nothing shows the edge but a pale ring.

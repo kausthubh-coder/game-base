@@ -122,7 +122,8 @@ void main() {
   // The line itself is light.
   float line = (1.0 - smoothstep(0.0, 0.08, abs(vDown - uLook.y))) * step(0.004, uLook.y) * step(uLook.y, 0.996) * uLook.x;
   color += uGlow * line;
-  color += vec3(0.42, 0.17, 0.0) * uHeat.x;
+  // Warmer light, a little brighter: the drawing stays readable under it.
+  color = color * (1.0 + vec3(0.22, 0.04, -0.08) * uHeat.x) + vec3(0.07, 0.025, 0.0) * uHeat.x;
   color = mix(color, vec3(0.78, 1.0, 0.95), uHeat.y);
   color = mix(color, vec3(1.0), uLook.z);
   gl_FragColor = vec4(color, uLook.w);
