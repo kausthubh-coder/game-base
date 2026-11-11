@@ -6,7 +6,7 @@ import { extname, join, normalize, resolve } from 'node:path';
 const [folder, port] = process.argv.slice(2);
 if (!folder || !port) { console.error('usage: bun tools/serve.mjs <folder> <port>'); process.exit(2); }
 const base = resolve(folder);
-const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.wasm': 'application/wasm', '.wav': 'audio/wav', '.ico': 'image/x-icon' };
+const types = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.md': 'text/markdown; charset=utf-8', '.svg': 'image/svg+xml', '.wasm': 'application/wasm', '.wav': 'audio/wav', '.ico': 'image/x-icon' };
 
 createServer(async (req, res) => {
   try {

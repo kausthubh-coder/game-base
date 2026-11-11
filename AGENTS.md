@@ -26,6 +26,8 @@ Read `15-system-design.md`, `12-art.md` and `13-sound.md` there before a large c
 | `bun tools/sprite-fringe.mjs` | Measures the pale rim a white background leaves round a sprite. The sprite check fails a sheet that has one |
 | `bun tools/hero-frames.mjs` | Films the hero walking, a twentieth of a second a frame, into `.artifacts/painted/hero-frames.png`, to see a frame that is drawn wrong |
 | `bun tools/hero-ground.mjs` | Walks the hero over sloping ground and fails if the drawn hero is ever off the drawn land |
+| `bun tools/style-lab.mjs --style <name>` | The style lab's shots and motion strips for one art style (see `docs/style-lab/README.md`) |
+| `bun tools/ghibli-assets.mjs` | Remakes the painted meadow test scene's textures from `assets-src/ghibli/raw`, and copies the game's twelve into `public/assets/painted` (see `demos/ghibli/README.md`) |
 | `bun --env-file=.env.local tools/voice.ts` | Makes the voice clips of new or changed lines (`--dry` prices it first). Needs `ELEVENLABS_API_KEY` in `.env.local` |
 
 ## Layout
@@ -71,4 +73,5 @@ docs/                  briefs, the style sheet, the asset contract
 | props | 5315 |
 | map | 5316 |
 | painted-shots | 5470 |
+| ghibli (the painted meadow test scene) | 5460 |
 | the game | 5300 |
