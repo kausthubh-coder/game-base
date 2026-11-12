@@ -1,6 +1,6 @@
 # The play tool treated clipped Almanac answers as readable
 
-**Fixed on 2026-11-12, in the branch that found it.** `see` now counts a piece only when at least 60% of
+**Fixed on 2026-11-11, in the branch that found it.** `see` now counts a piece only when at least 60% of
 its box shows inside its scrolling and clipping ancestors and nothing sits on top of it. `look` flags a
 piece that is mostly hidden as `cut`, and counts the pieces scrolled out of sight. `bun
 tools/play/check-eyes.mjs` keeps it fixed, on a page with one line past the edge of a scrolling box, one

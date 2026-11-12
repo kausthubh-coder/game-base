@@ -1,6 +1,6 @@
 # The first quest's watch step finishes while the hero stands still at the grant stone
 
-Found on 2026-11-12 by playing in human mode at 960x540, seed 7, after a playtester wrote that the
+Found on 2026-11-11 by playing in human mode at 960x540, seed 7, after a playtester wrote that the
 observation "completed during that walk" before they had found a creature. Not fixed.
 
 ## What happened
@@ -16,12 +16,12 @@ is told to watch, and is told they are done before they move.
 
 Happened 3 of 3 replays, and twice more by hand.
 
-![The tracker changes at 2.4 s with the hero at the stone](../playtests/img/2026-11-12-coordinator/watch-finishes-at-the-stone.jpg)
+![The tracker changes at 2.4 s with the hero at the stone](../playtests/img/2026-11-11-coordinator/watch-finishes-at-the-stone.jpg)
 
 ## The recording
 
 ```sh
-bun tools/play.mjs replay docs/bugs/2026-11-12-watch-step-finishes-by-itself.json
+bun tools/play.mjs replay docs/bugs/2026-11-11-watch-step-finishes-by-itself.json
 ```
 
 It plays the first talk with real keys, sees "Watch a mossling" on the tracker, waits 8 seconds without
