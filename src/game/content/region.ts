@@ -338,11 +338,38 @@ export const HALL = {
   one(-14, g, -251, 'barrier');
 }
 
+// ---- the camp: the player's fire and tent in the south half of the grant, where the first night starts. The stone
+// door is north of it, so a player who backs away from the fox backs toward the door. The fox comes out of a
+// stand of trees south-west of the plot, beside the camera's view and never between the camera and the fire.
+// src/game/views/world-camp.view.ts draws it, and scene 9 (content/cutscenes.ts) is shot around it.
+/** Columns of the camp's places: the fire, where the hero sits, the edge of the firelight, the trees. */
+const CAMP_AT = { x: -20, z: -229 };
+export const CAMP = {
+  ground: GRANT_GROUND,
+  /** The middle of the fire, in meters. Every offset of scene 9 starts at the place `camp`, which stands here. */
+  fire: { x: CAMP_AT.x + 0.5, y: GRANT_GROUND, z: CAMP_AT.z + 0.5 },
+  /** The tent: north-east of the fire, its open end turned to the fire. Radians around y, 0 faces south. */
+  tent: { x: CAMP_AT.x + 3, y: GRANT_GROUND, z: CAMP_AT.z - 2.5, rotation: Math.atan2(-2.5, 3) },
+  /** How far the firelight reaches on the ground, in blocks: the place `camp.edge` stands at its rim. */
+  reach: 6.6,
+  seat: { x: CAMP_AT.x - 1, z: CAMP_AT.z - 1 },
+  edge: { x: CAMP_AT.x - 5, z: CAMP_AT.z + 4 },
+  trees: { x: CAMP_AT.x - 7, z: CAMP_AT.z + 11 },
+} as const;
+// The fire's light: an unseen lamp block in the flame, as the town's lanterns have, so the land, the sprites and
+// the crops around it are lit by it at night. It is a block up, so the place `camp` itself stays open ground.
+one(CAMP_AT.x, GRANT_GROUND + 1, CAMP_AT.z, 'lantern_light');
+
 const PLACES: readonly PlanPlace[] = [
   { name: 'grant.stone', x: STONE.x + 1, y: GRANT_GROUND, z: STONE.z, label: 'Grant stone' },
   { name: 'grant.center', x: GRANT.x + 14, y: GRANT_GROUND, z: GRANT.z + 14, label: 'Your plot' },
   { name: 'grant.rocks', x: 8, y: GRANT_GROUND, z: -228, label: 'Mossy rocks' },
   { name: 'dead.garden', x: GARDEN.x, y: GARDEN_GROUND, z: GARDEN.z, label: 'Dead garden' },
+  // The camp. Only the fire is on the map.
+  { name: 'camp', x: CAMP_AT.x, y: GRANT_GROUND, z: CAMP_AT.z, label: 'Camp' },
+  { name: 'camp.seat', x: CAMP.seat.x, y: GRANT_GROUND, z: CAMP.seat.z, label: '' },
+  { name: 'camp.edge', x: CAMP.edge.x, y: GRANT_GROUND, z: CAMP.edge.z, label: '' },
+  { name: 'camp.trees', x: CAMP.trees.x, y: GRANT_GROUND, z: CAMP.trees.z, label: '' },
   // Outside the Shut Door, and four spots inside the Hall. The inside ones stay off the map.
   { name: 'shut.door', x: -17, y: HALL_GROUND, z: -251, label: 'Stone door' },
   { name: 'hall.door', x: -17, y: HALL_GROUND, z: -255, label: '' },
@@ -374,6 +401,15 @@ const TREES: readonly PlanTree[] = [
   { x: -42, z: -278, kind: 'birch', size: 0.7 },
   { x: 168, z: -224, kind: 'oak', size: 0.8 },
   { x: 175, z: -219, kind: 'birch', size: 0.5 },
+  // The stand south-west of the camp that the fox comes out of: two trunks either side of its way, and a few
+  // behind them, so the dark under them reads as a tree line from the fire.
+  { x: -28, z: -219, kind: 'oak', size: 0.5 },
+  { x: -25, z: -217, kind: 'oak', size: 0.7 },
+  { x: -31, z: -216, kind: 'oak', size: 0.8 },
+  { x: -27, z: -213, kind: 'oak', size: 0.9 },
+  { x: -23, z: -214, kind: 'birch', size: 0.5 },
+  { x: -33, z: -220, kind: 'birch', size: 0.6 },
+  { x: -30, z: -211, kind: 'oak', size: 0.6 },
   // Old trees behind the ruined house.
   { x: -70, z: -247, kind: 'oak', size: 0.6 },
   { x: -89, z: -248, kind: 'oak', size: 0.4 },

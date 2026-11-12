@@ -33,6 +33,10 @@ const FOX_THANKS = 3, FOX_GOES = 14;
 const CAMP = 40;
 /** How close to the place `shut.door` the player's back is against the door. */
 const AT_DOOR = 2.6;
+/** The player is at the camp when this close to the place `camp`, the fire: in its light, or a few steps out of it. */
+export const AT_CAMP = 10;
+/** A fox that came to the camp waits at the edge of the firelight until the player has walked this far from where they stood. */
+const FOX_WAITS = 1.5;
 
 /** Every scene this system starts. A test checks that each is a conversation in content/dialogue.ts. */
 export const SCENES = ['door.shut', 'night.door', 'hall.mark', 'custodian.wake', 'fox.calm', 'heart.first', 'hall.mural', 'hall.mural.asked', 'hall.gate', 'hall.gate.asked'] as const;
@@ -56,10 +60,12 @@ interface Fox {
   facing: number;
   /** Seconds since the Mark calmed it, or -1 while it is Blighted. */
   calm: number;
+  /** Where the player stood when it came to the camp, while it still waits at the edge of the light. Else null. */
+  wait: { x: number; z: number } | null;
 }
 
 interface HallSave {
-  fox: { x: number; y: number; z: number; calm: number } | null;
+  fox: { x: number; y: number; z: number; calm: number; wait?: { x: number; z: number } | null } | null;
 }
 
 export interface Hall {
@@ -137,17 +143,27 @@ export function createHall(game: Game): Hall {
     game.actors.delete(FOX_ID);
   }
 
-  /** Stands the fox a few blocks from the player, on the side away from the Hall where the ground lets it. */
+  /**
+   * Stands the fox a few blocks from the player, on the side away from the Hall where the ground lets it. A
+   * player at the camp (within `AT_CAMP` of the place `camp`) sees it at the edge of the firelight, the place `camp.edge`, where
+   * scene 9 (content/cutscenes.ts) leaves it, and there it waits until the player walks.
+   */
   function bringFox(): void {
     const at = player.pos;
-    for (const [dx, dz] of [[-FOX_APPEARS, 2], [-FOX_APPEARS, -3], [FOX_APPEARS, 3], [0, FOX_APPEARS], [-5, 6]] as const) {
-      const x = at.x + dx, z = at.z + dz, y = world.heightAt(Math.floor(x), Math.floor(z));
-      if (Math.abs(y - at.y) > 3 || inCourt({ x, y, z })) continue;
-      fox = { pos: { x, y, z }, facing: 0, calm: -1 };
+    const camp = place('camp'), edge = place('camp.edge');
+    if (camp && edge && distance2d(at, camp) <= AT_CAMP) {
+      fox = { pos: { x: edge.x, y: edge.y, z: edge.z }, facing: Math.atan2(at.x - edge.x, -(at.z - edge.z)), calm: -1, wait: { x: at.x, z: at.z } };
       showFox();
       return;
     }
-    fox = { pos: { x: at.x - 4, y: at.y, z: at.z + 4 }, facing: 0, calm: -1 };
+    for (const [dx, dz] of [[-FOX_APPEARS, 2], [-FOX_APPEARS, -3], [FOX_APPEARS, 3], [0, FOX_APPEARS], [-5, 6]] as const) {
+      const x = at.x + dx, z = at.z + dz, y = world.heightAt(Math.floor(x), Math.floor(z));
+      if (Math.abs(y - at.y) > 3 || inCourt({ x, y, z })) continue;
+      fox = { pos: { x, y, z }, facing: 0, calm: -1, wait: null };
+      showFox();
+      return;
+    }
+    fox = { pos: { x: at.x - 4, y: at.y, z: at.z + 4 }, facing: 0, calm: -1, wait: null };
     showFox();
   }
 
@@ -176,6 +192,15 @@ export function createHall(game: Game): Hall {
     if (!fox || !foxActor) return;
     const far = distance2d(fox.pos, player.pos);
     let moved = false;
+    if (fox.wait && Math.hypot(fox.wait.x - player.pos.x, fox.wait.z - player.pos.z) > FOX_WAITS) fox.wait = null;
+    if (fox.calm < 0 && fox.wait) {
+      // At the edge of the firelight, shaking, watching the player.
+      fox.facing = Math.atan2(player.pos.x - fox.pos.x, -(player.pos.z - fox.pos.z));
+      foxActor.facing = fox.facing;
+      foxActor.anim = 'shake';
+      foxActor.mark = 'alert';
+      return;
+    }
     if (fox.calm < 0) {
       // Blighted: it comes at the player and stops short. It will not cross the Hall's threshold.
       const threshold = place('hall.door');
@@ -360,7 +385,7 @@ export function createHall(game: Game): Hall {
     game.systems.time?.guardSleep?.(awake);
     if (pending?.fox) {
       const saved = pending.fox;
-      fox = { pos: { x: saved.x, y: saved.y, z: saved.z }, facing: 0, calm: saved.calm };
+      fox = { pos: { x: saved.x, y: saved.y, z: saved.z }, facing: 0, calm: saved.calm, wait: saved.wait ?? null };
       showFox();
     }
     pending = null;
@@ -382,10 +407,13 @@ export function createHall(game: Game): Hall {
       stepNight();
       stepHeart();
     },
-    save: (): HallSave => ({ fox: fox ? { x: fox.pos.x, y: fox.pos.y, z: fox.pos.z, calm: Math.round(fox.calm * 100) / 100 } : null }),
+    save: (): HallSave => ({
+      fox: fox ? { x: fox.pos.x, y: fox.pos.y, z: fox.pos.z, calm: Math.round(fox.calm * 100) / 100, wait: fox.wait ? { ...fox.wait } : null } : null,
+    }),
     load(data) {
       const saved = (data as Partial<HallSave> | null)?.fox ?? null;
       const good = saved && [saved.x, saved.y, saved.z, saved.calm].every((n) => Number.isFinite(n)) ? saved : null;
+      if (good && !(good.wait && Number.isFinite(good.wait.x) && Number.isFinite(good.wait.z))) good.wait = null;
       doorCleared = false;
       dropFox();
       heartWas = -1;
@@ -394,7 +422,7 @@ export function createHall(game: Game): Hall {
         return;
       }
       if (good) {
-        fox = { pos: { x: good.x, y: good.y, z: good.z }, facing: 0, calm: good.calm };
+        fox = { pos: { x: good.x, y: good.y, z: good.z }, facing: 0, calm: good.calm, wait: good.wait ?? null };
         showFox();
       }
       custodian.anim = flags.is('custodian.awake') ? 'idle' : 'sleep';

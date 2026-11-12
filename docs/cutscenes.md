@@ -137,3 +137,45 @@ engine and the recorded beds the game already ships: the crickets, the fire, the
 - Which scenes are films. The table above is a proposal.
 - Whether a film may be skipped on the first watch. The experiment allows it.
 - Whether the words of a film are read aloud. Nobody speaks in scene 9.
+
+## What is built
+
+On `cut/director`. The art helpers' props and effects are not merged yet, so the brazier, the bed and
+fireflies stand in for them; their names are looked for when the game runs.
+
+| Part | File |
+|---|---|
+| The film format and scene 9 | `src/game/content/cutscenes.ts` |
+| The frame as a pure function, its clock and skip, the rule for when a film starts | `src/game/uiview/cutscene.ts`, tested in `cutscene.test.ts` |
+| The director | `src/game/views/story-cutscene.view.ts` |
+| The camp: fire, tent, firelight on the ground, sparks, smoke, the fire's sound | `src/game/views/world-camp.view.ts`, `src/game/worldview/camp.ts` |
+| The film's sound, made by code | `src/game/uiview/film-sound.ts` |
+| The experiment badge and its button | `src/game/views/ui-experiment.view.ts`, `src/game/uiview/cutscene-stage.ts` |
+| The experiment save, `greenhollow.experiment.save` | `src/game/shell/save.ts` |
+| The camp's places, and the fox standing at `camp.edge` | `src/game/content/region.ts`, `src/game/hall/index.sim.ts` |
+| Six pictures, one a shot, with their draw costs | `bun tools/film-shots.mjs` (`--quality low` for low) |
+| Watch, walk, reload, and Esc at 3 s and 15 s, in Chrome with real keys | `bun tools/film-check.mjs` |
+
+Choices made while building it, for Kausthubh to overrule:
+
+- **The hour.** The film runs from 0.782 to 0.798, just as the sun goes (0.785 in the sky's table). At the
+  first plan's 0.752 the land was still lit gold and the fire did not show.
+- **Shot 4 is the hero's eye line**, from just behind and over their head with a long lens that follows the
+  fox in, not over the shoulder. Over the shoulder, the pixel-art head filled a third of the frame and the
+  fox was a speck in the grass.
+- **`camp.edge` moved a block**, to 5 west and 4 south of the fire (still 6.4 blocks from it), so the fox
+  stops clear of a tall tuft of the painted grass.
+- **Each drawing of a puppet comes from the film's time** too: a walk from the ground covered, the rest
+  from the seconds since its pose began. A held moment always shows the same drawing.
+- **The badge's button** sets up the first night at the camp and lets the rules start the film, the same
+  way play does. In a game where the fox has already come it plays the film as it stands; the rules carry
+  on from where they were.
+- **The film takes the quest's beam of light and the Almanac's card off the screen** while it plays.
+
+Open:
+
+- **Low graphics at the camp is over the triangle budget**, with or without the film: the game's own camera
+  there at `?quality=low` draws 199,413 triangles (budget 150,000), shot 4 195,658. The trees draw all 36
+  calls at low here. The film adds one draw call, the pool of firelight.
+- **The fallbacks show.** The brazier on its post stands in for the campfire, a bed for the tent, and
+  fireflies for the sparks until `cut/camp-props` is merged.
