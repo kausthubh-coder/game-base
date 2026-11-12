@@ -36,7 +36,6 @@ Written 2026-11-11. Take a row off when it is merged.
 | Stage 2: each player's own bag, hand and Almanac | `docs/multiplayer.md`; `src/game/online/README.md`, "What stage 2 changes" | The largest one. Design by the coordinator first |
 | A link a whole class can open | `convex/invites.ts`, `docs/multiplayer.md` | An invite lets one friend in today and a world holds 8. **His call** on how a class is split into worlds |
 | Stage 3: small binary messages, resume after a drop, the 8-player memory test on Cloudflare | `docs/multiplayer.md`; `server/README.md` | 85 KB a second for each player today against a goal of 20 |
-| Model joining and leaving a world, and the world's card | The `formal-game` skill | Both had real ordering bugs |
 
 ## The workshop
 

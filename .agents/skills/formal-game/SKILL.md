@@ -12,6 +12,7 @@ A test checks the cases someone thought of. A model checker walks every order of
 | Area | Its skill | The design | The code it is held to |
 |---|---|---|---|
 | The build-mode stroke: press, drag, release, cancel, undo | `verify-build-stroke` | `docs/verify/build-stroke/Stroke.tla` | `src/game/build/model.test.ts`, 1,500 random runs of the real systems |
+| Joining and leaving a world, and the world's card: hello, Convex's answer, a second tab, a drop, silence, a restart, posts that cross or fail | `verify-world-join` | `docs/verify/world-join/WorldJoin.tla` | `server/test/world-model.test.ts`, 600 random runs of the real `world.ts`, and `convex/world-card-model.test.ts` for `writeCard`. Two findings are filed and marked failing |
 
 If your change touches code a row covers, run that row's skill. Each skill has a table of the code it stands for and the commit it was last read against.
 
@@ -19,8 +20,6 @@ If your change touches code a row covers, run that row's skill. Each skill has a
 
 Each is a place where events arrive in more than one order and a wrong order harms a player.
 
-- **Joining and leaving a world** (`server/world.ts`): hello, the token check, Convex's answer, a second tab, a drop, a restart. The harm: two bodies for one player, or a world that never sleeps and keeps costing.
-- **The world's card** (`server/world.ts`, `convex/worlds.ts`): posts that cross. A crossed post once left a departed player in the world list (`docs/bugs/2026-11-11-world-list-keeps-departed-player.md`).
 - **An invite** (`convex/invites.ts`): made, accepted once, used twice, the world removed meanwhile.
 - **The bag** (`src/game/inventory`): moves, crafting and pickups never make or lose an item.
 - **The save** (`server/store.ts`, `src/game/shell/save.ts`): a change, a save, a restart, a load, in any order, loses nothing a player was shown.
