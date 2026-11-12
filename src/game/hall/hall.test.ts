@@ -5,7 +5,9 @@
 import { expect, test } from 'bun:test';
 import { CONVERSATIONS, CUSTODIAN_HEART, SCENE } from '../content/dialogue.ts';
 import { HALL } from '../content/region.ts';
+import { distance2d } from '../move.sim.ts';
 import { newPlay, type Play } from '../play/harness.sim.ts';
+import { STEPS } from '../play/script.ts';
 import { CUSTODIAN_ID, FOX_ID, HEART_WORTH, SCENES, heartWords } from './index.sim.ts';
 
 const AIR = 0;
@@ -87,6 +89,62 @@ test('the open door, the woken Custodian and the fox on the doorstep come back f
   expect(Math.hypot(back.x - fox!.x, back.z - fox!.z)).toBeLessThan(0.3);
   expect(again.game.actors.get(FOX_ID)).toMatchObject({ sprite: 'fox-blighted', mark: 'alert' });
   expect(again.game.actors.get(CUSTODIAN_ID)).toMatchObject({ anim: 'idle' });
+});
+
+test('at the camp the fox stands at the edge of the firelight, waits there until the player walks, and the night plays to its end', () => {
+  const p = newPlay();
+  p.advance(0.5);
+  p.sys.quests.skipTo('night');
+  p.advance(0.5);
+  // The hut the night ends in: a game that skipped here has none, as in src/game/play/script.ts.
+  for (const step of STEPS) if (step.quest === 'roof') step.run(p);
+  expect(p.walkTo('camp.seat', { within: 0.4, seconds: 120 })).toBe(true);
+  // Dusk at the fire: the rules hear the fox, which is the moment scene 9 starts.
+  p.sys.time.setTimeOfDay(0.76);
+  expect(p.until(() => p.game.flags.is('night.fox'), 2)).toBe(true);
+  expect(p.said.at(-1)).toBe('Something grey is moving at the edge of your camp.');
+  p.advance(1);
+  const edge = p.sys.region.place('camp.edge').at, seat = p.game.player.pos;
+  expect(p.sys.hall.fox()).toEqual(edge);
+  expect(p.game.actors.get(FOX_ID)).toMatchObject({ anim: 'shake', mark: 'alert' });
+  // It faces the player.
+  const facing = p.game.actors.get(FOX_ID)!.facing;
+  expect(Math.abs(facing - Math.atan2(seat.x - edge.x, -(seat.z - edge.z)))).toBeLessThan(1e-6);
+
+  // A while later it is still there, and still after a save and a load.
+  p.advance(8);
+  expect(p.sys.hall.fox()).toEqual(edge);
+  const again = p.reload();
+  again.advance(1);
+  expect(again.sys.hall.fox()).toEqual(edge);
+
+  // The player walks toward the door, and it follows, slower than they walk.
+  expect(again.walkTo('grant.center', { within: 1, seconds: 30 })).toBe(true);
+  again.advance(1);
+  const fox = again.sys.hall.fox()!;
+  expect(distance2d(fox, edge)).toBeGreaterThan(2);
+  expect(again.game.actors.get(FOX_ID)?.anim).not.toBe('shake');
+
+  // From there the night goes on as it does from the bed.
+  const night = STEPS.filter((step) => step.quest === 'night');
+  for (const step of night.slice(1)) step.run(again);
+  expect(again.game.flags.is('quest.night.done')).toBe(true);
+}, 120_000);
+
+test('away from the camp the fox comes near the player as before', () => {
+  const p = newPlay();
+  p.advance(0.5);
+  p.sys.quests.skipTo('night');
+  p.advance(0.5);
+  // The north-east of the plot, well out of the firelight.
+  const g = p.sys.region.grant();
+  expect(p.walkTo({ x: g.x + g.width - 5.5, y: p.sys.region.place('grant.center').at.y, z: g.z + 5.5 }, { within: 0.6, seconds: 120 })).toBe(true);
+  const camp = p.sys.region.place('camp').at;
+  expect(distance2d(p.game.player.pos, camp)).toBeGreaterThan(10);
+  p.sys.time.setTimeOfDay(0.76);
+  expect(p.until(() => p.sys.hall.fox() !== null, 3)).toBe(true);
+  expect(distance2d(p.sys.hall.fox()!, p.game.player.pos)).toBeLessThan(10);
+  expect(distance2d(p.sys.hall.fox()!, p.sys.region.place('camp.edge').at)).toBeGreaterThan(1);
 });
 
 test('the Heartstone adds up roofs, crops and bonded beasts', () => {
