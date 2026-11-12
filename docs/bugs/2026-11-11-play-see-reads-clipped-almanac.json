@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "mode": "human",
+  "seed": 7,
+  "inputs": [
+    {
+      "type": "click",
+      "text": "New game"
+    },
+    {
+      "type": "press",
+      "key": "Escape"
+    },
+    {
+      "type": "gone",
+      "text": "Skip",
+      "timeout": 15000
+    },
+    {
+      "type": "see",
+      "text": "Talk to Tamsin"
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "see",
+      "text": "Twelve people have asked me for this plot.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "You are the first who looked at the ground before the view.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "Take the book. It has been blank for forty years.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "I only ever looked at things to price them.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "She puts it in your hands. The cover is soft with use. Every page is empty.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "Mosslings keep the rocks by the pond. Sit near one and write down what you see.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "Two columns. What it needs, and what it gives. Fill both.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "And an axe. You will want a roof before you want anything else.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "That is the advice. It weighs more than the axe.",
+      "timeout": 15000
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "see",
+      "text": "Almanac (Tab)"
+    },
+    {
+      "type": "press",
+      "key": "Tab"
+    },
+    {
+      "type": "see",
+      "text": "What it gives"
+    },
+    {
+      "type": "click",
+      "x": 500,
+      "y": 38
+    },
+    {
+      "type": "see",
+      "text": "Tamsin"
+    },
+    {
+      "type": "click",
+      "text": "Tamsin"
+    },
+    {
+      "type": "gone",
+      "text": "The Almanac, an axe and dry advice",
+      "timeout": 1000
+    }
+  ]
+}
