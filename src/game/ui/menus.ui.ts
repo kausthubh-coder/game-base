@@ -160,6 +160,20 @@ function viewControls(ctx: UiContext): HTMLElement | null {
   );
 }
 
+/** The Debug section, last on its side: each overlay in the top left, on or off. */
+function debugControls(ctx: UiContext): HTMLElement | null {
+  const debug = ctx.options.debug;
+  if (!debug) return null;
+  const show = debug.get();
+  const onOff = (name: 'fps' | 'meter' | 'info', legend: string): HTMLElement =>
+    choices(`debug-${name}`, legend, ['off', 'on'] as const, ['Off', 'On'], show[name] ? 'on' : 'off', (value) => debug.set({ [name]: value === 'on' }));
+  return h('section', { class: 'gu-section gu-settings-debug', 'data-key': 'settings:debug' }, h('h3', { class: 'gu-label' }, 'Debug'),
+    onOff('fps', 'Frame rate'),
+    onOff('meter', 'Performance meter'),
+    onOff('info', 'Debug panel'),
+  );
+}
+
 export function settingsPanel(ctx: UiContext): PanelView {
   const body = h('div', { class: 'gu-settings' });
   return {
@@ -195,6 +209,7 @@ export function settingsPanel(ctx: UiContext): PanelView {
           viewControls(ctx),
           sound,
           h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Interface'), choices('size', 'Size', SIZES, SIZE_NAMES, ctx.settings.size, (value) => ctx.setSetting('size', value))),
+          debugControls(ctx),
         ),
         h('section', { class: 'gu-section' }, h('h3', { class: 'gu-label' }, 'Keys'), keys),
       );

@@ -17,6 +17,7 @@ const STYLE = `
   font: 11px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums;
   color: #e8eaee; background: rgba(16, 20, 26, 0.78); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 6px;
   user-select: none; }
+.perf-meter.perf-meter-inline { position: static; }
 .perf-meter pre { margin: 0 0 6px; font: inherit; white-space: pre; }
 .perf-meter .row { display: flex; gap: 4px; align-items: center; }
 .perf-meter .row + .row { margin-top: 4px; }
@@ -34,7 +35,8 @@ export function createPerfPanel(parent: HTMLElement, onMode: (mode: string) => v
   document.head.append(style);
 
   const root = document.createElement('div');
-  root.className = 'perf-meter';
+  // On the page itself it stands in the top left. Inside anything else it takes its place in the flow.
+  root.className = parent === document.body ? 'perf-meter' : 'perf-meter perf-meter-inline';
   const text = document.createElement('pre');
   const modes = document.createElement('div');
   modes.className = 'row';

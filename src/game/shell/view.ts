@@ -76,6 +76,16 @@ export const TILT_TURNS: readonly TiltTurn[] = ['quarter', 'smooth'];
 /** How people, the pet and the creatures are drawn: pixel-art sprites, the default, or 3D models. */
 export type CharacterLook = 'sprites' | 'models';
 export const CHARACTER_LOOKS: readonly CharacterLook[] = ['sprites', 'models'];
+/**
+ * The debug overlays in the top left, each on or off: `fps` a small frame-rate counter, `meter` the full performance
+ * meter with the quality buttons (F3), `info` the debug panel: where the hero is, the time, the camera, what is aimed at.
+ */
+export interface DebugShow {
+  fps: boolean;
+  meter: boolean;
+  info: boolean;
+}
+export const DEBUG_OVERLAYS: readonly (keyof DebugShow)[] = ['fps', 'meter', 'info'];
 
 /** The settings a title or pause screen changes. Each one is stored and is there again on the next visit. */
 export interface ViewSettings {
@@ -103,8 +113,12 @@ export interface ViewSettings {
   readonly characters: CharacterLook;
   /** Takes effect at once, with no reload, and is stored. */
   setCharacters(look: CharacterLook): void;
-  /** Runs `fn` after the camera mode, the mouse style, the 2.5D turning or the character look changed. Returns a function that stops it. */
-  onChange(fn: (setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters') => void): () => void;
+  /** `?perf=1` in the address shows the meter for this visit. The same object every time. */
+  readonly debug: Readonly<DebugShow>;
+  /** Takes effect at once, and is stored. F3 flips `meter`. */
+  setDebug(show: Partial<DebugShow>): void;
+  /** Runs `fn` after the camera mode, the mouse style, the 2.5D turning, the character look or the debug overlays changed. Returns a function that stops it. */
+  onChange(fn: (setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters' | 'debug') => void): () => void;
 }
 
 /** What the aim is on: the block under the pointer, or under the crosshair when the mouse is locked, when it is in reach. Else null. */
@@ -140,6 +154,11 @@ export interface GameView {
    * (`pointer-events: none`), so set `pointer-events: auto` on anything of yours that takes a click.
    */
   readonly root: HTMLElement;
+  /**
+   * The column in the top left the debug overlays share, in `root`: the frame-rate counter goes first, then the
+   * performance meter, then the debug panel. `view.settings.debug` says which are shown.
+   */
+  readonly debugStack: HTMLElement;
 
   // ---- the base features
   readonly world: WorldView;

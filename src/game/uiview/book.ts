@@ -120,6 +120,7 @@ function createBook(view: GameView): Book {
       characters: () => view.settings.characters,
       setCharacters: (look) => view.settings.setCharacters(look),
     },
+    debug: { get: () => view.settings.debug, set: (show) => view.settings.setDebug(show) },
     setInterfaceSize(next) {
       size = next;
       root.style.setProperty('--ui-size', String(next));

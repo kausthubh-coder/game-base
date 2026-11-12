@@ -5,6 +5,8 @@ self.addEventListener('install', () => { void VERSION; self.skipWaiting(); });
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) if (key.startsWith('game-assets-') && key !== CACHE) await caches.delete(key);
+    // The page's own request starts while this worker wakes up, instead of after.
+    await self.registration.navigationPreload?.enable();
     await self.clients.claim();
   })());
 });
@@ -12,10 +14,12 @@ self.addEventListener('fetch', event => {
   const request = event.request, url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
   // The page and stable discovery manifest must always see the current deployment.
-  if (request.mode === 'navigate' || !url.pathname.includes('/assets/fingerprinted/')) {
-    event.respondWith(fetch(request, {cache:'no-cache'}));
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => (await event.preloadResponse) || fetch(request, {cache:'no-cache'}))());
     return;
   }
+  // Everything else outside the fingerprinted folder is served with no-cache, so the browser asks the server itself.
+  if (!url.pathname.includes('/assets/fingerprinted/')) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const saved = await cache.match(request);

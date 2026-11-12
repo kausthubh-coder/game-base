@@ -35,7 +35,7 @@ import { createKeys, type MouseMode, type Press } from './keys.ts';
 import { HERO_STEP, createPlayer, type PlayerRig } from './player.ts';
 import { clearSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
 import { BUSES, DEFAULT_VOLUMES, createSound } from './sound.ts';
-import { CAMERA_MODES, CHARACTER_LOOKS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type CharacterLook, type GameView, type Look, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
+import { CAMERA_MODES, CHARACTER_LOOKS, DEBUG_OVERLAYS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type CharacterLook, type DebugShow, type GameView, type Look, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
 import { dressWater } from './water.ts';
 
 /** The camera's distance at each wheel step, nearest first. A person is about 90 pixels tall at the first on a 900 pixel screen. */
@@ -96,10 +96,11 @@ interface StoredSettings {
   mouse: MouseStyle;
   tiltTurn: TiltTurn;
   characters: CharacterLook;
+  debug: DebugShow;
 }
 
 function readSettings(): StoredSettings {
-  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', mouse: 'drag', tiltTurn: 'quarter', characters: 'sprites' };
+  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', mouse: 'drag', tiltTurn: 'quarter', characters: 'sprites', debug: { fps: false, meter: false, info: false } };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
     if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Level)) settings.quality = stored!.quality as QualityMode;
@@ -108,6 +109,7 @@ function readSettings(): StoredSettings {
     if (MOUSE_STYLES.includes(stored?.mouse as MouseStyle)) settings.mouse = stored!.mouse as MouseStyle;
     if (TILT_TURNS.includes(stored?.tiltTurn as TiltTurn)) settings.tiltTurn = stored!.tiltTurn as TiltTurn;
     if (CHARACTER_LOOKS.includes(stored?.characters as CharacterLook)) settings.characters = stored!.characters as CharacterLook;
+    for (const key of DEBUG_OVERLAYS) if (typeof stored?.debug?.[key] === 'boolean') settings.debug[key] = stored.debug[key];
     for (const bus of BUSES) {
       const value = stored?.volumes?.[bus];
       if (typeof value === 'number' && Number.isFinite(value)) settings.volumes[bus] = Math.min(1, Math.max(0, value));
@@ -133,7 +135,9 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   let mouseStyle: MouseStyle = MOUSE_STYLES.find((m) => m === params.get('mouse')) ?? settings.mouse;
   let tiltTurn: TiltTurn = TILT_TURNS.find((t) => t === params.get('turn')) ?? settings.tiltTurn;
   let characterLook: CharacterLook = CHARACTER_LOOKS.find((l) => l === params.get('chars')) ?? settings.characters;
-  const changeListeners: ((setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters') => void)[] = [];
+  // `?perf=1` shows the meter for this visit, whatever was stored.
+  const debug: DebugShow = { ...settings.debug, meter: settings.debug.meter || params.get('perf') === '1' };
+  const changeListeners: ((setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters' | 'debug') => void)[] = [];
 
   // ---------------------------------------------------------------- the renderer and the scene
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -151,10 +155,16 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const art = await loadArt(options.onProgress);
 
   // ---------------------------------------------------------------- the world, the rules, the features
+  // The debug overlays share one column in the top left, so any of them can be shown with the others.
+  // src/game/views/core-debug.view.ts says what stands over it and what under.
+  const debugStack = document.createElement('div');
+  debugStack.className = 'debug-stack';
+  debugStack.style.cssText = 'position:absolute;top:8px;left:8px;display:flex;flex-direction:column;align-items:flex-start;gap:6px';
+  root.append(debugStack);
   const perfHolder = document.createElement('div');
-  perfHolder.hidden = params.get('perf') !== '1';
+  perfHolder.hidden = !debug.meter;
   perfHolder.style.pointerEvents = 'auto';
-  root.append(perfHolder);
+  debugStack.append(perfHolder);
   let basePostScale = 1, appliedScale = -1;
   const perf = createPerf(ctx, {
     parent: perfHolder,
@@ -506,7 +516,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   function onPress(press: Press): void {
     // A view that claimed this kind of press acts on it itself.
     if (claimed(press.kind)) return;
-    if (press.kind === 'perf') { perfHolder.hidden = !perfHolder.hidden; return; }
+    if (press.kind === 'perf') { view.settings.setDebug({ meter: !debug.meter }); return; }
     if (press.kind === 'turn') { camera.turn(press.direction); return; }
     if (press.kind === 'zoom') { camera.zoomBy(press.steps); return; }
     if (press.kind === 'camera') { view.settings.setCamera(NEXT_CAMERA[cameraMode]); return; }
@@ -667,7 +677,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     world.setViewDistance((g.viewDistance ?? 1) * perf.stress * (cam?.load ?? 1));
   }
   const view: GameView = {
-    kernel, game, ctx, renderer, scene, canvas, root,
+    kernel, game, ctx, renderer, scene, canvas, root, debugStack,
     world, camera, sprites, sky, water, effects, post, perf,
     assets: art.assets,
     get audio() { return sound.audio; },
@@ -738,6 +748,14 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
         if (next === characterLook) return;
         characterLook = next;
         for (const fn of [...changeListeners]) fn('characters');
+      },
+      get debug() { return debug; },
+      setDebug(next) {
+        for (const key of DEBUG_OVERLAYS) if (typeof next[key] === 'boolean') debug[key] = next[key];
+        settings.debug = { ...debug };
+        store();
+        perfHolder.hidden = !debug.meter;
+        for (const fn of [...changeListeners]) fn('debug');
       },
       onChange: (fn) => {
         changeListeners.push(fn);

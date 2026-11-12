@@ -9,7 +9,7 @@ const args = process.argv.slice(2);
 const opt = (k, d) => args.includes('--'+k) ? args[args.indexOf('--'+k)+1] : d;
 const folder = resolve(opt('folder', 'dist')), output = opt('out', '.artifacts/load/after.json');
 const port = Number(opt('port', '5550'));
-const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.json':'application/json', '.png':'image/png', '.svg':'image/svg+xml', '.mp3':'audio/mpeg' };
+const types = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.json':'application/json', '.png':'image/png','.webp':'image/webp','.woff2':'font/woff2', '.svg':'image/svg+xml', '.mp3':'audio/mpeg' };
 const headers = await readFile(resolve(folder, '_headers'), 'utf8').catch(() => '');
 const immutable = new Set([...headers.matchAll(/^([^\n *]+)\n  Cache-Control: public, max-age=31536000, immutable/gm)].map(m => m[1]));
 let hits = [], timeline = [], visitStart = Date.now();

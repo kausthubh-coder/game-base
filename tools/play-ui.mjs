@@ -175,7 +175,7 @@ async function desktop(browser) {
     seconds: window.__game.state().clock.seconds,
   }));
   check('the game opens on the title and nothing has started', title.started === false);
-  check('the title shows the picture from the manifest, ui/title.png', /ui\/title(?:\.[a-f0-9]+)?\.png/.test(title.art), title.art.slice(0, 90));
+  check('the title shows the picture from the manifest, ui/title.png', /ui\/title(?:\.[a-f0-9]+)?\.(?:png|webp)/.test(title.art), title.art.slice(0, 90));
   check('Continue is off without a save', title.continueOff === true);
   check('the HUD is hidden behind the title', title.hud === false);
   await frames(3);
@@ -203,6 +203,21 @@ async function desktop(browser) {
     check(`Graphics ${name} applies`, (await game(name => window.__game.view.settings.graphics[name],name)) === value);
   }
   await page.getByRole('button',{name:'Reset graphics overrides',exact:true}).click();
+  // Settings > Debug: each overlay shows when it is turned on, and F3 flips the meter and the setting with it.
+  const shown = (selector) => game((s) => document.querySelector(s)?.checkVisibility() ?? false, selector);
+  const overlays = [['fps', '.debug-fps'], ['meter', '.perf-meter'], ['info', '.debug-info']];
+  for (const [name, selector] of overlays) check(`Debug ${name} starts hidden`, !(await shown(selector)));
+  for (const [name, selector] of overlays) {
+    await page.locator(`input[name="gu-debug-${name}"][value="on"]`).check();
+    await frames(20);
+    check(`Debug ${name} on shows it`, (await shown(selector)) && (await game((n) => window.__game.view.settings.debug[n], name)));
+  }
+  check('the debug panel says where the hero is', /^x .* y .* z /.test(await game(() => document.querySelector('.debug-info').textContent)));
+  check('the frame-rate counter shows a number', /\d+ fps/.test(await game(() => document.querySelector('.debug-fps').textContent)));
+  await page.keyboard.press('F3');
+  check('F3 hides the meter and turns its setting off', !(await shown('.perf-meter')) && !(await game(() => window.__game.view.settings.debug.meter)));
+  for (const [name] of overlays) await page.locator(`input[name="gu-debug-${name}"][value="off"]`).check();
+  for (const [name, selector] of overlays) check(`Debug ${name} off hides it`, !(await shown(selector)));
   await shot('ui-02-settings.png');
   await key('Escape');
   check('Esc goes back from Settings to the title', (await panel()) === 'title');
@@ -282,7 +297,7 @@ async function desktop(browser) {
     busy: window.__game.state().player.busy,
   }));
   check('the box shows the talk system\'s line, with the name', mid.name === 'Tamsin' && mid.whole === mid.line, `${mid.name}: ${mid.whole}`);
-  check('the portrait comes from the manifest\'s portraits sheet', /portraits\/portraits(?:\.[a-f0-9]+)?\.png/.test(mid.portrait), mid.portrait.slice(0, 80));
+  check('the portrait comes from the manifest\'s portraits sheet', /portraits\/portraits(?:\.[a-f0-9]+)?\.(?:png|webp)/.test(mid.portrait), mid.portrait.slice(0, 80));
   await page.waitForFunction(() => window.__typing.partial || window.__typing.full, null, { timeout: 15000 });
   const typing = await game(() => window.__typing);
   if (typing.partial || typing.frames > 2) check('the line types out a letter at a time', typing.partial, `partly typed in some frame: ${typing.partial}; ${typing.frames} frames until now`);
