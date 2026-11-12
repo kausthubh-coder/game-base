@@ -2,6 +2,7 @@
 // shadows and fog all work on it, with two things added:
 //   wind  each corner moves by its `sway` in the vertex shader. A prop's timing comes from where it stands.
 //   glow  corners marked as lights turn warm and bright when it is dark.
+//   flame corners that sway and keep their own glowing color flicker, with or without wind.
 // Both read the `aFx` attribute a `Shape` writes: x is sway, y is glow.
 import * as THREE from 'three';
 
@@ -36,6 +37,14 @@ if (aFx.x > 0.0 && uPropWind.z > 0.0) {
   // The push is in the world. Turning it by the transpose and dividing by the scale squared brings it into the prop's own space.
   vec3 pWorld = vec3(pPush.x, -0.3 * length(pPush), pPush.y);
   transformed += (pWorld * mat3(pPlace)) / dot(pPlace[0].xyz, pPlace[0].xyz);
+}
+// A flame (a corner that sways and gives off its own color) flickers in still air too: it stretches, sinks and
+// licks sideways, faster than any gust. Its root has no sway, so it stays in the logs.
+if (aFx.x > 0.0 && aFx.y > 1.5) {
+  float pSeed = fract(sin(dot(pPlace[3].xz, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
+  float pLick = uPropTime * 7.3 + pSeed + position.y * 4.1;
+  float pTall = sin(uPropTime * 9.1 + pSeed) * 0.6 + sin(uPropTime * 13.7 + pSeed * 1.7) * 0.4;
+  transformed += vec3(sin(pLick) * 0.05, pTall * 0.07, cos(pLick * 1.3) * 0.04) * aFx.x;
 }
 vPropGlow = aFx.y > 1.5 ? vec2(0.0, 1.0) : vec2(aFx.y * uPropNight, 0.0);
 `;
@@ -88,6 +97,6 @@ export function createPropMaterial(): PropMaterial {
       .replace('#include <color_fragment>', FRAGMENT_COLOR)
       .replace('#include <emissivemap_fragment>', FRAGMENT_EMISSIVE);
   };
-  material.customProgramCacheKey = () => 'props-v1';
+  material.customProgramCacheKey = () => 'props-v2';
   return { material, uniforms };
 }
