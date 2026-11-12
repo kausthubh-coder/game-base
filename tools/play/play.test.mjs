@@ -218,7 +218,7 @@ describe('inputs and the look block', () => {
     for (let i = 0; i < 9; i++) screen.push({ text: String(i + 1), kind: 'button', press: true, disabled: false, box: { x: 200 + i * 60, y: 500, w: 54, h: 54 } });
     const text = formatLook({ title: 'look 001', picture: '/p.png', screen, wrong: [], changed: ['hero moved 1 m north'], now: ['day 1, 06:00'], problems: [] });
     expect(text.split('\n').length).toBeLessThanOrEqual(40);
-    expect(text).toContain('… 17 more lines (look --json)');
+    expect(text).toContain('… 17 more lines (add --all to this command to print them)');
   });
   test('a row of same-sized buttons is one line, its shared words said once', () => {
     const row = ['Quick slot 1: Axe, 1', 'Quick slot 2: empty', 'Quick slot 3: empty', 'Quick slot 4: empty']

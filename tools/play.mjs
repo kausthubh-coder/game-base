@@ -92,8 +92,8 @@ else if (command === 'start') {
   for (let i = 0; i < 150 && (existsSync(pidFile) || existsSync(lock)); i++) await delay(100);
 } else if (['look', 'act', 'film'].includes(command)) {
   const json = flag('json');
-  const result = await request(command, argv.slice(1).filter((a) => a !== '--json'));
-  console.log(json ? JSON.stringify(result, null, 2) : formatLook(result));
+  const result = await request(command, argv.slice(1).filter((a) => a !== '--json' && a !== '--all'));
+  console.log(json ? JSON.stringify(result, null, 2) : formatLook(result, { all: flag('all') }));
   if (result.failed) process.exitCode = 1;
 } else if (command === 'note') {
   const result = await request('note', argv.slice(1));
@@ -110,4 +110,4 @@ else if (command === 'start') {
     console.log(`${copied.notes}\n${copied.pictures.length} pictures in ${resolve(to)}`);
   }
 } else if (command) console.log(JSON.stringify(await request(command, argv.slice(1)), null, 2));
-else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--live] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> <words> | journal [--to <folder> [--with 1,4]] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');
+else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--live] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> [--step <n>] <words> | journal [--to <folder> [--with 1,4]] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');

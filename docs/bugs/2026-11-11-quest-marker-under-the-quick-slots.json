@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "mode": "human",
+  "seed": 7,
+  "size": "960x540",
+  "inputs": [
+    {
+      "type": "click",
+      "text": "New game"
+    },
+    {
+      "type": "press",
+      "key": "Escape"
+    },
+    {
+      "type": "gone",
+      "text": "Skip",
+      "timeout": 15000
+    },
+    {
+      "type": "see",
+      "text": "Talk to Tamsin"
+    },
+    {
+      "type": "clean"
+    },
+    {
+      "type": "hold",
+      "key": "KeyW",
+      "ms": 1500
+    },
+    {
+      "type": "clean"
+    }
+  ]
+}

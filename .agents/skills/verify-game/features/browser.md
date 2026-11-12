@@ -5,7 +5,7 @@ The real page, built and served on this machine, in headless Chrome on the graph
 ## Sub-features
 
 - `door`: reach any point of the game through `window.__game`.
-- `human`: real keys and clicks only.
+- `human`: real keys and clicks only. A whole playtest in this mode is the `playtest-game` skill.
 - `shots`: fixed scenes compared with approved pictures, with the draw budgets.
 
 ## How to get to it (user POV)
@@ -21,7 +21,7 @@ Preconditions: `bun tools/doctor.mjs` is clean. Use the port it printed (`PLAY_P
 - **Act through the door:** `bun tools/play.mjs do '{"type":"door","method":"skipTo","args":["festival"]}'`. Other methods: `teleport`, `give`, `setTime`, `step`, `interact`, `talkThrough`.
 - **Act like a person:** `bun tools/play.mjs do '{"type":"hold","key":"KeyW","ms":250}'`, `'{"type":"press","key":"KeyE"}'`, `'{"type":"click","text":"New game"}'`.
 - **Check:** `bun tools/play.mjs do '{"type":"check","path":"talk.npc","equals":"tamsin"}'` waits for the state and fails on timeout.
-- **Look:** `bun tools/play.mjs shot .artifacts/<feature>/<name>.png`, then open the picture.
+- **Look:** `bun tools/play.mjs act '<input>' <name>` plays an input and prints the picture's path, the interface as text, what looks wrong and what changed; `look` does the same with no input, `film '<input>'` shows motion as a sheet of frames. Open the picture. `shot <png>` is one picture outside the journal.
 - **Keep it:** `bun tools/play.mjs record <name>`, play, `record stop`, and copy the file into `tools/play/scenarios/`. `bun tools/play.mjs replay <file>` runs it again and fails on a console error or a failed check.
 - **Stop:** `bun tools/play.mjs stop`.
 - **Pictures:** `bun tools/shots.mjs all --check`. Scenes are in `tools/shots/scenes.json`.

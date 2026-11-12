@@ -9,7 +9,7 @@ import { launchChrome } from '../lib/chrome.mjs';
 import { changes, now } from './diff.mjs';
 import { capture, differences, jumps, sheet } from './film.mjs';
 import { play, parseInputs } from './inputs.mjs';
-import { append, NOTE_KINDS } from './journal.mjs';
+import { append, NOTE_KINDS, read as readJournal } from './journal.mjs';
 import { findWrong, order, readScreen } from './screen.mjs';
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -49,11 +49,12 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
   let problems = [];
   let step = 0, lastState = null, lastPicture = null, lastStep = null;
   const recording = resolve(out, 'recordings', `${Date.now()}-${process.pid}.json`);
-  const save = () => writeFileSync(recording, JSON.stringify({ version: 1, mode, seed, inputs: entries }, null, 2));
+  const save = () => writeFileSync(recording, JSON.stringify({ version: 1, mode, seed, size: `${viewport.width}x${viewport.height}`, inputs: entries }, null, 2));
   const state = () => page.evaluate(() => window.__game?.state() ?? null);
   const clean = () => { if (errors.length) throw new Error(errors.splice(0).join('\n')); };
 
-  async function fresh(nextMode, nextSeed = 7) {
+  /** A clean page. `view` is a recording's own size: its clicks are in that size's pixels. */
+  async function fresh(nextMode, nextSeed = 7, view = viewport) {
     if (!['door', 'human'].includes(nextMode)) throw new Error('mode must be door or human');
     mode = nextMode; seed = nextSeed;
     if (existsSync(pidFile)) {
@@ -61,7 +62,7 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
       if (info.pid === process.pid) writeFileSync(pidFile, JSON.stringify({ ...info, mode, seed }, null, 2));
     }
     await context?.close(); errors = []; problems = []; lastState = null;
-    context = await browser.newContext({ viewport, hasTouch: touch });
+    context = await browser.newContext({ viewport: view, hasTouch: touch });
     await context.addInitScript(`window.__playScreen = ${readScreen.toString()};`);
     page = await context.newPage(); page.setDefaultTimeout(60000);
     cdp = await context.newCDPSession(page);
@@ -109,7 +110,10 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     const changed = changes(lastState, current);
     lastState = current;
     return {
-      screen: items.map(({ text, kind, press, disabled, box, blockedBy }) => ({ text, kind, press, disabled, box, ...(blockedBy ? { blockedBy } : {}) })),
+      screen: items.map(({ text, kind, press, disabled, box, blockedBy, coveredBy, shown, clippedBy }) => ({
+        text, kind, press, disabled, box,
+        ...(blockedBy ? { blockedBy } : {}), ...(coveredBy ? { coveredBy } : {}), ...(shown === undefined ? {} : { shown, clippedBy }),
+      })),
       wrong,
       ...(screen.outOfSight?.length ? { outOfSight: screen.outOfSight } : {}),
       ...(blind ? {} : { changed, now: now(current) }),
@@ -148,7 +152,7 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     const seconds = shot.frames.length > 1 ? Math.round((shot.frames.at(-1).t - shot.frames[0].t) * 100) / 100 : 0;
     const file = (i) => resolve(folder, `${String(i).padStart(3, '0')}-${shot.frames[i].t.toFixed(3)}s.jpg`);
     const info = {
-      frames: shot.frames.length, seconds, how: shot.how, failed: shot.failed, folder, median: found.median, limit: found.limit,
+      frames: shot.frames.length, seconds, how: shot.how, failed: shot.failed, capped: shot.capped, folder, median: found.median, limit: found.limit,
       jumps: found.jumps.map((j) => ({ ...j, t: at(j.frame), file: file(j.frame) })),
       flickers: flickers.map((f) => ({ ...f, t: at(f.from), frames: f.to - f.from + 1, file: file(f.from) })),
       last: shot.frames.length ? file(shot.frames.length - 1) : null,
@@ -218,11 +222,20 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
       return result;
     },
     note: async (args) => {
-      const [kind, ...words] = args;
+      const [kind, ...rest] = args;
       if (!NOTE_KINDS.includes(kind)) throw new Error(`a note is ${NOTE_KINDS.join(', ')}`);
+      // --step 12 pins the note to an earlier picture of this session.
+      const at = rest.indexOf('--step');
+      const words = at < 0 ? rest : rest.filter((_, i) => i !== at && i !== at + 1);
       if (!words.join(' ').trim()) throw new Error('a note needs words');
-      append(journal, { kind: 'note', note: kind, words: words.join(' '), picture: lastPicture, step: lastStep });
-      return { note: kind, picture: lastPicture, journal };
+      let picture = lastPicture, pinned = lastStep;
+      if (at >= 0) {
+        const earlier = readJournal(journal).find((e) => e.kind !== 'note' && e.step === Number(rest[at + 1]));
+        if (!earlier) throw new Error(`no step ${rest[at + 1]} in this session's journal`);
+        picture = earlier.picture; pinned = earlier.step;
+      }
+      append(journal, { kind: 'note', note: kind, words: words.join(' '), picture, step: pinned });
+      return { note: kind, picture, journal };
     },
     record: async (args) => {
       if (args[0] === 'stop') { if (!named) throw new Error('no named recording'); writeFileSync(named, readFileSync(recording)); const path = named; named = null; return { path }; }
@@ -230,7 +243,8 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     },
     replay: async (args) => {
       const scenario = JSON.parse(readFileSync(resolve(args[0]), 'utf8'));
-      await fresh(scenario.mode, scenario.seed); entries = []; save();
+      // A recording made before sizes were kept was made at the default size.
+      await fresh(scenario.mode, scenario.seed, parseSize(scenario.size)); entries = []; save();
       for (const s of scenario.inputs) await input(s, { replaying: true });
       clean();
       return { pass: true, inputs: entries.length, ...(blind ? {} : { state: await state() }) };

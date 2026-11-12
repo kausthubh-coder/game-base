@@ -71,7 +71,32 @@ export function readScreen() {
       }
     }
     const share = (Math.max(0, right - left) * Math.max(0, bottom - top)) / (r.width * r.height);
-    return { share: Math.round(share * 100) / 100, by, cx: (Math.max(left, 0) + Math.min(right, W)) / 2, cy: (Math.max(top, 0) + Math.min(bottom, H)) / 2 };
+    return { share: Math.round(share * 100) / 100, by, left, top, right, bottom, cx: (Math.max(left, 0) + Math.min(right, W)) / 2, cy: (Math.max(top, 0) + Math.min(bottom, H)) / 2 };
+  };
+  /**
+   * What is drawn on top of el at a point, or null. `layer` says it belongs to something over half the screen
+   * (a menu, the dialogue): el is under it, which is a modal doing its job. Otherwise a small thing covers el.
+   * Text that lets clicks through is made to take them for the length of the test, or the test would skip it.
+   */
+  const onTop = (el, x, y) => {
+    const through = getComputedStyle(el).pointerEvents === 'none', before = el.style.pointerEvents;
+    if (through) el.style.pointerEvents = 'auto';
+    const stack = document.elementsFromPoint(Math.min(W - 1, Math.max(0, x)), Math.min(H - 1, Math.max(0, y)));
+    if (through) el.style.pointerEvents = before;
+    // An unseen thing on top hides nothing. When it is a control (a radio laid over its label), the piece under it takes its clicks.
+    const hit = stack.find((e) => shown(e));
+    const control = stack[0] !== hit && stack[0]?.matches(PRESS) && !stack[0].disabled;
+    if (!hit || hit === el || el.contains(hit) || hit.contains(el)) return control ? { control: true } : null;
+    let layer = false;
+    for (let top = hit; top && !top.contains(el) && !layer; top = top.parentElement) {
+      const h = top.getBoundingClientRect();
+      const big = (Math.max(0, Math.min(h.right, W) - Math.max(h.left, 0)) * Math.max(0, Math.min(h.bottom, H) - Math.max(h.top, 0))) / (W * H) >= 0.5;
+      if (!big) continue;
+      // The HUD's root is as big as the screen and is no layer: it paints nothing and lets clicks through.
+      const cs = getComputedStyle(top);
+      layer = cs.pointerEvents !== 'none' || cs.backgroundImage !== 'none' || !/^(transparent|rgba\(.*,\s*0\))$/.test(cs.backgroundColor);
+    }
+    return { what: describe(hit), layer };
   };
   const items = [];
   /** Pieces scrolled wholly out of a box, counted by the box: a player has to scroll to read them. */
@@ -85,7 +110,10 @@ export function readScreen() {
       for (const child of el.children) visit(child, insideText);
       return;
     }
-    const press = el.matches(PRESS);
+    // A thing with a hand cursor and words of its own takes clicks, whatever its tag. A layer that only holds
+    // other pieces (the dialogue, which a click anywhere advances) is not one piece: its lines are listed.
+    const press = el.matches(PRESS) || (getComputedStyle(el).cursor === 'pointer' && (el.children.length === 0 || hasOwnText(el))
+      && (!el.parentElement || getComputedStyle(el.parentElement).cursor !== 'pointer'));
     const text = press ? label(el) : (!insideText && hasOwnText(el) ? ownText(el) : '');
     if (press || text) {
       const r = el.getBoundingClientRect();
@@ -97,28 +125,14 @@ export function readScreen() {
         const item = {
           text, press, kind: press ? (el.getAttribute('role') || el.tagName.toLowerCase()) : 'text',
           disabled: press && (el.disabled === true || el.getAttribute('aria-disabled') === 'true'),
-          box: { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) },
+          // The part of the box its scrolling ancestors leave showing: that is what a player sees and can press.
+          box: { x: Math.round(part.left), y: Math.round(part.top), w: Math.round(part.right - part.left), h: Math.round(part.bottom - part.top) },
           clip: clip(el), what: describe(el),
         };
         if (part.share < 1) { item.shown = part.share; item.clippedBy = describe(part.by); }
-        // Text that takes clicks can be hit-tested: a small thing on top of it (a footer over a page) hides it.
-        if (!press && getComputedStyle(el).pointerEvents !== 'none') {
-          const hit = document.elementFromPoint(Math.min(W - 1, Math.max(0, part.cx)), Math.min(H - 1, Math.max(0, part.cy)));
-          if (hit && hit !== el && !el.contains(hit) && !hit.contains(el)) {
-            const h = hit.getBoundingClientRect();
-            if ((h.width * h.height) / (W * H) < 0.5) item.coveredBy = describe(hit);
-          }
-        }
-        if (press) {
-          const cx = Math.min(W - 1, Math.max(0, r.left + r.width / 2)), cy = Math.min(H - 1, Math.max(0, r.top + r.height / 2));
-          const hit = document.elementFromPoint(cx, cy);
-          if (hit && hit !== el && !el.contains(hit)) {
-            // A layer over most of the screen is a modal doing its job: what is under it is blocked, not wrong.
-            const h = hit.getBoundingClientRect();
-            const share = (Math.max(0, Math.min(h.right, W) - Math.max(h.left, 0)) * Math.max(0, Math.min(h.bottom, H) - Math.max(h.top, 0))) / (W * H);
-            if (share >= 0.5) item.blockedBy = describe(hit); else item.coveredBy = describe(hit);
-          }
-        }
+        const above = onTop(el, part.cx, part.cy);
+        if (above?.control) item.press = true;
+        else if (above) { if (above.layer) item.blockedBy = above.what; else item.coveredBy = above.what; }
         items.push(item);
       } else if (part && part.by) {
         const box = describe(part.by);
@@ -179,7 +193,8 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
       wrong.push({ kind: 'small', what: name(item), box, why: `${box.w}x${box.h}, under ${minSize} px` });
     }
   }
-  const press = items.filter((item) => item.press);
+  // A piece under a menu or the dialogue is not what the player is looking at: it takes no part in overlaps.
+  const press = items.filter((item) => item.press && !item.blockedBy);
   for (let i = 0; i < press.length; i++) {
     for (let j = i + 1; j < press.length; j++) {
       const a = press[i], b = press[j];
@@ -191,7 +206,7 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
       wrong.push({ kind: 'over', what: name(one), box: one.box, why: `overlaps ${name(other)} at ${other.box.x},${other.box.y} ${other.box.w}x${other.box.h}` });
     }
   }
-  const text = items.filter((item) => !item.press && item.text);
+  const text = items.filter((item) => !item.press && item.text && !item.blockedBy);
   for (let i = 0; i < text.length; i++) {
     for (let j = i + 1; j < text.length; j++) {
       const a = text[i], b = text[j];
@@ -202,8 +217,10 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
   // Text is never listed from inside a pressable thing, so text over one is a stranger: a world marker
   // drawn across the quick slots. A block of text that holds the button is left alone.
   for (const a of text) {
+    // Text already said to be covered is not said again for the thing that covers it.
+    if (a.coveredBy) continue;
     for (const b of press) {
-      if (b.blockedBy || !overlap(a.box, b.box) || inside(b.box, a.box)) continue;
+      if (!overlap(a.box, b.box) || inside(b.box, a.box)) continue;
       wrong.push({ kind: 'over', what: name(a), box: a.box, why: `text over ${name(b)} at ${b.box.x},${b.box.y} ${b.box.w}x${b.box.h}` });
     }
   }

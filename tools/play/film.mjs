@@ -148,15 +148,16 @@ export async function differences(frames, options) {
  * Records the frames drawn while `play()` runs and for `tail` ms after. Chrome's screencast first, so no drawn
  * frame is missed; repeated screenshots when the screencast sends nothing. Each frame is { data: jpeg, t: s }.
  */
-export async function capture(page, play, { tail = 500, fps = 10 } = {}) {
+export async function capture(page, play, { tail = 500, fps = 10, most = 900 } = {}) {
   const frames = [];
-  let how = 'screencast', failed = null;
+  // An input that waits out its timeout would film a minute at 60 frames a second: stop at `most` frames, 15 s.
+  let how = 'screencast', failed = null, capped = false;
   const cdp = await page.context().newCDPSession(page);
   let start = null;
   cdp.on('Page.screencastFrame', ({ data, metadata, sessionId }) => {
     const t = metadata.timestamp ?? Date.now() / 1000;
     if (start === null) start = t;
-    frames.push({ data: Buffer.from(data, 'base64'), t: t - start });
+    if (frames.length < most) frames.push({ data: Buffer.from(data, 'base64'), t: t - start }); else capped = true;
     cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {});
   });
   const { width, height } = page.viewportSize();
@@ -169,7 +170,7 @@ export async function capture(page, play, { tail = 500, fps = 10 } = {}) {
   const shots = (async () => {
     while (shooting) {
       const data = await page.screenshot({ type: 'jpeg', quality: 85 });
-      frames.push({ data, t: (Date.now() - began) / 1000 });
+      if (frames.length < most) frames.push({ data, t: (Date.now() - began) / 1000 }); else capped = true;
       await new Promise((r) => setTimeout(r, Math.max(0, 1000 / fps - 30)));
     }
   })();
@@ -186,7 +187,7 @@ export async function capture(page, play, { tail = 500, fps = 10 } = {}) {
   }
   shooting = false; await shots;
   await cdp.detach().catch(() => {});
-  return { frames, how, failed, error, size: { width, height } };
+  return { frames, how, failed, error, capped, size: { width, height } };
 }
 
 /** Writes the full-size frames into `folder` and the sheet at `sheetPath`. Returns the frames shown on the sheet. */

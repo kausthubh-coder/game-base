@@ -23,19 +23,19 @@ export function screenLines(items) {
         i = j; continue;
       }
       lines.push(`[${cut(item.text || `(${item.kind}, no text)`, 60)}]${item.disabled ? ' disabled' : ''}${item.blockedBy ? ` blocked by ${cut(item.blockedBy, 40)}` : ''}  ${boxText(item.box)}`);
-    } else lines.push(`${JSON.stringify(cut(item.text))}  ${boxText(item.box)}`);
+    } else lines.push(`${JSON.stringify(cut(item.text))}${item.blockedBy ? ` under ${cut(item.blockedBy, 40)}` : ''}  ${boxText(item.box)}`);
   }
   return lines;
 }
 
 /** The look as plain text. Blind looks have no `changed` or `now`. */
-export function formatLook(look) {
+export function formatLook(look, { all = false } = {}) {
   const out = [];
   out.push(`${look.title}  ${look.picture}`);
   if (look.failed) out.push(`FAILED input ${look.failed}`);
   if (look.film) {
     const f = look.film;
-    out.push(`film: ${f.frames} frames in ${f.seconds} s by ${f.how}${f.failed ? ` (${f.failed})` : ''}; frames in ${f.folder}`);
+    out.push(`film: ${f.frames} frames in ${f.seconds} s by ${f.how}${f.failed ? ` (${f.failed})` : ''}${f.capped ? `; stopped filming at ${f.frames} frames, the inputs ran longer` : ''}; frames in ${f.folder}`);
     out.push(`flickers: ${f.flickers.length ? f.flickers.map((r) => `#${r.from}${r.to > r.from ? `-#${r.to}` : ''} at ${r.t} s, ${r.frames} frame${r.frames > 1 ? 's' : ''} (${r.score})`).join(', ') : 'none'}`);
     out.push(`jumps: ${f.jumps.length ? f.jumps.map((j) => `#${j.frame} at ${j.t} s (${j.diff}${j.back ? ', and back' : ''})`).join(', ') : 'none'}  (median ${f.median}, limit ${f.limit})`);
     const marked = [...f.flickers, ...f.jumps].map((m) => m.file).filter(Boolean);
@@ -44,8 +44,8 @@ export function formatLook(look) {
   }
   const lines = screenLines(look.screen);
   out.push(`screen (${look.screen.length}):`);
-  for (const line of lines.slice(0, MAX_SCREEN)) out.push(`  ${line}`);
-  if (lines.length > MAX_SCREEN) out.push(`  … ${lines.length - MAX_SCREEN} more lines (look --json)`);
+  for (const line of all ? lines : lines.slice(0, MAX_SCREEN)) out.push(`  ${line}`);
+  if (!all && lines.length > MAX_SCREEN) out.push(`  … ${lines.length - MAX_SCREEN} more lines (add --all to this command to print them)`);
   for (const more of look.outOfSight ?? []) out.push(`  out of sight: ${more.count} more piece${more.count > 1 ? 's' : ''} in ${cut(more.in, 50)}; scroll to read ${more.count > 1 ? 'them' : 'it'}`);
   out.push(look.wrong.length ? `wrong (${look.wrong.length}):` : 'wrong: none');
   for (const w of look.wrong.slice(0, 8)) out.push(`  ${w.kind} ${JSON.stringify(cut(w.what, 40))} ${boxText(w.box)}: ${w.why}`);

@@ -31,13 +31,14 @@ bun tools/play.mjs start --mode human --blind       # real keys and clicks only;
 
 1. `bun tools/play.mjs act '<input>' <name>` plays the input and looks.
 2. **Open the picture it names.** The text block lists the interface; only the picture shows the world.
-3. Pin what you saw while you see it: `bun tools/play.mjs note bug|polish|question '<what, where on the screen, why it reads as wrong>'`.
+3. Pin what you saw while you see it: `bun tools/play.mjs note bug|polish|question '<what, where on the screen, why it reads as wrong>'`. `--step 12` pins it to an earlier picture.
 4. Choose the next input from the screen: a tip, a prompt, a marker, a button. When the screen gives no next step, that is a `question` note, and then you try what a person would try.
 
 Use `film '<input>' <name>` for anything that moves: a walk, a panel opening, talk starting, a tool swing, sleep, a camera turn. Open the sheet, and open at full size the marked frames whose paths it prints. A fade or a panel opening is marked too: the picture says which it is.
 
 - An action is one `act` or `film`. Give `act` a list when the steps need no look between them, such as the presses that walk through a conversation: `act '[{"type":"press","key":"Enter"},{"type":"wait","ms":400},{"type":"press","key":"Enter"}]' talk`.
 - The game's clock stands still between commands, so reading a picture costs no game time. To see what happens when a player does nothing, play a `wait`.
+- After a change of size, a new panel or a scroll, look before you click by coordinates: the boxes have moved. Click by name where the block gives one.
 - Words drawn into the 3D picture (the opening's title, a sign) are in the picture only, never in the text block.
 
 As the New player, everything you know comes from the screen. Read the game's code and content only after the playtest, to place a bug.

@@ -3,6 +3,13 @@
 What agents found by playing the game like a person. The `playtest-game` skill is the method. One file here
 per playtest, `<date>-<charter>.md`, with its pictures in `img/`.
 
+## Reports
+
+| Report | Player | What it found |
+|---|---|---|
+| `2026-11-11-new-player-first-quest.md` | New, blind, 960x540 | The Almanac's answers are below the fold; the hero vanishes under a tree; nothing names the key that advances talk; dashed lines on the meadow. It led to the watch step that finishes by itself. |
+| `2026-11-11-menus-small-screen.md` | Thorough, 1366x768 | Settings offers 3D characters whose model is missing; Settings once opened without its parchment; the menus, bag, quests and map otherwise worked. |
+
 ## The parts of the game
 
 A charter takes one row. Take the row played longest ago. Set the date when you file a report, and add a row
