@@ -48,7 +48,34 @@ export function readScreen() {
     const text = words(el.innerText).slice(0, 30);
     return `${el.tagName.toLowerCase()}${id}${cls}${text ? ` "${text}"` : ''}`;
   };
+  /**
+   * How much of el's box its scrolling and clipping ancestors leave showing, from 0 to 1, and the ancestor that
+   * hides the rest. A fixed box is clipped by nobody, an absolute one only by its containing blocks.
+   */
+  const shownPart = (el, r) => {
+    let left = r.left, top = r.top, right = r.right, bottom = r.bottom, by = null;
+    let position = getComputedStyle(el).position;
+    for (let p = el.parentElement; p && p !== document.body && p !== document.documentElement && position !== 'fixed'; p = p.parentElement) {
+      const cs = getComputedStyle(p);
+      if (position === 'absolute' && cs.position === 'static') continue;
+      position = cs.position;
+      if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;
+      const pr = p.getBoundingClientRect();
+      if (cs.overflowX !== 'visible') {
+        if (pr.left > left) { left = pr.left; by = p; }
+        if (pr.right < right) { right = pr.right; by = p; }
+      }
+      if (cs.overflowY !== 'visible') {
+        if (pr.top > top) { top = pr.top; by = p; }
+        if (pr.bottom < bottom) { bottom = pr.bottom; by = p; }
+      }
+    }
+    const share = (Math.max(0, right - left) * Math.max(0, bottom - top)) / (r.width * r.height);
+    return { share: Math.round(share * 100) / 100, by, cx: (Math.max(left, 0) + Math.min(right, W)) / 2, cy: (Math.max(top, 0) + Math.min(bottom, H)) / 2 };
+  };
   const items = [];
+  /** Pieces scrolled wholly out of a box, counted by the box: a player has to scroll to read them. */
+  const outOfSight = new Map();
   const visit = (el, insideText) => {
     if (SKIP.has(el.tagName) || el.tagName.toLowerCase() === 'svg') return;
     if (el.hidden) return;
@@ -64,13 +91,24 @@ export function readScreen() {
       const r = el.getBoundingClientRect();
       const inView = r.right > 0 && r.bottom > 0 && r.left < W && r.top < H;
       // 2 px or less is a line kept for screen readers (the visually hidden pattern), not something a player sees.
-      if (r.width > 2 && r.height > 2 && inView) {
+      const part = r.width > 2 && r.height > 2 && inView ? shownPart(el, r) : null;
+      // A piece scrolled wholly out of its box is not on the screen at all.
+      if (part && part.share > 0) {
         const item = {
           text, press, kind: press ? (el.getAttribute('role') || el.tagName.toLowerCase()) : 'text',
           disabled: press && (el.disabled === true || el.getAttribute('aria-disabled') === 'true'),
           box: { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) },
           clip: clip(el), what: describe(el),
         };
+        if (part.share < 1) { item.shown = part.share; item.clippedBy = describe(part.by); }
+        // Text that takes clicks can be hit-tested: a small thing on top of it (a footer over a page) hides it.
+        if (!press && getComputedStyle(el).pointerEvents !== 'none') {
+          const hit = document.elementFromPoint(Math.min(W - 1, Math.max(0, part.cx)), Math.min(H - 1, Math.max(0, part.cy)));
+          if (hit && hit !== el && !el.contains(hit) && !hit.contains(el)) {
+            const h = hit.getBoundingClientRect();
+            if ((h.width * h.height) / (W * H) < 0.5) item.coveredBy = describe(hit);
+          }
+        }
         if (press) {
           const cx = Math.min(W - 1, Math.max(0, r.left + r.width / 2)), cy = Math.min(H - 1, Math.max(0, r.top + r.height / 2));
           const hit = document.elementFromPoint(cx, cy);
@@ -82,13 +120,16 @@ export function readScreen() {
           }
         }
         items.push(item);
+      } else if (part && part.by) {
+        const box = describe(part.by);
+        outOfSight.set(box, (outOfSight.get(box) ?? 0) + 1);
       }
     }
     // Inside a pressable thing only other pressable things are listed; inside a text block only those too.
     for (const child of el.children) visit(child, insideText || press || Boolean(text));
   };
   if (document.body) visit(document.body, false);
-  return { viewport: { w: W, h: H }, items };
+  return { viewport: { w: W, h: H }, items, outOfSight: [...outOfSight].map(([box, count]) => ({ in: box, count })) };
 }
 
 /** Reading order, with duplicates (same text, same box) left out. */
@@ -103,12 +144,17 @@ export function order(items) {
   });
 }
 
+/** A piece is readable when at least this share of its box shows inside its scrolling and clipping ancestors. */
+export const READABLE = 0.6;
+/** Can a player read or press this piece now: enough of it shows and nothing sits on top of it. */
+export const readable = (item) => (item.shown ?? 1) >= READABLE && !item.coveredBy;
+
 const overlap = (a, b) => Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > 2 && Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > 2;
 const inside = (a, b) => a.x >= b.x && a.y >= b.y && a.x + a.w <= b.x + b.w && a.y + a.h <= b.y + b.h;
 
 /**
  * What looks wrong, each with its kind, the piece and its box:
- * `cut` text clipped by its box, `off` partly outside the viewport, `over` a pressable thing covered at its
+ * `cut` text clipped by its box or mostly scrolled out of sight, `off` partly outside the viewport, `over` a pressable thing covered at its
  * centre, two pressable things that overlap, text drawn over other text or over a pressable thing, `small` a pressable
  * thing under 24 px on a side.
  */
@@ -124,7 +170,11 @@ export function findWrong(items, viewport, { minSize = 24 } = {}) {
     if (box.x < 0 || box.y < 0 || box.x + box.w > viewport.w || box.y + box.h > viewport.h) {
       wrong.push({ kind: 'off', what: name(item), box, why: 'partly outside the screen' });
     }
+    if (item.clippedBy && item.shown < READABLE) {
+      wrong.push({ kind: 'cut', what: name(item), box, why: `${Math.round((1 - item.shown) * 100)}% of it is hidden past the edge of ${item.clippedBy}` });
+    }
     if (item.press && item.coveredBy) wrong.push({ kind: 'over', what: name(item), box, why: `covered at its centre by ${item.coveredBy}` });
+    if (!item.press && item.coveredBy) wrong.push({ kind: 'over', what: name(item), box, why: `covered by ${item.coveredBy}` });
     if (item.press && !item.disabled && (box.w < minSize || box.h < minSize)) {
       wrong.push({ kind: 'small', what: name(item), box, why: `${box.w}x${box.h}, under ${minSize} px` });
     }

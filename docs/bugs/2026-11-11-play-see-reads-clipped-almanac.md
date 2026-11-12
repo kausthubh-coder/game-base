@@ -1,4 +1,12 @@
-# The play tool treats clipped Almanac answers as readable
+# The play tool treated clipped Almanac answers as readable
+
+**Fixed on 2026-11-12, in the branch that found it.** `see` now counts a piece only when at least 60% of
+its box shows inside its scrolling and clipping ancestors and nothing sits on top of it. `look` flags a
+piece that is mostly hidden as `cut`, and counts the pieces scrolled out of sight. `bun
+tools/play/check-eyes.mjs` keeps it fixed, on a page with one line past the edge of a scrolling box, one
+scrolled away and one under a footer. The recording that came with this file relied on the false `see` to
+wait, so it could not be kept as written; it became the recording of the game's own bug,
+`2026-11-11-almanac-answers-below-the-fold.json`. What follows is the report as filed.
 
 Found while playing the first quest cold at `e7844a8`, 960x540, human blind mode, seed 7. No existing report covered this.
 

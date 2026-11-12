@@ -20,6 +20,8 @@ Opening Tab after Tamsin shows a large portrait and name. The two column heading
 
 A mouse-wheel scroll reveals both columns. I found no visible scrollbar or scroll instruction. This is a layout and discoverability polish finding, not a quest blocker. Repeated on both initial pages, and again on two subsequent Mossling opens. The raw notes called it a bug before I discovered the scroll workaround.
 
+Filed after the playtest as `docs/bugs/2026-11-11-almanac-answers-below-the-fold.md`, with a recording that fails, once the tool could tell hidden text from shown.
+
 Pictures: [Tamsin before scrolling](img/2026-11-11-new-player-first-quest/019-almanac-cut.jpg), [Tamsin after scrolling](img/2026-11-11-new-player-first-quest/020-scroll-page.jpg), [completed Mossling](img/2026-11-11-new-player-first-quest/024-creature-entry.jpg), [repeat open](img/2026-11-11-new-player-first-quest/038-offscreen-see-again.jpg).
 
 The current input format cannot assert that these answers fit within the readable panel area. The tool bug below explains why a plain `see` is insufficient. I have not invented a passing visual check for this finding.
@@ -27,6 +29,8 @@ The current input format cannot assert that these answers fit within the readabl
 ### 2. The hero vanishes under the tree on the first walk
 
 I followed the yellow distance arrow with D. The camera followed, but the leaves covered the hero completely before I reached the pond. Observation completed during that walk. I could read the finished page, but I did not deliberately identify and watch a creature to earn it. Seen once; I did not repeat the full walk. No claim that the observation rule itself is broken.
+
+The coordinator followed this up: the step finishes with the hero standing still at the grant stone, 3 of 3. It is `docs/bugs/2026-11-12-watch-step-finishes-by-itself.md`.
 
 [Walk film sheet](img/2026-11-11-new-player-first-quest/023-walk-east.jpg). The hero is clear again on the [return toward Tamsin](img/2026-11-11-new-player-first-quest/026-return-tamsin.jpg).
 

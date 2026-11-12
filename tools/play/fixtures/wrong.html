@@ -19,7 +19,16 @@
   <button style="left: 600px; top: 400px" onclick="console.error('broken on purpose')">Break</button>
   <p style="position: absolute; left: 400px; top: 460px; margin: 0">Hello there</p>
   <p hidden>Not shown</p>
+  <div role="tab" tabindex="0" style="position: absolute; left: 400px; top: 300px; width: 80px; height: 30px">A tab</div>
   <div style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">For screen readers only, and much too long for its box</div>
   <p style="position: absolute; left: 600px; top: 100px; margin: 0; width: 200px">A hint across the corner</p>
   <p style="position: absolute; left: 700px; top: 105px; margin: 0">Quest title</p>
+  <!-- A page in a scrolling box, as the Almanac is: one line shows, one is mostly past the edge, one is scrolled away, one sits under a footer. -->
+  <div style="position: absolute; left: 20px; top: 380px; width: 300px; height: 60px; overflow: auto">
+    <p style="margin: 0; height: 30px; pointer-events: auto">Top of the page</p>
+    <p style="margin: 0; height: 22px; pointer-events: auto">Under the footer</p>
+    <p style="margin: 0; height: 30px">Mostly past the edge</p>
+    <p style="margin: 60px 0 0; height: 30px">Scrolled out of sight</p>
+  </div>
+  <div style="position: absolute; left: 20px; top: 408px; width: 300px; height: 24px; background: #333"></div>
 </body></html>

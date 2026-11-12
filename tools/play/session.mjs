@@ -111,6 +111,7 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     return {
       screen: items.map(({ text, kind, press, disabled, box, blockedBy }) => ({ text, kind, press, disabled, box, ...(blockedBy ? { blockedBy } : {}) })),
       wrong,
+      ...(screen.outOfSight?.length ? { outOfSight: screen.outOfSight } : {}),
       ...(blind ? {} : { changed, now: now(current) }),
       problems: problems.splice(0),
     };
@@ -145,15 +146,28 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     const folder = resolve(journal, base), picture = resolve(journal, `${base}.png`);
     await sheet(shot.frames, { folder, sheetPath: picture, fps, found: found.jumps, runs: flickers, size: shot.size });
     const seconds = shot.frames.length > 1 ? Math.round((shot.frames.at(-1).t - shot.frames[0].t) * 100) / 100 : 0;
+    const file = (i) => resolve(folder, `${String(i).padStart(3, '0')}-${shot.frames[i].t.toFixed(3)}s.jpg`);
     const info = {
       frames: shot.frames.length, seconds, how: shot.how, failed: shot.failed, folder, median: found.median, limit: found.limit,
-      jumps: found.jumps.map((j) => ({ ...j, t: at(j.frame) })),
-      flickers: flickers.map((f) => ({ ...f, t: at(f.from), frames: f.to - f.from + 1 })),
+      jumps: found.jumps.map((j) => ({ ...j, t: at(j.frame), file: file(j.frame) })),
+      flickers: flickers.map((f) => ({ ...f, t: at(f.from), frames: f.to - f.from + 1, file: file(f.from) })),
+      last: shot.frames.length ? file(shot.frames.length - 1) : null,
     };
     const result = { title: `film ${n}${name ? ` ${name}` : ''}`, step, picture, film: info, ...(failed ? { failed } : {}), ...(await observe()) };
     record('film', name, result, { input: inputs, film: { frames: info.frames, how: info.how, median: info.median, limit: info.limit, jumps: info.jumps, flickers: info.flickers, folder } });
     return result;
   }
+
+  /**
+   * A person looks and presses in a second. An agent reads for a minute, and the game's day would run on
+   * meanwhile. So between the commands of a playtest the rules stand still, and the picture is still drawn.
+   * `start --live` lets the clock run.
+   */
+  const live = flag('live');
+  const hold = async (on) => {
+    if (live || pageFile || mode !== 'human') return;
+    await page.evaluate((held) => window.__game?.manual?.(held), on).catch(() => {});
+  };
 
   let closing = false;
   const cleanup = async () => {
@@ -181,20 +195,27 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
       await page.screenshot({ path }); return { path };
     },
     do: async (args) => {
+      await hold(false);
       await input(JSON.parse(args.join(' ')));
       return blind ? { done: true } : state();
     },
-    look: async (args) => look('look', args[0]),
+    look: async (args) => { await hold(false); const result = await look('look', args[0]); await hold(true); return result; },
     act: async (args) => {
       const inputs = parseInputs(args[0]);
+      await hold(false);
       const failed = await playAll(inputs);
-      return look('act', args[1], { input: inputs.length === 1 ? inputs[0] : inputs, failed });
+      const result = await look('act', args[1], { input: inputs.length === 1 ? inputs[0] : inputs, failed });
+      await hold(true);
+      return result;
     },
     film: async (args) => {
       const fpsAt = args.indexOf('--fps');
       const fps = fpsAt < 0 ? 10 : Number(args[fpsAt + 1]);
       const rest = fpsAt < 0 ? args : args.filter((_, i) => i !== fpsAt && i !== fpsAt + 1);
-      return film(parseInputs(rest[0]), rest[1], fps);
+      await hold(false);
+      const result = await film(parseInputs(rest[0]), rest[1], fps);
+      await hold(true);
+      return result;
     },
     note: async (args) => {
       const [kind, ...words] = args;

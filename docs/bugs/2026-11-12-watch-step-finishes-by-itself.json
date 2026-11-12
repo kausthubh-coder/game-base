@@ -107,32 +107,15 @@
     },
     {
       "type": "see",
-      "text": "Almanac (Tab)"
+      "text": "Watch a mossling"
     },
     {
-      "type": "press",
-      "key": "Tab"
-    },
-    {
-      "type": "see",
-      "text": "What it gives"
-    },
-    {
-      "type": "click",
-      "x": 500,
-      "y": 38
+      "type": "wait",
+      "ms": 8000
     },
     {
       "type": "see",
-      "text": "Tamsin"
-    },
-    {
-      "type": "click",
-      "text": "Tamsin"
-    },
-    {
-      "type": "gone",
-      "text": "The Almanac, an axe and dry advice",
+      "text": "Watch a mossling",
       "timeout": 1000
     }
   ]

@@ -38,11 +38,15 @@ export function formatLook(look) {
     out.push(`film: ${f.frames} frames in ${f.seconds} s by ${f.how}${f.failed ? ` (${f.failed})` : ''}; frames in ${f.folder}`);
     out.push(`flickers: ${f.flickers.length ? f.flickers.map((r) => `#${r.from}${r.to > r.from ? `-#${r.to}` : ''} at ${r.t} s, ${r.frames} frame${r.frames > 1 ? 's' : ''} (${r.score})`).join(', ') : 'none'}`);
     out.push(`jumps: ${f.jumps.length ? f.jumps.map((j) => `#${j.frame} at ${j.t} s (${j.diff}${j.back ? ', and back' : ''})`).join(', ') : 'none'}  (median ${f.median}, limit ${f.limit})`);
+    const marked = [...f.flickers, ...f.jumps].map((m) => m.file).filter(Boolean);
+    for (const path of [...new Set(marked)].slice(0, 6)) out.push(`  open ${path}`);
+    if (f.last) out.push(`last frame: ${f.last}`);
   }
   const lines = screenLines(look.screen);
   out.push(`screen (${look.screen.length}):`);
   for (const line of lines.slice(0, MAX_SCREEN)) out.push(`  ${line}`);
   if (lines.length > MAX_SCREEN) out.push(`  … ${lines.length - MAX_SCREEN} more lines (look --json)`);
+  for (const more of look.outOfSight ?? []) out.push(`  out of sight: ${more.count} more piece${more.count > 1 ? 's' : ''} in ${cut(more.in, 50)}; scroll to read ${more.count > 1 ? 'them' : 'it'}`);
   out.push(look.wrong.length ? `wrong (${look.wrong.length}):` : 'wrong: none');
   for (const w of look.wrong.slice(0, 8)) out.push(`  ${w.kind} ${JSON.stringify(cut(w.what, 40))} ${boxText(w.box)}: ${w.why}`);
   if (look.wrong.length > 8) out.push(`  … ${look.wrong.length - 8} more (look --json)`);

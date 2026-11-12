@@ -34,10 +34,10 @@ bun tools/play.mjs start --mode human --blind       # real keys and clicks only;
 3. Pin what you saw while you see it: `bun tools/play.mjs note bug|polish|question '<what, where on the screen, why it reads as wrong>'`.
 4. Choose the next input from the screen: a tip, a prompt, a marker, a button. When the screen gives no next step, that is a `question` note, and then you try what a person would try.
 
-Use `film '<input>' <name>` for anything that moves: a walk, a panel opening, talk starting, a tool swing, sleep, a camera turn. Open the sheet and look at the frames it marks as flickers and jumps.
+Use `film '<input>' <name>` for anything that moves: a walk, a panel opening, talk starting, a tool swing, sleep, a camera turn. Open the sheet, and open at full size the marked frames whose paths it prints. A fade or a panel opening is marked too: the picture says which it is.
 
 - An action is one `act` or `film`. Give `act` a list when the steps need no look between them, such as the presses that walk through a conversation: `act '[{"type":"press","key":"Enter"},{"type":"wait","ms":400},{"type":"press","key":"Enter"}]' talk`.
-- The game's clock runs between commands. A minute of thinking is a minute or more of the game's day.
+- The game's clock stands still between commands, so reading a picture costs no game time. To see what happens when a player does nothing, play a `wait`.
 - Words drawn into the 3D picture (the opening's title, a sign) are in the picture only, never in the text block.
 
 As the New player, everything you know comes from the screen. Read the game's code and content only after the playtest, to place a bug.
@@ -62,7 +62,7 @@ Done playing when the budget is spent or the charter's part is played through, a
 ## 4. Report
 
 1. `bun tools/play.mjs journal` writes the playtest as a page and the notes as a list. `bun tools/play.mjs stop`.
-2. **Each bug becomes a script before anyone fixes it.** Make it happen again and count how often (3 of 3, 1 of 5). Then write the check with the `test-game` skill: a recording with `see` or `check` that fails today, or a scenario. File it in `docs/bugs/` as that skill says, with the failing recording beside it.
+2. **Each bug becomes a script before anyone fixes it.** Make it happen again and count how often (3 of 3, 1 of 5). Then write the check with the `test-game` skill: a recording that fails today, or a scenario. `see` and `gone` assert what a player can read, `clean` that nothing on the screen is cut, covered or off the edge, `check` the game's state. File it in `docs/bugs/` as that skill says, with the failing recording beside it.
 3. Write `docs/playtests/<date>-<charter>.md`: the charter, the renderer and size, how many actions were played, then the findings, worst for a player first. Each finding has what you did, what you saw, why it reads as wrong, and its picture. `bun tools/play.mjs journal --to docs/playtests/img/<date>-<charter>` copies each noted picture there as a small JPEG; link those. End with what you did not reach.
 4. Set the part's date in `docs/playtests/README.md`.
 

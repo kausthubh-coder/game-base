@@ -100,14 +100,14 @@ else if (command === 'start') {
   console.log(`${result.note} noted on ${result.picture ?? 'no picture yet'}`);
 } else if (command === 'journal') {
   const to = opt('to');
-  const given = argv.slice(1).find((a, i, all) => !a.startsWith('--') && all[i - 1] !== '--to');
+  const given = argv.slice(1).find((a, i, all) => !a.startsWith('--') && !['--to', '--with'].includes(all[i - 1]));
   const folder = given ? resolve(given) : session()?.journal ?? latest(resolve(out, 'journal'));
   if (!folder) throw new Error('no journal yet: look, act or film first');
   const paths = await render(folder);
   console.log(`${paths.html}\n${paths.notes}`);
   if (to) {
-    const copied = await exportNotes(folder, resolve(to));
+    const copied = await exportNotes(folder, resolve(to), String(opt('with', '')).split(',').filter(Boolean).map(Number));
     console.log(`${copied.notes}\n${copied.pictures.length} pictures in ${resolve(to)}`);
   }
 } else if (command) console.log(JSON.stringify(await request(command, argv.slice(1)), null, 2));
-else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> <words> | journal [--to <folder>] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');
+else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--live] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> <words> | journal [--to <folder> [--with 1,4]] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');

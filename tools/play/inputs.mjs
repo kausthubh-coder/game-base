@@ -1,5 +1,7 @@
 // The inputs `do`, `act`, `film` and recordings play, one at a time, as a person or through the debug door.
 
+import { findWrong, order } from './screen.mjs';
+
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 const DOOR = ['newGame', 'teleport', 'give', 'skipTo', 'advance', 'setTime', 'setCamera', 'look', 'interact', 'talkThrough', 'manual', 'turn'];
 
@@ -12,10 +14,30 @@ function checkState(s) {
   return Boolean(value);
 }
 
-// Runs in the page: is this text in a piece of interface a player can see now?
+// Runs in the page: is this text in a piece of interface a player can read now? A piece mostly scrolled out
+// of its box, or with something on top of it, is on the page and not on the screen. (0.6 is READABLE in screen.mjs.)
 function textShown({ text, want }) {
-  const found = window.__playScreen().items.some((item) => item.text.includes(text));
+  const found = window.__playScreen().items.some((item) => item.text.includes(text) && (item.shown ?? 1) >= 0.6 && !item.coveredBy);
   return found === want;
+}
+
+// Runs in the page: the middle of the pressable thing the screen list names so, or null.
+function pressableAt(text) {
+  const item = window.__playScreen().items.find((it) => it.press && !it.disabled && it.text === text);
+  return item ? { x: item.box.x + item.box.w / 2, y: item.box.y + item.box.h / 2 } : null;
+}
+
+/** Clicks what the screen list calls `text`: a button by its accessible name, or any pressable thing (a tab, a link) by the name `look` printed. */
+async function clickNamed(page, text, timeout = 10000) {
+  const button = page.getByRole('button', { name: text, exact: true });
+  const until = Date.now() + timeout;
+  for (;;) {
+    if (await button.count() > 0) return button.first().click({ timeout: Math.max(1000, until - Date.now()) });
+    const at = await page.evaluate(pressableAt, text);
+    if (at) return page.mouse.click(at.x, at.y);
+    if (Date.now() > until) throw new Error(`nothing to press named "${text}" was on the screen within ${timeout} ms`);
+    await delay(100);
+  }
 }
 
 /** `act KeyE` is short for a press; anything else is one JSON input or a JSON list of them. */
@@ -54,7 +76,7 @@ export async function play(page, step, { mode, blind = false, replaying = false,
     try { if (step.until) await page.waitForFunction(checkState, step.until, { timeout: step.timeout || 15000 }); else await delay(step.ms ?? 250); }
     finally { await page.keyboard.up(step.key); }
   } else if (step.type === 'click') {
-    if (step.text) await page.getByRole('button', { name: step.text, exact: true }).click({ timeout: step.timeout });
+    if (step.text) await clickNamed(page, step.text, step.timeout);
     else await page.mouse.click(step.x, step.y, { button: step.button || 'left' });
   } else if (step.type === 'mouseDown') await page.mouse.down({ button: step.button || 'left' });
   else if (step.type === 'mouseUp') await page.mouse.up({ button: step.button || 'left' });
@@ -68,6 +90,11 @@ export async function play(page, step, { mode, blind = false, replaying = false,
       if (!/Timeout/i.test(String(error))) throw error;
       throw new Error(step.type === 'see' ? `"${step.text}" was not on the screen within ${timeout} ms` : `"${step.text}" was still on the screen after ${timeout} ms`);
     }
+  } else if (step.type === 'clean') {
+    // Nothing a machine can tell looks wrong: no piece cut, off the screen, covered or too small. `allow` lets kinds through.
+    const screen = await page.evaluate(() => window.__playScreen());
+    const wrong = findWrong(order(screen.items), screen.viewport).filter((w) => !(step.allow ?? []).includes(w.kind));
+    if (wrong.length) throw new Error(`the screen is not clean: ${wrong.slice(0, 4).map((w) => `${w.kind} "${w.what}" (${w.why})`).join('; ')}${wrong.length > 4 ? `; and ${wrong.length - 4} more` : ''}`);
   } else if (step.type === 'type') await page.keyboard.type(String(step.text), { delay: step.delay ?? 20 });
   else if (step.type === 'tap' || step.type === 'swipe') {
     if (!touch) throw new Error(`${step.type} needs a touch session: start --touch`);

@@ -3,7 +3,7 @@ import { changes, clockText, heading, now } from './diff.mjs';
 import { cellDifference, cellMeans, flickers, flickerScore, jumps, pick, sheetLayout } from './film.mjs';
 import { formatLook } from './format.mjs';
 import { parseInputs } from './inputs.mjs';
-import { findWrong, order } from './screen.mjs';
+import { findWrong, order, readable } from './screen.mjs';
 
 const base = () => ({
   started: true, paused: false,
@@ -125,6 +125,16 @@ describe('wrong', () => {
     expect(marker.map((w) => [w.kind, w.what, w.why])).toEqual([['over', '!', 'text over Slot 4, empty at 393,468 54x54']]);
     expect(findWrong([label('Nothing saved yet.', 60, 300, 400, 120, clip), button('Continue', 70, 320, 360, 50)], viewport)).toEqual([]);
     expect(findWrong([button('Resume', 160, 343, 315, 50, { blockedBy: 'div.gb-dialogue' }), label('!', 428, 350, 26, 26, clip)], viewport)).toEqual([]);
+  });
+  test('cut: a piece mostly hidden past the edge of its scrolling box, and over: text with something on top', () => {
+    const clip = { clips: false, sw: 0, cw: 0, sh: 0, ch: 0 };
+    const heading = { ...label('What it needs', 332, 466, 276, 36, clip), shown: 0.27, clippedBy: 'div.gu-panel-body' };
+    expect(findWrong([heading], viewport).map((w) => [w.kind, w.why])).toEqual([['cut', '73% of it is hidden past the edge of div.gu-panel-body']]);
+    expect(findWrong([{ ...heading, shown: 0.8 }], viewport)).toEqual([]);
+    expect(findWrong([{ ...label('Under the footer', 20, 410, 300, 22, clip), coveredBy: 'div.footer' }], viewport).map((w) => [w.kind, w.why])).toEqual([['over', 'covered by div.footer']]);
+    expect(readable(heading)).toBe(false);
+    expect(readable({ ...heading, shown: 0.8 })).toBe(true);
+    expect(readable({ ...heading, shown: 1, coveredBy: 'div.footer' })).toBe(false);
   });
   test('a button nested inside another pressable box is not an overlap', () => {
     expect(findWrong([button('Card', 10, 10, 200, 100), button('x', 170, 15, 30, 30)], viewport)).toEqual([]);

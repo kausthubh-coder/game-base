@@ -109,8 +109,9 @@ ${blocks.join('\n')}
  * Copies each noted picture into `to` as a small JPEG, with a notes.md that links them, so a report in the repo
  * can show its findings. A picture is a 960 px wide JPEG of about 100 KB, where the journal's PNG is about 700 KB.
  */
-export async function exportNotes(folder, to) {
-  const notes = read(folder).filter((e) => e.kind === 'note');
+export async function exportNotes(folder, to, alsoSteps = []) {
+  const entries = read(folder);
+  const notes = entries.filter((e) => e.kind === 'note');
   mkdirSync(to, { recursive: true });
   const md = [`# Notes from ${basename(folder)}`, ''];
   if (notes.length === 0) md.push('No notes.');
@@ -125,6 +126,13 @@ export async function exportNotes(folder, to) {
       }
     }
     md.push(`- **${note.note}** ${note.words}${name ? `  \n  ![${name}](${name})` : ''}`);
+  }
+  // Pictures with no note that the report still needs: the steps named with --with.
+  for (const entry of entries) {
+    if (entry.kind === 'note' || !alsoSteps.includes(entry.step) || !entry.picture || written.has(entry.picture) || !existsSync(entry.picture)) continue;
+    const name = basename(entry.picture).replace(/\.png$/, '.jpg');
+    await sharp(entry.picture).resize({ width: 960, withoutEnlargement: true }).jpeg({ quality: 80 }).toFile(resolve(to, name));
+    written.set(entry.picture, name);
   }
   const notesPath = resolve(to, 'notes.md');
   writeFileSync(notesPath, md.join('\n') + '\n');

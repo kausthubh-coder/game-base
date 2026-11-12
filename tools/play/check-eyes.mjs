@@ -33,6 +33,19 @@ session('wrong.html', () => {
   expect(kinds('small').includes('x'), `look flags small: ${JSON.stringify(kinds('small'))}`);
   expect(!look.wrong.some((w) => ['Fine', 'Break', 'Hello there'].includes(w.what)), 'look leaves the fine buttons and the text alone');
   expect(!look.screen.some((s) => s.text === 'Not shown' || s.text.startsWith('For screen readers')), 'look leaves out hidden text and visually hidden text');
+  expect(kinds('cut').includes('Mostly past the edge'), 'look flags text mostly scrolled out of its box as cut');
+  expect(kinds('over').includes('Under the footer'), 'look flags text with a footer on top of it as over');
+  expect(!look.screen.some((s) => s.text === 'Scrolled out of sight'), 'look leaves out text scrolled wholly out of its box');
+  expect(!look.wrong.some((w) => w.what === 'Top of the page'), 'look leaves the line that shows alone');
+  for (const text of ['Mostly past the edge', 'Scrolled out of sight', 'Under the footer']) {
+    const hidden = json('act', JSON.stringify({ type: 'see', text, timeout: 500 }), 'see-hidden');
+    expect(Boolean(hidden.failed), `see fails on text a player cannot read: ${text}`);
+  }
+  expect(!json('act', '{"type":"gone","text":"Scrolled out of sight","timeout":500}', 'gone-hidden').failed, 'gone passes on text scrolled out of sight');
+  const named = json('act', '{"type":"click","text":"A tab","timeout":1000}', 'click-tab');
+  expect(!named.failed, `click finds a pressable thing that is not a button by the name look gives it: ${named.failed}`);
+  const dirty = json('act', '{"type":"clean"}', 'clean');
+  expect(Boolean(dirty.failed) && dirty.failed.includes('not clean'), `clean fails on a screen with something wrong: ${String(dirty.failed).slice(0, 80)}`);
   const seen = json('act', '{"type":"see","text":"Hello there","timeout":2000}', 'see-present');
   expect(!seen.failed, 'see passes on text that is there');
   const absent = json('act', '{"type":"see","text":"Nobody wrote this","timeout":1000}', 'see-absent');
