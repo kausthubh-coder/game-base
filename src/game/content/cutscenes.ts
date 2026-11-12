@@ -148,7 +148,7 @@ export const SCENE_9: Film = {
     // 2. Low and close across the flames, the hero beyond them, lit warm.
     { id: 'fire', seconds: 4.5, enter: 'dip', from: [3.4, 1.55, 3.3], to: [2.9, 1.45, 2.8], look: [-1, 0.65, -1], lookTo: [-1, 0.7, -1], fov: 34, fovTo: 32 },
     // 3. Closer on the hero. The twig snaps on the cut; the head comes up and turns.
-    { id: 'listen', seconds: 3, enter: 'cut', from: [-0.2, 1.2, 2.5], to: [-0.3, 1.15, 2.15], look: [-1, 0.8, -1], lookTo: [-1, 0.8, -1], fov: 32, fovTo: 30 },
+    { id: 'listen', seconds: 3, enter: 'cut', from: [0.5, 1.5, 5.6], to: [0.35, 1.45, 4.95], look: [-1, 0.8, -1], lookTo: [-1, 0.8, -1], fov: 32, fovTo: 30 },
     // 4. The hero's eye line, from just behind and over their head, toward the tree line. A long lens: the grey
     // shape comes out between the trunks, and the lens follows it in to where it stops at the edge of the light.
     { id: 'trees', seconds: 5.5, enter: 'cut', from: [-0.6, 2.1, -1.8], to: [-0.75, 2, -1.5], look: [-6, 0.5, 9.5], lookTo: [-5, 0.35, 4], fov: 24, fovTo: 17 },
