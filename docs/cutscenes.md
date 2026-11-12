@@ -60,8 +60,11 @@ entry and changes no other code.
 6. **Places, not coordinates.** Every point in a film is blocks east, up and south of a named place of the
    region, as in `src/game/content/opening.ts`.
 7. **Speed.** The film allocates nothing per frame, stays inside the draw budgets of `AGENTS.md` rule 6
-   at every graphics level, and reads any quality value from `src/content/quality.ts`. With reduced
-   motion on, each shot holds one still.
+   at every graphics level, and reads any quality value from `src/content/quality.ts`.
+8. **Reduced motion.** With reduced motion on, the lens holds still in each shot: no push, pan or zoom.
+   The people, the fire and the sparks still move, because the scene is told by what they do.
+9. **Any screen.** A film is framed for 16:9. On a narrower screen the lens widens until it shows as much
+   across as at 16:9, so both sides of a shot stay in frame on a phone.
 
 The opening scene keeps its own player for now. Moving it onto the director is a later, separate change.
 

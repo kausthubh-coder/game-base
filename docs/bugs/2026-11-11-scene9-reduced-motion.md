@@ -15,3 +15,7 @@ The page's camera position was identical in all three shot 4 samples: x -20.175,
 - `.artifacts/cut-test/reduced-live-16.5.png`
 
 All three pictures were opened and reviewed. Raw page state: `.artifacts/cut-test/reduced-live.json`.
+
+## State
+
+Not a code change. The design said each shot holds one still; the coordinator changed the design instead (`docs/cutscenes.md`, rule 8): reduced motion stops the lens, and the people and the fire still move, because the scene is told by what they do.

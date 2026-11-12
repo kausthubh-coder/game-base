@@ -290,6 +290,8 @@ export function install(view: GameView): void {
   }
 
   // ---- the camera
+  /** The shape of screen a film is framed for, and the widest the lens opens on a narrow one. */
+  const WIDE = 16 / 9, MAX_FOV = 80;
   const lens = view.ctx.camera as THREE.PerspectiveCamera;
   const rigPos = new THREE.Vector3(), rigLook = new THREE.Vector3(), rigDir = new THREE.Vector3();
   const look = new THREE.Vector3();
@@ -306,7 +308,10 @@ export function install(view: GameView): void {
     lens.position.set(f.lens.x, f.lens.y, f.lens.z).lerp(rigPos, k);
     look.set(f.lens.lookX, f.lens.lookY, f.lens.lookZ).lerp(rigLook, k);
     lens.lookAt(look);
-    lens.fov = f.lens.fov + (rigFov - f.lens.fov) * k;
+    // A film is framed for a wide screen. On a narrower one the lens widens until it shows as much across as
+    // at 16:9, so the two sides of a shot (the hero and the fox) both stay in frame on a phone.
+    const across = lens.aspect >= WIDE ? f.lens.fov : Math.min(MAX_FOV, (2 * Math.atan(Math.tan((f.lens.fov * Math.PI) / 360) * (WIDE / lens.aspect)) * 180) / Math.PI);
+    lens.fov = across + (rigFov - across) * k;
     lens.near = NEAR + (rigNear - NEAR) * k;
     lens.far = Math.max(lens.far, 400);
     lens.updateProjectionMatrix();

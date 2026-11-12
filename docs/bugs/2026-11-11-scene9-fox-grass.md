@@ -16,3 +16,7 @@ Pictures, opened and reviewed:
 - `.artifacts/cut-test/high/shot-4.png` (held frame, blade across face)
 - `.artifacts/cut-test/reduced-live-15.png` (continuous reduced-motion playback)
 - `.artifacts/cut-test/low-16.5.png` (comparison: clearer face)
+
+## State
+
+Fixed in the commit after 49967e6 on `experiment`: shot 4's lens is 1.3 blocks higher, so it looks over the grass. Checked at 13, 15 and 16.5 s (`.artifacts/fix-fox/`).

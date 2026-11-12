@@ -151,7 +151,7 @@ export const SCENE_9: Film = {
     { id: 'listen', seconds: 3, enter: 'cut', from: [0.5, 1.5, 5.6], to: [0.35, 1.45, 4.95], look: [-1, 0.8, -1], lookTo: [-1, 0.8, -1], fov: 32, fovTo: 30 },
     // 4. The hero's eye line, from just behind and over their head, toward the tree line. A long lens: the grey
     // shape comes out between the trunks, and the lens follows it in to where it stops at the edge of the light.
-    { id: 'trees', seconds: 5.5, enter: 'cut', from: [-0.6, 2.1, -1.8], to: [-0.75, 2, -1.5], look: [-6, 0.5, 9.5], lookTo: [-5, 0.35, 4], fov: 24, fovTo: 17 },
+    { id: 'trees', seconds: 5.5, enter: 'cut', from: [-0.6, 3.4, -1.8], to: [-0.75, 3.2, -1.5], look: [-6, 0.5, 9.5], lookTo: [-5, 0.35, 4], fov: 24, fovTo: 17 },
     // 5. Low, from the side: the hero by the fire on the left, the fox at the edge of the light on the right.
     { id: 'edge', seconds: 4.5, enter: 'cut', from: [-11.4, 1.05, -2.6], to: [-10.9, 1.05, -2.3], look: [-2.9, 0.8, 1.6], lookTo: [-2.9, 0.8, 1.6], fov: 30, words: 'The fire is low. Something is standing at the edge of the light.' },
     // 6. The lens eases to the game's own camera over the hero, and the bars leave.

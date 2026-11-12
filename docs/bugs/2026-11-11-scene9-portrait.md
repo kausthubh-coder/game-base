@@ -26,3 +26,7 @@ Pictures, opened and reviewed:
 - `.artifacts/cut-test/narrow-23.5.png`
 
 The test uses the real rendered camera and the named actors' landing positions. It does not assert a camera implementation detail.
+
+## State
+
+Fixed in the commit after 49967e6 on `experiment`: on a screen narrower than 16:9 the director widens the lens to show as much across as at 16:9. Checked at 390 by 844, shots 2 and 5 (`.artifacts/fix-portrait/`).
