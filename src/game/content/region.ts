@@ -353,7 +353,7 @@ export const CAMP = {
   /** How far the firelight reaches on the ground, in blocks: the place `camp.edge` stands at its rim. */
   reach: 6.6,
   seat: { x: CAMP_AT.x - 1, z: CAMP_AT.z - 1 },
-  edge: { x: CAMP_AT.x - 4, z: CAMP_AT.z + 5 },
+  edge: { x: CAMP_AT.x - 5, z: CAMP_AT.z + 4 },
   trees: { x: CAMP_AT.x - 7, z: CAMP_AT.z + 11 },
 } as const;
 // The fire's light: an unseen lamp block in the flame, as the town's lanterns have, so the land, the sprites and

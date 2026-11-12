@@ -141,20 +141,21 @@ export const SCENE_9: Film = {
   title: 'Something outside',
   place: 'camp',
   trigger: { flag: 'night.fox', near: 'camp', within: 10 },
-  setup: { quest: 'night', stand: 'camp.seat', timeOfDay: 0.752 },
+  setup: { quest: 'night', stand: 'camp.seat', timeOfDay: 0.782 },
   shots: [
     // 1. High and wide from the south-east: the plot small, the fire and the tent, the hill and the door behind.
-    { id: 'dusk', seconds: 5, enter: 'fade', from: [30, 21, 26], to: [24, 17, 21], look: [1, 1, -9], lookTo: [0, 1, -7], fov: 30, fovTo: 28 },
+    { id: 'dusk', seconds: 5, enter: 'fade', from: [28, 12, 24], to: [23, 10, 19.5], look: [-2, 2, -12], lookTo: [-2, 1.5, -10], fov: 32, fovTo: 30 },
     // 2. Low and close across the flames, the hero beyond them, lit warm.
-    { id: 'fire', seconds: 4.5, enter: 'dip', from: [2.7, 0.75, 2.6], to: [2.25, 0.8, 2.15], look: [-1, 0.85, -1], lookTo: [-1, 0.9, -1], fov: 26, fovTo: 25 },
+    { id: 'fire', seconds: 4.5, enter: 'dip', from: [3.4, 1.55, 3.3], to: [2.9, 1.45, 2.8], look: [-1, 0.65, -1], lookTo: [-1, 0.7, -1], fov: 34, fovTo: 32 },
     // 3. Closer on the hero. The twig snaps on the cut; the head comes up and turns.
-    { id: 'listen', seconds: 3, enter: 'cut', from: [1.15, 1.25, 1.75], to: [0.95, 1.25, 1.45], look: [-1, 1.25, -1], lookTo: [-1, 1.25, -1], fov: 22, fovTo: 21 },
-    // 4. Over the hero's shoulder, toward the black tree line. The grey shape comes out and stops at the edge.
-    { id: 'trees', seconds: 5.5, enter: 'cut', from: [0.6, 1.95, -3.1], to: [0.35, 1.8, -2.55], look: [-5, 0.5, 7.5], lookTo: [-4.5, 0.45, 6.5], fov: 30, fovTo: 27 },
+    { id: 'listen', seconds: 3, enter: 'cut', from: [-0.2, 1.2, 2.5], to: [-0.3, 1.15, 2.15], look: [-1, 0.8, -1], lookTo: [-1, 0.8, -1], fov: 32, fovTo: 30 },
+    // 4. The hero's eye line, from just behind and over their head, toward the tree line. A long lens: the grey
+    // shape comes out between the trunks, and the lens follows it in to where it stops at the edge of the light.
+    { id: 'trees', seconds: 5.5, enter: 'cut', from: [-0.6, 2.1, -1.8], to: [-0.75, 2, -1.5], look: [-6, 0.5, 9.5], lookTo: [-5, 0.35, 4], fov: 24, fovTo: 17 },
     // 5. Low, from the side: the hero by the fire on the left, the fox at the edge of the light on the right.
-    { id: 'edge', seconds: 4.5, enter: 'cut', from: [-11.4, 1.05, -2.6], to: [-10.9, 1.05, -2.3], look: [-2.4, 0.8, 2.1], lookTo: [-2.4, 0.8, 2.1], fov: 30, words: 'The fire is low. Something is standing at the edge of the light.' },
+    { id: 'edge', seconds: 4.5, enter: 'cut', from: [-11.4, 1.05, -2.6], to: [-10.9, 1.05, -2.3], look: [-2.9, 0.8, 1.6], lookTo: [-2.9, 0.8, 1.6], fov: 30, words: 'The fire is low. Something is standing at the edge of the light.' },
     // 6. The lens eases to the game's own camera over the hero, and the bars leave.
-    { id: 'play', seconds: 2, enter: 'cut', from: [-10.9, 1.05, -2.3], to: [-10.9, 1.05, -2.3], look: [-2.4, 0.8, 2.1], lookTo: [-2.4, 0.8, 2.1], fov: 30, land: true },
+    { id: 'play', seconds: 2, enter: 'cut', from: [-10.9, 1.05, -2.3], to: [-10.9, 1.05, -2.3], look: [-2.9, 0.8, 1.6], lookTo: [-2.9, 0.8, 1.6], fov: 30, land: true },
   ],
   puppets: [
     {
@@ -185,7 +186,8 @@ export const SCENE_9: Film = {
     // Where the hall's rules stand it when it comes to a player at the camp (src/game/hall/index.sim.ts).
     'fox:blighted': { at: at('camp.edge'), face: at('camp.seat') },
   },
-  sky: [0.752, 0.776],
+  // Blue hour: the sun just down (0.785 in src/features/sky/palette.ts), so the fire is what lights the people.
+  sky: [0.782, 0.798],
   fire: [[0, 1], [10.1, 0.66, 1.9]],
   sound: {
     // The crickets and the wind, then at 3.4 s into the fire shot the crickets stop. The night comes back quieter.
