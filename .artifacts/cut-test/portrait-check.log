@@ -1,0 +1,5 @@
+Chrome renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)
+portrait-1 [{"name":"camp.seat","screen":null},{"name":"camp.edge","screen":null}]
+portrait-2 [{"name":"camp.seat","screen":null},{"name":"camp.edge","screen":null}]
+portrait-3 [{"name":"camp.seat","screen":null},{"name":"camp.edge","screen":null}]
+FAIL: shot 5 must contain hero and fox; projected actors are outside the viewport.

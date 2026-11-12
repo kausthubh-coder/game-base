@@ -1,0 +1,8278 @@
+[
+  {
+    "name": "watch-1",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7831428571428569,
+          "seconds": 474.3447648624667
+        },
+        "ambient": {
+          "timeOfDay": 0.7831428571428569,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": 7.091,
+            "y": 33.437,
+            "z": -205.768
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.783131951020408,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 1.776,
+        "bpm": 82.56613922636723,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 0,
+        "beat": 2,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Dadd9",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.423249363393009,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.6
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.9
+          },
+          "bass": {
+            "on": true,
+            "level": 0.5625
+          },
+          "perc": {
+            "on": true,
+            "level": 0.77
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 10,
+        "voicePeak": 13,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 257,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 12,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0.2633101851851854
+        ],
+        [
+          "ambience",
+          0.7
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-3.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7847318857142853,
+          "seconds": 475.0909174090506
+        },
+        "ambient": {
+          "timeOfDay": 0.7847318857142853,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": 3.857,
+            "y": 32.143,
+            "z": -208.679
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7847210448979594,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 4.2026666666666666,
+        "bpm": 80.96801419455188,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 1,
+        "beat": 1,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Dadd9",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3726364651290959,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5861091721032766
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.9
+          },
+          "bass": {
+            "on": true,
+            "level": 0.5625
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 18,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 273,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 22,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0.7
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-7.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7873331591836739,
+          "seconds": 476.312384951198
+        },
+        "ambient": {
+          "timeOfDay": 0.7873331591836739,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -16.494,
+            "y": 23.471,
+            "z": -225.594
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7873223183673472,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 8.186666666666667,
+        "bpm": 79.07514922921048,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 2,
+        "beat": 2,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Bm7",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.34705790435737316,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5656463234858985
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8929389704576957
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 10,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 254,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 43,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0.7
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-9.6",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7887589877551018,
+          "seconds": 476.98190445430356
+        },
+        "ambient": {
+          "timeOfDay": 0.7887589877551018,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -19.029,
+            "y": 23.49,
+            "z": -223.027
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7887480816326535,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 10.368,
+        "bpm": 78.53243311898481,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 3,
+        "beat": 1,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Bm7",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3430438480874402,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5624350784699521
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8833052354098565
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 9,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 248,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 51,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-11",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7896514612244898,
+          "seconds": 477.4009789529725
+        },
+        "ambient": {
+          "timeOfDay": 0.7896514612244898,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -19.125,
+            "y": 23.458,
+            "z": -223.44
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7896405551020407,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 11.728,
+        "bpm": 78.39080852884904,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 3,
+        "beat": 3,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Bm7",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3418003738324883,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5614402990659906
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8803208971979719
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 10,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 242,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 53,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-13",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7909248000000002,
+          "seconds": 477.99889455190777
+        },
+        "ambient": {
+          "timeOfDay": 0.7909248000000002,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -20.117,
+            "y": 24.088,
+            "z": -230.265
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7909139591836736,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 13.68,
+        "bpm": 78.05498481337578,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 4,
+        "beat": 2,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "E",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3408445690777446,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5606756552621956
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8780269657865869
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 14,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 264,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 65,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-15",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7922309224489796,
+          "seconds": 478.6122042236024
+        },
+        "ambient": {
+          "timeOfDay": 0.7922309224489796,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -20.192,
+            "y": 24.039,
+            "z": -230.116
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7922200163265307,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 15.690666666666667,
+        "bpm": 77.82068855735686,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 5,
+        "beat": 0,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "E",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3403941672249507,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5603153337799606
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8769460013398817
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 12,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 268,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 77,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-16.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7932431020408162,
+          "seconds": 479.08748855368225
+        },
+        "ambient": {
+          "timeOfDay": 0.7932431020408162,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -20.242,
+            "y": 24.006,
+            "z": -230.017
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7932322612244895,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 17.226666666666667,
+        "bpm": 77.70532068337678,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 5,
+        "beat": 2,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "E",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3402172128638566,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5601737702910853
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8765213108732558
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 14,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 262,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 82,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-18.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.794527412244898,
+          "seconds": 479.6905559538597
+        },
+        "ambient": {
+          "timeOfDay": 0.794527412244898,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -30.815,
+            "y": 23.05,
+            "z": -231.049
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc\n\nThe fire is low. Something is standing at the edge of the light.",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7945165714285713,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 19.194666666666667,
+        "bpm": 77.61456909943202,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 6,
+        "beat": 1,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "A",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3401012710807333,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5600810168645867
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.87624305059376
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 14,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 262,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 90,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-20.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7958334693877549,
+          "seconds": 480.3038349600709
+        },
+        "ambient": {
+          "timeOfDay": 0.7958334693877549,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -30.503,
+            "y": 23.05,
+            "z": -230.862
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 25,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc\n\nThe fire is low. Something is standing at the edge of the light.",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7958226285714285,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 21.189333333333334,
+        "bpm": 77.51342094010863,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 6,
+        "beat": 3,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Asus4",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3400469259168007,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5600375407334405
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8761126222003217
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 10,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 254,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 99,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-22",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7968021551020408,
+          "seconds": 480.75869607808335
+        },
+        "ambient": {
+          "timeOfDay": 0.7968021551020408,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -29.824,
+            "y": 23.429,
+            "z": -230.391
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 25,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7967912489795916,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 22.688,
+        "bpm": 77.46361541484575,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 7,
+        "beat": 1,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Asus4",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.34002669476705505,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.560021355813644
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8760640674409321
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 11,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 249,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 103,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0.006135502092912958
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "watch-23.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7978361469387754,
+          "seconds": 481.2442226796805
+        },
+        "ambient": {
+          "timeOfDay": 0.7978361469387754,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.204083901857923,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -2.087,
+            "y": 41.66,
+            "z": -210.715
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 25,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7978252408163264,
+          "rain": 0,
+          "wind": 0.204083901857923,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 24.266666666666666,
+        "bpm": 77.42443700103898,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 7,
+        "beat": 3,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Dadd9",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.34001448604112133,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.560011588832897
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8760347664986912
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 10,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 263,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 110,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0
+        ],
+        [
+          "ambience",
+          0.30137167684800487
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "after-watch",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": false,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": true,
+          "inWater": false,
+          "busy": false
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7984259259259257,
+          "seconds": 481.5211623779947
+        },
+        "ambient": {
+          "timeOfDay": 0.7984259259259257,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.2073317838247869,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -0.806,
+            "y": 42.502,
+            "z": -209.806
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 25,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Experiment build.\nCutscenes are being tried here.\nPlay scene 9: Something outside\nDay 1\n19:09\nThe Shut Door\nBack away to the stone door\n1\n2\n3\n4\n5\n6\n7\n8\n9\nTab\n21 blocks",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.7984259259259257,
+          "rain": 0,
+          "wind": 0.2073317838247869,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 24.768,
+        "bpm": 77.42443700103898,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 8,
+        "beat": 0,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Dadd9",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3400118967163794,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5600095173731034
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8760285521193105
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 12,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 257,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 110,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0.02042250000000012
+        ],
+        [
+          "ambience",
+          0.3262323750000001
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  },
+  {
+    "name": "sound-starts",
+    "data": [
+      {
+        "kind": "buffer",
+        "time": 1274.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.5,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.6000000089407,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.7000000029802,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.7000000029802,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1274.9000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275.1000000089407,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275.2999999970198,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275.2999999970198,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1275.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 1278.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 1290.4000000059605,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1290.4000000059605,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1290.4000000059605,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1290.4000000059605,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1290.7000000029802,
+        "frequency": 73.41619110107422,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 1291.2999999970198,
+        "frequency": 146.83238220214844,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 1291.5,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 1291.7000000029802,
+        "frequency": 587.3295288085938,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 1291.7000000029802,
+        "frequency": 5.303155899047852,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1291.7000000029802,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 1292.2999999970198,
+        "frequency": 196.7509307861328,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1292.2999999970198,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 1292.2999999970198,
+        "frequency": 190.5630340576172,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1292.2999999970198,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 1293.2000000029802,
+        "frequency": 990,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.2000000029802,
+        "frequency": 660,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.5,
+        "frequency": 660,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.5,
+        "frequency": 990,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.6000000089407,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.6000000089407,
+        "frequency": 1761.9886474609375,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.9000000059605,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1293.9000000059605,
+        "frequency": 1977.765380859375,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1294,
+        "frequency": 739.9888305664062,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1294,
+        "frequency": 2219.966552734375,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1294,
+        "frequency": 880,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1294,
+        "frequency": 2640,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1326,
+        "loop": false,
+        "duration": 0.07890856794122579
+      },
+      {
+        "kind": "buffer",
+        "time": 1326.1000000089407,
+        "loop": false,
+        "duration": 0.0770807530368402
+      },
+      {
+        "kind": "osc",
+        "time": 1603.1000000089407,
+        "frequency": 55,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1603.1000000089407,
+        "frequency": 82.41000366210938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1603.1000000089407,
+        "frequency": 110.5999984741211,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 1603.1000000089407,
+        "frequency": 0.12999999523162842,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1604.4000000059605,
+        "loop": false,
+        "duration": 0.07545813359807266
+      },
+      {
+        "kind": "buffer",
+        "time": 1604.5,
+        "loop": false,
+        "duration": 0.06321173624168465
+      },
+      {
+        "kind": "osc",
+        "time": 1623.9000000059605,
+        "frequency": 4756.1484375,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1645.7000000029802,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 1722.7000000029802,
+        "loop": false,
+        "duration": 0.07999565903086041
+      },
+      {
+        "kind": "osc",
+        "time": 1730.1000000089407,
+        "frequency": 473.0566711425781,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 1809.1000000089407,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 1809.1000000089407,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 1809.2999999970198,
+        "frequency": 198.76499938964844,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1809.2999999970198,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 1809.4000000059605,
+        "frequency": 123.64352416992188,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 1809.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 2058.2000000029802,
+        "loop": false,
+        "duration": 0.06625699982546504
+      },
+      {
+        "kind": "buffer",
+        "time": 2244.9000000059605,
+        "loop": false
+      },
+      {
+        "kind": "osc",
+        "time": 2530.7000000029802,
+        "frequency": 110,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 2530.7999999970198,
+        "frequency": 369.9944152832031,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 2530.7999999970198,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 2530.9000000059605,
+        "frequency": 1760,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 2530.9000000059605,
+        "frequency": 12320,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 2530.9000000059605,
+        "frequency": 191.5678253173828,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 2530.9000000059605,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 2531,
+        "frequency": 201.67706298828125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 2531,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 2797.7000000029802,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 2842.6000000089407,
+        "loop": false,
+        "duration": 0.06312733383691477
+      },
+      {
+        "kind": "buffer",
+        "time": 2975.7999999970198,
+        "loop": false,
+        "duration": 0.07120440486535282
+      },
+      {
+        "kind": "buffer",
+        "time": 3027.5,
+        "loop": false,
+        "duration": 0.06357805268277461
+      },
+      {
+        "kind": "osc",
+        "time": 3064.6000000089407,
+        "frequency": 4527.82861328125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 3229.7000000029802,
+        "loop": false,
+        "duration": 0.07566476507330062
+      },
+      {
+        "kind": "osc",
+        "time": 3264.2999999970198,
+        "frequency": 73.41619110107422,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 3264.5,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 3264.6000000089407,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 3265.4000000059605,
+        "frequency": 198.212158203125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 3265.4000000059605,
+        "loop": true
+      },
+      {
+        "kind": "osc",
+        "time": 3265.5,
+        "frequency": 125.00027465820312,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 3265.5,
+        "loop": true
+      },
+      {
+        "kind": "buffer",
+        "time": 3561.7000000029802,
+        "loop": false,
+        "duration": 0.06708696524088299
+      },
+      {
+        "kind": "buffer",
+        "time": 3811.2999999970198,
+        "loop": false,
+        "duration": 0.08182927049846524
+      },
+      {
+        "kind": "buffer",
+        "time": 3831.7000000029802,
+        "loop": false,
+        "duration": 0.07038231869478254
+      },
+      {
+        "kind": "osc",
+        "time": 3981.5,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.5,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.6000000089407,
+        "frequency": 73.41619110107422,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.7000000029802,
+        "frequency": 146.83238220214844,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.7000000029802,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.7000000029802,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.7000000029802,
+        "frequency": 1174.6590576171875,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.7000000029802,
+        "frequency": 739.9888305664062,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 3981.7000000029802,
+        "frequency": 1479.9776611328125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 4026.2000000029802,
+        "loop": false
+      },
+      {
+        "kind": "buffer",
+        "time": 4060.1000000089407,
+        "loop": false,
+        "duration": 0.07154596123309159
+      },
+      {
+        "kind": "buffer",
+        "time": 4242.100000008941,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 4412.29999999702,
+        "loop": false,
+        "duration": 0.07071426125029756
+      },
+      {
+        "kind": "buffer",
+        "time": 4509.100000008941,
+        "loop": false,
+        "duration": 0.07060507895667074
+      },
+      {
+        "kind": "osc",
+        "time": 4708.70000000298,
+        "frequency": 73.41619110107422,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.70000000298,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 987.7666015625,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 1975.533203125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 1174.6590576171875,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 2349.318115234375,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 293.6647644042969,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 440,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4708.79999999702,
+        "frequency": 880,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 4848.29999999702,
+        "frequency": 4313.423828125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 5030.79999999702,
+        "frequency": 4648.7529296875,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 5198.4000000059605,
+        "loop": false,
+        "duration": 0.07286663583652504
+      },
+      {
+        "kind": "buffer",
+        "time": 5442.20000000298,
+        "loop": false,
+        "duration": 0.08071942776120225
+      },
+      {
+        "kind": "osc",
+        "time": 5463.100000008941,
+        "frequency": 369.9944152832031,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 5463.20000000298,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 5763.4000000059605,
+        "loop": false,
+        "duration": 0.0667286771314146
+      },
+      {
+        "kind": "buffer",
+        "time": 5932.100000008941,
+        "loop": false,
+        "duration": 0.0685830147167368
+      },
+      {
+        "kind": "osc",
+        "time": 6192.100000008941,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 6192.100000008941,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 6498.600000008941,
+        "loop": false,
+        "duration": 0.06511392944088716
+      },
+      {
+        "kind": "buffer",
+        "time": 6498.70000000298,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 6630.5,
+        "loop": false,
+        "duration": 0.08091242443784498
+      },
+      {
+        "kind": "buffer",
+        "time": 6764.70000000298,
+        "loop": false,
+        "duration": 0.0752230208064234
+      },
+      {
+        "kind": "buffer",
+        "time": 6913.20000000298,
+        "loop": false,
+        "duration": 0.06534250933091035
+      },
+      {
+        "kind": "buffer",
+        "time": 6913.20000000298,
+        "loop": false,
+        "duration": 0.067242506861355
+      },
+      {
+        "kind": "osc",
+        "time": 6943.9000000059605,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 6943.9000000059605,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 6944,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 6944,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 6944,
+        "frequency": 123.4708251953125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 6944,
+        "frequency": 184.99720764160156,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 6944,
+        "frequency": 739.9888305664062,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 6944,
+        "frequency": 2959.955322265625,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 6944.100000008941,
+        "frequency": 1479.9776611328125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 6944.100000008941,
+        "frequency": 10359.84375,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 7061.20000000298,
+        "loop": false,
+        "duration": 0.063127434237538
+      },
+      {
+        "kind": "buffer",
+        "time": 7228.100000008941,
+        "loop": false,
+        "duration": 0.06279667098587036
+      },
+      {
+        "kind": "buffer",
+        "time": 7446.100000008941,
+        "loop": false,
+        "duration": 0.08180712600547577
+      },
+      {
+        "kind": "buffer",
+        "time": 7509.29999999702,
+        "loop": false,
+        "duration": 0.06389948645191848
+      },
+      {
+        "kind": "buffer",
+        "time": 7531.70000000298,
+        "loop": false,
+        "duration": 0.07473099390600678
+      },
+      {
+        "kind": "buffer",
+        "time": 7542.70000000298,
+        "loop": false,
+        "duration": 0.06402326608726285
+      },
+      {
+        "kind": "osc",
+        "time": 7697.20000000298,
+        "frequency": 246.941650390625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 7697.20000000298,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 7697.20000000298,
+        "frequency": 369.9944152832031,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 7697.29999999702,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 7697.29999999702,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 7697.29999999702,
+        "frequency": 1760,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 7697.29999999702,
+        "frequency": 12320,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 7813.100000008941,
+        "loop": false,
+        "duration": 0.08186932564217758
+      },
+      {
+        "kind": "osc",
+        "time": 8442.20000000298,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 8442.29999999702,
+        "frequency": 246.941650390625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 8442.29999999702,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 8442.29999999702,
+        "frequency": 2349.318115234375,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 8580.79999999702,
+        "loop": false,
+        "duration": 0.06445803936933614
+      },
+      {
+        "kind": "buffer",
+        "time": 8580.79999999702,
+        "loop": false,
+        "duration": 0.07260210837277682
+      },
+      {
+        "kind": "buffer",
+        "time": 8580.79999999702,
+        "loop": false,
+        "duration": 0.0741088377071128
+      },
+      {
+        "kind": "buffer",
+        "time": 8647.20000000298,
+        "loop": false
+      },
+      {
+        "kind": "buffer",
+        "time": 8746.29999999702,
+        "loop": false,
+        "duration": 0.06365448742420844
+      },
+      {
+        "kind": "buffer",
+        "time": 8779.40000000596,
+        "loop": false,
+        "duration": 0.06457610433935505
+      },
+      {
+        "kind": "buffer",
+        "time": 8909,
+        "loop": false,
+        "duration": 0.08199305877061991
+      },
+      {
+        "kind": "buffer",
+        "time": 8931.20000000298,
+        "loop": false,
+        "duration": 0.0784833761204584
+      },
+      {
+        "kind": "buffer",
+        "time": 8942.10000000894,
+        "loop": false,
+        "duration": 0.06940418011806321
+      },
+      {
+        "kind": "buffer",
+        "time": 9065.10000000894,
+        "loop": false,
+        "duration": 0.07122046217639008
+      },
+      {
+        "kind": "osc",
+        "time": 9209.29999999702,
+        "frequency": 184.99720764160156,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 9209.29999999702,
+        "frequency": 123.4708251953125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 9209.40000000596,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 9209.40000000596,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 9265.10000000894,
+        "loop": false,
+        "duration": 0.07361262596694013
+      },
+      {
+        "kind": "buffer",
+        "time": 9512.70000000298,
+        "loop": false,
+        "duration": 0.07672985494414403
+      },
+      {
+        "kind": "buffer",
+        "time": 9542.29999999702,
+        "loop": false,
+        "duration": 0.07206398497729166
+      },
+      {
+        "kind": "buffer",
+        "time": 9731.5,
+        "loop": false,
+        "duration": 0.0785056698405015
+      },
+      {
+        "kind": "osc",
+        "time": 9964.29999999702,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 9964.29999999702,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 9964.40000000596,
+        "frequency": 123.4708251953125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 9964.40000000596,
+        "frequency": 184.99720764160156,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 9964.5,
+        "frequency": 739.9888305664062,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 9964.5,
+        "frequency": 2959.955322265625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 9996.20000000298,
+        "loop": false,
+        "duration": 0.06769097250803721
+      },
+      {
+        "kind": "buffer",
+        "time": 10030,
+        "loop": false,
+        "duration": 0.07348479174629437
+      },
+      {
+        "kind": "buffer",
+        "time": 10360.60000000894,
+        "loop": false,
+        "duration": 0.07152701050078294
+      },
+      {
+        "kind": "buffer",
+        "time": 10360.70000000298,
+        "loop": false,
+        "duration": 0.0655960669660468
+      },
+      {
+        "kind": "buffer",
+        "time": 10592.20000000298,
+        "loop": false,
+        "duration": 0.06408937377838092
+      },
+      {
+        "kind": "osc",
+        "time": 10731.10000000894,
+        "frequency": 246.941650390625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 10731.10000000894,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 10759.70000000298,
+        "loop": false,
+        "duration": 0.08
+      },
+      {
+        "kind": "buffer",
+        "time": 10759.70000000298,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 10759.70000000298,
+        "loop": false,
+        "duration": 0.07500000000000001
+      },
+      {
+        "kind": "buffer",
+        "time": 10759.79999999702,
+        "loop": false,
+        "duration": 0.07
+      },
+      {
+        "kind": "buffer",
+        "time": 10859.79999999702,
+        "loop": false,
+        "duration": 0.07152058507706074
+      },
+      {
+        "kind": "buffer",
+        "time": 10896.5,
+        "loop": false,
+        "duration": 0.06838058850579541
+      },
+      {
+        "kind": "buffer",
+        "time": 10942.60000000894,
+        "loop": false,
+        "duration": 0.06329337297778939
+      },
+      {
+        "kind": "buffer",
+        "time": 11010,
+        "loop": false,
+        "duration": 0.08158415276282553
+      },
+      {
+        "kind": "buffer",
+        "time": 11145.20000000298,
+        "loop": false,
+        "duration": 0.06341908424298079
+      },
+      {
+        "kind": "buffer",
+        "time": 11229.10000000894,
+        "loop": false,
+        "duration": 0.07467931451479233
+      },
+      {
+        "kind": "buffer",
+        "time": 11229.10000000894,
+        "loop": false,
+        "duration": 0.07691926861512406
+      },
+      {
+        "kind": "buffer",
+        "time": 11309.20000000298,
+        "loop": false,
+        "duration": 0.06698070280043845
+      },
+      {
+        "kind": "buffer",
+        "time": 11425.70000000298,
+        "loop": false,
+        "duration": 0.07711341081140026
+      },
+      {
+        "kind": "osc",
+        "time": 11474.29999999702,
+        "frequency": 369.9944152832031,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 11474.29999999702,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 11527.40000000596,
+        "loop": false,
+        "duration": 0.06673266916885723
+      },
+      {
+        "kind": "buffer",
+        "time": 11675.70000000298,
+        "loop": false,
+        "duration": 0.07962037781098925
+      },
+      {
+        "kind": "osc",
+        "time": 11809.70000000298,
+        "frequency": 4298.947265625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 11849.5,
+        "loop": false,
+        "duration": 0.07492323081582096
+      },
+      {
+        "kind": "buffer",
+        "time": 11911,
+        "loop": false,
+        "duration": 0.07552487376907804
+      },
+      {
+        "kind": "buffer",
+        "time": 12025.60000000894,
+        "loop": false,
+        "duration": 0.06606041131043239
+      },
+      {
+        "kind": "buffer",
+        "time": 12114,
+        "loop": false,
+        "duration": 0.06567589098414171
+      },
+      {
+        "kind": "buffer",
+        "time": 12125.29999999702,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "osc",
+        "time": 12242.10000000894,
+        "frequency": 246.941650390625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 12242.20000000298,
+        "frequency": 184.99720764160156,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 12277.29999999702,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 12326.5,
+        "loop": false,
+        "duration": 0.07345524190969684
+      },
+      {
+        "kind": "buffer",
+        "time": 12345.70000000298,
+        "loop": false,
+        "duration": 0.06332001290825308
+      },
+      {
+        "kind": "buffer",
+        "time": 12445.20000000298,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "osc",
+        "time": 12681.10000000894,
+        "frequency": 4202.12890625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 12726.29999999702,
+        "loop": false,
+        "duration": 0.06766470083844908
+      },
+      {
+        "kind": "buffer",
+        "time": 12925.40000000596,
+        "loop": false,
+        "duration": 0.06440688731607672
+      },
+      {
+        "kind": "osc",
+        "time": 13014.70000000298,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.70000000298,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.79999999702,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.79999999702,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.79999999702,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.79999999702,
+        "frequency": 207.65234375,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.79999999702,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.79999999702,
+        "frequency": 2349.318115234375,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.90000000596,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 13014.90000000596,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 13015,
+        "loop": false,
+        "duration": 0.07195524562329413
+      },
+      {
+        "kind": "buffer",
+        "time": 13042.60000000894,
+        "loop": false,
+        "duration": 0.07629468558437534
+      },
+      {
+        "kind": "buffer",
+        "time": 13364.29999999702,
+        "loop": false,
+        "duration": 0.06439752651660734
+      },
+      {
+        "kind": "buffer",
+        "time": 13412,
+        "loop": false,
+        "duration": 0.07753671698377296
+      },
+      {
+        "kind": "buffer",
+        "time": 13447,
+        "loop": false,
+        "duration": 0.06561259471080327
+      },
+      {
+        "kind": "buffer",
+        "time": 13479.10000000894,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 13493,
+        "loop": false,
+        "duration": 0.06340323961944139
+      },
+      {
+        "kind": "buffer",
+        "time": 13575.40000000596,
+        "loop": false,
+        "duration": 0.06763600173991104
+      },
+      {
+        "kind": "osc",
+        "time": 13776.10000000894,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 13776.20000000298,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 13776.20000000298,
+        "frequency": 739.9888305664062,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 13776.20000000298,
+        "frequency": 2959.955322265625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 13794.60000000894,
+        "loop": false,
+        "duration": 0.08136003026837876
+      },
+      {
+        "kind": "buffer",
+        "time": 13827,
+        "loop": false,
+        "duration": 0.07694521619938227
+      },
+      {
+        "kind": "osc",
+        "time": 14008.90000000596,
+        "frequency": 4399.0029296875,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 14545.5,
+        "frequency": 415.3046875,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 14545.60000000894,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 14545.60000000894,
+        "frequency": 987.7666015625,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 14545.60000000894,
+        "frequency": 3951.06640625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 14562,
+        "loop": false,
+        "duration": 0.07697552125641369
+      },
+      {
+        "kind": "buffer",
+        "time": 14576.70000000298,
+        "loop": false,
+        "duration": 0.07742672722000009
+      },
+      {
+        "kind": "buffer",
+        "time": 14759.5,
+        "loop": false,
+        "duration": 0.0721124148425451
+      },
+      {
+        "kind": "buffer",
+        "time": 15126.90000000596,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 15263.70000000298,
+        "loop": false,
+        "duration": 0.07835269459966918
+      },
+      {
+        "kind": "osc",
+        "time": 15308.90000000596,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 15308.90000000596,
+        "frequency": 207.65234375,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 15309,
+        "frequency": 880,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 15309,
+        "frequency": 3520,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 15359.60000000894,
+        "loop": false,
+        "duration": 0.0726181975627039
+      },
+      {
+        "kind": "buffer",
+        "time": 15393.79999999702,
+        "loop": false,
+        "duration": 0.06331633366566512
+      },
+      {
+        "kind": "buffer",
+        "time": 15393.79999999702,
+        "loop": false,
+        "duration": 0.08189447693489986
+      },
+      {
+        "kind": "buffer",
+        "time": 15431.20000000298,
+        "loop": false,
+        "duration": 0.0673170705462234
+      },
+      {
+        "kind": "buffer",
+        "time": 15493.79999999702,
+        "loop": false
+      },
+      {
+        "kind": "buffer",
+        "time": 15578.60000000894,
+        "loop": false,
+        "duration": 0.07773128308108898
+      },
+      {
+        "kind": "osc",
+        "time": 15728.79999999702,
+        "frequency": 4297.0576171875,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 15875.60000000894,
+        "loop": false,
+        "duration": 0.06309739308052811
+      },
+      {
+        "kind": "osc",
+        "time": 16076,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 16076,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 16076.10000000894,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 16076.10000000894,
+        "frequency": 207.65234375,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 16076.20000000298,
+        "frequency": 739.9888305664062,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 16076.20000000298,
+        "frequency": 2959.955322265625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 16561.90000000596,
+        "loop": false,
+        "duration": 0.07141427975196517
+      },
+      {
+        "kind": "buffer",
+        "time": 16678.5,
+        "loop": false,
+        "duration": 0.06826340820974897
+      },
+      {
+        "kind": "buffer",
+        "time": 16742.29999999702,
+        "loop": false,
+        "duration": 0.08097856732604194
+      },
+      {
+        "kind": "buffer",
+        "time": 16795.79999999702,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 16842.60000000894,
+        "loop": false,
+        "duration": 0.07842134940632497
+      },
+      {
+        "kind": "osc",
+        "time": 16858.90000000596,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 16859,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 16859,
+        "frequency": 415.3046875,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 16859,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 16859,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 16859,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 16859,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 17193.60000000894,
+        "loop": false,
+        "duration": 0.07309407957398331
+      },
+      {
+        "kind": "buffer",
+        "time": 17326,
+        "loop": false,
+        "duration": 0.07692243806110452
+      },
+      {
+        "kind": "osc",
+        "time": 17597.29999999702,
+        "frequency": 4665.9794921875,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 17625.79999999702,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 17625.90000000596,
+        "frequency": 329.6275634765625,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 17626,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 17626,
+        "frequency": 2349.318115234375,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 17812.70000000298,
+        "loop": false,
+        "duration": 0.06380276574319373
+      },
+      {
+        "kind": "buffer",
+        "time": 17826.20000000298,
+        "loop": false,
+        "duration": 0.07735895894815051
+      },
+      {
+        "kind": "buffer",
+        "time": 17942.90000000596,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 18130.29999999702,
+        "loop": false,
+        "duration": 0.07166334824254836
+      },
+      {
+        "kind": "buffer",
+        "time": 18276.29999999702,
+        "loop": false,
+        "duration": 0.08138305108582203
+      },
+      {
+        "kind": "buffer",
+        "time": 18342.90000000596,
+        "loop": false,
+        "duration": 0.07454480935612319
+      },
+      {
+        "kind": "buffer",
+        "time": 18375.70000000298,
+        "loop": false
+      },
+      {
+        "kind": "osc",
+        "time": 18391.40000000596,
+        "frequency": 207.65234375,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 18391.5,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 18477.5,
+        "loop": false,
+        "duration": 0.07416432948425143
+      },
+      {
+        "kind": "osc",
+        "time": 18575.60000000894,
+        "frequency": 4380.830078125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 18596.5,
+        "loop": false,
+        "duration": 0.06970893639792941
+      },
+      {
+        "kind": "osc",
+        "time": 18695.29999999702,
+        "frequency": 4647.37841796875,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 18829.20000000298,
+        "loop": false,
+        "duration": 0.08140232392895622
+      },
+      {
+        "kind": "buffer",
+        "time": 19028.10000000894,
+        "loop": false,
+        "duration": 0.06642902449455565
+      },
+      {
+        "kind": "buffer",
+        "time": 19046.29999999702,
+        "loop": false,
+        "duration": 0.06492074634444255
+      },
+      {
+        "kind": "osc",
+        "time": 19159.20000000298,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.29999999702,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.40000000596,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.40000000596,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.5,
+        "frequency": 110,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.70000000298,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.70000000298,
+        "frequency": 587.3295288085938,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 19159.70000000298,
+        "frequency": 2349.318115234375,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 19592.70000000298,
+        "loop": false,
+        "duration": 0.06436483719732114
+      },
+      {
+        "kind": "buffer",
+        "time": 19795.40000000596,
+        "loop": false,
+        "duration": 0.07521283361619709
+      },
+      {
+        "kind": "buffer",
+        "time": 19926.20000000298,
+        "loop": false,
+        "duration": 0.06735849609386144
+      },
+      {
+        "kind": "osc",
+        "time": 19943.10000000894,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 19943.10000000894,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 19943.10000000894,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 19943.10000000894,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 20113.60000000894,
+        "loop": false,
+        "duration": 0.07835884749441804
+      },
+      {
+        "kind": "buffer",
+        "time": 20526.5,
+        "loop": false,
+        "duration": 0.08114731794421036
+      },
+      {
+        "kind": "buffer",
+        "time": 20559.70000000298,
+        "loop": false,
+        "duration": 0.08138219308626328
+      },
+      {
+        "kind": "osc",
+        "time": 20709,
+        "frequency": 277.1826171875,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 20709.10000000894,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 20709.10000000894,
+        "frequency": 659.255126953125,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 20709.10000000894,
+        "frequency": 2637.0205078125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 20860.40000000596,
+        "loop": false,
+        "duration": 0.06406794883501038
+      },
+      {
+        "kind": "buffer",
+        "time": 20893.70000000298,
+        "loop": false,
+        "duration": 0.07355723777151016
+      },
+      {
+        "kind": "buffer",
+        "time": 21259.10000000894,
+        "loop": false,
+        "duration": 0.07368695345566167
+      },
+      {
+        "kind": "buffer",
+        "time": 21293.40000000596,
+        "loop": false,
+        "duration": 0.07122724592917189
+      },
+      {
+        "kind": "osc",
+        "time": 21477.5,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 21477.5,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 21513,
+        "loop": false,
+        "duration": 0.0737862900215924
+      },
+      {
+        "kind": "buffer",
+        "time": 21579,
+        "loop": false,
+        "duration": 0.06286273471967176
+      },
+      {
+        "kind": "buffer",
+        "time": 21642,
+        "loop": false,
+        "duration": 0.06539839612742372
+      },
+      {
+        "kind": "buffer",
+        "time": 21692.5,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "osc",
+        "time": 21725.5,
+        "frequency": 576.0450439453125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 21876.20000000298,
+        "loop": false,
+        "duration": 0.0705665011783224
+      },
+      {
+        "kind": "buffer",
+        "time": 21925.70000000298,
+        "loop": false,
+        "duration": 0.0708692210628191
+      },
+      {
+        "kind": "buffer",
+        "time": 21959.20000000298,
+        "loop": false,
+        "duration": 0.12000000000000001
+      },
+      {
+        "kind": "buffer",
+        "time": 21959.20000000298,
+        "loop": false,
+        "duration": 0.16999999999999998
+      },
+      {
+        "kind": "buffer",
+        "time": 22146.29999999702,
+        "loop": false,
+        "duration": 0.08158555411050054
+      },
+      {
+        "kind": "osc",
+        "time": 22259,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 22259,
+        "frequency": 293.6647644042969,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 22259.10000000894,
+        "frequency": 110,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 22259.20000000298,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 22259.20000000298,
+        "frequency": 880,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 22259.20000000298,
+        "frequency": 6160,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 22259.40000000596,
+        "loop": false,
+        "duration": 0.07491634094130105
+      },
+      {
+        "kind": "buffer",
+        "time": 22276.60000000894,
+        "loop": false,
+        "duration": 0.07981557283664201
+      },
+      {
+        "kind": "buffer",
+        "time": 22375.60000000894,
+        "loop": false,
+        "duration": 0.07854184389934546
+      },
+      {
+        "kind": "buffer",
+        "time": 22375.70000000298,
+        "loop": false,
+        "duration": 0.06589471623603366
+      },
+      {
+        "kind": "osc",
+        "time": 23025.90000000596,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 23025.90000000596,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 23026.5,
+        "loop": false,
+        "duration": 0.07102899927303741
+      },
+      {
+        "kind": "buffer",
+        "time": 23092.60000000894,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "buffer",
+        "time": 23227,
+        "loop": false,
+        "duration": 0.06402150129825264
+      },
+      {
+        "kind": "osc",
+        "time": 23645,
+        "frequency": 4667.17333984375,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 23793,
+        "loop": false,
+        "duration": 0.07388385994336004
+      },
+      {
+        "kind": "osc",
+        "time": 23807.79999999702,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 23807.90000000596,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 23808.40000000596,
+        "loop": false,
+        "duration": 0.0721776335675868
+      },
+      {
+        "kind": "buffer",
+        "time": 23892.20000000298,
+        "loop": false,
+        "duration": 0.07040253225561639
+      },
+      {
+        "kind": "buffer",
+        "time": 23908.29999999702,
+        "loop": false
+      },
+      {
+        "kind": "buffer",
+        "time": 23943.20000000298,
+        "loop": false,
+        "duration": 0.07054635309457245
+      },
+      {
+        "kind": "buffer",
+        "time": 24226.10000000894,
+        "loop": false,
+        "duration": 0.0694664019214711
+      },
+      {
+        "kind": "buffer",
+        "time": 24344.20000000298,
+        "loop": false,
+        "duration": 0.0712683210416889
+      },
+      {
+        "kind": "buffer",
+        "time": 24543,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "osc",
+        "time": 24575.79999999702,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 24576,
+        "frequency": 164.81378173828125,
+        "type": "custom"
+      },
+      {
+        "kind": "buffer",
+        "time": 24678.20000000298,
+        "loop": false,
+        "duration": 0.0727555606368265
+      },
+      {
+        "kind": "buffer",
+        "time": 24828.29999999702,
+        "loop": false,
+        "duration": 0.06607736125693695
+      },
+      {
+        "kind": "buffer",
+        "time": 24980.29999999702,
+        "loop": false,
+        "duration": 0.07411641632702064
+      },
+      {
+        "kind": "buffer",
+        "time": 24980.29999999702,
+        "loop": false,
+        "duration": 0.07881722921763903
+      },
+      {
+        "kind": "buffer",
+        "time": 25110.20000000298,
+        "loop": false,
+        "duration": 0.0713071181668831
+      },
+      {
+        "kind": "buffer",
+        "time": 25193.5,
+        "loop": false,
+        "duration": 0.07835528672556093
+      },
+      {
+        "kind": "buffer",
+        "time": 25295.29999999702,
+        "loop": false,
+        "duration": 0.0784269879994374
+      },
+      {
+        "kind": "osc",
+        "time": 25357.10000000894,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.10000000894,
+        "frequency": 146.83238220214844,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.10000000894,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.10000000894,
+        "frequency": 220,
+        "type": "triangle"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.20000000298,
+        "frequency": 146.83238220214844,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.20000000298,
+        "frequency": 220,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.20000000298,
+        "frequency": 1318.51025390625,
+        "type": "sine"
+      },
+      {
+        "kind": "osc",
+        "time": 25357.20000000298,
+        "frequency": 9229.5712890625,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 25408.10000000894,
+        "loop": false,
+        "duration": 0.08127424827727579
+      },
+      {
+        "kind": "buffer",
+        "time": 25492.40000000596,
+        "loop": false,
+        "duration": 0.07954977635186689
+      },
+      {
+        "kind": "buffer",
+        "time": 25642.90000000596,
+        "loop": false,
+        "duration": 0.07748960641745534
+      },
+      {
+        "kind": "buffer",
+        "time": 25659.60000000894,
+        "loop": false,
+        "duration": 0.06563478207271235
+      },
+      {
+        "kind": "buffer",
+        "time": 25908.60000000894,
+        "loop": false,
+        "duration": 0.07321658898727741
+      },
+      {
+        "kind": "buffer",
+        "time": 25994.10000000894,
+        "loop": false,
+        "duration": 0.06273863701553586
+      },
+      {
+        "kind": "buffer",
+        "time": 26078.20000000298,
+        "loop": false,
+        "duration": 0.07725184164264565
+      },
+      {
+        "kind": "buffer",
+        "time": 26092.79999999702,
+        "loop": false,
+        "duration": 0.1
+      },
+      {
+        "kind": "osc",
+        "time": 26130.60000000894,
+        "frequency": 293.6647644042969,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 26130.70000000298,
+        "frequency": 369.9944152832031,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 26130.70000000298,
+        "frequency": 440,
+        "type": "custom"
+      },
+      {
+        "kind": "osc",
+        "time": 26142.5,
+        "frequency": 4218.220703125,
+        "type": "sine"
+      },
+      {
+        "kind": "buffer",
+        "time": 26209.20000000298,
+        "loop": false
+      },
+      {
+        "kind": "buffer",
+        "time": 26311.60000000894,
+        "loop": false,
+        "duration": 0.07654824605673693
+      },
+      {
+        "kind": "buffer",
+        "time": 26492.5,
+        "loop": false,
+        "duration": 0.07899224746835268
+      },
+      {
+        "kind": "buffer",
+        "time": 26508.90000000596,
+        "loop": false,
+        "duration": 0.06386367827556545
+      }
+    ]
+  },
+  {
+    "name": "walk-after",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": false,
+        "player": {
+          "x": -23.61126983662466,
+          "y": 22,
+          "z": -232.61126983662461,
+          "facing": -0.7853981633974492,
+          "onGround": true,
+          "inWater": false,
+          "busy": false
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.8047083333333271,
+          "seconds": 484.47116237799537
+        },
+        "ambient": {
+          "timeOfDay": 0.8047083333333271,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.21444447736312752,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 24,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 2,
+          "fox": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -3.918,
+            "y": 42.502,
+            "z": -212.918
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": true,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": {
+        "x": -23.962727799359985,
+        "y": 22,
+        "z": -228.13751828393254
+      },
+      "text": "!\nExperiment build.\nCutscenes are being tried here.\nPlay scene 9: Something outside\nDay 1\n19:18\nThe Shut Door\nBack away to the stone door\n1\n2\n3\n4\n5\n6\n7\n8\n9\nTab\n19 blocks",
+      "audio": {
+        "running": true,
+        "ambience": {
+          "regions": {
+            "meadow": 1,
+            "town": 0
+          },
+          "town": 0,
+          "indoors": 0,
+          "danger": 0,
+          "fight": 0,
+          "boss": 0,
+          "timeOfDay": 0.8047083333333271,
+          "rain": 0,
+          "wind": 0.21444447736312752,
+          "nearWater": 0,
+          "trees": 0,
+          "stone": 0
+        },
+        "time": 27.712,
+        "bpm": 77.3693752174052,
+        "baseBpm": 83.99999999999999,
+        "targetBpm": 77.27999999999999,
+        "bar": 9,
+        "beat": 0,
+        "key": "D",
+        "scale": "major pentatonic, Lydian color",
+        "chord": "Dadd9",
+        "notes": "C# D E F# G# A B",
+        "lead": "meadow",
+        "weights": {
+          "meadow": 1,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "intensity": 0.3400038263197986,
+        "layers": {
+          "drone": {
+            "on": true,
+            "level": 0.3
+          },
+          "harmony": {
+            "on": true,
+            "level": 0.8
+          },
+          "melody": {
+            "on": true,
+            "level": 0.5600030610558389
+          },
+          "sparkle": {
+            "on": true,
+            "level": 0.8760091831675165
+          },
+          "bass": {
+            "on": false,
+            "level": 0
+          },
+          "perc": {
+            "on": false,
+            "level": 0
+          },
+          "full": {
+            "on": false,
+            "level": 0
+          },
+          "drums": {
+            "on": false,
+            "level": 0
+          },
+          "tension": {
+            "on": false,
+            "level": 0
+          },
+          "boss": {
+            "on": false,
+            "level": 0
+          }
+        },
+        "fight": false,
+        "resolving": false,
+        "voices": 11,
+        "voicePeak": 19,
+        "dropped": 0,
+        "refused": {
+          "music": 0,
+          "ambience": 0,
+          "effects": 0,
+          "voice": 0
+        },
+        "nodes": 250,
+        "fixedNodes": 207,
+        "notesByPalette": {
+          "meadow": 121,
+          "desert": 0,
+          "coast": 0,
+          "rainvalley": 0,
+          "highlands": 0,
+          "forge": 0,
+          "center": 0,
+          "town": 0
+        },
+        "ducking": 1
+      },
+      "volumes": [
+        [
+          "master",
+          0.9
+        ],
+        [
+          "music",
+          0.27853000000000316
+        ],
+        [
+          "ambience",
+          0.46819150000000176
+        ],
+        [
+          "effects",
+          0.8
+        ]
+      ]
+    }
+  }
+]

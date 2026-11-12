@@ -1,0 +1,16 @@
+$ bun server/test/live.ts
+292 |           throw forwardErrorData(
+293 |             respJSON.errorData,
+294 |             new ConvexError(respJSON.errorMessage)
+295 |           );
+296 |         }
+297 |         throw new Error(respJSON.errorMessage);
+                        ^
+error: [Request ID: 2859f4595b9cac31] Server Error
+Could not find public function for 'worlds:create'.
+
+      at mutationInner (/Users/dabot/.t3/worktrees/game-base/t3-78e426ec-ada3564fdcf57f7a/node_modules/convex/dist/esm/browser/http_client.js:297:19)
+      at async processMutationQueue (/Users/dabot/.t3/worktrees/game-base/t3-78e426ec-ada3564fdcf57f7a/node_modules/convex/dist/esm/browser/http_client.js:310:35)
+
+Bun v1.4.4 (macOS arm64)
+

@@ -1,0 +1,8 @@
+Chrome renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)
+shot 1 at 3.5s, high: 101 draw calls, 302548 triangles (grass 4/108079, trees 36/91338, bushes 3/36464, land 1/22528, rocks 8/18624, far land 1/11448) -> .artifacts/cut-test/high/shot-1.png
+shot 2 at 7.5s, high: 95 draw calls, 293937 triangles (grass 4/108079, trees 36/91338, bushes 3/36464, rocks 8/18624, land 1/15872, far land 1/11448) -> .artifacts/cut-test/high/shot-2.png
+shot 3 at 11s, high: 102 draw calls, 296231 triangles (grass 4/108079, trees 36/91338, bushes 3/36464, rocks 8/18624, land 1/15360, far land 1/11448) -> .artifacts/cut-test/high/shot-3.png
+shot 4 at 16.5s, high: 85 draw calls, 285274 triangles (grass 4/108094, trees 36/91338, bushes 3/36464, rocks 8/18624, far land 1/11448, land 1/10240) -> .artifacts/cut-test/high/shot-4.png
+shot 5 at 20.5s, high: 89 draw calls, 350709 triangles (grass 4/107950, trees 36/91338, town 2/60719, bushes 3/36464, rocks 8/18624, land 1/13824) -> .artifacts/cut-test/high/shot-5.png
+shot 6 at 23.5s, high: 82 draw calls, 277770 triangles (grass 4/108094, trees 36/91338, bushes 3/36464, rocks 8/18624, far land 1/11448, blocks 11/3026) -> .artifacts/cut-test/high/shot-6.png
+no console errors

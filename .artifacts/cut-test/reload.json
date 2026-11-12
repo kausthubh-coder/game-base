@@ -1,0 +1,1897 @@
+[
+  {
+    "name": "before-3",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7824135836734696,
+          "seconds": 473.85856390417047
+        },
+        "ambient": {
+          "timeOfDay": 0.7824135836734696,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.2008117535805175,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": 8.28,
+            "y": 33.912,
+            "z": -204.698
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": false,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "volumes": [
+        [
+          "master",
+          null
+        ],
+        [
+          "music",
+          null
+        ],
+        [
+          "ambience",
+          null
+        ],
+        [
+          "effects",
+          null
+        ]
+      ]
+    }
+  },
+  {
+    "name": "reload-3",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": false,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": true,
+          "inWater": false,
+          "busy": false
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7878208908541193,
+          "seconds": 476.39764727595434
+        },
+        "ambient": {
+          "timeOfDay": 0.7878208908541193,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.22306874103476604,
+          "windDir": 2.0638078666371324,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true,
+          "hint.slots": true
+        },
+        "actors": {
+          "total": 25,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 3,
+          "fox": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -0.806,
+            "y": 42.502,
+            "z": -209.806
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": false,
+        "sprites": {
+          "count": 25,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": {
+        "x": -24.5,
+        "y": 22,
+        "z": -224.5
+      },
+      "text": "!\n\nKeys 1 to 9 pick a quick slot.\n\n×\nExperiment build.\nCutscenes are being tried here.\nPlay scene 9: Something outside\nDay 1\n18:54\nThe Shut Door\nBack away to the stone door\n1\n2\n3\n4\n5\n6\n7\n8\n9\nTab\n21 blocks",
+      "volumes": [
+        [
+          "master",
+          null
+        ],
+        [
+          "music",
+          null
+        ],
+        [
+          "ambience",
+          null
+        ],
+        [
+          "effects",
+          null
+        ]
+      ]
+    }
+  },
+  {
+    "name": "before-15",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": true,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": false,
+          "inWater": false,
+          "busy": true
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7918934857142854,
+          "seconds": 478.30999616681447
+        },
+        "ambient": {
+          "timeOfDay": 0.7918934857142854,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.2008117535805175,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 22,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -20.171,
+            "y": 24.053,
+            "z": -230.158
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": false,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": null,
+      "text": "Skip\nEsc",
+      "volumes": [
+        [
+          "master",
+          null
+        ],
+        [
+          "music",
+          null
+        ],
+        [
+          "ambience",
+          null
+        ],
+        [
+          "effects",
+          null
+        ]
+      ]
+    }
+  },
+  {
+    "name": "reload-15",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": false,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": true,
+          "inWater": false,
+          "busy": false
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.7956311783824606,
+          "seconds": 480.06508663709
+        },
+        "ambient": {
+          "timeOfDay": 0.7956311783824606,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.22238379403640096,
+          "windDir": 2.0638078666371324,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true,
+          "hint.slots": true
+        },
+        "actors": {
+          "total": 24,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 2,
+          "fox": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -0.806,
+            "y": 42.502,
+            "z": -209.806
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": false,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": {
+        "x": -24.5,
+        "y": 22,
+        "z": -224.5
+      },
+      "text": "!\n\nKeys 1 to 9 pick a quick slot.\n\n×\nExperiment build.\nCutscenes are being tried here.\nPlay scene 9: Something outside\nDay 1\n19:05\nThe Shut Door\nBack away to the stone door\n1\n2\n3\n4\n5\n6\n7\n8\n9\nTab\n21 blocks",
+      "volumes": [
+        [
+          "master",
+          null
+        ],
+        [
+          "music",
+          null
+        ],
+        [
+          "ambience",
+          null
+        ],
+        [
+          "effects",
+          null
+        ]
+      ]
+    }
+  },
+  {
+    "name": "before-25.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": false,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": true,
+          "inWater": false,
+          "busy": false
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.80034259259259,
+          "seconds": 482.27737220940577
+        },
+        "ambient": {
+          "timeOfDay": 0.80034259259259,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.21729959251611702,
+          "windDir": 2.555412497800674,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true
+        },
+        "actors": {
+          "total": 23,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 1,
+          "fox": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -0.806,
+            "y": 42.502,
+            "z": -209.806
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": false,
+        "sprites": {
+          "count": 23,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": {
+        "x": -24.5,
+        "y": 22,
+        "z": -224.5
+      },
+      "text": "!\nExperiment build.\nCutscenes are being tried here.\nPlay scene 9: Something outside\nDay 1\n19:12\nThe Shut Door\nBack away to the stone door\n1\n2\n3\n4\n5\n6\n7\n8\n9\nTab\n21 blocks",
+      "volumes": [
+        [
+          "master",
+          null
+        ],
+        [
+          "music",
+          null
+        ],
+        [
+          "ambience",
+          null
+        ],
+        [
+          "effects",
+          null
+        ]
+      ]
+    }
+  },
+  {
+    "name": "reload-25.5",
+    "data": {
+      "state": {
+        "started": true,
+        "paused": false,
+        "player": {
+          "x": -20.5,
+          "y": 22,
+          "z": -229.5,
+          "facing": -2.4668517113662407,
+          "onGround": true,
+          "inWater": false,
+          "busy": false
+        },
+        "clock": {
+          "day": 1,
+          "timeOfDay": 0.8044953703703643,
+          "seconds": 484.2273722094062
+        },
+        "ambient": {
+          "timeOfDay": 0.8044953703703643,
+          "rain": 0,
+          "cloud": 0.2,
+          "fog": 0,
+          "wind": 0.2229863813563104,
+          "windDir": 5.8494763116732535,
+          "wetness": 0,
+          "flash": 0
+        },
+        "quests": [
+          {
+            "id": "plot",
+            "state": "done",
+            "steps": [
+              {
+                "id": "meet",
+                "done": true
+              },
+              {
+                "id": "watch",
+                "done": true,
+                "have": 2,
+                "need": 2
+              },
+              {
+                "id": "tell",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "roof",
+            "state": "done",
+            "steps": [
+              {
+                "id": "wood",
+                "done": true,
+                "have": 12,
+                "need": 12
+              },
+              {
+                "id": "bench",
+                "done": true
+              },
+              {
+                "id": "shelter",
+                "done": true
+              }
+            ]
+          },
+          {
+            "id": "night",
+            "state": "active",
+            "steps": [
+              {
+                "id": "bed",
+                "done": true
+              },
+              {
+                "id": "door",
+                "done": false
+              },
+              {
+                "id": "mark",
+                "done": false
+              },
+              {
+                "id": "key",
+                "done": false
+              },
+              {
+                "id": "calm",
+                "done": false
+              },
+              {
+                "id": "heart",
+                "done": false
+              },
+              {
+                "id": "sleep",
+                "done": false
+              },
+              {
+                "id": "tamsin",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "leaftail",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "find",
+                "done": false
+              },
+              {
+                "id": "berries",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "trust",
+                "done": false,
+                "have": 0,
+                "need": 3
+              },
+              {
+                "id": "show",
+                "done": false
+              }
+            ]
+          },
+          {
+            "id": "bread",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "town",
+                "done": false
+              },
+              {
+                "id": "queen",
+                "done": false
+              },
+              {
+                "id": "seeds",
+                "done": false
+              },
+              {
+                "id": "grow",
+                "done": false,
+                "have": 0,
+                "need": 20
+              },
+              {
+                "id": "deliver",
+                "done": false,
+                "have": 0,
+                "need": 20
+              }
+            ]
+          },
+          {
+            "id": "festival",
+            "state": "hidden",
+            "steps": [
+              {
+                "id": "evening",
+                "done": false
+              },
+              {
+                "id": "lamp",
+                "done": false
+              },
+              {
+                "id": "end",
+                "done": false
+              }
+            ]
+          }
+        ],
+        "tracked": "night",
+        "bag": [
+          {
+            "id": "axe",
+            "count": 1
+          }
+        ],
+        "selected": 0,
+        "held": "axe",
+        "flags": {
+          "quest.plot.started": true,
+          "quest.plot.done": true,
+          "quest.plot.step": "",
+          "met.tamsin": true,
+          "plot.met": true,
+          "plot.told": true,
+          "has.almanac": true,
+          "quest.roof.started": true,
+          "quest.roof.done": true,
+          "quest.roof.step": "",
+          "quest.night.started": true,
+          "quest.night.done": false,
+          "quest.night.step": "door",
+          "quest.leaftail.started": false,
+          "quest.leaftail.done": false,
+          "quest.leaftail.step": "",
+          "quest.bread.started": false,
+          "quest.bread.done": false,
+          "quest.bread.step": "",
+          "quest.festival.started": false,
+          "quest.festival.done": false,
+          "quest.festival.step": "",
+          "night.fox": true,
+          "cut.scene9": true,
+          "hint.almanac": true,
+          "hint.slots": true
+        },
+        "actors": {
+          "total": 24,
+          "player": 1,
+          "pet": 1,
+          "npc": 19,
+          "creature": 2,
+          "fox": 1
+        },
+        "talk": null,
+        "prompt": null,
+        "breaking": null,
+        "aim": null,
+        "stats": {
+          "days": 1,
+          "wheat": 0,
+          "blocks": 0,
+          "pages": 1
+        },
+        "camera": {
+          "mode": "tilt",
+          "quarter": 0,
+          "zoom": 2,
+          "yaw": 45,
+          "pitch": 35,
+          "distance": 34,
+          "reach": 34,
+          "at": {
+            "x": -0.806,
+            "y": 42.502,
+            "z": -209.806
+          },
+          "mouse": "point",
+          "locked": false,
+          "dragging": false,
+          "tiltTurn": "quarter"
+        },
+        "characters": "sprites",
+        "sound": false,
+        "sprites": {
+          "count": 24,
+          "missing": []
+        },
+        "quality": "high",
+        "systems": [
+          "items",
+          "inventory",
+          "region",
+          "trees",
+          "time",
+          "interact",
+          "actions",
+          "placeables",
+          "crafting",
+          "crops",
+          "build",
+          "sprinklers",
+          "nav",
+          "almanac",
+          "creatures",
+          "pets",
+          "people",
+          "talk",
+          "hall",
+          "quests",
+          "story"
+        ],
+        "leftOut": [],
+        "failed": {},
+        "viewErrors": [],
+        "online": null
+      },
+      "fox": {
+        "x": -24.5,
+        "y": 22,
+        "z": -224.5
+      },
+      "text": "!\n\nKeys 1 to 9 pick a quick slot.\n\n×\nExperiment build.\nCutscenes are being tried here.\nPlay scene 9: Something outside\nDay 1\n19:18\nThe Shut Door\nBack away to the stone door\n1\n2\n3\n4\n5\n6\n7\n8\n9\nTab\n21 blocks",
+      "volumes": [
+        [
+          "master",
+          null
+        ],
+        [
+          "music",
+          null
+        ],
+        [
+          "ambience",
+          null
+        ],
+        [
+          "effects",
+          null
+        ]
+      ]
+    }
+  }
+]

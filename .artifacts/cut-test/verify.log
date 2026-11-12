@@ -1,0 +1,15 @@
+$ bun tools/verify.mjs
+pass check     43.9 s  types, the .sim.ts rule, every test, the Convex tests
+pass lint       2.4 s  Biome lint
+pass tools      0.1 s  the tools' own tests
+pass bots       3.2 s  three bots, 20,000 steps each, rules only
+pass assets     2.2 s  every asset against the asset contract
+pass build      2.4 s  a production build
+pass server    30.3 s  the world server on wrangler dev, with two fake players
+pass together   52.3 s  two browsers on one world: walk, build, farm, leave, a server restart, a wrong build
+FAIL live       1.5 s  Bun v1.4.4 (macOS arm64)  (/Users/dabot/.t3/worktrees/game-base/t3-78e426ec-ada3564fdcf57f7a/.artifacts/verify/live.log)
+pass shots     18.5 s  six scenes against their approved pictures, and the draw budgets
+pass play      47.1 s  a person's walk to Tamsin with real keys, build mode, camera drag
+
+verify: 1 of 11 parts failed
+error: script "verify" exited with code 1
