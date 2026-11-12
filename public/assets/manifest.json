@@ -824,6 +824,65 @@
             "back": 4,
             "side": 5
           }
+        },
+        "stalk": {
+          "frames": 4,
+          "fps": 4,
+          "rows": {
+            "front": 6,
+            "back": 7,
+            "side": 8
+          }
+        },
+        "shake": {
+          "frames": 2,
+          "fps": 12,
+          "rows": {
+            "front": 9,
+            "back": 10,
+            "side": 11
+          }
+        }
+      }
+    },
+    "hero-camp": {
+      "sheet": "sprites/hero-camp.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "sit": {
+          "frames": 2,
+          "fps": 2,
+          "rows": {
+            "front": 0,
+            "back": 1,
+            "side": 2
+          }
+        },
+        "look": {
+          "frames": 2,
+          "fps": 2,
+          "rows": {
+            "front": 3,
+            "back": 4,
+            "side": 5
+          }
+        },
+        "rise": {
+          "frames": 4,
+          "fps": 5,
+          "rows": {
+            "front": 6,
+            "back": 7,
+            "side": 8
+          }
         }
       }
     }

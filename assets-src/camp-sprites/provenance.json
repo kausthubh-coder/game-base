@@ -1,0 +1,21 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "hero": {
+    "prompt": "Use case: identity-preserve. Edit target/reference: approved hero sprite sheet. Produce NEW ACTION SHEET of EXACTLY THIS SAME KID, not a redesign. Match broad tousled brown hair, face, large head, cream collar, ochre short cape, visible brown shirt belt pouch trousers and brown boots exactly. Pixel clusters, warm top left light, tinted brown outlines. Transparent background, NO ground/shadows/grid/text. STRICT FOUR columns NINE rows, square equal cells, ample padding. Rows 1-3 SIT front/back(no face)/right profile, columns 1-4 two alternating subtle breathing poses repeated: sitting on ground knees up arms resting on knees. Rows 4-6 LOOK front/back/right profile, two alternating seated poses repeated: head raised and turned over shoulder, body stays seated. Rows 7-9 RISE front/back/right profile, four distinct successive poses seated, kneeling, half-standing, standing exactly like reference idle. Same head size in every cell; sitting must be shorter than standing, never scaled up to fill cell. Same feet ground baseline in every cell. No fire or props. Keep same character identity and costume.",
+    "reference": "public/assets/sprites/hero.png",
+    "source": "assets-src/camp-sprites/hero-camp-3.png",
+    "attempts": 1,
+    "processingRevisions": 3,
+    "note": "Generated once. Corrected uneven row extraction, then increased whole-figure scale after the first contact sheets showed a small head. Last rise cells are approved idle frame 0. No drawn pixels or body parts replaced otherwise."
+  },
+  "fox": {
+    "prompt": "Use case: identity-preserve. Approved grey fox sheet is reference/edit target, preserve the SAME animal's huge ears, dull eyes, grey fur and muted cream chest, chibi proportions and pixel art clusters. Create new animation sheet STRICT FOUR columns SIX rows equal square cells. First THREE rows STALK front/back(no face)/right profile, four successive slow cautious walking steps: thin frightened fox head LOW, tail lowered near ground, paws carefully placed, hunched, NOT monster, no glow or snarl. Last THREE rows SHAKE front/back/right profile, four cells containing two alternating poses repeated: fox stands hunched and trembles, ears/fur move very slightly, feet fixed. Transparent background, ample padding, NO ground, shadow, text, grid or scenery. Whole animal in each cell, equal ground baseline and same head/body dimensions as approved reference. Keep grey colours and dull eyes. Front looks toward viewer; back has no face; side faces right.",
+    "reference": "public/assets/sprites/fox-blighted.png",
+    "source": "assets-src/camp-sprites/fox-camp-3.png",
+    "attempts": 1,
+    "processingRevisions": 1,
+    "note": "Alpha hardened and snapped to approved fox colours. Original six rows retained pixel-for-pixel from fox-blighted-base.png."
+  },
+  "build": "bun tools/sprites/camp-sprites.mjs",
+  "preview": "bun tools/sprites/preview-camp.mjs"
+}
