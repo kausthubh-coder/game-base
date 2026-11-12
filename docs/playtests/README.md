@@ -10,11 +10,11 @@ when the game grows a part.
 
 | Part | How a player gets there | Scripts that cover it today | Last playtest |
 |---|---|---|---|
-| The title and its settings | Open the page | `play-ui.mjs` | never |
-| The opening film | New game | `play-act1.mjs` | never |
-| First steps: the tips, walking, the camera | Skip the film, then W A S D, Q and R, the right button, the wheel | `first-talk.json`, `play-drag.mjs` | never |
-| Talking, and the quest tracker | E at Tamsin by the grant stone | `first-talk.json`, `act1.test.ts` | never |
-| The Almanac and watching a creature | After Tamsin, at the mossy rocks | `act1.test.ts` | never |
+| The title and its settings | Open the page | `play-ui.mjs` | 2026-11-11 |
+| The opening film | New game | `play-act1.mjs` | 2026-11-11 |
+| First steps: the tips, walking, the camera | Skip the film, then W A S D, Q and R, the right button, the wheel | `first-talk.json`, `play-drag.mjs` | 2026-11-11 |
+| Talking, and the quest tracker | E at Tamsin by the grant stone | `first-talk.json`, `act1.test.ts` | 2026-11-11 |
+| The Almanac and watching a creature | After Tamsin, at the mossy rocks | `act1.test.ts` | 2026-11-11 |
 | The bag and the quick slots | The bag key, 1 to 9, dragging | `cancel-bag-drag.json`, `play-ui.mjs` | never |
 | Gathering: wood, stone, berries | The axe on a tree, the left button on a block | `fell-a-tree` | never |
 | Crafting at the workbench | Logs to planks to a workbench, then E on it | `workbench-crafting` | never |
