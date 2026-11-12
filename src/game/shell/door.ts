@@ -15,8 +15,11 @@ export interface DebugDoor {
   state(): Record<string, unknown>;
   /** Steps the simulation that many seconds without drawing. Returns the kernel steps it ran. */
   advance(seconds: number): number;
-  /** Moves the player to a named place of the region, to `spawn`, or to x, y, z. Without y it stands on the ground. */
-  teleport(place: string | number, y?: number, z?: number): Vec3 | null;
+  /**
+   * Moves the player to a named place of the region, to `spawn`, or to x, y, z. Without y it stands on the ground.
+   * `facing` turns the hero too, in radians like `Player.facing`: a film uses it to stand the player where it ends.
+   */
+  teleport(place: string | number, y?: number, z?: number, facing?: number): Vec3 | null;
   /** Adds to the bag. Returns how many did not fit. */
   give(item: string, count?: number): number;
   /**
@@ -187,7 +190,7 @@ export function createDoor(shell: Shell): DebugDoor {
 
     advance,
 
-    teleport(place, y, z) {
+    teleport(place, y, z, facing) {
       let at: Vec3 | null;
       if (typeof place === 'string') {
         at = named(place);
@@ -208,7 +211,7 @@ export function createDoor(shell: Shell): DebugDoor {
       if (!Number.isFinite(at.y)) at.y = sim.heightAt(at.x, at.z);
       // Never inside a block: a named place may be the block to stand on, or the air above it.
       for (let lift = 0; lift < 6 && (solid(at.x, at.y, at.z) || solid(at.x, at.y + 1, at.z)); lift++) at.y = Math.floor(at.y) + 1;
-      shell.place(at.x, at.y, at.z);
+      shell.place(at.x, at.y, at.z, facing);
       return at;
     },
 

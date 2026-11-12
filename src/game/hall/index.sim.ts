@@ -192,7 +192,7 @@ export function createHall(game: Game): Hall {
     if (!fox || !foxActor) return;
     const far = distance2d(fox.pos, player.pos);
     let moved = false;
-    if (fox.wait && distance2d(fox.wait, player.pos) > FOX_WAITS) fox.wait = null;
+    if (fox.wait && Math.hypot(fox.wait.x - player.pos.x, fox.wait.z - player.pos.z) > FOX_WAITS) fox.wait = null;
     if (fox.calm < 0 && fox.wait) {
       // At the edge of the firelight, shaking, watching the player.
       fox.facing = Math.atan2(player.pos.x - fox.pos.x, -(player.pos.z - fox.pos.z));
