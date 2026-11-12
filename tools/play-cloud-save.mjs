@@ -222,7 +222,7 @@ async function panelSays(page, pattern) {
 /** Closes every panel and waits for the game to run. */
 async function play(page) {
   for (let i = 0; i < 4 && (await page.evaluate(() => document.querySelector('.gu-panel') !== null)); i++) await page.keyboard.press('Escape');
-  await wait(page, () => window.__game.started && !window.__game.state().paused);
+  await until(page, () => window.__game.started && !window.__game.state().paused);
 }
 
 /**
@@ -284,11 +284,13 @@ try {
     await synced(phone);
     await putDown(phone);
     // The phone's save reaches the laptop through the live query. The laptop fetches it and reloads into the game.
+    // It may reload twice: the phone also sent the save it wrote as its game started, and the laptop follows
+    // each save in turn. So this waits for the one with the phone's logs, across reloads.
     await reloaded(laptop, loads);
-    await wait(laptop, () => window.__game.started);
-    const got = await logs(laptop);
-    if (got !== phoneLogs) throw new Error(`the laptop has ${got} logs, the phone saved ${phoneLogs}`);
-    return `${got} logs`;
+    await until(laptop, (n) => window.__game.started && window.__game.view.game.systems.inventory.count('oak_log') === n, phoneLogs, 60_000)
+      .catch(async () => { throw new Error(`the laptop has ${await logs(laptop).catch(() => '?')} logs, the phone saved ${phoneLogs}`); });
+    await synced(laptop);
+    return `${phoneLogs} logs`;
   });
 
   await step(4, 'apart, both play; back online the phone is asked, and keeps the account\'s', [laptop, phone], async () => {
