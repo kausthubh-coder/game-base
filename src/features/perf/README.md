@@ -9,6 +9,7 @@ This feature measures, warms the shaders, picks the quality level and flies the 
 | `governor.sim.ts` | Automatic quality: gives up render size, then effects, when the frame rate drops. Its steps are `QUALITY_LADDER` in `src/content/quality.ts`. |
 | `cost.view.ts` | Draw calls and triangles by feature, and shader programs compiled in the middle of a draw |
 | `warm.view.ts` | Shader warm-up: compiles programs before the things that wear them are seen |
+| `shadows.view.ts` | Gives instanced meshes their own shadow depth material, so the shadow pass does not switch programs at every mesh |
 | `flight.sim.ts` | The fixed flight's path and log. `src/game/views/lab-bench.view.ts` flies it. |
 | `stats.sim.ts` | Frame-time arithmetic |
 
