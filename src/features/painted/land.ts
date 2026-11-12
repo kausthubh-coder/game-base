@@ -250,7 +250,9 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
   }
 
   const tiles = new Map<number, Tile>();
-  const key = (cx: number, cz: number): number => (cx + 32768) * 65536 + (cz + 32768);
+  // A chunk's key, small enough to stay a small integer: a larger number would be a new object at every lookup.
+  // It holds chunks within 8,192 of the origin, 131,072 blocks.
+  const key = (cx: number, cz: number): number => ((cx + 8192) << 14) | (cz + 8192);
 
   // The columns of a tile and two more each way, so every vertex of the tile and of its rim has four columns
   // round it and a slope across it.
@@ -282,11 +284,26 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
     work[at] = madeOf[id] as number;
   }
 
+  // The chunks' revisions around the hero, read once a frame. A tile's stamp needs its nine chunks, and the
+  // tiles share them, so the frame asks the world once for each chunk instead of nine times.
+  let revs = new Int32Array(0), revSide = 0, revX = 0, revZ = 0;
+  function readRevisions(fx: number, fz: number, reach: number): void {
+    revSide = 2 * (reach + 2) + 1;
+    if (revs.length < revSide * revSide) revs = new Int32Array(revSide * revSide);
+    revX = fx - reach - 2;
+    revZ = fz - reach - 2;
+    for (let j = 0; j < revSide; j++) for (let i = 0; i < revSide; i++) revs[j * revSide + i] = blocks.revision(revX + i, revZ + j);
+  }
+  function revisionAt(cx: number, cz: number): number {
+    const i = cx - revX, j = cz - revZ;
+    return i >= 0 && j >= 0 && i < revSide && j < revSide ? (revs[j * revSide + i] as number) : blocks.revision(cx, cz);
+  }
+
   function stampOf(cx: number, cz: number): number {
     let stamp = 0;
     for (let dx = -1; dx <= 1; dx++) {
       for (let dz = -1; dz <= 1; dz++) {
-        const rev = blocks.revision(cx + dx, cz + dz);
+        const rev = revisionAt(cx + dx, cz + dz);
         if (rev < 0) return -1;
         stamp = (Math.imul(stamp, 31) + rev + 1) | 0;
       }
@@ -439,13 +456,15 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
     group,
     update(x, z, reach, view) {
       const fx = Math.floor(x / CHUNK), fz = Math.floor(z / CHUNK);
-      for (const [k, tile] of tiles) {
-        if (Math.abs(tile.cx - fx) <= reach + 1 && Math.abs(tile.cz - fz) <= reach + 1) continue;
+      // forEach, not for-of: this runs every frame, and for-of makes an entry for each tile.
+      tiles.forEach((tile, k) => {
+        if (Math.abs(tile.cx - fx) <= reach + 1 && Math.abs(tile.cz - fz) <= reach + 1) return;
         if (tile.mesh) { group.remove(tile.mesh); tile.mesh.geometry.dispose(); }
         release(tile);
         tiles.delete(k);
-      }
+      });
       // Nearest first, a few a frame: the land grows outward from the hero.
+      readRevisions(fx, fz, reach);
       let budget = PER_FRAME;
       for (let ring = 0; ring <= reach && budget > 0; ring++) {
         for (let dx = -ring; dx <= ring && budget > 0; dx++) {

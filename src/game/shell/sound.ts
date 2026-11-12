@@ -15,6 +15,12 @@ export interface Sound {
   setVolume(bus: BusName, value: number): void;
   /** Starts the engine now. The first click or key does this by itself. */
   start(): AudioSystem | null;
+  /**
+   * Makes the engine now and keeps it silent until the first click or key. Making it takes a fifth of a second
+   * on a fast laptop (the context, a long bed of noise, the rooms' echoes), so the shell does it while the title
+   * waits, and that click only switches the sound on.
+   */
+  prepare(): void;
   dispose(): void;
 }
 
@@ -23,15 +29,23 @@ export function createSound(volumes: Record<BusName, number>): Sound {
   const waiting: ((audio: AudioSystem) => void)[] = [];
   let context: AudioContext | null = null;
   let audio: AudioSystem | null = null;
+  /** True once a click, a key or the game asked for sound. Until then a prepared engine stays suspended. */
+  let wanted = false;
 
   function start(): AudioSystem | null {
+    wanted = true;
     if (audio) return audio;
+    return make();
+  }
+
+  function make(): AudioSystem | null {
     try {
       context = new AudioContext();
       audio = createAudio(context);
       for (const bus of BUSES) audio.setVolume(bus, volumes[bus]);
       audio.start();
-      void context.resume().catch(() => undefined);
+      // A page the browser lets play sound at once would start it here: a prepared engine waits for the click.
+      void (wanted ? context.resume() : context.suspend()).catch(() => undefined);
     } catch (error) {
       // No sound is not a reason to stop the game.
       console.warn('[game] the sound engine did not start:', error);
@@ -51,7 +65,7 @@ export function createSound(volumes: Record<BusName, number>): Sound {
   window.addEventListener('keydown', first, { capture: true, signal: stop.signal });
   // A hidden tab draws no frames, so nothing would schedule the music: pause it and pick it up again.
   document.addEventListener('visibilitychange', () => {
-    if (!context) return;
+    if (!context || !wanted) return;
     if (document.hidden) void context.suspend().catch(() => undefined);
     else void context.resume().catch(() => undefined);
   }, { signal: stop.signal });
@@ -72,6 +86,10 @@ export function createSound(volumes: Record<BusName, number>): Sound {
     },
 
     start,
+
+    prepare() {
+      if (!audio && !stop.signal.aborted) make();
+    },
 
     dispose() {
       stop.abort();

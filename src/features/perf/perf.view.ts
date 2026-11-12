@@ -11,6 +11,7 @@ import type { Quality } from '../../engine/types.ts';
 import type { Level } from '../../content/quality.ts';
 import { createCostMeter, type CostMeter } from './cost.view.ts';
 import { FlightLog } from './flight.sim.ts';
+import { createSteadyShadows } from './shadows.view.ts';
 import { createWarm, type Warm } from './warm.view.ts';
 import { Governor, type GovernorOptions } from './governor.sim.ts';
 import { createPerfPanel } from './perf.ui.ts';
@@ -103,6 +104,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
   };
   const costs = createCostMeter(renderer, ctx.scene);
   const warm = createWarm(ctx, { costs });
+  const shadows = createSteadyShadows(ctx.scene);
   const flight = new FlightLog();
   const stress = Math.max(0.25, Number(new URLSearchParams(location.search).get('stress')) || 1);
   const started: Record<PerfSlot, number> = { frame: 0, sim: 0 };
@@ -210,6 +212,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
     report,
 
     update(dt) {
+      shadows.update();
       const now = performance.now();
       stats.push(now - last);
       snapshot.lastFrameMs = now - last;
@@ -264,6 +267,7 @@ export function createPerf(ctx: ViewContext, options: PerfOptions = {}): PerfVie
 
     dispose() {
       warm.dispose();
+      shadows.dispose();
       costs.dispose();
       renderer.info.autoReset = true;
       renderer.setPixelRatio(basePixelRatio);
