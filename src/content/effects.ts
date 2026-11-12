@@ -78,6 +78,10 @@ export const effects = {
   // ---- the ancients' lume: small teal motes that drift up from a woken lamp or the Heartstone.
   lume: { shape: 'glow', blend: 'add', count: 2, life: [3.5, 6], radius: 0.45, height: [0.2, 1.1], speed: [0.12, 0.3], aim: { up: 1 }, gravity: 0, wobble: [0.25, 0.2], size: [0.15, 0.05], color: [0x7fffd0, 0x3fe0c8], glow: 2.4, fade: [0.2, 0.5] },
 
+  // ---- camp. Play at the fire's ground origin; the director owns the emission cadence.
+  ember: { shape: 'glow', blend: 'add', count: 3, life: [0.7, 1.5], radius: 0.18, height: [0.25, 0.5], speed: [0.45, 0.8], aim: { up: 1, any: 0.15 }, gravity: -0.12, drag: 0.6, wind: 0.08, wobble: [0.08, 1.4], size: [0.045, 0.008], color: [0xefab7a, 0x894949], glow: 1.8, alpha: [0.85, 0], fade: [0.05, 0.6] },
+  campsmoke: { shape: 'puff', blend: 'normal', count: 1, life: [1.4, 2.2], radius: 0.1, height: [0.65, 0.8], speed: [0.3, 0.45], aim: { up: 1 }, gravity: -0.08, drag: 0.4, wind: 0.12, wobble: [0.12, 0.3], spin: 0.08, size: [0.12, 0.45], color: [0x918f88, 0xb2a8b0], alpha: [0.12, 0], fade: [0.25, 0.6] },
+
   // ---- weather. `count` is particles a second at full strength.
   rain: { shape: 'streak', blend: 'normal', facing: 'motion', count: 1300, life: [0.6, 0.9], radius: 1.2, speed: [15, 19], aim: { up: -1 }, gravity: 0, wind: 0.75, stretch: 18, size: [0.018, 0.018], color: [0xd4e4f8, 0xd4e4f8], alpha: [0.23, 0.16], glow: 1, fade: [0.05, 0.05], weather: true },
   rainSplash: { shape: 'ring', blend: 'normal', facing: 'ground', count: 1, life: [0.25, 0.35], speed: [0, 0], gravity: 0, size: [0.06, 0.32], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.3, 0], fade: [0, 0.3], weather: true },

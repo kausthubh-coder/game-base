@@ -2,7 +2,7 @@
 // built to be looked at from close by, across it and at night: a ring of stones, logs leaned together and
 // burnt black at their heads, and tongues of flame that are pale at the root and red at the tip. The flame
 // and the coals glow by day too, and the flame leans and licks with the wind.
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import { P, RAMP } from '../palette.ts';
 import { Shape } from '../shape.ts';
 
@@ -14,9 +14,9 @@ const TAU = Math.PI * 2;
  * as pale yellow, ochre as yellow-orange, oak as orange and brick as a dull red. The palette's brighter
  * reds, coral and rust, come out pink.
  */
-const FLAME = [P.lemon, P.butter, P.ochre, P.oak, P.brick];
+const FLAME = [P.lemon, P.butter, P.oak, P.brick];
 /** A flame at the edge of the fire, which burns cooler: less pale at its root and red sooner. */
-const FLAME_OUTER = [P.gold, P.ochre, P.oak, P.brick, P.brick];
+const FLAME_OUTER = [P.butter, P.ochre, P.oak, P.brick];
 /** Live coals, from the ones going out to the hottest. */
 const COALS = [P.oakDark, P.oak, P.oak, P.ochre];
 
@@ -43,7 +43,7 @@ export function campfire(variant: number): THREE.BufferGeometry {
   // One seed for all three, and the stones first, so it is the same ring as the fire burns down.
   const s = new Shape(2201);
   const lit = variant === 0, low = variant === 1;
-  s.disc(0, 0.012, 0, 0.52, 8, P.umber, { turn: 0.2 });
+  s.disc(0, 0.012, 0, 0.52, 8, P.soil, { turn: 0.2 });
   for (let k = 0; k < 7; k++) {
     const a = k * TAU / 7 + s.rr(-0.1, 0.1), big = k % 2 === 0;
     const rx = big ? s.rr(0.17, 0.2) : s.rr(0.13, 0.155), ry = big ? s.rr(0.12, 0.15) : s.rr(0.09, 0.11), rz = rx * s.rr(0.68, 0.8);
@@ -63,18 +63,14 @@ export function campfire(variant: number): THREE.BufferGeometry {
     // Five logs leaned together over the middle. Each is bark at its foot and burnt black where it stands in the fire.
     for (let k = 0; k < 5; k++) {
       const a = k * TAU / 5 + 0.35 + s.rr(-0.12, 0.12);
-      s.tube([around(a, -s.rr(0.05, 0.11), s.rr(0.31, 0.39)), around(a, s.rr(0.31, 0.35), 0.07)], [0.05, 0.07], 5, [P.ink, P.umber, P.bark], { capTone: P.clay, flat: true, turn: s.r() });
+      s.tube([around(a, -s.rr(0.05, 0.11), s.rr(0.31, 0.39)), around(a, s.rr(0.31, 0.35), 0.07)], [0.05, 0.07], 5, [P.ink, P.soil, P.bark], { capTone: P.clay, flat: true, turn: s.r() });
     }
     s.cone(0, 0.012, 0, 0.3, 0.1, 6, COALS, { glow: 2 });
-    // The flame: one tall tongue in the middle, three shorter ones round it that lean out and curl, and two
-    // scraps of flame that have come away from its tip.
-    tongue(s, [[0, 0.09, 0], [0.05, 0.3, -0.02], [-0.04, 0.56, 0.03], [0.02, 0.82, 0.01], [0.14, 1.04, -0.03]], [0.13, 0.21, 0.17, 0.1, 0], 5, FLAME, 1.5);
-    for (let k = 0; k < 3; k++) {
-      const a = k * TAU / 3 + 0.9, top = [0.7, 0.56, 0.62][k];
-      tongue(s, [around(a, 0.09, 0.1), around(a + 0.3, 0.22, 0.1 + top * 0.45), around(a + 1.1, 0.2, 0.1 + top)], [0.08, 0.115, 0], 5, FLAME_OUTER, [1.1, 1.5, 0.8][k], k);
-    }
-    s.tube([[0.1, 1.1, -0.03], [0.13, 1.17, -0.01], [0.11, 1.26, -0.04]], [0, 0.035, 0], 3, [P.oak, P.brick, P.brick], { cap: 'none', glow: 2, sway: 1.9 });
-    s.tube([[-0.13, 0.86, 0.1], [-0.17, 0.92, 0.12], [-0.16, 0.99, 0.1]], [0, 0.03, 0], 3, [P.ochre, P.oak, P.brick], { cap: 'none', glow: 2, sway: 1.7 });
+    // Broad roots and gently narrowing shoulders keep the silhouette soft at the close camera.
+    // Three tongues share the coal bed. Detached sparks belong to the pooled ember effect.
+    tongue(s, [[0, 0.1, 0], [0.01, 0.34, 0], [0.04, 0.64, 0], [0.08, 0.87, 0]], [0.23, 0.21, 0.12, 0], 7, FLAME, 1.5);
+    tongue(s, [[-0.15, 0.1, 0.06], [-0.19, 0.26, 0.06], [-0.22, 0.43, 0.06], [-0.2, 0.6, 0.06]], [0.13, 0.12, 0.07, 0], 6, FLAME_OUTER, 1.1);
+    tongue(s, [[0.17, 0.1, 0.08], [0.2, 0.24, 0.08], [0.23, 0.37, 0.08], [0.26, 0.52, 0.08]], [0.12, 0.1, 0.06, 0], 6, FLAME_OUTER, 1.3);
     s.light(0, 0.6, 0);
   } else if (low) {
     // The logs have burnt through and fallen in. What is left of each glows from its head.
@@ -85,42 +81,52 @@ export function campfire(variant: number): THREE.BufferGeometry {
       const mid: V3 = [head[0] + (foot[0] - head[0]) * 0.36, head[1] + (foot[1] - head[1]) * 0.36, head[2] + (foot[2] - head[2]) * 0.36];
       const turn = s.r();
       s.tube([head, mid], [0.045, 0.056], 4, [P.ochre, P.oakDark], { cap: 'start', capTone: P.gold, flat: true, glow: 2, turn });
-      s.tube([mid, foot], [0.056, 0.062], 4, [P.ink, P.umber], { capTone: P.umber, flat: true, turn });
+      s.tube([mid, foot], [0.056, 0.062], 4, P.soil, { capTone: P.ink, grade: 0.75, flat: true, turn });
     }
     // A bed of black cinders under them, and the coals that still glow on it.
-    s.cone(0, 0.012, 0, 0.31, 0.07, 6, [P.ink, P.umber]);
+    s.cone(0, 0.012, 0, 0.31, 0.07, 6, [P.ink, P.soil]);
     for (let k = 0; k < 4; k++) {
       const [x, , z] = around(k * TAU / 4 + 1.25 + s.rr(-0.2, 0.2), s.rr(0.12, 0.2), 0);
       s.blob(x, 0.07, z, s.rr(0.07, 0.1), 0.05, s.rr(0.06, 0.08), COALS, { sides: 4, rings: 1, jitter: 0.25, noise: 0.9, glow: 2 });
     }
-    tongue(s, [[0, 0.1, 0], [0.02, 0.22, 0.01], [-0.02, 0.36, -0.01], [0.04, 0.5, 0.01]], [0.07, 0.1, 0.065, 0], 5, FLAME, 1.2);
-    tongue(s, [[0.13, 0.08, 0.05], [0.16, 0.2, 0.07], [0.12, 0.33, 0.03]], [0.045, 0.065, 0], 4, FLAME_OUTER, 0.9, 1);
-    tongue(s, [[-0.1, 0.08, -0.1], [-0.13, 0.18, -0.12], [-0.09, 0.28, -0.08]], [0.04, 0.055, 0], 4, FLAME_OUTER, 1.1, 2);
+    tongue(s, [[0, 0.1, 0], [0.02, 0.22, 0.01], [-0.02, 0.36, -0.01], [0.04, 0.5, 0.01]], [0.12, 0.1, 0.065, 0], 6, FLAME, 1.2);
+    tongue(s, [[0.13, 0.08, 0.05], [0.16, 0.2, 0.07], [0.12, 0.33, 0.03]], [0.07, 0.05, 0], 5, FLAME_OUTER, 0.9, 1);
+    tongue(s, [[-0.1, 0.08, -0.1], [-0.13, 0.18, -0.12], [-0.09, 0.28, -0.08]], [0.065, 0.045, 0], 4, FLAME_OUTER, 1.1, 2);
     s.light(0, 0.3, 0);
   } else {
     // Cold: what did not burn lies black in a heap of grey ash.
-    s.disc(0, 0.02, 0, 0.36, 7, P.pewter, { turn: 0.5 });
-    s.blob(0.02, 0.03, -0.02, 0.24, 0.1, 0.21, [P.iron, P.pewter, P.ash, P.pearl], { floor: 0, sides: 6, rings: 2, jitter: 0.2, noise: 0.5 });
+    s.disc(0, 0.02, 0, 0.36, 7, RAMP.stone[2], { turn: 0.5 });
+    s.blob(0.02, 0.03, -0.02, 0.24, 0.1, 0.21, RAMP.stone, { floor: 0, sides: 6, rings: 2, jitter: 0.2, noise: 0.5 });
     for (let k = 0; k < 4; k++) {
       const a = k * TAU / 4 + 0.5 + s.rr(-0.25, 0.25);
       const head = around(a, s.rr(0.02, 0.08), s.rr(0.1, 0.14)), foot = around(a, s.rr(0.29, 0.34), 0.055);
       const mid: V3 = [(head[0] + foot[0]) / 2, (head[1] + foot[1]) / 2 + 0.01, (head[2] + foot[2]) / 2];
       // Ash on the end that was in the fire.
-      s.tube([head, mid, foot], [0.04, 0.052, 0.056], 4, [P.pewter, P.ink, P.umber], { cap: 'both', capTone: P.night, flat: true, turn: s.r() });
+      s.tube([head, mid, foot], [0.04, 0.052, 0.056], 4, [RAMP.stone[2], P.ink, P.ink], { cap: 'both', capTone: P.night, flat: true, turn: s.r() });
     }
-    for (const [x, z] of [[0.17, 0.12], [-0.14, 0.16]] as const) s.blob(x, 0.04, z, 0.06, 0.04, 0.05, [P.ink, P.night], { floor: 0, sides: 4, rings: 1, jitter: 0.3 });
+    for (const [x, z] of [[0.17, 0.12], [-0.14, 0.16]] as const) s.blob(x, 0.04, z, 0.06, 0.04, 0.05, [P.ink, P.soil], { floor: 0, sides: 4, rings: 1, jitter: 0.3 });
   }
-  return s.done();
+  const geometry = s.done();
+  // Char is the palette's earth under soot. Bake the shade once, not in the frame loop.
+  const colors = geometry.getAttribute('color'), fx = geometry.getAttribute('aFx');
+  const earth = new THREE.Color(P.soil), ink = new THREE.Color(P.ink);
+  for (let i = 0; i < colors.count; i++) {
+    if (fx.getY(i) !== 0) continue;
+    const r = colors.getX(i), g = colors.getY(i), b = colors.getZ(i);
+    const matches = (c: THREE.Color) => Math.abs(r - c.r) + Math.abs(g - c.g) + Math.abs(b - c.b) < 0.00001;
+    if (matches(earth) || matches(ink)) colors.setXYZ(i, earth.r * 0.22, earth.g * 0.22, earth.b * 0.22);
+  }
+  return geometry;
 }
 
 /**
- * A guild ward's tent: an A-frame of patched canvas over a ridge pole, two meters long, 1.8 wide and 1.5
+ * A guild ward's tent: an A-frame of patched canvas over a ridge pole, 2.6 meters long, 1.8 wide and 1.5
  * high, on two pairs of crossed poles with a guy rope and a peg each side of both ends. It is open at the
  * front (+z) with its flaps drawn aside, and a bedroll lies inside, long enough to lie down on.
  */
 export function tent(): THREE.BufferGeometry {
   const s = new Shape(2221);
-  const W = 0.9, TOP = 1.46, BACK = -1, FRONT = 1;
+  const W = 0.9, TOP = 1.46, BACK = -1.3, FRONT = 1.3;
   const slope = Math.hypot(W, TOP), outX = TOP / slope, outY = W / slope;
   /**
    * A point on the cloth: `u` runs from the ridge (0) down one side to the hem (1), at z. The cloth sags
@@ -163,12 +169,12 @@ export function tent(): THREE.BufferGeometry {
   for (const z of [FRONT + 0.12, BACK - 0.12]) {
     for (const side of [-1, 1]) {
       const at = z + side * 0.036;
-      s.tube([[side * 0.97, 0, at], [-side * 0.15, 1.6, at]], [0.044, 0.034], 4, [P.timber, P.plank], { capTone: P.plankLight, flat: true, turn: 0.4 });
+      s.tube([[side * 0.97, 0, at], [-side * 0.045, 1.65, at]], [0.044, 0.034], 4, [P.timber, P.plank], { capTone: P.plankLight, flat: true, turn: 0.4 });
     }
     // A rope from the fork down to a peg out past each foot, clear of the way in, and a peg at each corner of the hem.
     const out = Math.sign(z);
     for (const side of [-1, 1]) {
-      const peg: V3 = [side * 1.16, 0.1, z + out * 0.3];
+      const peg: V3 = [side * 1.2, 0.1, z + out * 0.18];
       s.tube([[0, 1.43, z + out * 0.06], peg], [0.016, 0.016], 3, P.burlapLight, { cap: 'none' });
       s.tube([[peg[0] - side * 0.035, 0, peg[2] - out * 0.02], [peg[0] + side * 0.02, 0.15, peg[2] + out * 0.012]], [0.02, 0.03], 3, P.plankPale, { flat: true });
       s.tube([[side * (W + 0.01), 0, z - out * 0.2], [side * (W + 0.08), 0.13, z - out * 0.2]], [0.02, 0.03], 3, P.plankPale, { flat: true });
@@ -182,7 +188,7 @@ export function tent(): THREE.BufferGeometry {
   s.box(-0.14, 0.082, 0.26, 0.7, 0.06, 1.12, P.teal, { skip: '-y', top: P.tealLight });
   s.box(-0.14, 0.082, -0.7, 0.44, 0.09, 0.26, P.ivory, { skip: '-y' });
   // Its shadow is cast from inside the cloth, so the cloth is not in its own shade and the inside is.
-  s.shadowBox(0, 0, 0, 0.86, 0.72, 1.96);
-  s.shadowBox(0, 0.72, 0, 0.34, 0.4, 1.96);
+  s.shadowBox(0, 0, 0, 0.86, 0.72, 2.56);
+  s.shadowBox(0, 0.72, 0, 0.34, 0.4, 2.56);
   return s.done();
 }
