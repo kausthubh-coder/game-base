@@ -809,6 +809,11 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     errors,
     run() {
       requestAnimationFrame(frame);
+      // While the title waits, nothing moves: the sound engine is made then, so the click that starts the game
+      // only switches it on instead of freezing the title for a fifth of a second or more.
+      const prepare = (): void => { if (held && !started) sound.prepare(); };
+      if (typeof requestIdleCallback === 'function') requestIdleCallback(prepare, { timeout: 1500 });
+      else setTimeout(prepare, 500);
     },
     advance,
     place: (x, y, z, facing) => place(x, y, z, facing),
