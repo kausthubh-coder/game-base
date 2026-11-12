@@ -1,5 +1,6 @@
 // Real Clerk UI -> Account panel -> invite -> world server. No dev authentication.
 // bun tools/play-together-signed-in.mjs [--url https://...] [--no-build] [--out folder]
+import { execFileSync } from 'node:child_process';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ConvexHttpClient } from 'convex/browser';
@@ -63,12 +64,34 @@ const clerk = async (path, body) => {
 };
 const results = [];
 let browser, server, worldId, ownerSession, proxy;
-const passwordFile = resolve('.artifacts/signed-in/accounts.json');
 mkdirSync(resolve('.artifacts/signed-in'), { recursive: true });
-let passwords = {};
-try {
-  passwords = JSON.parse(readFileSync(passwordFile, 'utf8'));
-} catch {}
+// The three test users are one set for every checkout of the game, so their passwords are one file too, in
+// the main checkout. With a file in each worktree, a new worktree's first run gave the users new passwords,
+// and the next run anywhere else failed at "Password is incorrect".
+const mainCheckout = () => {
+  try {
+    return /^worktree (.+)$/m.exec(execFileSync('git', ['worktree', 'list', '--porcelain'], { encoding: 'utf8' }))[1];
+  } catch {
+    return process.cwd();
+  }
+};
+const passwordFile = resolve(mainCheckout(), '.artifacts/signed-in/accounts.json');
+mkdirSync(resolve(passwordFile, '..'), { recursive: true });
+const readPasswords = () => {
+  try {
+    return JSON.parse(readFileSync(passwordFile, 'utf8'));
+  } catch {
+    return {};
+  }
+};
+let passwords = readPasswords();
+/** Gives a test user a new password and keeps it in the shared file. */
+async function newPassword(email, userId) {
+  const password = `Game-test-${crypto.randomUUID()}!`;
+  await clerk(`/users/${userId}`, { password, skip_password_checks: true });
+  passwords = { ...readPasswords(), [email]: password };
+  writeFileSync(passwordFile, JSON.stringify(passwords), { mode: 0o600 });
+}
 const pages = [];
 const runtimeErrors = [];
 const wait = (p, f, a, timeout = 30000) => p.waitForFunction(f, a, { timeout, polling: 100 });
@@ -154,7 +177,21 @@ async function signIn(p, email) {
     if (passwords[email]) {
       await password.fill(passwords[email]);
       await p.getByRole('button', { name: 'Continue', exact: true }).click();
-      await Promise.race([otp.waitFor(), p.locator('[data-key="sign-out"]').waitFor()]);
+      const wrong = p.locator('#error-password');
+      await Promise.race([otp.waitFor(), p.locator('[data-key="sign-out"]').waitFor(), wrong.waitFor()]);
+      if (await wrong.isVisible()) {
+        // Another machine or an older file changed it. Take the file's password if it moved on, or set a new one.
+        const tried = passwords[email];
+        passwords = readPasswords();
+        if (!passwords[email] || passwords[email] === tried) {
+          const user = (await clerk(`/users?email_address=${encodeURIComponent(email)}`))[0];
+          await newPassword(email, user.id);
+        }
+        console.log('Clerk password was stale, trying the current one');
+        await password.fill(passwords[email]);
+        await p.getByRole('button', { name: 'Continue', exact: true }).click();
+        await Promise.race([otp.waitFor(), p.locator('[data-key="sign-out"]').waitFor()]);
+      }
       if (await p.locator('[data-key="sign-out"]').isVisible()) return;
     } else {
       await p.getByText('Use another method', { exact: true }).click();
@@ -200,12 +237,7 @@ try {
         skip_password_requirement: true,
         first_name: email.split('.')[0],
       });
-    if (email !== emails[0] && !passwords[email]) {
-      const password = `Game-test-${crypto.randomUUID()}!`;
-      await clerk(`/users/${u.id}`, { password, skip_password_checks: true });
-      passwords[email] = password;
-      writeFileSync(passwordFile, JSON.stringify(passwords), { mode: 0o600 });
-    }
+    if (email !== emails[0] && !passwords[email]) await newPassword(email, u.id);
     users.push(u);
   }
   ownerSession = await clerk('/sessions', { user_id: users[0].id });

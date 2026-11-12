@@ -8,7 +8,9 @@ requested player flows. `--port 5572` moves both ports. Run checks sequentially.
 The users are `ada.tester+clerk_test@example.com`, `bo.tester+clerk_test@example.com`, and
 `cy.tester+clerk_test@example.com`. The latter two are created if missing. The tool gives them test
 passwords when its password file is missing. It keeps those passwords in the ignored, mode-600
-`.artifacts/signed-in/accounts.json`. Clerk's email verification uses its documented `424242` test code.
+`.artifacts/signed-in/accounts.json` of the main checkout, one file for every worktree, because the users
+are one set for all of them. When Clerk says a password is incorrect (another machine set a new one), the
+tool sets a new one, saves it and signs in again. Clerk's email verification uses its documented `424242` test code.
 The tool obtains a Clerk testing token to bypass bot detection. This does not bypass sign-in or the
 world server's token validation. A signs in by email code. B and C use their password and email code
 when Clerk asks for device verification.
