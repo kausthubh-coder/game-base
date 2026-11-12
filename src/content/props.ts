@@ -30,6 +30,8 @@ export interface PropDef {
   alwaysLit?: boolean;
   /** Variants that are dark, like a lamp that is out or a gate that is dead: nothing on them glows and they give no light. */
   unlit?: readonly number[];
+  /** The light each variant gives, for a kind whose variants differ, like a fire that burns low. `light` is the brightest of them. */
+  lights?: readonly number[];
   vary: PropVary;
   /** Trees only. For each variant: the height of its top and how far its leaves reach from the trunk, in meters. The builder builds to these, and the scatter rules list tree tops from them. */
   crown?: readonly { top: number; reach: number }[];
@@ -134,6 +136,10 @@ export const PROPS = {
   chest: { name: 'Chest', group: 'station', builder: 'chest', variants: ['closed', 'open'], triangles: 160, ...still, vary: SNUG },
   bed: { name: 'Bed', group: 'station', builder: 'bed', variants: ['teal', 'red'], triangles: 150, ...still, vary: SNUG },
   sprinkler: { name: 'Sprinkler', group: 'station', builder: 'sprinkler', variants: ['brass'], triangles: 170, ...still, vary: SNUG },
+
+  // ---- a ward's camp. The fire burns by day too, gives less light when it is low and none when it is cold.
+  campfire: { name: 'Campfire', group: 'station', builder: 'campfire', variants: ['lit', 'low', 'cold'], triangles: 300, wind: true, light: 12, lights: [12, 8, 0], alwaysLit: true, unlit: [2], vary: SNUG },
+  tent: { name: 'Tent', group: 'station', builder: 'tent', variants: ['canvas'], triangles: 260, wind: true, light: 0, vary: SNUG },
 } as const satisfies Record<string, PropDef>;
 
 export type PropKind = keyof typeof PROPS;
@@ -145,4 +151,11 @@ export function propDef(kind: string): PropDef {
   const def: PropDef | undefined = (PROPS as Record<string, PropDef>)[kind];
   if (!def) throw new Error(`no prop called ${kind}`);
   return def;
+}
+
+/** The block light one variant of a kind gives, 0 to 15. 0 for a variant that is unlit. */
+export function propLight(kind: string, variant: number): number {
+  const def = propDef(kind);
+  if (def.unlit?.includes(variant)) return 0;
+  return def.lights?.[variant] ?? def.light;
 }

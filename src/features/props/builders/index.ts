@@ -2,6 +2,7 @@
 // A builder gets the variant's index and its entry, and returns one merged geometry from a `Shape`.
 import type * as THREE from 'three';
 import type { PropDef } from '../../../content/props.ts';
+import { campfire, tent } from './camp.ts';
 import { barrel, cart, crate, sack } from './clutter.ts';
 import { log, rock, stump } from './ground.ts';
 import { banner, brazier, bunting, elderOak, lantern, noticeBoard, planter, rootFountain, stringLights } from './hollowmere.ts';
@@ -24,4 +25,5 @@ export const BUILDERS: Record<string, PropBuilder> = {
   shutDoor, heartstone, gateArch, hallLamp, muralSlab, ruinPillar, plinth,
   barrel, crate, cart, sack,
   workbench, forge, stove, chest, bed, sprinkler,
+  campfire, tent,
 };

@@ -1,17 +1,19 @@
 // The props demo. Three pages in one:
 //   ./                      a small world: a meadow, a forest edge, a pond rim and a village of the three buildings
-//   ./?only=<kind>          one kind alone on a turntable, with its triangle count (add &variant=1 for one variant)
+//   ./?only=<kind>          one kind alone on a turntable, with its triangle count (add &variant=1 for one variant,
+//                           &figure=1 to stand the hero beside it for its size, &lights=1 for a real light at each
+//                           light it lists, &tone=0 to draw it without the tone curve, as the painted game does)
 //   ./?sheet=<group>        every prop and variant of a group in labeled rows (tree, plant, ground, town, clutter, station)
 //
 // Keys in the world: Q and E turn the camera a quarter, Z and X or the wheel zoom, WASD or the arrows move.
 // `window.__props` lets a script set a state, step time, draw a frame and read the counters
 // (tools/props-shots.mjs uses it). `?panel=0` hides the panel.
 import * as THREE from 'three';
-import { PROPS, PROP_KINDS, propDef, type PropGroup, type PropKind } from '../../src/content/props.ts';
+import { PROPS, PROP_KINDS, propDef, propLight, type PropGroup, type PropKind } from '../../src/content/props.ts';
 import type { ViewContext } from '../../src/engine/system.ts';
 import { calmNoon, type Quality } from '../../src/engine/types.ts';
 import { flatWorld } from '../../src/engine/world-query.ts';
-import { createProps, scatter } from '../../src/features/props/index.ts';
+import { buildProp, createProps, propExtras, scatter } from '../../src/features/props/index.ts';
 import { createSky } from '../../src/features/sky/index.ts';
 import { createWaterMaterial, type Water } from '../../src/features/water/index.ts';
 import { createGround, LAND, SIZE, type Ground } from './ground.ts';
@@ -60,7 +62,7 @@ const canvas = document.querySelector<HTMLCanvasElement>('#view') as HTMLCanvasE
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: query.has('shots') });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // The game's last pass tone-maps. This page has no last pass, so the materials do it.
-renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMapping = query.get('tone') === '0' ? THREE.NoToneMapping : THREE.NeutralToneMapping;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x10141a);
 const camera = new THREE.PerspectiveCamera(20, 1, 0.5, 1500);
@@ -198,6 +200,44 @@ function showLayout(next: Layout, withKind: boolean): void {
   }
 }
 
+/** The hero, 2 meters tall, beside the props on the turntable to give their size. */
+let figure: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial> | null = null;
+/** A real light at each light the props on the turntable list, as bright as each variant's entry says. */
+const propLights: { light: THREE.PointLight; level: number; always: boolean }[] = [];
+const FIRELIGHT = new THREE.Color(0xffb469);
+
+function standFigure(x: number): void {
+  const frame = 128, feet = 120;
+  const texture = new THREE.TextureLoader().load('./assets/sprites/hero.png', (loaded) => {
+    // The first frame of the first row: standing, from the front.
+    loaded.repeat.set(frame / loaded.image.width, frame / loaded.image.height);
+    loaded.offset.set(0, 1 - frame / loaded.image.height);
+  });
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.magFilter = THREE.NearestFilter;
+  const plane = new THREE.PlaneGeometry(2, 2);
+  plane.translate(0, 1 - (2 * (frame - feet)) / frame, 0);
+  figure = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: texture, alphaTest: 0.5, side: THREE.DoubleSide }));
+  figure.position.set(x, 0, 0);
+  scene.add(figure);
+}
+
+function lightProps(items: Layout['items']): void {
+  for (const item of items) {
+    const level = propLight(item.kind, item.variant);
+    if (level <= 0) continue;
+    const geometry = buildProp(item.kind, item.variant);
+    const { lights } = propExtras(geometry);
+    for (let i = 0; i < lights.length; i += 3) {
+      const light = new THREE.PointLight(FIRELIGHT, 0, level, 1.7);
+      light.position.set(item.x - item.offsetX + lights[i], lights[i + 1], item.z - item.offsetZ + lights[i + 2]);
+      scene.add(light);
+      propLights.push({ light, level, always: propDef(item.kind).alwaysLit === true });
+    }
+    geometry.dispose();
+  }
+}
+
 function startTurntable(kind: string): void {
   if (!(kind in PROPS)) throw new Error(`no prop called ${kind}. Try one of: ${PROP_KINDS.join(', ')}`);
   const def = propDef(kind);
@@ -209,7 +249,15 @@ function startTurntable(kind: string): void {
     row.items[0].x = 0;
   }
   showLayout(row, false);
-  const radius = Math.max(...row.items.map((item) => Math.hypot(Math.abs(item.x) + item.width / 2, item.depth / 2))) + 0.45;
+  let reach = Math.max(...row.items.map((item) => Math.hypot(Math.abs(item.x) + item.width / 2, item.depth / 2)));
+  if (query.has('figure')) {
+    const last = row.items[row.items.length - 1];
+    standFigure(last.x + last.width / 2 + 0.75);
+    reach = Math.max(reach, last.x + last.width / 2 + 1.35);
+    row.tallest = Math.max(row.tallest, 2);
+  }
+  if (query.has('lights')) lightProps(row.items);
+  const radius = reach + 0.45;
   const disc = new THREE.CylinderGeometry(radius, radius, 0.3, 64);
   disc.translate(0, -0.15, 0);
   standOn(disc);
@@ -312,6 +360,17 @@ function step(dt: number): void {
   }
   props.update(dt, ctx);
   for (const light of lampLights) light.intensity = props.glow * 9;
+  let lit = 0;
+  for (const { light, level, always } of propLights) {
+    light.intensity = (always ? 1 : props.glow) * 9 * (level / 14) ** 2;
+    lit = Math.max(lit, light.intensity / 9);
+  }
+  if (figure) {
+    // It turns to the camera, and is as light as the hour, with what the nearest fire adds.
+    figure.rotation.y = rig.yaw;
+    const day = 0.3 + 0.7 * (1 - props.glow);
+    figure.material.color.setRGB(day * 0.9, day * 0.95, day).lerp(FIRELIGHT, Math.min(0.6, lit * props.glow));
+  }
 }
 
 function render(): typeof counters {
