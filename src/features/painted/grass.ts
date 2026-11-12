@@ -27,6 +27,11 @@ const RINGS = [
   { to: 66, spacing: 1.0, width: [0.22, 0.35], height: [0.36, 0.8], tufts: 9, flowers: 12 },
   { to: 112, spacing: 2.3, width: [0.5, 0.75], height: [0.5, 1.0], tufts: 0, flowers: 0 },
 ] as const;
+/** The finest of the first `rings` rings that `far` is within `slack` blocks of, or -1. A loop, not findIndex: it runs for every cell every frame. */
+function ringWithin(far: number, slack: number, rings: number): number {
+  for (let i = 0; i < rings; i++) if (far < (RINGS[i] as (typeof RINGS)[number]).to + slack) return i;
+  return -1;
+}
 /** Cells grown in one frame at most. */
 const PER_FRAME = 2;
 const PETALS = ['#fffaf0', '#fffaf0', '#f8dd6a', '#f8dd6a', '#f4aebd', '#cdb8f0'].map((h) => new THREE.Color(h));
@@ -144,7 +149,9 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
   const flowers = batch(cardGeometry(), flowerMaterial, 5200, true, 'flowers');
 
   const cells = new Map<number, Cell>();
-  const key = (cx: number, cz: number): number => (cx + 32768) * 65536 + (cz + 32768);
+  // A chunk's key, small enough to stay a small integer: a larger number would be a new object at every lookup.
+  // It holds chunks within 8,192 of the origin, 131,072 blocks.
+  const key = (cx: number, cz: number): number => ((cx + 8192) << 14) | (cz + 8192);
   const m = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), at = new THREE.Vector3(), size = new THREE.Vector3(), color = new THREE.Color();
 
   /** Grows one cell at the fineness of a ring. Null while the land under it is not drawn yet. */
@@ -217,9 +224,16 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
       n += count;
     }
     b.mesh.count = n;
-    b.mesh.instanceMatrix.needsUpdate = true;
-    (b.mesh.instanceColor as THREE.InstancedBufferAttribute).needsUpdate = true;
-    if (b.cards) b.cards.needsUpdate = true;
+    // Only the copies drawn go to the graphics chip. The batch holds room for the finest grass at ultra, so
+    // sending all of it would cost several megabytes each time the hero steps into a new cell.
+    const send = (attribute: THREE.InstancedBufferAttribute): void => {
+      attribute.clearUpdateRanges();
+      attribute.addUpdateRange(0, n * attribute.itemSize);
+      attribute.needsUpdate = true;
+    };
+    send(b.mesh.instanceMatrix);
+    send(b.mesh.instanceColor as THREE.InstancedBufferAttribute);
+    if (b.cards) send(b.cards);
   }
 
   let lastX = NaN, lastZ = NaN, stale = true, triangles = 0;
@@ -239,10 +253,10 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
           for (let dz = -ring; dz <= ring && budget > 0; dz++) {
             if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
             const far = Math.hypot((fx + dx + 0.5) * CELL - x, (fz + dz + 0.5) * CELL - z);
-            const want = RINGS.findIndex((r, i) => i < level.grassRings && far < r.to + CELL * 0.7);
+            const want = ringWithin(far, CELL * 0.7, level.grassRings);
             if (want < 0) continue;
             // A cell keeps finer grass than it needs until it is well past the ring, so a step back and forth grows nothing.
-            const loose = RINGS.findIndex((r, i) => i < level.grassRings && far < r.to + CELL * 1.9);
+            const loose = ringWithin(far, CELL * 1.9, level.grassRings);
             const k = key(fx + dx, fz + dz), have = cells.get(k);
             if (have && have.ring <= want && have.ring >= loose && have.stamp === land.stampAt(fx + dx, fz + dz)) continue;
             const grown = grow(fx + dx, fz + dz, want);
@@ -258,7 +272,7 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
       bladeParts.length = bladeColorParts.length = flowerParts.length = flowerColorParts.length = flowerCardParts.length = 0;
       for (const list of [...tuftParts, ...tuftColorParts, ...tuftCardParts]) list.length = 0;
       for (const [k, cell] of cells) {
-        const cx = Math.floor(k / 65536) - 32768, cz = (k % 65536) - 32768;
+        const cx = (k >> 14) - 8192, cz = (k & 16383) - 8192;
         if (Math.abs(cx - fx) > reach + 1 || Math.abs(cz - fz) > reach + 1) { cells.delete(k); continue; }
         bladeParts.push(cell.blades); bladeColorParts.push(cell.bladeColors);
         flowerParts.push(cell.flowers); flowerColorParts.push(cell.flowerColors); flowerCardParts.push(cell.flowerCards);
