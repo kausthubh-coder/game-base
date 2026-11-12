@@ -412,7 +412,7 @@ export function install(view: GameView): void {
     }
     if (cuesPlayed < 0) cuesPlayed = f.cues;
     const cues = run.cut.film.sound.cues;
-    while (cuesPlayed < f.cues) sound?.cue(cues[cuesPlayed++].cue);
+    for (; cuesPlayed < f.cues; cuesPlayed++) sound?.cue(cues[cuesPlayed].cue);
     sound?.setNote(f.note);
 
     if (f.text !== shownText) {
