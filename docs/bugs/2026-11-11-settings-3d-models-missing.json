@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "mode": "human",
+  "seed": 7,
+  "size": "1366x768",
+  "inputs": [
+    {
+      "type": "click",
+      "text": "Settings",
+      "timeout": 2000
+    },
+    {
+      "type": "move",
+      "x": 680,
+      "y": 600
+    },
+    {
+      "type": "wheel",
+      "y": 615
+    },
+    {
+      "type": "see",
+      "text": "Characters"
+    },
+    {
+      "type": "click",
+      "x": 602,
+      "y": 402
+    },
+    {
+      "type": "wait",
+      "ms": 1000
+    }
+  ]
+}
