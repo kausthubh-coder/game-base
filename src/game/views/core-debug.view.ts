@@ -98,7 +98,7 @@ export function install(view: GameView): void {
       `held ${held}   actors ${view.game.actors.size}`,
       `chunks ${s.chunks} loaded, ${s.meshQueue} waiting`,
       `draw calls ${s.drawCalls}  tris ${thousands(s.triangles)}  programs ${s.programs}`,
-      `${s.quality}${s.auto ? ' (auto)' : ''}  scale ${fixed(s.renderScale, 2)}   ${view.online ? 'online' : 'solo'}${view.paused ? '  paused' : ''}`,
+      `${s.quality}${s.auto ? ' (auto)' : ''}  scale ${fixed(s.renderScale, 2)}${view.paused ? '  paused' : ''}`,
     ].join('\n');
   }
 

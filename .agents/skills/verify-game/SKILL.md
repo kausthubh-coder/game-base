@@ -20,9 +20,8 @@ Each part prints `pass`, `skip` or `FAIL`. A failed part names its log in `.arti
 |---|---|---|
 | A `.sim.ts` rule or content in `src/game/content` | `check`, `bots` | The scenario for that rule, or write one (`features/rules.md`) |
 | A view, a shader, a panel, anything drawn | `check`, `shots`, `play` | The place in a browser, and look at the screenshot (`features/browser.md`) |
-| `server/` or `src/engine/net` | `check`, `server`, `together`, `live` | `features/world-server.md` |
-| `src/game/online`, `src/features/net`, the shell's online parts, or anything a system saves | `check`, `together` | `bun tools/play-together.mjs` prints what it saw; look at `.artifacts/together/bo-sees-ann.png` |
-| `convex/` or `src/features/account` | `check`, `live` | `features/account.md` |
+| `server/` (the Worker) or `wrangler.jsonc` | `check`, `build` | `bun run deploy --dry-run` |
+| `convex/`, `src/features/account`, or anything a system saves | `check`, `cloud` | `features/account.md`; look at `.artifacts/cloud-save/` |
 | An asset or `manifest.json` | `assets`, `build`, `shots` | The `verify-assets` skill |
 | A tool in `tools/` | `tools`, and the part that uses the tool | |
 | `package.json`, `vite.config.ts`, the build | everything, with `--full` | |

@@ -22,9 +22,6 @@ const PARTS = [
   { name: 'bots', what: 'three bots, 20,000 steps each, rules only', run: [['bun', 'tools/sim.ts', 'bot', '--seed', '1,2,3', '--steps', '20000']] },
   { name: 'assets', what: 'every asset against the asset contract', run: [['bun', 'tools/verify-assets.mjs']] },
   { name: 'build', what: 'a production build', run: [['bun', 'run', 'build']] },
-  { name: 'server', what: 'the world server on wrangler dev, with two fake players', run: [['bun', 'server/test/check.ts']] },
-  { name: 'together', what: 'two browsers on one world: walk, build, farm, leave, a server restart, a wrong build', run: [['bun', 'tools/play-together.mjs']] },
-  { name: 'live', what: 'Clerk, Convex and the world server together (needs .env.local)', run: [['bun', 'server/test/live.ts']], skip: 2 },
   { name: 'shots', what: 'six scenes against their approved pictures, and the draw budgets', run: [['bun', 'tools/shots.mjs', 'all', '--check']] },
   {
     name: 'play', what: 'every recording in tools/play/scenarios with real keys, the play tool\'s eyes, build mode, camera drag',
@@ -38,8 +35,8 @@ const PARTS = [
     ],
   },
   {
-    name: 'signed', slow: true, what: 'three players sign in through Clerk and join one world by invite link (needs .env.local)',
-    run: [['bun', 'tools/play-together-signed-in.mjs']],
+    name: 'cloud', slow: true, what: 'two browsers sign in through Clerk, the save goes between them, a conflict is asked (needs .env.local)',
+    run: [['bun', 'tools/play-cloud-save.mjs']], skip: 2,
   },
   {
     name: 'slow', slow: true, what: 'smoke, the interface and all of act 1 in a browser',

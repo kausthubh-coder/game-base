@@ -14,9 +14,8 @@ Pick the cheapest check that can fail for the thing you care about. Then see it 
 | One function's answers | A unit test beside the code | `<file>.test.ts` | `bun test <path>` |
 | What a player hits in a browser: a prompt, a panel, a drag | A recording in human mode, real keys and clicks only. `see` and `gone` assert on what the screen shows, `check` on the state. | `tools/play/scenarios/<name>.json` | `bun tools/play.mjs replay <file>`, or `replay all` |
 | How a place looks, and its draw calls and triangles | A scene with an approved picture | `tools/shots/scenes.json`, `docs/shots/approved/` | `bun tools/shots.mjs <scene> --check` |
-| Two players in one world | A step in the two-browser check | `tools/play-together.mjs` | `bun tools/play-together.mjs` |
-| Sign-in, the invite link, the live database | A step in the signed-in check | `tools/play-together-signed-in.mjs` | `bun tools/play-together-signed-in.mjs` |
-| The world server alone | A server test or a step of its check | `server/test/` | `bun test server`, `bun server/test/check.ts` |
+| Sign-in, and the save going between devices through the real database | A step in the cloud save check | `tools/play-cloud-save.mjs` | `bun tools/play-cloud-save.mjs` |
+| Which way the save goes, with stand-ins for Clerk and Convex | A unit test | `src/features/account/*.test.ts` | `bun test src/features/account` |
 | The database's functions and who may call them | A Convex test, with the refusals | `convex/*.test.ts` | `bunx vitest run --root convex` |
 | Every order of events in a small design | A model | The `formal-game` skill | |
 

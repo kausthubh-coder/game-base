@@ -10,7 +10,7 @@ import type { Clerk } from '@clerk/clerk-js';
 import type { ConvexClient } from 'convex/browser';
 import { api } from '../../../convex/_generated/api.js';
 import type { Id } from '../../../convex/_generated/dataModel';
-import { clerkAddress, type WorldCard } from './logic.ts';
+import { clerkAddress, type CloudSave } from './logic.ts';
 
 /** Who Clerk says is signed in. */
 export interface SessionUser {
@@ -19,33 +19,35 @@ export interface SessionUser {
   email: string | null;
 }
 
-/** What goes on a backup beside the save's text. */
-export interface BackupLabel {
+/** What goes up with a save beside its text. */
+export interface UploadLabel {
   slot: string;
-  name: string;
   savedAt: number;
   day: number;
+  /** The `savedAt` of the account's copy this one replaces, or null when the browser saw none. */
+  over: number | null;
 }
 
-export type BackupResult = { ok: true; bytes: number } | { ok: false; reason: 'tooBig'; bytes: number; limit: number };
+/**
+ * `stale`: another device put a newer save in the account since this browser last looked. Its `savedAt` comes back.
+ * `savedAt` on success is the time the account dated it, which is earlier when this device's clock is fast.
+ */
+export type UploadResult =
+  | { ok: true; bytes: number; savedAt: number }
+  | { ok: false; reason: 'tooBig'; bytes: number; limit: number }
+  | { ok: false; reason: 'stale'; savedAt: number };
 
 /** Convex, as the signed-in player. Every call is theirs: Convex reads who is asking from Clerk's token. */
 export interface Database {
-  /** Makes the player's profile on their first sign-in and returns the name on it. */
-  ensureProfile(name: string): Promise<{ name: string }>;
+  /** Makes the player's profile on their first sign-in and returns its id and the name on it. */
+  ensureProfile(name: string): Promise<{ _id: string; name: string }>;
   /** Returns the name as it was stored. */
   rename(name: string): Promise<string>;
-  /** The player's worlds, again on every change. Returns a function that stops it. */
-  watchWorlds(fn: (worlds: WorldCard[]) => void, onError: (error: unknown) => void): () => void;
-  uploadSave(text: string, label: BackupLabel): Promise<BackupResult>;
-  /** The text of the backup of the player's own world. */
-  downloadSave(worldId: string): Promise<string>;
-  /** Makes an online world the player owns, with this name. Returns its id: the `<id>` of `/world/<id>`. */
-  createWorld(name: string): Promise<string>;
-  /** Makes an invite to the player's online world. Returns its code, which lets one friend in, once. */
-  invite(worldId: string): Promise<string>;
-  /** Takes the player into the world an invite is for. Using one for a world they are already in changes nothing. */
-  acceptInvite(code: string): Promise<{ worldId: string; name: string }>;
+  /** The account's copy of the save in `slot`, or null, again whenever any device changes it. Returns a function that stops it. */
+  watchSave(slot: string, fn: (save: CloudSave | null) => void, onError: (error: unknown) => void): () => void;
+  uploadSave(text: string, label: UploadLabel): Promise<UploadResult>;
+  /** The text of the account's copy of the save in `slot`. */
+  downloadSave(slot: string): Promise<string>;
 }
 
 export interface Session {
@@ -56,8 +58,6 @@ export interface Session {
   signOut(): Promise<void>;
   /** Convex as the signed-in player, once it has accepted Clerk's token. It throws when it does not. */
   database(): Promise<Database>;
-  /** The signed-in player's token, the one Convex takes. The world server takes the same one. Null when signed out. */
-  token(): Promise<string | null>;
   dispose(): void;
 }
 
@@ -133,31 +133,21 @@ function openDatabase(client: ConvexClient): Database {
     async rename(name) {
       return await client.mutation(api.profiles.rename, { name });
     },
-    watchWorlds(fn, onError) {
-      return client.onUpdate(api.worlds.list, {}, fn, onError);
+    watchSave(slot, fn, onError) {
+      return client.onUpdate(api.saves.mine, { slot }, fn, onError);
     },
     async uploadSave(text, label) {
       const address = await client.mutation(api.saves.uploadUrl, {});
       const sent = await fetch(address, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: text });
       if (!sent.ok) throw new Error(`the upload was refused with status ${sent.status}`);
       const { storageId } = (await sent.json()) as { storageId: Id<'_storage'> };
-      const result = await client.mutation(api.saves.commit, { storageId, ...label });
-      return result.ok ? { ok: true, bytes: result.bytes } : result;
+      return await client.mutation(api.saves.commit, { storageId, ...label });
     },
-    async downloadSave(worldId) {
-      const address = await client.query(api.saves.downloadUrl, { worldId: worldId as Id<'worlds'> });
+    async downloadSave(slot) {
+      const address = await client.query(api.saves.downloadUrl, { slot });
       const got = await fetch(address);
       if (!got.ok) throw new Error(`the download was refused with status ${got.status}`);
       return await got.text();
-    },
-    async createWorld(name) {
-      return await client.mutation(api.worlds.create, { name });
-    },
-    async invite(worldId) {
-      return (await client.mutation(api.invites.create, { worldId: worldId as Id<'worlds'> })).code;
-    },
-    async acceptInvite(code) {
-      return await client.mutation(api.invites.accept, { code });
     },
   };
 }
@@ -269,7 +259,6 @@ export async function connect(keys: SessionKeys): Promise<Session> {
       });
       return mine;
     },
-    token: () => convexToken(clerk, false),
     dispose() {
       for (const stop of stops) stop();
       stops.clear();

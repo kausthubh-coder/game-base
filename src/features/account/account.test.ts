@@ -1,14 +1,18 @@
-// The account's rules, with stand-ins for Clerk, Convex and localStorage: a guest loads nothing, a backup
-// sends the save, a restore keeps the replaced save, and an answer for the player before is dropped.
+// The account's rules, with stand-ins for Clerk, Convex and localStorage: a guest loads nothing, a save
+// changed here goes up, one changed on another device comes down and restarts the game, a conflict waits
+// for the player, and an answer for the player before is dropped.
 import { describe, expect, test } from 'bun:test';
 import type { ViewContext } from '../../engine/system.ts';
 import { createAccount, type AccountOptions } from './account.ts';
-import type { WorldCard } from './logic.ts';
-import type { BackupLabel, BackupResult, Database, Session, SessionUser } from './session.ts';
+import { markKey, type CloudSave } from './logic.ts';
+import type { Database, Session, SessionUser, UploadLabel, UploadResult } from './session.ts';
 
 const KEY = 'greenhollow.save';
+const MARK = markKey(KEY);
 const ctx = {} as ViewContext;
 const saveText = (day: number, at = 5_000): string => JSON.stringify({ version: 1, at, world: { edits: [] }, game: { clock: { day } } });
+const cloud = (day: number, savedAt: number): CloudSave => ({ bytes: 100, savedAt, uploadedAt: savedAt + 1, day });
+const markText = (here: number, there: number, player = 'profile_ada'): string => JSON.stringify({ player, here, there });
 const ADA: SessionUser = { name: 'Ada Lovelace', email: 'ada@example.com' };
 
 /** Lets every promise that is already settled run its `then`. */
@@ -21,13 +25,14 @@ interface Stage {
   items: Record<string, string>;
   /** Signs a player in or out, as Clerk's listener would report it. */
   sign(user: SessionUser | null): void;
-  /** Sends the world list, as Convex's live query would. */
-  worlds(cards: WorldCard[]): void;
+  /** Sends the account's copy of the save, as Convex's live query would. */
+  there(save: CloudSave | null): void;
   calls: string[];
-  uploads: { text: string; label: BackupLabel }[];
+  uploads: { text: string; label: UploadLabel }[];
   /** What the next upload answers, the text a download gives back, and whether Convex accepts the sign-in. */
-  uploadResult: BackupResult | Error;
-  download: string | Error;
+  uploadResult: UploadResult | Error | null;
+  /** A promise holds the download until it settles. */
+  download: string | Error | Promise<string>;
   accepts: boolean;
   connects: number;
 }
@@ -35,43 +40,31 @@ interface Stage {
 function stage(start: Record<string, string> = {}, keys = true): Stage {
   const items = { ...start };
   let onUser: ((user: SessionUser | null) => void) | null = null;
-  let onWorlds: ((cards: WorldCard[]) => void) | null = null;
+  let onSave: ((save: CloudSave | null) => void) | null = null;
   const database: Database = {
     async ensureProfile(name) {
       s.calls.push(`ensureProfile ${name}`);
-      return { name: `${name} (profile)` };
+      return { _id: 'profile_ada', name: `${name} (profile)` };
     },
     async rename(name) {
       s.calls.push(`rename ${name}`);
       if (!name.trim()) throw { data: { code: 'badName', message: 'A name needs at least one letter.' } };
       return name.trim();
     },
-    watchWorlds(fn) {
-      onWorlds = fn;
-      return () => { onWorlds = null; s.calls.push('stop worlds'); };
+    watchSave(slot, fn) {
+      s.calls.push(`watch ${slot}`);
+      onSave = fn;
+      return () => { onSave = null; s.calls.push('stop watch'); };
     },
     async uploadSave(text, label) {
       s.uploads.push({ text, label });
       if (s.uploadResult instanceof Error) throw s.uploadResult;
-      return s.uploadResult;
+      return s.uploadResult ?? { ok: true, bytes: text.length, savedAt: label.savedAt };
     },
-    async downloadSave(worldId) {
-      s.calls.push(`download ${worldId}`);
+    async downloadSave(slot) {
+      s.calls.push(`download ${slot}`);
       if (s.download instanceof Error) throw s.download;
-      return s.download;
-    },
-    async createWorld(name) {
-      s.calls.push(`createWorld ${name}`);
-      return 'world_online';
-    },
-    async invite(worldId) {
-      s.calls.push(`invite ${worldId}`);
-      return `CODE${s.calls.length}`;
-    },
-    async acceptInvite(code) {
-      s.calls.push(`accept ${code}`);
-      if (code === 'USED') throw { data: { code: 'inviteUsed', message: 'That invite was already used.' } };
-      return { worldId: 'world_online', name: 'A world' };
+      return await s.download;
     },
   };
   const session: Session = {
@@ -88,24 +81,23 @@ function stage(start: Record<string, string> = {}, keys = true): Stage {
       if (!s.accepts) throw new Error('Convex did not accept the sign-in');
       return database;
     },
-    token: async () => 'token-of-ada',
     dispose: () => { s.calls.push('dispose'); },
   };
   const s: Stage = {
     items,
     calls: [],
     uploads: [],
-    uploadResult: { ok: true, bytes: 9_376 },
-    download: saveText(2),
+    uploadResult: null,
+    download: saveText(9, 8_000),
     accepts: true,
     connects: 0,
     sign: (user) => onUser?.(user),
-    worlds: (cards) => onWorlds?.(cards),
+    there: (save) => onSave?.(save),
     options: {
       clerkKey: keys ? 'pk_test_x' : undefined,
       convexUrl: keys ? 'https://example.convex.cloud' : undefined,
-      worldName: 'A plot of your own',
       now: () => 10_000,
+      syncEvery: 0,
       save: {
         key: KEY,
         storage: { getItem: (key) => items[key] ?? null, setItem: (key, value) => { items[key] = value; } },
@@ -121,15 +113,13 @@ function stage(start: Record<string, string> = {}, keys = true): Stage {
   return s;
 }
 
-const backupCard = (day: number): WorldCard => ({
-  _id: 'world_solo', name: 'A plot of your own', kind: 'solo', role: 'owner', ownerName: 'Ada', lastPlayedAt: 1, playersNow: [],
-  backup: { slot: KEY, bytes: 9_376, savedAt: 1, uploadedAt: 2, day },
-});
-
-async function signedIn(s: Stage) {
+/** Signs Ada in and sends the account's copy of the save, then lets the sync that follows run. */
+async function signedIn(s: Stage, there: CloudSave | null = null) {
   const account = createAccount(ctx, s.options);
   await account.connect();
   s.sign(ADA);
+  await settle();
+  s.there(there);
   await settle();
   return account;
 }
@@ -141,16 +131,15 @@ describe('a guest', () => {
     expect(account.state.status).toBe('off');
     await account.connect();
     account.open();
-    await settle();
+    await account.sync();
     expect(account.state.status).toBe('off');
     expect(s.connects).toBe(0);
-    expect(await account.backUp()).toBe(false);
-    expect(await account.restore()).toBe(false);
+    expect(s.uploads).toEqual([]);
     expect(s.items).toEqual({ [KEY]: saveText(3) });
   });
 
   test('with keys nothing is loaded until the account is asked to connect', async () => {
-    const s = stage();
+    const s = stage({ [KEY]: saveText(3) });
     const account = createAccount(ctx, s.options);
     expect(account.state.status).toBe('guest');
     expect(s.connects).toBe(0);
@@ -158,8 +147,8 @@ describe('a guest', () => {
     await account.connect();
     expect(s.connects).toBe(1);
     s.sign(null);
-    expect(account.state).toMatchObject({ status: 'signedOut', name: null, worlds: null });
-    expect(await account.backUp()).toBe(false);
+    expect(account.state).toMatchObject({ status: 'signedOut', name: null, cloud: undefined });
+    await account.sync();
     expect(s.uploads).toEqual([]);
   });
 
@@ -182,39 +171,39 @@ describe('a guest', () => {
 });
 
 describe('signed in', () => {
-  test('the profile is made, and the worlds arrive live', async () => {
+  test('the profile is made, then the account\'s copy of this save is watched', async () => {
     const s = stage();
-    const seen: string[] = [];
     const account = createAccount(ctx, s.options);
-    account.onChange((state) => seen.push(`${state.status} ${state.name} ${state.ready}`));
     await account.connect();
     s.sign(ADA);
-    expect(account.state).toMatchObject({ status: 'signedIn', name: 'Ada Lovelace', email: 'ada@example.com', ready: false, worlds: null });
+    expect(account.state).toMatchObject({ status: 'signedIn', name: 'Ada Lovelace', email: 'ada@example.com', ready: false, cloud: undefined });
     await settle();
-    expect(s.calls).toEqual(['ensureProfile Ada Lovelace']);
-    expect(account.state).toMatchObject({ name: 'Ada Lovelace (profile)', ready: true, worlds: null });
-    s.worlds([backupCard(3)]);
-    expect(account.state.worlds).toEqual([backupCard(3)]);
-    expect(seen).toEqual(['loading null false', 'signedIn Ada Lovelace false', 'signedIn Ada Lovelace (profile) true', 'signedIn Ada Lovelace (profile) true']);
+    expect(s.calls).toEqual(['ensureProfile Ada Lovelace', `watch ${KEY}`]);
+    expect(account.state).toMatchObject({ name: 'Ada Lovelace (profile)', ready: true, cloud: undefined });
+    s.there(cloud(4, 7_000));
+    expect(account.state.cloud).toEqual(cloud(4, 7_000));
   });
 
-  test('a sign-in Convex does not accept leaves the player signed in, with the reason, and no backup', async () => {
+  test('a sign-in Convex does not accept leaves the player signed in, with the reason, and sends nothing', async () => {
     const s = stage({ [KEY]: saveText(3) });
     s.accepts = false;
     const account = await signedIn(s);
     expect(account.state).toMatchObject({ status: 'signedIn', ready: false, note: { kind: 'problem' } });
-    expect(await account.backUp()).toBe(false);
+    await account.sync();
     expect(s.uploads).toEqual([]);
   });
 
-  test('signing out forgets the player and stops the world list', async () => {
-    const s = stage();
-    const account = await signedIn(s);
-    s.worlds([backupCard(3)]);
+  test('signing out sends what was played first, then forgets the player and stops watching', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(4_000, 4_000) });
+    const account = await signedIn(s, cloud(2, 4_000));
+    s.uploads.length = 0;
+    s.items[KEY] = saveText(3, 6_000);
     await account.signOut();
-    expect(account.state).toMatchObject({ status: 'signedOut', name: null, email: null, ready: false, worlds: null, busy: null });
-    expect(s.calls).toContain('stop worlds');
-    expect(await account.restore()).toBe(false);
+    expect(s.uploads.map((u) => u.label.savedAt)).toEqual([6_000]);
+    expect(s.calls).toContain('stop watch');
+    expect(account.state).toMatchObject({ status: 'signedOut', name: null, email: null, ready: false, cloud: undefined, busy: null });
+    // The save stays in this browser.
+    expect(s.items[KEY]).toBe(saveText(3, 6_000));
   });
 
   test('a rename is stored as Convex returns it, and a refused one says why', async () => {
@@ -236,155 +225,181 @@ describe('signed in', () => {
   });
 });
 
-describe('backing up', () => {
-  test('the save in this browser is written, then sent with its slot, day and time', async () => {
-    const s = stage({ [KEY]: saveText(3, 7_000) });
-    const account = await signedIn(s);
-    s.calls.length = 0;
-    expect(await account.backUp()).toBe(true);
-    expect(s.calls).toEqual(['flush']);
-    expect(s.uploads).toEqual([{ text: saveText(3, 7_000), label: { slot: KEY, name: 'A plot of your own', savedAt: 7_000, day: 3 } }]);
-    expect(account.state).toMatchObject({ busy: null, note: { kind: 'done', text: 'Backed up day 3, 9 KB.' } });
-    expect(account.localSave()).toMatchObject({ day: 3, at: 7_000 });
+describe('the save goes up', () => {
+  test('the first sign-in with a save here and none in the account sends it, and marks them matched', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000) });
+    const account = await signedIn(s, null);
+    expect(s.uploads).toEqual([{ text: saveText(3, 5_000), label: { slot: KEY, savedAt: 5_000, day: 3, over: null } }]);
+    expect(JSON.parse(s.items[MARK])).toEqual({ player: 'profile_ada', here: 5_000, there: 5_000 });
+    expect(account.state).toMatchObject({ sync: 'idle', note: null, conflict: null });
+    expect(s.calls).not.toContain('restart');
   });
 
-  test('nothing saved, or a save that is not one, is not sent', async () => {
-    const s = stage();
-    const account = await signedIn(s);
-    expect(await account.backUp()).toBe(false);
-    expect(account.state.note).toEqual({ kind: 'problem', text: 'There is nothing to back up yet. Play a little first.' });
-    s.items[KEY] = '{"version":7}';
-    expect(await account.backUp()).toBe(false);
+  test('a save that changed here since they matched goes up over the copy it was matched with', async () => {
+    const s = stage({ [KEY]: saveText(5, 9_000), [MARK]: markText(5_000, 5_100) });
+    await signedIn(s, cloud(3, 5_100));
+    expect(s.uploads.map((u) => u.label)).toEqual([{ slot: KEY, savedAt: 9_000, day: 5, over: 5_100 }]);
+    // The account dated it to its own clock: the mark keeps both sides.
+    expect(JSON.parse(s.items[MARK])).toEqual({ player: 'profile_ada', here: 9_000, there: 9_000 });
+  });
+
+  test('when nothing changed nothing is sent, and a later look sends what was played since', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(5_000, 5_000) });
+    const account = await signedIn(s, cloud(3, 5_000));
     expect(s.uploads).toEqual([]);
-    expect(account.localSave()).toBeNull();
+    s.items[KEY] = saveText(4, 6_000);
+    await account.sync();
+    expect(s.uploads.map((u) => u.label.savedAt)).toEqual([6_000]);
   });
 
-  test('a save Convex finds too big, and an upload that fails, are reported', async () => {
+  test('a save the account finds too big is kept here, said, and not sent again', async () => {
     const s = stage({ [KEY]: saveText(3) });
-    const account = await signedIn(s);
     s.uploadResult = { ok: false, reason: 'tooBig', bytes: 9_000_000, limit: 8_388_608 };
-    expect(await account.backUp()).toBe(false);
-    expect(account.state.note).toEqual({ kind: 'problem', text: 'This world is too big to back up. It is 9.0 MB and the limit is 8.4 MB.' });
-    s.uploadResult = new Error('offline');
-    expect(await account.backUp()).toBe(false);
-    expect(account.state).toMatchObject({ busy: null, note: { kind: 'problem', text: 'The backup did not go through. Check the connection and try again.' } });
-  });
-
-  test('a second press while one backup is under way does nothing', async () => {
-    const s = stage({ [KEY]: saveText(3) });
-    const account = await signedIn(s);
-    const first = account.backUp();
-    expect(account.state.busy).toBe('backup');
-    expect(await account.backUp()).toBe(false);
-    expect(await first).toBe(true);
+    const account = await signedIn(s, null);
+    expect(account.state.note).toEqual({ kind: 'problem', text: 'This save is too big for your account. It is 9.0 MB and the limit is 8.4 MB. It is kept in this browser.' });
+    await account.sync();
     expect(s.uploads).toHaveLength(1);
-  });
-});
-
-describe('restoring', () => {
-  test('the backup replaces the save, the replaced save is kept under another key, and the game restarts', async () => {
-    const s = stage({ [KEY]: saveText(5) });
-    const account = await signedIn(s);
-    s.worlds([backupCard(2)]);
-    s.calls.length = 0;
-    expect(await account.restore()).toBe(true);
-    expect(s.calls).toEqual(['download world_solo', 'flush', 'restart']);
-    expect(s.items).toEqual({ [KEY]: saveText(2), [`${KEY}.before-restore`]: saveText(5) });
+    expect(s.items[MARK]).toBeUndefined();
   });
 
-  test('on a device with no save there is nothing to keep aside', async () => {
-    const s = stage();
-    const account = await signedIn(s);
-    s.worlds([backupCard(2)]);
-    expect(await account.restore()).toBe(true);
-    expect(s.items).toEqual({ [KEY]: saveText(2) });
+  test('an upload that fails is said, and the next look tries again', async () => {
+    const s = stage({ [KEY]: saveText(3) });
+    s.uploadResult = new Error('offline');
+    const account = await signedIn(s, null);
+    expect(account.state).toMatchObject({ sync: 'idle', note: { kind: 'problem' } });
+    s.uploadResult = null;
+    await account.sync();
+    expect(s.uploads).toHaveLength(2);
+    expect(s.items[MARK]).toBeDefined();
   });
 
-  test('with no backup of this slot there is nothing to restore', async () => {
-    const s = stage({ [KEY]: saveText(5) });
-    const account = await signedIn(s);
-    expect(await account.restore()).toBe(false);
-    s.worlds([{ ...backupCard(2), backup: { ...backupCard(2).backup!, slot: 'greenhollow.save.build' } }]);
-    expect(await account.restore()).toBe(false);
-    expect(s.calls).not.toContain('restart');
-    expect(s.items).toEqual({ [KEY]: saveText(5) });
-  });
-
-  test('a backup that cannot be read or fetched replaces nothing', async () => {
-    const s = stage({ [KEY]: saveText(5) });
-    const account = await signedIn(s);
-    s.worlds([backupCard(2)]);
-    s.download = '<html>not a save</html>';
-    expect(await account.restore()).toBe(false);
-    expect(account.state.note).toEqual({ kind: 'problem', text: 'The backup could not be read, so nothing was replaced.' });
-    s.download = new Error('offline');
-    expect(await account.restore()).toBe(false);
-    expect(s.calls).not.toContain('restart');
-    expect(s.items).toEqual({ [KEY]: saveText(5) });
-  });
-
-  test('a browser that will not store the backup replaces nothing and does not restart', async () => {
-    const s = stage({ [KEY]: saveText(5) });
-    s.options.save = { ...s.options.save, storage: { getItem: (key) => s.items[key] ?? null, setItem: () => { throw new Error('QuotaExceededError'); } } };
-    const account = await signedIn(s);
-    s.worlds([backupCard(2)]);
-    expect(await account.restore()).toBe(false);
-    expect(account.state.note?.text).toBe('This browser would not store the backup, so nothing was replaced.');
-    expect(s.calls).not.toContain('restart');
-    expect(s.items).toEqual({ [KEY]: saveText(5) });
-  });
-
-  test('a player who signs out while the backup is on its way keeps their world', async () => {
-    const s = stage({ [KEY]: saveText(5) });
-    const account = await signedIn(s);
-    s.worlds([backupCard(2)]);
-    const restoring = account.restore();
-    s.sign(null);
-    expect(await restoring).toBe(false);
-    expect(s.calls).not.toContain('restart');
-    expect(s.items).toEqual({ [KEY]: saveText(5) });
-  });
-});
-
-describe('playing together', () => {
-  const online = (s: Stage, entered: string[]): void => {
-    s.options.online = { address: (world, invite) => `https://game.example/?world=${world}${invite ? `&invite=${invite}` : ''}`, enter: (world) => entered.push(world) };
-  };
-
-  test('Play together makes an online world and a link that lets one friend in', async () => {
-    const s = stage();
-    const entered: string[] = [];
-    online(s, entered);
-    const account = await signedIn(s);
-    expect(await account.playTogether()).toBe(true);
-    expect(s.calls).toContain('createWorld Ada Lovelace (profile)\'s world');
-    expect(s.calls).toContain('invite world_online');
-    expect(account.state.link?.url).toMatch(/^https:\/\/game\.example\/\?world=world_online&invite=CODE\d+$/);
-    const first = account.state.link?.url;
-    expect(await account.inviteTo('world_online')).toBe(true);
-    expect(account.state.link?.url).not.toBe(first);
-    account.enter('world_online');
-    expect(entered).toEqual(['world_online']);
-  });
-
-  test('without a way to open online worlds there is no Play together', async () => {
-    const s = stage();
-    const account = await signedIn(s);
-    expect(account.online).toBe(false);
-    expect(await account.playTogether()).toBe(false);
-    expect(s.calls.some((call) => call.startsWith('createWorld'))).toBe(false);
-  });
-
-  test('an invite that was used says so, and the token is the signed-in player\'s', async () => {
-    const s = stage();
-    const account = await signedIn(s);
-    expect(await account.acceptInvite('USED')).toBe(false);
-    expect(account.state.note?.text).toBe('That invite was already used.');
-    expect(await account.acceptInvite('GOOD')).toBe(true);
-    expect(await account.token()).toBe('token-of-ada');
-    s.sign(null);
+  test('an upload another device beat is dropped, and the newer copy that arrives is asked about', async () => {
+    const s = stage({ [KEY]: saveText(5, 9_000), [MARK]: markText(5_000, 5_000) });
+    s.uploadResult = { ok: false, reason: 'stale', savedAt: 8_000 };
+    const account = await signedIn(s, cloud(3, 5_000));
+    expect(s.items[MARK]).toBe(markText(5_000, 5_000));
+    s.there(cloud(6, 8_000));
     await settle();
-    expect(account.state.link).toBeNull();
+    expect(account.state.conflict).toEqual({ here: { at: 9_000, day: 5, bytes: saveText(5, 9_000).length }, there: cloud(6, 8_000) });
+  });
+
+  test('a save here that is not one is not sent', async () => {
+    const s = stage({ [KEY]: 'not a save' });
+    const account = await signedIn(s, null);
+    expect(s.uploads).toEqual([]);
+    expect(account.state.note?.kind).toBe('problem');
+  });
+});
+
+describe('the save comes down', () => {
+  test('on a device with no save the account\'s is put here and the game restarts from it', async () => {
+    const s = stage();
+    const account = await signedIn(s, cloud(9, 8_000));
+    expect(s.calls).toEqual(['ensureProfile Ada Lovelace', `watch ${KEY}`, `download ${KEY}`, 'restart']);
+    expect(s.items[KEY]).toBe(saveText(9, 8_000));
+    expect(JSON.parse(s.items[MARK])).toEqual({ player: 'profile_ada', here: 8_000, there: 8_000 });
+    expect(account.state.note?.kind).toBe('done');
+    expect(s.uploads).toEqual([]);
+  });
+
+  test('a save another device sent while this one sat still comes down, and the one it replaces is kept aside', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(5_000, 5_000) });
+    await signedIn(s, cloud(3, 5_000));
+    expect(s.calls).not.toContain('restart');
+    s.there(cloud(9, 8_000));
+    await settle();
+    expect(s.items[KEY]).toBe(saveText(9, 8_000));
+    expect(s.items[`${KEY}.before-restore`]).toBe(saveText(3, 5_000));
+    expect(s.calls).toContain('restart');
+  });
+
+  test('once the game is starting again from the fetched save, nothing here is sent over it', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(5_000, 5_000) });
+    const account = await signedIn(s, cloud(9, 8_000));
+    expect(s.calls).toContain('restart');
+    // The running game is written as the page unloads, after the fetched save was put back.
+    s.items[KEY] = saveText(3, 9_000);
+    const before = s.calls.length;
+    await account.sync();
+    account.open();
+    await settle();
+    expect(s.uploads).toEqual([]);
+    expect(s.calls.slice(before)).not.toContain('flush');
+  });
+
+  test('a download that cannot be read or fetched replaces nothing and does not restart', async () => {
+    for (const download of ['not a save', new Error('offline')]) {
+      const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(5_000, 5_000) });
+      s.download = download;
+      const account = await signedIn(s, cloud(9, 8_000));
+      expect(s.items[KEY]).toBe(saveText(3, 5_000));
+      expect(s.calls).not.toContain('restart');
+      expect(account.state).toMatchObject({ sync: 'idle', note: { kind: 'problem' } });
+    }
+  });
+
+  test('a browser that will not store it replaces nothing and does not restart', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(5_000, 5_000) });
+    s.options.save = { ...s.options.save, storage: { getItem: (key) => s.items[key] ?? null, setItem: () => { throw new Error('QuotaExceededError'); } } };
+    const account = await signedIn(s, cloud(9, 8_000));
+    expect(s.calls).not.toContain('restart');
+    expect(account.state.note?.text).toBe('This browser would not store the save from your account, so the one here was kept.');
+  });
+
+  test('a player who signs out while the save is on its way keeps the one here', async () => {
+    const s = stage({ [KEY]: saveText(3, 5_000), [MARK]: markText(5_000, 5_000) });
+    let release: (text: string) => void = () => {};
+    s.download = new Promise<string>((done) => { release = done; });
+    const account = await signedIn(s, cloud(9, 8_000));
+    expect(account.state.sync).toBe('fetching');
+    s.sign(null);
+    release(saveText(9, 8_000));
+    await settle();
+    expect(account.state).toMatchObject({ status: 'signedOut', sync: 'idle' });
+    expect(s.items[KEY]).toBe(saveText(3, 5_000));
+    expect(s.calls).not.toContain('restart');
+  });
+});
+
+describe('a conflict', () => {
+  test('a guest\'s save and an account save the browser never matched wait for the player', async () => {
+    const s = stage({ [KEY]: saveText(2, 9_000) });
+    const account = await signedIn(s, cloud(7, 6_000));
+    expect(account.state.conflict).toEqual({ here: { at: 9_000, day: 2, bytes: saveText(2, 9_000).length }, there: cloud(7, 6_000) });
+    expect(s.uploads).toEqual([]);
+    expect(s.calls).not.toContain(`download ${KEY}`);
+    // Looks while it waits change nothing.
+    await account.sync();
+    expect(s.uploads).toEqual([]);
+  });
+
+  test('keeping the account\'s puts it here, keeps this browser\'s aside, and restarts', async () => {
+    const s = stage({ [KEY]: saveText(2, 9_000) });
+    const account = await signedIn(s, cloud(7, 6_000));
+    s.download = saveText(7, 6_000);
+    await account.keep('there');
+    expect(s.items[KEY]).toBe(saveText(7, 6_000));
+    expect(s.items[`${KEY}.before-restore`]).toBe(saveText(2, 9_000));
+    expect(s.calls.slice(-3)).toEqual(['flush', `download ${KEY}`, 'restart']);
+    expect(account.state.conflict).toBeNull();
+  });
+
+  test('keeping this browser\'s sends it over the account\'s copy', async () => {
+    const s = stage({ [KEY]: saveText(2, 9_000) });
+    const account = await signedIn(s, cloud(7, 6_000));
+    await account.keep('here');
+    expect(s.uploads.map((u) => u.label)).toEqual([{ slot: KEY, savedAt: 9_000, day: 2, over: 6_000 }]);
+    expect(account.state.conflict).toBeNull();
+    expect(JSON.parse(s.items[MARK])).toEqual({ player: 'profile_ada', here: 9_000, there: 9_000 });
+    expect(s.calls).not.toContain('restart');
+  });
+
+  test('the same save on both sides is only marked', async () => {
+    const s = stage({ [KEY]: saveText(4, 6_000) });
+    const account = await signedIn(s, cloud(4, 6_000));
+    expect(account.state.conflict).toBeNull();
+    expect(s.uploads).toEqual([]);
+    expect(JSON.parse(s.items[MARK])).toEqual({ player: 'profile_ada', here: 6_000, there: 6_000 });
   });
 });
 
@@ -396,8 +411,9 @@ describe('the end', () => {
     account.onChange(() => heard++);
     account.dispose();
     expect(s.calls).toContain('dispose');
+    expect(s.calls).toContain('stop watch');
     s.sign(null);
-    s.worlds([]);
+    s.there(null);
     expect(heard).toBe(0);
   });
 });

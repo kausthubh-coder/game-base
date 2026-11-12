@@ -18,7 +18,8 @@ const iconButton = (ctx: UiContext, icon: string, label: string, onclick: () => 
   return element;
 };
 
-export function titlePanel(ctx: UiContext): PanelView {
+/** `account` is true when a view has given the interface an Account panel: signing in there brings a save from another device. */
+export function titlePanel(ctx: UiContext, account: boolean): PanelView {
   const body = h('div', { class: 'gu-plate' });
   /** True while New game waits for a second click, because a save would be replaced. */
   let asking = false;
@@ -53,6 +54,7 @@ export function titlePanel(ctx: UiContext): PanelView {
             { 'data-key': 'title:continue', class: saved ? 'gu-btn gu-primary' : 'gu-btn', disabled: !saved, 'aria-describedby': saved ? null : 'gu-no-save' }),
           saved ? null : h('p', { class: 'gu-menu-note', id: 'gu-no-save' }, 'Nothing saved yet.'),
           iconButton(ctx, 'settings', 'Settings', () => ctx.ui.open('settings'), { 'data-key': 'title:settings' }),
+          account && iconButton(ctx, 'account', 'Account', () => ctx.ui.open('account'), { 'data-key': 'title:account' }),
         );
       }
       body.replaceChildren(h('h1', { class: 'gu-chapter' }, 'A plot of your own'), menu);

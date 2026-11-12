@@ -1,7 +1,8 @@
 # account
 
-Clerk signs a player in. Convex keeps their profile, their worlds and the backup of the solo save. A guest
-plays with none of it loaded.
+Clerk signs a player in. Convex keeps their profile and a copy of their save, so a game started on one
+device goes on on any other they sign in on. A guest plays with none of it loaded, and their save stays in
+this browser.
 
 ```ts
 import { createAccount } from '../features/account/index.ts';
@@ -9,7 +10,6 @@ import { createAccount } from '../features/account/index.ts';
 const account = createAccount(ctx, {
   clerkKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY,   // both missing: the account is `off`
   convexUrl: import.meta.env.VITE_CONVEX_URL,
-  worldName: 'A plot of your own',
   save: { key, storage: localStorage, flush, restart },
   look: { button: 'gu-btn', primary: 'gu-btn gu-primary', section: 'gu-section', label: 'gu-label', note: 'gu-menu-note' },
 });
@@ -17,7 +17,8 @@ somePanel.append(account.panel);
 account.open();
 ```
 
-The game installs it in `src/game/views/ui-account.view.ts`, behind the Account entry of the pause menu.
+The game installs it in `src/game/views/ui-account.view.ts`, behind Account on the title screen and in the
+pause menu.
 
 ## What loads, and when
 
@@ -34,6 +35,36 @@ The package is one 1.5 MB file with every wallet and password library inside it.
 fetches those only when a player uses them. The package stays installed for its types. Both ways are in
 Clerk's JavaScript quickstart.
 
+## How the save follows the player
+
+Signed in, the account watches its copy of the save live (`saves.mine`) and looks for a change every 30
+seconds, when the page is hidden, when the panel opens and before a sign-out. Each look compares three
+times: the save here (its `at`), the account's copy (its `savedAt`), and the mark of the last time the two
+were the same save, kept under `<key>.synced`. `syncStep` in `logic.ts` decides:
+
+| Here | In the account | What happens |
+|---|---|---|
+| A save | None | This one goes up |
+| None | A save | It comes down, and the game starts again from it |
+| Changed since the mark | Not changed | This one goes up over it |
+| Not changed | Changed, by another device | It comes down, and the game starts again from it |
+| Changed | Changed | The panel opens by itself and asks which one to play |
+| A save never matched with this account, such as a guest's | A different save | The same question |
+
+A save that comes down replaces the one here, which is kept under `<key>.before-restore`. Nothing in the
+game reads that copy yet. To go back by hand, copy its value over `greenhollow.save` in the browser's
+storage and reload.
+
+The upload says which copy it replaces (`over`). When another device put a newer one there first, Convex
+refuses it as `stale`, the newer copy arrives through the watch, and the next look asks. So two devices
+never overwrite each other without the player choosing.
+
+The game starts again in the host's `restart`. At the title the page reloads to the title, with the save to
+Continue. In a game it reloads straight into the game.
+
+The shell writes the save every 60 seconds of play, so a device that is switched off mid-game can be up to
+a minute behind. Hiding the page writes and sends it at once.
+
 ## The states
 
 `account.state.status`:
@@ -45,25 +76,22 @@ Clerk's JavaScript quickstart.
 | `loading` | Clerk is on its way |
 | `failed` | Clerk could not be reached. `connect()` tries again. |
 | `signedOut` | Clerk is loaded and nobody is signed in |
-| `signedIn` | `name` and `email` are set. `ready` turns true once Convex has accepted the sign-in. `worlds` is null until the first answer, then the live list. |
+| `signedIn` | `name` and `email` are set. `ready` turns true once Convex has accepted the sign-in. `cloud` is undefined until the first answer, then the account's copy or null. |
+
+`sync` is `idle`, `sending` or `fetching`. `conflict` holds both saves' facts while the player is asked.
 
 ## Methods
 
 | Method | What it does |
 |---|---|
 | `connect()` | Loads Clerk and finds out who is signed in |
-| `open()` | The panel came on screen: writes the save, connects if it has not, redraws |
-| `signIn()` | Opens Clerk's sign-in box over the page |
-| `signOut()` | Signs out and closes the connection to Convex |
+| `open()` | The panel came on screen: writes the save, connects if it has not, redraws, looks for a change |
+| `signIn()` | Writes the save, then opens Clerk's sign-in box over the page |
+| `signOut()` | Sends what was played, then signs out and closes the connection to Convex. The save stays here. |
 | `rename(name)` | Changes the player's name. True when Convex stored it. |
-| `backUp()` | Writes the save, then sends it to Convex. True when it arrived. |
-| `restore()` | Fetches the backup, copies the save it replaces to `<key>.before-restore`, writes the backup and calls `save.restart()`. The panel asks before it calls this. |
+| `sync()` | One look: sends, fetches, asks or does nothing, as the table above says |
+| `keep('here' \| 'there')` | Settles a conflict: send this browser's save over the account's, or fetch the account's |
 | `localSave()` | The day, time and size of the save in this browser, or null |
-| `playTogether()` | Makes an online world the player owns, and a link with an invite in it. The panel shows the link to copy |
-| `inviteTo(worldId)` | A new link to the player's online world, for one more friend. An invite lets one player in, once |
-| `enter(worldId)` | Opens an online world |
-| `acceptInvite(code)` | Lets the player into the world an invite is for. The game calls it for a link with `&invite=` |
-| `token()` | The signed-in player's token, the one Convex takes. The world server takes the same one |
 | `onChange(fn)` | Hears every change of `state` |
 | `panel` | The panel's element. It redraws itself. |
 | `update()`, `dispose()` | As every view system. `update` does nothing. |
@@ -73,28 +101,14 @@ Clerk's JavaScript quickstart.
 | Option | Needed | What it is |
 |---|---|---|
 | `clerkKey`, `convexUrl` | no | Clerk's publishable key and the Convex deployment's address. Without both the account is `off`. |
-| `save.key` | yes | The key the save is stored under. It is also the backup's slot, so a test scene's save has its own backup. |
+| `save.key` | yes | The key the save is stored under. It is also its slot in the account, so a test scene's save has its own. |
 | `save.storage` | yes | Where the save is: `localStorage` |
 | `save.flush()` | yes | Writes the running game to storage now |
 | `save.restart()` | yes | Starts the game again from what is stored |
-| `worldName` | yes | The name on the solo world's card |
-| `online` | no | `address(worldId, invite?)` and `enter(worldId)`. Without it the panel has no Play together and no Enter |
 | `look` | no | The host's class names for a button, the primary button, a section, its heading and a note |
+| `syncEvery` | no | Milliseconds between looks, 30,000 by default. 0 turns off the timer and the page-hidden look, for tests. |
 | `connect` | no | A stand-in for Clerk and Convex, for tests |
 | `now` | no | The clock, for tests |
-
-## Restoring
-
-Restoring replaces the save in this browser, so the panel asks first. `restore()` then:
-
-1. Fetches the backup and checks it is a save this game loads. If not, it stops.
-2. Writes the running game, so the copy it keeps is the world as it is now.
-3. Copies that save to `<key>.before-restore`, then writes the backup over `<key>`. If the browser refuses
-   either write, nothing was replaced.
-4. Calls `save.restart()`, which reloads the page into the restored world.
-
-The copy under `<key>.before-restore` is the only way back. Nothing in the game reads it yet. To go back by
-hand, copy its value over `greenhollow.save` in the browser's storage and reload.
 
 ## Keys
 
@@ -105,12 +119,11 @@ typing an email walks nobody, Tab stays in the box and Esc closes only the box.
 
 | File | What is in it |
 |---|---|
-| `account.ts` | `createAccount`: the states, backing up and restoring |
+| `account.ts` | `createAccount`: the states and the sync |
 | `account.ui.ts` | The panel's contents |
 | `session.ts` | The only file that talks to Clerk and Convex |
-| `logic.ts` | Reading a save, the words on the panel, swapping a save. No page, no network. |
+| `logic.ts` | Reading a save, which way it goes, the mark, the words on the panel, swapping a save. No page, no network. |
 | `account.test.ts`, `logic.test.ts` | `bun test src/features/account` |
 
 The tables and functions it calls are in `convex/`, described in `convex/README.md`.
-
-There is no demo page under `demos/account` yet.
+`bun tools/play-cloud-save.mjs` plays it with two browsers and real sign-ins.

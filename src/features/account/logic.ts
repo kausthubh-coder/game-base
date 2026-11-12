@@ -1,18 +1,13 @@
-// The parts of the account with no page and no network in them: reading a save's text, the words on the
-// panel, and swapping a save for a restored one. Tested in logic.test.ts.
+// The parts of the account with no page and no network in them: reading a save's text, deciding which way
+// a save goes, the words on the panel, and swapping a save for the account's. Tested in logic.test.ts.
 
-/** A world's card, as `worlds.list` in convex/worlds.ts returns it. */
-export interface WorldCard {
-  _id: string;
-  name: string;
-  kind: 'solo' | 'online';
-  role: 'owner' | 'member';
-  ownerName: string;
-  /** Milliseconds since 1970. */
-  lastPlayedAt: number;
-  playersNow: { playerId: string; name: string }[];
-  /** The owner's backup of a solo world, or null. */
-  backup: { slot: string; bytes: number; savedAt: number; uploadedAt: number; day: number } | null;
+/** The account's copy of a save, as `saves.mine` in convex/saves.ts returns it. */
+export interface CloudSave {
+  bytes: number;
+  /** When the browser that sent it wrote it, and when it reached the account. Milliseconds since 1970. */
+  savedAt: number;
+  uploadedAt: number;
+  day: number;
 }
 
 /** What a save's text says about itself. */
@@ -53,6 +48,60 @@ export function readSaveText(text: string): SaveFacts | null {
 /** The key a replaced save is kept under. */
 export const asideKey = (key: string): string => `${key}.before-restore`;
 
+/** The key the last time this browser and the account agreed is kept under. */
+export const markKey = (key: string): string => `${key}.synced`;
+
+/**
+ * The last time this browser's save and the account's were the same save: whose account, the `at` of the
+ * save here and the `savedAt` of the copy there. A save that differs from its side of the mark has changed
+ * since. Both sides are kept because the account dates a save from a fast clock to its own time.
+ */
+export interface SyncMark {
+  player: string;
+  here: number;
+  there: number;
+}
+
+export function readMark(storage: SaveStorage, key: string): SyncMark | null {
+  try {
+    const mark = JSON.parse(storage.getItem(markKey(key)) ?? 'null') as unknown;
+    if (!isObject(mark) || typeof mark.player !== 'string' || typeof mark.here !== 'number' || typeof mark.there !== 'number') return null;
+    return { player: mark.player, here: mark.here, there: mark.there };
+  } catch {
+    return null;
+  }
+}
+
+/** False when the browser would not store it. The next sign-in then asks once more. */
+export function writeMark(storage: SaveStorage, key: string, mark: SyncMark): boolean {
+  try {
+    storage.setItem(markKey(key), JSON.stringify(mark));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Which way the save goes between this browser and the account. `send` the save here, `fetch` the account's,
+ * `ask` the player because both changed, or one is a stranger to the other. `same`: nothing to move, but the
+ * mark is new. `none`: nothing to do.
+ */
+export type SyncStep = 'send' | 'fetch' | 'ask' | 'same' | 'none';
+
+export function syncStep(here: Pick<SaveFacts, 'at'> | null, there: Pick<CloudSave, 'savedAt'> | null, mark: SyncMark | null, player: string): SyncStep {
+  if (!there) return here ? 'send' : 'none';
+  if (!here) return 'fetch';
+  // A save this browser never matched with this account: a guest's game, or another player's.
+  if (!mark || mark.player !== player) return here.at === there.savedAt ? 'same' : 'ask';
+  const changedHere = here.at !== mark.here;
+  const changedThere = there.savedAt !== mark.there;
+  if (changedHere && changedThere) return 'ask';
+  if (changedHere) return 'send';
+  if (changedThere) return 'fetch';
+  return 'none';
+}
+
 /**
  * Puts `text` where the save is, and first copies the save it replaces to `asideKey(key)`. False when the
  * browser would not store one of them. Then nothing was replaced: the copy is written before the save.
@@ -89,24 +138,6 @@ export function sizeText(bytes: number): string {
   if (bytes < 1000) return plural(bytes, 'byte');
   if (bytes < 1_000_000) return `${Math.round(bytes / 1000)} KB`;
   return `${(bytes / 1_000_000).toFixed(1)} MB`;
-}
-
-/** The backup of the save in `slot` among the player's worlds, with the world it belongs to. */
-export function backupOf(worlds: readonly WorldCard[], slot: string): (NonNullable<WorldCard['backup']> & { worldId: string }) | null {
-  for (const world of worlds) if (world.role === 'owner' && world.backup?.slot === slot) return { ...world.backup, worldId: world._id };
-  return null;
-}
-
-/** The line under a world's name in the list. */
-export function worldLine(world: WorldCard, now: number): string {
-  if (world.kind === 'solo') {
-    const backup = world.backup;
-    return backup ? `Solo. Day ${backup.day}, backed up ${agoText(backup.uploadedAt, now)}.` : 'Solo.';
-  }
-  const whose = world.role === 'owner' ? 'Yours' : `${world.ownerName}'s`;
-  const names = world.playersNow.map((player) => player.name);
-  const inIt = names.length === 0 ? `Last played ${agoText(world.lastPlayedAt, now)}.` : `${names.length} in it now: ${names.join(', ')}.`;
-  return `Online. ${whose}. ${inIt}`;
 }
 
 /** Why Convex refused a call, in the player's words. Convex sends `{ code, message }` (convex/model/auth.ts). */

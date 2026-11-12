@@ -13,10 +13,6 @@ export type RefusalCode =
   | 'badName'
   | 'badSlot'
   | 'tooMany'
-  | 'soloWorld'
-  | 'worldFull'
-  | 'inviteUsed'
-  | 'inviteExpired'
   | 'noFile';
 
 export const refusal = (code: RefusalCode, message: string): ConvexError<{ code: RefusalCode; message: string }> =>
@@ -45,21 +41,4 @@ export async function requirePlayer(ctx: Ctx): Promise<Doc<'profiles'>> {
   const player = await findPlayer(ctx);
   if (player === null) throw refusal('noProfile', 'This account has no profile yet.');
   return player;
-}
-
-/** The world, when the player owns it. Being signed in is not owning this world. */
-export function requireOwner(player: Doc<'profiles'>, world: Doc<'worlds'> | null): Doc<'worlds'> {
-  if (world === null) throw refusal('notFound', 'No such world.');
-  if (world.ownerId !== player._id) throw refusal('forbidden', 'This is not your world.');
-  return world;
-}
-
-/** `owner`, `member`, or null when the player may not enter. */
-export async function roleIn(ctx: Ctx, player: Doc<'profiles'>, world: Doc<'worlds'>): Promise<'owner' | 'member' | null> {
-  if (world.ownerId === player._id) return 'owner';
-  const row = await ctx.db
-    .query('members')
-    .withIndex('by_worldId_and_playerId', (q) => q.eq('worldId', world._id).eq('playerId', player._id))
-    .unique();
-  return row ? 'member' : null;
 }

@@ -1,6 +1,5 @@
 {
-  // The world server's own type check: the Workers runtime's types and no page. A rule file that reaches
-  // for `document` fails here, because the server imports the rules.
+  // The Worker's own type check: the Workers runtime's types and no page.
   //   bunx tsc -p server
   "compilerOptions": {
     "target": "es2023",
@@ -20,6 +19,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["*.ts", "../src/engine/net"],
-  "exclude": ["../src/engine/net/*.test.ts"]
+  "include": ["*.ts"]
 }

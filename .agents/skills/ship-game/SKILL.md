@@ -15,7 +15,7 @@ The live copy is https://game-base.kausthubh2007.workers.dev. A push to `main` t
 |---|---|---|
 | The code | `git push origin HEAD:main` | `kausthubh-coder/game-base` on GitHub |
 | The database's functions | The deploy job: `bunx convex deploy` | Convex project `game-base`, production deployment `rare-lion-700` |
-| The game's files and the world server | The deploy job: `bun run deploy` | One Cloudflare Worker, `game-base` |
+| The game's files | The deploy job: `bun run deploy` | One Cloudflare Worker, `game-base` |
 
 Clerk has nothing to deploy. The live copy uses Clerk's development instance until the game has a domain, so sign-in shows Clerk's development badge.
 
@@ -31,7 +31,7 @@ Clerk has nothing to deploy. The live copy uses Clerk's development instance unt
 3. **Watch the deploy.** `gh run list --branch main --limit 1`, then `gh run view <id> --json jobs -q '.jobs[] | "\(.name) \(.conclusion)"'` until `check` and `deploy` both say `success`. Look again every 30 seconds or so; do not end your turn while it runs. A red run stops the ship: read `gh run view <id> --log-failed`, fix it and push again.
 4. **Check the live copy**, reading only:
    - `bun tools/live-look.mjs https://game-base.kausthubh2007.workers.dev` opens it like a player, starts a new game and ends with `PASS`. Look at `.artifacts/live/playing.png`.
-   - `bun server/test/live.ts --url https://game-base.kausthubh2007.workers.dev` joins a world on the live server with a real Clerk token and reads the world's card back from the live database. It removes the world it made. Run it from the commit that was deployed, or pass `--build <short hash>`.
+   - When the account or the save changed: `bun tools/play-cloud-save.mjs --url https://game-base.kausthubh2007.workers.dev` signs a fresh test user in on two browsers and plays the save between them through the live database.
 5. **Update the main checkout**, `~/dev/sandbox/game-base`: when it is clean and on `main`, `git -C ~/dev/sandbox/game-base pull --ff-only`, then `bun tools/doctor.mjs --quick` there. When it is dirty or on another branch, leave it and say so.
 6. **Clean up.** Delete the merged branch here and on the remote. A thread cannot remove its own worktree: list it for removal.
 7. **Report** in a few lines: what shipped, the evidence, anything skipped.
@@ -44,6 +44,5 @@ From the main checkout only, where `.env.live.local` holds the live settings: `b
 
 Names only. The values live in each service's settings, in GitHub's secrets and variables, and in `.env.local` and `.env.live.local` in the main checkout on the Mac mini.
 
-- GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CONVEX_DEPLOY_KEY`. Variables: `VITE_CONVEX_URL`, `VITE_CONVEX_SITE_URL`, `VITE_CLERK_PUBLISHABLE_KEY`.
-- The Worker's variables are set by the deploy script from those: `CLERK_ISSUER`, `CLERK_AUDIENCE`, `CONVEX_URL`, `CONVEX_SITE_URL`. Its one secret, `WORLD_SERVER_SECRET`, stays on the Worker between deploys.
-- Convex's production deployment: `CLERK_JWT_ISSUER_DOMAIN`, `WORLD_SERVER_SECRET`, the same value as the Worker's.
+- GitHub secrets: `CLOUDFLARE_API_TOKEN`, `CONVEX_DEPLOY_KEY`. Variables: `VITE_CONVEX_URL`, `VITE_CLERK_PUBLISHABLE_KEY`.
+- Convex's production deployment: `CLERK_JWT_ISSUER_DOMAIN`. The Worker has no variables or secrets.

@@ -174,7 +174,7 @@ export function createGameUi(root: HTMLElement, game: Game, options: GameUiOptio
       case 'make': return makePanel(ctx);
       case 'almanac': return almanacPanel(ctx, detail);
       case 'quests': return questsPanel(ctx);
-      case 'title': return titlePanel(ctx);
+      case 'title': return titlePanel(ctx, account !== null);
       case 'pause': return pausePanel(ctx, account !== null);
       case 'settings': return settingsPanel(ctx);
       case 'account': return account ? account() : pausePanel(ctx, false);

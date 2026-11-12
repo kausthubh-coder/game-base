@@ -20,9 +20,7 @@ Data first, then rules, then the picture. Each part has one home, and a check fa
 
 ## What a new feature must keep true
 
-- **Saved.** A system that holds state has `save()` and `load()`. The solo save, the world server's save and the online copy all use them, so a system that saves right is also right online.
-- **Online.** In an online world the browser does not run the rules. A player's action reaches the server only through the methods `src/game/online/online.ts` forwards. A new kind of action needs a new act there and in `src/engine/net/messages.ts`. Read `src/game/online/README.md` before adding one.
-- **One player today.** The rules know one bag and one set of quests (`docs/multiplayer.md`, stage 2). Write new state so it can become one player's own: keyed by who, not global.
+- **Saved.** A system that holds state has `save()` and `load()`. The save is one string in the browser, and a signed-in player's goes to their account and comes back on another device (`src/features/account/README.md`), so whatever `load()` reads must be what `save()` wrote, with nothing kept outside it.
 - **Speed.** Nothing allocated per frame. After a change to anything drawn, read `window.__game.costs()` and stay inside rule 6 of `AGENTS.md`.
 - **Sound and models** are made by tools, never added by hand (rule 4).
 

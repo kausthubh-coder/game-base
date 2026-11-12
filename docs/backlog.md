@@ -29,21 +29,13 @@ Written 2026-11-11. Take a row off when it is merged.
 | The world loaded by region | `docs/architecture.md`, "Regions" | After the bake step |
 | Measure on a real Chromebook | `/?bench` | Needs the device |
 
-## Playing together
-
-| Task | Where to read first | Notes |
-|---|---|---|
-| Stage 2: each player's own bag, hand and Almanac | `docs/multiplayer.md`; `src/game/online/README.md`, "What stage 2 changes" | The largest one. Design by the coordinator first |
-| A link a whole class can open | `convex/invites.ts`, `docs/multiplayer.md` | An invite lets one friend in today and a world holds 8. **His call** on how a class is split into worlds |
-| Stage 3: small binary messages, resume after a drop, the 8-player memory test on Cloudflare | `docs/multiplayer.md`; `server/README.md` | 85 KB a second for each player today against a goal of 20 |
-
 ## The workshop
 
 | Task | Where to read first | Notes |
 |---|---|---|
 | Apply Biome's formatter | `biome.json` | 664 files change. Do it when few branches are open |
 | A night playtester on a schedule | `docs/ai-native.md`, step 7; the `playtest-game` skill | Bots with new seeds, one charter from `docs/playtests/README.md`, bug files |
-| Model the save, the bag and an invite | The `formal-game` skill | One model each, in that order |
+| Model the cloud save and the bag | The `formal-game` skill | One model each, in that order |
 | Content views and change cards in the handbook app | `docs/ai-native.md`, "The workbench" | The app is in `~/dev/sandbox/game-look-test/handbook` |
 | One shots tool for the forty one-scene scripts | `docs/shots/README.md` | Sol |
 | The painted-texture loader reads the manifest | `tools/asset-build.mjs` | The build patches one line of the loader today |

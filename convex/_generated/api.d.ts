@@ -8,13 +8,10 @@
  * @module
  */
 
-import type * as http from "../http.js";
-import type * as invites from "../invites.js";
 import type * as model_auth from "../model/auth.js";
 import type * as model_limits from "../model/limits.js";
 import type * as profiles from "../profiles.js";
 import type * as saves from "../saves.js";
-import type * as worlds from "../worlds.js";
 
 import type {
   ApiFromModules,
@@ -23,13 +20,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  http: typeof http;
-  invites: typeof invites;
   "model/auth": typeof model_auth;
   "model/limits": typeof model_limits;
   profiles: typeof profiles;
   saves: typeof saves;
-  worlds: typeof worlds;
 }>;
 
 /**

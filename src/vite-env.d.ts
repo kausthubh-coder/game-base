@@ -5,9 +5,8 @@
 interface ImportMetaEnv {
   /** Clerk's publishable key. */
   readonly VITE_CLERK_PUBLISHABLE_KEY?: string;
-  /** The Convex deployment's address, and the address of its HTTP actions. */
+  /** The Convex deployment's address. */
   readonly VITE_CONVEX_URL?: string;
-  readonly VITE_CONVEX_SITE_URL?: string;
 }
 
 interface ImportMeta {

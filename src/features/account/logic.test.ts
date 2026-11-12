@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { agoText, asideKey, backupOf, clerkAddress, readSaveText, refusalText, replaceSave, sizeText, worldLine, type SaveStorage, type WorldCard } from './logic.ts';
+import { agoText, asideKey, clerkAddress, markKey, readMark, readSaveText, refusalText, replaceSave, sizeText, syncStep, writeMark, type SaveStorage } from './logic.ts';
 
 const SAVE = JSON.stringify({ version: 1, at: 5_000, world: { version: 1, seed: 1, edits: [] }, game: { version: 1, clock: { day: 3, timeOfDay: 0.4, seconds: 900 } }, shell: { wheat: 2, blocks: 5 } });
 
@@ -15,8 +15,6 @@ function storage(start: Record<string, string> = {}, full = false): SaveStorage 
     },
   };
 }
-
-const card = (over: Partial<WorldCard>): WorldCard => ({ _id: 'w1', name: 'Hollow Oak', kind: 'online', role: 'owner', ownerName: 'Ada', lastPlayedAt: 0, playersNow: [], backup: null, ...over });
 
 describe('reading a save', () => {
   test('the facts of a save the game wrote', () => {
@@ -67,6 +65,54 @@ describe('replacing a save', () => {
   });
 });
 
+describe('which way the save goes', () => {
+  const ADA = 'profile_ada';
+  const here = (at: number) => ({ at });
+  const there = (savedAt: number) => ({ savedAt });
+  const mark = (h: number, t: number, player = ADA) => ({ player, here: h, there: t });
+
+  test('with a save on one side only, it goes to the other', () => {
+    expect(syncStep(null, null, null, ADA)).toBe('none');
+    expect(syncStep(here(5), null, null, ADA)).toBe('send');
+    expect(syncStep(null, there(5), null, ADA)).toBe('fetch');
+    // A mark from before, when the account's copy is gone: this browser's goes up again.
+    expect(syncStep(here(5), null, mark(5, 5), ADA)).toBe('send');
+  });
+
+  test('after they matched, the side that changed wins', () => {
+    expect(syncStep(here(5), there(6), mark(5, 6), ADA)).toBe('none');
+    expect(syncStep(here(9), there(6), mark(5, 6), ADA)).toBe('send');
+    expect(syncStep(here(5), there(9), mark(5, 6), ADA)).toBe('fetch');
+    // An older save on the other device is still a change: the mark says what was agreed, not which is newer.
+    expect(syncStep(here(5), there(2), mark(5, 6), ADA)).toBe('fetch');
+  });
+
+  test('when both changed since they matched, the player is asked', () => {
+    expect(syncStep(here(9), there(8), mark(5, 6), ADA)).toBe('ask');
+  });
+
+  test('a save this browser never matched with this account is asked about, unless it is the same save', () => {
+    // A guest's game, then the first sign-in on this device.
+    expect(syncStep(here(9), there(8), null, ADA)).toBe('ask');
+    // A mark of another player who signed in on this browser.
+    expect(syncStep(here(5), there(6), mark(5, 6, 'profile_bo'), ADA)).toBe('ask');
+    expect(syncStep(here(8), there(8), null, ADA)).toBe('same');
+  });
+
+  test('the mark is kept beside the save and read back, and anything else is no mark', () => {
+    const store = storage();
+    expect(readMark(store, 'greenhollow.save')).toBeNull();
+    expect(writeMark(store, 'greenhollow.save', mark(5, 6))).toBe(true);
+    expect(markKey('greenhollow.save')).toBe('greenhollow.save.synced');
+    expect(readMark(store, 'greenhollow.save')).toEqual(mark(5, 6));
+    for (const text of ['', 'null', '{"player":1,"here":2,"there":3}', '[1,2]', 'not json']) {
+      store.items['greenhollow.save.synced'] = text;
+      expect(readMark(store, 'greenhollow.save')).toBeNull();
+    }
+    expect(writeMark(storage({}, true), 'greenhollow.save', mark(5, 6))).toBe(false);
+  });
+});
+
 describe('the words on the panel', () => {
   test('how long ago', () => {
     const now = 1_000_000_000_000;
@@ -81,24 +127,8 @@ describe('the words on the panel', () => {
     expect([0, 1, 999, 1000, 9376, 376_383, 999_499, 1_466_238].map(sizeText)).toEqual(['0 bytes', '1 byte', '999 bytes', '1 KB', '9 KB', '376 KB', '999 KB', '1.5 MB']);
   });
 
-  test('the line under a world', () => {
-    const now = 10 * 60_000;
-    expect(worldLine(card({ kind: 'solo', backup: { slot: 's', bytes: 9000, savedAt: 0, uploadedAt: now - 5 * 60_000, day: 3 } }), now)).toBe('Solo. Day 3, backed up 5 minutes ago.');
-    expect(worldLine(card({ kind: 'solo' }), now)).toBe('Solo.');
-    expect(worldLine(card({ lastPlayedAt: now - 2 * 3600_000 }), now)).toBe('Online. Yours. Last played 2 hours ago.');
-    expect(worldLine(card({ role: 'member', playersNow: [{ playerId: 'p1', name: 'Bo' }, { playerId: 'p2', name: 'Cy' }] }), now)).toBe("Online. Ada's. 2 in it now: Bo, Cy.");
-  });
-
-  test('the backup of this browser\'s save is the owner\'s world with that slot', () => {
-    const backup = { slot: 'greenhollow.save', bytes: 9000, savedAt: 1, uploadedAt: 2, day: 3 };
-    const worlds = [card({ _id: 'online' }), card({ _id: 'scene', kind: 'solo', backup: { ...backup, slot: 'greenhollow.save.build' } }), card({ _id: 'mine', kind: 'solo', backup })];
-    expect(backupOf(worlds, 'greenhollow.save')).toEqual({ ...backup, worldId: 'mine' });
-    expect(backupOf(worlds, 'greenhollow.save.other')).toBeNull();
-    expect(backupOf([], 'greenhollow.save')).toBeNull();
-  });
-
   test('why Convex refused, in the player\'s words', () => {
-    expect(refusalText({ data: { code: 'tooMany', message: 'You have too many worlds. Delete one first.' } }, 'fallback')).toBe('You have too many worlds. Delete one first.');
+    expect(refusalText({ data: { code: 'tooMany', message: 'You have too many saves.' } }, 'fallback')).toBe('You have too many saves.');
     expect(refusalText({ data: { code: 'signedOut', message: 'Sign in first.' } }, 'fallback')).toBe('You are signed out. Sign in and try again.');
     for (const error of [new Error('network'), null, 'text', { data: 'text' }, { data: {} }]) expect(refusalText(error, 'fallback')).toBe('fallback');
   });

@@ -86,7 +86,7 @@ browser and no drawing. `bun tools/sim.ts` wraps that harness and adds the three
 - **Replays.** A failure prints its seed and step. `bun tools/sim.ts --replay <seed> --until <step>` plays
   the same game to the step before the failure.
 
-This is the cheapest way to find rule bugs, and it is the same code path a multiplayer server will run.
+This is the cheapest way to find rule bugs.
 
 ### 5. Play in the browser: one tool, two modes
 

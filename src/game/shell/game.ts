@@ -27,10 +27,6 @@ import { STEP, createKernel } from '../kernel.sim.ts';
 import { installSystems, type Installed } from '../systems.ts';
 import { loadArt, makeSprites } from './art.ts';
 import { HINTS } from '../content/hints.ts';
-import { devToken, readJoin } from '../online/join.ts';
-import { createOnline, type Online } from '../online/online.ts';
-import { wireSteer } from '../online/predict.ts';
-import { splitEvents } from '../online/relay.ts';
 import { createKeys, type MouseMode, type Press } from './keys.ts';
 import { HERO_STEP, createPlayer, type PlayerRig } from './player.ts';
 import { clearSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
@@ -84,8 +80,6 @@ export interface Shell {
   readonly errors: string[];
   /** True when a title screen, or `?hold` in the address, asked the game not to start by itself. */
   readonly holdsStart: boolean;
-  /** The online world this page plays, or null in solo play. */
-  readonly online: Online | null;
 }
 
 interface StoredSettings {
@@ -123,8 +117,6 @@ function readSettings(): StoredSettings {
 export async function createShell(options: ShellOptions): Promise<Shell> {
   const { canvas, root } = options;
   const params = new URLSearchParams(location.search);
-  // `?world=<id>` opens that online world: the server runs the rules and this page is a copy (src/game/online).
-  const join = readJoin(location.search, location);
   const settings = readSettings();
   // `?quality=low` holds a level for this visit only. It is how a test gets the same picture every time.
   const asked = levelOf(params.get('quality'));
@@ -243,8 +235,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   ctx.ambient = game.ambient;
   const systems = installSystems(kernel);
   const sys = game.systems as Partial<Systems>;
-  // In an online world the systems hear nothing from here on: they are a copy, and the server decides.
-  const relay = join ? splitEvents(game.events) : null;
 
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
   const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov, mode: cameraMode });
@@ -270,7 +260,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // With Quarter turns the 2.5D camera turns with the hand during a drag and glides to the nearest quarter after it.
   keys.onDragEnd(() => { if (tiltTurn === 'quarter') camera.settle(); });
   const start = sys.region?.spawn() ?? spawnPoint();
-  const player = createPlayer(game, world.sim, keys, start, { stepUp: look === 'smooth' ? 1 : 0, lift, standAt: look === 'smooth' ? standAt : undefined, wire: join ? wireSteer : undefined });
+  const player = createPlayer(game, world.sim, keys, start, { stepUp: look === 'smooth' ? 1 : 0, lift, standAt: look === 'smooth' ? standAt : undefined });
 
   /**
    * How the mouse works with a camera: the 2.5D camera points and drags, first person locks the mouse, and the free
@@ -394,22 +384,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     water.refresh();
   }
 
-  const online: Online | null = join && relay ? createOnline({
-    join, game, kernel, sim: world.sim, player, relay,
-    place: (x, y, z, facing) => place(x, y, z, facing),
-    drawn: player.position,
-  }) : null;
-  if (online && join?.dev) online.setToken(() => devToken(join.dev as string));
-
-  /** An online world starts when its first snap is in. The save in this browser is solo play's and is never touched. */
-  function startOnline(): void {
-    if (!online || started) return;
-    started = dirty = true;
-    online.start();
-  }
-
   function save(): boolean {
-    if (!started || online) return false;
+    if (!started) return false;
     sinceSave = 0;
     saveDue = false;
     try {
@@ -421,10 +397,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   }
 
   function newGame(): void {
-    if (online) {
-      startOnline();
-      return;
-    }
     if (dirty) {
       // Systems keep their state in closures, so the clean way back to day 1 is a fresh page.
       clearSave();
@@ -437,10 +409,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   }
 
   function continueGame(): boolean {
-    if (online) {
-      startOnline();
-      return true;
-    }
     if (dirty) {
       if (!hasSave()) return false;
       reloadInto('continue');
@@ -481,12 +449,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // ---------------------------------------------------------------- one step of the rules
   function simStep(): void {
     if (keys.primary && !game.player.busy && !claimed('use')) sys.actions?.hold(useContext('primary'), STEP);
-    if (online) {
-      // The rules run on the server. This step's steering and acts go up instead.
-      online.step();
-      call(stepListeners, STEP, 'step');
-      return;
-    }
     kernel.step();
     call(stepListeners, STEP, 'step');
     sinceSave += STEP;
@@ -496,15 +458,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   let carry = 0, bodySteps = 0;
   function bodyStep(): void {
     player.step(camera.yaw, camera.mode === 'first');
-    online?.bodyStepped(player.steer);
     if (++bodySteps < BODY_STEPS) return;
     bodySteps = 0;
     simStep();
   }
 
   function advance(steps: number): void {
-    // An online world's time is the server's.
-    if (!started || online) return;
+    if (!started) return;
     for (let i = 0; i < steps; i++) {
       if (!loadedAround(player.body.x, player.body.z, READY_REACH)) loadAround(player.body.x, player.body.z, LOAD_REACH);
       for (let b = 0; b < BODY_STEPS; b++) bodyStep();
@@ -558,7 +518,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     last = now;
     ctx.time += dt;
 
-    if (running() && (!online || online.ready) && loadedAround(player.body.x, player.body.z, READY_REACH)) {
+    if (running() && loadedAround(player.body.x, player.body.z, READY_REACH)) {
       perf.begin('sim');
       carry = Math.min(carry + dt, 0.25);
       while (carry >= HERO_STEP) {
@@ -568,7 +528,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       perf.end('sim');
       player.blend(carry / HERO_STEP, dt);
     }
-    online?.frame(dt);
 
     // A locked mouse or a right-button drag turns the view; the 2.5D camera only along the ground. Anything that
     // holds the player gives the cursor back and ends a drag.
@@ -767,8 +726,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     },
 
     get started() { return started; },
-    // An online world has no title: the page opens straight into it.
-    holdStart() { if (!online) held = true; },
+    holdStart() { held = true; },
     hasSave,
     continueGame,
     newGame,
@@ -793,7 +751,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       else claims.delete(reason);
     },
     claimed,
-    online,
   };
 
   applyGraphics();
@@ -825,6 +782,5 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       await until(() => quiet >= 3);
     },
     get holdsStart() { return held; },
-    online,
   };
 }

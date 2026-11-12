@@ -10,7 +10,7 @@
     "typecheck": "bun tools/typecheck.mjs",
     "test": "bun test src",
     "boundaries": "bun tools/boundaries.mjs",
-    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && tsc -p server && tsc -p server/test && bun test src server && vitest run --root convex",
+    "check": "bun tools/typecheck.mjs && bun tools/boundaries.mjs && tsc -p server && bun test src && vitest run --root convex",
     "demo:build": "bun tools/demo.mjs build",
     "demo:dev": "bun tools/demo.mjs dev",
     "serve": "bun tools/serve.mjs",
@@ -20,8 +20,6 @@
     "deploy": "bun tools/deploy.mjs",
     "sim": "bun tools/sim.ts",
     "server": "wrangler dev",
-    "server:check": "bun server/test/check.ts",
-    "server:live": "bun server/test/live.ts",
     "lint": "biome lint ."
   },
   "devDependencies": {

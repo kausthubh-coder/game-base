@@ -1,50 +1,19 @@
-// One Worker for the whole game: it serves the built game's files (dist/, made by `bun run build`) and
-// routes a world's address, /world/<id>, to that world's Durable Object. See server/README.md.
+// One Worker for the whole game: it serves the built game's files (dist/, made by `bun run build`). See server/README.md.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "game-base",
   "main": "server/index.ts",
   "compatibility_date": "2026-11-11",
 
-  // The game's files. A request is answered from dist/ when a file matches. Only /world/* runs the Worker first.
   "assets": {
     "directory": "./dist",
-    "binding": "ASSETS",
-    "run_worker_first": ["/world/*"]
+    "binding": "ASSETS"
   },
 
-  // One Durable Object per world. SQLite storage is the kind the free plan allows.
-  "durable_objects": {
-    "bindings": [{ "name": "WORLD", "class_name": "WorldServer" }]
-  },
+  // The world server's Durable Object is gone with multiplayer. This tombstone retires its namespace and the
+  // worlds stored in it on the next deploy; Cloudflare refuses a deploy that drops the class without it.
   "exports": {
-    "WorldServer": { "type": "durable-object", "storage": "sqlite" }
-  },
-
-  // The rules read `import.meta.env.VITE_TOWN`, which Vite fills in for the browser. Here it is empty.
-  "define": {
-    "import.meta.env": "{}"
-  },
-
-  // Addresses and switches, none of them secret. Empty means "not set up": see server/README.md.
-  // .dev.vars overrides these on this machine. The one secret, WORLD_SERVER_SECRET, is never written here.
-  "vars": {
-    // Clerk's Frontend API URL, such as https://your-app.clerk.accounts.dev. Tokens must come from it.
-    "CLERK_ISSUER": "",
-    // When set, a token's `aud` must be this. Convex's Clerk tokens carry "convex".
-    "CLERK_AUDIENCE": "",
-    // When set, a token's `azp` must be one of these origins, separated by commas.
-    "CLERK_PARTIES": "",
-    // The Convex deployment, such as https://name.convex.cloud, and its HTTP actions, https://name.convex.site.
-    "CONVEX_URL": "",
-    "CONVEX_SITE_URL": "",
-    // "1" in .dev.vars only: accept `dev:<name>` tokens, and let everyone into every world while Convex is not set.
-    "DEV_TOKENS": "",
-    // "1" in .dev.vars only: /world/<id>/stats and /world/<id>/dev, for the checks and the memory test.
-    "DEV_TOOLS": ""
-  },
-  "secrets": {
-    "required": ["WORLD_SERVER_SECRET"]
+    "WorldServer": { "type": "durable-object", "state": "deleted" }
   },
 
   "observability": {

@@ -15,9 +15,6 @@ at `/` is `main` and stays as it was, so a player whose playtest copy breaks goe
 The two builds share no script, so new story code cannot break the game at `/`. With no `playtest` branch
 the step is skipped.
 
-The playtest copy is for one player. Its rules differ from the world server's, which runs `main`, so a
-shared world (`?world=`) is refused there.
-
 ## What is in it
 
 `playtest` is `main` plus slices of `docs/story-build.md`, merged as each one works:

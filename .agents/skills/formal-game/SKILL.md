@@ -12,7 +12,6 @@ A test checks the cases someone thought of. A model checker walks every order of
 | Area | Its skill | The design | The code it is held to |
 |---|---|---|---|
 | The build-mode stroke: press, drag, release, cancel, undo | `verify-build-stroke` | `docs/verify/build-stroke/Stroke.tla` | `src/game/build/model.test.ts`, 1,500 random runs of the real systems |
-| Joining and leaving a world, and the world's card: hello, Convex's answer, a second tab, a drop, silence, a restart, posts that cross or fail | `verify-world-join` | `docs/verify/world-join/WorldJoin.tla` | `server/test/world-model.test.ts`, 600 random runs of the real `world.ts`, and `convex/world-card-model.test.ts` for `writeCard`. Two findings are filed and marked failing |
 
 If your change touches code a row covers, run that row's skill. Each skill has a table of the code it stands for and the commit it was last read against.
 
@@ -20,7 +19,7 @@ If your change touches code a row covers, run that row's skill. Each skill has a
 
 Each is a place where events arrive in more than one order and a wrong order harms a player.
 
-- **An invite** (`convex/invites.ts`): made, accepted once, used twice, the world removed meanwhile.
+- **The cloud save** (`src/features/account/account.ts`, `convex/saves.ts`): two devices, each playing, sending and fetching, a drop, a sign-out mid-fetch. No device's play is lost without the player choosing.
 - **The bag** (`src/game/inventory`): moves, crafting and pickups never make or lose an item.
 - **The save** (`server/store.ts`, `src/game/shell/save.ts`): a change, a save, a restart, a load, in any order, loses nothing a player was shown.
 

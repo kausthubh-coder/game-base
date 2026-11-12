@@ -45,7 +45,6 @@ Nothing on hand can measure it. This Mac draws WebGL in software, and the Window
 | Instance streaming | The server sends only the part of the world near the player. A minimum radius always stays loaded. A target radius loads when there is room. Far parts are dropped when memory runs low. | The world is cut into regions. The game downloads and builds the regions near the hero, and drops far ones. Props already sit in 32-block cells. | Partly |
 | SLIM and mesh LOD | At publish, Roblox's servers make several detail levels of each model and strip hidden faces. The client picks one by distance and by device. | The bake step makes a far version of every asset. The low tier uses far versions sooner. Far trees and NPCs become flat cards. | Missing |
 | Automatic graphics quality | The client lowers quality on weak devices by itself. | `governor.sim.ts`. It needs a low tier that changes the look on purpose: no leaf cards, blob shadows, no post effects. | Partly |
-| Server authority with prediction | The server runs the rules. The client predicts its own moves at once, then rolls back and replays when the server disagrees. | A world server on Cloudflare runs the `.sim.ts` rules (see `docs/architecture.md`). Clients send inputs, not positions. Each client predicts its own hero. The server sends each player only what is near them, using the same regions as streaming. | Missing, ready by design |
 
 Sources: [instance streaming](https://create.roblox.com/docs/workspace/streaming),
 [SLIM](https://create.roblox.com/docs/workspace/streaming/slim),
@@ -77,7 +76,5 @@ downloads and draws.
    `test/asset-routes`).
 5. **Regions.** Stream the world by region, with a minimum and a target radius, and drop far regions under
    memory pressure.
-6. **Multiplayer.** Run the `.sim.ts` rules on the world server, send inputs, predict the hero, and send each
-   player only nearby regions and players. `docs/architecture.md` has the full order.
 
 Steps 1 and 2 come first because every later step is judged by the Chromebook's numbers.

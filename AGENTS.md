@@ -11,7 +11,7 @@ Read before a large change:
 |---|---|
 | How agents build, play and check the game | `docs/ai-native.md` |
 | How the three ways of testing fit: scripts, playtests, models | `docs/testing.md` |
-| Hosting, accounts, the world server, graphics levels, the bake step | `docs/architecture.md` |
+| Hosting, accounts and the cloud save, graphics levels, the bake step | `docs/architecture.md` |
 | Frame rate or load time on a weak device | `docs/fast-everywhere.md` |
 | The look of the world | `docs/painted-world.md` |
 | Menus, HUD, dialogue, map or any interface look (with the `make-ui` skill) | `docs/ui-look.md` |
@@ -32,7 +32,7 @@ They are in `.agents/skills`. Load the one that fits before you start.
 | Add a check, test something, or a bug was reported | `test-game` |
 | Play like a person to find what scripts miss: bugs, polish, how it looks and feels | `playtest-game` |
 | Prove a change works before saying done | `verify-game` |
-| A rule where the order of events is the risk, or "model-check this" | `formal-game`, then `verify-build-stroke` for build mode, `verify-world-join` for joining and leaving a world |
+| A rule where the order of events is the risk, or "model-check this" | `formal-game`, then `verify-build-stroke` for build mode |
 | A menu, a panel, the HUD, dialogue, the map, or how any of it looks | `make-ui` |
 | A 3D prop, or a sprite, icon, portrait or tile | `make-3d-asset`, `make-sprite`, then `verify-assets` |
 | An art style behind `?style=` | `verify-style-lab` |
@@ -44,7 +44,7 @@ What to build next, one line a task: `docs/backlog.md`.
 | Command | What it does |
 |---|---|
 | `bun tools/doctor.mjs` | Makes this checkout run: packages, keys, Chrome, a port of its own. Prints the port to use. |
-| `bun run check` | Types, the `.sim.ts` rule, every test, the world server's types, the Convex tests |
+| `bun run check` | Types, the `.sim.ts` rule, every test, the Worker's types, the Convex tests |
 | `bun run verify` | Every check there is, about two minutes. `--full` adds the slow browser plays, `--list` names the parts. |
 | `bun run lint` | Biome lint. The formatter is not applied to the code yet. |
 | `bun tools/sim.ts scenarios` | Plays the rules with no browser. Also `bot --seed <n> --steps <n>` and `--replay <seed> --until <step>`. |
@@ -52,11 +52,8 @@ What to build next, one line a task: `docs/backlog.md`.
 | `bun tools/shots.mjs all --check` | Six scenes against their approved pictures and the draw budgets (`docs/shots/README.md`) |
 | `bun tools/shot.mjs <url> <out.png>` | One screenshot in headless Chrome. Exits 1 on a console error. |
 | `bun run dev` | The game itself, on port 5300 in the main checkout |
-| `bunx wrangler dev` | The built game and the world server, on port 5540 (`server/README.md`) |
-| `bun server/test/check.ts` | The world server's checks, on its own `wrangler dev` |
-| `bun server/test/live.ts` | Clerk, Convex and the world server together. Needs `.env.local`. |
-| `bun tools/play-together.mjs` | Two browsers in one world with dev tokens: walk, build, farm, leave, a server restart (`src/game/online/README.md`) |
-| `bun tools/play-together-signed-in.mjs` | The same with three real Clerk sign-ins and the invite link (`tools/play/signed-in.md`). `--url <address>` plays a deployed copy. |
+| `bunx wrangler dev` | The built game as the Worker serves it, on port 5540 (`server/README.md`) |
+| `bun tools/play-cloud-save.mjs` | Two browsers, one real Clerk sign-in: the save goes up from one and comes down on the other, and a conflict is asked about. Needs `.env.local`. `--url <address>` plays a deployed copy. |
 | `bunx convex dev --once` | Pushes `convex/` to the dev deployment (`convex/README.md`) |
 | `bun tools/load-measure.mjs` | Bytes and requests before the first playable frame, first and second visit |
 | `bun run deploy --dry-run` | Builds and packages the live copy and sends nothing. GitHub does the real deploy. |
@@ -72,12 +69,11 @@ The other scripts in `tools/` shoot or measure one thing each. `docs/painted-wor
 
 ```
 src/engine/            the contract between features: types, events, world-query, system
-src/engine/net/        the messages the browser and the world server send each other
 src/content/           data only: blocks, surfaces, palettes, effects, props
 src/features/<name>/   one folder per feature, with its tests beside the code
 src/game/              the game itself: rules, content, views and the shell that starts it
-server/                the world server, a Cloudflare Durable Object that runs the .sim.ts rules
-convex/                the database's tables and functions
+server/                the Cloudflare Worker that serves the built game
+convex/                the database: profiles and the save that follows a player between devices
 demos/<name>/          one small page per feature that shows it alone
 public/assets/         finished sprites and textures, and manifest.json (see docs/assets.md)
 assets-src/            raw generated images, prompts and the palette
@@ -88,7 +84,7 @@ docs/                  plans, briefs, the style sheet, the asset contract
 
 ## Rules
 
-1. **A `.sim.ts` file is game rules.** It will run on a server later. It imports only other `.sim.ts` files, `src/content` and `engine/types`, `events` or `world-query`. It never touches Three.js, the page or Web Audio. `bun run boundaries` fails otherwise. Drawing goes in `.view.ts`, panels in `.ui.ts`.
+1. **A `.sim.ts` file is game rules.** It runs with no page, so `tools/sim.ts` plays it thousands of steps a second. It imports only other `.sim.ts` files, `src/content` and `engine/types`, `events` or `world-query`. It never touches Three.js, the page or Web Audio. `bun run boundaries` fails otherwise. Drawing goes in `.view.ts`, panels in `.ui.ts`.
 2. **A feature is a deep module.** It exports `createX(ctx, options)` and returns a `ViewSystem` plus a few methods of its own. No globals, no singletons, no reaching into another feature's files. Features meet through `src/engine` and through `src/main.ts`.
 3. **Content is data.** A block, a sound palette, an effect or a prop is an entry in `src/content`. Adding one does not change engine code.
 4. **Sound files are made by tools, never by hand. 3D models are made by code.** Code makes the music and every sound that works better made: the wind, the made creatures, spells, the interface. Two kinds of files are made ahead of time with ElevenLabs. Spoken dialogue: `tools/voice.ts` makes a clip for each line a person in `src/game/content/cast.ts` says, into `public/assets/voice/` with its list `voice/voice.json`. Recorded ambience beds, footsteps, tool strikes and spot sounds: `tools/sound.ts` makes each from its prompt in `src/content/sound-samples.ts`, into `public/assets/sound/` with its list `sound/sound.json`. Both are small mp3s listed in the manifest (see `docs/assets.md`). To change a recorded sound, change its prompt and run the tool. Never add an audio file by hand, and never call ElevenLabs from the game. Simple shapes are TypeScript builders in `src/features/props/builders`. Richer models (trees, rocks, bushes, characters) are `.glb` files listed in `public/assets/manifest.json`, built by a Blender script in `tools/models/`, or modelled by hand with the `.blend` source kept beside an export script that rebuilds the `.glb` and checks its triangles, scale and animation names. Never commit a model that nothing rebuilds. Sprites and textures are PNG files listed there too.
@@ -118,5 +114,5 @@ Ports. `bun tools/doctor.mjs` gives each worktree one of its own in 5400 to 5999
 | 5361 | The handbook app |
 | 5460, 5470 | The painted meadow test scene, `painted-shots` |
 | 5525, 5526 | `tools/play.mjs` and `tools/shots.mjs` when `PLAY_PORT` is not set |
-| 5540 to 5548 | The world server: `wrangler dev`, its check, its memory test, the live check, `play-together` |
-| 5570 to 5578 | `play-together-signed-in` |
+| 5540, 5541 | `wrangler dev` and its inspector |
+| 5577 | `play-cloud-save` when `PLAY_PORT` is not set |
