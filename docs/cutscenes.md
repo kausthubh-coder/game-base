@@ -171,3 +171,11 @@ Choices made while building it, for Kausthubh to overrule:
   way play does. In a game where the fox has already come it plays the film as it stands; the rules carry
   on from where they were.
 - **The film takes the quest's beam of light and the Almanac's card off the screen** while it plays.
+
+Open:
+
+- **Low graphics at the camp is over the triangle budget**, with or without the film: the game's own camera
+  there at `?quality=low` draws 199,413 triangles (budget 150,000), shot 4 195,658. The trees draw all 36
+  calls at low here. The film adds one draw call, the pool of firelight.
+- **The fallbacks show.** The brazier on its post stands in for the campfire, a bed for the tent, and
+  fireflies for the sparks until `cut/camp-props` is merged.
