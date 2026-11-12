@@ -1,0 +1,41 @@
+[
+  {
+    "name": "portrait-1",
+    "data": [
+      {
+        "name": "camp.seat",
+        "screen": null
+      },
+      {
+        "name": "camp.edge",
+        "screen": null
+      }
+    ]
+  },
+  {
+    "name": "portrait-2",
+    "data": [
+      {
+        "name": "camp.seat",
+        "screen": null
+      },
+      {
+        "name": "camp.edge",
+        "screen": null
+      }
+    ]
+  },
+  {
+    "name": "portrait-3",
+    "data": [
+      {
+        "name": "camp.seat",
+        "screen": null
+      },
+      {
+        "name": "camp.edge",
+        "screen": null
+      }
+    ]
+  }
+]

@@ -1,0 +1,12 @@
+Chrome renderer: ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version)
+ok   the film played from start to end in 24.4 s of the page's clock
+ok   play resumes with the hero by the fire, 0.00 from camp.seat
+ok   the fox stands at the edge of the light, 0.00 from camp.edge
+ok   the player has the keys and the night is on its step "door"
+ok   the hero walked 7.2 blocks
+ok   the fox followed: it moved 7.0 blocks, now 3.2 from the hero
+ok   a reload after the film continues the save and does not play the film again
+ok   Esc at 0.3 s leaves the same world as watching: hero -20.50,-229.50 facing -2.47 (watched -20.50,-229.50 facing -2.47), fox -24.50,-224.50, hour 0.7993 (watched 0.7994)
+ok   Esc at 3 s leaves the same world as watching: hero -20.50,-229.50 facing -2.47 (watched -20.50,-229.50 facing -2.47), fox -24.50,-224.50, hour 0.7993 (watched 0.7994)
+ok   Esc at 15 s leaves the same world as watching: hero -20.50,-229.50 facing -2.47 (watched -20.50,-229.50 facing -2.47), fox -24.50,-224.50, hour 0.7992 (watched 0.7994)
+ok   Esc at 24 s leaves the same world as watching: hero -20.50,-229.50 facing -2.47 (watched -20.50,-229.50 facing -2.47), fox -24.50,-224.50, hour 0.7993 (watched 0.7994)

@@ -1,0 +1,4 @@
+$ bun tools/verify.mjs tools
+pass tools      0.0 s  the tools' own tests
+
+verify: 1 parts, nothing failed
