@@ -91,3 +91,12 @@ Hall repair b1b07359 removes raised stone across the flat walking entrance. The 
 UI movement diagnosis: the old probe crosses the pitched tent, not a missing movement binding. The actual A trace stalls near x=-15.3, z=-232.5; `clearCampTent` resolves (-16.3,22,-232.5) to (-15.3019,22,-232.6508). The supplied UI fixture now checks movement on clear ground east/north of the tent with the same distance assertions. Red traces are in the release checkout's `.artifacts/ui-movement-red/` and `ui-movement-probe.log`.
 
 A fresh title-to-Gallery chain is being connected from the existing ten earned-input runners. Every stage must consume the preceding stage's new raw save. No accepted historical checkpoint will substitute for this final chain. Full Act 1 beyond Gallery remains unfinished.
+
+
+## Release preflight follow-up
+
+The UI movement replay now passes all 134 checks after its fixture moved outside the tent. The fresh Begin route also passes through the ferry landing on the release build. Its new raw save will start the remaining first-half chain.
+
+Phone scene inspection found two cosmetic issues for the post-beta queue: the first Maren film speaker name clips at the right edge in scene 27, and foreground cutaway dithering remains visible in scene 22. The captions and required characters remain readable. These do not block progression, so this minimal release does not expand into a dialogue-layout or scenery redesign.
+
+Automatic-film checker repairs preserve the real scene timing and verify every captured line against the actual dialogue log. Failed diagnostics stay separate from passing scene evidence. No final replay or public release is claimed by this checkpoint.
