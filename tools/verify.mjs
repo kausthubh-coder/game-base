@@ -19,7 +19,7 @@ const PARTS = [
   { name: 'check', what: 'types, the .sim.ts rule, every test, the Convex tests', run: [['bun', 'run', 'check']] },
   { name: 'formal', what: 'covered code matches the reviewed formal model', run: [['bun', 'tools/formal-sync.mjs']] },
   { name: 'lint', what: 'Biome lint', run: [['bun', 'run', 'lint']] },
-  { name: 'tools', what: 'the tools\' own tests', run: [['bun', 'test', 'tools/doctor.test.mjs', 'tools/art', 'tools/workflow'], ['bun', 'tools/workflow/break-checks.mjs']] },
+  { name: 'tools', what: 'the tools\' own tests', run: [['bun', 'test', 'tools/doctor.test.mjs', 'tools/art', 'tools/workflow', 'tools/lib/beta-chain.test.mjs'], ['bun', 'tools/workflow/break-checks.mjs']] },
   { name: 'bots', what: 'three bots, 20,000 steps each, rules only', run: [['bun', 'tools/sim.ts', 'bot', '--seed', '1,2,3', '--steps', '20000']] },
   { name: 'assets', what: 'every asset against the asset contract', run: [['bun', 'tools/verify-assets.mjs']] },
   { name: 'build', what: 'a production build', run: [['bun', 'run', 'build']] },

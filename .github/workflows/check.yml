@@ -19,7 +19,7 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun tools/formal-sync.mjs
       - run: bun run check
-      - run: bun test tools/doctor.test.mjs tools/workflow
+      - run: bun test tools/doctor.test.mjs tools/workflow tools/lib/beta-chain.test.mjs
       - run: bun tools/workflow/break-checks.mjs
       - run: bun run lint
 
