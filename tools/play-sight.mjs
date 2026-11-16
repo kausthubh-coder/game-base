@@ -1,5 +1,6 @@
 import {sample,canStartHeavy} from './resource-status.mjs';
 import {storyCosts,costIssues} from './lib/story-cost-probe.mjs';
+import {dialogueCoverage,presentedDialogueLine,sameDialogueLine} from './lib/dialogue-capture.mjs';
 // What the camera shows of what matters: every scene of act 1 with its people and the hero in the shot, and the
 // places the first playtest found hidden (docs/bugs/2026-11-12-act1-*-occlusion.md, -town-foliage.md).
 //   bun tools/play-sight.mjs [scenes|places|all] [--only 12,16] [--shots] [--port 5541] [--url http://...] [--no-build] [--quality high]
@@ -108,11 +109,11 @@ async function heartstoneHUD() {
 /** Plays one conversation line by line and checks what the camera shows on each. */
 async function playLines(label, shotName, expectedScene) {
   const problems = [];
-  for (let i = 0; i < 60; i++) {
-    const seen = await page.evaluate(async (first) => {
+  const captured = [];
+  const logBefore = await page.evaluate(() => window.__game.view.game.systems.talk.log().slice(0, -1).map(entry => entry.text));
+  const observe = async (frames) => page.evaluate(async (frames) => {
       const g = window.__game;
-      // The first line is checked once the camera has cut or eased in; the rest as they show.
-      await g.frames(first ? 50 : 8);
+      if (frames) await g.frames(frames);
       const talk = g.view.game.systems.talk;
       if (!talk.active) return null;
       const line = talk.current();
@@ -122,12 +123,17 @@ async function playLines(label, shotName, expectedScene) {
       const inWorld = line.npc ? [`npc:${line.npc}`, `stage:${line.npc}`].find((id) => { const a = actors.get(id); return a?.visible && Math.hypot(a.pos.x - p.x, a.pos.z - p.z) <= 16; }) ?? null : null;
       const lens = g.view.ctx.camera.position, r = (n) => Math.round(n * 10) / 10;
       const where = `hero at ${r(p.x)}, ${r(p.y)}, ${r(p.z)}, lens at ${r(lens.x)}, ${r(lens.y)}, ${r(lens.z)}`;
-      return { line: { scene: line.scene, npc: line.npc, text: line.text, choices: line.choices.length }, inWorld, sight: g.sight(), where, costs: g.costs(), camera: {x:lens.x,y:lens.y,z:lens.z} };
-    }, i === 0);
+      return { line: { scene: line.scene, npc: line.npc, text: line.text, choices: line.choices.length, kind: line.kind }, inWorld, sight: g.sight(), where, costs: g.costs(), camera: {x:lens.x,y:lens.y,z:lens.z} };
+    }, frames);
+  for (let i = 0; i < 60; i++) {
+    let seen = await observe(i === 0 ? 50 : 8);
     if (!seen) break;
-    await settleDialogue(page);
-    await page.waitForFunction(text => { const el=document.querySelector('.gb-dialogue-typed'); return el?.textContent === text && el.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}); }, splitCues(seen.line.text).shown, {timeout:30000});
-    await page.evaluate(()=>new Promise((resolve,reject)=>{
+    // Films advance while the camera moves. A second settle can outlast a whole
+    // phone shot; observe later lines as shown and fail if any line is missed.
+    const ready = await presentedDialogueLine({expected:seen,first:i===0,
+      settle:()=>settleDialogue(page),
+      waitText:text=>page.waitForFunction(text => { const el=document.querySelector('.gb-dialogue-typed'); return el?.textContent === text && el.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}); }, splitCues(text).shown, {timeout:30000}),
+      waitClear:()=>page.evaluate(()=>new Promise((resolve,reject)=>{
       const started=performance.now();let quietSince=started;
       function observe(){
         const now=performance.now();
@@ -137,7 +143,13 @@ async function playLines(label, shotName, expectedScene) {
         requestAnimationFrame(observe);
       }
       requestAnimationFrame(observe);
-    }));
+    })),read:()=>observe(0)});
+    if (!ready.same) {
+      writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.changed.json`)),JSON.stringify(ready,null,2));
+      problems.push(`line ${i+1}: dialogue advanced before its capture`);
+      break;
+    }
+    seen = ready.actual;
     if (await page.locator('.hp-banner:not([hidden])').count()) problems.push(`line ${i+1}: reward banner obscures scene`);
     if ((i === 0 || EVERY_SHOT) && shotName) await page.screenshot({ path: resolve(out, i === 0 ? shotName : shotName.replace('.png', `-${String(i + 1).padStart(2, '0')}.png`)) });
     if (expectedScene && seen.line.scene !== expectedScene) problems.push(`line ${i + 1}: expected scene ${expectedScene}, got ${seen.line.scene}`);
@@ -154,8 +166,19 @@ async function playLines(label, shotName, expectedScene) {
       if (body.hiddenBy) problems.push(`line ${i + 1} "${words}": ${body.who} is hidden by ${body.hiddenBy}`);
     }
     if (seen.inWorld && !seen.sight.some((b) => b.who === seen.inWorld)) problems.push(`line ${i + 1} "${words}": the speaker ${seen.inWorld} is not kept in sight`);
+    captured.push(seen.line.text);
+    const after = await observe(0);
+    if (!sameDialogueLine(seen, after)) {
+      writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.changed.json`)),JSON.stringify({expected:seen,actual:after},null,2));
+      problems.push(`line ${i+1}: dialogue advanced during its capture`);
+      break;
+    }
     await page.evaluate((choices) => { const t = window.__game.view.game.systems.talk; if (choices) t.choose(0); else t.advance(); }, seen.line.choices);
   }
+  const logAfter = await page.evaluate(() => window.__game.view.game.systems.talk.log().map(entry => entry.text));
+  const coverage = dialogueCoverage(logBefore, captured, logAfter);
+  writeFileSync(resolve(out,shotName.replace('.png','-coverage.json')),JSON.stringify(coverage,null,2));
+  if (!coverage.complete) problems.push('dialogue line coverage differs from its actual log');
   const cleanup = await page.evaluate(async()=>{
     const g=window.__game;await g.frames(30);
     return {active:g.view.game.systems.talk.active,busy:g.view.game.player.busy,stages:[...g.view.game.actors.keys()].filter(id=>id.startsWith('stage:')),yaw:g.view.camera.yaw,ask:g.view.game.systems.opening.asking(),openingStage:g.view.game.systems.opening.stage(),deedVisible:!!document.querySelector('[data-key="deed:sign"]')?.checkVisibility(),riverVisible:!!document.querySelector('[data-key="river:skip"]')?.checkVisibility()};
