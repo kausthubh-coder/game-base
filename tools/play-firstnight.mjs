@@ -4,6 +4,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createKeyboardSteering } from './lib/keyboard-steering.mjs';
+import { holdFirstnightBlock } from './lib/firstnight-input.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 import { CONVERSATIONS } from '../src/game/content/dialogue.ts';
 import { createHash } from 'node:crypto';
@@ -204,8 +205,8 @@ try {
   await shot('03-ditch-continued');
   current='brambles';await press('Digit1');await walk(19,-223);
   for(const x of [20,19,18]) {
-    await point(x,22,-225);record({type:'hold-mouse',button:'left',cell:[x,22,-225]});await page.mouse.down();
-    await page.waitForFunction(x=>window.__game.view.game.world.getBlock(x,22,-225)===0,x,{timeout:5000});await page.mouse.up();
+    await point(x,22,-225);record({type:'hold-mouse',button:'left',cell:[x,22,-225]});
+    await holdFirstnightBlock(page, [x,22,-225], record);
   }
   await wait(s=>s.flags['step.ground.brambles']===true,'brambles cleared');await shot('04-brambles');
   current='gather-camp-material';await walk(18,-224);await walk(18,-239);await walk(5,-239);
