@@ -1,0 +1,12 @@
+bun test v1.4.4 (38afee6c8)
+
+src/features/props/builders/hall-threshold.test.ts:
+(pass) Hall threshold has a floor-level walking opening at detail 1 [27.93ms]
+(pass) Hall threshold does not hide the hero behind protected stone at detail 1 [12.34ms]
+(pass) Hall threshold has a floor-level walking opening at detail 0.5 [7.29ms]
+(pass) Hall threshold does not hide the hero behind protected stone at detail 0.5 [4.44ms]
+
+ 4 pass
+ 0 fail
+ 86 expect() calls
+Ran 4 tests across 1 file. [92.00ms]

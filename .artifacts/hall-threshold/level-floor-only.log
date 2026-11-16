@@ -1,0 +1,126 @@
+bun test v1.4.4 (38afee6c8)
+
+src/features/props/builders/hall-threshold.test.ts:
+11 |     mesh.updateMatrixWorld();
+12 |     try {
+13 |       for (const x of [-1, -0.5, 0, 0.5, 1]) {
+14 |         for (const y of [0.02, 0.4, 0.7, 1.1, 1.8, 2.5]) {
+15 |           const ray = new THREE.Raycaster(new THREE.Vector3(x, y, 3), new THREE.Vector3(0, 0, -1), 0, 6);
+16 |           expect(ray.intersectObject(mesh), `opening x=${x}, y=${y}`).toHaveLength(0);
+                                                                           ^
+error: opening x=-1, y=0.4
+
+Expected length: 0
+Received length: 2
+
+      at <anonymous> (/Users/dabot/.t3/worktrees/game-base/act1/src/features/props/builders/hall-threshold.test.ts:16:71)
+(fail) Hall threshold has a floor-level walking opening at detail 1 [22.33ms]
+43 |         for (const hit of ray.intersectObject(mesh)) {
+44 |           const p = hit.point;
+45 |           if (rule.cuts(p.x, p.y, p.z) < 0.5) hidden.push({ height, side, point: p.toArray() });
+46 |         }
+47 |       }
+48 |       expect(hidden).toEqual([]);
+                          ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "height": 0.4,
++     "point": [
++       0.29584082377500565,
++       0.9129672814619774,
++       -1.2907217879042854,
++     ],
++     "side": -0.3,
++   },
++   {
++     "height": 0.7,
++     "point": [
++       0.4395723553947022,
++       1.34829020540705,
++       -1.150053678532604,
++     ],
++     "side": -0.3,
++   },
++   {
++     "height": 0.7,
++     "point": [
++       0.2694833515322266,
++       1.179092273053591,
++       -1.3165174901167838,
++     ],
++     "side": -0.3,
++   },
++ ]
+
+- Expected  - 1
++ Received  + 29
+
+      at <anonymous> (/Users/dabot/.t3/worktrees/game-base/act1/src/features/props/builders/hall-threshold.test.ts:48:22)
+(fail) Hall threshold does not hide the hero behind protected stone at detail 1 [13.62ms]
+11 |     mesh.updateMatrixWorld();
+12 |     try {
+13 |       for (const x of [-1, -0.5, 0, 0.5, 1]) {
+14 |         for (const y of [0.02, 0.4, 0.7, 1.1, 1.8, 2.5]) {
+15 |           const ray = new THREE.Raycaster(new THREE.Vector3(x, y, 3), new THREE.Vector3(0, 0, -1), 0, 6);
+16 |           expect(ray.intersectObject(mesh), `opening x=${x}, y=${y}`).toHaveLength(0);
+                                                                           ^
+error: opening x=-1, y=0.4
+
+Expected length: 0
+Received length: 2
+
+      at <anonymous> (/Users/dabot/.t3/worktrees/game-base/act1/src/features/props/builders/hall-threshold.test.ts:16:71)
+(fail) Hall threshold has a floor-level walking opening at detail 0.5 [4.81ms]
+43 |         for (const hit of ray.intersectObject(mesh)) {
+44 |           const p = hit.point;
+45 |           if (rule.cuts(p.x, p.y, p.z) < 0.5) hidden.push({ height, side, point: p.toArray() });
+46 |         }
+47 |       }
+48 |       expect(hidden).toEqual([]);
+                          ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   {
++     "height": 0.4,
++     "point": [
++       0.2958408237750021,
++       0.9129672814619738,
++       -1.290721787904289,
++     ],
++     "side": -0.3,
++   },
++   {
++     "height": 0.7,
++     "point": [
++       0.43957235539469863,
++       1.348290205407043,
++       -1.1500536785326076,
++     ],
++     "side": -0.3,
++   },
++   {
++     "height": 0.7,
++     "point": [
++       0.26948335153223013,
++       1.1790922730535947,
++       -1.3165174901167802,
++     ],
++     "side": -0.3,
++   },
++ ]
+
+- Expected  - 1
++ Received  + 29
+
+      at <anonymous> (/Users/dabot/.t3/worktrees/game-base/act1/src/features/props/builders/hall-threshold.test.ts:48:22)
+(fail) Hall threshold does not hide the hero behind protected stone at detail 0.5 [5.34ms]
+
+ 0 pass
+ 4 fail
+ 6 expect() calls
+Ran 4 tests across 1 file. [89.00ms]

@@ -175,10 +175,10 @@ function root(
     skin: 'barkOld', ribs: [7, 0.06], key: 0.4, moss: 0.12, lump: 0.06 });
 }
 function doorFrame(s: Shape) {
-  for (let i = 0; i < 4; i++)
-    s.roundBox(0, i * 0.3, 0.55 - i * 0.28, 8.6 - i * 0.65, 0.3, 1.9 - i * 0.12, C.stone, {
-      round: 0.06, skin: 'stone', key: 0.35,
-    });
+  // The Hall caller supplies a flat walking floor at model y=0, not a stair surface.
+  s.roundBox(0, -0.12, 0, 8.6, 0.12, 3, C.stone, {
+    round: 0.03, skin: 'stone', key: 0.35,
+  });
   for (const sign of [-1, 1]) {
     s.roundBox(sign * 3.48, 0, -0.6, 1.75, 3.8, 1.8, STONE, {
       round: 0.09, wobble: 0.025, skin: 'stone', key: 0.3, moss: 0.16,
@@ -186,7 +186,10 @@ function doorFrame(s: Shape) {
     s.roundBox(sign * 3.48, 3.7, -0.6, 2, 0.35, 1.8, STONE, { round: 0.06, skin: 'stone' });
     foliage(s, sign * 3.9, 0.3);
   }
-  ring(s, 3.9, 2.6, 3.65, -1.5, 0.32, 0, TAU, 30, C.stone);
+  // Leave a 2.5m floor-level bore through the circular surround. Its lower arc used
+  // to form a raised sill through the hero, inside the sight rule's protected zone.
+  // Keep the original 12-degree stone courses around the upper and side arcs.
+  ring(s, 3.9, 2.6, 3.65, -1.5, 0.32, -Math.PI / 3, 4 * Math.PI / 3, 25, C.stone);
   // Roots sweep across the crown and descend outside the door, never across its opening.
   for (const sign of [-1, 1]) {
     root(
