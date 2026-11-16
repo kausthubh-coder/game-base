@@ -4,7 +4,7 @@
 //
 // It reads and never writes: a new game lives in this browser only. Exit 1 on a console error, a page
 // that never finishes loading, or a game that does not start.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { launchChrome } from './lib/chrome.mjs';
 
@@ -30,8 +30,22 @@ try {
   await page.screenshot({ path: resolve(out, 'title.png') });
   await page.locator('[data-key="title:new"]').click({ timeout: 30_000 });
   await page.waitForFunction(() => window.__game.started === true, null, { timeout: 60_000 });
-  await page.evaluate(() => window.__game.settle());
-  await page.waitForTimeout(1500);
+  await page.locator('[data-key="opening:skip"]').waitFor();
+  await page.screenshot({ path: resolve(out, 'opening.png') });
+  await page.locator('[data-key="opening:skip"]').click();
+  await page.waitForFunction(() => Boolean(window.__game.state().talk));
+  for (let line = 0; line < 40 && await page.evaluate(() => Boolean(window.__game.state().talk)); line++) {
+    await page.keyboard.press('KeyE');
+    await page.waitForTimeout(150);
+  }
+  await page.waitForFunction(() => !window.__game.state().talk && !window.__game.state().player.busy);
+  const before = await page.evaluate(() => window.__game.state().player);
+  await page.keyboard.down('KeyD');
+  await page.waitForTimeout(400);
+  await page.keyboard.up('KeyD');
+  const after = await page.evaluate(() => window.__game.state().player);
+  if (Math.hypot(after.x - before.x, after.z - before.z) < 0.2) throw Error('world controls did not move the hero after the opening');
+  writeFileSync(resolve(out, 'controls.json'), JSON.stringify({ before, after }, null, 2));
   await page.screenshot({ path: resolve(out, 'playing.png') });
   const state = await page.evaluate(() => window.__game.state());
   const build = await page.evaluate(() => [...document.scripts].map((s) => s.src).find((src) => /index-/.test(src)) ?? '');
