@@ -315,6 +315,7 @@ try {
       }
     }finally{await page.mouse.up();for(const key of ['KeyF','KeyW','KeyA','KeyS','KeyD'])await page.keyboard.up(key);}
     must(broke,'guard break observed');await wait(s=>s.flags['fight.2.won']===true,'thistlehog calmed',10000);
+    await wait(s=>!!s.talk||s.flags['quest.kitchen.done']===true,'post-fight dialogue or completed kitchen');
     if((await read()).talk)await dialogue('19-thistlehog-calm');
     await wait(s=>s.flags['quest.kitchen.done']===true&&s.flags['scene.19']===true,'earned kitchen completion');
     await shot('earned-homestead');
