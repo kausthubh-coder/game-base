@@ -254,6 +254,13 @@ try {
     // Begin now plays the film. Finish its real Skip flow before trying world or menu input.
     await laptop.locator('[data-key="opening:skip"]').click();
     await wait(laptop, () => !document.querySelector('.st-film:not([hidden])'));
+    // Hobb's wake conversation follows the film and owns input until its last line.
+    await wait(laptop, () => Boolean(window.__game.state().talk));
+    for (let line = 0; line < 40 && await laptop.evaluate(() => Boolean(window.__game.state().talk)); line++) {
+      await laptop.keyboard.press('KeyE');
+      await laptop.waitForTimeout(150);
+    }
+    await wait(laptop, () => !window.__game.state().talk && !window.__game.view.game.busy);
     laptopLogs = await gather(laptop, 7);
     await putDown(laptop);
     // Opening the panel writes the game and looks for a change at once, so this does not wait for the timer.
