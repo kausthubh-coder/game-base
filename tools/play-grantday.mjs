@@ -51,6 +51,22 @@ async function wait(test, why, timeout = 15000) {
   throw new Error(`Timed out: ${why}`);
 }
 async function press(key) { record({ type: 'press', key }); await page.keyboard.press(key); await page.waitForTimeout(120); }
+async function practiceHit(remaining) {
+  const aim = await page.evaluate(() => {
+    const g = window.__game, fight = window.__fights?.state();
+    const target = fight?.targets?.find(t => !t.broken);
+    if (!fight?.practice || !target) return null;
+    const at = g.view.project(target.x, g.view.playerPosition.y, target.z);
+    return at ? { x: at.x, y: at.y, weapon: fight.hero.weapon, guard: target.guard } : null;
+  });
+  must(aim && aim.weapon === 'staff', 'earned staff practice target');
+  record({ type: 'aim-practice-target', ...aim });
+  await page.mouse.move(aim.x, aim.y); await page.waitForTimeout(100);
+  record({ type: 'primary-quick-attack' });
+  await page.mouse.down(); await page.waitForTimeout(80); await page.mouse.up();
+  await wait(s => s.opening.bout.guard === remaining, 'actual staff hit leaves ' + remaining + ' guard');
+}
+
 async function click(selector) { record({ type: 'click', selector }); await page.locator(selector).click(); }
 async function frameShot(name) {
   const seen = await openingFrame(page);
@@ -160,7 +176,7 @@ try {
   if (!(await read()).talk) await press('KeyE');
   await dialogue('10-rack-and-dax');
   await wait(s => s.opening.bout.on, 'spar starts');
-  current = 'spar-first-hit'; await walk(29, 24.5, .8); await press('KeyF');
+  current = 'spar-first-hit'; await walk(29, 24.5, .8); await practiceHit(2);
   await wait(s => s.opening.bout.guard === 2, 'first hit'); await shot('11-spar-checkpoint');
   const before = await read(); await save('mid-spar');
   current = 'save-continue';
@@ -173,9 +189,9 @@ try {
   must(JSON.stringify(before.flags) === JSON.stringify(after.flags), 'flags changed across Continue');
   must(JSON.stringify(before.bag) === JSON.stringify(after.bag), 'bag changed across Continue');
   await shot('13-spar-restored');
-  current = 'spar-remaining-hits'; await press('KeyF'); await wait(s => s.opening.bout.guard === 1, 'second hit');
-  await page.waitForTimeout(500);
-  record({ type: 'mouse-click', x: 680, y: 350 }); await page.mouse.click(680, 350);
+  current = 'spar-remaining-hits'; await practiceHit(1);
+  await page.waitForTimeout(800);
+  await practiceHit(0);
   await wait(s => !s.opening.bout.on && s.opening.bout.guard === 0, 'third hit'); await dialogue('14-spar-after');
   current = 'deed'; await walk(37, 22); await dialogue('15-grant');
   await page.locator('[data-key="deed:name"]').waitFor(); await page.waitForTimeout(900);
