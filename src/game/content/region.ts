@@ -226,8 +226,15 @@ const BOULDERS: readonly (readonly [x: number, z: number, high: number])[] = [[8
 export const BRAMBLES = [18, 19, 20].map(x => ({ x, y: GRANT_GROUND, z: -225 }));
 for (const b of BRAMBLES) one(b.x, b.y, b.z, 'oak_leaves');
 
-// The arrival pond drains east into the dry field, beyond the later machine farms.
-box(18, GRANT_GROUND - 1, -229, 21, GRANT_GROUND - 1, -227, 'tilled_soil');
+// The arrival pond drains east into this dry field, beyond the later machine farms.
+// The ground, quest waypoint and temporary guide use the same authored bounds.
+const ARRIVAL_FIELD = { x0: 18, x1: 21, z0: -229, z1: -227, soilY: GRANT_GROUND - 1 } as const;
+export const ARRIVAL_IRRIGATION = {
+  field: ARRIVAL_FIELD,
+  fieldTarget: { x: (ARRIVAL_FIELD.x0 + ARRIVAL_FIELD.x1 + 1) / 2, y: GRANT_GROUND, z: (ARRIVAL_FIELD.z0 + ARRIVAL_FIELD.z1 + 1) / 2 },
+  source: { x: 7.5, y: GRANT_GROUND, z: -228.5 },
+} as const;
+box(ARRIVAL_FIELD.x0, ARRIVAL_FIELD.soilY, ARRIVAL_FIELD.z0, ARRIVAL_FIELD.x1, ARRIVAL_FIELD.soilY, ARRIVAL_FIELD.z1, 'tilled_soil');
 
 // ---- the dead garden: four dry beds, a broken fence around them, and the ruin of a house to the north
 {

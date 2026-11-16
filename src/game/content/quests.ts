@@ -239,7 +239,7 @@ export const QUESTS: readonly QuestDef[] = [
     starts: after('grantday'),
     steps: [
       scene('landing', 7, 'Step off the ferry', { at: 'landing', place: 'landing' }),
-      ground('ditch', 'do', 'Dig a ditch from the pond to your dry field', { at: 'plot', place: 'plot', hint: 'Where the water goes, the ground turns green.' }),
+      ground('ditch', 'do', 'Dig one block deep from the pond to the marked dry field', { at: 'plot', place: 'plot.field', hint: 'Start at the pond\'s east edge. Use your spade to dig a connected trench one block deep until water touches the gold-outlined dry field. Leave the tilled soil in place.' }),
       ground('brambles', 'do', 'Cut back the brambles', { at: 'plot', place: 'plot' }),
       ground('camp', 'do', 'Pitch your tent and light a fire before dark', { at: 'plot', place: 'camp' }),
       scene('door', 8, 'Push the stone door in your hill', { at: 'hall', place: 'shut.door' }),
@@ -254,7 +254,7 @@ export const QUESTS: readonly QuestDef[] = [
     summary: 'A stone door in your hill has been shut for a thousand years. Tonight something comes out of the dark.',
     starts: after('ground'),
     steps: [
-      { id: 'bed', kind: 'scene', scene: 9, at: 'plot', text: 'Dusk. Something is standing at the edge of your firelight', done: { flag: 'night.fox' }, place: 'camp' },
+      { id: 'bed', kind: 'scene', scene: 9, at: 'plot', text: 'Dusk. Something is standing at the edge of your firelight', done: { flag: 'night.fox' }, place: 'camp', hint: 'Wait until dusk at your lit campfire.' },
       { id: 'door', kind: 'fight', fight: 1, scene: 10, at: 'hall', text: 'Back away to the stone door', done: { flag: 'door.open' }, place: 'shut.door', hint: 'It is slower than you. Walk backwards until stone is behind you.' },
       { id: 'mark', kind: 'scene', scene: 11, at: 'hall', text: 'Go through the door', done: { flag: 'mark' }, place: 'hall.heart' },
       { id: 'key', kind: 'scene', scene: 12, at: 'hall', text: 'Find what your key fits', done: { flag: 'custodian.awake' }, place: 'hall.custodian' },

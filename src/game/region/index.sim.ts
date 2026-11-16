@@ -9,7 +9,7 @@ import { forestAt, groundHeight } from '../../features/world/terrain.sim.ts';
 import type { BerryBush, Game, Interactable, Place, RegionApi, RegionScatter, SimSystem } from '../api.sim.ts';
 import { FLAG } from '../content/flags.ts';
 import { LAND_RING } from '../content/goods.ts';
-import { REGION } from '../content/region.ts';
+import { ARRIVAL_IRRIGATION, REGION } from '../content/region.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { PATHS, PLACES as PLAN_PLACES, toWorld } from '../content/greenhollow.ts';
 import { greenhollowWoods, planStands, waterLevelAt } from './greenhollow-land.sim.ts';
@@ -66,7 +66,7 @@ export function createRegion(game: Game): Region {
     if (p && !places.some((q) => q.name === name)) places.push({ name, at: { ...p.at }, label });
   };
   also('plot.pond', 'grant.rocks');
-  also('plot.field', 'grant.center');
+  places.push({ name: 'plot.field', at: { ...ARRIVAL_IRRIGATION.fieldTarget }, label: '' });
   also('plot.stone', 'grant.stone');
   also('plot.camp', 'camp');
   also('town.green', 'town.square');
