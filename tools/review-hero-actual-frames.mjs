@@ -1,0 +1,9 @@
+// Retains every capture; creates contact sheets and reports GPU ownership differences.
+import {readdirSync,readFileSync,writeFileSync} from 'node:fs';import sharp from 'sharp';
+const root=process.argv[2]||'.artifacts/hero-actual-frames/run-01';const summary=[];
+for(const name of readdirSync(root).filter(n=>n.startsWith('look-'))){const dir=root+'/'+name,rows=JSON.parse(readFileSync(dir+'/frames.json'));const issues=[];for(let i=0;i<rows.length;i++){const r=rows[i],s=r.gpuSlot,p=r.place,x=s[4]+r.frame*s[8];if(JSON.stringify(s)!==JSON.stringify(r.slot))issues.push({i,type:'gpu-buffer-mismatch'});if(s[10]!==p.page||x<p.x||x+s[8]>p.x+p.width||s[5]<p.y||s[5]+s[9]>p.y+p.height)issues.push({i,type:'wrong-sheet'});}
+for(let start=0;start<rows.length;start+=100){const subset=rows.slice(start,start+100),parts=[];for(let i=0;i<subset.length;i++){const n=start+i,x=i%10*128,y=Math.floor(i/10)*146;parts.push({input:await sharp(dir+'/'+String(n).padStart(4,'0')+'.png').extract({left:64,top:64,width:128,height:128}).png().toBuffer(),left:x,top:y});parts.push({input:Buffer.from(`<svg width="128" height="18"><rect width="128" height="18" fill="#111"/><text x="3" y="13" fill="white" font-size="11">${n} ${subset[i].actor.anim} ${subset[i].row}:${subset[i].frame}</text></svg>`),left:x,top:y+128});}await sharp({create:{width:1280,height:Math.ceil(subset.length/10)*146,channels:3,background:'#111'}}).composite(parts).png().toFile(dir+'/sheet-'+start+'.png');}
+summary.push({name,frames:rows.length,issues,poses:[...new Set(rows.map(r=>`${r.actor.sprite}:${r.actor.anim}:${r.row}:${r.frame}`))],slots:[...new Set(rows.map(r=>r.index))],positions:[rows[0]?.actor.pos,rows.at(-1)?.actor.pos]});}
+writeFileSync(root+'/summary.json',JSON.stringify(summary,null,2));console.log(JSON.stringify(summary.map(({poses,...r})=>({...r,poses:poses.length})),null,2));
+
+if(summary.some(r=>r.issues.length))process.exitCode=1;
