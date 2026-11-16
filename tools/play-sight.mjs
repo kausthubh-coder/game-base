@@ -155,7 +155,6 @@ async function playLines(label, shotName, expectedScene) {
     if (expectedScene && seen.line.scene !== expectedScene) problems.push(`line ${i + 1}: expected scene ${expectedScene}, got ${seen.line.scene}`);
     if (args.includes('--bodies')) { const frame=await firstnightFrame(page); writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.frame.json`)),JSON.stringify(frame,null,2));problems.push(...firstnightIssues(frame).map(p => `line ${i+1}: ${p}`)); }
     writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.json`)), JSON.stringify(seen,null,2));
-    if(args.includes('--costs')){const frames=await storyCosts(page);writeFileSync(resolve(out,shotName.replace('.png',`-line-${i+1}.costs.json`)),JSON.stringify(frames,null,2));if(costIssues(frames,quality).length)problems.push(`line ${i+1}: draw budget exceeded`);}
     if(args.includes('--dialogue-hud')) {
       const hud=await heartstoneHUD();writeFileSync(resolve(out,shotName.replace('.png',`-line-${i+1}.hud.json`)),JSON.stringify(hud,null,2));
       if(!hud.present || hud.visible || hud.hit || hud.pointerEvents!=='none') problems.push(`line ${i+1}: Heartstone HUD visible or hit-testable during dialogue`);
@@ -166,14 +165,23 @@ async function playLines(label, shotName, expectedScene) {
       if (body.hiddenBy) problems.push(`line ${i + 1} "${words}": ${body.who} is hidden by ${body.hiddenBy}`);
     }
     if (seen.inWorld && !seen.sight.some((b) => b.who === seen.inWorld)) problems.push(`line ${i + 1} "${words}": the speaker ${seen.inWorld} is not kept in sight`);
-    captured.push(seen.line.text);
-    const after = await observe(0);
-    if (!sameDialogueLine(seen, after)) {
-      writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.changed.json`)),JSON.stringify({expected:seen,actual:after},null,2));
-      problems.push(`line ${i+1}: dialogue advanced during its capture`);
+    const evidenceEnd = await observe(0);
+    if (!sameDialogueLine(seen, evidenceEnd)) {
+      writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.changed.json`)),JSON.stringify({expected:seen,actual:evidenceEnd},null,2));
+      problems.push(`line ${i+1}: dialogue advanced before its picture, body and HUD evidence was complete`);
       break;
     }
-    await page.evaluate((choices) => { const t = window.__game.view.game.systems.talk; if (choices) t.choose(0); else t.advance(); }, seen.line.choices);
+    captured.push(seen.line.text);
+    if(args.includes('--costs')){const frames=await storyCosts(page);writeFileSync(resolve(out,shotName.replace('.png',`-line-${i+1}.costs.json`)),JSON.stringify(frames,null,2));if(costIssues(frames,quality).length)problems.push(`line ${i+1}: draw budget exceeded`);}
+    const after = await observe(0);
+    if(args.includes('--costs'))writeFileSync(resolve(out,shotName.replace('.png',`-line-${i+1}.cost-window.json`)),JSON.stringify({start:seen.line,end:after?.line??null,crossedLine:!sameDialogueLine(seen,after),scope:'45 consecutive real frames after the captured line evidence; may include following lines.'},null,2));
+    // Automatic films may advance during the real cost window. Follow that line
+    // without advancing it again; exact log coverage below rejects any skipped line.
+    if (sameDialogueLine(seen, after)) await page.evaluate((expected) => {
+      const t = window.__game.view.game.systems.talk, current = t.current();
+      if (current?.scene !== expected.scene || current.text !== expected.text) return;
+      if (expected.choices) t.choose(0); else t.advance();
+    }, seen.line);
   }
   const logAfter = await page.evaluate(() => window.__game.view.game.systems.talk.log().map(entry => entry.text));
   const coverage = dialogueCoverage(logBefore, captured, logAfter);
