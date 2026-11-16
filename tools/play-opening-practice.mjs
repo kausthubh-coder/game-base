@@ -16,6 +16,12 @@ const must = (ok, why) => { if (!ok) throw Error(why); };
 const viewports = { desktop: { width: 1366, height: 768 }, phone: { width: 390, height: 844 } };
 
 export function options(args) {
+  const switches = ['--views', '--weapons', '--quality', '--dist', '--runtime-manifest', '--out', '--port', '--active-heavy'];
+  for (let i = 0; i < args.length; i += 2) {
+    must(switches.includes(args[i]), 'unknown option: ' + args[i]);
+    must(args[i + 1] && !args[i + 1].startsWith('--'), args[i] + ' needs a value');
+    must(args.indexOf(args[i]) === i, 'duplicate option: ' + args[i]);
+  }
   const option = (name, fallback) => {
     const i = args.indexOf('--' + name);
     if (i < 0) return fallback;
@@ -142,10 +148,10 @@ export async function main(args = process.argv.slice(2)) {
     }
     const budget = costs ? await storyCosts(page) : null;
     const after = await read(); check(after);
+    if (budget && costIssues(budget, opt.quality).length) problems.push('draw budget exceeded');
     const record = { name, before, after, frame, costs: budget, problems, scope: { bodies, dax, costs },
       costWindowCrossedState: before.opening.bout.guard !== after.opening.bout.guard || before.talkLine?.text !== after.talkLine?.text };
     writeFileSync(resolve(caseDir, name + '.json'), JSON.stringify(record, null, 2));
-    if (budget && costIssues(budget, opt.quality).length) problems.push('draw budget exceeded');
     steps.push({ name, image: fileEvidence(resolve(caseDir, name + '.png')), raw: fileEvidence(resolve(caseDir, name + '.json')) });
     must(!problems.length, name + ': ' + problems.join('; '));
     console.log('captured', stage, name);
