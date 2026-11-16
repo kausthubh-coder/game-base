@@ -229,9 +229,14 @@ try {
   current='wait-for-night';await walk(-20,-229);
   const preNight=await read();
   must(preNight.flags['quest.ground.done']===true,'all work must be earned before idle time');
-  for(let seconds=0;seconds<900 && !(await read()).flags['night.fox'];seconds++) {
-   record({type:'noninteractive-wait-advance',seconds:1,reason:'idle until dusk after all ground actions'});
-   await page.evaluate(()=>window.__game.advance(1));await page.waitForTimeout(10);
+  if(!preNight.flags['night.fox']) {
+    await wait(s=>s.prompt==='Wait until dusk'||s.flags['night.fox']===true,'campfire dusk interaction');
+    if(!(await read()).flags['night.fox']) {
+      await shot('08-wait-until-dusk');await save('earned-before-dusk');
+      record({type:'wait-until-dusk',input:'KeyE',day:preNight.clock.day});await press('KeyE');
+      must((await read()).clock.day===preNight.clock.day,'waiting must keep the same day');
+      must(!(await read()).flags['night.over'],'waiting must not complete the first night');
+    }
   }
   await wait(s=>s.flags['night.fox']===true,'fox arrival');
   await shot('09-fox');
