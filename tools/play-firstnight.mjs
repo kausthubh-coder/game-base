@@ -7,6 +7,7 @@ import { createKeyboardSteering } from './lib/keyboard-steering.mjs';
 import { holdFirstnightBlock } from './lib/firstnight-input.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 import { CONVERSATIONS } from '../src/game/content/dialogue.ts';
+import { CAMP } from '../src/game/content/region.ts';
 import { createHash } from 'node:crypto';
 import { firstnightFrame, firstnightIssues, settleDialogue } from './lib/firstnight-framing.mjs';
 const root = resolve(import.meta.dirname, '..');
@@ -243,7 +244,7 @@ try {
   current='custodian';await walk(places['hall.custodian'].x,places['hall.custodian'].z,.5);await wait(s=>s.prompt==='Turn the key','key prompt');await press('KeyE');await dialogue('12-custodian');
   current='calm-fox';const fox=await page.evaluate(()=>window.__game.view.game.systems.hall.fox());await walk(fox.x,fox.z,2.5);await wait(s=>s.prompt==='Hold out your hand','fox prompt');await press('KeyE');await dialogue('13-calm');
   current='heartstone';await walk(places['hall.heart'].x,places['hall.heart'].z,.5);await wait(s=>s.prompt==='Touch the Heartstone','heart prompt');await press('KeyE');await dialogue('14-heart');
-  current='sleep';await walk(-17,-251);await walk(-17,-231);
+  current='sleep';await walk(-17,-251);await walk(-12,-236);await walk(-12,-227);await walk(CAMP.tentApproach.x,CAMP.tentApproach.z);
   await wait(s=>s.prompt==='Sleep in your tent','sleep prompt');await press('KeyE');await wait(s=>s.flags['night.over']===true&&!s.player.busy,'wake',30000);await shot('15-morning');
   current='tamsin';await walk(places['grant.stone'].x,places['grant.stone'].z,2);await press('KeyE');await dialogue('16-tamsin');
   const end=await wait(s=>s.flags['quest.night.done']===true&&!s.player.busy&&!s.talk,'morning conversation ends');
