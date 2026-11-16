@@ -1,6 +1,6 @@
 /** Observe the rendered line without waiting past a later film line's lifetime. */
-export async function presentedDialogueLine({ expected, first, settle, waitText, waitClear, read }) {
-  if (first || expected.line.kind !== 'film') await settle();
+export async function presentedDialogueLine({ expected, settle, waitText, waitClear, read }) {
+  if (expected.line.kind !== 'film') await settle();
   await waitText(expected.line.text);
   await waitClear();
   const actual = await read();

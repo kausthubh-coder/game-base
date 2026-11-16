@@ -128,22 +128,13 @@ async function playLines(label, shotName, expectedScene) {
   for (let i = 0; i < 60; i++) {
     let seen = await observe(i === 0 ? 50 : 8);
     if (!seen) break;
-    // Films advance while the camera moves. A second settle can outlast a whole
-    // phone shot; observe later lines as shown and fail if any line is missed.
-    const ready = await presentedDialogueLine({expected:seen,first:i===0,
+    // Films advance while the camera moves. Observe them as shown, without a
+    // stationary-camera wait, and fail if any line is missed.
+    const ready = await presentedDialogueLine({expected:seen,
       settle:()=>settleDialogue(page),
       waitText:text=>page.waitForFunction(text => { const el=document.querySelector('.gb-dialogue-typed'); return el?.textContent === text && el.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}); }, splitCues(text).shown, {timeout:30000}),
-      waitClear:()=>page.evaluate(()=>new Promise((resolve,reject)=>{
-      const started=performance.now();let quietSince=started;
-      function observe(){
-        const now=performance.now();
-        if(document.querySelector('.hp-banner:not([hidden])'))quietSince=now;
-        if(now-quietSince>=1000){resolve();return;}
-        if(now-started>=45000){reject(Error('line reward banners did not finish'));return;}
-        requestAnimationFrame(observe);
-      }
-      requestAnimationFrame(observe);
-    })),read:()=>observe(0)});
+      waitClear:()=>page.waitForFunction(()=>!document.querySelector('.hp-banner:not([hidden])'),null,{timeout:45000}),
+      read:()=>observe(0)});
     if (!ready.same) {
       writeFileSync(resolve(out, shotName.replace('.png', `-line-${i+1}.changed.json`)),JSON.stringify(ready,null,2));
       problems.push(`line ${i+1}: dialogue advanced before its capture`);
