@@ -1,9 +1,9 @@
 import { test, expect, afterEach } from 'bun:test';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { BETA_STAGES, digest, fileEvidence, verifyPredecessor, requireBetaHash, runtimeHashes, verifyRuntime, verifyBetaPreflight, verifyBetaReport, verifyBetaResume, runnerDependencies } from './beta-chain.mjs';
+import { BETA_STAGES, digest, fileEvidence, verifyPredecessor, requireBetaHash, runtimeHashes, verifyRuntime, verifyBetaPreflight, verifyBetaReport, verifyBetaResume, runnerDependencies, runBetaCommand } from './beta-chain.mjs';
 
 const directories = [];
 afterEach(() => { for (const dir of directories.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -125,4 +125,29 @@ test('rejects a passing stage grafted from another attempt', () => {
   record.runId = 'another-attempt';
   const graft = f.put('night/passed.json', record);
   expect(() => verifyPredecessor(graft, 'night')).toThrow();
+});
+
+test('the CLI runner receives a clean output directory while admission and live logs are retained outside it', async () => {
+  const dir = mkdtempSync(resolve(tmpdir(), 'game-beta-command-')); directories.push(dir);
+  const stageOut = resolve(dir, '08-pump'); mkdirSync(stageOut);
+  const input = resolve(dir, 'preceding.save.json'); writeFileSync(input, 'earned preceding bytes');
+  const script = resolve(dir, 'strict-runner.mjs');
+  writeFileSync(script, `
+    import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+    const args = process.argv.slice(2);
+    const out = args[args.indexOf('--out') + 1];
+    const input = args[args.indexOf('--save') + 1];
+    if (!args.includes('--no-build')) throw Error('unexpected build');
+    console.log('runner imported');
+    await new Promise(resolve => setTimeout(resolve, 30));
+    if (readdirSync(out).length) throw Error('Choose an empty --out directory');
+    if (readFileSync(input, 'utf8') !== 'earned preceding bytes') throw Error('wrong earned input');
+    writeFileSync(out + '/replay.json', JSON.stringify({status:'PASS'}));
+    console.log('PASS strict runner');
+  `);
+  const log = await runBetaCommand([script, '--no-build', '--out', stageOut, '--save', input], { chainOut: dir, stageOut, id: 'pump', admission: { admitted: true }, cwd: dir, onOutput: () => {} });
+  expect(readdirSync(stageOut)).toEqual(['replay.json']);
+  expect(JSON.parse(readFileSync(resolve(dir, 'pump-admission.json')))).toEqual({ admitted: true });
+  expect(readFileSync(log.path, 'utf8')).toBe('runner imported\nPASS strict runner\n');
+  expect(log.path).toBe(resolve(dir, 'pump-runner.log'));
 });

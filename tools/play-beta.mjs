@@ -1,8 +1,8 @@
 // Fresh Begin through Lamp Gallery, with exact earned bytes between existing runners.
-import { spawn, execFileSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { BETA_STAGES, digest, fileEvidence, readEvidence, requireBetaHash, verifyPredecessor, verifyRuntime, verifyBetaPreflight, verifyBetaEnding, verifyBetaReport, verifyBetaResume, runnerDependencies } from './lib/beta-chain.mjs';
+import { BETA_STAGES, digest, fileEvidence, readEvidence, requireBetaHash, verifyPredecessor, verifyRuntime, verifyBetaPreflight, verifyBetaEnding, verifyBetaReport, verifyBetaResume, runnerDependencies, runBetaCommand } from './lib/beta-chain.mjs';
 import { sample, canStartHeavy } from './resource-status.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -64,17 +64,11 @@ try {
     else symlinkSync(runtime, target, 'dir');
   }
   persist();
-  async function command(commandArgs, stageOut, label, env) {
+  async function command(commandArgs, stageOut, stage, label, env, admission) {
     if (interrupted) throw Error('beta interrupted');
-    const logPath = resolve(stageOut, label + '.log');
-    child = spawn('bun', commandArgs, { cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'] });
-    const chunks = [];
-    const take = bytes => { chunks.push(bytes); process.stdout.write(bytes); writeFileSync(logPath, Buffer.concat(chunks)); };
-    child.stdout.on('data', take); child.stderr.on('data', take);
-    const result = await new Promise((done, fail) => { child.once('error', fail); child.once('exit', (code, signal) => done({ code, signal })); });
-    child = null;
-    if (interrupted || result.code !== 0) throw Error(label + ' failed: ' + JSON.stringify(result));
-    return fileEvidence(logPath);
+    const result = await runBetaCommand(commandArgs, { chainOut: out, stageOut, id: stage.id, label, env, cwd: root, admission, onChild: value => { child = value; } });
+    if (interrupted) throw Error('beta interrupted');
+    return result;
   }
   let predecessor = report.stages.at(-1) ?? null;
   for (const stage of BETA_STAGES.slice(report.stages.length)) {
@@ -104,12 +98,11 @@ try {
       if (execFileSync('git', ['diff', replay.sha, '--', 'src', 'public', 'index.html', 'vite.config.ts', 'package.json', 'bun.lock'], { encoding: 'utf8' })) throw Error('adopted fresh Begin used a different product');
     } else {
       const resources = await sample();
-      writeFileSync(resolve(stageOut, 'admission.json'), JSON.stringify(resources, null, 2));
       if (!canStartHeavy(resources, 0)) throw Error('resource admission held before ' + stage.id);
       const commandArgs = ['tools/play-' + stage.runner + '.mjs', '--no-build', '--out', stageOut];
       if (prior) commandArgs.push('--save', prior.output.path);
       if (stage.index >= 7) commandArgs.push('--dist', stage.dist, '--active-heavy-jobs', '0');
-      await command(commandArgs, stageOut, 'runner', env);
+      await command(commandArgs, stageOut, stage, 'runner', env, resources);
     }
     const replay = fileEvidence(resolve(stageOut, 'replay.json'));
     const replayData = JSON.parse(readEvidence(replay));
@@ -120,7 +113,7 @@ try {
     if (!stage.index && !flags['quest.grantday.done']) throw Error('fresh Begin did not finish Grant day');
     let audit, auditResults;
     if (stage.audit) {
-      audit = await command(['tools/audit-' + stage.audit + '.mjs', stageOut], stageOut, 'audit', env);
+      audit = await command(['tools/audit-' + stage.audit + '.mjs', stageOut], stageOut, stage, 'audit', env);
       const files = stage.id === 'copper' ? ['audit.json'] : stage.id === 'uphill' ? ['transaction-audit.json'] : stage.id === 'gallery' ? ['independent-audit.json'] : ['raw-audit.json'];
       auditResults = files.map(file => fileEvidence(resolve(stageOut, file)));
     }

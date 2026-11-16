@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
-import { readFileSync, readdirSync } from 'node:fs';
+import { execFileSync, spawn } from 'node:child_process';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, relative } from 'node:path';
 
 export const BETA_STAGES = [
@@ -162,4 +162,22 @@ export function verifyBetaResume(path, runtimeSha256, { cwd } = {}) {
     previous = entry;
   }
   return report;
+}
+
+export async function runBetaCommand(args, { chainOut, stageOut, id, label = 'runner', admission, cwd, env = process.env, onChild = () => {}, onOutput = bytes => process.stdout.write(bytes) }) {
+  const relativeLogDirectory = relative(resolve(stageOut), resolve(chainOut));
+  if (!relativeLogDirectory || !relativeLogDirectory.startsWith('..')) throw Error('beta command logs must be outside the runner output');
+  if (admission) writeFileSync(resolve(chainOut, id + '-admission.json'), JSON.stringify(admission, null, 2));
+  const logPath = resolve(chainOut, id + '-' + label + '.log');
+  writeFileSync(logPath, '');
+  const child = spawn('bun', args, { cwd, env, stdio: ['ignore', 'pipe', 'pipe'] });
+  onChild(child);
+  const chunks = [];
+  const take = bytes => { chunks.push(bytes); onOutput(bytes); writeFileSync(logPath, Buffer.concat(chunks)); };
+  child.stdout.on('data', take); child.stderr.on('data', take);
+  try {
+    const result = await new Promise((done, fail) => { child.once('error', fail); child.once('close', (code, signal) => done({ code, signal })); });
+    if (result.code !== 0) throw Error(label + ' failed: ' + JSON.stringify(result));
+    return fileEvidence(logPath);
+  } finally { onChild(null); }
 }
