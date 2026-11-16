@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Audit raw earned exports without changing them. bun tools/audit-bench-copper.mjs <run-directory>
 import {readFileSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
@@ -30,7 +31,7 @@ assert.equal(give.game.systems.farms.farms.find(v=>v.id==='copper').mode,'give')
 const replay=JSON.parse(readFileSync(resolve(out,'replay.json'),'utf8'));
 const imports=replay.inputs.filter(i=>i.type==='import-earned-pre-choice');assert.equal(imports.length,2);assert.equal(imports[0].sha256,imports[1].sha256);
 assert.equal(replay.status,'PASS');
-assert.equal(replay.inputHash,'d1de50e2eb48a7de5b9af900e470cabd2a88d6688e2e701a18407db1e2c7290b','requires complete fresh earned route');
+requireBetaHash(replay.inputHash, 'd1de50e2eb48a7de5b9af900e470cabd2a88d6688e2e701a18407db1e2c7290b', 'greywood');
 read('earned-pre-choice');assert.equal(imports[0].sha256,hashes['earned-pre-choice']);
 const combat=replay.inputs.filter(i=>i.type==='combat-observation').map(i=>i.fight);assert.ok(combat.some(f=>f.record.rigsPlaced>=1&&f.record.rigsTriggered>=1),'quill strip never worked');
 const dodgeAt=replay.inputs.findIndex(i=>i.type==='copper-grip-dodge');assert.ok(dodgeAt>=0,'copper grip never used');

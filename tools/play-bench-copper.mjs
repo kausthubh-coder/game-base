@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Bench and copper from the exact unedited earned grey-wood save. Required actions use browser keys and mouse.
 // PLAY_PORT=5559 bun tools/play-bench-copper.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -28,7 +29,10 @@ const inputHash = createHash('sha256').update(rawInput).digest('hex');
 const recoverDax=process.argv.includes('--recover-dax');
 const resumeGive=process.argv.includes('--resume-earned-give');
 const resume=process.argv.includes('--resume-earned-choice')||resumeGive;
-if(recoverDax?inputHash!=='9865912499b1f6d8dd5c4ac1ca2ee0f05cb2d363b7bfea6ccac5a9a6df0a30fa':resumeGive?inputHash!=='5d827b4cb2cb992ccc530133f115dad0c086f4545e36830a684eddc35f59333d':resume?inputHash!=='84420052013beb7c95a5e1e78b7578b2b16fe38d6c4f93c0fd54f2c2dfae05b4':inputHash!=='d1de50e2eb48a7de5b9af900e470cabd2a88d6688e2e701a18407db1e2c7290b')throw Error('requires exact historical earned greywood');
+if (process.env.BETA_PREDECESSOR) {
+  if (recoverDax || resume) throw Error('beta requires the complete Copper route');
+  requireBetaHash(inputHash, null, 'greywood');
+} else if(recoverDax?inputHash!=='9865912499b1f6d8dd5c4ac1ca2ee0f05cb2d363b7bfea6ccac5a9a6df0a30fa':resumeGive?inputHash!=='5d827b4cb2cb992ccc530133f115dad0c086f4545e36830a684eddc35f59333d':resume?inputHash!=='84420052013beb7c95a5e1e78b7578b2b16fe38d6c4f93c0fd54f2c2dfae05b4':inputHash!=='d1de50e2eb48a7de5b9af900e470cabd2a88d6688e2e701a18407db1e2c7290b')throw Error('requires exact historical earned greywood');
 mkdirSync(out, { recursive: true });
 const qualityIndex = process.argv.indexOf('--quality');
 const quality = qualityIndex < 0 ? 'high' : process.argv[qualityIndex + 1];

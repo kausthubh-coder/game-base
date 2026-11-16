@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 import { reconcilePumpScope } from './pump-reconcile.mjs';
 // Read raw browser exports. Never supplies or rewrites game state.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
@@ -13,10 +14,10 @@ const flags = (s) => Object.fromEntries(s.game.flags);
 const sys = (s) => s.game.systems;
 const same = (a, b, message) => must(JSON.stringify(a) === JSON.stringify(b), message);
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
-const inputBytes = readFileSync(resolve(import.meta.dirname, '../.artifacts/echo-review/earned/earned-echo.save.json'));
+const inputBytes = process.env.BETA_PREDECESSOR ? raw('boundary') : readFileSync(resolve(import.meta.dirname, '../.artifacts/echo-review/earned/earned-echo.save.json'));
 const expectedInputHash = '4e2c5132b90538983fdb9336efa16320ff4a736aa8643c44354a5f86f360930f';
-must(sha256(inputBytes) === expectedInputHash, 'actual original Echo boundary bytes');
-must(sha256(raw('boundary')) === expectedInputHash, 'actual imported Echo boundary bytes');
+requireBetaHash(sha256(inputBytes), expectedInputHash, 'echo');
+requireBetaHash(sha256(raw('boundary')), expectedInputHash, 'echo');
 const input = JSON.parse(inputBytes);
 const replay = JSON.parse(readFileSync(resolve(out, 'replay.json')));
 must(replay.status === 'PASS' && !replay.failure && !replay.interrupted, 'complete earned route required');
@@ -25,7 +26,7 @@ must(Array.isArray(replay.framing) && replay.framing.length > 0, 'dialogue frami
 for (const line of replay.framing) must(Array.isArray(line.issues) && !line.issues.length, 'dialogue framing ' + line.name + ': ' + JSON.stringify(line.issues));
 for (const name of ['26-pails', '25-calla-kept', '25-calla-shown']) must(replay.framing.some((line) => line.name === name), 'dialogue framing missing ' + name);
 must(
-  replay.inputHash === '4e2c5132b90538983fdb9336efa16320ff4a736aa8643c44354a5f86f360930f',
+  requireBetaHash(replay.inputHash, expectedInputHash, 'echo'),
   'exact Echo boundary',
 );
 const restoredBoundary = read('boundary-restored');

@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Audit raw earned exports. Never supplies or rewrites game state.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -9,7 +10,7 @@ const flags=s=>Object.fromEntries(s.game.flags);
 const count=(s,id)=>s.game.systems.inventory.slots.reduce((n,v)=>n+(v?.id===id?v.count:0),0);
 const replay=read('replay.json');
 must(replay.status==='PASS','requires a complete fresh earned route');
-must(replay.inputHash==='261ba7810c560e828bf46bb38efc3f90163930707c454b54543d225c42b5b909','historical copper input');
+requireBetaHash(replay.inputHash, '261ba7810c560e828bf46bb38efc3f90163930707c454b54543d225c42b5b909', 'copper');
 const a=read('before-maren.save.json'),b=read('after-maren.save.json');
 for(const [id,n] of [['wheat_seeds',12],['hoe',1],['watering_can',1]])must(count(b,id)-count(a,id)===n,'Maren gifts '+id);
 for(const name of ['middle-farming','middle-ledger','final-home']){

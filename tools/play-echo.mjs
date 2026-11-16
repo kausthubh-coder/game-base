@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Echo from the exact earned Gold boundary. All actions use browser input.
 // PLAY_PORT=5559 bun tools/play-echo.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -24,7 +25,7 @@ mustSave();
 function mustSave() { if (saveIndex < 0 || !process.argv[saveIndex+1] || process.argv[saveIndex+1].startsWith('--')) throw Error('--save requires an unedited earned stage save'); }
 const rawInput = readFileSync(resolve(root, process.argv[saveIndex+1]), 'utf8');
 const inputHash = createHash('sha256').update(rawInput).digest('hex');
-if(inputHash!=='22c1a54d698331f83a35d1a8d9c998a80b1825150b13d1d6ca38f07442fca043')throw Error('requires exact unedited earned Gold boundary');
+requireBetaHash(inputHash, '22c1a54d698331f83a35d1a8d9c998a80b1825150b13d1d6ca38f07442fca043', 'gold');
 mkdirSync(out, { recursive: true });
 const qualityIndex = process.argv.indexOf('--quality');
 const quality = qualityIndex < 0 ? 'high' : process.argv[qualityIndex + 1];

@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Grey wood from an unedited earned morning save. Required actions use browser keys and mouse.
 // PLAY_PORT=5559 bun tools/play-greywood.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -25,7 +26,7 @@ mustSave();
 function mustSave() { if (saveIndex < 0 || !process.argv[saveIndex+1] || process.argv[saveIndex+1].startsWith('--')) throw Error('--save requires an unedited earned stage save'); }
 const rawInput = readFileSync(resolve(root, process.argv[saveIndex+1]), 'utf8');
 const inputHash = createHash('sha256').update(rawInput).digest('hex');
-if(inputHash!=='bbfc0fce50f455acf3699ab04f3a328398585d398a372f3988c69f85fd23e9c3')throw Error('requires exact historical earned homestead');
+requireBetaHash(inputHash, 'bbfc0fce50f455acf3699ab04f3a328398585d398a372f3988c69f85fd23e9c3', 'home');
 mkdirSync(out, { recursive: true });
 const qualityIndex = process.argv.indexOf('--quality');
 const quality = qualityIndex < 0 ? 'high' : process.argv[qualityIndex + 1];

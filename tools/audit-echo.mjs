@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Inspect unedited earned exports. This audit never supplies game state.
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -10,7 +11,7 @@ const systems = save => save.game.systems;
 const count = (save, id) => systems(save).inventory.slots.reduce((n, slot) => n + (slot?.id === id ? slot.count : 0), 0);
 const replay = read('replay.json');
 must(replay.status === 'PASS', 'requires a complete fresh earned route');
-must(replay.inputHash === '22c1a54d698331f83a35d1a8d9c998a80b1825150b13d1d6ca38f07442fca043', 'historical Gold input');
+requireBetaHash(replay.inputHash, '22c1a54d698331f83a35d1a8d9c998a80b1825150b13d1d6ca38f07442fca043', 'gold');
 must(replay.scenes.filter(s => s.scene === 24).length === 1, 'memory plays once');
 for (const name of ['middle-memory', 'shrine-heart', 'shrine-stamina', 'dinner-gus', 'dinner-hobb', 'final-home']) {
  const a = read(name + '.save.json'), b = read(name + '-continued.save.json');

@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Pump from the exact earned Echo boundary. All actions use browser input.
 // PLAY_PORT=5571 bun tools/play-pump.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -106,8 +107,7 @@ function mustSave() {
 }
 const rawInput = readFileSync(resolve(root, process.argv[saveIndex + 1]), 'utf8');
 const inputHash = createHash('sha256').update(rawInput).digest('hex');
-if (inputHash !== '4e2c5132b90538983fdb9336efa16320ff4a736aa8643c44354a5f86f360930f')
-  throw Error('requires exact unedited earned Echo boundary');
+requireBetaHash(inputHash, '4e2c5132b90538983fdb9336efa16320ff4a736aa8643c44354a5f86f360930f', 'echo');
 mkdirSync(out, { recursive: true });
 writeFileSync(resolve(out, 'boundary.save.json'), rawInput);
 const qualityIndex = process.argv.indexOf('--quality');

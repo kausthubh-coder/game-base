@@ -1,3 +1,4 @@
+import { requireBetaHash, verifyRuntime } from './lib/beta-chain.mjs';
 // Water uphill from the exact accepted Pump boundary. All actions use browser input.
 // PLAY_PORT=5575 bun tools/play-uphill.mjs --save <earned-pump.save.json> --out <new-directory> --active-heavy-jobs 0
 import { spawn, spawnSync } from 'node:child_process';
@@ -108,8 +109,7 @@ function mustSave() {
 }
 const rawInput = readFileSync(resolve(root, process.argv[saveIndex + 1]), 'utf8');
 const inputHash = createHash('sha256').update(rawInput).digest('hex');
-if (inputHash !== '00bfc093d7f1aecb61838f6314d59db27b329dcc235dd7376a6feb28032bdf10')
-  throw Error('requires exact unedited earned Pump boundary');
+requireBetaHash(inputHash, '00bfc093d7f1aecb61838f6314d59db27b329dcc235dd7376a6feb28032bdf10', 'pump');
 mkdirSync(out, { recursive: true });
 writeFileSync(resolve(out, 'boundary.save.json'), rawInput);
 const qualityIndex = process.argv.indexOf('--quality');
@@ -592,7 +592,11 @@ try {
     );
     must((await new Promise((done, fail) => { build.once('error', fail); build.once('exit', done); })) === 0, 'build failed');
   }
-  if(dist === 'dist-pump-exit'||process.argv.includes('--no-build')) {
+  if (process.env.BETA_RUNTIME_MANIFEST) {
+    if (!process.env.BETA_PREDECESSOR || !process.argv.includes('--no-build')) throw Error('beta runtime requires the earned chain and no-build');
+    const expected = verifyRuntime(dist, process.env.BETA_RUNTIME_MANIFEST);
+    writeFileSync(resolve(out, 'accepted-build-provenance.json'), JSON.stringify(expected, null, 2));
+  } else if(dist === 'dist-pump-exit'||process.argv.includes('--no-build')) {
     const provenance=dist==='dist-pump-exit'?'.artifacts/pump-exit-staging/checks/provenance.json':'.artifacts/uphill-input/build-provenance.json';
     const expected=JSON.parse(readFileSync(provenance,'utf8'));
     must(!spawnSync('git',['diff',expected.source,'--','src','public','index.html','vite.config.ts','package.json'],{encoding:'utf8'}).stdout,'runtime differs from accepted build');
@@ -628,7 +632,7 @@ try {
   await importRaw(rawInput);
   const initial = JSON.parse(rawInput);
   must(initial.game.systems.quests.quests.pump.state === 'done', 'Pump completed boundary');
-  must(inputHash === '00bfc093d7f1aecb61838f6314d59db27b329dcc235dd7376a6feb28032bdf10', 'accepted raw boundary');
+  requireBetaHash(inputHash, '00bfc093d7f1aecb61838f6314d59db27b329dcc235dd7376a6feb28032bdf10', 'pump');
   await shot('00-boundary');
   current = 'craft-machines';
   await make('waterwheel');

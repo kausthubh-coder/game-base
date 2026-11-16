@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -322,11 +323,7 @@ if (import.meta.main) {
     }
   }
   const boundaryRaw = readFileSync(resolve(out, 'boundary.save.json'), 'utf8');
-  if (
-    createHash('sha256').update(boundaryRaw).digest('hex') !==
-    '00bfc093d7f1aecb61838f6314d59db27b329dcc235dd7376a6feb28032bdf10'
-  )
-    throw Error('accepted Pump root bytes changed');
+  requireBetaHash(createHash('sha256').update(boundaryRaw).digest('hex'), '00bfc093d7f1aecb61838f6314d59db27b329dcc235dd7376a6feb28032bdf10', 'pump');
   saves.set(createHash('sha256').update(boundaryRaw).digest('hex'), JSON.parse(boundaryRaw));
   const result = scopes.map((s) => {
     const input = saves.get(s.inputHash);

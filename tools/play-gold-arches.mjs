@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Gold on the arches from the exact earned copper boundary. All actions use browser input.
 // PLAY_PORT=5559 bun tools/play-gold-arches.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -33,7 +34,10 @@ const resumeHarvest=process.argv.includes('--resume-harvest')||resumeCounter;
 const resumeCrops=process.argv.includes('--resume-crops');
 const resumeField=process.argv.includes('--resume-field')||resumeCrops||resumeHarvest;
 const resume=process.argv.includes('--resume-maren')||resumeField||resumeFinal;
-if(continueEarned?inputHash!=='22c1a54d698331f83a35d1a8d9c998a80b1825150b13d1d6ca38f07442fca043':resumeFinal?inputHash!=='cf00d45dd7498cc3895d58b65008487b02aeed18fde477aa2712aa78891c2d0c':resumeNeeds?inputHash!=='d218c01d5d2cbe4f76e767a59c25cccdc0cd2f1fcdfde99df350b33dc6d51a0b':resumeCounter?inputHash!=='a0c7e9882cdf4a1bb61a9180714399dcc274330d6070b9899b606a3d435b7b21':resumeHarvest?inputHash!=='a3e34e2f8c3e23e120e29f3cf016a7713dace124a5ef3dded9f117ca4f47270d':resumeCrops?inputHash!=='3dfe665d5531429a942e10348822fe55717d3d576c747beec9f3be8a33de9bb3':resumeField?inputHash!=='1212e7b590199b16802583255152a2b228a57da54833071175c7cd40b3970897':resume?inputHash!=='0bed9db10191460fa89742620cdd77dbafdbe7c21e045563a52c697e7b22aca5':inputHash!=='261ba7810c560e828bf46bb38efc3f90163930707c454b54543d225c42b5b909')throw Error('requires exact unedited earned copper boundary');
+if (process.env.BETA_PREDECESSOR) {
+  if (resume || resumeNeeds || resumeCounter || resumeHarvest || resumeCrops || resumeField || resumeFinal) throw Error('beta requires the complete Gold route');
+  requireBetaHash(inputHash, null, 'copper');
+} else if(continueEarned?inputHash!=='22c1a54d698331f83a35d1a8d9c998a80b1825150b13d1d6ca38f07442fca043':resumeFinal?inputHash!=='cf00d45dd7498cc3895d58b65008487b02aeed18fde477aa2712aa78891c2d0c':resumeNeeds?inputHash!=='d218c01d5d2cbe4f76e767a59c25cccdc0cd2f1fcdfde99df350b33dc6d51a0b':resumeCounter?inputHash!=='a0c7e9882cdf4a1bb61a9180714399dcc274330d6070b9899b606a3d435b7b21':resumeHarvest?inputHash!=='a3e34e2f8c3e23e120e29f3cf016a7713dace124a5ef3dded9f117ca4f47270d':resumeCrops?inputHash!=='3dfe665d5531429a942e10348822fe55717d3d576c747beec9f3be8a33de9bb3':resumeField?inputHash!=='1212e7b590199b16802583255152a2b228a57da54833071175c7cd40b3970897':resume?inputHash!=='0bed9db10191460fa89742620cdd77dbafdbe7c21e045563a52c697e7b22aca5':inputHash!=='261ba7810c560e828bf46bb38efc3f90163930707c454b54543d225c42b5b909')throw Error('requires exact unedited earned copper boundary');
 mkdirSync(out, { recursive: true });
 const qualityIndex = process.argv.indexOf('--quality');
 const quality = qualityIndex < 0 ? 'high' : process.argv[qualityIndex + 1];

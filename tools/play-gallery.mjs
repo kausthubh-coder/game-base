@@ -1,3 +1,4 @@
+import { requireBetaHash } from './lib/beta-chain.mjs';
 // Pump from the exact earned uphill boundary. All actions use browser input.
 // PLAY_PORT=5582 bun tools/play-gallery.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -162,8 +163,8 @@ export async function playGallery({run = null, args = process.argv, startingSave
   const resumePath = resumeIndex < 0 ? null : args[resumeIndex + 1];
   const rawInput = readFileSync(resolve(root, args[saveIndex + 1]), 'utf8');
   const inputHash = createHash('sha256').update(rawInput).digest('hex');
-  if (inputHash !== '2e87196658d91e6cace033284b2b218414e242c4a4e1214d791ed999abdb771d')
-    throw Error('requires exact unedited earned uphill boundary');
+  requireBetaHash(inputHash, '2e87196658d91e6cace033284b2b218414e242c4a4e1214d791ed999abdb771d', 'uphill');
+  if (process.env.BETA_PREDECESSOR && resumePath) throw Error('beta requires the complete Gallery route');
   mkdirSync(out, { recursive: true });
   writeFileSync(resolve(out, 'tested-runner.mjs'), readFileSync(import.meta.filename));
   writeFileSync(resolve(out, 'boundary.save.json'), rawInput);
