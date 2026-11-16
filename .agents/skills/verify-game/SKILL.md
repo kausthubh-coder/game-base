@@ -28,7 +28,7 @@ Each part prints `pass`, `skip` or `FAIL`. A failed part names its log in `.arti
 | A tool in `tools/` | `tools`, and the part that uses the tool | |
 | `package.json`, `vite.config.ts`, the build | everything, with `--full` | |
 
-For story chapters and earned progression, use `verify-chapter` before the long replay. Chapter acceptance supplements these regression checks.
+For story chapters and earned progression, use `verify-chapter` before the long replay. Chapter acceptance supplements these regression checks. The supported first-half beta ends at Lamp Gallery. Run the fresh chain in `docs/beta-replay.md`, then set `BETA_REPLAY_REPORT` to its accepted report for `bun run verify --full`. The `beta` part checks all retained inputs, outputs, audits and runtime identity. `legacy-act1` remains an explicit diagnostic for the removed six-quest story, outside this beta acceptance. Full current Act 1 beyond Gallery still requires its own final earned replay.
 
 ## Three ways to play
 

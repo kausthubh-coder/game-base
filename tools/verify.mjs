@@ -45,14 +45,22 @@ const PARTS = [
     run: [['bun', 'tools/play-sight.mjs']],
   },
   {
-    name: 'slow', slow: true, what: 'smoke, the interface and all of act 1 in a browser',
-    run: [['bun', 'tools/play-smoke.mjs'], ['bun', 'tools/play-ui.mjs'], ['bun', 'tools/play-act1.mjs']],
+    name: 'slow', slow: true, what: 'smoke and the interface in a browser',
+    run: [['bun', 'tools/play-smoke.mjs'], ['bun', 'tools/play-ui.mjs']],
+  },
+  {
+    name: 'beta', slow: true, what: 'fresh Begin through Lamp Gallery, with verified earned saves between chapters',
+    run: [['bun', 'tools/play-beta.mjs', '--verify-report', process.env.BETA_REPLAY_REPORT || '.artifacts/beta-final/report.json']],
+  },
+  {
+    name: 'legacy-act1', deferred: true, what: 'obsolete six-quest diagnostic; full current Act 1 replacement is unfinished',
+    run: [['bun', 'tools/play-act1.mjs']],
   },
 ];
 
 const args = process.argv.slice(2);
 if (args.includes('--list')) {
-  for (const part of PARTS) console.log(`${part.name.padEnd(8)} ${part.what}${part.slow ? ' (only with --full or by name)' : ''}`);
+  for (const part of PARTS) console.log(`${part.name.padEnd(8)} ${part.what}${part.deferred ? ' (explicit diagnostic only)' : part.slow ? ' (only with --full or by name)' : ''}`);
   process.exit(0);
 }
 const named = args.filter((arg) => !arg.startsWith('--'));
@@ -61,7 +69,7 @@ if (unknown.length > 0) {
   console.error(`No part named ${unknown.join(', ')}. The parts: ${PARTS.map((part) => part.name).join(', ')}`);
   process.exit(1);
 }
-const chosen = PARTS.filter((part) => (named.length > 0 ? named.includes(part.name) : args.includes('--full') || !part.slow));
+const chosen = PARTS.filter((part) => (named.length > 0 ? named.includes(part.name) : !part.deferred && (args.includes('--full') || !part.slow)));
 
 mkdirSync(LOGS, { recursive: true });
 let failed = 0;

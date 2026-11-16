@@ -82,7 +82,7 @@ Evidence: `.artifacts/first-half-beta-release/`, `.artifacts/opening-audio-brows
 
 ## Release resumed, 16 November
 
-The user authorized finishing and releasing the first-half beta. Weekly usage remains user-reported; the current reading was requested again.
+The user authorized finishing and releasing the first-half beta. The user then explicitly withdrew the weekly-meter stop constraint: "just ignore the weekly meter". Continue to the release boundary.
 
 Cloud save now passes all four actual two-browser cases after the checker finishes Hobb's wake conversation with E. Account and cloud product code did not change. Evidence is `.artifacts/cloud-save/` on act1. An attempted Bun syntax check ran the tool because Bun does not support Node's `--check`; that invocation built and ran the diagnostic, and its owned server/browser closed normally. Immutable release runtimes and the private preview were untouched.
 

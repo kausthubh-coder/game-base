@@ -23,7 +23,7 @@ Clerk has nothing to deploy. The live copy uses Clerk's development instance unt
 
 1. **Ready.**
    - `git status` is clean. `git fetch origin && git merge origin/main` (or rebase) so the branch holds everything on `main`.
-   - `bun run verify --full` passes. Every changed feature was driven with the `verify-game` skill and has evidence in `.artifacts/`.
+   - `BETA_REPLAY_REPORT=<accepted-first-half-report> bun run verify --full` passes for the supported first-half release through Lamp Gallery. Generate the report with `tools/play-beta.mjs` as documented in `docs/beta-replay.md`; verification rejects stale or changed evidence. This does not accept later Act 1 chapters. Every changed feature was driven with the `verify-game` skill and has evidence in `.artifacts/`.
    - List what goes out: `git log --oneline origin/main..HEAD`, and which surfaces it touches.
    - Roll back, if it comes to that: `git revert` the commit and push, which deploys the old code again. `bunx wrangler rollback` is faster for the Worker alone. A schema change that removed a field needs a plan before you ship, not after.
    - When `convex/schema.ts` changed: the new schema must accept the rows that exist, and work with the game code that is live now, since the functions deploy a few seconds before the files. Read `~/.skills-parked/convex-migrate/SKILL.md` for anything but an added optional field.
