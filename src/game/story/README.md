@@ -30,6 +30,11 @@ A conversation starts only when nobody is talking and the player has been free f
 remembered as `story.seen.<id>` when it ends, and a scene whose `scene.<n>` is already set (by the bots, the debug
 door or another way) is not played again.
 
+Post-fight conversations also recover from saved `fight.<n>.won` or `fight.<n>.denied` flags. Continue restarts an
+unfinished conversation from its first line, without awarding the fight's gifts again. Completed scenes stay
+completed. Loading an earlier save in the same game ignores queued post-fight scenes whose fight is unresolved
+in that save.
+
 While a staged or film scene plays, the people in its `cast` the people system does not have near are stood in as
 actors `stage:<who>` round its place (or round the player when they are far from it), turned toward the player.
 In a memory (24, 26, 28, 29 and the dream) the player's own actor is hidden. They go when the conversation ends.

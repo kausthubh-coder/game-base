@@ -11,8 +11,8 @@
 // when the queen's ledger fills (the end of 27), and in the night's sleep (35). The hall plays the first night's
 // own (8, 10 to 14), and the film director scene 9.
 //
-// Nothing here is saved: a scene that was cut short by a load starts again, and stand-ins live only while their
-// scene plays.
+// The queue and stand-ins are not saved. Open steps and won/denied fights recover unfinished conversations
+// from their saved flags; stand-ins live only while their scene plays.
 
 import type { Actor, Game, QuestId, SimSystem } from '../api.sim.ts';
 import type { PersonId } from '../content/ids.ts';
@@ -82,6 +82,8 @@ export function createSceneRunner(game: Game): SceneRunner {
   /** The scene a fight step plays once its fight is won, or denied for the boar out of reach. */
   const afterFight = new Map<FightNumber, SceneNumber>();
   for (const quest of QUESTS) for (const step of quest.steps) if (step.kind === 'fight' && step.fight && step.scene && sceneOf(step.scene)?.start === 'fight') afterFight.set(step.fight, step.scene);
+  const fightForTalk = new Map([...afterFight].map(([fight, scene]) => [sceneTalk(scene), fight]));
+  const fightResolved = (fight: FightNumber): boolean => flags.is(FLAG.fightWon(fight)) || flags.is(FLAG.fightDenied(fight));
 
   events.on('flag.changed', ({ flag, value }) => {
     if (!value) return;
@@ -149,7 +151,15 @@ export function createSceneRunner(game: Game): SceneRunner {
   function nextStep(): string | null {
     for (const id of queue) {
       if (seen(id)) continue;
+      // Loading an earlier save in this kernel can leave a later victory in the unsaved queue.
+      const fight = fightForTalk.get(id);
+      if (fight !== undefined && !fightResolved(fight)) continue;
       return id;
+    }
+    // Loading flags emits no victory event. Recover the owed scene, including a conversation cut short
+    // by the save, before the quest's ordinary step. Authored quest order puts earlier unfinished fights first.
+    for (const [id, fight] of fightForTalk) {
+      if (fightResolved(fight) && !seen(id)) return id;
     }
     for (const quest of QUESTS) {
       if (!flags.is(FLAG.questStarted(quest.id)) || flags.is(FLAG.questDone(quest.id))) continue;
