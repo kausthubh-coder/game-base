@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync, rmSyn
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { BETA_STAGES, digest, fileEvidence, verifyPredecessor, requireBetaHash, runtimeHashes, verifyRuntime, verifyBetaPreflight, verifyBetaReport, verifyBetaResume, runnerDependencies, runBetaCommand } from './beta-chain.mjs';
+import { BETA_STAGES, digest, fileEvidence, verifyPredecessor, requireBetaHash, runtimeHashes, verifyRuntime, verifyBetaPreflight, verifyBetaReport, verifyBetaResume, runnerDependencies, runBetaCommand, chapterRuntime, betaRunnerArgs } from './beta-chain.mjs';
 
 const directories = [];
 afterEach(() => { for (const dir of directories.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -14,7 +14,7 @@ function fixture() {
   const git = args => execFileSync('git', args, { cwd: dir, stdio: 'pipe' }).toString().trim();
   git(['init', '-q']); git(['add', 'src']); git(['-c', 'user.name=Beta test', '-c', 'user.email=beta@example.invalid', 'commit', '-qm', 'Create runtime fixture']);
   const revision = git(['rev-parse', 'HEAD']);
-  const runtime = resolve(dir, 'runtime'); mkdirSync(runtime); writeFileSync(resolve(runtime, 'index.html'), '<p>fixture</p>');
+  const runtime = resolve(dir, 'dist-beta-test'); mkdirSync(runtime); writeFileSync(resolve(runtime, 'index.html'), '<p>fixture</p>');
   const manifest = put('runtime.json', { source: revision, build: runtimeHashes(runtime) });
   const measurement = put('measurement.json', { status: 'PASS', actual: 1 });
   const image = put('reviewed.png', 'image fixture');
@@ -138,6 +138,7 @@ test('the CLI runner receives a clean output directory while admission and live 
     const out = args[args.indexOf('--out') + 1];
     const input = args[args.indexOf('--save') + 1];
     if (!args.includes('--no-build')) throw Error('unexpected build');
+    if (args[args.indexOf('--dist') + 1] !== 'dist-beta-test') throw Error('wrong runtime argument');
     console.log('runner imported');
     await new Promise(resolve => setTimeout(resolve, 30));
     if (readdirSync(out).length) throw Error('Choose an empty --out directory');
@@ -145,9 +146,36 @@ test('the CLI runner receives a clean output directory while admission and live 
     writeFileSync(out + '/replay.json', JSON.stringify({status:'PASS'}));
     console.log('PASS strict runner');
   `);
-  const log = await runBetaCommand([script, '--no-build', '--out', stageOut, '--save', input], { chainOut: dir, stageOut, id: 'pump', admission: { admitted: true }, cwd: dir, onOutput: () => {} });
+  const args = betaRunnerArgs(BETA_STAGES[7], 'dist-beta-test', stageOut, input);
+  const log = await runBetaCommand([script, ...args.slice(1)], { chainOut: dir, stageOut, id: 'pump', admission: { admitted: true }, cwd: dir, onOutput: () => {} });
   expect(readdirSync(stageOut)).toEqual(['replay.json']);
   expect(JSON.parse(readFileSync(resolve(dir, 'pump-admission.json')))).toEqual({ admitted: true });
   expect(readFileSync(log.path, 'utf8')).toBe('runner imported\nPASS strict runner\n');
   expect(log.path).toBe(resolve(dir, 'pump-runner.log'));
+});
+
+test('all beta stages use the explicit immutable runtime without native aliases', () => {
+  for (const stage of BETA_STAGES) {
+    const args = betaRunnerArgs(stage, '/checkout/dist-beta-new', '/evidence/stage', stage.index ? '/evidence/preceding.save.json' : null);
+    expect(args[args.indexOf('--dist') + 1]).toBe('/checkout/dist-beta-new');
+    expect(args.includes('--no-build')).toBe(true);
+    expect(args.includes('--save')).toBe(stage.index > 0);
+    expect(args.includes('--active-heavy-jobs')).toBe(stage.index >= 7);
+  }
+  expect(() => betaRunnerArgs(BETA_STAGES[0], 'dist-beta-new', '/out', '/unearned.save')).toThrow();
+  expect(() => betaRunnerArgs(BETA_STAGES[1], 'dist-beta-new', '/out')).toThrow();
+});
+test('runtime selection preserves legacy guards and requires exact beta provenance', () => {
+  const f=fixture(),legacyPattern=/^dist-pump-[a-z0-9-]+$/;
+  expect(chapterRuntime([], 'dist-pump-input', {env:{},cwd:f.dir,legacyPattern})).toBe('dist-pump-input');
+  expect(chapterRuntime(['--dist','dist-custom'], 'dist-firstnight', {env:{},cwd:f.dir})).toBe('dist-custom');
+  expect(()=>chapterRuntime(['--dist'], 'dist-firstnight', {env:{},cwd:f.dir})).toThrow();
+  expect(()=>chapterRuntime(['--dist','../dist-outside'], 'dist-firstnight', {env:{},cwd:f.dir})).toThrow();
+  expect(()=>chapterRuntime(['--dist','dist-beta-test'], 'dist-pump-input', {env:{},cwd:f.dir,legacyPattern})).toThrow();
+  const env={BETA_RUNTIME_MANIFEST:f.manifest.path,BETA_RUNTIME_MANIFEST_SHA256:f.manifest.sha256};
+  expect(chapterRuntime(['--dist',f.runtime,'--no-build'], 'dist-pump-input', {env,cwd:f.dir,legacyPattern})).toBe(f.runtime);
+  expect(()=>chapterRuntime(['--dist',f.runtime], 'dist-pump-input', {env,cwd:f.dir,legacyPattern})).toThrow();
+  expect(()=>chapterRuntime(['--dist',f.runtime,'--no-build'], 'dist-pump-input', {env:{...env,BETA_RUNTIME_MANIFEST_SHA256:digest('wrong')},cwd:f.dir,legacyPattern})).toThrow();
+  writeFileSync(resolve(f.runtime,'index.html'),'changed');
+  expect(()=>chapterRuntime(['--dist',f.runtime,'--no-build'], 'dist-pump-input', {env,cwd:f.dir,legacyPattern})).toThrow();
 });

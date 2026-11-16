@@ -1,3 +1,4 @@
+import { chapterRuntime } from './lib/beta-chain.mjs';
 // Current opening, from an empty browser context. All progression uses browser input.
 // PLAY_PORT=5559 bun tools/play-grantday.mjs [--no-build] [--out .artifacts/grantday-review]
 import { spawn, spawnSync } from 'node:child_process';
@@ -14,7 +15,7 @@ const out = resolve(root, outIndex >= 0 ? process.argv[outIndex + 1] : '.artifac
 mkdirSync(out, { recursive: true });
 for (const name of ['earned-landing.save.json', 'mid-spar.save.json']) rmSync(resolve(out, name), { force: true });
 const port = Number(process.env.PLAY_PORT || 5559);
-const dist = 'dist-grantday';
+const dist = chapterRuntime(process.argv, 'dist-grantday');
 const qualityIndex = process.argv.indexOf('--quality');
 const quality = qualityIndex < 0 ? 'high' : process.argv[qualityIndex + 1];
 const framing = [];

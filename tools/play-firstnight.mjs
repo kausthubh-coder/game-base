@@ -1,3 +1,4 @@
+import { chapterRuntime } from './lib/beta-chain.mjs';
 // First night from an unedited earned landing save. Required actions use browser keys and mouse.
 // PLAY_PORT=5559 bun tools/play-firstnight.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -19,7 +20,7 @@ const out = resolve(root, outIndex >= 0 ? process.argv[outIndex + 1] : '.artifac
 mkdirSync(out, { recursive: true });
 if (existsSync(resolve(out, 'replay.json'))) throw Error('Choose a new --out directory to preserve prior evidence');
 const port = Number(process.env.PLAY_PORT || 5559);
-const dist = 'dist-firstnight';
+const dist = chapterRuntime(process.argv, 'dist-firstnight');
 const saveIndex = process.argv.indexOf('--save');
 mustSave();
 function mustSave() { if (saveIndex < 0 || !process.argv[saveIndex+1] || process.argv[saveIndex+1].startsWith('--')) throw Error('--save requires the unedited earned landing save'); }

@@ -1,4 +1,4 @@
-import { requireBetaHash } from './lib/beta-chain.mjs';
+import { requireBetaHash, chapterRuntime } from './lib/beta-chain.mjs';
 // Echo from the exact earned Gold boundary. All actions use browser input.
 // PLAY_PORT=5559 bun tools/play-echo.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -18,7 +18,7 @@ const out = resolve(root, process.argv[outIndex + 1]);
 if(existsSync(out)&&readdirSync(out).length)throw Error('Choose an empty --out directory to preserve prior evidence');
 
 const port = Number(process.env.PLAY_PORT || 5559);
-const dist = 'dist-bench-copper'; // Reuse only this completed, regenerable output.
+const dist = chapterRuntime(process.argv, 'dist-bench-copper'); // Reuse only this completed, regenerable output.
 const pumpChoice=process.argv.includes('--running')?'running':'crated';
 const saveIndex = process.argv.indexOf('--save');
 mustSave();

@@ -1,3 +1,4 @@
+import { chapterRuntime } from './lib/beta-chain.mjs';
 // Blessing and kitchen from an unedited earned morning save. Required actions use browser keys and mouse.
 // PLAY_PORT=5559 bun tools/play-homestead.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -18,7 +19,7 @@ const out = resolve(root, process.argv[outIndex + 1]);
 if(existsSync(out)&&readdirSync(out).length)throw Error('Choose an empty --out directory to preserve prior evidence');
 mkdirSync(out, { recursive: true });
 const port = Number(process.env.PLAY_PORT || 5559);
-const dist = 'dist-homestead';
+const dist = chapterRuntime(process.argv, 'dist-homestead');
 const pumpChoice=process.argv.includes('--running')?'running':'crated';
 const saveIndex = process.argv.indexOf('--save');
 mustSave();

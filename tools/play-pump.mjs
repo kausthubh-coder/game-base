@@ -1,4 +1,4 @@
-import { requireBetaHash } from './lib/beta-chain.mjs';
+import { requireBetaHash, chapterRuntime } from './lib/beta-chain.mjs';
 // Pump from the exact earned Echo boundary. All actions use browser input.
 // PLAY_PORT=5571 bun tools/play-pump.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -94,9 +94,7 @@ const port = Number(process.env.PLAY_PORT || 5571);
 const activeIndex = process.argv.indexOf('--active-heavy-jobs');
 const activeHeavyJobs = activeIndex < 0 ? NaN : Number(process.argv[activeIndex + 1]);
 if (![0, 1].includes(activeHeavyJobs)) throw Error('--active-heavy-jobs requires the coordinator-confirmed machine-wide count, 0 or 1');
-const distIndex = process.argv.indexOf('--dist');
-const dist = distIndex < 0 ? 'dist-pump-input' : process.argv[distIndex + 1];
-if (!dist || !/^dist-pump-[a-z0-9-]+$/.test(dist)) throw Error('--dist requires a named dist-pump-* output');
+const dist = chapterRuntime(process.argv, 'dist-pump-input', { legacyPattern: /^dist-pump-[a-z0-9-]+$/ });
 // Reuse only a completed output whose runtime source the coordinator has confirmed.
 let pumpChoice = 'shown';
 const saveIndex = process.argv.indexOf('--save');

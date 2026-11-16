@@ -1,4 +1,4 @@
-import { requireBetaHash, verifyRuntime } from './lib/beta-chain.mjs';
+import { requireBetaHash, verifyRuntime, chapterRuntime } from './lib/beta-chain.mjs';
 // Water uphill from the exact accepted Pump boundary. All actions use browser input.
 // PLAY_PORT=5575 bun tools/play-uphill.mjs --save <earned-pump.save.json> --out <new-directory> --active-heavy-jobs 0
 import { spawn, spawnSync } from 'node:child_process';
@@ -95,9 +95,7 @@ const port = Number(process.env.PLAY_PORT || 5575);
 const activeIndex = process.argv.indexOf('--active-heavy-jobs');
 const activeHeavyJobs = activeIndex < 0 ? NaN : Number(process.argv[activeIndex + 1]);
 if (![0, 1].includes(activeHeavyJobs)) throw Error('--active-heavy-jobs requires the coordinator-confirmed machine-wide count, 0 or 1');
-const distIndex = process.argv.indexOf('--dist');
-const dist = distIndex < 0 ? 'dist-uphill-input' : process.argv[distIndex + 1];
-if (!dist || !/^dist-(?:pump-exit|uphill-input)$/.test(dist)) throw Error('--dist requires dist-pump-exit or dist-uphill-input');
+const dist = chapterRuntime(process.argv, 'dist-uphill-input', { legacyPattern: /^dist-(?:pump-exit|uphill-input)$/ });
 if(dist==='dist-pump-exit'&&!process.argv.includes('--no-build'))throw Error('accepted output is read-only; pass --no-build or --dist dist-uphill-input');
 // Reuse only a completed output whose runtime source the coordinator has confirmed.
 let pumpChoice = 'shown';

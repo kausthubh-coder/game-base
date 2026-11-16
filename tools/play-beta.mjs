@@ -1,8 +1,8 @@
 // Fresh Begin through Lamp Gallery, with exact earned bytes between existing runners.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { BETA_STAGES, digest, fileEvidence, readEvidence, requireBetaHash, verifyPredecessor, verifyRuntime, verifyBetaPreflight, verifyBetaEnding, verifyBetaReport, verifyBetaResume, runnerDependencies, runBetaCommand } from './lib/beta-chain.mjs';
+import { BETA_STAGES, digest, fileEvidence, readEvidence, requireBetaHash, verifyPredecessor, verifyRuntime, verifyBetaPreflight, verifyBetaEnding, verifyBetaReport, verifyBetaResume, runnerDependencies, runBetaCommand, betaRunnerArgs } from './lib/beta-chain.mjs';
 import { sample, canStartHeavy } from './resource-status.mjs';
 
 const root = resolve(import.meta.dirname, '..');
@@ -57,12 +57,6 @@ try {
     report.stages = [...prior.stages];
     report.resumeFrom = fileEvidence(resolve(resumePath));
   }
-  // Never replace or delete another retained runtime directory.
-  for (const dist of new Set(BETA_STAGES.map(s => s.dist))) {
-    const target = resolve(root, dist);
-    if (existsSync(target)) verifyRuntime(target, manifest);
-    else symlinkSync(runtime, target, 'dir');
-  }
   persist();
   async function command(commandArgs, stageOut, stage, label, env, admission) {
     if (interrupted) throw Error('beta interrupted');
@@ -77,7 +71,7 @@ try {
     const stageOut = stage.index === 0 && grantOutput ? resolve(grantOutput) : resolve(out, String(stage.index + 1).padStart(2, '0') + '-' + stage.id);
     if (!(stage.index === 0 && grantOutput)) mkdirSync(stageOut);
     report.current = stage.id; persist();
-    const env = { ...process.env, BETA_RUNTIME_MANIFEST: manifest };
+    const env = { ...process.env, BETA_RUNTIME_MANIFEST: manifest, BETA_RUNTIME_MANIFEST_SHA256: report.runtimeSha256 };
     delete env.BETA_PREDECESSOR; delete env.BETA_PREDECESSOR_SHA256;
     const prior = predecessor && verifyPredecessor(predecessor, BETA_STAGES[stage.index - 1].id);
     if (prior) {
@@ -99,9 +93,7 @@ try {
     } else {
       const resources = await sample();
       if (!canStartHeavy(resources, 0)) throw Error('resource admission held before ' + stage.id);
-      const commandArgs = ['tools/play-' + stage.runner + '.mjs', '--no-build', '--out', stageOut];
-      if (prior) commandArgs.push('--save', prior.output.path);
-      if (stage.index >= 7) commandArgs.push('--dist', stage.dist, '--active-heavy-jobs', '0');
+      const commandArgs = betaRunnerArgs(stage, runtime, stageOut, prior?.output.path);
       await command(commandArgs, stageOut, stage, 'runner', env, resources);
     }
     const replay = fileEvidence(resolve(stageOut, 'replay.json'));

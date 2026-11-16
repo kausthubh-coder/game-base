@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { execFileSync, spawn } from 'node:child_process';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, resolve, relative } from 'node:path';
+import { basename, dirname, resolve, relative } from 'node:path';
 
 export const BETA_STAGES = [
   ['grant', 'grantday', 'earned-landing', 'dist-grantday'],
@@ -180,4 +180,26 @@ export async function runBetaCommand(args, { chainOut, stageOut, id, label = 'ru
     if (result.code !== 0) throw Error(label + ' failed: ' + JSON.stringify(result));
     return fileEvidence(logPath);
   } finally { onChild(null); }
+}
+
+/** Choose a checkout-local output; beta mode additionally requires the exact supplied runtime. */
+export function chapterRuntime(args, fallback, { legacyPattern = /^dist-[a-z0-9-]+$/, env = process.env, cwd = process.cwd() } = {}) {
+  const index = args.indexOf('--dist');
+  if (index >= 0 && (!args[index + 1] || args[index + 1].startsWith('--'))) throw Error('--dist requires a runtime directory');
+  const chosen = index < 0 ? fallback : args[index + 1];
+  const path = resolve(cwd, chosen);
+  if (dirname(path) !== resolve(cwd) || !/^dist-[a-z0-9-]+$/.test(basename(path))) throw Error('--dist must name a dist-* directory in this checkout');
+  if (env.BETA_RUNTIME_MANIFEST) {
+    if (index < 0 || !args.includes('--no-build')) throw Error('beta requires an explicit immutable --dist and --no-build');
+    readEvidence({ path: env.BETA_RUNTIME_MANIFEST, sha256: env.BETA_RUNTIME_MANIFEST_SHA256 });
+    verifyRuntime(path, env.BETA_RUNTIME_MANIFEST, cwd);
+  } else if (!legacyPattern.test(chosen)) throw Error('runtime directory is outside this runner’s legacy scope');
+  return chosen;
+}
+export function betaRunnerArgs(stage, runtime, out, save = null) {
+  if ((stage.index > 0) !== !!save) throw Error('beta chapter must receive exactly its earned predecessor');
+  const args = ['tools/play-' + stage.runner + '.mjs', '--no-build', '--out', out, '--dist', runtime];
+  if (save) args.push('--save', save);
+  if (stage.index >= 7) args.push('--active-heavy-jobs', '0');
+  return args;
 }

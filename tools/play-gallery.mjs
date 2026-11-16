@@ -1,4 +1,4 @@
-import { requireBetaHash } from './lib/beta-chain.mjs';
+import { requireBetaHash, chapterRuntime } from './lib/beta-chain.mjs';
 // Pump from the exact earned uphill boundary. All actions use browser input.
 // PLAY_PORT=5582 bun tools/play-gallery.mjs --save <earned.save.json> --out <new-directory>
 import { spawn, spawnSync } from 'node:child_process';
@@ -143,10 +143,7 @@ export async function playGallery({run = null, args = process.argv, startingSave
     throw Error(
       '--active-heavy-jobs requires the coordinator-confirmed machine-wide count, 0 or 1',
     );
-  const distIndex = args.indexOf('--dist');
-  const dist = distIndex < 0 ? 'dist-gallery-input' : args[distIndex + 1];
-  if (!/^dist-gallery-(input|resume(?:-[a-z0-9]+)?)$/.test(dist))
-    throw Error('Gallery owns dist-gallery-input only');
+  const dist = chapterRuntime(args, 'dist-gallery-input', { legacyPattern: /^dist-gallery-(input|resume(?:-[a-z0-9]+)?)$/ });
   // Reuse only a completed output whose runtime source the coordinator has confirmed.
   let pumpChoice = 'shown';
   const saveIndex = args.indexOf('--save');

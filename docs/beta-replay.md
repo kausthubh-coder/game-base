@@ -18,7 +18,7 @@ writeFileSync('<runtime-manifest.json>', JSON.stringify({
 }, null, 2));
 ```
 
-The adapter compares every runtime file with that manifest and checks the current source against its recorded revision for `src`, `public`, `index.html`, `vite.config.ts`, `package.json` and `bun.lock`. Do not stamp an old output with the current revision. Existing native runtime directories must match the same manifest. Missing directories become symlinks to the supplied output. A conflicting existing directory stops the attempt without replacing it.
+The adapter compares every runtime file with that manifest and checks the current source against its recorded revision for `src`, `public`, `index.html`, `vite.config.ts`, `package.json` and `bun.lock`. Do not stamp an old output with the current revision. Every stage receives the supplied immutable directory through `--dist`. Existing native outputs and runtime aliases are left untouched. Build a new directory when the product changes, especially while a private preview serves an older output.
 
 Complete and inspect chapter preflight before the long replay. Supply a JSON report with this shape. Each evidence entry contains an absolute `path` and the SHA256 of the actual file, as returned by `fileEvidence` in `tools/lib/beta-chain.mjs`:
 
@@ -53,7 +53,7 @@ PLAY_PORT=5838 bun tools/play-beta.mjs \
 
 An already completed fresh Begin may be adopted by adding `--grant-output .artifacts/beta-final/attempt-01/01-grant`. The adapter checks its actual passing replay, raw landing hash, original Grantday runner bytes and unchanged product source. This option adopts only the first stage; later historical saves cannot enter the chain. Its recorded source identity remains in the replay.
 
-| Stage | Existing runner | New output passed onward | Native runtime |
+| Stage | Existing runner | New output passed onward | Legacy default |
 |---|---|---|---|
 | 01-grant | `tools/play-grantday.mjs` | `earned-landing.save.json` | `dist-grantday` |
 | 02-night | `tools/play-firstnight.mjs` | `earned-morning.save.json` | `dist-firstnight` |
@@ -66,7 +66,7 @@ An already completed fresh Begin may be adopted by adding `--grant-output .artif
 | 09-uphill | `tools/play-uphill.mjs` | `earned-uphill.save.json` | `dist-uphill-input` |
 | 10-gallery | `tools/play-gallery.mjs` | `earned-gallery.save.json` | `dist-gallery-resume-beta` |
 
-All receive `--no-build --out <stage-directory>`. Stages after Grant receive `--save <preceding-new-output>`. Pump, uphill and Gallery also receive `--dist <native-runtime> --active-heavy-jobs 0`. No recovery or resume flags are used. The original rootsnare/fight checkpoint Gallery adapter remains available for its historical chapter proof.
+All receive `--no-build --out <stage-directory> --dist <supplied-immutable-runtime>`. Stages after Grant receive `--save <preceding-new-output>`. Pump, uphill and Gallery also receive `--active-heavy-jobs 0`. No recovery or resume flags are used. The original rootsnare/fight checkpoint Gallery adapter remains available for its historical chapter proof.
 
 Each completed stage has a hashed passing record with its actual replay, runner, transitive tools helper imports, output and audit results. Later gates recursively verify these records back to Begin. Missing, modified, mixed-attempt or failed evidence stops the chain. Existing historical hash gates remain active outside this mode. The adapter runs the existing Copper, Gold, Echo, Pump, uphill and Gallery audits without changing their reward or preservation assertions.
 
