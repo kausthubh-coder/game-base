@@ -209,8 +209,9 @@ if (part !== 'places') {
       else if (place) {
         try {
           const p = sys.region.place(place).at;
-          // ruins.outOfVault returns to this exact place, not the generic approach offset.
-          at = vaultExit ? { x: p.x, y: p.y, z: p.z } : { x: p.x + near * 0.7, z: p.z + near * 0.7 };
+          // The ferry and ruins.outOfVault arrive at these exact places. An approach
+          // offset moves the landing fixture off the jetty and into the river.
+          at = vaultExit || n === 7 ? { x: p.x, y: p.y, z: p.z } : { x: p.x + near * 0.7, z: p.z + near * 0.7 };
         } catch { at = null; }
       }
       if (at) g.teleport(at.x, at.y, at.z);
