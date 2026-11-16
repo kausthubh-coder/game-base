@@ -1,6 +1,16 @@
 # Act 1 beta work queue
 
-Coordinator owns this record. Release scope: the smallest first-half Act 1 beta, through Lamp Gallery, then stop. Only release blockers and final checks are active. Light and all later progression, improvements and experiments are deferred. The user has authorized shipping this beta. Weekly usage was reported at 29%; stop at 24% remaining. The available tools do not expose a current account meter.
+Coordinator owns this record. Release scope: the smallest first-half Act 1 beta, through Lamp Gallery, then stop. Only release blockers and final checks are active. Light and all later progression, improvements and experiments are deferred. The user has authorized shipping this beta. The user withdrew the weekly usage stop constraint. Continue until this release is complete, then stop.
+
+## Current release status
+
+The private playtest remains available at https://mac-mini.taile36082.ts.net:15796/ on Tailscale. It includes irrigation, mobile input, cursor cancellation and first-person visibility fixes. The newer opening-audio and Hall-threshold repairs are verified locally but are not on that preview yet.
+
+The final continuous replay has passed fresh Begin through the first morning. Homestead gameplay reached its completed quest and exported a new save, but that stage is not accepted yet: its Dax conversation has two hero-occlusion findings to inspect. The replay is stopped at this boundary.
+
+A release-critical save gap is confirmed in the source: winning a fight persists, but its queued conversation is lost on reload. A focused repair and normal-save browser proof are active. No public release has occurred. After these blockers, the remaining work is the continuous replay through Lamp Gallery, full release verification, deployment and live checks. There is no reliable completion time yet.
+
+The animal-frame report remains unreproduced, not fixed. Water/bridge appearance, broader placement issues and all redesign experiments remain recorded below. Historical checkpoint sections retain their original scope; this section describes the current status.
 
 ## Beta blockers and active fixes
 
