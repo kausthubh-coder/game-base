@@ -291,7 +291,8 @@ export async function main(args = process.argv.slice(2)) {
       await activate(page.getByRole('button', { name: 'Begin', exact: true }), touch);
       await wait(s => s.started && (s.prompt === 'Take a weapon from the rack' || s.talkLine?.choices.length), 'rack prompt');
       if (!(await read()).talkLine) await press('KeyE');
-      await activate(page.getByRole('button', { name: 'Take the ' + weapon, exact: true }), touch);
+      // The choice button's accessible name also includes its key hint.
+      await activate(page.getByRole('button', { name: new RegExp('Take the ' + weapon + '$') }), touch);
       await endDialogue();
       await wait(s => s.fight?.practice && s.fight.hero.weapon === weapon && !s.player.busy, 'chosen practice weapon');
       if (touch) {
