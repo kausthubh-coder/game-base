@@ -1,7 +1,18 @@
 // The painted world's textures. `tools/ghibli-assets.mjs` makes them from the generated images in
 // assets-src/ghibli/raw, and they are served from `public/assets/painted/`. A texture that does not load
 // falls back to a stand-in drawn here, so the world is always drawn.
+//
+// The kinds of land have paintings of their own (PAINTINGS). Each is asked for only when the manifest lists it,
+// so a missing one costs no failed request; until then it is a stand-in made from the twelve.
 import * as THREE from 'three';
+
+/**
+ * The kinds of land's paintings, by name, and what stands in for each until its file exists: ground and stone
+ * (`moss`, `mud`, `scree`, `terrace-stone`), bark (`bark-grey`, `bark-old`), leaf masks (`leaves-grey`,
+ * `leaves-old`, `leaves-willow`) and card masks (`reeds`, `fern`).
+ */
+export const PAINTINGS = ['moss', 'mud', 'scree', 'terrace-stone', 'bark-grey', 'bark-old', 'leaves-grey', 'leaves-old', 'leaves-willow', 'reeds', 'fern'] as const;
+export type Painting = (typeof PAINTINGS)[number];
 
 
 export interface Textures {
@@ -18,6 +29,10 @@ export interface Textures {
   flower: THREE.Texture;
   /** Paving stones, drawn by code. Red is how light a stone is (dark between stones), green is a number of the stone's own. It repeats. */
   cobble: THREE.Texture;
+  /** The kinds of land's paintings, or their stand-ins. */
+  paintings: Record<Painting, THREE.Texture>;
+  /** Each painting's average colour, so it can vary a colour without tinting it. */
+  means: Record<Painting, THREE.Color>;
   /** Names of the textures that are stand-ins. */
   standIns: string[];
 }
@@ -80,6 +95,67 @@ function rosette(seed: number, leaflets: number): HTMLCanvasElement {
     g.beginPath(); g.moveTo(0, 6); g.bezierCurveTo(width * 0.5, length * 0.3, width, length * 0.75, 0, length); g.bezierCurveTo(-width, length * 0.75, -width * 0.5, length * 0.3, 0, 6); g.fill();
     g.restore();
   }
+  return c;
+}
+
+/** A willow's strands: long narrow leaves hanging in a fan from the top of the card. */
+function strands(seed: number): HTMLCanvasElement {
+  const [c, g] = canvas(256);
+  const r = random(seed);
+  for (let i = 0; i < 9; i++) {
+    const x = 40 + r() * 176, sway = (r() - 0.5) * 40, length = 150 + r() * 100;
+    const shade = 190 + Math.floor(r() * 65);
+    g.strokeStyle = `rgb(${shade},${shade},${shade})`;
+    g.lineWidth = 3;
+    g.beginPath(); g.moveTo(x, 0); g.quadraticCurveTo(x + sway * 0.3, length * 0.5, x + sway, length); g.stroke();
+    // Leaves along the strand, each a thin blade.
+    for (let t = 0.12; t < 1; t += 0.09) {
+      const px = x + sway * t * t, py = length * t, side = (r() < 0.5 ? -1 : 1) * (10 + r() * 8);
+      g.fillStyle = `rgb(${shade},${shade},${shade})`;
+      g.beginPath(); g.ellipse(px + side * 0.5, py + 6, 4, 13, side * 0.03, 0, Math.PI * 2); g.fill();
+    }
+  }
+  return c;
+}
+
+/** A fern's fronds as one card: arching leaves of many narrow leaflets, from the foot of the card. */
+function frond(seed: number): HTMLCanvasElement {
+  const [c, g] = canvas(256);
+  const r = random(seed);
+  for (let i = 0; i < 7; i++) {
+    const lean = (i / 6 - 0.5) * 2.4 + (r() - 0.5) * 0.3, length = 150 + r() * 80, shade = 200 + Math.floor(r() * 55);
+    g.fillStyle = g.strokeStyle = `rgb(${shade},${shade},${shade})`;
+    g.lineWidth = 4;
+    const tipX = 128 + Math.sin(lean) * length, tipY = 256 - Math.cos(lean) * length * 0.8;
+    const midX = 128 + Math.sin(lean) * length * 0.45, midY = 256 - length * 0.65;
+    g.beginPath(); g.moveTo(128, 256); g.quadraticCurveTo(midX, midY, tipX, tipY); g.stroke();
+    for (let t = 0.15; t < 0.97; t += 0.07) {
+      const u = 1 - t, px = u * u * 128 + 2 * u * t * midX + t * t * tipX, py = u * u * 256 + 2 * u * t * midY + t * t * tipY, size = 15 * (1 - t * 0.75);
+      for (const side of [-1, 1]) { g.beginPath(); g.ellipse(px + side * size * 0.6, py - size * 0.2, size * 0.75, 3.5, side * 0.6 + lean * 0.4, 0, Math.PI * 2); g.fill(); }
+    }
+  }
+  return c;
+}
+
+/** Reeds and bulrushes as one card: tall straight blades and a few brown heads. */
+function reedCard(seed: number): HTMLCanvasElement {
+  const [c, g] = canvas(256);
+  const r = random(seed);
+  for (let i = 0; i < 16; i++) {
+    const x = 70 + r() * 116, top = 10 + r() * 90, lean = (r() - 0.5) * 40, w = 3 + r() * 3, shade = 200 + Math.floor(r() * 55);
+    g.fillStyle = `rgb(${shade},${shade},${shade})`;
+    g.beginPath(); g.moveTo(x - w, 256); g.quadraticCurveTo(x + lean * 0.4, 140, x + lean, top); g.quadraticCurveTo(x + lean * 0.4 + 1, 150, x + w, 256); g.fill();
+    if (i % 4 === 0) { g.fillStyle = 'rgb(120,120,120)'; g.beginPath(); g.ellipse(x + lean * 0.8, top + 26, 6, 18, lean * 0.006, 0, Math.PI * 2); g.fill(); }
+  }
+  return c;
+}
+
+/** A canvas of an image multiplied by a colour: a stand-in painting made from one of the twelve. */
+function tinted(source: CanvasImageSource, color: string, size = 256): HTMLCanvasElement {
+  const [c, g] = canvas(size);
+  g.drawImage(source, 0, 0, size, size);
+  g.globalCompositeOperation = 'multiply';
+  g.fillStyle = color; g.fillRect(0, 0, size, size);
   return c;
 }
 
@@ -175,11 +251,14 @@ function cobbles(): THREE.DataTexture {
   return t;
 }
 
-/** `base` is the folder the paintings are served from, with its last slash. */
-export async function loadTextures(base: string): Promise<Textures> {
+/**
+ * `base` is the folder the paintings are served from, with its last slash. `listed` names the paintings the
+ * manifest lists: of PAINTINGS only those are asked for. Left out, none of them are.
+ */
+export async function loadTextures(base: string, listed: readonly string[] = []): Promise<Textures> {
   const standIns: string[] = [];
   // Every painting is asked for at once, so they download side by side. They are finished in order below.
-  const files = new Map(['brush', 'meadow', 'bark', 'rock', 'tuft-1', 'tuft-2', 'cloud-1', 'cloud-2', 'cloud-3', 'cloud-4', 'cloud-5', 'cloud-6'].map((name) => [name, image(base, name)]));
+  const files = new Map([...['brush', 'meadow', 'bark', 'rock', 'tuft-1', 'tuft-2', 'cloud-1', 'cloud-2', 'cloud-3', 'cloud-4', 'cloud-5', 'cloud-6'], ...PAINTINGS.filter((name) => listed.includes(name))].map((name) => [name, image(base, name)]));
   async function one(name: string, repeat: boolean, color: boolean, standIn: () => HTMLCanvasElement, painted = true): Promise<[THREE.Texture, CanvasImageSource]> {
     // A texture that is always drawn by code asks for no file, so nothing fails to load.
     const img = painted ? await (files.get(name) ?? image(base, name)) : null;
@@ -193,14 +272,33 @@ export async function loadTextures(base: string): Promise<Textures> {
   const greens = ['#9ccb52', '#7fb648', '#b6d660', '#5f9f4a'];
   const [brush] = await one('brush', true, false, () => strokes(1, '#808080', ['#6e6e6e', '#939393', '#787878', '#8a8a8a'], 260, 34, 7));
   const [ground, groundSource] = await one('meadow', true, true, () => strokes(2, '#8cc04e', greens, 420, 12, 5));
-  const [bark] = await one('bark', true, true, () => strokes(3, '#7d5f44', ['#5c4336', '#96744f', '#6a4e3c'], 200, 40, 4));
-  const [rock] = await one('rock', true, true, () => strokes(4, '#a7a297', ['#8f8d92', '#bcb6a8', '#9a97a2'], 160, 40, 14));
+  const [bark, barkSource] = await one('bark', true, true, () => strokes(3, '#7d5f44', ['#5c4336', '#96744f', '#6a4e3c'], 200, 40, 4));
+  const [rock, rockSource] = await one('rock', true, true, () => strokes(4, '#a7a297', ['#8f8d92', '#bcb6a8', '#9a97a2'], 160, 40, 14));
   const [flowerTexture] = await one('flower', false, false, flower, false);
+  const rosettes = [[51, 6], [52, 7], [53, 5]].map(([seed, leaflets]) => finish(rosette(seed as number, leaflets as number), false, false));
+  const willow = finish(strands(57), false, false);
+  // Each kind of land's painting, or a stand-in: one of the twelve, tinted, or a mask drawn here.
+  const standInFor: Record<Painting, () => HTMLCanvasElement> = {
+    moss: () => tinted(groundSource, '#7fa070'), mud: () => tinted(groundSource, '#b49a86'), scree: () => tinted(rockSource, '#e6e2dc'), 'terrace-stone': () => tinted(rockSource, '#f0e8d8'),
+    'bark-grey': () => tinted(barkSource, '#c8c8c8'), 'bark-old': () => tinted(barkSource, '#a89c8c'),
+    'leaves-grey': () => rosette(51, 6), 'leaves-old': () => rosette(52, 7), 'leaves-willow': () => strands(57),
+    reeds: () => reedCard(71), fern: () => frond(73),
+  };
+  const paintings = {} as Record<Painting, THREE.Texture>, means = {} as Record<Painting, THREE.Color>;
+  for (const name of PAINTINGS) {
+    const ground = name === 'moss' || name === 'mud' || name === 'scree' || name === 'terrace-stone' || name.startsWith('bark');
+    const [texture, source] = await one(name, ground, ground, standInFor[name], listed.includes(name));
+    paintings[name] = texture;
+    means[name] = new THREE.Color().setRGB(...meanPixel(source), THREE.SRGBColorSpace);
+  }
   return {
     brush, ground, groundMean: new THREE.Color().setRGB(...meanPixel(groundSource), THREE.SRGBColorSpace), bark, rock, flower: flowerTexture, cobble: cobbles(),
     tufts: await many('tuft', 2, false, false, (i) => tuft(21 + i)),
     clouds: await many('cloud', 6, false, true, (i) => cloud(31 + i)),
-    rosettes: [[51, 6], [52, 7], [53, 5]].map(([seed, leaflets]) => finish(rosette(seed as number, leaflets as number), false, false)),
-    standIns: standIns.filter((n) => n !== 'flower'),
+    // The fourth is a willow's hanging strands.
+    rosettes: [...rosettes, listed.includes('leaves-willow') ? paintings['leaves-willow'] : willow],
+    paintings, means,
+    // The kinds of land's paintings are left out until the manifest lists them: a stand-in there is expected.
+    standIns: standIns.filter((n) => n !== 'flower' && (!(PAINTINGS as readonly string[]).includes(n) || listed.includes(n))),
   };
 }

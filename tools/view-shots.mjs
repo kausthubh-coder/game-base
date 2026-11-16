@@ -1,5 +1,5 @@
 // The same views every time, to compare looks: one screenshot per place and variant, with the renderer's
-// counts. A variant is extra text for the address, such as `chars=models` or `camera=free&cam=shoulder`.
+// counts. A variant is extra text for the address, such as `camera=free&cam=shoulder`.
 // It opens an already served build once per variant, starts a game through the debug door, and for each
 // place sets the clock and weather, teleports, turns the camera, lets the place come alive and shoots.
 // It writes <variant>-<place>.png and shots.json, and sheet.png with one column per variant.
@@ -8,7 +8,7 @@
 // `back` meters from the place, on the side the 2.5D camera looks from, and the camera looks the same way. The
 // free camera stands behind the hero with the place beyond them; first person looks at the place.
 //   bun tools/view-shots.mjs --url http://127.0.0.1:5381/ [--out .artifacts/view-shots]
-//     [--variants sprites=chars=sprites,models=chars=models,near=camera=tilt&zoomstep=0] [--places spawn,rocks,garden,town,meadow,river]
+//     [--variants tilt=camera=tilt,free=camera=free,near=camera=tilt&zoomstep=0] [--places spawn,rocks,garden,town,meadow,river]
 //     [--quality high] [--w 1440] [--h 900]
 // Build and serve first: `bun x vite build --outDir dist-<name>` and `bun tools/serve.mjs dist-<name> <port>`.
 // It fails on a console error. This Mac draws WebGL in software: counts only, never frames a second.
@@ -39,7 +39,7 @@ const PLACES = {
   river: { at: 'river.bank', quarter: 2, zoom: 1, time: 19.6 / 24, wait: 8, back: 5, pitch: 14, name: 'River bank at dusk, lanternflies' },
 };
 
-const variants = opt('variants', 'sprites=chars=sprites,models=chars=models').split(',').map((pair) => {
+const variants = opt('variants', 'tilt=camera=tilt,free=camera=free').split(',').map((pair) => {
   const at = pair.indexOf('=');
   return at < 0 ? { name: pair, query: '' } : { name: pair.slice(0, at), query: pair.slice(at + 1) };
 });

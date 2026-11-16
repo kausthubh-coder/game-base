@@ -1,0 +1,6 @@
+{
+  "description": "Boot-pair midpoint measured in the attempt-1 legacy 128px cells. Tool ROIs exclude the axe even when it touches ground. Walking uses its direction's idle stance offset, preserving stride and sway rather than chasing the moving contact foot. Coordinates convert back to raw-source space before placement; no pixels are redrawn.",
+  "base": [[69.5,70.5,69,70],[65.5,64,63.5,64.5],[72,72.5,72.5,74]],
+  "swing": [[75.5,71,56.5],[75,67.5,52.5],[77,60,60.5]],
+  "swingBootRoi": [[[57,115,94,120],[52,115,90,120],[38,115,75,120]],[[56,115,94,120],[48,115,87,120],[34,115,71,120]],[[59,115,95,120],[45,115,75,120],[44,115,77,120]]]
+}

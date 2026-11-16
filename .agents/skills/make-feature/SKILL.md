@@ -24,6 +24,8 @@ Data first, then rules, then the picture. Each part has one home, and a check fa
 - **Speed.** Nothing allocated per frame. After a change to anything drawn, read `window.__game.costs()` and stay inside rule 6 of `AGENTS.md`.
 - **Sound and models** are made by tools, never added by hand (rule 4).
 
+For a story chapter or an earned progression replay, load `verify-chapter` before starting. It owns the chapter gates and checkpoint evidence.
+
 ## The order of work
 
 1. Write the data and the rule, with a scenario that plays it (`test-game` skill). Run `bun tools/sim.ts scenarios`.

@@ -1,3 +1,4 @@
+import { chromeExecutable } from './chrome-path.mjs';
 import { chromium } from 'playwright-core';
 
 export async function rendererOf(page) {
@@ -16,7 +17,7 @@ export async function launchChrome(options = {}) {
   const args = (rest.args ?? []).filter(arg => !arg.includes('swiftshader'));
   if (software) args.push('--enable-unsafe-swiftshader', '--use-angle=swiftshader');
   const browser = await chromium.launch({
-    executablePath: process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    executablePath: chromeExecutable({ cached: chromium.executablePath() }),
     headless: true, ...rest, args,
   });
   try {

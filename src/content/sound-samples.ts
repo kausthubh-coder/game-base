@@ -61,7 +61,32 @@ export const SAMPLES: readonly SampleSpec[] = [
   { id: 'bed.meadow.night', kind: 'bed', stereo: true, seconds: 24, level: -30, influence: 0.4,
     prompt: 'A grassy meadow at night: crickets and katydids chirping in the long grass, a very light breeze, peaceful and warm, no voices, no music' },
 
+  // ---- beds: the regions of Greenhollow. The engine plays them from random points, so a bed of 14 to 18
+  // seconds does not loop the same way twice. Their run was held under 3,000 credits.
+  { id: 'bed.oldforest.day', kind: 'bed', stereo: true, seconds: 18, level: -28, influence: 0.45,
+    prompt: 'Deep inside an ancient old-growth forest of giant oaks on a still day: old trunks creaking slowly, a woodpecker tapping far off, a few birds calling with long pauses between, deep and hushed, no wind gusts, no voices, no music' },
+  { id: 'bed.greyforest', kind: 'bed', stereo: true, seconds: 14, level: -33, influence: 0.5,
+    prompt: 'The hushed air of a silent dead grey forest with no birds and no insects: a very faint soft dry hiss like fine ash drifting down, a low empty hush, utterly still and even, no ticking, no clicks, no wind gusts, no voices, no music' },
+  { id: 'bed.marsh', kind: 'bed', stereo: true, seconds: 18, level: -28, influence: 0.45,
+    prompt: 'A misty marsh at dusk: many small frogs croaking and chirping among the reeds, gentle water trickling between shallow pools, a soft plop now and then, reeds rustling softly, calm, no voices, no music' },
+  { id: 'bed.caves', kind: 'bed', stereo: true, seconds: 14, level: -30, influence: 0.5,
+    prompt: 'Inside a large cool rock cave: slow water drips falling into small pools and echoing off stone, a soft low hollow wind breathing from deeper in, spacious reverb, no voices, no music' },
+  { id: 'bed.river', kind: 'bed', stereo: true, seconds: 16, level: -27, influence: 0.45,
+    prompt: 'A wide gentle river flowing steadily past a grassy bank and an old wooden landing, water lapping at the posts, calm and continuous, no wind, no birds, no voices, no music' },
+  { id: 'bed.saltgate', kind: 'bed', stereo: true, seconds: 16, level: -28, influence: 0.45,
+    prompt: 'A small harbour on the sea on a breezy day: seagulls crying in the distance, rigging and ropes of moored sailing boats creaking and clinking, waves washing against the stone harbour wall, no voices, no music' },
+  { id: 'bed.highroad.wind', kind: 'bed', stereo: true, seconds: 16, level: -30, influence: 0.45,
+    prompt: 'Soft natural wind high up on an old stone bridge over a wide valley, a smooth airy breeze rising and falling gently, a faint whistle past the stone, calm, no harsh gusts, no birds, no voices, no music' },
+
   // ---- spot sounds, placed in the world by src/game/content/soundscape.ts
+  { id: 'spot.creak', kind: 'shot', takes: 2, seconds: 3, level: -14,
+    prompt: 'A single huge old oak tree trunk creaking slowly and deeply as it sways, one long wooden groan, in a quiet forest, no birds, no voices, no music' },
+  { id: 'spot.crow', kind: 'shot', takes: 2, seconds: 3, level: -16,
+    prompt: 'One crow cawing twice far away across an empty silent forest, distant and lonely, no other birds, no wind, no voices, no music' },
+  { id: 'spot.market', kind: 'shot', takes: 2, seconds: 3, level: -16,
+    prompt: 'A market seller in a medieval town calling out once to passers-by from a little way off, cheerful, the words indistinct, then a few coins clinking, no music' },
+  { id: 'spot.bells', kind: 'shot', takes: 1, seconds: 4, level: -10,
+    prompt: 'A single bronze chapel bell ringing three slow strokes from a small tower across a quiet town, warm, with a long ring after, outdoors, no voices, no music' },
   { id: 'spot.well', kind: 'shot', takes: 2, seconds: 4.5, level: -9,
     prompt: 'A wooden bucket on a creaking rope lowered into a stone village well, then a splash and water dripping, heard from a few meters away, no voices, no music' },
   { id: 'spot.dog', kind: 'shot', takes: 3, seconds: 2.5, level: -12,

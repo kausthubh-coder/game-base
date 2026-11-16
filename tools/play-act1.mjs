@@ -1,5 +1,5 @@
 // The browser play of the first part: builds the game into dist-play, serves it on port 5340, opens it in
-// headless Chrome and plays all five quests of docs/play/act1.md from the title to the end card.
+// headless Chrome and plays all six quests of docs/play/act1.md from the title to the end card.
 //   bun tools/play-act1.mjs [--port 5340] [--dist dist-play] [--no-build] [--shots] [--quality low|medium|high] [--no-continue]
 //     [--camera tilt|free|first] [--mouse drag|lock]
 //
@@ -25,6 +25,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { installReplayDriver } from './workflow/replay.mjs';
 import { cameraStill } from './play/wait.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 import { REGION } from '../src/game/content/region.ts';
@@ -32,7 +33,7 @@ import { REGION } from '../src/game/content/region.ts';
 const args = process.argv.slice(2);
 const opt = (name, fallback) => { const i = args.indexOf('--' + name); return i < 0 ? fallback : args[i + 1]; };
 const root = resolve(import.meta.dirname, '..');
-const out = resolve(root, '.artifacts/play/act1');
+const out = resolve(root, '.artifacts/play/act1', `${Date.now()}-${crypto.randomUUID()}`);
 // --port or PLAY_PORT moves it, so several worktrees can run their checks at once.
 const PORT = Number(opt('port', process.env.PLAY_PORT || '5340'));
 const dist = opt('dist', 'dist-play');
@@ -47,7 +48,6 @@ const LOCK = CAMERA === 'first' || (CAMERA === 'free' && MOUSE === 'lock');
 const BASE = `http://127.0.0.1:${PORT}/?quality=${opt('quality', 'medium')}&camera=${CAMERA}&mouse=${MOUSE}`;
 const SHOTS = args.includes('--shots');
 const PATH = REGION.paths[0].points.map(([x, z]) => ({ x, z }));
-rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 
 if (!args.includes('--no-build')) {
@@ -132,68 +132,7 @@ function installHelpers() {
   const KEYS = ['w', 'a', 's', 'd'];
   const release = () => { for (const k of KEYS) g.key(k, false); g.key('shift', false); };
 
-  /** Holds the keys that point the body at (tx, tz), relative to the camera's yaw. */
-  function steer(tx, tz) {
-    const yaw = g.view.camera.yaw;
-    const fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
-    const dx = tx - P.pos.x, dz = tz - P.pos.z, len = Math.hypot(dx, dz) || 1;
-    const forward = (dx * fx + dz * fz) / len, right = (dx * rx + dz * rz) / len;
-    g.key('w', forward > 0.38); g.key('s', forward < -0.38);
-    g.key('d', right > 0.38); g.key('a', right < -0.38);
-  }
-
-  /**
-   * Walks the hero's body to `goal` along nav routes, through `via` first. `soft` holds Shift, or is a function
-   * asked every tenth of a second. Returns { ok, seconds, jumps, replans }.
-   */
-  function walk(goal, options = {}) {
-    const within = options.within ?? 0.6;
-    const legs = [...(options.via ?? []).map((v) => ({ x: v.x + 0.5, y: P.pos.y, z: v.z + 0.5, via: true })), { ...goal, via: false }];
-    let seconds = 0, jumps = 0, replans = 0;
-    const limit = options.seconds ?? 300;
-    try {
-      for (const leg of legs) {
-        const near = leg.via ? 3 : within;
-        let route = null, at = 0, check = { x: P.pos.x, z: P.pos.z }, sinceCheck = 0;
-        while (d2(P.pos, leg) > near) {
-          if (seconds > limit) return { ok: false, seconds, jumps, replans, why: `timed out ${d2(P.pos, leg).toFixed(1)} blocks short` };
-          if (!route || at >= route.length) {
-            route = sys.nav.toward(P.pos, { x: Math.floor(leg.x) + 0.5, y: leg.y ?? P.pos.y, z: Math.floor(leg.z) + 0.5 }, 4000) ?? [];
-            at = 0;
-            replans++;
-            if (replans > 400) return { ok: false, seconds, jumps, replans, why: `no route, ${d2(P.pos, leg).toFixed(1)} blocks short` };
-            if (route.length === 0) route = [{ x: leg.x, y: leg.y, z: leg.z }];
-          }
-          // Skip route points already reached, and head for the goal itself on the last stretch.
-          while (at < route.length - 1 && d2(P.pos, route[at]) < 0.45) at++;
-          const target = at >= route.length - 1 && d2(route[route.length - 1], leg) < 1.5 ? leg : route[at];
-          // The route ended short of the goal: head straight for it. Asking again here would loop with no time passing.
-          if (at === route.length - 1 && d2(P.pos, route[at]) < 0.45 && d2(P.pos, leg) > near) route[at] = { x: leg.x, y: leg.y, z: leg.z };
-          const soft = typeof options.soft === 'function' ? options.soft() : Boolean(options.soft);
-          g.key('shift', soft);
-          steer(target.x, target.z);
-          g.advance(0.1);
-          seconds += 0.1;
-          sinceCheck += 0.1;
-          if (sinceCheck >= 1) {
-            if (Math.hypot(P.pos.x - check.x, P.pos.z - check.z) < (soft ? 0.25 : 0.5)) {
-              // Stuck on a step or a corner: jump, and plan again.
-              g.key('space');
-              jumps++;
-              route = null;
-              if (jumps > 40) return { ok: false, seconds, jumps, replans, why: 'stuck' };
-            }
-            check = { x: P.pos.x, z: P.pos.z };
-            sinceCheck = 0;
-          }
-        }
-      }
-    } finally {
-      release();
-      g.advance(0.15);
-    }
-    return { ok: true, seconds: Math.round(seconds * 10) / 10, jumps, replans };
-  }
+  const { walk } = window.__replay;
 
   const pet = () => sys.pets.all().find((one) => one.kind === 'leaftail');
 
@@ -253,6 +192,7 @@ function installHelpers() {
 
 async function helpers() {
   await page.waitForFunction(() => window.__game !== undefined);
+  await game(installReplayDriver);
   await game(installHelpers);
 }
 
@@ -643,10 +583,10 @@ const QUESTS = {
       await page.click('[data-key="title:new"]');
       await page.waitForFunction(() => window.__game.started);
       // The opening scene plays before control. It is skipped with its real Skip button.
-      await page.waitForSelector('.st-cinema:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
+      await page.waitForSelector('.st-film:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
       await shot('00-opening.png');
       await page.click('[data-key="opening:skip"]');
-      await page.waitForSelector('.st-cinema', { state: 'hidden', timeout: 60000 });
+      await page.waitForSelector('.st-film', { state: 'hidden', timeout: 60000 });
       must(!(await game(() => window.__game.view.game.player.busy)), 'the player is still held after the opening was skipped');
       await game(() => window.__game.settle());
       await game(() => window.__game.advance(0.5));
@@ -795,11 +735,36 @@ const QUESTS = {
       must((await p.openStep()) === 'roof.shelter', 'a bed under open sky passed the shelter step');
       await hold('plank');
       await use(h.x - 1, g + 2, h.z, [1, 0, 0]);
-      await expectStep('roof.sleep');
+      // The roof quest ends with the roof. The night is a quest of its own.
+      await expectStep('night.bed');
     });
-    await step('roof', 'wait for evening and sleep in the bed with E', async () => {
+    await questDone('roof', '13-roof-done.png');
+  },
+
+  // The first night: src/game/hall. Every scene is started by walking or by the real E, and clicked through with Enter.
+  async night() {
+    const flag = (name) => p.flag(name);
+    const scene = async () => {
+      await page.waitForFunction(() => { const e = document.querySelector('.gb-dialogue'); return e && !e.hidden; }, null, { timeout: 30000 });
+      const lines = await talkThrough();
+      await game(() => window.__game.advance(0.6));
+      return lines;
+    };
+    const toBed = async () => {
       const h = await hut();
-      await walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 60 });
+      await walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 120 });
+    };
+    await step('night', 'push the stone door by day: it does not move', async () => {
+      await walkTo('shut.door', { within: 1.2, seconds: 120 });
+      const prompt = (await state()).prompt;
+      must(prompt === 'Push the door', `at the stone door the prompt is "${prompt}"`);
+      await shot('14-door-shut.png');
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines.some((line) => line.includes('It does not move')) && (await flag('door.open')) !== true, `pushing the door said "${lines.join(' | ')}"`);
+    });
+    await step('night', 'lie down at evening with E, and something is outside', async () => {
+      await toBed();
       const prompt = (await state()).prompt;
       must(prompt === 'Sleep', `beside the bed the prompt is "${prompt}"`);
       if ((await state()).clock.timeOfDay < 0.66) {
@@ -808,15 +773,84 @@ const QUESTS = {
         must((await state()).clock.day === 1, 'the bed slept before evening');
         await until('g.state().clock.timeOfDay >= 0.66', 720, 2);
       }
-      await shot('13-shelter-evening.png');
       must(await p.canSleep(), 'canSleep() is false in the evening beside the bed');
       const day = (await state()).clock.day;
       await page.keyboard.press('KeyE');
-      await until(`g.state().clock.day === ${day + 1}`, 10, 0.25);
-      must((await state()).clock.day === day + 1, 'E beside the bed in the evening did not sleep to the next morning');
-      await game(() => window.__game.advance(2));
+      await game(() => window.__game.advance(1.5));
+      must((await state()).clock.day === day && (await flag('night.fox')) === true, 'the player slept through the first night, or the fox did not come');
+      const fox = await game(() => window.__game.view.game.systems.hall.fox());
+      must(fox !== null, 'no fox is about after it was heard');
+      await expectStep('night.door');
+      await shot('15-fox.png');
     });
-    await questDone('roof', '14-morning.png');
+    await step('night', 'back away to the stone door, and it opens', async () => {
+      await walkTo('shut.door', { within: 2.2, seconds: 180 });
+      const lines = await scene();
+      must(lines.at(-1) === 'Behind you, stone moves for the first time in a thousand years.' && (await flag('door.open')) === true, `the scene at the door ended on "${lines.at(-1)}"`);
+      await expectStep('night.mark');
+      await shot('16-door-open.png');
+    });
+    await step('night', 'walk in, and the Mark comes', async () => {
+      const inside = await p.place('hall.door');
+      await walkTo({ x: inside.x, y: inside.y, z: inside.z + 0.4 }, { within: 0.5, seconds: 60 });
+      const lines = await scene();
+      must(lines.some((line) => line.includes('a ring of seven points')) && (await flag('mark')) === true, 'the scene in the Hall did not give the Mark');
+      await expectStep('night.key');
+      await shot('17-hall-lit.png');
+    });
+    await step('night', 'turn the key with E, and the Custodian wakes', async () => {
+      await walkTo('hall.custodian', { within: 0.6, seconds: 60 });
+      const prompt = (await state()).prompt;
+      must(prompt === 'Turn the key', `at the plinth the prompt is "${prompt}"`);
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines.includes('(one eye opening) You\'re late.') && (await flag('custodian.awake')) === true, 'turning the key did not wake the Custodian');
+      await expectStep('night.calm');
+      await shot('18-custodian.png');
+    });
+    await step('night', 'hold out a hand to the fox in the doorway with E', async () => {
+      const inside = await p.place('hall.door');
+      await walkTo({ x: inside.x, y: inside.y, z: inside.z + 1.5 }, { within: 0.4, seconds: 60 });
+      must(await until(`g.state().prompt === 'Hold out your hand'`, 6, 0.25), `in the doorway the prompt is "${(await state()).prompt}"`);
+      await shot('19-fox-doorway.png');
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines.length === 3 && (await flag('fox.calmed')) === true, 'holding out the marked hand did not calm the fox');
+      must(await until(`sys.hall.fox() === null`, 24, 0.5), 'the calmed fox never left');
+      await expectStep('night.heart');
+    });
+    await step('night', 'touch the Heartstone with E', async () => {
+      await walkTo('hall.heart', { within: 0.6, seconds: 60 });
+      const prompt = (await state()).prompt;
+      must(prompt === 'Touch the Heartstone', `at the Heartstone the prompt is "${prompt}"`);
+      await page.keyboard.press('KeyE');
+      const lines = await scene();
+      must(lines[0].startsWith('That is the Heartstone.') && (await flag('heart.seen')) === true, 'the Custodian did not explain the Heartstone');
+      await expectStep('night.sleep');
+      await shot('20-heartstone.png');
+    });
+    await step('night', 'sleep until morning with E', async () => {
+      await toBed();
+      must(await p.canSleep(), 'after the Hall canSleep() is false beside the bed');
+      const day = (await state()).clock.day;
+      await page.keyboard.press('KeyE');
+      await until(`g.state().clock.day === ${day + 1}`, 10, 0.25);
+      must((await state()).clock.day === day + 1, 'E beside the bed did not sleep to the next morning');
+      await game(() => window.__game.advance(2));
+      await expectStep('night.tamsin');
+    });
+    await step('night', 'show Tamsin the Mark at the grant stone', async () => {
+      const stone = await p.place('grant.stone');
+      for (const id of ['tamsin', 'juniper', 'gus', 'brack']) {
+        const npc = await p.npc(id);
+        must(npc && Math.hypot(npc.x - stone.x, npc.z - stone.z) < 6, `${id} is not at the grant stone the morning after (${npc?.place})`);
+      }
+      await walkTo('grant.stone', { within: 4, seconds: 120 });
+      await shot('21-morning-after.png');
+      const lines = await talkTo('tamsin');
+      must(lines[0] === '(looking at your hand) So the door opened. I saw the light from the lodge.' && (await flag('night.told')) === true, `Tamsin's first words were "${lines[0]}"`);
+    });
+    await questDone('night', '22-night-done.png');
   },
 
   async leaftail() {
@@ -1003,7 +1037,7 @@ const QUESTS = {
       await page.waitForSelector('.gu-stage-end:not([hidden])', { timeout: 30000 });
       await shot('42-end-card.png');
       const card = await game(() => document.querySelector('.gu-stage-end')?.innerText ?? '');
-      must(/End of the first part/i.test(card), `the end card reads "${card.slice(0, 80)}"`);
+      must(/End of act 1/i.test(card), `the end card reads "${card.slice(0, 80)}"`);
       await page.getByRole('button', { name: 'Keep playing' }).click();
       await frames(2);
       const s = await state();
@@ -1025,7 +1059,7 @@ try {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', (e) => errors.push(String(e)));
   page.on('response', (r) => { const m = /\/assets\/((?:fingerprinted\/)?voice\/.+\.mp3)$/.exec(r.url()); if (m) clipFiles.set(m[1], r.status()); });
-  for (const quest of ['plot', 'roof', 'leaftail', 'bread', 'festival']) await QUESTS[quest]();
+  for (const quest of ['plot', 'roof', 'night', 'leaftail', 'bread', 'festival']) await QUESTS[quest]();
   await step('voice', 'voiced lines fetched their clips and typed in time with them', checkVoice);
   const end = await state();
   must(Object.keys(end.failed).length === 0 && end.viewErrors.length === 0, `failed: ${JSON.stringify(end.failed)} ${end.viewErrors.join('; ')}`);

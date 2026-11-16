@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-12",
+  "base": "553e6d128cbcb4efdd90cac4dc74a64193c3f859",
+  "branch": "act1-concept-cast",
+  "status": "ISSUES",
+  "checks": {
+    "decodedAllWebps": true,
+    "allUnder600000Bytes": true,
+    "approvedReferencesByteIdentical": 7,
+    "lineupUniqueNamedCast": 18,
+    "changedPathsOnlyInThreeFolders": true,
+    "openedAllOriginalAndFinalSheets": true,
+    "visualIdentityReview": "Distinct faces, hair silhouettes, builds and colour keys; checked against chapter 28 and people data. Reviewed saved sheets and reduced whole lineup.",
+    "runtimeChecks": "Not run: unreferenced concept sources only."
+  },
+  "issues": [
+    "Ilara: eight visible teal points despite seven-point caption; three image-generation attempts did not resolve symbol.",
+    "Aldric: generated half-sun has extra lower rays."
+  ],
+  "files": [
+    {
+      "file": "assets-src/concept/people-home/gus.webp",
+      "bytes": 385826,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "4d291f4d7719013281bc01b3affda1b5274257ec38eac1f93c97bbc6849a7421"
+    },
+    {
+      "file": "assets-src/concept/people-home/hero.webp",
+      "bytes": 214256,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "ff670a29149491b9faac80d37c58235f3c9da1c2ecdc0a167120835017a3c8d9"
+    },
+    {
+      "file": "assets-src/concept/people-home/wren.webp",
+      "bytes": 199790,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "db27088abebf08457afa93c7f2d15c11ee8eca69c1610fdc6baa6d9f5d0c3dcc"
+    },
+    {
+      "file": "assets-src/concept/people-home/lineup.webp",
+      "bytes": 240512,
+      "width": 5100,
+      "height": 1390,
+      "sha256": "1c8ff96e3d74a238ae5432e6730d2a4078b77b90cdc5124291426cc9f3b5a661"
+    },
+    {
+      "file": "assets-src/concept/people-home/mina.webp",
+      "bytes": 200992,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "0dc79e7daadfafe66eec086cf54f3206a9f0e1b3579d796d929333e6db8cc9a5"
+    },
+    {
+      "file": "assets-src/concept/people-home/dax.webp",
+      "bytes": 225338,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "41fc4bfcf0cdea27169714fe624abb7770a3bea27ee2d2109ff23b8f513a0f2f"
+    },
+    {
+      "file": "assets-src/concept/people-home/tansy.webp",
+      "bytes": 288938,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "30ba624f12dd45853ebc6051b3dcf78a1eaa8fdb582e66d169b6b328b2fc9c59"
+    },
+    {
+      "file": "assets-src/concept/people-home/hobb.webp",
+      "bytes": 225830,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "a63801be48eda67f574ed0de7eaf708acce792df9fbd5c2deb2763f2c138c51c"
+    },
+    {
+      "file": "assets-src/concept/people-home/holt.webp",
+      "bytes": 351204,
+      "width": 1600,
+      "height": 1243,
+      "sha256": "ea20e31b3dc83fe6c039abcc937b3932e47f85819966e7166dcbacca7a36481f"
+    },
+    {
+      "file": "assets-src/concept/people-world/aldric.webp",
+      "bytes": 176316,
+      "width": 1600,
+      "height": 1204,
+      "sha256": "40e2f61a6cf6b9e7d6915221b071fb2fe16c560297345ecfd7c2118850efd9fc"
+    },
+    {
+      "file": "assets-src/concept/people-world/calla.webp",
+      "bytes": 123604,
+      "width": 1600,
+      "height": 1204,
+      "sha256": "89329e8ab7126a1038751593f8cd6b45cca08913752eb69c80b65e4becc58f50"
+    },
+    {
+      "file": "assets-src/concept/people-world/ren.webp",
+      "bytes": 136416,
+      "width": 1600,
+      "height": 1018,
+      "sha256": "36c15c41546c55cf4f989ce6f1b9cf93c3f81ebda45438701d17e9825e1811f7"
+    },
+    {
+      "file": "assets-src/concept/people-world/maren.webp",
+      "bytes": 157384,
+      "width": 1600,
+      "height": 1204,
+      "sha256": "b96297f3d70999fe124f28263afebdcc0bd75adeb2e7de288b3e42790726a85a"
+    },
+    {
+      "file": "assets-src/concept/people-world/tamsin.webp",
+      "bytes": 318628,
+      "width": 1600,
+      "height": 1203,
+      "sha256": "3e5c03fbd3ad332b5ac6f5d042232b640eb455da0879c4d42cbcd0bb46c92c99"
+    },
+    {
+      "file": "assets-src/concept/people-world/elowen.webp",
+      "bytes": 265722,
+      "width": 1600,
+      "height": 1203,
+      "sha256": "cdb1f54ed8bfbf31dbec50c425631d83cf04b82392d3de59425d10d0327e0804"
+    },
+    {
+      "file": "assets-src/concept/people-world/townsfolk.webp",
+      "bytes": 588838,
+      "width": 1600,
+      "height": 3315,
+      "sha256": "9772416e6d284c77b1ace760d43382fc5364b907938eb07e11d8af045ee61786"
+    },
+    {
+      "file": "assets-src/concept/people-old/stag.webp",
+      "bytes": 421958,
+      "width": 1600,
+      "height": 1640,
+      "sha256": "114a6736159361f5edc0e5303079eda924567e1610b4cc9d0888b17c24abbbe3"
+    },
+    {
+      "file": "assets-src/concept/people-old/ilara.webp",
+      "bytes": 150868,
+      "width": 1600,
+      "height": 1203,
+      "sha256": "95aab23ef1bf6de381c17514b912fab0cd29895ecf0c19b6a928796943ddad76"
+    },
+    {
+      "file": "assets-src/concept/people-old/auren.webp",
+      "bytes": 167192,
+      "width": 1600,
+      "height": 1204,
+      "sha256": "183ac0e8e0f3e28c2e0b1a048c1047296af75eaf6116706fd670f4020a566866"
+    },
+    {
+      "file": "assets-src/concept/people-old/custodian.webp",
+      "bytes": 260910,
+      "width": 1600,
+      "height": 1203,
+      "sha256": "8226ed51f27f32a46f48a6d01be4ebdca321973074b146fdb2b789e1096b1e19"
+    }
+  ]
+}

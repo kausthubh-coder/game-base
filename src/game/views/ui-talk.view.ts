@@ -1,6 +1,12 @@
 // Talking: the line `game.systems.talk.current()` holds, drawn in the dialogue box with the speaker's
-// portrait and name. A click, Space, Enter or E shows the whole line and then moves on. A number key or a
-// click picks a choice. This is the one file that touches src/features/dialogue.
+// portrait in the face the line asks for, and their name. A click, Space, Enter or E shows the whole line and then
+// moves on. A number key or a click picks a choice. L opens the log of what was said. This is the one file that
+// touches src/features/dialogue. The look is the approved mockup, assets-src/concept/interface/dialogue.webp and
+// dialogue-phone.webp: the medallion with a diamond top and bottom, the name over a gold rule, the choices as
+// outlined pills to the right on a wide screen and under the line on a phone, and the cues at the bottom right.
+//
+// A scene shown as a film (content/scenes.ts) takes the screen: black bars top and bottom, the HUD steps out, the
+// line sits centred in the lower bar, and each line moves on by itself once it has been read. Esc skips the rest.
 //
 // A voiced line (one with a clip in public/assets/voice, made by tools/voice.ts) plays its clip on the sound
 // engine's voice bus and types in time with it. Any other line, or a voiced one whose clip is not ready in
@@ -12,7 +18,9 @@
 // system is moved on (or told the choice), and its next line is handed over.
 import { createDialogue, type Conversation, type Flags } from '../../features/dialogue/index.ts';
 import type { TalkLine } from '../api.sim.ts';
+import { sceneOf } from '../content/scenes.ts';
 import type { GameView } from '../shell/view.ts';
+import { splitCues } from '../talk/cues.sim.ts';
 import { bookOf } from '../uiview/book.ts';
 import { TALK_ADVANCE_CODES } from '../uiview/keys.ts';
 import { addStyle, frame } from '../uiview/theme.ts';
@@ -28,6 +36,10 @@ const BOX_GAP = 12;
 const CLIP_WAIT_MS = 800;
 /** Records kept in `window.__voice.log`. */
 const LOG_SIZE = 300;
+/** In a film a line stays this long after it has typed, plus a little for each letter, then moves on by itself. */
+const FILM_HOLD = 1.6, FILM_PER_LETTER = 0.035;
+/** Whether keys and the log are open for each key code. */
+const LOG_KEY = 'KeyL';
 
 const STYLE = /* css */ `
 /* The box takes every click while it is open: a click anywhere moves the line on. There is no box over the world:
@@ -75,6 +87,119 @@ const STYLE = /* css */ `
 .ui-book .gb-dialogue.is-narrator .gb-dialogue-portrait, .ui-book .gb-dialogue.is-narrator .gb-dialogue-name { display: none; }
 .ui-book .gb-dialogue.is-narrator .gb-dialogue-text { justify-self: center; font-family: var(--ui-display); font-style: italic; font-weight: 500; min-height: 2.9em; }
 
+
+/* ---- the mockup: the medallion set with a diamond top and bottom, the face clipped round inside it ---- */
+.ui-book .gb-dialogue::before { height: min(52vh, 380px); background: linear-gradient(0deg, rgb(20 24 38 / 0.94), rgb(22 27 42 / 0.82) 42%, rgb(22 27 42 / 0)); }
+.ui-book .gb-dialogue-portrait { overflow: visible; position: relative; }
+.ui-book .gb-dialogue-portrait > * { border-radius: 50%; overflow: hidden; }
+.ui-book .gb-dialogue-portrait::before, .ui-book .gb-dialogue-portrait::after {
+  content: ''; position: absolute; left: 50%; width: 11px; height: 11px; margin-left: -5.5px;
+  background: linear-gradient(135deg, var(--ui-gold-bright), var(--ui-gold) 60%, var(--ui-bronze));
+  transform: rotate(45deg); box-shadow: 0 0 0 1.5px rgb(22 26 38 / 0.8), 0 0 6px rgb(240 212 138 / 0.5);
+}
+.ui-book .gb-dialogue-portrait::before { top: -11px; }
+.ui-book .gb-dialogue-portrait::after { bottom: -11px; }
+/* The name's rule ends in a small diamond, as on the phone mockup. */
+.ui-book .gb-dialogue-name::before {
+  content: ''; position: absolute; left: min(60%, 180px); bottom: -3.5px; width: 7px; height: 7px;
+  border: 1.2px solid var(--ui-gold); background: rgb(22 26 38); transform: rotate(45deg);
+}
+/* Choices: outlined pills with a diamond, not numbered discs. On a wide screen they stand to the right of the line. */
+.ui-book .gb-dialogue-choices button {
+  min-height: 48px; padding: 4px 26px 4px 20px; gap: 16px; font-weight: 700;
+  background: linear-gradient(180deg, rgb(30 36 54 / 0.78), rgb(22 26 38 / 0.86));
+  box-shadow: inset 0 0 0 1.5px rgb(211 188 142 / 0.85), 0 2px 8px rgb(0 0 0 / 0.3);
+}
+.ui-book .gb-dialogue-choices button:hover, .ui-book .gb-dialogue-choices button:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 18px rgb(240 212 138 / 0.35);
+}
+.ui-book .gb-dialogue-key {
+  width: 12px; height: 12px; flex: none; font-size: 0; color: transparent; border-radius: 1px; transform: rotate(45deg);
+  background: transparent; box-shadow: inset 0 0 0 1.5px var(--ui-gold-bright);
+}
+.ui-book .gb-dialogue-choices button:hover .gb-dialogue-key, .ui-book .gb-dialogue-choices button:focus-visible .gb-dialogue-key {
+  background: var(--ui-gold-bright); box-shadow: 0 0 8px rgb(240 212 138 / 0.8);
+}
+@media (min-width: 980px) {
+  .ui-book .gb-dialogue-box { width: min(1240px, 100%); }
+  .ui-book .gb-dialogue.has-choices .gb-dialogue-body { grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); column-gap: 48px; align-items: center; }
+  .ui-book .gb-dialogue-name, .ui-book .gb-dialogue-text { grid-column: 1; }
+  .ui-book .gb-dialogue-choices { grid-column: 2; grid-row: 1 / span 2; margin: 0; align-self: center; }
+  .ui-book .gb-dialogue-choices li { width: 100%; }
+}
+/* The cues at the bottom right: keycaps and one verb each (rule 9 of the look). */
+.ui-talk-cues {
+  position: absolute; right: max(24px, env(safe-area-inset-right, 0px)); bottom: max(10px, env(safe-area-inset-bottom, 0px)); z-index: 1;
+  display: flex; gap: 22px; align-items: center; pointer-events: auto;
+}
+.ui-talk-cue {
+  display: inline-flex; align-items: center; gap: 8px; padding: 0; min-height: 32px;
+  font: 700 15px / 1 var(--ui-font); color: var(--ui-paper-light, #f6f1e7); text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+  background: none; border: 0; cursor: pointer;
+}
+.ui-talk-cue kbd {
+  display: inline-grid; place-items: center; min-width: 30px; height: 28px; padding: 0 8px; font: 800 13px / 1 var(--ui-font); color: var(--ui-night);
+  background: radial-gradient(90% 90% at 35% 25%, var(--ui-gold-bright), var(--ui-gold)); border-radius: 7px; box-shadow: 0 0 0 1px var(--ui-bronze), 0 2px 4px rgb(0 0 0 / 0.4);
+}
+.ui-talk-cue:hover { color: var(--ui-gold-bright); }
+.ui-talk-cue:focus-visible { outline: 2px solid var(--ui-gold-bright); outline-offset: 3px; border-radius: 4px; }
+.ui-book .gb-dialogue.has-choices .ui-talk-continue { visibility: hidden; }
+/* Choices reach lower than a line: the box keeps the cues' row under them, so no choice runs into Log. */
+.ui-book .gb-dialogue.has-choices { padding-bottom: max(56px, env(safe-area-inset-bottom, 0px)); }
+@media (pointer: coarse) { .ui-talk-cue kbd { display: none; } }
+
+/* ---- the log: what was said, on night glass down the right side ---- */
+.ui-talk-log {
+  position: absolute; top: 0; right: 0; bottom: 0; z-index: 40; width: min(460px, 100%); box-sizing: border-box;
+  display: flex; flex-direction: column; padding: 22px 0 18px; pointer-events: auto; cursor: default;
+  background: linear-gradient(270deg, rgb(20 24 38 / 0.96), rgb(22 27 42 / 0.9)); box-shadow: -1px 0 0 rgb(211 188 142 / 0.5), -12px 0 30px rgb(0 0 0 / 0.4);
+  color: var(--ui-glass-ink); animation: ui-log-in 200ms var(--ui-ease);
+}
+.ui-talk-log[hidden] { display: none; }
+@keyframes ui-log-in { from { transform: translateX(12px); } }
+.ui-talk-log-head { display: flex; align-items: center; gap: 12px; padding: 0 22px 12px; border-bottom: 1px solid rgb(211 188 142 / 0.35); }
+.ui-talk-log-title { margin: 0; flex: 1; font: 650 22px / 1.2 var(--ui-display); color: var(--ui-gold-bright); }
+.ui-talk-log-close {
+  width: 40px; height: 40px; border-radius: 50%; border: 0; cursor: pointer; font: 700 18px / 1 var(--ui-font); color: var(--ui-paper-light, #f6f1e7);
+  background: rgb(43 50 69 / 0.9); box-shadow: inset 0 0 0 1.5px var(--ui-gold);
+}
+.ui-talk-log-close:hover, .ui-talk-log-close:focus-visible { box-shadow: inset 0 0 0 2px var(--ui-gold-bright), 0 0 10px rgb(240 212 138 / 0.4); outline: none; }
+.ui-talk-log-list { flex: 1; overflow-y: auto; margin: 0; padding: 14px 22px; list-style: none; display: grid; align-content: start; gap: 12px; scrollbar-color: rgb(211 188 142 / 0.35) transparent; }
+.ui-talk-log-list li { display: grid; gap: 2px; font-size: 16px; line-height: 1.45; font-weight: 600; }
+.ui-talk-log-who { font: 650 15px / 1.2 var(--ui-display); color: var(--ui-gold); }
+.ui-talk-log-said.is-narrator { font-family: var(--ui-display); font-style: italic; font-weight: 500; opacity: 0.85; }
+.ui-talk-log-chose { display: inline-flex; align-items: center; gap: 8px; color: var(--ui-gold-bright); font-weight: 700; }
+.ui-talk-log-chose::before { content: ''; width: 8px; height: 8px; background: var(--ui-gold-bright); transform: rotate(45deg); }
+
+/* ---- a film: the bars, the line centred in the lower one, and nothing else on screen ---- */
+/* The bars sit under the dialogue's layer (30) and the top one, with Skip, over it. */
+.ui-talk-bars { position: absolute; inset: 0; pointer-events: none; }
+.ui-talk-bars[hidden] { display: none; }
+.ui-talk-bar { position: absolute; left: 0; right: 0; height: clamp(56px, 12vh, 128px); background: oklch(0.1 0.012 60); animation: ui-bar-in 380ms var(--ui-ease); }
+.ui-talk-bar-top { top: 0; z-index: 31; display: flex; align-items: center; justify-content: flex-end; padding: 0 clamp(16px, 4vw, 48px); }
+.ui-talk-bar-bottom { bottom: 0; z-index: 29; height: clamp(120px, 22vh, 200px); }
+@keyframes ui-bar-in { from { transform: scaleY(0); } }
+/* A memory or a dream: the picture between the bars washed warm and soft at the edges, as if remembered. */
+.ui-talk-bars.is-memory::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(70% 62% at 50% 46%, rgb(255 236 190 / 0.1), rgb(240 212 138 / 0.34) 72%, rgb(196 150 84 / 0.55));
+  mix-blend-mode: soft-light; animation: ui-memory-in 900ms var(--ui-ease);
+}
+@keyframes ui-memory-in { from { opacity: 0; } }
+.ui-talk-skip { pointer-events: auto; }
+.ui-book.ui-filming .gb-dialogue::before { display: none; }
+.ui-book.ui-filming .gb-dialogue { padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+.ui-book.ui-filming .gb-dialogue-box { grid-template-columns: minmax(0, 1fr); width: min(900px, 100%); text-align: center; gap: 0; animation: none; }
+.ui-book.ui-filming .gb-dialogue-portrait { display: none; }
+.ui-book.ui-filming .gb-dialogue-name { justify-self: center; font-size: 18px; padding-bottom: 4px; }
+.ui-book.ui-filming .gb-dialogue-name::after, .ui-book.ui-filming .gb-dialogue-name::before { display: none; }
+.ui-book.ui-filming .gb-dialogue-text, .ui-book .gb-dialogue.is-narrator .gb-dialogue-text { text-align: center; }
+.ui-book.ui-filming .gb-dialogue-text { justify-self: center; min-height: 3em; font-family: var(--ui-display); font-style: italic; font-weight: 500; color: oklch(0.93 0.035 85); }
+.ui-book.ui-filming .ui-talk-continue { display: none; }
+.ui-book.ui-filming .gb-hud, .ui-book.ui-filming .gb-beacon, .ui-book.ui-filming .gu-top, .ui-book.ui-filming .gu-toasts,
+.ui-book.ui-filming .gu-prompt, .ui-book.ui-filming .marks, .ui-book.ui-filming .st-gift, .ui-book.ui-filming .ui-playtest,
+.ui-book.ui-filming .ui-experiment { visibility: hidden; }
+
 @media (max-width: 560px) {
   .ui-book .gb-dialogue { padding: 0 10px max(10px, env(safe-area-inset-bottom, 0px)); font-size: 16px; }
   .ui-book .gb-dialogue-box { gap: 14px; padding: 8px 4px 4px; zoom: 1; }
@@ -82,9 +207,20 @@ const STYLE = /* css */ `
   .ui-book .gb-dialogue-portrait > .gb-dialogue-initial { font-size: 30px; }
   .ui-book .gb-dialogue-name { font-size: 19px; padding-bottom: 6px; }
   .ui-book .gb-dialogue-text { min-height: 5.8em; }
+  /* The phone mockup: the medallion and the name in a row, the line and the choices full width under them. */
+  .ui-book .gb-dialogue-box { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "face name" "body body"; row-gap: 14px; padding-bottom: 36px; }
+  .ui-book .gb-dialogue-portrait { grid-area: face; width: 76px; height: 76px; }
+  .ui-book .gb-dialogue-body { display: contents; }
+  .ui-book .gb-dialogue-name { grid-area: name; align-self: center; }
+  .ui-book .gb-dialogue-text, .ui-book .gb-dialogue-choices { grid-column: 1 / -1; }
+  .ui-book .gb-dialogue-text { min-height: 3em; }
+  .ui-book .gb-dialogue-choices li { width: 100%; }
+  .ui-book .gb-dialogue.is-narrator .gb-dialogue-box { grid-template-areas: "body"; }
+  .ui-talk-cues { right: 14px; bottom: 6px; gap: 16px; }
+  .ui-talk-cue { font-size: 13.5px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ui-book .gb-dialogue-box { animation: none; }
+  .ui-book .gb-dialogue-box, .ui-talk-log, .ui-talk-bar { animation: none; }
   .ui-book .gb-dialogue-choices button { transition: none; }
 }
 `;
@@ -145,7 +281,9 @@ export function install(view: GameView): void {
     }
     const mine = turn;
     // Nothing types until the clip starts: below 0 the box waits.
-    box.follow(clip.reveal, () => (speech ? speech.elapsed() : -1));
+    // The box shows the line without its stage cues, so each letter shown takes the time of its own letter in the clip.
+    const keep = splitCues(line.text).keep;
+    box.follow(keep.length === clip.reveal.length ? clip.reveal : keep.map((i) => clip.reveal[i] ?? 0), () => (speech ? speech.elapsed() : -1));
     const late = setTimeout(() => {
       if (mine !== turn || speech) return;
       turn++;
@@ -189,7 +327,11 @@ export function install(view: GameView): void {
     advanceKeys: [],
     // The box keeps one picture for each key. The key carries the name too, so two villagers who share
     // a portrait name, and have no portrait, each get their own initial.
-    portrait: (key) => art.portraitElement(key.split('|')[0] ?? ''),
+    // The key is `face|portrait|name`: the line's face if the manifest has it, else the plain portrait.
+    portrait: (key) => {
+      const [face = '', plain = ''] = key.split('|');
+      return art.portraitElement(face) ?? art.portraitElement(plain);
+    },
     onCharacter(letter, voice) {
       const spec = VOICES[voice];
       if (spec) view.audio?.emit({ type: 'talk', voice: spec, char: letter });
@@ -221,17 +363,22 @@ export function install(view: GameView): void {
       id: 'line',
       start: 'line',
       speakers: {
-        speaker: { name: line.name, voice: line.voice, portrait: `${line.portrait}|${line.name}`, speed: VOICES[line.voice]?.speed ?? NARRATOR_SPEED },
+        speaker: { name: line.name, voice: line.voice, portrait: `${line.face}|${line.portrait}|${line.name}`, speed: VOICES[line.voice]?.speed ?? NARRATOR_SPEED },
       },
       lines: {
         line: {
           who: 'speaker',
-          text: line.text,
+          // A stage cue is acted by the stage view, never printed.
+          text: splitCues(line.text).shown,
           choices: line.choices.map((text, index) => ({ text, do: [{ set: PICKED, to: index }] })),
         },
       },
     };
     box.element.classList.toggle('is-narrator', line.name === '');
+    box.element.classList.toggle('has-choices', line.choices.length > 0);
+    film(line.kind === 'film');
+    bars.classList.toggle('is-memory', line.kind === 'film' && sceneOf(line.scene)?.memory === true);
+    held = 0;
     hush();
     box.start(conversation);
     voice(line);
@@ -255,12 +402,101 @@ export function install(view: GameView): void {
     if (box.isOpen === wasOpen) return;
     wasOpen = box.isOpen;
     root.classList.toggle('ui-talking', wasOpen);
+    if (!wasOpen) {
+      film(false);
+      showLog(false);
+    }
     measure();
+  }
+
+  // ---- the cues: keycaps and a verb, bottom right
+  const cues = document.createElement('div');
+  cues.className = 'ui-talk-cues';
+  cues.innerHTML = /* html */ `
+    <button type="button" class="ui-talk-cue ui-talk-log-open" data-key="talk:log"><kbd>L</kbd> Log</button>
+    <span class="ui-talk-cue ui-talk-continue"><kbd>E</kbd> Continue</span>`;
+  box.element.append(cues);
+  cues.addEventListener('click', (event) => event.stopPropagation());
+  cues.querySelector('.ui-talk-log-open')!.addEventListener('click', () => showLog(!logOpen));
+
+  // ---- the log of what was said
+  const logPanel = document.createElement('aside');
+  logPanel.className = 'ui-talk-log';
+  logPanel.dataset.key = 'talk-log';
+  logPanel.hidden = true;
+  logPanel.setAttribute('aria-label', 'What was said');
+  logPanel.innerHTML = /* html */ `
+    <div class="ui-talk-log-head"><h2 class="ui-talk-log-title">What was said</h2><button type="button" class="ui-talk-log-close" data-key="talk-log:close" aria-label="Close">×</button></div>
+    <ol class="ui-talk-log-list"></ol>`;
+  root.append(logPanel);
+  const logList = logPanel.querySelector<HTMLElement>('.ui-talk-log-list')!;
+  logPanel.addEventListener('click', (event) => event.stopPropagation());
+  logPanel.querySelector('.ui-talk-log-close')!.addEventListener('click', () => showLog(false));
+
+  let logOpen = false;
+  function showLog(open: boolean): void {
+    if (open === logOpen) return;
+    logOpen = open;
+    logPanel.hidden = !open;
+    if (!open) return;
+    logList.replaceChildren(...talk!.log().map((entry) => {
+      const item = document.createElement('li');
+      if (entry.name) {
+        const who = document.createElement('span');
+        who.className = 'ui-talk-log-who';
+        who.textContent = entry.name;
+        item.append(who);
+      }
+      const text = document.createElement('span');
+      text.className = `ui-talk-log-said${entry.name ? '' : ' is-narrator'}`;
+      text.textContent = splitCues(entry.text).shown;
+      item.append(text);
+      if (entry.chose) {
+        const chose = document.createElement('span');
+        chose.className = 'ui-talk-log-chose';
+        chose.textContent = entry.chose;
+        item.append(chose);
+      }
+      return item;
+    }));
+    logList.scrollTop = logList.scrollHeight;
+    view.game.events.emit('ui.sound', { sound: 'click' });
+  }
+
+  // ---- a film: the bars, the HUD away, the lines moving on by themselves
+  const bars = document.createElement('div');
+  bars.className = 'ui-talk-bars';
+  bars.hidden = true;
+  bars.innerHTML = /* html */ `
+    <div class="ui-talk-bar ui-talk-bar-top"><button class="sf-skip ui-talk-skip" type="button" data-key="talk:skip">Skip <kbd>Esc</kbd></button></div>
+    <div class="ui-talk-bar ui-talk-bar-bottom"></div>`;
+  root.append(bars);
+  bars.querySelector('.ui-talk-skip')!.addEventListener('click', (event) => {
+    event.stopPropagation();
+    skipFilm();
+  });
+  /** Seconds the line on screen has been fully shown, in a film. */
+  let held = 0;
+  let filming = false;
+
+  function film(on: boolean): void {
+    if (on === filming) return;
+    filming = on;
+    bars.hidden = !on;
+    root.classList.toggle('ui-filming', on);
+  }
+
+  function skipFilm(): void {
+    if (!filming || !talk?.active) return;
+    hush();
+    talk.skip();
+    view.game.events.emit('ui.sound', { sound: 'click' });
+    sync();
   }
 
   /** What a click does: the whole line, then the next one. */
   function advance(): void {
-    if (box.isOpen && !opening) box.advance();
+    if (box.isOpen && !opening && !logOpen) box.advance();
   }
 
   game.events.on('talk.started', (e) => {
@@ -272,6 +508,21 @@ export function install(view: GameView): void {
     queueMicrotask(sync);
   });
   game.events.on('talk.ended', sync);
+
+  // L opens and closes the log, Esc closes it or skips a film. In the capture phase, before the shell's own keys.
+  window.addEventListener('keydown', (event) => {
+    if (!box.isOpen || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return;
+    if (event.code === LOG_KEY) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      showLog(!logOpen);
+    } else if (event.code === 'Escape' && (logOpen || filming)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (logOpen) showLog(false);
+      else skipFilm();
+    }
+  }, { capture: true });
 
   // E is the shell's key for "use and talk", so it is heard where the shell sends it.
   view.keys.onPress((press) => {
@@ -296,6 +547,14 @@ export function install(view: GameView): void {
     // A load, or anything else that ends a conversation without the event, is caught here.
     sync();
     box.update(dt, view.ctx);
+    // A film moves on by itself once the line has been read, unless a voice is still saying it.
+    if (filming && box.isOpen && !box.typing && shown && shown.choices.length === 0 && !logOpen && !(speech && !speech.ended)) {
+      held += dt;
+      if (held >= FILM_HOLD + shown.text.length * FILM_PER_LETTER) {
+        held = 0;
+        box.advance();
+      }
+    }
     if (speech && record) {
       if (record.typedAt === undefined && !box.typing && record.status === 'playing') record.typedAt = speech.elapsed();
       if (speech.ended && record.status === 'playing') record.status = 'ended';

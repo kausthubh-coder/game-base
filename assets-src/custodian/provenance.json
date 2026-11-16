@@ -1,0 +1,19 @@
+{
+  "name": "custodian",
+  "tool": "image_gen.imagegen",
+  "baseCommit": "874be0930b0775ee3c064c709852d155b3d6ab85",
+  "references": ["reference-leaftail.png", "reference-cast.png"],
+  "attempts": [
+    {"number": 1, "prompt": "prompt.txt", "source": "attempt-1.png", "references": ["reference-leaftail.png", "reference-cast.png"], "result": "Correct identity and grid. Back flank plate switches anatomical sides; sleep pose drifts."},
+    {"number": 2, "prompt": "prompt-attempt-2.txt", "source": "attempt-2.png", "references": ["attempt-1.png"], "result": "Selected. Back plate corrected. Sleep retains slight head/key drift and only subtle desaturation."},
+    {"number": 3, "prompt": "prompt-attempt-3.txt", "source": "attempt-3.png", "references": ["attempt-2.png"], "result": "Rejected. Extra edge specks and residual sleep drift; no improvement over attempt two."}
+  ],
+  "selectedAttempt": 2,
+  "rawBuildInput": "assets-src/raw/custodian-3.png",
+  "publication": "Appended storySprites.custodian; ran bun tools/sprites/build-story.mjs. Pipeline slices equal cells, hardens alpha, removes specks, snaps to locked palette, scales uniformly and anchors frames. No pixels drawn by code or hand.",
+  "defaults": "Used leaftail height 68, four columns and approved outline/palette treatment. worldHeight 0.8 and animation rows/rates follow task exactly.",
+  "visualReview": "Opened entire final sheet on green, all directions and actions beside leaftail at native size, and 3x nearest-neighbor sheet. One creature across every row, overall head/body size steady with small silhouette wobble. Key, brass ear, plate and tail ring readable. Back has no face; side faces right. No visible pale halo or floor shadow.",
+  "remainingDefects": ["Sleep head and key shift slightly between frames, beyond a pure torso breath.", "Sleep is only subtly duller/dustier than awake fur.", "Small frame-to-frame silhouette and facial-shape wobble, most visible in side idle and front walk.", "Walk stride is restrained; front/back steps read less clearly than leaftail's.", "Sleep keeps the forepaws visible rather than a completely closed stone-like curl."],
+  "notChecked": ["In-game rendering or loader integration", "Timed animation playback", "Hardware performance"],
+  "previews": [".artifacts/custodian/sheet-native.png", ".artifacts/custodian/leaftail-native.png", ".artifacts/custodian/sheet-3x.png"]
+}

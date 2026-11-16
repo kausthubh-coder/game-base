@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "demos/opening/art/plates/m4-roads.jpg",
+  "prompt": "Use case: precise-object-edit. Edit target is attached approved fresco map. Preserve exact coastline, island shape, warm tempera paint and gold-leaf line on island edge, sea blue waves, ivory plaster, top and bottom gold bands, flat illustrated painting style. Remove all seven city buildings and their people, all golden roads (both circular ring and six spokes), and all four ships. Replace roads and cities with uninterrupted emerald green painted grass, flowers and small orchard trees. Replace ships with matching lapis sea and waves. This will be the clean background behind separately animated ORIGINAL cities and ships. Do not shift composition, change size of island, or add any roads, buildings, people or boats. 1920x1080 composition."
+}

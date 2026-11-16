@@ -51,8 +51,10 @@ export function createUiArt(assets: Assets): UiArt {
   for (const [name, file] of Object.entries(kitEntry?.images ?? {})) kit[name] = assetBase() + file;
   const tabs = kitEntry?.tabs;
 
+  // Act 1 redraw aliases take precedence here; frozen atlas names and files stay intact.
   return {
     icon(name) {
+      if (icons.has(`act1-${name}`)) name = `act1-${name}`;
       if (!icons.has(name)) return null;
       const icon = assets.icon(name);
       return { url: icon.url, x: icon.x, y: icon.y, size: icon.tile };
@@ -71,6 +73,7 @@ export function createUiArt(assets: Assets): UiArt {
     },
 
     iconElement(name) {
+      if (icons.has(`act1-${name}`)) name = `act1-${name}`;
       if (!icons.has(name)) return null;
       const icon = assets.icon(name);
       return cellElement(icon.url, icon);

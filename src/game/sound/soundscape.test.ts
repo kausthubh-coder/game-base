@@ -2,10 +2,22 @@ import { expect, test } from 'bun:test';
 import { BEDS, SPOTS, WELL_AT } from '../content/soundscape.ts';
 import { SAMPLES } from '../../content/sound-samples.ts';
 import { REGION } from '../content/region.ts';
-import { bedLevels, gaitOf, hoursWeight, SpotClock, stepMaterial, zonesAt, type Zones } from './soundscape.sim.ts';
+import { MUSIC_REGIONS, type MusicRegion } from '../content/soundscape.ts';
+import { placeAt } from '../region/greenhollow.sim.ts';
+import { toWorld } from '../content/greenhollow.ts';
+import { bedLevels, gaitOf, hoursWeight, newRegions, regionsAt, SpotClock, stepMaterial, zonesAt, type Regions, type Zones } from './soundscape.sim.ts';
 
 const zones = (): Zones => ({ town: 0, square: 0, bank: 0, lane: 0 });
-const levelsAt = (x: number, z: number, hour: number, forest = 0): Record<string, number> => bedLevels(zonesAt(x, z, zones()), { x, z, hour, forest }, {});
+const regionsHere = (x: number, z: number): Regions => regionsAt(x, z, zonesAt(x, z, zones()).town, newRegions());
+const levelsAt = (x: number, z: number, hour: number, forest = 0): Record<string, number> =>
+  bedLevels(zonesAt(x, z, zones()), { x, z, hour, forest, regions: regionsHere(x, z) }, {});
+/** The region whose music leads at a column. */
+const leadAt = (x: number, z: number): MusicRegion => {
+  const r = regionsHere(x, z);
+  return MUSIC_REGIONS.reduce((best, id) => (r[id] > r[best] ? id : best), 'meadow' as MusicRegion);
+};
+const at = (id: string): { x: number; z: number } => placeAt(id);
+const map = (x: number, y: number): { x: number; z: number } => toWorld([x, y]);
 const square = REGION.places.find((p) => p.name === 'town.square')!;
 const bank = REGION.places.find((p) => p.name === 'river.bank')!;
 const stone = REGION.places.find((p) => p.name === 'grant.stone')!;
@@ -100,4 +112,60 @@ test('a foot knows a path from a field, a floor from a bridge and cobbles from r
   expect(gaitOf(2)).toBe('soft');
   expect(gaitOf(4.4)).toBe('walk');
   expect(gaitOf(7)).toBe('run');
+});
+
+test('each place of the map has its own region\'s music', () => {
+  const cases: [{ x: number; z: number }, MusicRegion][] = [
+    [at('plot'), 'meadow'], [at('town'), 'town'], [at('seedvault'), 'oldForest'], [at('shrine-forest'), 'oldForest'],
+    [at('boar'), 'greyForest'], [at('terraces'), 'terraces'], [at('shrine-terrace'), 'terraces'], [at('highroad'), 'highRoad'],
+    [at('arches'), 'highRoad'], [at('lampgallery'), 'caves'], [map(720, 250), 'caves'], [at('shrine-marsh'), 'marsh'],
+    [map(700, 560), 'marsh'], [at('landing'), 'mere'], [at('bridge'), 'mere'], [map(404, 596), 'mere'],
+  ];
+  for (const [p, region] of cases) expect(`${p.x},${p.z} ${leadAt(p.x, p.z)}`).toBe(`${p.x},${p.z} ${region}`);
+});
+
+test('the music weights sum to one everywhere, and walking never moves them by more than a little a block', () => {
+  // A walk through every region: the plot, the Old Forest, the High Road, the grey forest, the terraces, the
+  // caves, the town, the river, the marsh and the south toward Saltgate.
+  const route = [at('plot'), at('garden'), at('seedvault'), map(150, 208), map(300, 160), at('terraces'), map(600, 140), map(720, 250), at('caves'),
+    at('chapel'), at('town'), at('landing'), at('shrine-bend'), map(640, 430), at('shrine-marsh'), map(560, 560), map(404, 596)];
+  let last = regionsHere(route[0]!.x, route[0]!.z);
+  const seen = new Set<MusicRegion>();
+  for (let leg = 1; leg < route.length; leg++) {
+    const a = route[leg - 1]!, b = route[leg]!;
+    const steps = Math.ceil(Math.hypot(b.x - a.x, b.z - a.z));
+    for (let i = 1; i <= steps; i++) {
+      const x = a.x + ((b.x - a.x) * i) / steps, z = a.z + ((b.z - a.z) * i) / steps;
+      const now = regionsHere(x, z);
+      let sum = 0;
+      for (const id of MUSIC_REGIONS) {
+        sum += now[id];
+        // A walk is about four blocks a second and the engine eases the weights at 0.6 a second: a block's
+        // change stays well under that, so every edge is a crossfade and never a cut.
+        expect(Math.abs(now[id] - last[id])).toBeLessThan(0.15);
+      }
+      expect(sum).toBeCloseTo(1, 5);
+      seen.add(leadAt(x, z));
+      last = now;
+    }
+  }
+  expect([...seen].sort()).toEqual([...MUSIC_REGIONS].sort());
+});
+
+test('each region has its own recorded bed, and the meadow\'s beds stay out of the other lands', () => {
+  const noon = (p: { x: number; z: number }): Record<string, number> => levelsAt(p.x, p.z, 12);
+  expect(noon(at('seedvault'))['bed.oldforest.day']).toBeGreaterThan(0.7);
+  expect(noon(at('seedvault'))['bed.meadow.day']).toBeLessThan(0.1);
+  expect(noon(at('boar'))['bed.greyforest']).toBeGreaterThan(0.6);
+  expect(noon(at('boar'))['bed.meadow.day']).toBeLessThan(0.1);
+  expect(noon(at('shrine-marsh'))['bed.marsh']).toBeGreaterThan(0.6);
+  expect(noon(map(720, 250))['bed.caves']).toBeGreaterThan(0.7);
+  expect(noon(at('landing'))['bed.river']).toBeGreaterThan(0.6);
+  expect(noon(map(404, 596))['bed.saltgate']).toBeGreaterThan(0.7);
+  expect(noon(at('arches'))['bed.highroad.wind']).toBeGreaterThan(0.7);
+  expect(noon(at('plot'))['bed.highroad.wind']).toBe(0);
+  expect(noon(at('plot'))['bed.river']).toBe(0);
+  // Night in the marsh keeps its frogs and water; the meadow's crickets do not come into the grey forest.
+  expect(levelsAt(at('shrine-marsh').x, at('shrine-marsh').z, 23)['bed.marsh']).toBeGreaterThan(0.6);
+  expect(levelsAt(at('boar').x, at('boar').z, 23)['bed.meadow.night']).toBeLessThan(0.1);
 });

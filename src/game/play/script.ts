@@ -1,22 +1,33 @@
-// The first part, played the way a player would play it, as a list of small steps over the play harness.
-// Each step reads everything it needs from the game it is handed, so a test can save after any step,
-// load the save into a fresh world and kernel, and go on with the next step there.
+// Act 1, played by the rules with no page, as lists of small steps over the play harness. Each step reads
+// everything it needs from the game it is handed, so a test can save after any step, load the save into a fresh
+// world and kernel, and go on with the next step there.
 //
-// No step gives an item, writes a flag or skips a quest. A step that cannot go on throws, with the
-// clock and the last toasts in the message, because every such stop is a finding about the game.
+//   STEPS        the 21 quests from a new game to `act.ended`, each step done by setting the flag its condition
+//                asks for (`satisfy` in content/quests.ts). This is the act at stub level: it proves the quests
+//                chain, save and end, and each builder's real step replaces a stub without changing this list.
+//   FIRST_NIGHT  the night quest played the way a player plays it, from `skipTo('night')`: a hut with a bed
+//                under a roof (HUT), then the fox, the door, the Mark, the Custodian, the Heartstone, a night's
+//                sleep and Tamsin. No step of it gives an item, writes a flag or skips a quest.
+//
+// A step that cannot go on throws, with the clock and the last toasts in the message, because every such stop is a
+// finding about the game.
 
 import { blockId } from '../../content/blocks.ts';
 import type { Vec3 } from '../../engine/types.ts';
-import type { NpcId, PetState } from '../api.sim.ts';
-import { REGION } from '../content/region.ts';
+import type { ItemId, NpcId, QuestId } from '../api.sim.ts';
+import { QUEST_IDS } from '../content/ids.ts';
+import { QUESTS, satisfy } from '../content/quests.ts';
+import { HALL, REGION } from '../content/region.ts';
 import { distance2d } from '../move.sim.ts';
+import { heartWords } from '../hall/index.sim.ts';
 import { TOO_EARLY_TOAST } from '../placeables/index.sim.ts';
+import { apply, holds } from '../quests/rules.sim.ts';
 import { EVENING } from '../time/index.sim.ts';
 import type { Play } from './harness.sim.ts';
 
 export interface Step {
-  /** The quest this step belongs to: `plot`, `roof`, `leaftail`, `bread` or `festival`. */
-  quest: string;
+  /** The quest this step belongs to. */
+  quest: QuestId;
   name: string;
   run(p: Play): void;
 }
@@ -31,7 +42,6 @@ const TOP: Face = [0, 1, 0];
 
 /** The dirt path from the grant stone to the town gate, as the points a player would walk through. */
 export const PATH_TO_TOWN = REGION.paths[0].points.map(([x, z]) => ({ x, z }));
-const PATH_TO_GRANT = [...PATH_TO_TOWN].reverse();
 
 /** Walks into town from wherever the player is: to the grant stone first when the town is far, then along the path to the gate. */
 export function walkToTown(p: Play): void {
@@ -144,55 +154,25 @@ function hut(p: Play): { x: number; y: number; z: number } {
   return { x: g.x + g.width - 6, y: p.sys.region.place('grant.center').at.y, z: g.z + g.depth - 8 };
 }
 
+/** Walks up to the foot of the bed in the hut. The bed fills its two blocks, so the player stands in the open doorway. */
+function toBed(p: Play): void {
+  const h = hut(p);
+  must(p, p.walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 180 }), 'could not walk up to the bed');
+}
+
+/** True while every cell of the stone door is still solid. */
+function doorShut(p: Play): boolean {
+  const door = HALL.door;
+  for (let x = door.x0; x <= door.x1; x++) for (let y = door.y0; y <= door.y1; y++) if (p.world.getBlock(x, y, door.z) === 0) return false;
+  return true;
+}
+
 /** Uses the held item on a block face and checks that a block of `id` now stands in front of that face. */
-function set(p: Play, item: string, x: number, y: number, z: number, face: Face, id: number): void {
+function set(p: Play, item: ItemId, x: number, y: number, z: number, face: Face, id: number): void {
   must(p, p.take(item), `there is no ${item} in the bag`);
   const used = p.use(x, y, z, face);
   const [nx, ny, nz] = face;
   must(p, used && p.world.getBlock(x + nx, y + ny, z + nz) === id, `${item} did not go down at ${x + nx}, ${y + ny}, ${z + nz}`);
-}
-
-// ------------------------------------------------------------------------------------------ the leaftail
-
-function leaftail(p: Play): PetState {
-  const pet = p.sys.pets.all().find((one) => one.kind === 'leaftail');
-  must(p, pet, 'there is no leaftail');
-  return pet;
-}
-
-/** Walks to a point, softly whenever the wild leaftail is near, as a player does once the hint has told them. */
-function walkCarefully(p: Play, goal: Vec3, within: number): boolean {
-  const pet = leaftail(p), player = p.game.player;
-  const close = (): boolean => !pet.bonded && distance2d(pet.pos, player.pos) < 9;
-  const there = (): boolean => distance2d(goal, player.pos) <= within;
-  for (let legs = 0; legs < 40 && !there(); legs++) {
-    const soft = close();
-    if (!p.walkTo(goal, { soft, within, seconds: 180, until: () => close() !== soft })) return false;
-  }
-  return there();
-}
-
-/** Holds a berry out to the leaftail and stands still until it has eaten. `byKey` presses E instead of clicking. */
-function feed(p: Play, byKey: boolean): void {
-  const pet = leaftail(p), player = p.game.player;
-  const before = pet.trust;
-  for (let tries = 0; tries < 8; tries++) {
-    must(p, p.walkTo(pet.pos, { soft: true, within: 2.2, seconds: 120 }), 'could not walk softly up to the leaftail');
-    if (byKey) {
-      must(p, p.prompt() === 'Offer a berry', `beside the leaftail the prompt should be "Offer a berry" and is "${String(p.prompt())}"`);
-      p.interact();
-    } else {
-      must(p, p.take('berry'), 'there is no berry in the bag');
-      // The berry is held out with the secondary button on the ground at the player's feet.
-      p.use(Math.floor(player.pos.x), Math.floor(player.pos.y) - 1, Math.floor(player.pos.z));
-    }
-    if (p.until(() => pet.trust > before, 6)) {
-      // It eats for three seconds and takes nothing more until it is done.
-      p.advance(3.2);
-      return;
-    }
-  }
-  must(p, false, `the leaftail did not take a berry in eight tries (trust ${pet.trust}, startled ${String(pet.startled)}, ${distance2d(pet.pos, player.pos).toFixed(1)} blocks away)`);
 }
 
 // ------------------------------------------------------------------------------------------ the field
@@ -234,57 +214,63 @@ function plant(p: Play): number {
   return planted;
 }
 
-// ------------------------------------------------------------------------------------------ the steps
 
-export const STEPS: readonly Step[] = [
-  // ---------------------------------------------------------------- 1. A plot of your own
-  {
-    quest: 'plot', name: 'meet Tamsin at the grant stone',
-    run(p) {
-      p.advance(0.5);
-      expectStep(p, 'plot.meet');
-      // The game opens two blocks from her: the prompt is there without a step taken.
-      must(p, p.prompt() === 'Talk to Tamsin', `a new game should open on "Talk to Tamsin" and shows "${String(p.prompt())}"`);
-      // Before she speaks the book is not the player's. It is never a thing in the bag.
-      must(p, !p.game.flags.is('has.almanac') && p.count('almanac') === 0, 'the player has the Almanac before Tamsin gives it');
-      const lines = talkTo(p, 'tamsin');
-      must(p, lines[0] === 'Twelve people have asked me for this plot.', `Tamsin's first line is "${lines[0]}"`);
-      must(p, lines.some((line) => line.startsWith('Take the book.')), 'Tamsin did not hand over the book in her first talk');
-      must(p, p.game.flags.is('has.almanac') && p.count('axe') === 1, 'Tamsin should have given the Almanac and an axe');
-      must(p, p.sys.inventory.slots.every((slot) => slot?.id !== 'almanac'), 'the Almanac takes a slot in the bag');
-      must(p, !p.sys.inventory.remove('almanac', 1) && p.game.flags.is('has.almanac'), 'the Almanac can be taken from the player');
-      expectStep(p, 'plot.watch');
-    },
-  },
-  {
-    quest: 'plot', name: 'watch a mossling until both facts are learned',
-    run(p) {
-      must(p, p.walkTo('grant.rocks', { seconds: 60 }), 'could not walk to the mossy rocks');
-      const page = (): string => (p.sys.almanac.page('mossling')?.facts ?? []).map((fact) => `${fact.id}:${fact.known ? 'known' : 'unknown'}`).join(' ');
-      const done = p.until(() => p.sys.almanac.page('mossling')?.complete === true, 150);
-      must(p, done, `the mossling page did not fill in 150 seconds of watching (${page()}, ${p.sys.creatures.all().length} creatures)`);
-      expectStep(p, 'plot.tell');
-    },
-  },
-  {
-    quest: 'plot', name: 'tell Tamsin',
-    run(p) {
-      talkTo(p, 'tamsin');
-      must(p, p.game.flags.is('plot.told'), 'telling Tamsin did not set plot.told');
-    },
-  },
+/** Tills the field in the middle of the grant, plants every seed the bag holds there, and waters it. */
+export function sowTheField(p: Play): void {
+  const f = field(p);
+  must(p, p.walkTo(f.stand, { within: 0.3, seconds: 120 }), 'could not walk to the field');
+  must(p, p.take('hoe'), 'the hoe is not in the bag');
+  for (const cell of f.cells) {
+    must(p, p.world.getBlock(cell.x, cell.y, cell.z) === GRASS, `the grant's meadow at ${cell.x}, ${cell.z} is not grass`);
+    must(p, p.use(cell.x, cell.y, cell.z) && p.world.getBlock(cell.x, cell.y, cell.z) === TILLED, `the hoe did not till ${cell.x}, ${cell.z}`);
+  }
+  must(p, plant(p) > 0, 'no seed went into the soil');
+  water(p);
+  for (const cell of f.cells) {
+    const crop = p.sys.crops.at(cell.x, cell.y, cell.z);
+    if (crop) must(p, crop.wet > 0, `the crop at ${cell.x}, ${cell.z} is dry after watering`);
+  }
+}
 
-  // ---------------------------------------------------------------- 2. A roof before dark
-  {
-    quest: 'roof', name: 'cut 12 logs and pick 3 fiber',
+// ------------------------------------------------------------------------------------------ the act, a flag at a time
+
+/** The quests in order. */
+export const QUEST_ORDER: readonly QuestId[] = QUEST_IDS;
+
+/** One step for every step of every quest: it sets what the step's condition asks for, and the quest moves on. */
+export const STEPS: readonly Step[] = QUESTS.flatMap((def) =>
+  def.steps.map((step): Step => ({
+    quest: def.id,
+    name: `${def.id}.${step.id}: ${step.text}`,
     run(p) {
-      expectStep(p, 'roof.wood');
+      // The story starts a step's scene or choice as the step opens, as a player sees it: clicked through here,
+      // taking the first choice. When that did the step, the quest has moved on by itself.
+      if (p.sys.talk.active) {
+        p.talkThrough();
+        p.advance(0.6);
+        if (holds(p.game, step.done) && openStep(p) !== `${def.id}.${step.id}`) return;
+      }
+      expectStep(p, `${def.id}.${step.id}`);
+      const effects = satisfy(step.done);
+      must(p, effects.length > 0, `the step ${def.id}.${step.id} cannot be done by a flag`);
+      for (const effect of effects) apply(p.game, effect);
+      p.advance(0.6);
+    },
+  })),
+);
+
+// ------------------------------------------------------------------------------------------ the first night, played
+
+/** A hut with a workbench beside it and a bed under a roof, built from trees the player fells. */
+export const HUT: readonly Step[] = [
+  {
+    quest: 'night', name: 'cut 12 logs and pick 3 fiber',
+    run(p) {
       gather(p, 12, 3);
-      expectStep(p, 'roof.bench');
     },
   },
   {
-    quest: 'roof', name: 'make planks and a workbench, and set it down',
+    quest: 'night', name: 'make planks and a workbench, and set it down',
     run(p) {
       // 4 for the bench, 6 for the bed, 12 for the shelter: 22 planks, so 6 logs.
       for (let i = 0; i < 6; i++) must(p, p.make('plank'), 'a log did not saw into planks by hand');
@@ -294,11 +280,10 @@ export const STEPS: readonly Step[] = [
       must(p, p.take('workbench'), 'the workbench is not in the bag');
       must(p, p.use(h.x - 3, h.y - 1, h.z + 1), 'the workbench did not go down');
       must(p, p.sys.placeables.at(h.x - 3, h.y, h.z + 1)?.kind === 'workbench', 'no workbench stands where it was set down');
-      expectStep(p, 'roof.shelter');
     },
   },
   {
-    quest: 'roof', name: 'make a bed and build a shelter of planks over it',
+    quest: 'night', name: 'make a bed and build a shelter of planks over it',
     run(p) {
       const h = hut(p), g = h.y;
       must(p, p.walkTo({ x: h.x + 0.5, y: g, z: h.z + 2.5 }, { within: 0.3, seconds: 120 }), 'could not walk to the hut');
@@ -314,20 +299,30 @@ export const STEPS: readonly Step[] = [
       must(p, p.take('bed'), 'the bed is not in the bag');
       must(p, p.use(h.x, g - 1, h.z + 1), 'the bed did not go down');
       must(p, p.sys.placeables.at(h.x, g, h.z)?.kind === 'bed' && p.sys.placeables.at(h.x, g, h.z + 1)?.kind === 'bed', 'no bed two blocks long stands where it was set down');
-      // Under open sky the quest still waits.
-      p.advance(1);
-      must(p, openStep(p) === 'roof.shelter', 'a bed under open sky should not pass the shelter step');
-      // The roof is what the quest asks for: one block over the bed, set out from the top of the west wall.
+      // The roof: one block over the bed, set out from the top of the west wall.
       set(p, 'plank', h.x - 1, g + 2, h.z, [1, 0, 0], PLANK);
-      expectStep(p, 'roof.sleep');
+      must(p, p.sys.time.canSleep() || p.game.clock.timeOfDay < EVENING, 'beside a bed with a roof over it, in the evening, the player cannot sleep');
     },
   },
+
+];
+
+/** The night quest from its first step, as a player plays it. A game that skipped here builds the HUT first. */
+export const FIRST_NIGHT: readonly Step[] = [
   {
-    quest: 'roof', name: 'wait for evening and sleep',
+    quest: 'night', name: 'lie down at evening, and something comes out of the dark',
     run(p) {
-      const h = hut(p), clock = p.game.clock;
-      // The bed fills its two blocks, so the player stands at its foot, in the open doorway.
-      must(p, p.walkTo({ x: h.x + 0.5, y: h.y, z: h.z + 2.5 }, { within: 0.25, seconds: 120 }), 'could not walk up to the bed');
+      const clock = p.game.clock;
+      expectStep(p, 'night.bed');
+      // The night needs a bed under a roof. A game that skipped here has none, so it is built now.
+      if (!p.sys.placeables.all().some((placed) => placed.kind === 'bed')) for (const step of HUT) step.run(p);
+      // By day the stone door is only a door: it gives a prompt, two lines, and does not move.
+      must(p, p.walkTo('shut.door', { within: 1.2, seconds: 120 }), 'could not walk to the stone door');
+      must(p, p.prompt() === 'Push the door', `at the stone door the prompt should be "Push the door" and is "${String(p.prompt())}"`);
+      p.interact();
+      const pushed = p.talkThrough();
+      must(p, pushed.some((line) => line.includes('It is like pushing the hill')) && doorShut(p), 'pushing the stone door by day should say it does not move, and leave it shut');
+      toBed(p);
       must(p, p.prompt() === 'Sleep', `beside the bed the prompt should be "Sleep" and is "${String(p.prompt())}"`);
       if (clock.timeOfDay < EVENING) {
         // Too early: the bed says so and the day goes on.
@@ -337,210 +332,117 @@ export const STEPS: readonly Step[] = [
       }
       must(p, p.sys.time.canSleep(), 'it is evening, the player stands beside a bed with a block over it, and canSleep() is false');
       const day = clock.day;
+      if (!p.game.flags.is('night.fox')) {
+        p.interact();
+        must(p, p.said.at(-1) === 'Something is moving outside. You cannot sleep.', `the first night the bed should say something is outside, and said "${String(p.said.at(-1))}"`);
+      }
+      must(p, clock.day === day && p.game.flags.is('night.fox'), 'the player slept through the first night, or the fox did not come');
+      expectStep(p, 'night.door');
+      p.advance(1);
+      const fox = p.sys.hall.fox();
+      must(p, fox && distance2d(fox, p.game.player.pos) < 14, 'no fox stands near the player after it was heard');
+      // It will not let the player sleep it away.
       p.interact();
-      must(p, clock.day === day + 1 && p.heard.some((event) => event.name === 'slept'), 'E beside the bed in the evening did not sleep to the next morning');
+      must(p, clock.day === day && p.said.at(-1) === 'Not with that thing outside.', `with the fox outside the bed said "${String(p.said.at(-1))}"`);
     },
   },
-
-  // ---------------------------------------------------------------- 3. Leaf and tail
   {
-    quest: 'leaftail', name: 'walk to the dead garden',
+    quest: 'night', name: 'back away to the stone door, and it opens',
     run(p) {
-      expectStep(p, 'leaftail.find');
-      const garden = p.sys.region.place('dead.garden').at;
-      must(p, walkCarefully(p, garden, 9), 'could not walk to the dead garden');
-      const pet = leaftail(p);
-      must(p, distance2d(pet.pos, garden) < 8, `the leaftail should be tending the garden and is ${distance2d(pet.pos, garden).toFixed(1)} blocks from it`);
+      must(p, doorShut(p), 'the stone door is open before the player reached it');
+      must(p, p.walkTo('shut.door', { within: 1.5, seconds: 180, until: () => p.sys.talk.active }), 'could not walk to the stone door');
+      must(p, p.until(() => p.sys.talk.active, 3), 'with the fox behind the player at the stone door, nothing happened');
+      const lines = p.talkThrough();
+      must(p, lines.at(-1) === 'Behind you, the stone moves.', `the scene at the door ended on "${String(lines.at(-1))}"`);
       p.advance(0.6);
-      must(p, openStep(p) !== 'leaftail.find', 'ten blocks from the garden the find step is still open');
+      must(p, p.game.flags.is('door.open') && !doorShut(p), 'the scene at the door ended and the door is still shut');
+      expectStep(p, 'night.mark');
     },
   },
   {
-    quest: 'leaftail', name: 'pick 3 berries',
+    quest: 'night', name: 'go through the door, and the Mark comes',
     run(p) {
-      const player = p.game.player;
-      const bushes = [...(p.sys.region.berryBushes?.() ?? [])]
-        .filter((bush) => distance2d(bush, player.pos) < 40)
-        .sort((a, b) => distance2d(a, player.pos) - distance2d(b, player.pos));
-      must(p, bushes.length >= 3, `only ${bushes.length} berry bushes within 40 blocks of the garden`);
-      for (const bush of bushes) {
-        if (p.count('berry') >= 3) break;
-        if (!bush.ripe) continue;
-        must(p, walkCarefully(p, { x: bush.x, y: bush.y, z: bush.z }, 1.2), `could not walk to the berry bush at ${bush.x}, ${bush.z}`);
-        must(p, p.prompt() === 'Pick berries', `at a ripe bush the prompt should be "Pick berries" and is "${String(p.prompt())}"`);
-        const before = p.count('berry');
-        p.interact();
-        must(p, p.count('berry') > before && !bush.ripe, 'picking a bush gave no berry');
+      must(p, p.walkTo('hall.heart', { within: 1.5, seconds: 120, until: () => p.sys.talk.active }), 'could not walk through the open door');
+      must(p, p.until(() => p.sys.talk.active, 3), 'inside the Hall nothing happened');
+      const lines = p.talkThrough();
+      must(p, lines.some((line) => line.includes('a ring of seven points')) && p.game.flags.is('mark'), 'the scene in the Hall did not give the Mark');
+      // The fox does not follow past the threshold.
+      p.advance(3);
+      const fox = p.sys.hall.fox();
+      must(p, fox && fox.z > HALL.door.z + 0.9, `the fox should wait outside the door and is at ${fox ? `${fox.x.toFixed(1)}, ${fox.z.toFixed(1)}` : 'nowhere'}`);
+      expectStep(p, 'night.key');
+    },
+  },
+  {
+    quest: 'night', name: 'turn the key, and the Custodian wakes',
+    run(p) {
+      must(p, p.walkTo('hall.custodian', { within: 0.6, seconds: 60 }), 'could not walk to the plinth');
+      must(p, p.prompt() === 'Turn the key', `at the plinth the prompt should be "Turn the key" and is "${String(p.prompt())}"`);
+      p.interact();
+      const lines = p.talkThrough();
+      must(p, lines.includes('(one eye opening) You\'re late.') && p.game.flags.is('custodian.awake'), 'turning the key did not wake the Custodian');
+      p.advance(0.1);
+      must(p, p.prompt() === 'Talk to the Custodian', `beside the woken Custodian the prompt is "${String(p.prompt())}"`);
+      p.interact();
+      const said = p.talkThrough();
+      must(p, said[0] === 'The fox, first. Hold out the hand. It remembers that mark.', `the Custodian should send the player to the fox and said "${said[0]}"`);
+      expectStep(p, 'night.calm');
+    },
+  },
+  {
+    quest: 'night', name: 'hold out a hand to the fox',
+    run(p) {
+      // The doorway itself: the fox stands a block and a half outside it.
+      must(p, p.walkTo({ x: HALL.doorAt.x, y: HALL.ground, z: HALL.door.z + 0.5 }, { within: 0.4, seconds: 60 }), 'could not walk to the doorway');
+      must(p, p.until(() => p.prompt() === 'Hold out your hand', 6), `in the doorway the prompt should be "Hold out your hand" and is "${String(p.prompt())}"`);
+      p.interact();
+      const lines = p.talkThrough();
+      must(p, lines.length === 3 && p.game.flags.is('fox.calmed'), 'holding out the marked hand did not calm the fox');
+      // It thanks the player for a moment, then goes home.
+      must(p, p.until(() => p.sys.hall.fox() === null, 24) && p.game.flags.is('fox.gone'), 'the calmed fox never left');
+      expectStep(p, 'night.heart');
+    },
+  },
+  {
+    quest: 'night', name: 'touch the Heartstone',
+    run(p) {
+      must(p, p.walkTo('hall.heart', { within: 0.6, seconds: 60 }), 'could not walk to the Heartstone');
+      must(p, p.prompt() === 'Touch the Heartstone', `at the Heartstone the prompt should be "Touch the Heartstone" and is "${String(p.prompt())}"`);
+      p.interact();
+      const lines = p.talkThrough();
+      must(p, lines[0].startsWith('That is the Heartstone.') && p.game.flags.is('heart.seen'), 'touching the Heartstone the first time should have the Custodian explain it');
+      // After that it gives its number: the design's first step, 1, until the settlement counts more.
+      p.interact();
+      must(p, p.sys.hall.heart().level >= 1 && p.said.at(-1) === heartWords(p.sys.hall.heart()), `the Heartstone said "${String(p.said.at(-1))}"`);
+      expectStep(p, 'night.sleep');
+    },
+  },
+  {
+    quest: 'night', name: 'sleep until morning',
+    run(p) {
+      const clock = p.game.clock;
+      toBed(p);
+      must(p, p.sys.time.canSleep(), 'after the Hall the player should be able to sleep');
+      const day = clock.day;
+      p.interact();
+      must(p, clock.day === day + 1 && p.heard.some((event) => event.name === 'slept'), 'E beside the bed did not sleep to the next morning');
+      expectStep(p, 'night.tamsin');
+    },
+  },
+  {
+    quest: 'night', name: 'show Tamsin the Mark at the grant stone',
+    run(p) {
+      p.advance(1);
+      const stone = p.sys.region.place('grant.stone').at;
+      for (const id of ['tamsin', 'villager-1', 'gus', 'villager-5'] as const) {
+        const npc = p.sys.people.get(id);
+        must(p, npc && distance2d(npc.pos, stone) < 6, `${id} should be at the grant stone the morning after and is at ${npc?.place ?? 'nowhere'}`);
       }
-      must(p, p.count('berry') >= 3, `only ${p.count('berry')} berries after every bush near the garden`);
+      const lines = talkTo(p, 'tamsin');
+      must(p, lines.includes('(looking at your hand) So it opened. I\'ve walked past that door for years.') && p.game.flags.is('night.told'), `Tamsin's words the morning after were "${lines.join(' | ')}"`);
       p.advance(0.6);
-      must(p, openStep(p) === 'leaftail.trust', `with 3 berries the open step should be leaftail.trust and is ${openStep(p)}`);
-    },
-  },
-  {
-    quest: 'leaftail', name: 'feed the leaftail twice',
-    run(p) {
-      const pet = leaftail(p);
-      while (pet.trust < 2) feed(p, false);
-      must(p, !pet.bonded, 'two berries should not bond it yet');
-    },
-  },
-  {
-    quest: 'leaftail', name: 'feed it a third time, and it bonds',
-    run(p) {
-      const pet = leaftail(p);
-      // A bush or two more, should the bag have run out: a pick gives 1 or 2.
-      for (const bush of p.sys.region.berryBushes?.() ?? []) {
-        if (p.count('berry') >= 1) break;
-        if (!bush.ripe || distance2d(bush, p.game.player.pos) > 40) continue;
-        must(p, walkCarefully(p, { x: bush.x, y: bush.y, z: bush.z }, 1.2), `could not walk to the berry bush at ${bush.x}, ${bush.z}`);
-        p.interact();
-      }
-      feed(p, true);
-      must(p, pet.bonded && p.game.flags.is('pet.leaftail.bonded'), 'three berries did not bond the leaftail');
-      must(p, p.sys.pets.companion()?.id === pet.id, 'the bonded leaftail is not the companion');
-      expectStep(p, 'leaftail.show');
-    },
-  },
-  {
-    quest: 'leaftail', name: 'show it to Tamsin in Hollowmere',
-    run(p) {
-      const pet = leaftail(p);
-      walkToTown(p);
-      must(p, distance2d(pet.pos, p.game.player.pos) < 12, `the leaftail fell ${distance2d(pet.pos, p.game.player.pos).toFixed(1)} blocks behind on the path`);
-      const lines = talkTo(p, 'tamsin');
-      must(p, p.game.flags.is('leaftail.shown'), `showing the leaftail to Tamsin did not count. She said: ${lines.join(' / ')}`);
+      must(p, p.game.flags.is('quest.night.done'), 'showing Tamsin the Mark did not end the night quest');
     },
   },
 
-  // ---------------------------------------------------------------- 4. The queen's bread
-  {
-    quest: 'bread', name: 'meet Queen Maren in the granary',
-    run(p) {
-      // The gate was passed on the way to Tamsin, so the walk to town is already done. A game that was
-      // skipped to this quest has not been there yet.
-      if (openStep(p) === 'bread.town') walkToTown(p);
-      expectStep(p, 'bread.queen');
-      talkTo(p, 'maren');
-      must(p, p.game.flags.is('bread.asked'), 'Maren did not ask for the wheat');
-      expectStep(p, 'bread.seeds');
-    },
-  },
-  {
-    quest: 'bread', name: 'get the hoe, the can and 12 seeds from Gus',
-    run(p) {
-      const seeds = p.count('wheat_seeds');
-      talkTo(p, 'gus');
-      must(p, p.count('hoe') === 1 && p.count('watering_can') === 1, 'Gus should have given a hoe and a watering can');
-      must(p, p.count('wheat_seeds') === seeds + 12, `Gus should have given 12 seeds and gave ${p.count('wheat_seeds') - seeds}`);
-      expectStep(p, 'bread.grow');
-    },
-  },
-  {
-    quest: 'bread', name: 'till a field on the grant, plant and water',
-    run(p) {
-      must(p, p.walkTo('town.gate', { within: 2, seconds: 300 }), 'could not walk back to the town gate');
-      must(p, p.walkTo('grant.stone', { via: PATH_TO_GRANT, within: 3, seconds: 400 }), 'could not walk the path back to the grant');
-      const f = field(p);
-      must(p, p.walkTo(f.stand, { within: 0.3, seconds: 120 }), 'could not walk to the field');
-      must(p, p.take('hoe'), 'the hoe is not in the bag');
-      for (const cell of f.cells) {
-        must(p, p.world.getBlock(cell.x, cell.y, cell.z) === GRASS, `the grant's meadow at ${cell.x}, ${cell.z} is not grass`);
-        must(p, p.use(cell.x, cell.y, cell.z) && p.world.getBlock(cell.x, cell.y, cell.z) === TILLED, `the hoe did not till ${cell.x}, ${cell.z}`);
-      }
-      must(p, plant(p) === 12, 'twelve seeds should have gone into twelve soil blocks');
-      water(p);
-      for (const cell of f.cells) must(p, (p.sys.crops.at(cell.x, cell.y, cell.z)?.wet ?? 0) > 0, `the crop at ${cell.x}, ${cell.z} is dry after watering`);
-    },
-  },
-  {
-    quest: 'bread', name: 'harvest and replant until there are 20 wheat',
-    run(p) {
-      const f = field(p);
-      for (let rounds = 0; rounds < 6 && p.count('wheat') < 20; rounds++) {
-        must(p, p.walkTo(f.stand, { within: 0.3, seconds: 120 }), 'could not walk to the field');
-        if (p.sys.crops.all().length === 0) {
-          must(p, plant(p) > 0, `there is no wheat in the ground and no seed in the bag, with ${p.count('wheat')} wheat`);
-          water(p);
-        }
-        // Wet soil grows a stage in 45 seconds. Water lasts three minutes, so a dry crop is watered again.
-        for (let waited = 0; waited < 600 && p.sys.crops.all().some((crop) => !crop.state.ripe); waited += 5) {
-          if (p.sys.crops.all().some((crop) => !crop.state.ripe && crop.state.wet <= 0)) water(p);
-          p.advance(5);
-        }
-        must(p, p.sys.crops.all().every((crop) => crop.state.ripe), 'the wheat was not ripe after ten minutes of wet soil');
-        for (const cell of f.cells) {
-          if (!p.sys.crops.at(cell.x, cell.y, cell.z)?.ripe) continue;
-          const before = p.count('wheat');
-          must(p, p.hit(cell.x, cell.y, cell.z), `the primary button did not harvest the ripe wheat at ${cell.x}, ${cell.z}`);
-          must(p, p.count('wheat') === before + 2, `a ripe wheat gave ${p.count('wheat') - before} wheat, not 2`);
-        }
-        if (p.count('wheat') < 20) {
-          plant(p);
-          water(p);
-        }
-      }
-      must(p, p.count('wheat') >= 20, `only ${p.count('wheat')} wheat after six harvests`);
-      expectStep(p, 'bread.deliver');
-    },
-  },
-  {
-    quest: 'bread', name: 'bring 20 wheat to Maren',
-    run(p) {
-      walkToTown(p);
-      const wheat = p.count('wheat');
-      const lines = talkTo(p, 'maren');
-      must(p, p.game.flags.is('bread.delivered') && p.count('wheat') === wheat - 20, `Maren did not take 20 wheat. She said: ${lines.join(' / ')}`);
-    },
-  },
-
-  // ---------------------------------------------------------------- 5. The harvest festival
-  {
-    quest: 'festival', name: 'come to the square at dusk',
-    run(p) {
-      expectStep(p, 'festival.evening');
-      // Waiting with Maren was the first choice, so dusk comes at once. Otherwise the player waits for it.
-      must(p, p.until(() => p.game.flags.is('festival.started'), p.sys.time.dayLength), 'the festival did not start at dusk');
-      must(p, p.game.clock.timeOfDay >= 0.73 || p.game.clock.timeOfDay < 0.23, `the festival started at ${p.game.clock.timeOfDay.toFixed(3)}, which is not dusk or night`);
-      walkToTown(p);
-      must(p, p.walkTo('town.square', { within: 3, seconds: 240 }), 'could not walk to the square');
-      expectStep(p, 'festival.lamp');
-    },
-  },
-  {
-    quest: 'festival', name: 'get the river lamp from Odo',
-    run(p) {
-      talkTo(p, 'odo');
-      must(p, p.count('river_lamp') === 1 && p.game.flags.is('festival.lamp.given'), 'Odo did not give the river lamp');
-    },
-  },
-  {
-    quest: 'festival', name: 'float the lamp from the river bank',
-    run(p) {
-      must(p, p.walkTo('river.bank', { within: 2, seconds: 240 }), 'could not walk to the river bank');
-      must(p, p.take('river_lamp'), 'the river lamp is not in the bag');
-      const at = p.game.player.pos;
-      // The secondary button on the quay in front of the water.
-      p.use(Math.floor(at.x), Math.floor(at.y) - 1, Math.floor(at.z) + 1);
-      must(p, p.game.flags.is('festival.lamp') && p.count('river_lamp') === 0, 'the lamp did not float');
-      expectStep(p, 'festival.end');
-    },
-  },
-  {
-    quest: 'festival', name: 'talk to Tamsin on the bank',
-    run(p) {
-      const tamsin = p.sys.people.get('tamsin');
-      must(p, tamsin, 'Tamsin is gone');
-      const bank = p.sys.region.place('river.bank').at;
-      // She walks down from the lodge when the festival starts.
-      p.until(() => distance2d(tamsin.pos, bank) < 6, 120);
-      must(p, distance2d(tamsin.pos, bank) < 6, `Tamsin should be on the river bank and is ${distance2d(tamsin.pos, bank).toFixed(1)} blocks from it, at ${tamsin.place}`);
-      const lines = talkTo(p, 'tamsin');
-      must(p, lines.at(-1) === 'Go on. Float your lamp.', `Tamsin's last line is "${String(lines.at(-1))}"`);
-      must(p, p.game.flags.is('festival.ended'), 'the last talk did not set festival.ended');
-    },
-  },
 ];
-
-/** The quests in order. */
-export const QUEST_ORDER: readonly string[] = ['plot', 'roof', 'leaftail', 'bread', 'festival'];

@@ -1,0 +1,24 @@
+{
+  "name": "stag-free",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "assets-src/raw/stag-3.png"
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Use case: stylized-concept. NEW Verdant Stag FREEDOM POSES sprite sheet. Attached idle is exact identity reference. Same majestic ancient gentle long-legged stag, heavy chest, bark brown legs, cream chest, warm green moss back, broad oak-branch antler crown with sparse cream blossoms. Same body size and anatomical proportions as idle. Warm top-left lighting, brown tinted outlines and chunky pixel art. Genuine transparent background no text/grid/ground/shadow/chains, no teal. STRICT FOUR columns THREE rows equal SQUARE cells landscape 4:3. Row1 FRONT, Row2 BACK with NO FACE NO EYES NO NOSE in any cell, Row3 RIGHT PROFILE. Four columns in EVERY row: 1 STAGGERS knees bent unbalanced head jerked sharply aside as a chain pin breaks, gold collar PRESENT. 2 STRAINS whole body leaning hard to one side pulling AGAINST heavy gold collar, neck taut stretched diagonally, collar PRESENT. 3 STANDS FREE upright still head HIGH, BOTH front feet planted, collar COMPLETELY GONE bare cream throat, no gold. 4 BOWS all four feet planted long neck bent deeply down, nose almost touching ground toward viewer, broad antlers forward, soft readable eyes; collar GONE no gold. These are four different poses of one creature. Column3 dignified standing, NOT rearing. Column4 deepest gentle bow, NOT grazing or attacking. Back row shows same body poses from behind, no face showing even on turned heads. Preserve exact crown shape, blossoms, colors, chest mass and long legs throughout. Generous transparent padding, antlers fully inside cells, hooves on same baseline. Body does not shrink between poses. Only gold is collar in columns1 and2.",
+      "source": "assets-src/fight-stag/stag-free-attempt-1.png",
+      "selected": false,
+      "defects": "Freed back view retains collar; antler margins too tight."
+    },
+    {
+      "number": 2,
+      "prompt": "Edit attached freedom sheet, preserve same long-legged mighty Verdant Stag and four columns three rows front/back/right. Fix TWO things: 1. REMOVE GOLD COLLAR completely from column THREE and FOUR in ALL rows. Especially MIDDLE ROW column THREE currently shows gold horizontal neck band, erase band and replace with natural bark-brown neck fur, no gold stripe anywhere on released poses. Columns ONE/TWO keep plain gold collar. 2. ALL ANTLER TIPS must fit wholly INSIDE their own equal square cell with ample clear transparent margin. No clipping on top of image, no tips cross row border. Leave 8 percent empty padding all around in every cell, same anatomical animal scale throughout. Keep poses: col1 staggering bent knees off balance head jerked aside, col2 strain leaning HARD to one side against collar neck taut, col3 free standing tall head high all feet grounded bare neck, col4 deep gentle bow nose nearly on ground bare neck. Back row NO face/eye/nose. Same oak bough crown cream blossoms, healthy warm green moss, bark brown legs and cream chest, gentle ancient expression. Same scale/proportions as original idle reference. Genuine transparency, no shadows ground grid text chains teal. Brown outlined chunky pixel art matching approved boar. Do not draw a collar-colored band on freed back neck.",
+      "source": "assets-src/raw/stag-free-3.png",
+      "selected": true,
+      "defects": "Colors warmer and crown bushier than idle; crown, flowers, face and body proportions drift. Strain is a forward lean rather than strong sideways pull, bow side reads grazing. Back bow is subtle."
+    }
+  ],
+  "processing": "Standard build-story.mjs size384 anchor[192,364] height320 worldHeight13.2. No tool extension or drawn replacement pixels."
+}

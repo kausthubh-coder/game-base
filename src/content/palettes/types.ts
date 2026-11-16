@@ -99,6 +99,8 @@ export interface SparkleLayer {
   /** The chance of a note on each step, 0 to 1. */
   chance: number;
   gain: number;
+  /** The chance is multiplied by this at night. 0.7 when left out; above 1 where the night comes alive (the marsh's lanternflies). */
+  night?: number;
 }
 
 /** The background bed only this land has. The engine has one recipe per name. */

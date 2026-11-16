@@ -7,7 +7,8 @@ import type {
   Actor, AlmanacPage, EventName, Game, GameEvents, ItemId, NpcId, NpcState, PetState, Place, Placed, Stack, Systems, UseContext,
 } from '../api.sim.ts';
 import { createKernel, STEP, type Kernel } from '../kernel.sim.ts';
-import { install as installQuests } from '../quests/index.sim.ts';
+import type { QuestDef } from '../content/quests.ts';
+import { createQuests, install as installQuests } from '../quests/index.sim.ts';
 import { install as installTalk } from '../talk/index.sim.ts';
 import { install as installStory } from './index.sim.ts';
 
@@ -28,9 +29,9 @@ export const PLACES: Record<string, [number, number]> = {
   ferry: [30, -200],
 };
 
-const HOMES: Record<NpcId, string> = {
-  tamsin: 'grant.stone', maren: 'granary', odo: 'bakery', gus: 'gus.field', mira: 'carpenter', wren: 'kennel',
-  juniper: 'town.square', brack: 'ferry', 'villager-1': 'town.square', 'villager-2': 'town.square',
+const HOMES: Partial<Record<NpcId, string>> = {
+  tamsin: 'grant.stone', maren: 'granary', gus: 'gus.field', wren: 'kennel',
+  'villager-1': 'town.square', 'villager-2': 'town.square',
 };
 
 /** The height everything in the fake region stands at: open air high in the one loaded chunk. */
@@ -68,7 +69,8 @@ export interface Stage {
   events(name: EventName): GameEvents[EventName][];
 }
 
-export function stage(options: { story?: boolean } = {}): Stage {
+/** `quests` replaces the game's quests with these, for a test of the quest engine itself. */
+export function stage(options: { story?: boolean; quests?: readonly QuestDef[] } = {}): Stage {
   const world = new World(7);
   world.load(0, 0);
   const kernel = createKernel(world, 7);
@@ -90,7 +92,7 @@ export function stage(options: { story?: boolean } = {}): Stage {
   const handlers: ((context: UseContext) => boolean)[] = [];
   const pet: PetState = { id: 'pet:leaftail:1', kind: 'leaftail', name: 'Leaftail', pos: at('dead.garden'), trust: 0, bonded: false, startled: false };
 
-  for (const [id, home] of Object.entries(HOMES)) {
+  for (const [id, home] of Object.entries(HOMES) as [NpcId, string][]) {
     const name = id[0].toUpperCase() + id.slice(1);
     people.set(id, { id, name, sprite: id, portrait: id, voice: id, pos: at(home), place: home, friendship: 0 });
     game.actors.set(`npc:${id}`, { id: `npc:${id}`, sprite: id, pos: people.get(id)!.pos, facing: 0, anim: 'idle', visible: true, mark: '' } satisfies Actor);
@@ -101,7 +103,7 @@ export function stage(options: { story?: boolean } = {}): Stage {
     id, title: id, picture: id, kind, facts: [fact('needs', 'needs'), fact('gives', 'gives')], complete: false, seen: false,
   });
   const pages = new Map<string, AlmanacPage>([['mossling', page('mossling', 'creature')]]);
-  for (const id of ['tamsin', 'maren', 'odo', 'gus', 'mira', 'wren', 'juniper', 'brack']) pages.set(id, page(id, 'person'));
+  for (const id of ['tamsin', 'maren', 'gus', 'wren']) pages.set(id, page(id, 'person'));
 
   const stageBag = { full: false };
   const fakes: Partial<Systems> = {
@@ -220,12 +222,12 @@ export function stage(options: { story?: boolean } = {}): Stage {
       all: () => crops,
     },
     time: {
-      dayLength: 720,
+      dayLength: 1200,
       canSleep: () => true,
       sleep() {
         game.clock.day += 1;
         game.clock.timeOfDay = 0.27;
-        game.events.emit('slept', { day: game.clock.day });
+        game.events.emit('slept', { day: game.clock.day, skipped: 600 });
       },
       setWeather(kind) {
         weather.push(kind);
@@ -249,7 +251,10 @@ export function stage(options: { story?: boolean } = {}): Stage {
   Object.assign(game.systems, fakes);
 
   installTalk(kernel);
-  installQuests(kernel);
+  if (options.quests) {
+    const quests = createQuests(game, options.quests);
+    kernel.add('quests', quests.api, quests.system);
+  } else installQuests(kernel);
   if (options.story !== false) installStory(kernel);
 
   Object.assign(game.player.pos, at('grant.stone'));
@@ -266,7 +271,7 @@ export function stage(options: { story?: boolean } = {}): Stage {
     run(seconds) {
       for (let i = 0, steps = Math.round(seconds / STEP); i < steps; i++) {
         game.clock.seconds += STEP;
-        game.clock.timeOfDay = (game.clock.timeOfDay + STEP / 720) % 1;
+        game.clock.timeOfDay = (game.clock.timeOfDay + STEP / 1200) % 1;
         kernel.step();
       }
     },

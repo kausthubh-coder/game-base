@@ -13,7 +13,7 @@ export const townIsProtected: Scenario = {
   name: 'town-is-protected',
   about: 'On the grass of the town square nothing can be placed, dug, tilled or built, and the game says the land belongs to the town.',
   seed: 16,
-  start: { quest: 'roof', give: { plank: 2, hoe: 1, fence: 2 } },
+  start: { quest: 'ground', give: { plank: 2, hoe: 1, fence: 2 } },
   inputs: [
     { do: 'teleport', to: 'town.square' },
     // Grass: anywhere else a hand digs it and a hoe tills it. Here only the town's rule stands in the way.

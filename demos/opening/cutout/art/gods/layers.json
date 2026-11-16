@@ -1,0 +1,219 @@
+{
+  "shot": "gods",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m7-gods.jpg",
+  "layers": [
+    {
+      "id": "plaster-ground",
+      "file": "ground.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Mirrored empty plaster patch from the approved plate; original gold edge bands."
+    },
+    {
+      "id": "stag",
+      "file": "stag.webp",
+      "x": 515,
+      "y": 162,
+      "w": 442,
+      "h": 257,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Unbanded drawing from src/unbanded-raw.png, registered to the approved plate."
+    },
+    {
+      "id": "stag-bands",
+      "file": "stag-bands.webp",
+      "x": 515,
+      "y": 162,
+      "w": 442,
+      "h": 257,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Move with stag; same box and pivot."
+    },
+    {
+      "id": "lion",
+      "file": "lion.webp",
+      "x": 972,
+      "y": 173,
+      "w": 413,
+      "h": 269,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Unbanded drawing from src/unbanded-raw.png, registered to the approved plate."
+    },
+    {
+      "id": "lion-bands",
+      "file": "lion-bands.webp",
+      "x": 972,
+      "y": 173,
+      "w": 413,
+      "h": 269,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Move with lion; same box and pivot."
+    },
+    {
+      "id": "tortoise",
+      "file": "tortoise.webp",
+      "x": 348,
+      "y": 400,
+      "w": 408,
+      "h": 244,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Unbanded drawing from src/unbanded-raw.png, registered to the approved plate."
+    },
+    {
+      "id": "tortoise-bands",
+      "file": "tortoise-bands.webp",
+      "x": 348,
+      "y": 400,
+      "w": 408,
+      "h": 244,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Move with tortoise; same box and pivot."
+    },
+    {
+      "id": "serpent",
+      "file": "serpent.webp",
+      "x": 1149,
+      "y": 393,
+      "w": 410,
+      "h": 261,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Unbanded drawing from src/unbanded-raw.png, registered to the approved plate."
+    },
+    {
+      "id": "serpent-bands",
+      "file": "serpent-bands.webp",
+      "x": 1149,
+      "y": 393,
+      "w": 410,
+      "h": 261,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Move with serpent; same box and pivot."
+    },
+    {
+      "id": "bird",
+      "file": "bird.webp",
+      "x": 475,
+      "y": 621,
+      "w": 427,
+      "h": 246,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Unbanded drawing from src/unbanded-raw.png, registered to the approved plate."
+    },
+    {
+      "id": "bird-bands",
+      "file": "bird-bands.webp",
+      "x": 475,
+      "y": 621,
+      "w": 427,
+      "h": 246,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Move with bird; same box and pivot."
+    },
+    {
+      "id": "elephant",
+      "file": "elephant.webp",
+      "x": 968,
+      "y": 615,
+      "w": 475,
+      "h": 254,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Unbanded drawing from src/unbanded-raw.png, registered to the approved plate."
+    },
+    {
+      "id": "elephant-bands",
+      "file": "elephant-bands.webp",
+      "x": 968,
+      "y": 615,
+      "w": 475,
+      "h": 254,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Move with elephant; same box and pivot."
+    },
+    {
+      "id": "wreath",
+      "file": "wreath.webp",
+      "x": 348,
+      "y": 163,
+      "w": 1213,
+      "h": 723,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Leaves and flowers outside beast pieces; their foreground foliage travels with each beast."
+    },
+    {
+      "id": "sun",
+      "file": "sun.webp",
+      "x": 738,
+      "y": 377,
+      "w": 445,
+      "h": 356,
+      "z": 15,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    }
+  ]
+}

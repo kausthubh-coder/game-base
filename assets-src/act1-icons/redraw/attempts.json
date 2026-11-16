@@ -1,0 +1,86 @@
+{
+  "act1-weapons": [
+    {
+      "attempt": 1,
+      "kept": true,
+      "prompt": "Use case: stylized-concept. Production inventory PIXEL ART ICON SHEET, FOUR columns TWO rows, eight equal square cells, transparent background. Image 1 reference is STYLE ONLY; images 2 and 3 provide weapon identity/materials. NO lettering, grid, shadows or background. Tiny chunky 32x32 pixel icons, each whole object fits inside 28x28; CLOSED dark tinted brown outline #302529 #493335, thick enough to survive reduction, darker-than-parchment body, upper-left highlight, hard alpha, warm earth palette. Actual chunky pixels, not detailed paintings. Each object occupies same height, squat readable proportions. Row1 left to right: plain GUILD BOW stout dark brown single D curve and linen string; COPPER BOW orange reinforced limbs, broad copper-headed arrow horizontally across string connected to grip, shaggy pelt grip; SPRING BOW distinctive angular recurved limbs, two large brass spring housings with dark open slits; TUSK BOW dark heartwood angular limbs, exaggerated ivory horn tips flaring OUTWARD and olive vine grip. Transparent inside bowstrings. Row2: GUILD STAFF large circular carved wood disc teal dot, short thick diagonal shaft; COPPER STAFF wide split-petal U-shaped copper crown embracing teal core, thick pelt-wrapped shaft; BRASS STAFF broad domed lantern cage crown with cap and dark bars teal core, spring band shaft; ROOTWOOD STAFF asymmetric branching fork crown with tall ivory tusk and teal core, crooked root shaft with olive vine and leaves. Staff heads occupy top HALF of each icon, shafts short, clear unlike silhouettes. Only magic cores teal. Do not reproduce concept labels, people or palette swatches.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/gear/bow.webp",
+        "assets-src/concept/gear/staff.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    }
+  ],
+  "act1-story": [
+    {
+      "attempt": 1,
+      "kept": true,
+      "prompt": "Use case: stylized-concept. Production tiny PIXEL ART inventory icons matching Image1 original sword/bow/staff/key STYLE. Image2 concept supplies identity materials ONLY, no lettering. THREE columns ONE row three equal square cells. Whole objects centered with generous transparent margins. Genuine TRANSPARENT background no text no grid no shadows. Each is designed as exactly 28x28 chunky pixels in a 32x32 cell. CLOSED 1-2 final-pixel very dark tinted brown outline #302529 #493335 around all outer edges. Dark ochre bronze sides, medium warm limestone face DARKER than parchment, upper-left highlight only. Not pale tan shields. Left PUMP HOUSE KEYSTONE broad low TRIANGLE, blunt pointed top, straight broad bottom brass rim, large dark engraved water spiral. Middle LAMP GALLERY KEYSTONE tall narrow HEXAGON with pointed top AND bottom and vertical sides, dark bronze thick rim, simple dark hanging lantern motif. Right SEED VAULT KEYSTONE ROUND DISC thick brass rim with simple olive green two-leaf sprout. Main silhouettes MUST be triangular versus tall angular hexagon versus perfect round. No extra loops or attachments. Use tiny pixel clusters avoid illustration detail, no softly painted edges, not photoreal.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/goods/story.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    }
+  ],
+  "act1-equipment": [
+    {
+      "attempt": 1,
+      "kept": "fittings only; jackets rejected as twins",
+      "prompt": "Use case: stylized-concept. Production PIXEL ART INVENTORY SHEET five columns one row, FIVE equal square cells. Image1 style reference original game icons, images2/3 identity materials armour and fittings. Whole objects isolated transparent background. No text grid cast shadows or people. Chunky 32x32 icons fitting inside 28x28 pixel bounds. CLOSED very dark tinted brown outline #302529 #493335 one to two final pixels around ALL outer edges, body darker than parchment, top-left restrained highlight. Warm locked earth palette. Left to right: 1 CANVAS JACKET slim straight-hem short-sleeved cream canvas jacket, ochre shoulder cape, brown elbow patches and cuffs, open V neck, no wearer. Cream is medium tan so holds against parchment. 2 PADDED JACKET wide round puffy long sleeves and thick grey fur collar, quilted tan canvas panels, dark brown copper toggles, scalloped padded hem. Squat wide winter coat, very different outline to narrow flat canvas jacket. 3 PADDED GRIP moss olive padded cloth wrap partly UNROLLED, large flat rectangular flap hanging left from dark hollow rolled end on right, clear cloth scroll silhouette. 4 SPRING HILT brass capped metal spring cartridge DIAGONAL, exposed dark grey coil with THREE large separated turns and dark gaps, flat wide brass end caps, mechanical not cloth. 5 HONEY BINDING squat amber braided waxed cord binding RING seen obliquely with big transparent open centre, irregular thick crossed braids and single downward honey drip connected to bottom right. Orange dark golden shadow, unlike green unrolled cloth and diagonal metal cartridge. Minimal large pixel clusters, no tiny detail, not realistic drawings.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/gear/armour.webp",
+        "assets-src/concept/gear/fittings.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    },
+    {
+      "attempt": 2,
+      "kept": "jackets",
+      "prompt": "Use case: stylized-concept. TWO-column ONE-row tiny PIXEL ART icon sheet, genuine transparent background. Image1 original game icon style ONLY; image2 armour concept identity. Two EMPTY jackets no person, NO text grid shadows. Closed DARK tinted brown outline 1-2 FINAL pixels #302529 #493335, medium warm tan canvas cloth darker than parchment, top-left highlight, chunky 32px pixel clusters. CRITICAL silhouette difference: LEFT CANVAS JACKET shown as FLAT WIDE T-SHAPE with short straight sleeves extending HORIZONTALLY, angular square shoulders, flat hem, shallow short body. Entire jacket 28 pixels WIDE and only 18 pixels TALL. Ochre shoulder yoke, visible brown elbow patches and thin cuffs, flat unpadded tan canvas, NO quilting NO fur NO belt pouches. Right PADDED JACKET LONG NARROW WINTER SHAPE, thick rounded fur collar, sleeves hanging DOWN close to sides, long quilted body, scalloped padded hem, three copper toggles. Entire padded jacket 18 pixels WIDE and 28 pixels TALL. Long thin vertical padded coat contrasted with wide flat T-shaped lightweight jacket. Clear dark negative space beneath horizontal sleeves on left. Large transparent margins whole jackets visible. No realism, no concept painting panels.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/gear/armour.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    }
+  ],
+  "act1-farm": [
+    {
+      "attempt": 1,
+      "kept": true,
+      "prompt": "Use case: stylized-concept. Production PIXEL ART inventory icon of SHED PELT, one centered whole object genuine transparent background. Image1 is pixel style reference, image2 farm goods is identity only. Folded GREY shed beast pelt, not animal trophy: broad rectangular folded flap, clearly visible dark hollow beneath top folded grey fur layer and hanging jagged fur edges. Three big grey tufts along upper left, charcoal violet-grey body and small warm grey lining, NO beige lump. Cozy chunky tiny 32x32 game icon occupying 28x28. CLOSED dark tinted brown outline #302529 #493335 one to two FINAL pixels all around. Medium dark grey body holds on pale parchment, small warm upper-left highlights. Hard alpha, no lettering, no grid, no shadow, no background, no people. Silhouette like folded shaggy blanket with wide hollow fold. Fewer large pixel clusters, original game pixel style not a realistic illustration.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/goods/farm-goods.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    }
+  ],
+  "act1-found": [
+    {
+      "attempt": 1,
+      "kept": true,
+      "prompt": "Use case: stylized-concept. ONE tiny pixel inventory icon OLD BRASS salvaged bracket. Image1 reference is pixel style; image2 concept is object identity. Match concept curved thick brass bracket with big round through-hole in upper right, two large broken gear teeth projecting to LEFT, flat short foot at bottom left. Solid broad aged ochre brass metal body with dark copper sides, one dull olive patina patch. Hollow hole transparent. Not a thin wire or empty ring. Fill 28x28 inside 32x32 game cell with a CLOSED 1-2 final pixel DARK tinted brown outline #302529 #493335. Broad chunky pixel clusters, top-left warm highlight, hard alpha, darker than parchment. One centered isolated object with generous transparent margins, genuine transparent background. NO lettering grid shadow or ground. Do not reproduce the concept illustration detail. Clear readable mechanical salvaged part silhouette.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/goods/found.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    }
+  ],
+  "act1-kit": [
+    {
+      "attempt": 1,
+      "kept": true,
+      "prompt": "Use case: stylized-concept. Production tiny PIXEL ART inventory ICON SHEET TWO columns ONE row two equal square cells. Image1 original icons provides STYLE ONLY, image2 concept kit provides object identity. Genuine transparent background, NO text grid ground shadow or haze. Whole objects centered with generous transparent margins, hard alpha. Each reduced game cell 32x32 object fits 28x28. CLOSED DARK tinted brown outline #302529 #493335, one-two FINAL pixels; medium-dark body visible on parchment, top-left highlights, chunky pixel clusters, warm earth colours. Left QUILL STRIP a broad rolled and folded DARK GREY PELT bundle, tied with thick ochre rope, THREE thick SHORT STIFF IVORY QUILLS protrude above it as an upright fan with three separated triangular points, quills attached to pelt, dark outlines around all ivory points. Clearly a fur trap kit NOT feather bunch or a pale strip. Right LAMP POST portable lantern on short pointed wooden stake: LARGE broad rectangular brass lantern head occupying upper TWO THIRDS of icon, dark brown frame roof and handle, small ochre lit window split by dark crossbars, thick dark brown stake tapering to a point underneath. NO glow halo, do not draw long thin pole. Broad readable lantern top with little pointed stake. One connected object per cell. Squat game-icon proportions, not photoreal concept paintings.",
+      "references": [
+        "public/assets/icons/icons.png",
+        "assets-src/concept/goods/kit.webp"
+      ],
+      "tool": "built-in image_gen.imagegen"
+    }
+  ]
+}

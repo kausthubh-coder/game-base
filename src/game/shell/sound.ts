@@ -1,6 +1,7 @@
 // Starts the sound engine on the first click or key, since a browser will not let a page make sound
 // before that, and keeps the volumes from before it started. What each game event sounds like is in
 // src/game/views/core-sound.view.ts.
+import { greenhollowPalettes } from '../../content/palettes/index.ts';
 import { createAudio, type AudioSystem, type BusName } from '../../features/audio/index.ts';
 
 export const BUSES: readonly BusName[] = ['master', 'music', 'ambience', 'effects', 'voice'];
@@ -13,6 +14,8 @@ export interface Sound {
   onStart(fn: (audio: AudioSystem) => void): void;
   volume(bus: BusName): number;
   setVolume(bus: BusName, value: number): void;
+  /** Temporarily silences the world for a film without changing the player's volumes. */
+  setMuted(reason: string, muted: boolean): void;
   /** Starts the engine now. The first click or key does this by itself. */
   start(): AudioSystem | null;
   /**
@@ -29,8 +32,11 @@ export function createSound(volumes: Record<BusName, number>): Sound {
   const waiting: ((audio: AudioSystem) => void)[] = [];
   let context: AudioContext | null = null;
   let audio: AudioSystem | null = null;
+  let output: GainNode | null = null;
   /** True once a click, a key or the game asked for sound. Until then a prepared engine stays suspended. */
   let wanted = false;
+  const mutedBy = new Set<string>();
+  const effectiveVolume = (bus: BusName): number => bus === 'master' && mutedBy.size > 0 ? 0 : volumes[bus];
 
   function start(): AudioSystem | null {
     wanted = true;
@@ -41,8 +47,12 @@ export function createSound(volumes: Record<BusName, number>): Sound {
   function make(): AudioSystem | null {
     try {
       context = new AudioContext();
-      audio = createAudio(context);
-      for (const bus of BUSES) audio.setVolume(bus, volumes[bus]);
+      // Greenhollow's regions, each with its music: src/game/views/core-sound.view.ts says where the hero is.
+      output = context.createGain();
+      output.gain.value = mutedBy.size ? 0 : 1;
+      output.connect(context.destination);
+      audio = createAudio(context, { palettes: greenhollowPalettes, destination: output });
+      for (const bus of BUSES) audio.setVolume(bus, effectiveVolume(bus));
       audio.start();
       // A page the browser lets play sound at once would start it here: a prepared engine waits for the click.
       void (wanted ? context.resume() : context.suspend()).catch(() => undefined);
@@ -82,7 +92,15 @@ export function createSound(volumes: Record<BusName, number>): Sound {
 
     setVolume(bus, value) {
       volumes[bus] = Math.min(1, Math.max(0, value));
-      audio?.setVolume(bus, volumes[bus]);
+      audio?.setVolume(bus, effectiveVolume(bus));
+    },
+
+    setMuted(reason, muted) {
+      if (muted) mutedBy.add(reason);
+      else mutedBy.delete(reason);
+      audio?.setVolume('master', effectiveVolume('master'));
+      // Ownership silence is immediate; the mixer's volume glide can retain a quiet tail.
+      if (output) output.gain.value = mutedBy.size ? 0 : 1;
     },
 
     start,
@@ -94,6 +112,8 @@ export function createSound(volumes: Record<BusName, number>): Sound {
     dispose() {
       stop.abort();
       audio?.dispose();
+      output?.disconnect();
+      output = null;
       void context?.close().catch(() => undefined);
       audio = null;
       context = null;

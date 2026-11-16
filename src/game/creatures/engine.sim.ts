@@ -274,7 +274,7 @@ export function createCreatures(game: Game, kinds: readonly CreatureKind[] = CRE
     const def = kinds[k];
     const pos = { x, y, z };
     const id = `creature:${def.id}:${n}`;
-    const actor: Actor = { id, sprite: def.sprite, pos, facing: 0, anim: 'idle', visible: true, mark: '' };
+    const actor: Actor = { id, sprite: def.sprite, pos, facing: 0, anim: def.animations?.idle ?? 'idle', visible: true, mark: '' };
     const c: Creature = {
       id, kind: def.id, pos, doing: 'idle',
       def, k, n, actor,
@@ -507,7 +507,7 @@ export function createCreatures(game: Game, kinds: readonly CreatureKind[] = CRE
     }
 
     if (facing !== null) c.actor.facing = facing;
-    c.actor.anim = facing !== null ? 'walk' : 'idle';
+    c.actor.anim = facing !== null ? (def.animations?.walk ?? 'walk') : (def.animations?.idle ?? 'idle');
 
     if (def.gives && c.ready < def.gives.every) c.ready = Math.min(def.gives.every, c.ready + dt);
     if (m.toward) c.lureAge -= dt;
@@ -561,7 +561,7 @@ export function createCreatures(game: Game, kinds: readonly CreatureKind[] = CRE
           if (c.def.appears.around === 'player') remove(i);
           else if (c.doing !== 'sleep') {
             c.doing = 'sleep';
-            c.actor.anim = 'idle';
+            c.actor.anim = c.def.animations?.idle ?? 'idle';
           }
           continue;
         }

@@ -1,6 +1,6 @@
 import { treesInArea } from '../../features/world/terrain.sim.ts';
 import { pathReach, BOUNDS } from '../region/land.sim.ts';
-import { STEPS } from '../play/script.ts';
+import { HUT } from '../play/script.ts';
 import { test, expect } from 'bun:test';
 import { emptyHit } from '../../features/world/world.sim.ts';
 import { blockId } from '../../content/blocks.ts';
@@ -58,16 +58,17 @@ test('region paths and one block of verge have no tree trunks', () => {
 
 test('Continue restores felled and standing trees together with quests and the bonded pet', () => {
   const p=newPlay();
-  for (const step of STEPS) {
-    if (step.name==='harvest and replant until there are 20 wheat') break;
-    step.run(p);
-  }
+  p.advance(0.5);
+  // Past the grey wood the fox is bonded; the night's hut fells real trees.
+  p.sys.quests.skipTo('bench');
+  p.advance(0.5);
+  for (const step of HUT) step.run(p);
   const snapshot=p.save();
   const trees=JSON.parse(JSON.stringify(p.sys.trees.all()));
   expect(trees.some((t:{standing:boolean})=>!t.standing)).toBe(true);
   expect(trees.some((t:{standing:boolean})=>t.standing)).toBe(true);
   expect(p.sys.pets.all().some(t=>t.bonded)).toBe(true);
-  expect(p.sys.quests.tracked()?.id).toBe('bread');
+  expect(p.sys.quests.tracked()?.id).toBe('bench');
   const restored=loadPlay(snapshot);
   expect(restored.sys.trees.all()).toEqual(trees);
   expect(restored.sys.pets.all()).toEqual(p.sys.pets.all());
@@ -77,4 +78,16 @@ test('Continue restores felled and standing trees together with quests and the b
     restored.world.load(Math.floor(t.x/16),Math.floor(t.z/16));
     expect(restored.world.getBlock(t.x,t.y+dy,t.z)).toBe(t.standing?blockId('barrier'):0);
   }
+});
+
+test('old oak felling emits an existing trunk block and preserves rewards',()=>{
+ for(const kind of ['oldOak'] as const){
+  const p=newPlay();p.teleport({x:-130,z:-230});p.advance(.1);
+  const t=p.sys.trees.all().find(t=>t.kind===kind&&!t.protected)!;
+  expect(t).toBeDefined();
+  expect(()=>p.sys.trees.fell(t.x,t.y,t.z)).not.toThrow();
+  expect(p.count('oak_log')).toBe(Math.max(3,Math.round(4*t.size)));
+  const event=p.heard.find(e=>e.name==='block.broken');
+  expect(event?.data).toMatchObject({id:blockId('oak_log'),by:'player'});
+ }
 });

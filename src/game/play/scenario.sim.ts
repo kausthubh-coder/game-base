@@ -15,7 +15,7 @@ export interface Start {
   /** `quests.skipTo`: the quests before this one are passed over, with what finishing them would have left. */
   quest?: QuestId;
   /** Items put in the bag. A tool the bag already holds is not given twice. */
-  give?: Readonly<Record<ItemId, number>>;
+  give?: Readonly<Partial<Record<ItemId, number>>>;
 }
 
 /** Something that must be true, and whether it is. */
@@ -55,7 +55,7 @@ export function begin(seed: number, start?: Start, remember?: number): Play {
     p.sys.quests.skipTo(start.quest);
     p.advance(0.5);
   }
-  for (const [id, count] of Object.entries(start?.give ?? {})) {
+  for (const [id, count] of Object.entries(start?.give ?? {}) as [ItemId, number][]) {
     if (p.sys.items.get(id).tool && p.count(id) > 0) continue;
     if (p.sys.inventory.add(id, count) > 0) throw new Error(`the bag has no room for ${count} ${id} at the start`);
   }

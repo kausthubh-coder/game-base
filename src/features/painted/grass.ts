@@ -5,10 +5,16 @@
 // The land is cut into cells of one chunk. A cell grows its grass once, at the fineness its distance from the
 // hero asks for, and keeps it. Each kind of thing is one draw call: when the cells in reach change, their
 // kept blades are copied into it. So walking costs a copy, and only new land costs growing.
+//
+// Each kind of land grows its own (LAND_KINDS): long in the marsh, short and pale in the grey, thin on the
+// hills, few flowers off the meadow and none where it is grey. Two painted cards grow with it, in their own
+// colours: ferns where the old forest is, reeds round the marsh's pools.
 import * as THREE from 'three';
+import type { LandKind } from '../../content/land.ts';
 import { QUALITY, type Level } from '../../content/quality.ts';
+import { POOL_AT } from './nature.ts';
 import { fbm, smoothstep, type Land } from './land.ts';
-import { paint } from './paint.ts';
+import { paint, shared } from './paint.ts';
 import { cardHooks } from './trees.ts';
 import type { Textures } from './textures.ts';
 
@@ -23,9 +29,17 @@ export interface Grass {
 const CELL = 16;
 /** How fine a cell's grass is, by its distance from the hero: fine blades near, broad strokes far. */
 const RINGS = [
-  { to: 34, spacing: 0.5, width: [0.11, 0.19], height: [0.28, 0.6], tufts: 22, flowers: 26 },
-  { to: 66, spacing: 1.0, width: [0.22, 0.35], height: [0.36, 0.8], tufts: 9, flowers: 12 },
-  { to: 112, spacing: 2.3, width: [0.5, 0.75], height: [0.5, 1.0], tufts: 0, flowers: 0 },
+  { to: 34, spacing: 0.5, width: [0.11, 0.19], height: [0.28, 0.6], tufts: 22, flowers: 26, cards: 26 },
+  { to: 66, spacing: 1.0, width: [0.22, 0.35], height: [0.36, 0.8], tufts: 9, flowers: 12, cards: 14 },
+  { to: 112, spacing: 2.3, width: [0.5, 0.75], height: [0.5, 1.0], tufts: 0, flowers: 0, cards: 0 },
+] as const;
+/**
+ * The painted cards: which painting, the kind of land it grows in and how many of a ring's `cards` it takes
+ * there, `rim` for a marsh pool's edge only, and its height in meters.
+ */
+const CARDS = [
+  { painting: 'fern', kind: 'oldForest', share: 1, rim: false, size: [0.9, 1.6] },
+  { painting: 'reeds', kind: 'marsh', share: 1, rim: true, size: [1.3, 2.1] },
 ] as const;
 /** The finest of the first `rings` rings that `far` is within `slack` blocks of, or -1. A loop, not findIndex: it runs for every cell every frame. */
 function ringWithin(far: number, slack: number, rings: number): number {
@@ -70,6 +84,8 @@ interface Cell {
   blades: Float32Array; bladeColors: Float32Array;
   tufts: Float32Array[]; tuftColors: Float32Array[]; tuftCards: Float32Array[];
   flowers: Float32Array; flowerColors: Float32Array; flowerCards: Float32Array;
+  /** The painted cards, a list for each of CARDS. */
+  cards: Float32Array[]; cardColors: Float32Array[]; cardCards: Float32Array[];
 }
 
 /** One draw call that holds what many cells grew. */
@@ -125,6 +141,30 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
   };
   const flowerMaterial = paint({ ...cardHooks([0.5, 0.5]), map: textures.flower, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.1, bands: 0.2, wrap: 0.6 });
   flowerMaterial.alphaToCoverage = true;
+  // A painted card stands on its lower edge, faces the camera and leans in the wind like a tuft. It keeps its
+  // painting's colours, toned a little toward the ground's, and drained by grey (`aCard.w`).
+  const paintedMaterial = (map: THREE.Texture): THREE.Material => {
+    const material = paint({
+      map, alphaTest: 0.5, side: THREE.DoubleSide, keepNormal: true, brush: 0.2, bands: 0.25, wrap: 0.4, dapple: 1,
+      uniforms: { uGreyLeaf: shared.uGreyLeaf, uGreyDrain: shared.uGreyDrain },
+      vertexPars: 'attribute vec4 aCard; varying vec2 vCard; varying float vCardGrey;',
+      vertexWorld: 'float gust = paintGust(paintWorldPos.xz);',
+      vertexView: /* glsl */ `
+        vec2 corner = vec2((uv.x - 0.5) * (aCard.y > 0.5 ? -1.0 : 1.0), uv.y) * aCard.x;
+        float across = (viewMatrix * vec4(uWind.x, 0.0, uWind.y, 0.0)).x;
+        corner.x += across * (0.04 + 0.3 * gust + 0.03 * sin(uTime * 2.1 + aCard.z * 30.0)) * uv.y * uv.y * aCard.x;
+        mvPosition.xy += corner;
+        vCard = vec2(uv.y, gust);
+        vCardGrey = aCard.w;`,
+      fragmentPars: 'uniform vec3 uGreyLeaf; uniform float uGreyDrain; varying vec2 vCard; varying float vCardGrey;',
+      fragmentAlbedo: /* glsl */ `
+        vec3 own = texture2D(map, vMapUv).rgb;
+        diffuseColor.rgb = own * mix(vec3(1.0), vColor.rgb / max(dot(vColor.rgb, vec3(0.3, 0.59, 0.11)), 0.05) * 0.45, 0.22) * mix(0.75, 1.08, vCard.x);
+        diffuseColor.rgb = mix(diffuseColor.rgb, uGreyLeaf * dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11)) / dot(uGreyLeaf, vec3(0.3, 0.59, 0.11)), vCardGrey * uGreyDrain);`,
+    });
+    material.alphaToCoverage = true;
+    return material;
+  };
 
   function batch(geometry: THREE.BufferGeometry, material: THREE.Material, capacity: number, cards: boolean, name: string): Batch {
     const mesh = new THREE.InstancedMesh(geometry, material, capacity);
@@ -147,6 +187,11 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
   const blades = batch(bladeGeometry(), bladeMaterial, 70000, false, 'blades');
   const tufts = textures.tufts.map((mask, i) => batch(cardGeometry(), tuftMaterial(mask), 2600, true, `tufts-${i}`));
   const flowers = batch(cardGeometry(), flowerMaterial, 5200, true, 'flowers');
+  const cardBatches = CARDS.map((c) => batch(cardGeometry(), paintedMaterial(textures.paintings[c.painting]), 2400, true, `cards-${c.painting}`));
+  // What each kind of land does to the grass, read once per blade from the land.
+  const ground = land.ground, nature = new Float32Array(ground.size);
+  const of = (f: (k: LandKind) => number) => (r: Float32Array): number => ground.sum(r, f);
+  const thickOf = of((k) => k.thick), tallOf = of((k) => k.tall), flowersOf = of((k) => k.flowers), tuftsOf = of((k) => k.tufts);
 
   const cells = new Map<number, Cell>();
   // A chunk's key, small enough to stay a small integer: a larger number would be a new object at every lookup.
@@ -168,8 +213,14 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
         if (!(bare === bare) || !(h === h)) continue;
         const open = 1 - bare;
         if (open < 0.5 || r() > open) continue;
-        // Long grass grows in patches and stays short beside bare ground.
-        const tall = 0.55 + 1.05 * tallness(px, pz);
+        land.natureAt(px, pz, nature);
+        const grey = nature[ground.GREY] as number;
+        // A random number is drawn only where the kind thins the grass, so the meadow grows as it always has.
+        const thick = thickOf(nature);
+        if (thick < 0.999 && r() > thick) continue;
+        // Long grass grows in patches and stays short beside bare ground. The kind of land makes it longer or
+        // shorter, and grey stunts it.
+        const tall = (0.55 + 1.05 * tallness(px, pz)) * tallOf(nature) * (1 - 0.35 * grey);
         const width = ring.width[0] + r() * (ring.width[1] - ring.width[0]);
         const height = (ring.height[0] + r() * (ring.height[1] - ring.height[0])) * tall * (0.5 + 0.5 * open);
         m.compose(at.set(px, h - 0.03, pz), q.setFromAxisAngle(up, r() * Math.PI * 2), size.set(width, height, width));
@@ -182,6 +233,9 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
     for (let i = 0, tries = 0; i < ring.tufts && tries < ring.tufts * 6; tries++) {
       const px = x0 + r() * CELL, pz = z0 + r() * CELL, bare = land.bareAt(px, pz), h = land.heightAt(px, pz);
       if (!(bare === bare) || bare > 0.15 || r() > 0.25 + 0.75 * tallness(px, pz)) continue;
+      land.natureAt(px, pz, nature);
+      const tuftShare = tuftsOf(nature);
+      if (tuftShare < 0.999 && r() > tuftShare) continue;
       const which = i % tufts.length;
       m.makeTranslation(px, h - 0.04, pz);
       for (let k = 0; k < 16; k++) (tuftData[which] as number[]).push(m.elements[k] as number);
@@ -197,6 +251,10 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
       if (fbm(px / 13, pz / 13, 2, 77) < 0.56) continue;
       const bare = land.bareAt(px, pz), h = land.heightAt(px, pz);
       if (!(bare === bare) || bare > 0.2) continue;
+      // Nothing flowers where it is grey.
+      land.natureAt(px, pz, nature);
+      const bloom = flowersOf(nature) * (1 - (nature[ground.GREY] as number));
+      if (bloom < 0.999 && r() > bloom) continue;
       const lead = Math.floor(fbm(px / 30, pz / 30, 1, 78) * PETALS.length), pick = r() < 0.7 ? lead : Math.floor(r() * PETALS.length);
       m.makeTranslation(px, h + 0.22 + r() * 0.3, pz);
       for (let k = 0; k < 16; k++) flowerData.push(m.elements[k] as number);
@@ -204,7 +262,22 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
       flowerColorData.push(petal.r, petal.g, petal.b);
       flowerCardData.push(0.2 + r() * 0.16, r() * 6.283, r(), 0.5);
     }
+    const cardData: number[][] = CARDS.map(() => []), cardColorData: number[][] = CARDS.map(() => []), cardCardData: number[][] = CARDS.map(() => []);
+    for (let i = 0; i < ring.cards * 3; i++) {
+      const px = x0 + r() * CELL, pz = z0 + r() * CELL, which = i % CARDS.length, card = CARDS[which] as (typeof CARDS)[number];
+      if (!land.natureAt(px, pz, nature)) continue;
+      const share = ground.share(nature, card.kind), pool = nature[ground.POOL] as number;
+      if (r() > share * card.share * 0.34) continue;
+      const bare = land.bareAt(px, pz), h = land.heightAt(px, pz);
+      if (card.rim ? pool < POOL_AT - 0.07 || pool > POOL_AT + 0.004 : bare > 0.5) continue;
+      m.makeTranslation(px, h - 0.05, pz);
+      for (let k = 0; k < 16; k++) (cardData[which] as number[]).push(m.elements[k] as number);
+      land.colorAt(px, pz, color);
+      (cardColorData[which] as number[]).push(color.r, color.g, color.b);
+      (cardCardData[which] as number[]).push((card.size[0] + r() * (card.size[1] - card.size[0])) * (1 + ringIndex * 0.3), r(), r(), nature[ground.GREY] as number);
+    }
     return {
+      cards: cardData.map((d) => new Float32Array(d)), cardColors: cardColorData.map((d) => new Float32Array(d)), cardCards: cardCardData.map((d) => new Float32Array(d)),
       ring: ringIndex, stamp: land.stampAt(cx, cz),
       blades: new Float32Array(bladeData), bladeColors: new Float32Array(bladeColorData),
       tufts: tuftData.map((d) => new Float32Array(d)), tuftColors: tuftColorData.map((d) => new Float32Array(d)), tuftCards: tuftCardData.map((d) => new Float32Array(d)),
@@ -224,6 +297,8 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
       n += count;
     }
     b.mesh.count = n;
+    // An empty batch would still cost a draw call.
+    b.mesh.visible = n > 0;
     // Only the copies drawn go to the graphics chip. The batch holds room for the finest grass at ultra, so
     // sending all of it would cost several megabytes each time the hero steps into a new cell.
     const send = (attribute: THREE.InstancedBufferAttribute): void => {
@@ -239,6 +314,7 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
   let lastX = NaN, lastZ = NaN, stale = true, triangles = 0;
   const bladeParts: Float32Array[] = [], bladeColorParts: Float32Array[] = [], flowerParts: Float32Array[] = [], flowerColorParts: Float32Array[] = [], flowerCardParts: Float32Array[] = [];
   const tuftParts: Float32Array[][] = tufts.map(() => []), tuftColorParts: Float32Array[][] = tufts.map(() => []), tuftCardParts: Float32Array[][] = tufts.map(() => []);
+  const cardParts: Float32Array[][] = CARDS.map(() => []), cardColorParts: Float32Array[][] = CARDS.map(() => []), cardCardParts: Float32Array[][] = CARDS.map(() => []);
 
   return {
     group,
@@ -270,18 +346,20 @@ export function createGrass(land: Land, textures: Textures, quality: Level): Gra
       if (!stale) return;
       stale = false;
       bladeParts.length = bladeColorParts.length = flowerParts.length = flowerColorParts.length = flowerCardParts.length = 0;
-      for (const list of [...tuftParts, ...tuftColorParts, ...tuftCardParts]) list.length = 0;
+      for (const list of [...tuftParts, ...tuftColorParts, ...tuftCardParts, ...cardParts, ...cardColorParts, ...cardCardParts]) list.length = 0;
       for (const [k, cell] of cells) {
         const cx = (k >> 14) - 8192, cz = (k & 16383) - 8192;
         if (Math.abs(cx - fx) > reach + 1 || Math.abs(cz - fz) > reach + 1) { cells.delete(k); continue; }
         bladeParts.push(cell.blades); bladeColorParts.push(cell.bladeColors);
         flowerParts.push(cell.flowers); flowerColorParts.push(cell.flowerColors); flowerCardParts.push(cell.flowerCards);
+        cell.cards.forEach((part, i) => { (cardParts[i] as Float32Array[]).push(part); (cardColorParts[i] as Float32Array[]).push(cell.cardColors[i] as Float32Array); (cardCardParts[i] as Float32Array[]).push(cell.cardCards[i] as Float32Array); });
         cell.tufts.forEach((part, i) => { (tuftParts[i] as Float32Array[]).push(part); (tuftColorParts[i] as Float32Array[]).push(cell.tuftColors[i] as Float32Array); (tuftCardParts[i] as Float32Array[]).push(cell.tuftCards[i] as Float32Array); });
       }
       fill(blades, bladeParts, bladeColorParts, null);
       tufts.forEach((b, i) => fill(b, tuftParts[i] as Float32Array[], tuftColorParts[i] as Float32Array[], tuftCardParts[i] as Float32Array[]));
       fill(flowers, flowerParts, flowerColorParts, flowerCardParts);
-      triangles = blades.mesh.count * 3 + (flowers.mesh.count + tufts.reduce((sum, b) => sum + b.mesh.count, 0)) * 2;
+      cardBatches.forEach((b, i) => fill(b, cardParts[i] as Float32Array[], cardColorParts[i] as Float32Array[], cardCardParts[i] as Float32Array[]));
+      triangles = blades.mesh.count * 3 + (flowers.mesh.count + tufts.reduce((sum, b) => sum + b.mesh.count, 0) + cardBatches.reduce((sum, b) => sum + b.mesh.count, 0)) * 2;
     },
     setQuality(next) {
       level = QUALITY[next];

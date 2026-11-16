@@ -3,7 +3,7 @@
 // landings on as game events. Nothing here draws.
 import { createBus, type GameEvent } from '../../engine/events.ts';
 import type { Vec3 } from '../../engine/types.ts';
-import { HERO_STEP, HeroBody } from '../../features/hero/index.ts';
+import { HERO_STEP, HeroBody, type HeroInput } from '../../features/hero/index.ts';
 import type { World } from '../../features/world/index.ts';
 import type { Actor, Game } from '../api.sim.ts';
 import { facingOf } from '../move.sim.ts';
@@ -28,6 +28,14 @@ export interface PlayerRig {
   /** Sets the drawn position between the last two steps. `blend` is 0 to 1, `dt` the seconds since the last frame. */
   blend(blend: number, dt?: number): void;
   teleport(x: number, y: number, z: number, facing?: number): void;
+  /** Push out of an obstacle while retaining motion along it and vertical movement. */
+  correctHorizontal(x: number, z: number): void;
+  /**
+   * A view that moves the hero itself for a moment (a dodge, a push, a faint) sets this. It is called before
+   * every step of the body with what the keys asked for, and may change that input and the body. Null, the
+   * default, leaves the body to the keys. The fight lab is the one user.
+   */
+  drive: ((input: HeroInput, body: HeroBody) => void) | null;
 }
 
 export interface PlayerOptions {
@@ -93,10 +101,11 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
   }
   write();
 
-  return {
+  const rig: PlayerRig = {
     body,
     position,
     actor,
+    drive: null,
 
     step(yaw, faceView = false) {
       // The way the camera looks along the ground. Yaw 0 looks north and grows counter-clockwise.
@@ -108,6 +117,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       input.moveX = ((fx * forward - fz * right) / length) * pace;
       input.moveZ = ((fz * forward + fx * right) / length) * pace;
       input.jump = !busy && keys.jump;
+      rig.drive?.(input, body);
       previous.x = body.x; previous.y = body.y; previous.z = body.z;
       const stood = body.grounded;
       body.step(input);
@@ -136,6 +146,19 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       position.y = drawn = target + carry;
     },
 
+    correctHorizontal(x, z) {
+      const dx = x - body.x, dz = z - body.z;
+      const length = Math.hypot(dx, dz);
+      if (length === 0) return;
+      const nx = dx / length, nz = dz / length;
+      const inward = Math.min(0, body.vx * nx + body.vz * nz);
+      body.vx -= inward * nx; body.vz -= inward * nz;
+      body.x = x; body.z = z;
+      previous.x += dx; previous.z += dz;
+      position.x += dx; position.z += dz;
+      write();
+    },
+
     teleport(x, y, z, facing) {
       body.teleport(x, y, z);
       if (facing !== undefined) body.facing = facing;
@@ -144,6 +167,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       write();
     },
   };
+  return rig;
 }
 
 export { HERO_STEP };

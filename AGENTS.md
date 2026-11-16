@@ -19,7 +19,7 @@ Read before a large change:
 
 ## Commands
 
-Every task in a new worktree starts with the `worktree-game` skill. Say done only after the `verify-game` skill. Ship only with the `ship-game` skill, when Kausthubh says so.
+Every task in a new worktree starts with the `worktree-game` skill. Run `bun tools/setup.mjs` to repair it, `bun tools/doctor.mjs --quick` to inspect it, and `bun tools/remove-worktree.mjs <path>` from another checkout to remove a merged worktree. Say done only after the `verify-game` skill. Ship only with the `ship-game` skill, when Kausthubh says so.
 
 ## Skills
 
@@ -27,6 +27,7 @@ They are in `.agents/skills`. Load the one that fits before you start.
 
 | The task | Skill |
 |---|---|
+| A story chapter, an earned progression replay, or chapter acceptance | `verify-chapter` |
 | A new worktree, or packages, keys or a port look wrong | `worktree-game` |
 | Build or change a rule, a system, something drawn, a panel | `make-feature` |
 | Add a check, test something, or a bug was reported | `test-game` |
@@ -43,9 +44,13 @@ What to build next, one line a task: `docs/backlog.md`.
 
 | Command | What it does |
 |---|---|
-| `bun tools/doctor.mjs` | Makes this checkout run: packages, keys, Chrome, a port of its own. Prints the port to use. |
+| `bun tools/setup.mjs` | Repair packages and dev env, link skills, and reserve this checkout's port. |
+| `bun tools/doctor.mjs` | Inspect packages, env, Chrome, port reservation and checks without repairing them. |
 | `bun run check` | Types, the `.sim.ts` rule, every test, the Worker's types, the Convex tests |
 | `bun run verify` | Every check there is, about two minutes. `--full` adds the slow browser plays, `--list` names the parts. |
+| `bun tools/place-check.ts [place ...]` | Checks every place on the land with no browser, in about 10 seconds: old blocks under a model, a model floating, buried or in water, a size that is not the model's. `--blocks` names what still writes old blocks. |
+| `bun tools/look-beside.mjs <moment ...\|all>` | Shoots the act's moments from the game's own camera beside their approved concept sheets (`docs/act1-look.md`) |
+| `bun tools/slot.mjs [--look] -- <command>` | The machine-wide queue. Plain: one of three heavy slots (check and verify use it by themselves). `--look`: one of two slots for a short job that makes pictures to look at, stopped after 5 minutes. `--status` shows both. |
 | `bun run lint` | Biome lint. The formatter is not applied to the code yet. |
 | `bun tools/sim.ts scenarios` | Plays the rules with no browser. Also `bot --seed <n> --steps <n>` and `--replay <seed> --until <step>`. |
 | `bun tools/play.mjs start` | One Chrome for this worktree to play in, through the debug door or like a person, with `act`, `look`, `film` and `note` to see and report (`tools/play/README.md`) |
@@ -105,7 +110,7 @@ docs/                  plans, briefs, the style sheet, the asset contract
 - Check your own work with `bun tools/typecheck.mjs <feature>` as well as `bun run check`, since another agent's half-written code can fail the full check.
 - Put screenshots and renders in `.artifacts/<feature>/`.
 
-Ports. `bun tools/doctor.mjs` gives each worktree one of its own in 5400 to 5999. These are fixed:
+Ports. `bun tools/setup.mjs` reserves each worktree a port in 5400 to 5999. These are fixed:
 
 | Port | What |
 |---|---|
@@ -116,3 +121,16 @@ Ports. `bun tools/doctor.mjs` gives each worktree one of its own in 5400 to 5999
 | 5525, 5526 | `tools/play.mjs` and `tools/shots.mjs` when `PLAY_PORT` is not set |
 | 5540, 5541 | `wrangler dev` and its inspector |
 | 5577 | `play-cloud-save` when `PLAY_PORT` is not set |
+
+## Workflow enforcement
+
+| Rule | Enforcement |
+|---|---|
+| Chapter replay starts after rules, presentation and budget checks pass | `createChapterRun.preflight` in `tools/workflow/chapter.mjs` |
+| Chapter acceptance requires a successful replay and every required evidence file | `createChapterRun.accept`, with file hashes and immutable input checkpoint |
+| Replay arrival includes the requested height; interactions use authored reach and the exact target | `tools/workflow/replay.mjs`, used by `tools/play-act1.mjs` |
+| Each checkout keeps its port while idle; dev uses that reservation | `tools/setup.mjs`, the common git port registry, and `tools/dev.mjs` |
+| Formal coverage matches the current code | `bun tools/formal-sync.mjs`, locally and in CI |
+| These checks must detect the earlier failure patterns | `bun test tools/doctor.test.mjs tools/workflow` and `bun tools/workflow/break-checks.mjs`, locally and in CI |
+
+Chapter scope, route choice, screenshot judgment and which scene ids belong to a chapter remain judgment calls in `verify-chapter`. A passing build-stroke model proves only its named build rules.

@@ -1,0 +1,5 @@
+# A test gets 60 seconds, not bun's 5. Many agents share this machine, and under their load the prop and region
+# tests (which build every model and a strip of land) took 10 to 40 seconds and failed as "timed out" all day on
+# 2026-11-12. A test that hangs still fails; it just takes a minute to say so.
+[test]
+timeout = 60000

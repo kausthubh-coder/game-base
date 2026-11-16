@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import { World } from '../../features/world/world.sim.ts';
 import type { GameEvents } from '../api.sim.ts';
+import { HOME_RECIPES } from '../content/people.ts';
 import { createKernel } from '../kernel.sim.ts';
 import { installFakes } from './fakes.ts';
 import { install } from './index.sim.ts';
@@ -19,26 +20,57 @@ const WORKBENCH = { x: 3, y: 0, z: 0 };
 test('the recipes are the ones in the design', () => {
   const { crafting } = setup();
   const lines = crafting.recipes().map((r) => `${r.station}: ${r.needs.map((n) => `${n.count} ${n.id}`).join(' + ')} -> ${r.makes.count} ${r.makes.id}`);
-  expect(lines).toEqual([
+  expect(lines.slice(0, 8)).toEqual([
     'hand: 1 oak_log -> 4 plank',
     'hand: 4 plank -> 1 workbench',
+    'hand: 2 plank -> 1 spade',
     'workbench: 6 plank + 3 fiber -> 1 bed',
     'workbench: 8 plank -> 1 chest',
-    'workbench: 1 plank + 1 moss_tuft -> 1 lamp',
+    'workbench: 1 plank + 1 moss_fiber -> 1 lamp',
     'workbench: 2 plank + 1 fiber -> 4 fence',
-    'workbench: 4 plank + 2 moss_tuft -> 1 sprinkler',
+    'workbench: 1 plank -> 2 post',
   ]);
+  // Each machine part needs one farm good, as chapter 30's table of parts says.
+  expect(lines).toContain('workbench: 6 plank + 1 old_brass -> 1 waterwheel');
+  expect(lines).toContain('workbench: 1 copper + 1 frog_slick -> 1 sprinkler');
+  expect(lines).toContain('workbench: 1 copper + 1 gear_spring -> 1 pusher');
+  expect(lines).toContain('workbench: 1 glow_dust + 1 wax -> 1 switch_lamp');
+  expect(lines).toContain('workbench: 3 quill + 1 shed_pelt -> 1 quill_strip');
+  expect(lines).toContain('workbench: 1 frog_slick + 1 honey -> 1 salve');
 });
+
+// The settlement's buildings come last (content/people.ts), and src/game/settlement tests them.
+const HOMES = HOME_RECIPES.map((r) => r.id);
+const KNOWN = ['plank', 'workbench', 'spade'];
+const AT_BENCH = ['bed', 'chest', 'lamp', 'fence', 'post', 'bee_box', 'hatch', 'clapper', 'rope_ladder', 'chute', 'collector_chest', 'pusher',
+  'quill_strip', 'lamp_post_kit', 'slick_patch', 'clapper_kit', 'pusher_plate', 'salve'];
 
 test('available() lists hand recipes, and station recipes only within 5 blocks of the station', () => {
   const { crafting, placeables, game } = setup();
-  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench']);
+  expect(crafting.available().map((r) => r.id)).toEqual(KNOWN);
   placeables.stand('workbench', WORKBENCH);
-  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench', 'bed', 'chest', 'lamp', 'fence', 'sprinkler']);
+  expect(crafting.available().map((r) => r.id)).toEqual([...KNOWN, ...AT_BENCH, ...HOMES]);
   game.player.pos.x = -2;
-  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench', 'bed', 'chest', 'lamp', 'fence', 'sprinkler']);
+  expect(crafting.available().map((r) => r.id)).toEqual([...KNOWN, ...AT_BENCH, ...HOMES]);
   game.player.pos.x = -2.5;
-  expect(crafting.available().map((r) => r.id)).toEqual(['plank', 'workbench']);
+  expect(crafting.available().map((r) => r.id)).toEqual(KNOWN);
+});
+
+test('each vault teaches its family of parts, and Hobb the travel meals', () => {
+  const { crafting, placeables, game, bag } = setup();
+  placeables.stand('workbench', WORKBENCH);
+  bag.add('copper', 2);
+  bag.add('frog_slick', 1);
+  expect(crafting.canMake('sprinkler')).toBe(false);
+  expect(crafting.available().some((r) => r.id === 'sprinkler')).toBe(false);
+  game.flags.set('quest.pump.done', true);
+  expect(crafting.available().filter((r) => ['waterwheel', 'gear_shaft', 'lever', 'sprinkler'].includes(r.id))).toHaveLength(4);
+  expect(crafting.make('sprinkler')).toBe(true);
+  expect(crafting.available().some((r) => r.id === 'sensor' || r.id === 'harvester_arm' || r.id === 'travel_meal')).toBe(false);
+  game.flags.set('quest.gallery.done', true);
+  game.flags.set('quest.seeds.done', true);
+  game.flags.set('settler.hobb', true);
+  expect(crafting.available().filter((r) => ['sensor', 'switch_lamp', 'harvester_arm', 'saw_arm', 'travel_meal'].includes(r.id))).toHaveLength(5);
 });
 
 test('the bed recipe needs a workbench nearby', () => {

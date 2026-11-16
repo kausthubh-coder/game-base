@@ -43,20 +43,22 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
   mkdirSync(journal, { recursive: true });
 
   let browser, context, page, cdp, entries = [], mode = opt('mode', 'door'), seed = 7, named = null;
+  /** More of the address, such as `opening=deed` to start at a step of grant day: `--query`, or a recording's `query`. */
+  let query = String(opt('query', ''));
   /** Console errors not yet reported: `do`, `shot` and `replay` fail on them once, then they are gone. */
   let errors = [];
   /** Errors, warnings and failed requests since the last look. */
   let problems = [];
   let step = 0, lastState = null, lastPicture = null, lastStep = null;
   const recording = resolve(out, 'recordings', `${Date.now()}-${process.pid}.json`);
-  const save = () => writeFileSync(recording, JSON.stringify({ version: 1, mode, seed, size: `${viewport.width}x${viewport.height}`, inputs: entries }, null, 2));
+  const save = () => writeFileSync(recording, JSON.stringify({ version: 1, mode, seed, ...(query ? { query } : {}), size: `${viewport.width}x${viewport.height}`, inputs: entries }, null, 2));
   const state = () => page.evaluate(() => window.__game?.state() ?? null);
   const clean = () => { if (errors.length) throw new Error(errors.splice(0).join('\n')); };
 
   /** A clean page. `view` is a recording's own size: its clicks are in that size's pixels. */
-  async function fresh(nextMode, nextSeed = 7, view = viewport) {
+  async function fresh(nextMode, nextSeed = 7, view = viewport, nextQuery = query) {
     if (!['door', 'human'].includes(nextMode)) throw new Error('mode must be door or human');
-    mode = nextMode; seed = nextSeed;
+    mode = nextMode; seed = nextSeed; query = nextQuery;
     if (existsSync(pidFile)) {
       const info = JSON.parse(readFileSync(pidFile, 'utf8'));
       if (info.pid === process.pid) writeFileSync(pidFile, JSON.stringify({ ...info, mode, seed }, null, 2));
@@ -75,7 +77,7 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     page.on('response', (res) => { if (res.status() >= 400) problems.push(`HTTP ${res.status()}: ${res.url()}`); });
     if (pageFile) await page.goto(pathToFileURL(pageFile).href);
     else {
-      await page.goto(`http://127.0.0.1:${port}/?hold=1&quality=high&seed=${seed}`);
+      await page.goto(`http://127.0.0.1:${port}/?hold=1&quality=high&seed=${seed}${query ? `&${query}` : ''}`);
       await page.waitForFunction(() => window.__game !== undefined);
     }
   }
@@ -244,7 +246,7 @@ export async function serveSession({ root, out, socket, pidFile, opt, flag, requ
     replay: async (args) => {
       const scenario = JSON.parse(readFileSync(resolve(args[0]), 'utf8'));
       // A recording made before sizes were kept was made at the default size.
-      await fresh(scenario.mode, scenario.seed, parseSize(scenario.size)); entries = []; save();
+      await fresh(scenario.mode, scenario.seed, parseSize(scenario.size), scenario.query ?? ''); entries = []; save();
       for (const s of scenario.inputs) await input(s, { replaying: true });
       clean();
       return { pass: true, inputs: entries.length, ...(blind ? {} : { state: await state() }) };

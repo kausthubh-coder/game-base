@@ -11,12 +11,16 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
+      - run: bun tools/formal-sync.mjs
       - run: bun run check
-      - run: bun test tools/doctor.test.mjs
+      - run: bun test tools/doctor.test.mjs tools/workflow
+      - run: bun tools/workflow/break-checks.mjs
       - run: bun run lint
 
   # A push to main that passes the check goes live: the database's functions first, then the game's

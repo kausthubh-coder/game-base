@@ -1,0 +1,328 @@
+{
+  "tool": "image_gen.imagegen",
+  "status": "ISSUES: no new sheets accepted or registered",
+  "attemptLimit": 3,
+  "referenceBaseCommit": "8bf758581821a1626320cb3edde57f88174e5ecf",
+  "actions": {
+    "cut": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Input 1 accepted Braid idle/walk is the exact character identity, head size, proportions and costume to preserve. Input 2 accepted Braid tool action shows continuity. Input 3 concept option D lower right and pixel mock D defines identity. Input 4 Copper cut sheet is pose and weapon reference ONLY, never copy its orange hair, face or clothes. Generate STRICT FOUR columns THREE rows, twelve equal square cells, whole sheet 4:3. Rows front, back with absolutely no face, RIGHT profile. Columns sword windup behind shoulder, distinct forward strike across body, follow-through low opposite side, recovery upright guard. Match the short silver iron sword with brown grip in Copper cut, no axe. Clearly different blade and arm silhouette at windup/strike/follow/recovery in ALL directions. Same olive square face, clipped scalp, long connected brown braid, pale sage jacket, cream shirt, charcoal legs, brown boots/satchel/brass key. Same head size and torso size as Braid every frame, final body ~110 pixels in 128-square cell. Fit sword diagonally into margin without shrinking body. Feet planted stable, allow intentional arm and shoulder lean. Warm upper-left light, chunky crisp pixels, closed dark tinted brown outline 1-2 pixels at target, no black outline, gradients, pale rim, shadow, floor, text or grid. Genuine transparent background. Ample equal margins, no parts crossing cells. Recovery returns naturally to accepted Braid idle.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-cut.png"
+        ],
+        "raw": "cut-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-c6da4c59-430d-4d83-84f5-428f463f2c23.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Back body is101-102px vs109-111px idle"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Input 1 accepted Braid idle/walk is the exact character identity, head size, proportions and costume to preserve. Input 2 accepted Braid tool action shows continuity. Input 3 concept option D lower right and pixel mock D defines identity. Input 4 Copper cut sheet is pose and weapon reference ONLY, never copy its orange hair, face or clothes. Generate STRICT FOUR columns THREE rows, twelve equal square cells, whole sheet 4:3. Rows front, back with absolutely no face, RIGHT profile. Columns sword windup behind shoulder, distinct forward strike across body, follow-through low opposite side, recovery upright guard. Match the short silver iron sword with brown grip in Copper cut, no axe. Clearly different blade and arm silhouette at windup/strike/follow/recovery in ALL directions. Same olive square face, clipped scalp, long connected brown braid, pale sage jacket, cream shirt, charcoal legs, brown boots/satchel/brass key. Same head size and torso size as Braid every frame, final body ~110 pixels in 128-square cell. Fit sword diagonally into margin without shrinking body. Feet planted stable, allow intentional arm and shoulder lean. Warm upper-left light, chunky crisp pixels, closed dark tinted brown outline 1-2 pixels at target, no black outline, gradients, pale rim, shadow, floor, text or grid. Genuine transparent background. Ample equal margins, no parts crossing cells. Recovery returns naturally to accepted Braid idle. Correct the previous attempt: the entire BACK row was 8-10 percent too short compared with accepted idle, despite front and right matching standing height. Generate the back body and bare skull at exactly the same scale as accepted Braid back idle. All three rows must have the same standing head-to-sole height, approximately 110 final pixels. Recovery back must not be shorter. Keep back bare skull same width as accepted idle. Do not reproduce the smaller back figures from the previous output. Use only attached accepted references.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-cut.png"
+        ],
+        "raw": "cut-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-326e350b-3d85-451e-acec-6f5237cf6ea4.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Back follow/recovery head band narrows"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Input 1 accepted Braid idle/walk is the exact character identity, head size, proportions and costume to preserve. Input 2 accepted Braid tool action shows continuity. Input 3 concept option D lower right and pixel mock D defines identity. Input 4 Copper cut sheet is pose and weapon reference ONLY, never copy its orange hair, face or clothes. Generate STRICT FOUR columns THREE rows, twelve equal square cells, whole sheet 4:3. Rows front, back with absolutely no face, RIGHT profile. Columns sword windup behind shoulder, distinct forward strike across body, follow-through low opposite side, recovery upright guard. Match the short silver iron sword with brown grip in Copper cut, no axe. Clearly different blade and arm silhouette at windup/strike/follow/recovery in ALL directions. Same olive square face, clipped scalp, long connected brown braid, pale sage jacket, cream shirt, charcoal legs, brown boots/satchel/brass key. Same head size and torso size as Braid every frame, final body ~110 pixels in 128-square cell. Fit sword diagonally into margin without shrinking body. Feet planted stable, allow intentional arm and shoulder lean. Warm upper-left light, chunky crisp pixels, closed dark tinted brown outline 1-2 pixels at target, no black outline, gradients, pale rim, shadow, floor, text or grid. Genuine transparent background. Ample equal margins, no parts crossing cells. Recovery returns naturally to accepted Braid idle. Correct the previous attempt: the entire BACK row was 8-10 percent too short compared with accepted idle, despite front and right matching standing height. Generate the back body and bare skull at exactly the same scale as accepted Braid back idle. All three rows must have the same standing head-to-sole height, approximately 110 final pixels. Recovery back must not be shorter. Keep back bare skull same width as accepted idle. Do not reproduce the smaller back figures from the previous output. Use only attached accepted references. Final correction: preserve accepted Braid bare head width and height to within TWO target pixels in every direction. Accepted back idle has a broad 49-pixel head/braid silhouette; do not narrow it to 45 pixels. Accepted front has ~53-54 and right ~55 including braid. Weapons may extend beyond head but bare skull and braid must not change size. Back follow-through and recovery must retain broad square back head and long waist braid of accepted idle, not a narrow tapered skull. Same scale across all twelve cells.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-cut.png"
+        ],
+        "raw": "cut-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-ab933665-9dac-4c93-a053-e18e1046b3d7.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Narrowed/rounded face and changing right skull"
+      }
+    ],
+    "cut-back": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Reverse sword cut matching Copper reverse sheet. Columns low opposite-side windup / reverse across-body strike / high follow-through across shoulder / upright guard recovery. Keep blade silver iron with brown grip. Must read as reverse of forward cut, not duplicate.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-cut-back.png"
+        ],
+        "raw": "cut-back-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-c1a835e8-d69e-4461-a6ef-69c2f528541b.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Back skull too narrow"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Reverse sword cut matching Copper reverse sheet. Columns low opposite-side windup / reverse across-body strike / high follow-through across shoulder / upright guard recovery. Keep blade silver iron with brown grip. Must read as reverse of forward cut, not duplicate. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale. ",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-cut-back.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "cut-back-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-b9e1b29d-231d-4e72-b438-3c9fb26d3051.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Back skull too narrow, profile body taller"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Reverse sword cut matching Copper reverse sheet. Columns low opposite-side windup / reverse across-body strike / high follow-through across shoulder / upright guard recovery. Keep blade silver iron with brown grip. Must read as reverse of forward cut, not duplicate.  Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  Correct back row: bare back scalp silhouette must be49 target pixels, not43-44. Keep right profile same110px body as idle, not114.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-cut-back.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "cut-back-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-335f4278-3ac0-4451-b083-c2d634344134.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Extra lateral braid in back view and altered skull"
+      }
+    ],
+    "moves": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four distinct poses: dodge crouched low with knees bent and torso leaning, hurt recoiling with pained face and hand across chest, reach open hand extended, calm same hand holding the small bright teal Mark. Keep head size constant even during crouch. Back shows no face. No weapons.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-moves.png"
+        ],
+        "raw": "moves-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-6feb0d20-5991-4107-a379-1ab3b04bf35f.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Larger rounder head on dodge"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four distinct poses: dodge crouched low with knees bent and torso leaning, hurt recoiling with pained face and hand across chest, reach open hand extended, calm same hand holding the small bright teal Mark. Keep head size constant even during crouch. Back shows no face. No weapons. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale. ",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-moves.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "moves-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-09efb4e1-8040-46ea-8bf0-ccdcaf383eea.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Dodge/reach skull expands; head scale changes"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four distinct poses: dodge crouched low with knees bent and torso leaning, hurt recoiling with pained face and hand across chest, reach open hand extended, calm same hand holding the small bright teal Mark. Keep head size constant even during crouch. Back shows no face. No weapons.  Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  Correct dodge/hurt skull: preserve accepted head shape and size instead of enlarging scalp and cheeks. Keep crouch low through bent knees, not a larger head. Hurt can change expression but not skull.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-moves.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "moves-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-3d307bb3-9632-451e-a446-63d79aa3771a.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Dodge/hurt skull and face change; head grows out of crouch"
+      }
+    ],
+    "call": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four poses matching Copper call exactly: holding small teal orb in raised hand for throw windup, throw release with empty open outstretched hand, calling with hand cupped near mouth and other palm open, pointing horizontally. Frame2 calling must be generated even though current fight fallback skips it.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-call.png"
+        ],
+        "raw": "call-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-d9d35e1f-2fe3-4127-ad90-bd0db1f5cdba.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Rounder face, narrowed back head"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four poses matching Copper call exactly: holding small teal orb in raised hand for throw windup, throw release with empty open outstretched hand, calling with hand cupped near mouth and other palm open, pointing horizontally. Frame2 calling must be generated even though current fight fallback skips it. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale. ",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-call.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "call-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-c9170f03-acdc-44e0-95fb-50b682c79cc3.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Standard review back head46px vs49px idle"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four poses matching Copper call exactly: holding small teal orb in raised hand for throw windup, throw release with empty open outstretched hand, calling with hand cupped near mouth and other palm open, pointing horizontally. Frame2 calling must be generated even though current fight fallback skips it. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  Final correction: back head measured by the standard review is46px wide vs accepted49px, with no weapon occluding it. Keep exact49px back bare scalp/hair width, same head height, long braid. Do not narrow or round the skull. Retain all4 poses and exact identity. Front and right must remain same accepted proportions.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-call.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "call-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-fd5ea42c-4393-48fe-95ec-8d15d25eb9e6.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Front head broadens to58-59px vs53px idle, back53-54px vs49px; changed skull"
+      }
+    ],
+    "bow": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four archery poses: nock an arrow on short curved brown wood bow, full draw with string pulled to cheek and arrow level, release with open fingers and bow extended, lower bow beside leg. Exactly Copper weapon design. Never shrink body for bow. Keep quiver with arrows. String and arrow must be readable.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-bow.png"
+        ],
+        "raw": "bow-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-db18b288-5229-41e5-8604-a14b3212d2e0.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Narrowed right/back head, outline fringe"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four archery poses: nock an arrow on short curved brown wood bow, full draw with string pulled to cheek and arrow level, release with open fingers and bow extended, lower bow beside leg. Exactly Copper weapon design. Never shrink body for bow. Keep quiver with arrows. String and arrow must be readable. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale. ",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-bow.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "bow-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-245194a5-a64a-40fa-9083-d32665d5190d.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Narrowed lower-bow head"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four archery poses: nock an arrow on short curved brown wood bow, full draw with string pulled to cheek and arrow level, release with open fingers and bow extended, lower bow beside leg. Exactly Copper weapon design. Never shrink body for bow. Keep quiver with arrows. String and arrow must be readable. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  Correct bare head independent of bow: right profile and back lower-bow frames were too narrow. Keep full broad49px back and55px right head/braid silhouette, front54px; arrow or bow must not be used to disguise a smaller head. Keep nose and jaw as square as accepted idle.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-bow.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "bow-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-8181643d-a1c1-4470-9433-105a4d3835fb.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Narrow skull, round blank face at release/lower"
+      }
+    ],
+    "staff": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four staff poses matching Copper: raise short wooden staff with brass ring head and teal centre, cast staff extended diagonally forward, hold staff gathered toward chest and tilted up with teal light concentrated at head, burst staff planted upright with light near ground. No large spell haze or giant new weapon.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-staff.png"
+        ],
+        "raw": "staff-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-84e704e5-8721-4547-8e88-305dfdcb8358.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Burst staff below sole support, head drift"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four staff poses matching Copper: raise short wooden staff with brass ring head and teal centre, cast staff extended diagonally forward, hold staff gathered toward chest and tilted up with teal light concentrated at head, burst staff planted upright with light near ground. No large spell haze or giant new weapon. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  In burst all boots must actually touch the same ground row as staff tip. Do not place orb below the soles or float the body.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-staff.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "staff-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-b2c287cc-e88d-4c2a-a4f1-7abd7b6ff0b2.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Head shape drift remains despite improved ground tip"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns THREE rows; twelve equal square cells. Rows front, back with NO face, RIGHT profile. Four staff poses matching Copper: raise short wooden staff with brass ring head and teal centre, cast staff extended diagonally forward, hold staff gathered toward chest and tilted up with teal light concentrated at head, burst staff planted upright with light near ground. No large spell haze or giant new weapon. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  Final correction: preserve bare head width exactly in back and right. Keep skull broad and square as accepted idle rather than narrow round chibi face. All three burst staff tips must be level with boot soles, no lower.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-staff.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "staff-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-8798684d-5109-42fc-b01e-897462729460.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Narrow back skull and altered side jaw"
+      }
+    ],
+    "camp": [
+      {
+        "attempt": 1,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns NINE rows equal square cells. Rows0/1/2 front/back/right SIT, two subtly different seated knees-up frames in columns0,1; columns2,3 fully empty. Rows3/4/5 front/back/right LOOK toward woods, two seated head-turn frames columns0,1; columns2,3 empty. Rows6/7/8 front/back/right RISE four stages across columns seated / low crouch / halfway straightening / standing. Keep head and torso physical scale identical to accepted idle, sitting is lower because legs bend, never shrink whole person. Full braid, satchel and boots in every pose. Last rise frame is placeholder for exact accepted idle frame zero that processing will reuse; generate real preceding seated and rising stages. No weapons or chairs.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-camp.png"
+        ],
+        "raw": "camp-attempt-1.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-e33a9466-1016-4399-b4d5-cdbf8843824e.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Uniform slicing crosses figures; refused at body scale"
+      },
+      {
+        "attempt": 2,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns NINE rows equal square cells. Rows0/1/2 front/back/right SIT, two subtly different seated knees-up frames in columns0,1; columns2,3 fully empty. Rows3/4/5 front/back/right LOOK toward woods, two seated head-turn frames columns0,1; columns2,3 empty. Rows6/7/8 front/back/right RISE four stages across columns seated / low crouch / halfway straightening / standing. Keep head and torso physical scale identical to accepted idle, sitting is lower because legs bend, never shrink whole person. Full braid, satchel and boots in every pose. Last rise frame is placeholder for exact accepted idle frame zero that processing will reuse; generate real preceding seated and rising stages. No weapons or chairs. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  The previous grid failed: occupied figures crossed equal cell boundaries. STRICT portrait sheet ratio4:9, every figure centred at its actual equal grid-cell centre, twelve unused cells completely empty. Do not squeeze the left two characters together or crop bottom row.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-camp.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "camp-attempt-2.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-8e7a3501-b3b5-4ebb-80a0-9cee2ec66b5e.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Seated/rising head proportions differ from accepted idle; abrupt endpoint change"
+      },
+      {
+        "attempt": 3,
+        "prompt": "Use case: identity-preserve. Production pixel RPG sheet of EXACT accepted Braid character. Input1 accepted Braid idle is identity and scale; input2 accepted Braid tool shows continuity; input3 concept lower right option D defines square olive face, athletic medium build, clipped brown scalp, long brown braid, sage jacket, cream shirt, charcoal pants, brown boots/satchel/brass key. Input4 Copper corresponding sheet is ONLY pose/weapon reference. Never copy Copper identity. Preserve same bare head width/height and costume as accepted Braid in EVERY frame and direction, no smaller back row, no narrowed skull. Head about40px, standing body110px at final128. Uniform body scale, no body shrinking to fit weapon. Warm top-left light, chunky crisp pixel clusters, dark tinted brown closed1-2px outline, no black or pale rim, no gradients, floor, shadow, text or grid. Genuine transparent background, generous padding, complete figures. STRICT FOUR columns NINE rows equal square cells. Rows0/1/2 front/back/right SIT, two subtly different seated knees-up frames in columns0,1; columns2,3 fully empty. Rows3/4/5 front/back/right LOOK toward woods, two seated head-turn frames columns0,1; columns2,3 empty. Rows6/7/8 front/back/right RISE four stages across columns seated / low crouch / halfway straightening / standing. Keep head and torso physical scale identical to accepted idle, sitting is lower because legs bend, never shrink whole person. Full braid, satchel and boots in every pose. Last rise frame is placeholder for exact accepted idle frame zero that processing will reuse; generate real preceding seated and rising stages. No weapons or chairs. Identity correction: enlarged final input is the EXACT ACCEPTED raster head and body. Copy that broad square olive face with narrow serious eyes, clipped sides and scalp contour into the new action organically. Do not redesign into a round blank chibi head, move the facial features toward the centre, narrow the back skull or thicken braid clusters. Preserve its exact head-to-torso proportions. The previous attempt did not preserve the character closely enough. Keep all required poses and body scale.  Final correction: seated and crouching heads in attempt2 were SMALLER than accepted idle, and grow on rising. Keep identical40px head height and identical directional head widths while knees fold. Sit body should be lower only through legs, never shrink torso/head. Exact equal4x9 grid, complete figures with margin, each occupied figure centred in its cell.",
+        "references": [
+          "public/assets/sprites/hero-braid.png",
+          "public/assets/sprites/hero-braid-swing.png",
+          "assets-src/concept/people-home/hero.webp",
+          "public/assets/sprites/hero-camp.png",
+          "assets-src/hero-braid/actions/accepted-idle-reference-3x.png"
+        ],
+        "raw": "camp-attempt-3.png",
+        "toolOutput": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e as /Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-74c4596f-8174-4413-bbe8-f98c087a9687.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link.",
+        "verdict": "REJECTED",
+        "defect": "Seated head wider/squatter than idle, profile sit59-61px vs54px idle; endpoint snaps to accepted shape"
+      }
+    ]
+  }
+}

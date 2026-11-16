@@ -15,11 +15,13 @@ function book() {
   return { kernel, game, almanac: game.systems.almanac, heard };
 }
 
-const PEOPLE = ['tamsin', 'maren', 'odo', 'gus', 'mira', 'wren', 'juniper', 'brack'];
+const PEOPLE = ['tamsin', 'maren', 'gus', 'wren'];
 
 test('the book has a page for each creature, the pet, the crop and the eight people, all hidden at first', () => {
   const { almanac } = book();
-  expect(almanac.pages().map((p) => p.id)).toEqual(['mossling', 'leaftail', 'wheat', 'lanternfly', ...PEOPLE]);
+  expect(almanac.pages().map((p) => p.id)).toEqual([
+    'mossling', 'burrower', 'gearling', 'frog', 'bee', 'thistlehog', 'rootsnare', 'bramble', 'leaftail', 'wheat', 'lanternfly', ...PEOPLE,
+  ]);
   for (const page of almanac.pages()) {
     expect(page.seen).toBe(false);
     expect(page.complete).toBe(false);
@@ -37,11 +39,13 @@ test('the book has a page for each creature, the pet, the crop and the eight peo
   expect(almanac.page('nobody')).toBeUndefined();
 });
 
-test('the mossling page has the exact words of the design', () => {
+test('the mossling page has the exact words of the field book', () => {
   const { almanac } = book();
   expect(almanac.page('mossling')!.facts).toEqual([
-    { id: 'needs', column: 'needs', text: 'Shade and mossy stone', known: false },
-    { id: 'gives', column: 'gives', text: 'A moss tuft, when the ground under it is damp', known: false },
+    { id: 'comes', column: 'needs', text: 'Comes to: damp mossy stone in shade.', known: false },
+    { id: 'fears', column: 'needs', text: 'Fears: dry ground and the open sun.', known: false },
+    { id: 'gives', column: 'gives', text: 'Gives: moss fiber, 10 a day each.', known: false },
+    { id: 'proved', column: 'gives', text: 'Proved: a fed pair brings a third.', known: false },
   ]);
 });
 
@@ -54,17 +58,22 @@ test('learn sends fact.learned, and page.completed on the last fact, each once',
   almanac.learn('mossling', 'gives');
   expect(heard).toHaveLength(1);
 
-  almanac.learn('mossling', 'needs');
+  almanac.learn('mossling', 'comes');
+  almanac.learn('mossling', 'fears');
+  expect(almanac.page('mossling')!.complete).toBe(false);
+  almanac.learn('mossling', 'proved');
   expect(almanac.page('mossling')!.complete).toBe(true);
   expect(heard.slice(1)).toEqual([
-    { name: 'fact.learned', data: { page: 'mossling', column: 'needs', fact: 'needs' } },
+    { name: 'fact.learned', data: { page: 'mossling', column: 'needs', fact: 'comes' } },
+    { name: 'fact.learned', data: { page: 'mossling', column: 'needs', fact: 'fears' } },
+    { name: 'fact.learned', data: { page: 'mossling', column: 'gives', fact: 'proved' } },
     { name: 'page.completed', data: { page: 'mossling' } },
   ]);
 
-  almanac.learn('mossling', 'needs');
+  almanac.learn('mossling', 'comes');
   almanac.learn('mossling', 'no-such-fact');
   almanac.learn('no-such-page', 'needs');
-  expect(heard).toHaveLength(3);
+  expect(heard).toHaveLength(5);
 });
 
 test('meet shows a page with its facts still hidden', () => {
@@ -73,7 +82,7 @@ test('meet shows a page with its facts still hidden', () => {
   almanac.meet('no-such-page');
   const page = almanac.page('lanternfly')!;
   expect(page.seen).toBe(true);
-  expect(page.facts.map((f) => f.known)).toEqual([false, false]);
+  expect(page.facts.map((f) => f.known)).toEqual([false, false, false, false]);
   expect(heard).toEqual([]);
 });
 
@@ -98,8 +107,8 @@ test('a person is met when a talk with them starts, and their facts come from th
 
 test('a flag teaches a person who was never met, and a flag that says "wants" fills the needs column', () => {
   const { game, almanac } = book();
-  game.flags.set('fact.brack.wants', true);
-  const page = almanac.page('brack')!;
+  game.flags.set('fact.wren.wants', true);
+  const page = almanac.page('wren')!;
   expect(page.seen).toBe(true);
   expect(page.facts.find((f) => f.column === 'needs')!.known).toBe(true);
   expect(page.facts.find((f) => f.column === 'gives')!.known).toBe(false);
@@ -174,7 +183,7 @@ test('watering teaches the wheat fact when the event names the plant block above
 
 test('save then load keeps met pages and known facts, and says nothing', () => {
   const first = book();
-  first.almanac.learn('mossling', 'needs');
+  for (const fact of ['comes', 'fears', 'proved']) first.almanac.learn('mossling', fact);
   first.almanac.learn('wheat', 'gives');
   first.almanac.learn('wheat', 'needs');
   first.almanac.learn('wheat', 'time');
@@ -190,7 +199,7 @@ test('save then load keeps met pages and known facts, and says nothing', () => {
     const page = second.almanac.page(id)!;
     return { seen: page.seen, complete: page.complete, known: page.facts.filter((f) => f.known).map((f) => f.id) };
   };
-  expect(summary('mossling')).toEqual({ seen: true, complete: false, known: ['needs'] });
+  expect(summary('mossling')).toEqual({ seen: true, complete: false, known: ['comes', 'fears', 'proved'] });
   expect(summary('wheat')).toEqual({ seen: true, complete: true, known: ['needs', 'time', 'gives'] });
   expect(summary('maren')).toEqual({ seen: true, complete: false, known: [] });
   expect(summary('gus')).toEqual({ seen: false, complete: false, known: [] });

@@ -39,8 +39,7 @@ the town's buildings, the hero, Tamsin, the villagers and the leaftail.
 
 - 2D pixel sheets for the hero, 8 townspeople, the leaftail and creatures: `public/assets/sprites`, listed in
   `public/assets/manifest.json`. `.agents/skills/make-sprite` is how they were made.
-- 3D models of the same 14 characters on one shared rig, toon-shaded: `?chars=models`. Their Blender package
-  is `~/dev/sandbox/game-look-test/design/img/3d/cast-dot/` (sources, scripts, renders).
+- The game uses 2D sprites for all characters. The former `?chars=models` option and Settings switch have been removed. Historical cast-model authoring sources remain in `~/dev/sandbox/game-look-test/design/img/3d/cast-dot/`; they are not a game rendering option.
 - Tree, rock and bush models from Blender scripts in `tools/models/`; code-built props in
   `src/features/props/builders`. `.agents/skills/make-3d-asset` covers both.
 - Soft shadows, bloom, haze, colour grade and water from the merged look work.

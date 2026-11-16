@@ -1,0 +1,76 @@
+{
+  "line": {
+    "npc": "custodian",
+    "name": "The Custodian",
+    "portrait": "custodian",
+    "face": "custodian",
+    "voice": "custodian",
+    "text": "A thousand years and sixty-one days late. I counted. There was nothing else to do.",
+    "choices": [],
+    "kind": "staged",
+    "scene": 12
+  },
+  "sight": [],
+  "actors": [
+    {
+      "id": "player",
+      "sprite": "hero",
+      "anim": "idle",
+      "pos": {
+        "x": -12.662954910253791,
+        "y": 22,
+        "z": -260.550005457136
+      },
+      "foot": {
+        "x": 673.2832454191838,
+        "y": 478.89624303691033
+      },
+      "face": {
+        "x": 672.7406505227092,
+        "y": 310.5192262181115
+      },
+      "chest": {
+        "x": 672.9738114383321,
+        "y": 382.8732783228943
+      },
+      "box": {
+        "left": 611.4239829438047,
+        "right": 734.0573181016136,
+        "top": 310.5192262181115,
+        "bottom": 478.89624303691204
+      },
+      "depth": -16.93240551173264,
+      "inFrame": true
+    },
+    {
+      "id": "npc:custodian",
+      "sprite": "custodian-wake",
+      "anim": "idle",
+      "pos": {
+        "x": -11.5,
+        "y": 22.4,
+        "z": -261.5
+      },
+      "foot": {
+        "x": 692.1760110186787,
+        "y": 329.24319487304837
+      },
+      "face": {
+        "x": 692.2802685819554,
+        "y": 293.2832654033941
+      },
+      "chest": {
+        "x": 692.2204046037467,
+        "y": 313.93121042049137
+      },
+      "box": {
+        "left": 645.2051068898941,
+        "right": 739.473061225391,
+        "top": 272.996963950611,
+        "bottom": 329.24319487305013
+      },
+      "depth": -17.926854349786982,
+      "inFrame": true
+    }
+  ]
+}

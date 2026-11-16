@@ -40,8 +40,12 @@ const STYLE = /* css */ `
 /* The pointer is a cross while build mode is on. The keys hide it during a drag that turns the camera. */
 canvas.bd-on { cursor: crosshair; }
 @media (prefers-reduced-motion: reduce) { .ui-book .bd-bar, .ui-book .bd-chip { transition: none; } }
-/* Narrow screens keep the bar to its first line. */
-@container gu (width < 720px) { .ui-book .bd-keys { display: none; } }
+/* Keep the action words readable above the quick slots on narrow screens. */
+@container gu (width < 720px) {
+  .ui-book .bd-keys { display: none; }
+  .ui-book .bd-bar { box-sizing: border-box; width: max-content; max-width: calc(100% - 16px); flex-direction: column; gap: 4px; white-space: normal; text-align: center; }
+  .ui-book .bd-what { min-width: 0; overflow-wrap: anywhere; }
+}
 `;
 
 /** What the bar says the held item does, by the kind of stroke. */

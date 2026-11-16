@@ -1,0 +1,45 @@
+{
+  "base": "9161b86",
+  "branch": "act1-concept-parts",
+  "status": "ISSUES",
+  "scope_check": "PASS",
+  "sheets": [
+    {
+      "sheet": "cutting.webp",
+      "bytes": 219532,
+      "size_check": "PASS",
+      "opened_and_visually_checked": true
+    },
+    {
+      "sheet": "farms.webp",
+      "bytes": 347988,
+      "size_check": "PASS",
+      "opened_and_visually_checked": true
+    },
+    {
+      "sheet": "hands.webp",
+      "bytes": 252864,
+      "size_check": "PASS",
+      "opened_and_visually_checked": true
+    },
+    {
+      "sheet": "light.webp",
+      "bytes": 232890,
+      "size_check": "PASS",
+      "opened_and_visually_checked": true
+    },
+    {
+      "sheet": "moving.webp",
+      "bytes": 223144,
+      "size_check": "PASS",
+      "opened_and_visually_checked": true
+    },
+    {
+      "sheet": "water.webp",
+      "bytes": 291058,
+      "size_check": "PASS",
+      "opened_and_visually_checked": true
+    }
+  ],
+  "notes": "See README for painting caption issues and unresolved design defaults. No runtime assets changed."
+}

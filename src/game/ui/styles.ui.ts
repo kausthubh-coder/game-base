@@ -252,11 +252,12 @@ export const STYLES = /* css */ `
 .gu-ready::before { content: ''; position: absolute; top: 7px; right: 7px; z-index: 1; width: 8px; height: 8px; background: var(--gold-bright); transform: rotate(45deg); box-shadow: 0 0 6px rgb(240 212 138 / 0.9); }
 /* The detail column: the thing large on a warm sky, then its name, how many, its use and what it says of itself. */
 .gu-detail { display: flex; flex-direction: column; align-self: center; height: min(100%, 600px); min-height: 0; overflow: hidden; border-radius: 16px; color: var(--ink); background: var(--paper-light); box-shadow: inset 0 0 0 1px var(--gold), 0 10px 30px rgb(0 0 0 / 0.4); }
-.gu-detail-art { position: relative; display: grid; place-items: center; flex: 0 0 46%; min-height: 150px; background: radial-gradient(70% 80% at 35% 25%, #f6d79a, #d79b52 55%, #9c6b3a); box-shadow: inset 0 -1px 0 var(--gold); }
+/* The picture gives way first: on a short screen it shrinks so the recipe's needs are never cut. */
+.gu-detail-art { position: relative; display: grid; place-items: center; flex: 0 1 46%; min-height: 96px; background: radial-gradient(70% 80% at 35% 25%, #f6d79a, #d79b52 55%, #9c6b3a); box-shadow: inset 0 -1px 0 var(--gold); }
 .gu-detail-art::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 78% 22%, rgb(255 250 230 / 0.6) 0 1.5px, transparent 2.5px), radial-gradient(circle at 20% 70%, rgb(255 250 230 / 0.5) 0 1px, transparent 2px), radial-gradient(circle at 66% 78%, rgb(255 250 230 / 0.45) 0 1px, transparent 2px); pointer-events: none; }
 .gu-detail-art .gu-pic { filter: drop-shadow(0 8px 10px rgb(60 30 10 / 0.45)); }
 .gu-detail-art-empty { background: radial-gradient(70% 80% at 35% 25%, var(--paper-2), var(--paper-3)); }
-.gu-detail-text { display: grid; gap: 8px; align-content: start; min-height: 0; overflow: auto; padding: 20px 26px 16px; }
+.gu-detail-text { display: grid; gap: 8px; align-content: start; flex: 0 0 auto; min-height: 0; overflow: auto; padding: 20px 26px 16px; }
 .gu-detail > .gu-empty { padding: 20px 26px; text-align: center; }
 .gu-detail-name { font-family: var(--display); font-size: 30px; font-weight: 650; line-height: 1.1; }
 .gu-detail-times { font-family: 'Nunito', sans-serif; font-size: 20px; color: var(--ink-2); }
@@ -352,6 +353,12 @@ export const STYLES = /* css */ `
 .gu-quest-done { background: transparent; }
 .gu-quest-done .gu-quest-title { font-size: 17px; }
 .gu-quest-done .gu-quest-state { color: var(--done); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; }
+.gu-quest-chapter { margin: 0 0 2px; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--bronze); }
+.gu-quest-tracked { box-shadow: inset 0 0 0 1.5px var(--gold), 0 0 12px rgb(211 188 142 / 0.35); }
+.gu-quest-following { margin-left: auto; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: var(--bronze); }
+.gu-quest-follow { margin-left: auto; min-height: 36px; padding: 0 16px; font-size: 14px; }
+.gu-step-open .gu-step-mark { background: var(--gold); border-color: var(--bronze); }
+.gu-step-hint { grid-column: 2 / -1; margin-top: -2px; font-size: 14px; color: var(--ink-2); text-wrap: pretty; }
 
 /* ---- menus: pause, settings, the end ---- */
 .gu-menu { display: grid; gap: 10px; width: 320px; max-width: 100%; }
@@ -438,6 +445,17 @@ export const STYLES = /* css */ `
 .gu-plate .gu-menu-note { text-align: left; color: var(--glass-ink-2); text-shadow: 0 1px 2px rgb(10 12 20 / 0.8); }
 .gu-plate .gu-btn:not(.gu-primary):not(:disabled) { background: rgb(22 26 38 / 0.6); }
 .gu-plate .gu-btn:disabled { color: rgb(246 241 231 / 0.45); background: rgb(22 26 38 / 0.35); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.25); }
+.gu-title-name { display: grid; gap: 14px; }
+.gu-chapter .gu-title-act { display: flex; align-items: center; gap: 0.7em; font: 800 15px/1 'Nunito', sans-serif; letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold-bright); }
+.gu-chapter .gu-title-act::before { content: ''; width: 9px; height: 9px; background: var(--gold-bright); transform: rotate(45deg); box-shadow: 0 0 8px rgb(240 212 138 / 0.7); }
+.gu-plate .gu-title-begin { min-height: 56px; font-size: 20px; }
+.gu-plate .gu-title-note { margin-top: calc(var(--s3) * -1); }
+.gu-plate .gu-title-quiet { min-height: 44px; justify-self: start; padding-inline: var(--s5); }
+.gu-title-foot { display: flex; gap: var(--s3); }
+.gu-title-round { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; color: var(--gold-bright); background: rgb(22 26 38 / 0.6); border: 0; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--glass-line), var(--glass-shadow); cursor: pointer; }
+.gu-title-round > * { width: 26px; height: 26px; filter: brightness(1.5); }
+.gu-title-round:hover { background: rgb(22 26 38 / 0.8); box-shadow: inset 0 0 0 1px var(--gold-bright), 0 0 12px rgb(240 212 138 / 0.35); }
+.gu-title-round:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
 
 /* ---- over the game: prompt, hints, toasts, the ring. Night glass with a gold hairline, so the world shows around them. ---- */
 .gu-over { position: absolute; inset: 0; }

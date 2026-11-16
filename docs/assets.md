@@ -144,8 +144,14 @@ The sprite pipeline writes it. The game never guesses a file name.
 }
 ```
 
-- **Sprites.** One sheet per character. Each row is one animation seen from one direction, and each column is one frame. `rows` names the row for `front`, `back` and `side`. The side view faces right. An animation with one direction lists only `front`.
-- **`anchor`** is the pixel in a frame where the feet touch the ground. **`worldHeight`** is how tall one frame is in blocks.
+- **Sprites.** A character's first sheet has its idle and walk. An action or pose sheet is `<character>-<set>`
+  (`hero-swing`, `hero-camp`, `custodian-wake`), and a recolour of the same body is `<character>-<form>`
+  (`fox-blighted`). Each row is one animation seen from one direction, and each column is one frame. `rows` names
+  the row for `front`, `back` and `side`. The side view faces right. An animation with one direction lists only
+  `front`.
+- **`anchor`** is the pixel in a frame where the feet touch the ground. **`worldHeight`** is how tall one frame is
+  in blocks, so a figure drawn `d` pixels tall in a frame `f` pixels high stands `d / f * worldHeight` blocks. Every
+  sheet of one character stands the same height.
 - **Blocks.** One atlas of square tiles. A tile name maps to a list of cells, `[column, row]`. More than one cell means variants, and the game picks one by position.
 - **Icons.** One sheet of square tiles, each named.
 - Paths are relative to `public/assets/`. Every image is a PNG with a transparent background where it needs one.
@@ -154,7 +160,7 @@ The sprite pipeline writes it. The game never guesses a file name.
 Additional manifest sections use the same PNG contract:
 
 - `icons.sheets.<set>` has `tile`, `sheet`, and `names`, with one `[column,row]` per icon.
-- `portraits` has `tile:128`, `sheet`, and `names`.
+- `portraits` has `tile:128`, `sheet`, and `names`. Its atlas has three columns and may grow by whole rows. Act 1 names have `-calm`, `-glad`, and `-troubled` expression keys; the bare name selects calm. `bun tools/sprites/people-world.mjs` rebuilds the cast and these portraits from retained generated sources in `assets-src/people-world/`. The original nine portrait cells remain at their original coordinates.
 - `crops` has `tile:32`, `sheet`, and `names`, with a list of cells per crop's stages.
 - `ui` maps image names to PNG paths.
 - `materials` has `tile:32`, `sheet`, and `names`. A material is drawn over a frozen tile of `blocks.atlas` when the game loads: `MATERIALS` in `src/game/shell/art.ts` maps the tile to the material (today `oak_plank` to `oak_boards`). The atlas file and its baseline stay as they were approved.
@@ -162,6 +168,39 @@ Additional manifest sections use the same PNG contract:
 `sprites.hero-swing` is a separate action sheet. Its `tool` animation uses rows 0 front,
 1 back and 2 right-facing side, three frames at 9 fps, frame 128-square, anchor `[64,120]`,
 world height 2. `sprites.hero` remains approved and unchanged.
+
+## One style, as data
+
+Three files in `assets-src/` say how the 2D set is drawn and who is in it. The tools in `tools/art/` read them, and
+no tool keeps a copy of a value from them.
+
+| File | Holds | Changed by |
+|---|---|---|
+| `art-style.json` | Frame and anchor by kind (`person` 128 and `[64,120]`, `creature` 96 and `[48,88]`, `giant` 192 or 384), the hero's 64 pixels a block, the outline ramp, the light's side, the grounds the review pictures use, and `limits`: the most a sheet may be off each rule | The 2D lead, on purpose, with the reason in the commit |
+| `art-contract.json` | `characters`: each one's `kind`, `concept` sheet and `crop`, `stated` height (its metres or blocks and the hero's on that sheet), its action `sheets` and recolour `variants`, and the flags `flies`, `mixed`, `glow`. `poses`: the names an animation may have. `wanted`: poses the act asks for and no sheet has | Whoever adds a character or a sheet |
+| `art-ledger.json` | For each asset as audited: the rules it breaks (`known`), the hash it had (`sha`), a `grade`, how often it is `seen`, what the `eyes` saw | `bun tools/art/check.mjs --ledger` (the lead's audit) and `--settle <key>` (when a redraw passes) |
+
+| Command | Does |
+|---|---|
+| `bun tools/art/check.mjs [names]` | Every sheet, portrait and icon against the style and the contract. A sheet whose file and manifest entry match its ledger entry may break the rules listed there; a new or changed one passes every rule and has an answered review. `--list` is the redraw list, `--poses` the wanted poses. Part of `bun tools/verify-assets.mjs` |
+| `bun tools/art/review.mjs <sheet> --quick` | The look after every change: the sheet to scale beside the hero, its concept, every frame. No browser, a second |
+| `bun tools/art/review.mjs <sheet> [--before <ref>]` | The review: the sheet before, its reference and the sheet now, with the rubric file `assets-src/art-reviews/<sheet>.md`. No browser. `--world --url <game>` in the look lane adds it standing in the game |
+| `bun tools/art/see.mjs [--only ...]` | Contact sheets of everything, in `.artifacts/art/see/` |
+| `bun tools/art/repair.mjs <sheet> --height / --anchor / --defringe` | What a tool can put right without drawing |
+
+The rules and their fixes are in `.agents/skills/make-sprite/check-failures.md`; the audit that filled the ledger is
+`docs/act1-2d-audit.md`.
+
+Portrait colour ranking counts distinct characters from `art-contract.json`.
+An action or variant contributes its character's closest competing head, but
+does not add another competitor. The portrait's own similarity still uses its
+base sprite. This prevents added action sheets from manufacturing new identity
+failures. The rank and similarity limits remain in `art-style.json`; the contact
+sheet and checker use the same calculation. A changed ranking is a diagnostic
+correction, not proof that an existing portrait's visual defects were repaired.
+
+A scene asks for a pose as `{ sprite, anim }` with a stand-in (`src/game/content/cutscenes.ts`), so a pose sheet
+is drawn the day it merges and nothing breaks before. Its animation names come from `poses` in the contract.
 
 ## The interface kit
 
@@ -188,7 +227,7 @@ from `assets-src/models/town/` (`--rebuild` re-exports the `.blend` sources
 first). The town view fetches them only as the hero nears Hollowmere, so they
 are not part of the first load.
 
-The whole of `public/assets` must stay under 24 MB.
+The whole of `public/assets` must stay under 30 MB.
 
 ## The cast
 
@@ -230,8 +269,11 @@ tools/sound.ts` makes them ahead of time with ElevenLabs' sound effects model (`
 - **Kept out of the game.** `assets-src/sound/report.json` (each prompt, its hash and its measures). The raw takes
   go to `assets-src/raw/sound/`, which git ignores; `bun tools/sound.ts --process` cuts and levels again from them
   without asking ElevenLabs for anything. A prompt that changes is asked for again; nothing else is.
-- **Cost.** 40 credits a second of sound asked for. The tool prices a run first and stops above 30,000 credits.
-  The whole set is about 16,000.
+  A new worktree has no raw takes, and a run there would leave every sound without its takes out of the list:
+  copy `assets-src/raw/sound/` from a checkout that has them first, then `--dry` must say only your new
+  sounds are to be asked for. `--ids a,b` asks for those alone.
+- **Cost.** About 11 credits a second of sound asked for, measured on the account's own counter on 2026-11-12
+  (198 credits for an 18 second bed). The tool prices a run first and stops above 30,000 credits.
 
 ## Voiced lines
 
@@ -252,6 +294,40 @@ ElevenLabs. The game never calls ElevenLabs, and the key never leaves `.env.loca
   play, so the game fetches them when the talk starts.
 - **Kept out of the game.** `assets-src/voice/report.json` (what each clip was made from, its transcript by
   ElevenLabs Scribe and the share of its words heard) and `assets-src/voice/align/` (the raw character timings).
-- **Cost.** The tool prices a run before it makes anything and stops above 40,000 credits. v4 Turbo bills half a
-  credit a character.
+- **Auditions.** `tools/voice/audition.ts` has each candidate in `tools/voice/auditions.ts` say two of a person's
+  own lines, made exactly as `tools/voice.ts` would make them, into `assets-src/voice/auditions/<speaker>/<candidate>/`
+  with their measures in `auditions.json` (pitch, words a second, what Scribe heard). `tools/voice.ts` copies a take
+  whose hash matches a line instead of buying it again, so swapping in another candidate costs only the person's
+  other lines.
+- **Cost.** The tool prices a run before it makes anything and stops above 40,000 credits. It prices at half a
+  credit a character, the rate the API lists for v4 Turbo; the account's own counter charged about 0.2 a character
+  on 2026-11-12, so the price is an upper bound.
 
+
+## Offline ground contact
+
+An asymmetric grounded sprite may declare `groundContact` in `story-config.mjs`.
+It maps every used `row:column` to an inclusive `[left,top,right,bottom]`
+rectangle. It is source/check data and is not shipped in the runtime manifest.
+Both complete sprite commands use `validateSpriteGeometry` in
+`tools/sprites/geometry.mjs`. Without metadata the original bounding-box centre
+check runs unchanged. With metadata the checker measures the bounds of actual
+opaque support pixels, with the same six-pixel horizontal tolerance. It still
+checks the complete silhouette's baseline and padding. Palette, alpha, size,
+animations, frozen hashes and art reviews retain their separate existing checks.
+
+Regions include the complete lateral support at the sole band, with transparent
+side columns, at least five rows through the actual baseline, and no omitted
+used frame. A side column through an opaque sole fails. The top can cross a
+lower leg. A walking region includes the raised foot and keeps the source sway;
+it does not move each frame to follow whichever foot happens to be grounded.
+The Braid tool band starts at row 116 because the side-strike axe connects to
+the boot at rows 113–115 and separates at 116. Its ground pixels outside that
+region do not define stance and still receive the full-frame clipping check.
+
+A rectangle cannot identify a boot semantically. Review all overlays against
+the actual pixels, including both feet, the raised foot, and any grounded
+weapon. Do not generate regions anew to conceal a moved body. Braid's retained
+regions are `assets-src/hero-braid/ground-contact.json`; they require the actual
+pixel regressions in `bun test tools/sprites/geometry.test.mjs`. Inspect overlays
+with `bun tools/sprites/contact-overlays.mjs <name> <output-folder>` after edits.

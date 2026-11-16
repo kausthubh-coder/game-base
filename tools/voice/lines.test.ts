@@ -13,13 +13,15 @@ const align = (text: string, step = 0.1) => {
 
 test('every line a person says is found once, with each place it is said, and narration is left out', () => {
   const lines = spokenLines(CONVERSATIONS);
-  const gift = lines.find((l) => l.key === "gus|Rain'd do it better. Rain always does it better.");
-  expect(gift?.ids).toEqual(['gus.seeds.first.5', 'gus.seeds.3']);
-  expect(gift?.conversations).toEqual(['gus.seeds.first', 'gus.seeds']);
+  const spar = lines.find((l) => l.key === "dax|Go on. Hit me. Not the face. Hobb counts my teeth.");
+  expect(spar?.ids).toEqual(['scene.4.before.0', 'scene.4.0']);
+  expect(spar?.conversations).toEqual(['scene.4.before', 'scene.4']);
   // A line after a choice.
-  expect(lines.find((l) => l.text.startsWith('They crowned me'))?.ids).toEqual(['maren.ask.3.2.0']);
-  expect(lines.some((l) => l.text.startsWith('She puts it in your hands'))).toBe(false);
-  expect(lines.some((l) => l.text === 'Twenty sheaves. Done.')).toBe(false);
+  expect(lines.find((l) => l.text.startsWith('My rows. Good.'))?.ids).toEqual(['choice.gus.0.1.0']);
+  // A line with nobody to talk to: what Hobb says on taking the kitchen.
+  expect(lines.find((l) => l.text.startsWith('A meal a day for everyone'))?.ids).toEqual(['took.hobb.kitchen.0']);
+  expect(lines.some((l) => l.text.startsWith('Dax at a table of locks'))).toBe(false);
+  expect(lines.some((l) => l.text === 'Take the sword')).toBe(false);
 });
 
 test('a stage cue is never given to the voice, and a direction replaces the words when there is one', () => {

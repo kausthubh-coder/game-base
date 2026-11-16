@@ -1,0 +1,25 @@
+{
+  "tool": "image_gen.imagegen",
+  "base": {
+    "attempt": 1,
+    "prompt": "Use case: stylized-concept. Production pixel RPG sprite sheet. Edit the supplied Copper sprite reference into a NEW Braid character using option D lower right and lower pixel mock D in the concept, and look-d as IDENTITY. Copper supplies ONLY rendering, pixel scale, head size and body proportions. Braid: sixteen-year-old Guild Ward, olive complexion, square face, athletic medium build, ash brown high long plait with closely clipped sides, pale sage canvas jacket, cream shirt, charcoal trousers, brown boots and satchel, small brass key on cord. Two eyes front, one right profile, absolutely no face on back. No orange hair. Same identity and costume every cell. Warm upper-left light, hard chunky pixels, closed tinted brown 1-2 pixel outline, no black outline, no soft shading, no pale rim, no floor shadow. Genuine transparent background. STRICT SIX equal columns by SIX equal rows, square overall sheet, 36 equal square cells. Rows 1-3: front idle, back idle, RIGHT profile idle; first FOUR columns subtle breathing cycle, last TWO columns EMPTY transparent. Rows 4-6: front walk, back walk, RIGHT profile walk; SIX distinct walking phases across all six columns. One complete whole character per occupied cell with generous padding, same scale throughout, about 110 pixels tall in final 128 square, head about 40 pixels tall matching Copper. Keep braid fully in cell; no clipped limbs, no tool, no text or grid. Preserve visibly clipped sides, a long connected brown plait hanging to waist behind head, square olive face, sage jacket. Do not copy Copper's hair or costume. Output high quality pixel sheet suitable for uniform cell slicing.",
+    "references": [
+      "public/assets/sprites/hero.png",
+      "assets-src/concept/people-home/hero.webp",
+      "src/game/openingview/art/look-d.webp"
+    ],
+    "output": "base-attempt-1.png",
+    "toolRecord": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d972-e1ca-7aa0-9211-2d5d3b6234bf as /Users/dabot/.codex/generated_images/01a1d972-e1ca-7aa0-9211-2d5d3b6234bf/exec-a3ea3fbb-3353-44fd-aa9d-fcc3223e1833.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  },
+  "swing": {
+    "attempt": 1,
+    "prompt": "Use case: identity-preserve. Produce TOOL ACTION pixel sprite sheet of EXACT Braid character in first attached generated idle/walk sheet. First image is accepted identity reference: retain brown high plait with clipped sides, square olive face, same head/body size, pale sage canvas jacket, cream shirt, charcoal pants, brown boots, satchel, brass key. Second image Copper tool sheet gives only ACTION LAYOUT and pixel style, do not copy Copper identity. Third concept shows option D identity. Transparent background, no text, no grid, no floor shadow. STRICT THREE columns THREE rows, NINE equal square cells. Row1 FRONT: tool windup raised by shoulder / strike down before body / recovery lowering to side. Row2 BACK same three phases, absolutely no face. Row3 RIGHT-facing profile same three phases. Small iron axe with wooden handle, whole axe and braid inside each cell with generous transparent padding. Preserve the same head, torso size, head shape and costume across all 9 cells, no crouching or shrinking, stable feet. Final each cell 128 square with body about 110 pixels tall, head about 40 pixels, matching first image. Closed warm dark brown 1-2 pixel outlines, chunky crisp pixel clusters, upper-left warm light, no white fringe, no black, no gradients. Recovery must return naturally to first image idle. Do not change hairstyle, clothing or anatomy during swing.",
+    "references": [
+      "assets-src/hero-braid/base-identity-reference.png",
+      "public/assets/sprites/hero-swing.png",
+      "assets-src/concept/people-home/hero.webp"
+    ],
+    "output": "swing-attempt-1.png",
+    "toolRecord": "Generated images are saved to /Users/dabot/.codex/generated_images/01a1d972-e1ca-7aa0-9211-2d5d3b6234bf as /Users/dabot/.codex/generated_images/01a1d972-e1ca-7aa0-9211-2d5d3b6234bf/exec-9980a20e-0320-4168-b354-c2b628cd6977.png by default.\nIf you need to use a generated image at another path, copy it and leave the original in place unless the user explicitly asks you to delete it.\nThe generated image is already displayed to the user. There is no need to render it in the final response as a Markdown image or file link."
+  }
+}

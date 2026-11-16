@@ -3,7 +3,11 @@
 // tiles come from an array texture, baked light and corner shade come from the vertices, and the
 // camera's cutaway removes what hides the hero.
 import * as THREE from 'three';
+import { SEE_GLSL, shared } from '../painted/paint.ts';
 import { GROUND_SIZE, MAX_LAYERS } from './ground.view.ts';
+
+/** The camera's sight rule, as the painted light holds it: one write a frame moves it for the blocks too. */
+const SEE_UNIFORMS = { uSeeAt: shared.uSeeAt, uSeeRoom: shared.uSeeRoom, uSeeShape: shared.uSeeShape, uSeeNear: shared.uSeeNear };
 
 /** Shared by every terrain material, so one write moves the cutaway everywhere. */
 export interface TerrainUniforms {
@@ -90,6 +94,7 @@ vTile = vec3(aInfo.y, aInfo.z, tFace == 2 ? 1.0 : 0.0);
 `;
 
 const FRAGMENT_PARS = /* glsl */ `
+${SEE_GLSL}
 uniform sampler2DArray uTiles;
 uniform vec4 uCut;
 uniform vec2 uCutEdge;
@@ -211,7 +216,8 @@ if (uEdge.w > 0.0 && smoothstep(uEdge.z, uEdge.w, distance(vWorld.xz, uEdge.xy))
 #ifdef TERRAIN_CAP
   if (tCut() <= tThreshold || tSight() > tThreshold) discard;
 #else
-  if (max(tCut(), tSight()) > tThreshold) discard;
+  // The camera's sight rule clears blocks too, for every point it keeps in sight (src/features/camera/sight.sim.ts).
+  if (max(max(tCut(), tSight()), paintSeeCut(vWorld, 0.0)) > tThreshold) discard;
 #endif
 vec2 tCell = mod(floor(vTileUv) + vCellBase, 64.0);
 float tPick = fract(52.9829189 * fract(dot(tCell, vec2(0.06711056, 0.00583715))));
@@ -233,7 +239,8 @@ if (uEdge.w > 0.0 && smoothstep(uEdge.z, uEdge.w, distance(vWorld.xz, uEdge.xy))
 #ifdef TERRAIN_CAP
   if (tCut() <= tThreshold || tSight() > tThreshold) discard;
 #else
-  if (max(tCut(), tSight()) > tThreshold) discard;
+  // The camera's sight rule clears blocks too, for every point it keeps in sight (src/features/camera/sight.sim.ts).
+  if (max(max(tCut(), tSight()), paintSeeCut(vWorld, 0.0)) > tThreshold) discard;
 #endif
 vec2 tCell = mod(floor(vTileUv) + vCellBase, 64.0);
 float tPick = fract(52.9829189 * fract(dot(tCell, vec2(0.06711056, 0.00583715))));
@@ -379,7 +386,7 @@ export function createTerrainMaterial(kind: TerrainKind, uniforms: TerrainUnifor
   material.defines = kind === 'water' ? { TERRAIN_WATER: '' } : kind === 'cap' ? { TERRAIN_CAP: '' } : {};
   if (isClean) material.defines.TERRAIN_CLEAN = '';
   material.onBeforeCompile = (shader) => {
-    Object.assign(shader.uniforms, uniforms, isClean ? clean : {});
+    Object.assign(shader.uniforms, uniforms, isClean ? clean : {}, SEE_UNIFORMS);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\n' + VERTEX_PARS)
       .replace('#include <beginnormal_vertex>', VERTEX_NORMAL)
@@ -389,6 +396,6 @@ export function createTerrainMaterial(kind: TerrainKind, uniforms: TerrainUnifor
       .replace('#include <map_fragment>', isClean ? FRAGMENT_MAP_CLEAN : FRAGMENT_MAP)
       .replace('vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;', FRAGMENT_LIGHT);
   };
-  material.customProgramCacheKey = () => 'terrain-' + kind + (isClean ? '-clean' : '');
+  material.customProgramCacheKey = () => 'terrain-see-' + kind + (isClean ? '-clean' : '');
   return material;
 }

@@ -1,0 +1,635 @@
+{
+  "line": {
+    "npc": "aldric",
+    "name": "Brother Aldric",
+    "portrait": "aldric",
+    "face": "aldric-troubled",
+    "voice": "aldric",
+    "text": "(out of breath) Is it true? No. Do not show me. She is coming herself.",
+    "choices": [],
+    "kind": "film",
+    "scene": 16
+  },
+  "yaw": 0.7853981633974492,
+  "camera": {
+    "x": 14.117052998172827,
+    "y": 35.918681599723016,
+    "z": -209.27343258772686
+  },
+  "top": 92,
+  "bottom": 599,
+  "actors": [
+    {
+      "id": "player",
+      "sprite": "hero",
+      "anim": "idle",
+      "pos": {
+        "x": 2.5,
+        "y": 22.3125,
+        "z": -222.5
+      },
+      "foot": {
+        "x": 818.8057857507462,
+        "y": 482.1918579641426
+      },
+      "face": {
+        "x": 824.5148302600965,
+        "y": 355.57294932985434
+      },
+      "chest": {
+        "x": 822.079963849214,
+        "y": 409.575002932919
+      },
+      "box": {
+        "left": 774.5076400537138,
+        "right": 870.6751947430839,
+        "top": 355.57294932985434,
+        "bottom": 482.1918579641426
+      },
+      "depth": -22.18012334882735,
+      "inFrame": true
+    },
+    {
+      "id": "npc:tamsin",
+      "sprite": "tamsin",
+      "anim": "idle",
+      "pos": {
+        "x": -1.5,
+        "y": 22,
+        "z": -220.5
+      },
+      "foot": {
+        "x": 419.60717274757843,
+        "y": 421.88128434039334
+      },
+      "face": {
+        "x": 409.21286649126233,
+        "y": 300.6387089706324
+      },
+      "chest": {
+        "x": 413.63967368842054,
+        "y": 352.2744306834413
+      },
+      "box": {
+        "left": 365.8801777087532,
+        "right": 461.29473952474683,
+        "top": 300.63870897063236,
+        "bottom": 421.88128434039334
+      },
+      "depth": -23.56550585646637,
+      "inFrame": true
+    },
+    {
+      "id": "npc:maren",
+      "sprite": "maren",
+      "anim": "idle",
+      "pos": {
+        "x": 158.5,
+        "y": 20,
+        "z": -174.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 95.50509493775058,
+      "inFrame": false
+    },
+    {
+      "id": "npc:gus",
+      "sprite": "gus",
+      "anim": "idle",
+      "pos": {
+        "x": 1.5,
+        "y": 22,
+        "z": -221.5
+      },
+      "foot": {
+        "x": 679.6330141740236,
+        "y": 505.22352099525654
+      },
+      "face": {
+        "x": 679.4927611812035,
+        "y": 380.71743127940607
+      },
+      "chest": {
+        "x": 679.5525654645348,
+        "y": 433.8071894095501
+      },
+      "box": {
+        "left": 633.7528915673681,
+        "right": 725.2326307950359,
+        "top": 380.71743127940607,
+        "bottom": 505.22352099525796
+      },
+      "depth": -22.37529714818249,
+      "inFrame": true
+    },
+    {
+      "id": "npc:wren",
+      "sprite": "wren",
+      "anim": "idle",
+      "pos": {
+        "x": 193.5,
+        "y": 20,
+        "z": -165.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 121.1958204671373,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-1",
+      "sprite": "villager-b",
+      "anim": "idle",
+      "pos": {
+        "x": 0.5,
+        "y": 22,
+        "z": -219.5
+      },
+      "foot": {
+        "x": 466.31526478756115,
+        "y": 547.2243306317487
+      },
+      "face": {
+        "x": 457.04903520991854,
+        "y": 421.2017129284079
+      },
+      "chest": {
+        "x": 461.00259265961427,
+        "y": 474.9709029615715
+      },
+      "box": {
+        "left": 410.09220079013403,
+        "right": 511.3464034778464,
+        "top": 421.2017129284065,
+        "bottom": 547.2243306317473
+      },
+      "depth": -21.82002070152915,
+      "inFrame": true
+    },
+    {
+      "id": "npc:villager-2",
+      "sprite": "town-pell",
+      "anim": "idle",
+      "pos": {
+        "x": 172.5,
+        "y": 20,
+        "z": -141.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 122.57488887317942,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-3",
+      "sprite": "town-acolyte-a",
+      "anim": "idle",
+      "pos": {
+        "x": 175.5,
+        "y": 20,
+        "z": -131.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 130.04838128759988,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-4",
+      "sprite": "town-pip",
+      "anim": "idle",
+      "pos": {
+        "x": 176.5,
+        "y": 20,
+        "z": -133.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 129.49310484094656,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-5",
+      "sprite": "town-isolde",
+      "anim": "idle",
+      "pos": {
+        "x": -0.5,
+        "y": 22,
+        "z": -218.5
+      },
+      "foot": {
+        "x": 325.07145012645225,
+        "y": 545.9894637484825
+      },
+      "face": {
+        "x": 309.77679499552977,
+        "y": 420.0102043729829
+      },
+      "chest": {
+        "x": 316.302341631826,
+        "y": 473.7599310077992
+      },
+      "box": {
+        "left": 262.85577753775533,
+        "right": 370.0696482879291,
+        "top": 420.0102043729829,
+        "bottom": 545.9894637484825
+      },
+      "depth": -21.83595186452459,
+      "inFrame": true
+    },
+    {
+      "id": "npc:villager-6",
+      "sprite": "villager-a",
+      "anim": "idle",
+      "pos": {
+        "x": 132.5,
+        "y": 20,
+        "z": -172.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 81.38190206829844,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-7",
+      "sprite": "town-corin",
+      "anim": "idle",
+      "pos": {
+        "x": 176.5,
+        "y": 20,
+        "z": -141.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 124.92344396375631,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-8",
+      "sprite": "town-acolyte-b",
+      "anim": "idle",
+      "pos": {
+        "x": 135.5,
+        "y": 20,
+        "z": -169.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 84.85694121517744,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-9",
+      "sprite": "town-hesper",
+      "anim": "idle",
+      "pos": {
+        "x": 171.5,
+        "y": 20,
+        "z": -129.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 128.84224141632058,
+      "inFrame": false
+    },
+    {
+      "id": "npc:villager-10",
+      "sprite": "town-roan",
+      "anim": "idle",
+      "pos": {
+        "x": 132.5,
+        "y": 20,
+        "z": -172.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": 81.38190206829844,
+      "inFrame": false
+    },
+    {
+      "id": "npc:custodian",
+      "sprite": "custodian-wake",
+      "anim": "idle",
+      "pos": {
+        "x": -11.5,
+        "y": 22.4,
+        "z": -261.5
+      },
+      "foot": null,
+      "face": null,
+      "chest": null,
+      "box": null,
+      "depth": -52.626975003968155,
+      "inFrame": false
+    },
+    {
+      "id": "stage:elowen",
+      "sprite": "elowen",
+      "anim": "idle",
+      "pos": {
+        "x": 1.5,
+        "y": 22,
+        "z": -221
+      },
+      "foot": {
+        "x": 644.1653225067404,
+        "y": 526.5620214637459
+      },
+      "face": {
+        "x": 642.525795104086,
+        "y": 401.27469999145495
+      },
+      "chest": {
+        "x": 643.2251109466587,
+        "y": 454.7141293277467
+      },
+      "box": {
+        "left": 596.1679702861553,
+        "right": 688.8836199220137,
+        "top": 401.27469999145495,
+        "bottom": 526.5620214637459
+      },
+      "depth": -22.0896933433581,
+      "inFrame": true
+    },
+    {
+      "id": "stage:calla",
+      "sprite": "calla",
+      "anim": "idle",
+      "pos": {
+        "x": 3.5,
+        "y": 23,
+        "z": -222.5
+      },
+      "foot": {
+        "x": 896.9412374670644,
+        "y": 471.08783648795156
+      },
+      "face": {
+        "x": 906.370895229797,
+        "y": 337.84220905731746
+      },
+      "chest": {
+        "x": 902.3447076862366,
+        "y": 394.7341874189667
+      },
+      "box": {
+        "left": 850.5865754184681,
+        "right": 954.7686818484851,
+        "top": 337.842209057319,
+        "bottom": 471.08783648795304
+      },
+      "depth": -21.198650776191787,
+      "inFrame": true
+    },
+    {
+      "id": "stage:aldric",
+      "sprite": "aldric",
+      "anim": "idle",
+      "pos": {
+        "x": 0,
+        "y": 22,
+        "z": -222.7
+      },
+      "foot": {
+        "x": 662.9072275767707,
+        "y": 397.28238061363925
+      },
+      "face": {
+        "x": 662.1272693555528,
+        "y": 277.06743320971873
+      },
+      "chest": {
+        "x": 662.4593255509051,
+        "y": 328.2472489658718
+      },
+      "box": {
+        "left": 619.5031373724735,
+        "right": 704.7514013386323,
+        "top": 277.0674332097175,
+        "bottom": 397.2823806136379
+      },
+      "depth": -23.94145443872735,
+      "inFrame": true
+    }
+  ],
+  "sight": [
+    {
+      "who": "player",
+      "x": 2.5,
+      "y": 22.3125,
+      "z": -222.5,
+      "screen": {
+        "x": 0.6020648161396701,
+        "y": 0.5234655061826798
+      },
+      "inFrame": true,
+      "hiddenBy": null
+    },
+    {
+      "who": "stage:elowen",
+      "x": 1.5,
+      "y": 22,
+      "z": -221,
+      "screen": {
+        "x": 0.47081061558771153,
+        "y": 0.5823434960082978
+      },
+      "inFrame": true,
+      "hiddenBy": "land: land-sheet"
+    },
+    {
+      "who": "stage:calla",
+      "x": 3.5,
+      "y": 23,
+      "z": -222.5,
+      "screen": {
+        "x": 0.6609864302937151,
+        "y": 0.5036226190955885
+      },
+      "inFrame": true,
+      "hiddenBy": null
+    },
+    {
+      "who": "stage:aldric",
+      "x": 0,
+      "y": 22,
+      "z": -222.7,
+      "screen": {
+        "x": 0.48492886291261117,
+        "y": 0.4180734216384084
+      },
+      "inFrame": true,
+      "hiddenBy": null
+    }
+  ],
+  "costs": {
+    "total": {
+      "drawCalls": 79,
+      "triangles": 300649
+    },
+    "features": [
+      {
+        "feature": "grass",
+        "drawCalls": 4,
+        "triangles": 125309,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "landmarks",
+        "drawCalls": 11,
+        "triangles": 64524,
+        "shadowCalls": 6,
+        "shadowTriangles": 5794
+      },
+      {
+        "feature": "trees",
+        "drawCalls": 14,
+        "triangles": 57144,
+        "shadowCalls": 4,
+        "shadowTriangles": 24968
+      },
+      {
+        "feature": "bushes",
+        "drawCalls": 5,
+        "triangles": 16248,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "rocks",
+        "drawCalls": 11,
+        "triangles": 12464,
+        "shadowCalls": 4,
+        "shadowTriangles": 2512
+      },
+      {
+        "feature": "far land",
+        "drawCalls": 1,
+        "triangles": 11448,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "land",
+        "drawCalls": 1,
+        "triangles": 5120,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "sky",
+        "drawCalls": 5,
+        "triangles": 2875,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "far trees",
+        "drawCalls": 1,
+        "triangles": 1916,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "blocks",
+        "drawCalls": 7,
+        "triangles": 1400,
+        "shadowCalls": 4,
+        "shadowTriangles": 908
+      },
+      {
+        "feature": "props",
+        "drawCalls": 6,
+        "triangles": 1075,
+        "shadowCalls": 2,
+        "shadowTriangles": 108
+      },
+      {
+        "feature": "other: machines",
+        "drawCalls": 2,
+        "triangles": 560,
+        "shadowCalls": 1,
+        "shadowTriangles": 280
+      },
+      {
+        "feature": "other: ruins",
+        "drawCalls": 1,
+        "triangles": 272,
+        "shadowCalls": 1,
+        "shadowTriangles": 272
+      },
+      {
+        "feature": "people",
+        "drawCalls": 2,
+        "triangles": 144,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "water",
+        "drawCalls": 1,
+        "triangles": 74,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "effects",
+        "drawCalls": 1,
+        "triangles": 56,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "other: hall-glow",
+        "drawCalls": 1,
+        "triangles": 14,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "final picture",
+        "drawCalls": 4,
+        "triangles": 4,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      },
+      {
+        "feature": "other: camp-glow",
+        "drawCalls": 1,
+        "triangles": 2,
+        "shadowCalls": 0,
+        "shadowTriangles": 0
+      }
+    ],
+    "sum": {
+      "drawCalls": 79,
+      "triangles": 300649
+    },
+    "addsUp": true
+  }
+}

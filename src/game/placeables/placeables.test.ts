@@ -2,21 +2,28 @@ import { expect, test } from 'bun:test';
 import { blockId } from '../../content/blocks.ts';
 import type { Placed } from '../api.sim.ts';
 import { makeStage, type Stage } from '../actions/stage.ts';
+import { HOME_PLACEABLES } from '../content/people.ts';
 import { NO_ROOF_TOAST, TOO_EARLY_TOAST } from './index.sim.ts';
 
 const STONE = blockId('stone');
 
 const named = (s: Stage, name: string) => s.heard.filter((e) => e.name === name).map((e) => e.data);
 
-test('the kinds are a workbench, a bed and a chest, each with its station, and a fence and a sprinkler with none', () => {
+test('the kinds are a workbench, a bed and a chest, each with its station, a fence, and the machine parts', () => {
   const { placeables } = makeStage().kernel.game.systems;
-  expect(placeables.defs().map((def) => [def.kind, def.station, def.prompt])).toEqual([
+  expect(placeables.defs().slice(0, 4).map((def) => [def.kind, def.station, def.prompt])).toEqual([
     ['workbench', 'workbench', 'Craft'],
     ['bed', 'bed', 'Sleep'],
     ['chest', 'chest', 'Open'],
     ['fence', undefined, null],
-    ['sprinkler', undefined, null],
   ]);
+  // Every part sets down a placeable of its own name, which the machines view draws.
+  expect(placeables.defs().slice(4, -HOME_PLACEABLES.length).map((def) => [def.kind, def.drawnBy])).toEqual([
+    'waterwheel', 'gear_shaft', 'lever', 'sprinkler', 'chute', 'collector_chest', 'pusher', 'sensor', 'switch_lamp',
+    'harvester_arm', 'saw_arm', 'bee_box', 'post', 'clapper', 'hatch',
+  ].map((kind) => [kind, 'machines']));
+  // Then the settlement's buildings (content/people.ts), which src/game/settlement tests.
+  expect(placeables.defs().slice(-HOME_PLACEABLES.length)).toEqual([...HOME_PLACEABLES]);
 });
 
 test('placing a workbench sends placeable.placed, fills its cell, and near() is true within the radius', () => {

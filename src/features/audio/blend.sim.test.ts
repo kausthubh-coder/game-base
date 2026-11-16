@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { palettes } from '../../content/palettes/index.ts';
+import { greenhollowPalettes, palettes } from '../../content/palettes/index.ts';
 import {
   allowedMasks, blendTempo, countBits, crossoverGains, dayAmount, maskNames, normalizeWeights, PALETTE_LAYERS, pitchMask, slewWeights, snapToMask,
 } from './blend.sim.ts';
@@ -147,4 +147,21 @@ test('day and night', () => {
   expect(dayAmount(0)).toBe(0);
   expect(dayAmount(0.25)).toBeGreaterThan(0);
   expect(dayAmount(0.25)).toBeLessThan(1);
+});
+
+test('in Greenhollow, every two regions that meet share at least four notes, and the tempos glide', () => {
+  const byId = new Map(greenhollowPalettes.map((p) => [p.id, p]));
+  // Who borders whom on the map of src/game/content/greenhollow.ts, the High Road and the river counted as lands.
+  const borders: [string, string][] = [
+    ['meadow', 'town'], ['meadow', 'oldForest'], ['meadow', 'highRoad'], ['meadow', 'mere'], ['meadow', 'marsh'], ['meadow', 'greyForest'], ['meadow', 'caves'],
+    ['oldForest', 'greyForest'], ['oldForest', 'highRoad'], ['oldForest', 'mere'], ['greyForest', 'highRoad'], ['greyForest', 'terraces'], ['greyForest', 'caves'],
+    ['terraces', 'highRoad'], ['highRoad', 'caves'], ['highRoad', 'mere'], ['town', 'mere'], ['town', 'marsh'], ['town', 'caves'], ['marsh', 'mere'], ['caves', 'mere'],
+  ];
+  for (const [a, b] of borders) {
+    const pa = byId.get(a)!, pb = byId.get(b)!;
+    // Named, so a failure says which border.
+    expect(`${a} and ${b} share ${countBits(pitchMask(pa) & pitchMask(pb)) >= 4 ? 'four or more' : 'too few'}`).toBe(`${a} and ${b} share four or more`);
+  }
+  expect(new Set(greenhollowPalettes.map((p) => p.id)).size).toBe(greenhollowPalettes.length);
+  expect(greenhollowPalettes[0]?.id).toBe('meadow');
 });

@@ -1,21 +1,22 @@
-// The director: the scripted moments of the first part, the rules that keep the player from getting
-// stuck, and the hints. It is not in `game.systems`. Install it with the others and the kernel steps it.
+// The director: the scripted moments of act 1 that belong to no one system, the rules that keep the player from
+// getting stuck, and the hints. It is not in `game.systems`. Install it with the others and the kernel steps it.
 //
+//   - Act 1's scenes and the conversations that offer a quest step, started when the step opens and the player is
+//     there, with the people of the scene stood in the world while it plays (./scenes.sim.ts).
 //   - 90 seconds of rain on the afternoon after the first wheat is planted.
-//   - The festival: the dusk after the wheat is delivered starts it, and the next morning ends it.
-//   - A river lamp used within 6 blocks of the river bank floats.
-//   - `act.ended` after the last talk with Tamsin.
-//   - Never stuck: a quest mark over Tamsin when the axe is gone and over Gus when the seed runs short,
-//     gifts that did not fit in the bag handed over when there is room, and a bonded leaftail left
-//     behind brought back when the player reaches the grant.
+//   - `act.ended` when the last quest of the act is done.
+//   - Never stuck: gifts that did not fit in the bag handed over when there is room, a bonded fox left behind
+//     brought back when the player reaches the grant, and a lost tool replaced by whoever gave it (dialogue.ts).
 
-import type { Game, ItemId, NpcId, SimSystem, UseContext } from '../api.sim.ts';
+import type { Game, ItemId, SimSystem } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { distance2d } from '../move.sim.ts';
 import { CONVERSATIONS, type Line } from '../content/dialogue.ts';
+import { FLAG } from '../content/flags.ts';
 import { HINTS } from '../content/hints.ts';
-import { QUESTS, WHEAT_SHORT, type Condition, type Effect } from '../content/quests.ts';
-import { DAWN, DUSK, holds, isDark, owedFlag, petOf, placeAt } from '../quests/rules.sim.ts';
+import { LAST_QUEST, QUESTS, type Effect } from '../content/quests.ts';
+import { DAWN, DUSK, holds, owedFlag, petOf, placeAt } from '../quests/rules.sim.ts';
+import { createSceneRunner } from './scenes.sim.ts';
 
 /** Seconds of rain the scripted shower brings. */
 export const RAIN_SECONDS = 90;
@@ -30,45 +31,11 @@ const RAIN_LEAD = 75;
 const RAIN_DELAY = 20;
 /** The afternoon, as times of day. The shower starts inside it and dusk is still a while off. */
 const AFTERNOON_FROM = 0.5, AFTERNOON_TO = 0.7;
-/** How close to the river bank a lamp can be floated, in blocks. */
-export const LAMP_REACH = 6;
 /** A bonded pet further than this from a player standing on the grant is brought back. */
 const PET_LOST = 24;
 /** Seconds between two hints, and between two of the same toast. */
 const HINT_GAP = 4, TOAST_GAP = 30;
 const TICK = 0.5;
-
-/** Where someone stands at the festival: a named place, and blocks east and south of it. */
-interface FestivalSpot {
-  place: string;
-  x: number;
-  z: number;
-}
-
-/**
- * The festival, laid out. Tamsin and Brack are on the river bank, everyone else in the square, a few
- * blocks apart, so the town reads as a crowd and "E" beside someone still names that person. Odo stands on
- * the place itself, where the quest's waypoint brings the player. The well is six blocks north of it.
- */
-const FESTIVAL_SPOTS: Readonly<Record<NpcId, FestivalSpot>> = {
-  tamsin: { place: 'river.bank', x: 0, z: 0 },
-  brack: { place: 'river.bank', x: 7, z: 0 },
-  odo: { place: 'town.square', x: 0, z: 0 },
-  maren: { place: 'town.square', x: -4, z: -1 },
-  gus: { place: 'town.square', x: 9, z: 2 },
-  mira: { place: 'town.square', x: -7, z: 2 },
-  wren: { place: 'town.square', x: 4, z: -2 },
-  juniper: { place: 'town.square', x: 2, z: 3 },
-};
-/** Spots in the square for everyone without one of their own, taken in the order people are listed. */
-const CROWD_SPOTS: readonly (readonly [x: number, z: number])[] = [[-10, -1], [7, -4], [-3, 4], [6, 4], [-8, -5], [11, -2], [-5, -6], [-11, 4], [-5, 7], [9, 7]];
-
-const AXE_LOST: Condition = { all: [{ flag: 'plot.met' }, { not: { bag: 'axe' } }, { not: { flag: 'owed.axe' } }] };
-const SEEDS_SHORT: Condition = { all: [{ flag: 'bread.seeds' }, { not: { flag: 'bread.delivered' } }, WHEAT_SHORT] };
-/** Odo has a river lamp to hand over: the festival has begun, the player's lamp is not on the water and none is in the bag. */
-const LAMP_WAITS: Condition = {
-  all: [{ quest: 'festival' }, { flag: 'festival.started' }, { not: { flag: 'festival.lamp' } }, { not: { bag: 'river_lamp' } }, { not: { flag: 'owed.river_lamp' } }],
-};
 
 /** Every item a conversation or a skipped quest can give, so a gift that did not fit can be found again. */
 function giftItems(): ItemId[] {
@@ -102,21 +69,27 @@ export interface Director {
 export function createDirector(game: Game): Director {
   const { clock, events, flags, player } = game;
   const gifts = giftItems();
+  const scenes = createSceneRunner(game);
+  // Keep the lighting's day in the normal saved flags, including a Continue during that night.
+  events.on('scene.played', ({ scene }) => {
+    if (scene === 23) flags.set('story.road.litDay', clock.day);
+  });
+  function stepRoadMorning(): void {
+    const litDay = flags.get('story.road.litDay');
+    if (typeof litDay !== 'number' || clock.day <= litDay || clock.timeOfDay < DAWN || clock.timeOfDay >= DUSK) return;
+    if (flags.get(FLAG.questStep('count')) !== 'grey' || player.busy) return;
+    const arches = placeAt(game, 'arches');
+    if (arches && distance2d(player.pos, arches) <= 8) flags.set(FLAG.step('count', 'grey'), true);
+  }
 
-  let ready = false;
+
   let sinceTick = TICK;
   /** Seconds of the scripted shower still to fall. */
   let rainLeft = 0;
   /** Seconds the shower has been asked for with no rain falling yet. */
   let rainLead = 0;
   let sinceHint = HINT_GAP;
-  let lastBagToast = -TOAST_GAP, lastBankToast = -TOAST_GAP, lastPetCall = -TOAST_GAP;
-  /** People this director holds for the festival. Empty again after a load, so they are sent once more. */
-  const held = new Set<NpcId>();
-  /** Marks this director set, so it takes off only its own. */
-  let axeMark = false, seedMark = false, lampMark = false;
-
-  const festivalOn = (): boolean => flags.is('festival.started') && !flags.is('festival.over');
+  let lastBagToast = -TOAST_GAP, lastPetCall = -TOAST_GAP;
 
   events.on('crop.planted', () => {
     if (flags.is('story.rain.done') || flags.is('story.rain.due')) return;
@@ -124,29 +97,12 @@ export function createDirector(game: Game): Director {
     flags.set('story.rain.planted', clock.seconds);
   });
 
-  // The last scene sets `festival.ended`. The end card follows the moment the conversation closes.
-  events.on('talk.ended', () => {
-    if (!flags.is('festival.ended') || flags.is('act1.ended')) return;
+  // The last quest's last step ends the act. The end card follows.
+  events.on('flag.changed', ({ flag, value }) => {
+    if (flag !== FLAG.questDone(LAST_QUEST) || !value || flags.is('act1.ended')) return;
     flags.set('act1.ended', true);
     events.emit('act.ended', { act: 1 });
   });
-
-  function floatLamp(context: UseContext): boolean {
-    if (context.button !== 'secondary' || context.held?.id !== 'river_lamp') return false;
-    const bank = placeAt(game, 'river.bank');
-    if (!bank || distance2d(player.pos, bank) > LAMP_REACH) {
-      if (clock.seconds - lastBankToast >= 3) {
-        lastBankToast = clock.seconds;
-        events.emit('toast', { text: 'Float the lamp from the river bank.', icon: 'lantern' });
-      }
-      return true;
-    }
-    if (!game.systems.inventory?.remove('river_lamp', 1)) return false;
-    flags.set('festival.lamp', true);
-    flags.add('festival.lamps', 1);
-    events.emit('toast', { text: 'Your lamp joins the others on the Mere.', icon: 'lantern' });
-    return true;
-  }
 
   function stepRain(dt: number): void {
     if (flags.is('story.raining')) {
@@ -155,7 +111,7 @@ export function createDirector(game: Game): Director {
       if (rainLeft <= 0) endRain();
       return;
     }
-    if (!flags.is('story.rain.due') || festivalOn() || player.busy) return;
+    if (!flags.is('story.rain.due') || player.busy) return;
     const time = clock.timeOfDay;
     if (time < AFTERNOON_FROM || time >= AFTERNOON_TO) return;
     if (clock.seconds - Number(flags.get('story.rain.planted') ?? 0) < RAIN_DELAY) return;
@@ -170,82 +126,7 @@ export function createDirector(game: Game): Director {
     flags.set('story.raining', false);
     flags.set('story.rain.due', false);
     flags.set('story.rain.done', true);
-    // The festival holds its own clear sky.
-    if (!festivalOn()) game.systems.time?.setWeather(null);
-  }
-
-  /** `skipped` is true when the afternoon was waited out: the weather of that afternoon is gone with it. */
-  function startFestival(skipped: boolean): void {
-    if (flags.is('story.raining')) endRain();
-    // A shower leaves as a front, over a quarter of a minute. After a skipped afternoon the sky is clear at once.
-    game.systems.time?.setWeather('clear', skipped);
-    flags.set('festival.started', true);
-    gather();
-    events.emit('festival.started', {});
-    events.emit('toast', { text: 'Dusk. Lamps are being lit in Hollowmere.', icon: 'lantern' });
-  }
-
-  /** Sends everyone to the festival and holds them. Someone sent and then held finishes the walk and stays. */
-  function gather(): void {
-    const people = game.systems.people;
-    let crowd = 0;
-    for (const npc of people?.all() ?? []) {
-      // The spot goes by the person's place in the list, so it is the same one after a load.
-      const spare = CROWD_SPOTS[crowd % CROWD_SPOTS.length];
-      const spot = FESTIVAL_SPOTS[npc.id] ?? { place: 'town.square', x: spare[0], z: spare[1] };
-      if (!FESTIVAL_SPOTS[npc.id]) crowd++;
-      if (held.has(npc.id)) continue;
-      people.send(npc.id, spot.place, { x: spot.x, z: spot.z });
-      people.hold(npc.id, true);
-      held.add(npc.id);
-    }
-  }
-
-  function endFestival(): void {
-    const people = game.systems.people;
-    for (const npc of people?.all() ?? []) people.hold(npc.id, false);
-    held.clear();
     game.systems.time?.setWeather(null);
-    flags.set('festival.over', true);
-  }
-
-  function stepFestival(): void {
-    if (flags.is('festival.over')) return;
-    if (flags.is('festival.started')) {
-      const time = clock.timeOfDay;
-      if (time >= DAWN + 0.04 && time < AFTERNOON_TO) endFestival();
-      else gather();
-      return;
-    }
-    if (!flags.is('bread.delivered') || player.busy) return;
-    if (isDark(clock.timeOfDay)) {
-      flags.set('festival.wait', false);
-      startFestival(false);
-    } else if (flags.is('festival.wait')) {
-      // The player chose to wait with Maren: the afternoon passes.
-      flags.set('festival.wait', false);
-      game.systems.time?.setTimeOfDay(DUSK + 0.005);
-      startFestival(true);
-    }
-  }
-
-  /** The quest mark over whoever can get the player moving again. The quest system puts its own back within a check. */
-  function stepMarks(): void {
-    const people = game.systems.people;
-    if (!people) return;
-    const axe = holds(game, AXE_LOST);
-    if (axe) people.setMark('tamsin', 'quest');
-    else if (axeMark) people.setMark('tamsin', '');
-    axeMark = axe;
-    const seeds = holds(game, SEEDS_SHORT);
-    if (seeds) people.setMark('gus', 'quest');
-    else if (seedMark) people.setMark('gus', '');
-    seedMark = seeds;
-    // The step "float a lamp" names nobody, and the lamp comes from Odo: he carries the mark until he has given it.
-    const lamp = holds(game, LAMP_WAITS);
-    if (lamp) people.setMark('odo', 'quest');
-    else if (lampMark) people.setMark('odo', '');
-    lampMark = lamp;
   }
 
   /** Hands over gifts that did not fit in the bag when they were given. */
@@ -282,7 +163,7 @@ export function createDirector(game: Game): Director {
       actor.pos.y = pet.pos.y;
       actor.pos.z = pet.pos.z;
     }
-    events.emit('toast', { text: 'Your leaftail found its way home.' });
+    events.emit('toast', { text: 'Your fox found its way home.' });
   }
 
   function stepHints(): void {
@@ -309,21 +190,16 @@ export function createDirector(game: Game): Director {
 
   const system: SimSystem = {
     step(dt) {
-      if (!ready) {
-        ready = true;
-        // Added on the first step, when every system is in place. Handlers run before blocks are placed.
-        game.systems.actions?.addHandler(floatLamp);
-      }
       sinceHint += dt;
       sinceTick += dt;
       const tick = sinceTick >= TICK;
       if (tick) sinceTick = 0;
       // Each part is tried by itself: the shell switches a system off for good when its step throws,
-      // and one moment that fails must not take the festival and the end of the act with it.
+      // and one moment that fails must not take the others with it.
       attempt('rain', () => stepRain(dt));
+      attempt('scenes', () => scenes.system.step?.(dt));
       if (!tick) return;
-      attempt('festival', stepFestival);
-      attempt('marks', stepMarks);
+      attempt('road morning', stepRoadMorning);
       attempt('owed', stepOwed);
       attempt('pet', stepPet);
       attempt('hints', stepHints);
@@ -335,10 +211,6 @@ export function createDirector(game: Game): Director {
       if (flags.is('story.raining') && !(rainLeft > 0)) rainLeft = 1;
       // The time system settles a loaded shower at full rain at once, so its seconds count from the first step.
       rainLead = RAIN_LEAD;
-      held.clear();
-      axeMark = false;
-      seedMark = false;
-      lampMark = false;
     },
   };
 

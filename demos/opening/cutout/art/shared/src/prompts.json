@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "demos/opening/art/plates/m1-war.jpg",
+  "prompt": "Use case: precise-object-edit. Input is the approved war temple fresco, an edit target. Remove ALL painted figures, banners, poles, spears, flowers, grass, fountain, rays and gold halos from the interior, leaving only the EMPTY warm ivory plaster wall with its natural fine cracks and the exact thin gold leaf bands across top and bottom. Preserve the colors, texture, 16:9 composition and gold band treatment of the input. Nothing painted in center, no figures or light rays or ground line. Output 1920x1080 landscape."
+}

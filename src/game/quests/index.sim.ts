@@ -6,7 +6,7 @@ import type { Vec3 } from '../../engine/types.ts';
 import type { EventName, Game, NpcId, QuestId, QuestStepView, QuestView, QuestsApi, SimSystem } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { distance2d } from '../move.sim.ts';
-import { QUESTS, type QuestDef, type StepDef } from '../content/quests.ts';
+import { QUESTS, waitsFor, type QuestDef, type StepDef } from '../content/quests.ts';
 import { apply, bagCount, holds, petOf, placeAt, questState, walk, type QuestState } from './rules.sim.ts';
 
 /** Seconds between two checks when nothing happened. */
@@ -23,6 +23,8 @@ interface Progress {
 interface QuestsSave {
   quests: Record<string, { state: QuestState; step: string | null }>;
   seen: string[];
+  /** The quest the player picked to follow, or null. */
+  tracked?: string | null;
 }
 
 export interface Quests {
@@ -39,6 +41,8 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
   const marked = new Set<NpcId>();
   let views: QuestView[] = [];
   let tracked: QuestView | null = null;
+  /** The quest the player picked to follow. The tracker shows it while it is open, else the first open one in the act's order. */
+  let follow: QuestId | null = null;
   let sinceCheck = CHECK_EVERY;
   let dirty = true;
   /** True after a load, when marks left by the saved game have to be matched to this one. */
@@ -112,9 +116,18 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
       p.state = 'done';
       writeFlags(def, p);
       events.emit('quest.completed', { quest: def.id });
-      for (const next of defs) if (typeof next.starts === 'object' && next.starts.after === def.id) start(next.id);
+      startWaiting();
     }
     return true;
+  }
+
+  /** Starts each quest whose quests to wait for are all done. Several can be open at once: the three vaults. */
+  function startWaiting(): void {
+    for (const next of defs) {
+      const waits = waitsFor(next);
+      if (waits.length === 0 || progress.get(next.id)!.state !== 'hidden') continue;
+      if (waits.every((id) => progress.get(id)?.state === 'done')) start(next.id);
+    }
   }
 
   function check(): void {
@@ -128,6 +141,7 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
     for (const def of defs) {
       if (def.starts === 'new game' && progress.get(def.id)!.state === 'hidden' && questState(game, def.id) === 'hidden') start(def.id);
     }
+    startWaiting();
     // One quest finishing can start the next, whose first step may already hold.
     for (let pass = 0, moved = true; moved && pass < 8; pass++) {
       moved = false;
@@ -197,6 +211,7 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
 
   function stepView(step: StepDef, done: boolean, open: boolean): QuestStepView {
     const view: QuestStepView = { id: step.id, text: step.text, done };
+    if (step.hint) view.hint = step.hint;
     const count = step.count;
     if (count) {
       if ('bag' in count) {
@@ -227,10 +242,11 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
         title: def.title,
         summary: def.summary,
         state: p.state,
+        chapter: def.chapter,
         steps: def.steps.map((step, i) => stepView(step, p.state === 'done' || i < p.step, p.state === 'active' && i === p.step)),
       };
     });
-    tracked = views.find((view) => view.state === 'active') ?? null;
+    tracked = views.find((view) => view.id === follow && view.state === 'active') ?? views.find((view) => view.state === 'active') ?? null;
   }
 
   /** Marks a quest finished without sending its events, and gives what finishing it would have given. */
@@ -245,11 +261,17 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
   const api: QuestsApi = {
     all: () => views,
     tracked: () => tracked,
+    track(id) {
+      if (progress.get(id)?.state !== 'active') return;
+      follow = id;
+      refresh();
+    },
     start,
     skipTo(id) {
       const target = defs.findIndex((def) => def.id === id);
       if (target < 0) return;
       seen.clear();
+      follow = null;
       defs.forEach((def, i) => {
         const p = progress.get(def.id)!;
         if (i < target) {
@@ -260,8 +282,9 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
           writeFlags(def, p);
         }
       });
-      // Tamsin waits at the grant stone until the first quest is done, then keeps the lodge.
-      game.systems.people?.send('tamsin', target === 0 ? 'grant.stone' : 'lodge');
+      // Tamsin waits at the grant stone until the first night is over, then keeps the lodge.
+      const night = defs.findIndex((def) => def.id === 'night');
+      game.systems.people?.send('tamsin', night < 0 || target <= night ? 'grant.stone' : 'lodge');
       start(id);
       check();
     },
@@ -291,12 +314,13 @@ export function createQuests(game: Game, defs: readonly QuestDef[] = QUESTS): Qu
         const p = progress.get(def.id)!;
         quests[def.id] = { state: p.state, step: p.state === 'active' ? def.steps[p.step].id : null };
       }
-      return { quests, seen: [...seen] };
+      return { quests, seen: [...seen], tracked: follow };
     },
     load(data) {
       const save = data as Partial<QuestsSave> | null;
       seen.clear();
       for (const key of save?.seen ?? []) seen.add(key);
+      follow = defs.some((def) => def.id === save?.tracked) ? (save!.tracked as QuestId) : null;
       for (const def of defs) {
         const p = progress.get(def.id)!;
         const saved = save?.quests?.[def.id];

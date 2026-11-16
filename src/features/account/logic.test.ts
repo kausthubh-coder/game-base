@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { agoText, asideKey, clerkAddress, markKey, readMark, readSaveText, refusalText, replaceSave, sizeText, syncStep, writeMark, type SaveStorage } from './logic.ts';
 
-const SAVE = JSON.stringify({ version: 1, at: 5_000, world: { version: 1, seed: 1, edits: [] }, game: { version: 1, clock: { day: 3, timeOfDay: 0.4, seconds: 900 } }, shell: { wheat: 2, blocks: 5 } });
+const SAVE = JSON.stringify({ version: 2, at: 5_000, world: { version: 1, seed: 1, edits: [] }, game: { version: 2, clock: { day: 3, timeOfDay: 0.4, seconds: 900 } }, shell: { wheat: 2, blocks: 5 } });
 
 /** localStorage as a map. `full` makes every write fail, as a full disk or a private window does. */
 function storage(start: Record<string, string> = {}, full = false): SaveStorage & { items: Record<string, string> } {
@@ -22,18 +22,18 @@ describe('reading a save', () => {
   });
 
   test('bytes are counted as the file is sent, not as letters', () => {
-    const text = JSON.stringify({ version: 1, at: 1, world: {}, game: { note: 'é' } });
+    const text = JSON.stringify({ version: 2, at: 1, world: {}, game: { note: 'é' } });
     expect(readSaveText(text)?.bytes).toBe(text.length + 1);
   });
 
   test('anything else is not a save', () => {
-    for (const text of ['', 'not json', 'null', '[]', '{}', '{"version":2,"world":{},"game":{}}', '{"version":1,"world":{}}', '{"version":1,"world":[],"game":{}}', '{"version":1,"world":{},"game":null}']) {
+    for (const text of ['', 'not json', 'null', '[]', '{}', '{"version":1,"world":{},"game":{}}', '{"version":3,"world":{},"game":{}}', '{"version":2,"world":{}}', '{"version":2,"world":[],"game":{}}', '{"version":2,"world":{},"game":null}']) {
       expect(readSaveText(text), text).toBeNull();
     }
   });
 
   test('a save with no clock or time still reads, as day 1', () => {
-    expect(readSaveText('{"version":1,"world":{},"game":{}}')).toMatchObject({ at: 0, day: 1 });
+    expect(readSaveText('{"version":2,"world":{},"game":{}}')).toMatchObject({ at: 0, day: 1 });
   });
 });
 
@@ -143,4 +143,10 @@ describe('a Clerk publishable key', () => {
   test('anything else is not a key', () => {
     for (const key of ['', 'pk_test_', 'sk_test_abc', 'pk_test_!!!', `pk_test_${btoa('no-dollar.example.com')}`, `pk_test_${btoa('evil.example.com/path$')}`]) expect(clerkAddress(key), key).toBeNull();
   });
+});
+
+test('the account reads the same save version the game writes', async () => {
+  const { SAVE_VERSION } = await import('./logic.ts');
+  const kernel = await import('../../game/kernel.sim.ts');
+  expect(SAVE_VERSION).toBe(kernel.SAVE_VERSION);
 });

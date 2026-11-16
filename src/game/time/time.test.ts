@@ -38,9 +38,9 @@ function shelter(t: ReturnType<typeof setup>): void {
   t.world.setBlock(4, FLOOR + 3, 4, blockId('oak_plank'));
 }
 
-test('a day is 12 minutes and the game starts at dawn on day 1', () => {
+test('a day is 20 minutes and the game starts at dawn on day 1', () => {
   const t = setup();
-  expect(t.time.dayLength).toBe(720);
+  expect(t.time.dayLength).toBe(1200);
   expect(t.game.clock.day).toBe(1);
   expect(t.game.clock.timeOfDay).toBeCloseTo(0.27, 9);
   expect(t.game.clock.seconds).toBe(0);
@@ -56,18 +56,18 @@ test('a day is 12 minutes and the game starts at dawn on day 1', () => {
   });
   expect(turned).toBeCloseTo(1, 6);
   expect(t.game.clock.day).toBe(2);
-  expect(t.game.clock.seconds).toBeCloseTo(730, 6);
+  expect(t.game.clock.seconds).toBeCloseTo(1210, 6);
 });
 
 test('noon comes halfway through the light, and night passes faster than day', () => {
   const t = setup();
-  // 12 minutes hold the weather clock's 20 in proportion: 36 s of dawn, 432 of light, 36 of dusk, 216 of night.
-  run(t.kernel, 216);
+  // The weather clock's 20 minutes: 60 s of dawn, 720 of light, 60 of dusk, 360 of night. The game starts 60 s in.
+  run(t.kernel, 360);
   expect(t.game.clock.timeOfDay).toBeCloseTo(0.5, 3);
-  run(t.kernel, 216);
+  run(t.kernel, 360);
   expect(t.game.clock.timeOfDay).toBeCloseTo(0.73, 3);
   // Half a second past dawn, so the step that crosses it is not in question.
-  run(t.kernel, 36 + 216 + 0.5);
+  run(t.kernel, 60 + 360 + 0.5);
   expect(t.game.clock.timeOfDay).toBeCloseTo(0.23, 2);
   expect(t.game.clock.day).toBe(2);
 });
@@ -99,7 +99,7 @@ test('dawn sends day.started once a day, and dusk sends night.started once a day
 test('day 1 is clear, and the weather runs by itself from day 2', () => {
   const t = setup();
   const clear = weatherTable.clear;
-  run(t.kernel, DAY_LENGTH - 40, () => {
+  run(t.kernel, DAY_LENGTH - 70, () => {
     const a = t.game.ambient;
     if (a.rain !== 0 || a.fog !== 0 || Math.abs(a.cloud - clear.cloud) > 1e-9) throw new Error(`day 1 was not clear at ${t.game.clock.seconds}`);
   });
@@ -249,7 +249,7 @@ test('sleep() jumps to 0.27 of the next day and sends day.started, then slept', 
   const t = setup();
   const order: string[] = [];
   t.game.events.onAny((name) => order.push(name));
-  run(t.kernel, 500);
+  run(t.kernel, 834);
   order.length = 0;
   const before = t.game.clock.seconds;
   expect(t.game.clock.timeOfDay).toBeGreaterThan(0.75);
@@ -258,17 +258,17 @@ test('sleep() jumps to 0.27 of the next day and sends day.started, then slept', 
   expect(t.game.clock.day).toBe(2);
   expect(t.game.clock.timeOfDay).toBeCloseTo(0.27, 9);
   expect(t.game.ambient.timeOfDay).toBeCloseTo(0.27, 9);
-  // The night that was skipped counts as game time: 720 - 536 seconds to dawn, and 36 of dawn.
-  expect(t.game.clock.seconds - before).toBeCloseTo(220, 6);
+  // The night that was skipped counts as game time: 1200 - 894 seconds to dawn, and 60 of dawn.
+  expect(t.game.clock.seconds - before).toBeCloseTo(366, 6);
   expect(order).toEqual(['day.started', 'slept']);
   expect(t.days).toEqual([1, 2]);
   expect(t.slept).toEqual([2]);
 
   // The new day is announced once, and its dusk still comes.
-  run(t.kernel, DAY_LENGTH - 40);
+  run(t.kernel, DAY_LENGTH - 70);
   expect(t.days).toEqual([1, 2]);
   expect(t.nights).toEqual([1, 2]);
-  run(t.kernel, 40);
+  run(t.kernel, 70);
   expect(t.days).toEqual([1, 2, 3]);
 });
 
@@ -308,7 +308,7 @@ test('setTimeOfDay() jumps the dial within the day, and game time never runs bac
 test('save then load keeps the clock, the day and the forced weather', () => {
   const t = setup();
   t.time.setWeather('rain');
-  run(t.kernel, 600);
+  run(t.kernel, 1000);
   expect(t.nights).toEqual([1]);
   const save = JSON.parse(JSON.stringify(t.kernel.save()));
 
@@ -316,7 +316,7 @@ test('save then load keeps the clock, the day and the forced weather', () => {
   again.kernel.load(save);
   expect(again.game.clock.day).toBe(1);
   expect(again.game.clock.timeOfDay).toBeCloseTo(t.game.clock.timeOfDay, 9);
-  expect(again.game.clock.seconds).toBeCloseTo(600, 6);
+  expect(again.game.clock.seconds).toBeCloseTo(1000, 6);
   // The rain is there at once, not a minute later, and it is still held.
   expect(again.game.ambient.rain).toBeCloseTo(weatherTable.rain.rain, 5);
   // The events of the saved day are not sent again, and the next dawn is.

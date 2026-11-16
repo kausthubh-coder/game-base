@@ -1,0 +1,257 @@
+{
+  "shot": "king",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m2-king.jpg",
+  "layers": [
+    {
+      "id": "plaster",
+      "file": "../shared/plaster.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0
+    },
+    {
+      "id": "person-green",
+      "file": "person-green.webp",
+      "x": 268,
+      "y": 503,
+      "w": 215,
+      "h": 371,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "One kneeling representative with lowered banner."
+    },
+    {
+      "id": "person-red",
+      "file": "person-red.webp",
+      "x": 457,
+      "y": 503,
+      "w": 199,
+      "h": 371,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "One kneeling representative with lowered banner."
+    },
+    {
+      "id": "person-blue",
+      "file": "person-blue.webp",
+      "x": 624,
+      "y": 503,
+      "w": 202,
+      "h": 371,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "One kneeling representative with lowered banner."
+    },
+    {
+      "id": "person-violet",
+      "file": "person-violet.webp",
+      "x": 1090,
+      "y": 503,
+      "w": 211,
+      "h": 371,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "One kneeling representative with lowered banner."
+    },
+    {
+      "id": "person-white",
+      "file": "person-white.webp",
+      "x": 1268,
+      "y": 497,
+      "w": 202,
+      "h": 377,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "One kneeling representative with lowered banner."
+    },
+    {
+      "id": "person-grey",
+      "file": "person-grey.webp",
+      "x": 1428,
+      "y": 499,
+      "w": 215,
+      "h": 375,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "One kneeling representative with lowered banner."
+    },
+    {
+      "id": "hand-green",
+      "file": "hand-green.webp",
+      "x": 527,
+      "y": 315,
+      "w": 261,
+      "h": 109,
+      "z": 40,
+      "pivot": [
+        0,
+        0.5
+      ],
+      "note": "Cuff and hand retraced on the approved plate. Continuous alpha preserves the pale skin and white sleeve."
+    },
+    {
+      "id": "hand-red",
+      "file": "hand-red.webp",
+      "x": 618,
+      "y": 264,
+      "w": 235,
+      "h": 84,
+      "z": 40,
+      "pivot": [
+        0,
+        0.5
+      ],
+      "note": "Cuff and hand retraced on the approved plate. Continuous alpha preserves the pale skin and white sleeve."
+    },
+    {
+      "id": "hand-blue",
+      "file": "hand-blue.webp",
+      "x": 710,
+      "y": 209,
+      "w": 194,
+      "h": 77,
+      "z": 40,
+      "pivot": [
+        0,
+        0.5
+      ],
+      "note": "Cuff and hand retraced on the approved plate. Continuous alpha preserves the pale skin and white sleeve."
+    },
+    {
+      "id": "hand-violet",
+      "file": "hand-violet.webp",
+      "x": 1004,
+      "y": 209,
+      "w": 197,
+      "h": 79,
+      "z": 40,
+      "pivot": [
+        1,
+        0.5
+      ],
+      "note": "Cuff and hand retraced on the approved plate. Continuous alpha preserves the pale skin and white sleeve."
+    },
+    {
+      "id": "hand-white",
+      "file": "hand-white.webp",
+      "x": 1065,
+      "y": 274,
+      "w": 215,
+      "h": 72,
+      "z": 40,
+      "pivot": [
+        1,
+        0.5
+      ],
+      "note": "Cuff and hand retraced on the approved plate. Continuous alpha preserves the pale skin and white sleeve."
+    },
+    {
+      "id": "hand-grey",
+      "file": "hand-grey.webp",
+      "x": 1137,
+      "y": 315,
+      "w": 245,
+      "h": 108,
+      "z": 40,
+      "pivot": [
+        1,
+        0.5
+      ],
+      "note": "Cuff and hand retraced on the approved plate. Continuous alpha preserves the pale skin and white sleeve."
+    },
+    {
+      "id": "crown",
+      "file": "crown.webp",
+      "x": 772,
+      "y": 268,
+      "w": 379,
+      "h": 69,
+      "z": 35,
+      "pivot": [
+        0.5,
+        0.5
+      ],
+      "note": ""
+    },
+    {
+      "id": "boy",
+      "file": "boy.webp",
+      "x": 862,
+      "y": 309,
+      "w": 204,
+      "h": 558,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Boy, halo and hoe. No crown attached."
+    },
+    {
+      "id": "spring",
+      "file": "spring.webp",
+      "x": 808,
+      "y": 368,
+      "w": 297,
+      "h": 497,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": ""
+    },
+    {
+      "id": "flowers",
+      "file": "flowers.webp",
+      "x": 244,
+      "y": 747,
+      "w": 1437,
+      "h": 125,
+      "z": 15,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": ""
+    },
+    {
+      "id": "rays",
+      "file": "rays.webp",
+      "x": 398,
+      "y": 78,
+      "w": 1115,
+      "h": 775,
+      "z": 5,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Even continuous radial masks with texture color sampled from the approved upper gold rays."
+    }
+  ]
+}

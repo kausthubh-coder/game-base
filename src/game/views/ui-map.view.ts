@@ -6,8 +6,14 @@
 // The map asks for a color at each column of blocks. The world keeps only the land around the player in
 // memory, so each color is kept the first time its column is read, and the full map can still draw land
 // the player has walked away from.
+import { custodianMarked } from '../uiview/echo-pins.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import { createMap, type MapMarker, type PinKind } from '../../features/map/index.ts';
+import { farmDef } from '../content/farms.ts';
+import { FLAG } from '../content/flags.ts';
+import { PLACES as PLAN_PLACES, type Biome, type PlaceKind } from '../content/greenhollow.ts';
+import { mapWeight } from '../region/greenhollow-land.sim.ts';
+import { biomeAt } from '../region/greenhollow.sim.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
 import { clearOfPanels, type MarkBox } from '../uiview/clear.ts';
@@ -45,6 +51,17 @@ const PIN_OF: Readonly<Record<string, PinKind>> = {
   bakery: 'shop',
   carpenter: 'shop',
   kennel: 'shop',
+};
+
+/** The pin of each kind of place of the plan of Greenhollow. */
+const PIN_OF_KIND: Readonly<Record<PlaceKind, PinKind>> = { landmark: 'gate', vault: 'vault', place: 'gate', fight: 'quest', shrine: 'waystone', ruin: 'quest' };
+// Keyed by any name, since a place of the region is looked up in it by its region name.
+const PLAN_PINS = new Map<string, PinKind>(PLAN_PLACES.map((p) => [p.id, PIN_OF_KIND[p.kind]]));
+
+/** How each kind of land inks the map, multiplied into a column's own colour: deep green woods, grey woods, olive marsh, pale rock. */
+const LAND_INK: Readonly<Record<Biome, readonly [number, number, number]>> = {
+  meadow: [1, 1, 1], oldForest: [0.62, 0.8, 0.6], greyForest: [0.92, 0.9, 0.86], marsh: [0.86, 0.92, 0.74],
+  caveHills: [1.04, 0.98, 0.94], terraces: [1.08, 1, 0.84], town: [1, 1, 1],
 };
 
 const STYLE = /* css */ `
@@ -172,7 +189,12 @@ export function install(view: GameView): void {
     if (!sim.chunkAt(cx, cz)) return BLANK;
     if (!tile) tiles.set(key, (tile = new Uint32Array(256)));
     const canopy=sim.canopyAt(bx,sim.heightAt(bx,bz)+2,bz);
-    const color = canopy ? 0x516b3c : readColumn(bx, bz);
+    let color = canopy ? 0x516b3c : readColumn(bx, bz);
+    // Inside Greenhollow's map each kind of land has its own ink, so the Old Forest and the grey forest read at a glance.
+    if (color !== BLANK && mapWeight(bx, bz) >= 1) {
+      const ink = LAND_INK[biomeAt(bx, bz)];
+      color = (Math.min(255, ((color >> 16) & 0xff) * ink[0]) << 16) | (Math.min(255, ((color >> 8) & 0xff) * ink[1]) << 8) | Math.min(255, (color & 0xff) * ink[2]);
+    }
     tile[at] = color + 1;
     return color;
   }
@@ -184,9 +206,11 @@ export function install(view: GameView): void {
     colorAt,
     parent: root,
     edgeArrows: 'active',
-    // The far zoom of the full map shows the grant, the dead garden and Hollowmere together.
-    worldSize: 640,
+    // The far zoom of the full map shows all of Greenhollow's 800 by 600 blocks.
+    worldSize: 900,
     storageKey: 'greenhollow.map',
+    // The distance to the waypoint keeps off the quest list, the minimap, the clock and the quick slots.
+    avoid: () => root.querySelectorAll('.gb-hud-quest, .gb-hud-minimap, .gb-hud-sky, .gb-hud-clock, .gb-hud-slots, .gb-hud-vitals, .gb-hud-log, .ui-bookbtn'),
     onToggle(open) {
       book.settle();
       if (open) view.keys.release();
@@ -311,10 +335,25 @@ export function install(view: GameView): void {
     if (!places) return;
     for (const place of places) {
       if (!place.label || pinned.has(place.name)) continue;
-      if (Math.hypot(place.at.x - px, place.at.z - pz) > PIN_RANGE) continue;
+      if (Math.hypot(place.at.x - px, place.at.z - pz) > PIN_RANGE && !custodianMarked(game.flags.is('vaults.marked'), place.name)) continue;
       pinned.add(place.name);
-      marks.setPin({ id: place.name, kind: PIN_OF[place.name] ?? 'waystone', x: place.at.x, z: place.at.z, label: place.label });
+      marks.setPin({ id: place.name, kind: PIN_OF[place.name] ?? PLAN_PINS.get(place.name) ?? 'waystone', x: place.at.x, z: place.at.z, label: place.label });
     }
+  }
+
+  // ---------------------------------------------------------------- Mina's survey
+  // With Mina on the survey, each farm is pinned with its best rate and what holds it back (`job.mina`).
+  const SURVEY = 'survey:';
+  function syncSurvey(): void {
+    const on = game.flags.is(FLAG.settler('mina')) && game.flags.get(FLAG.job('mina')) === 'survey';
+    for (const farm of on ? sys.farms?.all() ?? [] : []) {
+      if (!farm.built || !farm.at) continue;
+      const id = SURVEY + farm.id, label = `${farmDef(farm.id).name}: best ${farm.best} a day. ${farm.symptom}`;
+      const pin = marks.pins.find((one) => one.id === id);
+      // Set only when it changed, since each change is saved.
+      if (!pin || pin.label !== label || pin.x !== farm.at.x || pin.z !== farm.at.z) marks.setPin({ id, kind: 'farm', x: farm.at.x, z: farm.at.z, label });
+    }
+    if (!on) for (const pin of marks.pins.filter((one) => one.id.startsWith(SURVEY))) marks.removePin(pin.id);
   }
 
   // ---------------------------------------------------------------- who is marked
@@ -360,6 +399,7 @@ export function install(view: GameView): void {
       lookForLand(p.x, p.z);
       syncWaypoint(p.x, p.z);
       syncPins(p.x, p.z);
+      syncSurvey();
     }
     syncMarkers();
     map.setPlayer(p.x, p.z, game.player.facing);

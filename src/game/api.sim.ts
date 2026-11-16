@@ -5,15 +5,24 @@
 // `game.systems.<name>` and returns the object the kernel steps and saves.
 //
 // If your system needs one more method or event, add it here in your own section and say so in your report.
+//
+// Act 1 (docs/act1-foundation.md): each of the seven new systems has its own section at the end of this file,
+// marked with a line of `=`. A section adds its events to `GameEvents` and its api to `Systems` by declaring
+// those interfaces again: TypeScript merges every declaration of an interface in one file. A builder edits
+// only its own section, so two builders never touch the same lines.
 
 import type { Ambient, Surface, Vec3 } from '../engine/types.ts';
 import type { RayHit, World } from '../features/world/world.sim.ts';
+import type { FittingId, Gear, GearTier, WeaponKind } from './content/gear.ts';
+import type {
+  BuyerId, FarmId, FarmMode, FightNumber, ItemId, KitId, LedgerSection, MemoryId, NpcId, PersonId, QuestId, RuinId,
+  SceneNumber, SettlementStep, ShrineId, VaultId,
+} from './content/ids.ts';
 
 // ---------------------------------------------------------------------------------------- basics
 
-export type ItemId = string;
-export type NpcId = string;
-export type QuestId = string;
+/** Every id is one of the lists in src/game/content/ids.ts, so a wrong one fails the type check. */
+export type { ItemId, NpcId, QuestId };
 
 export interface Stack {
   id: ItemId;
@@ -88,8 +97,9 @@ export interface GameEvents {
   'pet.startled': { pet: string };
   'pet.bonded': { pet: string };
   // people and story
-  'talk.started': { npc: NpcId; conversation: string };
-  'talk.ended': { npc: NpcId; conversation: string };
+  /** `npc` is empty for a conversation with nobody in the world. */
+  'talk.started': { npc: NpcId | ''; conversation: string };
+  'talk.ended': { npc: NpcId | ''; conversation: string };
   'quest.started': { quest: QuestId };
   'quest.step': { quest: QuestId; step: string };
   'quest.completed': { quest: QuestId };
@@ -97,7 +107,8 @@ export interface GameEvents {
   // time
   'day.started': { day: number };
   'night.started': { day: number };
-  slept: { day: number };
+  /** The player slept to the next morning. `skipped` is the seconds of game time the night skipped, for systems that catch up. */
+  slept: { day: number; skipped: number };
   'placeable.placed': { kind: string; x: number; y: number; z: number };
   // building
   /** Build mode went on or off. */
@@ -112,8 +123,9 @@ export interface GameEvents {
   'ui.sound': { sound: 'click' | 'open' | 'close' };
   /** Asks the interface to open a panel: `make` from a workbench, `bag`, `almanac` (detail is a page id), `quests`. */
   'ui.open': { panel: string; detail?: string };
-  'festival.started': Record<string, never>;
   'act.ended': { act: number };
+  /** Scene n of chapter 22 played to its end, as talk, staged or film. Its flag `scene.<n>` is set first. */
+  'scene.played': { scene: SceneNumber };
 }
 
 export type EventName = keyof GameEvents;
@@ -181,6 +193,7 @@ export interface Systems {
   talk: TalkApi;
   quests: QuestsApi;
   region: RegionApi;
+  hall: HallApi;
 }
 
 // ---------------------------------------------------------------------------------------- items
@@ -501,7 +514,7 @@ export interface TimeApi {
    * most of a minute. `now` settles a kind at once with no front, for a moment that skips time.
    */
   setWeather(kind: 'clear' | 'breezy' | 'overcast' | 'rain' | 'storm' | 'fog' | null, now?: boolean): void;
-  /** Jumps the clock. For the festival and for tests. */
+  /** Jumps the clock. For a scripted moment and for tests. */
   setTimeOfDay(timeOfDay: number): void;
   /**
    * Hears each clap of thunder in a storm, with the place the lightning struck. The clap comes later the
@@ -509,6 +522,12 @@ export interface TimeApi {
    * It is optional so that a fake without it still fits. The real system always has it.
    */
   onThunder?(listener: (at: Vec3) => void): () => void;
+  /**
+   * Asks before the player sleeps. `sleep()` calls each guard, and the first that returns words keeps the
+   * player awake: the words go out as a toast. For a story moment that will not let the night pass yet.
+   * It is optional so that a fake without it still fits. The real system always has it.
+   */
+  guardSleep?(guard: () => string | null): void;
 }
 
 // ---------------------------------------------------------------------------------------- living things
@@ -634,11 +653,25 @@ export interface TalkLine {
   npc: NpcId | null;
   /** The speaker's name, portrait and voice id. Empty strings for the narrator. */
   name: string;
+  /** The portrait with the line's face, `hobb-glad`, and the plain one to fall back on, `hobb`. */
   portrait: string;
+  face: string;
   voice: string;
   text: string;
   /** Up to three choices. Empty when the line just continues. */
   choices: string[];
+  /** How the conversation is shown: talk in the box, staged with the camera on the people, or a film. */
+  kind: 'talk' | 'staged' | 'film';
+  /** The scene of chapter 22 it is part of, or 0. */
+  scene: number;
+}
+
+/** A line that was said, for the log of the conversation so far. */
+export interface TalkLogEntry {
+  name: string;
+  text: string;
+  /** The choice the player took on this line, if it had choices. */
+  chose?: string;
 }
 
 export interface TalkApi {
@@ -653,11 +686,17 @@ export interface TalkApi {
   advance(): void;
   /** Picks a choice by its index and moves on. */
   choose(index: number): void;
+  /** Ends a film at once, with everything it does done: each line's effects, the first choice where one is asked. */
+  skip(): void;
+  /** What has been said, oldest first: this conversation and the ones before it, up to the last 80 lines. */
+  log(): readonly TalkLogEntry[];
 }
 
 export interface QuestStepView {
   id: string;
   text: string;
+  /** One more line for the quest log, when the step text alone does not say how. */
+  hint?: string;
   done: boolean;
   /** Progress such as 7 of 20, when the step counts something. */
   have?: number;
@@ -671,13 +710,17 @@ export interface QuestView {
   title: string;
   summary: string;
   state: 'hidden' | 'active' | 'done';
+  /** The chapter of act 1 it is in, 1 to 5. */
+  chapter?: number;
   steps: QuestStepView[];
 }
 
 export interface QuestsApi {
   all(): readonly QuestView[];
-  /** The quest the tracker shows. */
+  /** The quest the tracker shows: the one the player picked while it is open, else the first open one. */
   tracked(): QuestView | null;
+  /** Follows this open quest in the tracker, when more than one is open. */
+  track?(id: QuestId): void;
   start(id: QuestId): void;
   /** For tests and the debug panel: finishes steps up to this quest's start. */
   skipTo(id: QuestId): void;
@@ -689,6 +732,22 @@ export interface Place {
   at: Vec3;
   /** A short label for the map, or empty to keep it off the map. */
   label: string;
+}
+
+/** How alive the player's land is: the number the Heartstone shows, and what it is made of. */
+export interface Heart {
+  /** 0 to 6, by chapter 30's ladder. */
+  level: number;
+  /** Each kind of living thing on the land: how many there are, and what one is worth. */
+  parts: readonly { label: string; count: number; worth: number }[];
+}
+
+/** Ilara's Hall: the Shut Door, the first night, the Mark, the Custodian and the Heartstone. */
+export interface HallApi {
+  /** The Heartstone. The settlement owns the number (`SettlementApi.heartstone`); the Hall shows it. */
+  heart(): Heart;
+  /** Where the Blighted fox of the first night is, or null when it is not about. */
+  fox(): Vec3 | null;
 }
 
 export interface RegionApi {
@@ -760,4 +819,636 @@ export interface RegionScatter {
    * grew as blocks, and is 0 around the grant, the dead garden, the town and the path, so they stay in view.
    */
   forest(x: number, z: number): number;
+}
+
+// ======================================================================================== act 1: fights
+// The fights builder's section. The world's encounters: which of the twelve fights is armed, running and done,
+// and the hero's numbers. The 60 Hz fight itself is the lab's code in src/game/fight, run by a view.
+
+export interface GameEvents {
+  'fight.started': { fight: FightNumber };
+  /** `won`: calmed, shut down or freed. `fell`: the hero fainted and woke at the stage's wake point. `left`: walked out of the circle. */
+  'fight.ended': { fight: FightNumber; result: 'won' | 'fell' | 'left' };
+  /** The Mark was held out to a beast deeper than the Heartstone. */
+  'fight.denied': { fight: FightNumber; depth: number; heartstone: number };
+}
+
+export interface Systems {
+  fights: FightsApi;
+}
+
+/**
+ * The hero's health and stamina outside the lab. The fights system owns them and works them out from the
+ * gear record's armour tier (`BenchApi.gear().armor`), today's meal (the flag `meal.day`) and the shrine
+ * picks (the flags `shrine.<id>` = `heart` or `stamina`). A heart is a step of health.
+ */
+export interface HeroStats {
+  health: number;
+  maxHealth: number;
+  stamina: number;
+  maxStamina: number;
+}
+
+export interface FightsApi {
+  hero(): HeroStats;
+  /** The fight running now, or null. A night visitor at the fence is a fight with no number: see `running()`. */
+  active(): FightNumber | null;
+
+  // ---- added by the fights builder. Optional, so a fake without them still fits; the real system has them all.
+  /** Each of the twelve fights: whether its quest step has armed it, and how it came out. */
+  states?(): readonly FightState[];
+  /** The fight running now, with its rules, for the view that draws it and steps it. Null when none is. */
+  running?(): RunningFight | null;
+  /** A view that steps the running fight itself, 60 times a second with the hero's body, says so here. Without one the system steps it. */
+  drive?(byView: boolean): void;
+  /** Starts fight n now, where the hero stands, whether or not its step is open: the debug door and the tests. False for fight 1, the Hall's. */
+  begin?(n: FightNumber): boolean;
+  /**
+   * Starts a vault's keeper (fights 7, 9 and 10) in the room the ruins built for it, with its step open or not.
+   * Nothing else starts a keeper in the world; `begin(n)` fights it in its test room where the hero stands.
+   */
+  startKeeper?(n: 7 | 9 | 10, room: import('./fight/keepers.sim.ts').KeeperRoom): boolean;
+  /** Starts the Verdant Stag (fight 12) in its hall, round this point: the ruins call it under the Rootworks. */
+  startStag?(x: number, z: number): boolean;
+  /** Walks away from the fight running now: it ends as left, and arms again once the hero is well away. */
+  leave?(): void;
+  /** The companions the hero has (Dax, Wren, the fox, the Stag's young), the one picked to come next, and picking one. */
+  companions?(): readonly string[];
+  companion?(): string | null;
+  pick?(kind: string): boolean;
+  /** The rule-made player fights the running fight: for the sim's scenarios and the debug door. Null hands it back. */
+  autoplay?(level: 'perfect' | 'middle' | 'clumsy' | null): void;
+  /** Tonight's visitor at the fence, or null. */
+  visitor?(): { kind: string; depth: number; x: number; z: number } | null;
+}
+
+/** One of the twelve fights as the world has it. */
+export interface FightState {
+  n: FightNumber;
+  /** Its quest step is open: it starts when the hero comes near its place. */
+  armed: boolean;
+  won: boolean;
+  denied: boolean;
+  /** Where it is fought. */
+  at: { x: number; z: number };
+}
+
+/** A fight running in the world. */
+export interface RunningFight {
+  /** Its number, or 0 for a night visitor. */
+  readonly n: FightNumber | 0;
+  readonly fight: import('./fight/fight.sim.ts').Fight;
+  readonly stage: import('./fight/arena.sim.ts').Stage;
+  /** A vault's keeper, or the Stag's hall, when it is one of those. */
+  readonly keeper: import('./fight/keepers.sim.ts').Keeper | null;
+  readonly hall: import('./fight/stag-hall.sim.ts').Hall | null;
+  /** The fight's one line: what it teaches. */
+  readonly line: string;
+  /** Seconds since it ended, or -1 while it goes on. */
+  readonly over: number;
+  /** One step of the rules: the rule-made player when it plays, the fight, the keeper or the hall, and what the world does with what happened. */
+  step(dt: number): void;
+}
+
+// ======================================================================================== act 1: settlement
+// The settlement builder's section. Who lives on the player's land, their needs, jobs and wishes, the dinner
+// table, the settlement's step, and the Heartstone, which `HallApi.heart()` passes on.
+
+export interface GameEvents {
+  'settler.arrived': { who: PersonId };
+  'settlement.step': { step: SettlementStep };
+  'wish.granted': { who: PersonId };
+  /** Dinner: two settlers ask, the player grants one. */
+  'dinner.asked': { asks: readonly [PersonId, PersonId] };
+}
+
+export interface GameEvents {
+  /** "E" on a settler or on their home: the interface shows their card. */
+  'settler.opened': { who: PersonId };
+  /** "E" on the Heartstone, or a click on its gauge: the interface shows what the next step asks for. */
+  'heartstone.opened': Record<string, never>;
+  /** A dinner ask was granted. `other` says `line`, once. */
+  'dinner.granted': { who: PersonId; other: PersonId; line?: string };
+}
+
+export interface Systems {
+  settlement: SettlementApi;
+}
+
+/** The three needs a settler shows on their door. */
+export type NeedId = 'bed' | 'meal' | 'lamp';
+
+export interface JobView {
+  id: string;
+  name: string;
+  /** What the job does, in a line. */
+  text: string;
+  /** What to walk them to, as "the kitchen". */
+  room: string;
+  /** False while nothing of that kind stands on the land. */
+  ready: boolean;
+}
+
+/** A building of the settlement that someone sleeps in, or works in. */
+export interface HomeView {
+  /** The placed thing's id. */
+  id: string;
+  kind: string;
+  name: string;
+  /** The middle of its roof, for a tag over it, and the spot before its door. */
+  top: Vec3;
+  door: Vec3;
+  /** Who sleeps in it. */
+  residents: readonly PersonId[];
+  /** A lamp stands by it. */
+  lit: boolean;
+}
+
+export interface SettlerView {
+  who: PersonId;
+  name: string;
+  needs: Readonly<Record<NeedId, boolean>>;
+  /** Every need met and nothing stopping their work: they give a heart each morning. */
+  glad: boolean;
+  wish: { text: string; granted: boolean };
+  /** The two jobs to choose from, or none for someone who came to do one thing. */
+  jobs: readonly JobView[];
+  job: string | null;
+  /** The job they are being walked to, or null. */
+  leading: string | null;
+  /** The home they sleep in, or null for a bed under a roof somewhere else, or no bed. */
+  home: HomeView | null;
+  /** Hearts they have given. */
+  hearts: number;
+  /** What you can tell from the road once they work. */
+  road: string;
+  /** Why they are not glad, or something else worth a line, or empty. */
+  note: string;
+}
+
+export interface DinnerView {
+  day: number;
+  asks: readonly { who: PersonId; text: string }[];
+  /** Who was granted, once the player picked. */
+  granted: PersonId | null;
+}
+
+/** What the next level of the Heartstone asks for. */
+export interface HeartNextView {
+  level: number;
+  /** What it puts in reach: "The lynx". */
+  reach: string;
+  parts: readonly { label: string; have: number; need: number }[];
+  /** The Order's pump is running, so the stone reads one step lower. */
+  pump: boolean;
+}
+
+export interface SettlementApi {
+  /** The Heartstone, 0 to 6, and what it is made of. Also written to the flag `heartstone`. */
+  heartstone(): Heart;
+  step(): SettlementStep;
+  /** Who lives on the player's land. */
+  settlers(): readonly PersonId[];
+  /** One settler's needs, wish and work, or null for someone who does not live here. */
+  settler(who: PersonId): SettlerView | null;
+  /** The homes that someone sleeps in. The same array on every call until the land changes. */
+  homes(): readonly HomeView[];
+  /** What the next level of the Heartstone asks for, or null at 6. */
+  next(): HeartNextView | null;
+  /**
+   * Starts walking a settler to a job's room: they follow the hero, and the job is theirs once both stand by the
+   * room. Returns why not (no such room yet), or null when they are on their way.
+   */
+  lead(who: PersonId, job: string): string | null;
+  /** Tonight's dinner once the hero sat down to it, or null. */
+  dinner(): DinnerView | null;
+  /** Grants one of tonight's asks: ten hearts. Returns the other's one line, or null when it cannot. */
+  grant(who: PersonId): string | null;
+  /** Food into the kitchen's larder, from a buyer or a delivery. Returns how many it took. */
+  stock(item: ItemId, count: number): number;
+  /** Meals in the larder, travel meals waiting at the smokehouse. */
+  larder(): { meals: number; travel: number };
+  /**
+   * Where a settler stands now by their routine, or null. The people system walks them there. With `seat` they sit
+   * there, facing that way (0 north, clockwise seen from above): a seat at the dinner table.
+   */
+  spot(who: PersonId): { key: string; place: string; at: Vec3; seat?: number } | null;
+}
+
+/** The people system walks a settler behind the hero while the settlement leads them to a room. */
+export interface PeopleApi {
+  lead?(id: NpcId, on: boolean): void;
+}
+
+// ======================================================================================== act 1: farms
+// The farms builder's section. Every farm of chapter 30: its mode, whether it is living, its rate and what is
+// wrong with it.
+
+export interface GameEvents {
+  'farm.built': { farm: FarmId };
+  'farm.mode': { farm: FarmId; mode: FarmMode };
+  /** A farm made goods. `at` is where they dropped. */
+  'good.made': { farm: FarmId; item: ItemId; count: number; at: Vec3 };
+}
+
+export interface Systems {
+  farms: FarmsApi;
+}
+
+export interface FarmView {
+  id: FarmId;
+  built: boolean;
+  mode: FarmMode;
+  /** On Give and running, so it counts for the Heartstone. */
+  living: boolean;
+  /** Goods a day (20 minutes), now and at best. */
+  rate: number;
+  best: number;
+  /** The one line on the rate tag that says what is wrong, or empty. */
+  symptom: string;
+
+  // ---- the farm panel and the rate tag (the farms builder's view)
+  /** The tag's words, such as `6 springs a day`, and the line under them. Empty while the farm is not on the ground. */
+  tag: string;
+  sub: string;
+  /** How to put the symptom right: one press away on the tag, never shown first. */
+  fix: string;
+  /** Where the tag hangs, or null while nothing of the farm is on the ground. */
+  at: Vec3 | null;
+  /** What Take would give at once, and the days its creatures stay away after one. 0 when it cannot take. */
+  take: number;
+  away: number;
+}
+
+export interface FarmsApi {
+  all(): readonly FarmView[];
+  get(id: FarmId): FarmView | undefined;
+  /** Give or Take. Take gives its goods at once and sends the creatures away three days. False for a farm that cannot. */
+  setMode?(id: FarmId, mode: FarmMode): boolean;
+}
+
+// ======================================================================================== act 1: machines
+// The farms builder's section too. Shafts, power and the parts on them, ditches, and goods on the move.
+
+export interface GameEvents {
+  /** A placed part's state changed. `part` is its `Placed.id`. */
+  'machine.state': { part: string; state: MachineState };
+}
+
+export interface Systems {
+  machines: MachinesApi;
+}
+
+export interface PlaceableDef {
+  /** Drawn by that system's own view, with its state and its moving piece. The stations view leaves it. */
+  drawnBy?: 'machines';
+}
+
+export interface CropsApi {
+  /**
+   * Cuts a ripe crop where it stands and plants its seed again, for a harvester arm. Returns what it gave, which
+   * the caller drops on the ground, or null when nothing ripe grows on this soil block.
+   */
+  cut?(x: number, y: number, z: number): readonly Stack[] | null;
+}
+
+export type MachineState = 'working' | 'starved' | 'backed up' | 'off';
+
+/** What a sensor watches the cell in front of it for. The shaft it is on runs while it sees it. */
+export type SensorMode = 'creature' | 'good' | 'ripe' | 'dry' | 'light' | 'dark' | 'room';
+
+export interface MachinePart {
+  /** The placed thing's id. */
+  id: string;
+  kind: string;
+  state: MachineState;
+  /** Power it has, and power it asks for. A wheel's `power` is what it makes. */
+  power: number;
+  wants: number;
+  x: number;
+  y: number;
+  z: number;
+  quarterTurns: number;
+  /** How fast its shaft runs, 0 to 1: the power made over the power asked for, at most 1. 0 when switched off. */
+  speed: number;
+  /** The shaft it is on, as an index into `shafts()`, or -1 when it is on none. */
+  shaft: number;
+}
+
+/** One shaft: the parts joined to each other, the power its wheels make and what its parts ask for. */
+export interface Shaft {
+  power: number;
+  wants: number;
+  speed: number;
+  /** False while a lever on it is down or a sensor on it sees nothing. */
+  on: boolean;
+}
+
+/** A hole the spade dug. It fills when water is beside it, level or higher, and then it is a ditch. */
+export interface Hole {
+  x: number;
+  y: number;
+  z: number;
+  wet: boolean;
+}
+
+/** A good lying on the ground, where a creature left it or a chute dropped it. */
+export interface LooseGood {
+  id: number;
+  item: ItemId;
+  count: number;
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface MachinesApi {
+  parts(): readonly MachinePart[];
+  /** True when any wheel turns: the Heartstone's "a wheel turning". */
+  turning(): boolean;
+
+  // ---- what the rest of the farms builder's systems and views use
+  part(id: string): MachinePart | undefined;
+  shafts(): readonly Shaft[];
+  /** How strongly the working sprinklers wet this soil block, 0 to 1: the speed of the best one that reaches it. */
+  sprinkled(x: number, y: number, z: number): number;
+  holes(): readonly Hole[];
+  /** True when the spade dug this block out and it is still open. */
+  hole(x: number, y: number, z: number): Hole | undefined;
+  loose(): readonly LooseGood[];
+  /** Drops goods on the ground at a point. Chutes, chests and the player pick them up. */
+  drop(item: ItemId, count: number, at: Vec3): void;
+  /** What a collector chest holds, or null when there is no such chest. */
+  chest(id: string): readonly Stack[] | null;
+  /** Moves what a collector chest holds into the bag, as far as there is room. Returns how many moved. */
+  empty(id: string): number;
+  /** Items a collector chest holds at most. */
+  readonly chestSize: number;
+  /** A gearling walked into this wheel: it stops, and its shaft with it, for a while. */
+  jam(wheelId: string): void;
+  jammed(wheelId: string): boolean;
+  lever(id: string): boolean;
+  sensor(id: string): SensorMode | null;
+  /** A hatch lets the sun in. Open on a running shaft, or as the player left it. */
+  hatchOpen(id: string): boolean;
+  /** The farms set the state of the builds they run (a post, a clapper, a bee box), so the view shows it. */
+  mark(id: string, state: MachineState): void;
+  /** The power a wheel standing here would make: 6 where the water drops, 4 on flat water, 0 with none. */
+  wheelPower(x: number, y: number, z: number): number;
+}
+
+// ======================================================================================== act 1: bench
+// The farms builder's section too. The bench's four steps, fittings, the other weapons, and the kit.
+
+export interface GameEvents {
+  /** The bench made a weapon at a step with a fitting, or a step of armour. */
+  'gear.made': { what: WeaponKind | 'armor'; tier: GearTier; fitting: FittingId | null };
+}
+
+export interface Systems {
+  bench: BenchApi;
+}
+
+/** One thing the bench makes: a weapon at a step with one of the step's two fittings, or a step of armour. */
+export type BenchMake = { what: WeaponKind; tier: GearTier; fitting: FittingId } | { what: 'armor'; tier: GearTier };
+
+export interface BenchApi {
+  /** The gear record (src/game/content/gear.ts). The fights read it. */
+  gear(): Gear;
+
+  // ---- the bench panel and the kit panel (the farms builder's views)
+  /** The weapons the hero owns, each at its own step with its own fitting. The first is the one picked on grant day. */
+  weapons(): readonly { weapon: WeaponKind; tier: GearTier; fitting: FittingId | null }[];
+  /** The goods and found things a make takes, the fitting's good among them. */
+  cost(make: BenchMake): readonly Stack[];
+  /** Null when it can be made now, or the reason it cannot, in a few words for the panel. */
+  why(make: BenchMake): string | null;
+  make(make: BenchMake): boolean;
+  /** Takes another owned weapon in hand. */
+  wield(weapon: WeaponKind): boolean;
+  /** Puts a kit thing in one of the three slots, or empties it with null. The thing must be in the bag. */
+  equip(slot: 0 | 1 | 2, kit: KitId | null): boolean;
+}
+
+// ======================================================================================== act 1: goods
+// The goods builder's section. Coin, the buyers, the queen's ledger and the Order's pump.
+
+export interface GameEvents {
+  'goods.sold': { buyer: BuyerId; item: ItemId; count: number; coin: number };
+  'coin.changed': { coin: number; by: number };
+  'ledger.filled': { section: LedgerSection };
+  'pump.set': { running: boolean };
+  /** A standing order of the ledger was delivered, or a pack order is all in the bag. `times` counts the deliveries. */
+  'order.filled': { order: import('./content/goods.ts').OrderId; times: number };
+  /** Market day's rush order was posted at dawn, or met. */
+  'rush.posted': { item: ItemId; count: number };
+  'rush.met': { item: ItemId; count: number };
+}
+
+export interface Systems {
+  goods: GoodsApi;
+}
+
+export interface LedgerView {
+  section: LedgerSection;
+  /** What the section asks for, and how much of each has been delivered. */
+  needs: readonly { item: ItemId; count: number; have: number }[];
+  filled: boolean;
+}
+
+/** What a buyer in town takes today. */
+export interface BuyerView {
+  buyer: import('./content/goods.ts').TownBuyer;
+  /** Each good it takes: its price, what it has taken today, and today's cap. */
+  goods: readonly { item: ItemId; price: number; taken: number; cap: number }[];
+  marketDay: boolean;
+}
+
+/** A standing order of the ledger, once its four sections are filled. */
+export interface OrderView {
+  id: import('./content/goods.ts').OrderId;
+  /** `have` is what the bag holds now. */
+  needs: readonly { item: ItemId; count: number; have: number }[];
+  /** For a pack order: kit slots filled, of three. -1 when it asks for no kit. */
+  kit: number;
+  /** Deliveries made, or 1 for a pack order the bag holds in full. */
+  times: number;
+  /** It can be delivered now, or for a pack order, the bag holds it all. */
+  ready: boolean;
+}
+
+/** Market day's rush order: twice a farm's daily rate of one good, by nightfall. */
+export interface RushView {
+  day: number;
+  item: ItemId;
+  count: number;
+  met: boolean;
+  /** Seconds of game time left before nightfall, 0 once it has passed. */
+  left: number;
+}
+
+/** Something coin buys, as the panels show it. */
+export interface ShopView {
+  id: import('./content/goods.ts').ShopId;
+  coin: number;
+  /** Null when it can be bought now, or why not, in a few words. */
+  why: string | null;
+}
+
+/** The Order's pump: running in the field, or in its crate. */
+export interface PumpView {
+  running: boolean;
+  /** Where it stands, or its crate, on the ground. Null before the blessing offers it. */
+  at: Vec3 | null;
+  /** How grey the ground round it is, 1 while it runs, falling to 0 over three days once it is out. */
+  grey: number;
+  /** Where the grey ring is, the spot it last ran at. */
+  greyAt: Vec3 | null;
+}
+
+export interface GoodsApi {
+  coin(): number;
+  ledger(): readonly LedgerView[];
+  /** True while the Order's pump runs in the player's field. */
+  pumpRunning(): boolean;
+
+  // ---- selling
+  buyer(id: import('./content/goods.ts').TownBuyer): BuyerView;
+  /** Sells up to `count` from the bag. Returns how many the buyer took. */
+  sell(id: import('./content/goods.ts').TownBuyer, item: ItemId, count: number): number;
+  marketDay(): boolean;
+  /** Wheat in the bag that grew while the pump ran: the granary takes it, the ledger does not. */
+  pumpWheat(): number;
+
+  // ---- the ledger
+  /** The section the player picked to work on, or null before the first pick. */
+  picked(): LedgerSection | null;
+  pick(section: LedgerSection): void;
+  /** Delivers what the bag holds toward a section: clean wheat only. Returns how many went in. */
+  deliver(section: LedgerSection): number;
+  orders(): readonly OrderView[];
+  /** Delivers one standing order. False when the bag is short or it is not open. */
+  fill(order: import('./content/goods.ts').OrderId): boolean;
+  /** Today's rush order, or null when there is none. */
+  rush(): RushView | null;
+  /** Delivers the rush order at the market. False when the bag is short, it is met, or night has come. */
+  meetRush(): boolean;
+
+  // ---- what coin buys
+  shop(): readonly ShopView[];
+  /** Buys one. Null when it was bought, or why not. A guide needs `vault`, the vault to walk to. */
+  buy(id: import('./content/goods.ts').ShopId, vault?: VaultId): string | null;
+  /** Furniture in the player's homes, 1 to 3, and the hearts each use gives. */
+  furniture(): { grade: number; hearts: number };
+
+  // ---- the pump
+  pump(): PumpView;
+  /** Sets the pump running in the field, or pulls it out into its crate. False when nothing changed. */
+  setPump(running: boolean): boolean;
+}
+
+// ======================================================================================== act 1: ruins
+// The ruins builder's section. Small ruins, shrines, memory stones, the vaults, keystones and the Rootworks.
+
+export interface Systems {
+  ruins: RuinsApi;
+}
+
+export type RuinState = 'unknown' | 'found' | 'sealed' | 'cleared';
+
+export interface RuinsApi {
+  /** A small ruin's or a vault's state. */
+  state(id: RuinId | VaultId): RuinState;
+  /** What a shrine gave, or null while it is dormant. */
+  shrine(id: ShrineId): 'heart' | 'stamina' | null;
+  /** True once the memory stone's scene has played. */
+  remembered(id: MemoryId): boolean;
+  keystones(): number;
+
+  // ---- added by the ruins builder. Optional, so a fake without them still fits; the real system has them all.
+  /** What the rooms and the Old Gate show now, for the views. */
+  view?(): RuinsView;
+  /** Restores a shrine with what the player picked from it. False when it is not theirs to restore. */
+  restore?(shrine: ShrineId, gift: 'heart' | 'stamina'): boolean;
+  /** Takes the hero into a room, at its door: the debug door and the tests. */
+  enter?(room: string): void;
+}
+
+export interface GameEvents {
+  /**
+   * The hero went through a door of the ruins: into a room, out of one, or between two. `game.player.pos` is there
+   * already; a view moves the hero's body there too and makes the land round it.
+   */
+  'ruins.moved': { x: number; y: number; z: number; facing: number; room: string | null };
+  /** The player put their marked hand on a dormant shrine: the interface asks heart or stamina, and calls `restore`. */
+  'shrine.asked': { shrine: ShrineId };
+}
+
+/** The rooms as they are now. */
+export interface RuinsView {
+  /** The room the hero is in, or null. */
+  room: string | null;
+  /** The Pump House's lever is pulled: the stair is dry, and its sprays run. */
+  lever: boolean;
+  /** The Lamp Gallery's glass eyes that have seen the hero, 0 to 6. Each lights two lamps. */
+  eyes: number;
+  /** The Rootworks' three machines rebuilt, by level. */
+  machines: readonly boolean[];
+  /** The deepest level of the Rootworks the hero has climbed down to, 0 before the first. */
+  deepest: number;
+  /** The Old Gate stands open. */
+  gate: boolean;
+  /** The keystone of each vault taken from its dais. */
+  taken: Readonly<Record<VaultId, boolean>>;
+  /** The Hall's second level is open. */
+  below: boolean;
+  /** Each memory stone that is still there to be touched (one shown to Calla is ash). */
+  stones: readonly MemoryId[];
+}
+
+// ======================================================================================== act 1: the opening
+// The opening builder's section. The film's end, grant day at Saltgate and the ferry up the Mere (src/game/opening).
+
+export interface GameEvents {
+  /** The opening moved on: `saltgate` once the film is over, `ferry` when the ferry pushes off, `landed` at the landing. */
+  'opening.stage': { stage: OpeningStage };
+  /** Grant day asks something a panel answers: the hero's look at the mirror, or their name on the deed. */
+  'opening.ask': { ask: OpeningAsk };
+  /** A swing at Dax in the bout. `landed` is false when his crate lid took it. `guard` is what is left of his guard. */
+  'opening.swing': { landed: boolean; guard: number };
+}
+
+export interface Systems {
+  opening: OpeningApi;
+}
+
+export type OpeningStage = 'film' | 'saltgate' | 'ferry' | 'landed';
+export type OpeningAsk = 'mirror' | 'deed';
+/** The four looks of the hero's sheet (`assets-src/concept/people-home/hero.webp`), picked at the mirror. */
+export type HeroLook = 'a' | 'b' | 'c' | 'd';
+
+export interface OpeningApi {
+  stage(): OpeningStage;
+  /** The name written on the deed (empty until then) and the look picked at the mirror. */
+  hero(): { name: string; look: HeroLook };
+  /** The film played to its end or was skipped. The hero wakes in the bunk room. */
+  filmDone(): void;
+  /** The panel the player has open, or null. */
+  asking(): OpeningAsk | null;
+  /** The mirror's answer. Ends scene 1 the first time. */
+  setLook(look: HeroLook): void;
+  /** The deed's answer: the name, trimmed to 20 letters. A blank name is refused and returns false. */
+  sign(name: string): boolean;
+  /** Closes the panel without an answer. */
+  cancel(): void;
+  /** A swing at Dax in the bout. True when it emptied a pip of his guard. */
+  swing(): boolean;
+  /** The bout with Dax: whether it is on, and his guard left, from 3. */
+  bout(): { on: boolean; guard: number };
+  /** The river is behind: the hero stands at the landing. The view has moved them there. */
+  ferryDone(): void;
+  /** A spot of Saltgate in the world, feet height. */
+  spot(id: string): Vec3 | null;
+  /** True while the hero stands in Saltgate. */
+  inSaltgate(at: Vec3): boolean;
 }

@@ -7,7 +7,7 @@
 //
 // A part's full output goes to .artifacts/verify/<part>.log. The exit code is 1 when a part failed.
 // Which part to run for which change is in .agents/skills/verify-game/SKILL.md.
-import { spawnSync } from 'node:child_process';
+import { executePart } from './workflow/verify.mjs';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -17,13 +17,15 @@ const LOGS = resolve(ROOT, '.artifacts/verify');
 /** A part passes when every command exits 0. `skip` is an exit code that means "nothing to check here". */
 const PARTS = [
   { name: 'check', what: 'types, the .sim.ts rule, every test, the Convex tests', run: [['bun', 'run', 'check']] },
+  { name: 'formal', what: 'covered code matches the reviewed formal model', run: [['bun', 'tools/formal-sync.mjs']] },
   { name: 'lint', what: 'Biome lint', run: [['bun', 'run', 'lint']] },
-  { name: 'tools', what: 'the tools\' own tests', run: [['bun', 'test', 'tools/doctor.test.mjs']] },
+  { name: 'tools', what: 'the tools\' own tests', run: [['bun', 'test', 'tools/doctor.test.mjs', 'tools/art', 'tools/workflow'], ['bun', 'tools/workflow/break-checks.mjs']] },
   { name: 'bots', what: 'three bots, 20,000 steps each, rules only', run: [['bun', 'tools/sim.ts', 'bot', '--seed', '1,2,3', '--steps', '20000']] },
   { name: 'assets', what: 'every asset against the asset contract', run: [['bun', 'tools/verify-assets.mjs']] },
   { name: 'build', what: 'a production build', run: [['bun', 'run', 'build']] },
   { name: 'shots', what: 'six scenes against their approved pictures, and the draw budgets', run: [['bun', 'tools/shots.mjs', 'all', '--check']] },
   {
+    onFailure: [['bun', 'tools/play.mjs', 'stop']],
     name: 'play', what: 'every recording in tools/play/scenarios with real keys, the play tool\'s eyes, build mode, camera drag',
     run: [
       ['bun', 'tools/play.mjs', 'replay', 'all'],
@@ -37,6 +39,10 @@ const PARTS = [
   {
     name: 'cloud', slow: true, what: 'two browsers sign in through Clerk, the save goes between them, a conflict is asked (needs .env.local)',
     run: [['bun', 'tools/play-cloud-save.mjs']], skip: 2,
+  },
+  {
+    name: 'sight', slow: true, what: 'every scene of act 1 frames the hero and whoever speaks, and nothing hides them; the places the playtests found hidden',
+    run: [['bun', 'tools/play-sight.mjs']],
   },
   {
     name: 'slow', slow: true, what: 'smoke, the interface and all of act 1 in a browser',
@@ -61,14 +67,7 @@ mkdirSync(LOGS, { recursive: true });
 let failed = 0;
 for (const part of chosen) {
   const started = Date.now();
-  let log = '', result = 'pass';
-  for (const cmd of part.run) {
-    const done = spawnSync(cmd[0], cmd.slice(1), { cwd: ROOT, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024 });
-    log += `$ ${cmd.join(' ')}\n${done.stdout ?? ''}${done.stderr ?? ''}\n`;
-    if (done.status === 0) continue;
-    result = part.skip !== undefined && done.status === part.skip ? 'skip' : 'FAIL';
-    break;
-  }
+  const { log, result } = executePart(part, ROOT);
   const logPath = resolve(LOGS, `${part.name}.log`);
   writeFileSync(logPath, log);
   if (result === 'FAIL') failed++;

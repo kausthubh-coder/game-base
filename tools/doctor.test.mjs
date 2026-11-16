@@ -3,8 +3,9 @@ import { createServer } from 'node:net';
 import { availablePort, formatResults, portForFolder, portIsFree } from './lib/doctor.mjs';
 
 describe('worktree doctor', () => {
-  test('stable ports depend on the folder name and main keeps 5300', () => {
-    expect(portForFolder('/tmp/game-a')).toBe(portForFolder('/other/game-a'));
+  test('stable ports depend on the full checkout path and main keeps 5300', () => {
+    expect(portForFolder('/tmp/game-a')).toBe(portForFolder('/tmp/game-a'));
+    expect(portForFolder('/tmp/game-a')).not.toBe(portForFolder('/other/game-a'));
     expect(portForFolder('/tmp/game-a')).not.toBe(portForFolder('/tmp/game-b'));
     for (let i = 0; i < 1000; i++) {
       expect(portForFolder(`/tmp/worktree-${i}`)).toBeGreaterThanOrEqual(5400);

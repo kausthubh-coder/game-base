@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Precise object edit of approved temple fresco. Preserve exact 1920x1080 layout and all six sleeping beasts, their identities, silhouettes, paint texture, colours, flowers, wreath, central sun and ivory ground and borders. Remove ONLY every broad gold ribbon/band wrapped across all six beasts. Repaint the small occluded areas with coherent beast anatomy: stag cream flank and folded legs, lion orange body and red mane, tortoise green shell, serpent blue coils and ivory belly, bird violet and ivory feathers, elephant ivory skin. Do not remove gold outlines or sun. No new objects. This will be aligned under original gold bands for cutout animation so position and silhouette must be exactly unchanged.",
+  "use": "All six unbanded beasts, registered to original composition; original extracted gold bands overlay them."
+}

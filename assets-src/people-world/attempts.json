@@ -1,0 +1,28 @@
+[
+  {
+    "name": "ilara",
+    "kind": "world",
+    "attempt": 2,
+    "tool": "image_gen.imagegen",
+    "refs": [
+      "assets-src/people-world/sources/ilara-world.webp",
+      "assets-src/concept/people-old/ilara.webp"
+    ],
+    "prompt": "Edit this production sprite sheet. Preserve every character head, body, pose, cell layout and pixel style exactly. Correct ONLY hand Mark continuity: remove ALL teal from her RIGHT HAND (the hand on viewer LEFT in front views). Her LEFT hand (viewer RIGHT in front views, visible hand in right facing side view) has exactly SEVEN tiny round places arranged as a clear ring: SIX lit teal dots and ONE dark brown unlit dot. NOT a solid teal blob, NOT eight points, NOT a mark on both hands. No mark visible on palms in back views if back of left hand hidden. All other pixels identical including green tunic, long ash blond hair, brown trousers, white waist tie. Keep transparent background. FOUR columns SIX rows sprite sheet.",
+    "kept": false,
+    "defect": "Both hands remain marked; six-lit/one-dark geometry unresolved."
+  },
+  {
+    "name": "ilara",
+    "kind": "world",
+    "attempt": 3,
+    "tool": "image_gen.imagegen",
+    "refs": [
+      "assets-src/people-world/sources/ilara-world.webp",
+      "assets-src/concept/people-old/ilara.webp"
+    ],
+    "prompt": "Correct sprite sheet: right hand MUST BE PLAIN TAWNY SKIN every front frame, with ZERO teal or glowing pixels on viewer LEFT. Only her LEFT hand on viewer RIGHT carries SIX tiny separated teal lights and ONE dark spot, seven total places in a ring. This is critical. Current sheet wrongly has turquoise on BOTH hands. Erase turquoise from viewer-left hand in front idle and walking rows. Preserve exact same Ilara ash blond long hair green tunic cream tie brown trousers sprite identity and four columns six rows layout. Back views plain hands. In right profile only visible left hand marked. Transparent background; no extra geometry no shadows text. Do not change hair or costume or pixel proportions.",
+    "kept": false,
+    "defect": "Both hands remain marked; six-lit/one-dark geometry unresolved."
+  }
+]

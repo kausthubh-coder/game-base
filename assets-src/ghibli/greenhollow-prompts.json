@@ -1,0 +1,101 @@
+[
+  {
+    "name": "bark-grey",
+    "prompt": "Use case: stylized-concept. Make ONE square game texture, pale dry grey oak bark with the life drained out. Use reference image as brushwork reference only (bark is bottom left): broad soft opaque gouache dabs, warm cream-grey ridges, muted violet-grey narrow vertical fissures, low contrast, cozy hand painted anime background. Flat orthographic material swatch filling whole square, no trunk silhouette, no border, text or lighting gradient. Seamless repeating on both axes. Similar scale of marks to reference bark. Output one 1024 square opaque image.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/bark-grey.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-13c337e0-3d65-49cd-a884-6e9a8b9fbec6.png"
+  },
+  {
+    "name": "bark-old",
+    "prompt": "Use case: stylized-concept. ONE square game tiling surface texture. Ancient oak bark, deep broad vertical furrows, muted brown grey ridges, dark moss green paint inside furrows. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. Flat orthographic material swatch filling whole square, seamless repeating on both axes, even light without an overall gradient. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/bark-old.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-b9ad12a4-72ab-410b-a50b-6509636251e2.png"
+  },
+  {
+    "name": "moss",
+    "prompt": "Use case: stylized-concept. ONE square game tiling surface texture. Deep lush forest moss ground, rounded tiny cushions and overlapping broad dabs of dark olive, fern green and warm yellow green, occasional earth gaps. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. Flat orthographic material swatch filling whole square, seamless repeating on both axes, even light without an overall gradient. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/moss.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-1ce467e7-6a3c-4fa9-a78e-6d8f2f7d4803.png"
+  },
+  {
+    "name": "mud",
+    "prompt": "Use case: stylized-concept. ONE square game tiling surface texture. Wet marsh mud ground, warm dark umber and grey olive broad smooth brush patches, soft damp sheen strokes, sparse tiny reed litter, no big pools or footprints. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. Flat orthographic material swatch filling whole square, seamless repeating on both axes, even light without an overall gradient. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/mud.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-9492f1db-7c6f-4325-85d0-01e4dcdc7f11.png"
+  },
+  {
+    "name": "scree",
+    "prompt": "Use case: stylized-concept. ONE square game tiling surface texture. Loose grey scree ground, small angular broken stones loosely layered, warm grey lit faces and muted lavender grey shade, occasional dark cracks. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. Flat orthographic material swatch filling whole square, seamless repeating on both axes, even light without an overall gradient. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/scree.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-3406ecf0-5fa3-4f36-87c2-29096a2d98a0.png"
+  },
+  {
+    "name": "terrace-stone",
+    "prompt": "Use case: stylized-concept. ONE square game tiling surface texture. Ancient giant carved stone paving blocks, three or four large weathered grey sandstone slabs with staggered narrow joints, subtle worn shallow incised grooves, few thin dark brown roots crossing, sparse muted grey moss. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. Flat orthographic material swatch filling whole square, seamless repeating on both axes, even light without an overall gradient. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/terrace-stone.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-218c4d78-6f9b-4f63-b89a-8815ed3abe5b.png"
+  },
+  {
+    "name": "leaves-grey",
+    "prompt": "Use case: stylized-concept. ONE square game plant card texture. ONE spray of oak leaves on thin twigs for a tree leaf card. Ashen pale grey green with cream grey highlights and muted violet grey shade, a few leaves missing, airy gaps, no trunk. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. True transparent background with clean edges and interior gaps, subject fills 88 percent of square, no ground or shadow. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/leaves-grey.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-267512ff-47a0-4b29-8711-75f17c861621.png"
+  },
+  {
+    "name": "leaves-old",
+    "prompt": "Use case: stylized-concept. ONE square game plant card texture. ONE dense broad spray of ancient oak leaves on thin twigs for a tree leaf card, dark forest olive green with warm muted green highlights and deep cool green shade, uneven organic outline with leaf gaps, no trunk. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. True transparent background with clean edges and interior gaps, subject fills 88 percent of square, no ground or shadow. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/leaves-old.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-521c6a8a-0825-4e5b-b75c-27f1fcb50457.png"
+  },
+  {
+    "name": "leaves-willow",
+    "prompt": "Use case: stylized-concept. ONE square game plant card texture. ONE cluster of long hanging willow fronds, thin curved descending stems with long narrow olive green leaves, muted warm green highlights, cool green shadows. Hangs from top center, airy pointed lower ends, no trunk. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. True transparent background with clean edges and interior gaps, subject fills 88 percent of square, no ground or shadow. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/leaves-willow.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-25bfcdac-c02b-4488-b844-001032bbc757.png"
+  },
+  {
+    "name": "reeds",
+    "prompt": "Use case: stylized-concept. ONE square game plant card texture. ONE reed clump for a billboard card, upright slender olive green stems and arching strap leaves, two muted brown bulrush seed heads, gathered at bottom center. Full silhouette, no clipped tips. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. True transparent background with clean edges and interior gaps, subject fills 88 percent of square, no ground or shadow. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/reeds.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-8d13077d-373c-4832-b2e2-d70bda7bf7f7.png"
+  },
+  {
+    "name": "fern",
+    "prompt": "Use case: stylized-concept. ONE square game plant card texture. ONE spreading fern plant clump for a billboard card, gracefully arching pinnate fronds with paired small leaflets, dark forest green with muted warm green highlights, gathered at bottom center, full silhouette, no clipped tips. Match reference brushwork: broad soft opaque gouache dabs, cozy painted anime countryside. No photorealism, no sharp digital detail. True transparent background with clean edges and interior gaps, subject fills 88 percent of square, no ground or shadow. Muted natural palette, light upper left. No text or border. 1024 square.",
+    "tool": "image_gen.imagegen",
+    "attempts": 1,
+    "reference": "public/assets/painted: all twelve existing paintings as a contact sheet",
+    "raw": "assets-src/ghibli/raw/greenhollow/fern.png",
+    "generatedSource": "/Users/dabot/.codex/generated_images/01a1ce2e-1fc3-7ab1-bb90-f4ae3d4d17c0/exec-a8d10d5d-5e74-48d9-b6fb-d6536642a8d8.png"
+  }
+]

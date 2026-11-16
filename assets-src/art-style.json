@@ -1,0 +1,28 @@
+{
+  "about": "How the 2D set is drawn, as data. Read by tools/art (check, review, see, repair). Change a value here on purpose and say why in the commit.",
+  "palette": "assets-src/palette.json",
+  "light": "upper left",
+  "pixelsPerBlock": 64,
+  "grounds": { "day": "#7f9a4c", "night": "#1f2638", "well": "#1f2638", "parchment": "#efe2c4" },
+  "outline": { "ramp": ["#302529", "#493335", "#65453a"], "pixels": [1, 2] },
+  "kinds": {
+    "person": { "frame": 128, "anchor": [64, 120], "about": "about 110 drawn pixels tall standing; a taller or shorter person is drawn so, within 96 to 114" },
+    "creature": { "frame": 96, "anchor": [48, 88], "about": "about 68 drawn pixels tall" },
+    "giant": { "frames": [192, 384], "about": "anything over 2.6 blocks: 192 square, or 384 for the Stag" }
+  },
+  "limits": {
+    "about": "Each is the most a sheet may be off before tools/art/check.mjs fails it. The rule names are the ones the check prints.",
+    "density": { "person": [52, 76], "creature": [43, 128], "giant": [43, 96] },
+    "scale": { "person": 0.08, "creature": 0.2, "part": 0.35 },
+    "sameSize": { "density": 0.03, "height": 0.06 },
+    "baseline": 1,
+    "steady": { "idle": 2.5, "loop": 4.5 },
+    "jump": { "idle": 1.12, "loop": 1.3 },
+    "loop": { "seam": 1.6 },
+    "outline": { "bare": 0.15, "black": 0.02 },
+    "fringe": { "pale": 0.02, "halo": 0.03 },
+    "identity": { "frame": 0.9, "sheet": 0.93 },
+    "portrait": { "rank": 20, "like": 0.8 },
+    "icon": { "margin": 2, "twinShape": 0.72, "twinColour": 0.95, "bare": 0.3, "rim": 0.36, "fill": 15 }
+  }
+}

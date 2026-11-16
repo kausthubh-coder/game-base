@@ -28,33 +28,38 @@ function run(kernel: Kernel, seconds: number): void {
   for (let i = 0; i < steps; i++) kernel.step();
 }
 
+/** Water in the block beside this one, as a ditch is: the soil next to it stays wet. */
+function ditch(t: ReturnType<typeof setup>, x: number, z: number): void {
+  t.world.setBlock(x, Y, z, blockId('water'));
+}
+
 /** Tills a block and plants wheat on it. */
 function sow(t: ReturnType<typeof setup>, x: number, z: number): void {
   expect(t.crops.till(x, Y, z)).toBe(true);
   expect(t.crops.plant(x, Y, z, 'wheat_seeds')).toBe(true);
 }
 
-test('wheat is 4 stages of 45 seconds and gives 2 wheat, and the other crops are slower', () => {
+test('wheat is ripe in one day of 1,200 seconds and gives 2 wheat; carrots, sunroot and the hedge take two', () => {
   const [wheat, ...others] = cropTable;
-  expect(wheat).toMatchObject({ id: 'wheat', seed: 'wheat_seeds', stages: 4, secondsPerStage: 45, gives: [{ id: 'wheat', count: 2 }] });
+  expect(wheat).toMatchObject({ id: 'wheat', seed: 'wheat_seeds', stages: 4, secondsPerStage: 400, gives: [{ id: 'wheat', count: 2 }] });
   expect(wheat.seedChance).toBeCloseTo(1 / 3, 6);
-  expect(others.map((c) => c.id)).toEqual(['turnip', 'carrot']);
-  for (const crop of others) expect(crop.secondsPerStage * (crop.stages - 1)).toBeGreaterThan(135);
+  expect(others.map((c) => c.id)).toEqual(['carrot', 'sunroot', 'berry_bush']);
+  for (const crop of others) expect(crop.secondsPerStage * (crop.stages - 1)).toBe(2400);
 });
 
-test('a watered wheat reaches stage 3 in 135 seconds and not before', () => {
+test('wheat beside a ditch reaches stage 3 in 1,200 seconds and not before', () => {
   const t = setup();
   sow(t, 4, 4);
-  expect(t.crops.water(4, Y, 4)).toBe(true);
+  ditch(t, 5, 4);
   const grew: GameEvents['crop.grew'][] = [];
   t.game.events.on('crop.grew', (g) => grew.push(g));
 
-  run(t.kernel, 45 - 0.05);
+  run(t.kernel, 400 - 0.05);
   expect(t.crops.at(4, Y, 4)).toMatchObject({ crop: 'wheat', stage: 0, ripe: false });
   t.kernel.step();
   expect(t.crops.at(4, Y, 4)?.stage).toBe(1);
 
-  run(t.kernel, 90 - 0.05);
+  run(t.kernel, 800 - 0.05);
   expect(t.crops.at(4, Y, 4)).toMatchObject({ stage: 2, ripe: false });
   t.kernel.step();
   expect(t.crops.at(4, Y, 4)).toMatchObject({ stage: 3, ripe: true });
@@ -73,9 +78,9 @@ test('dry soil does not grow, and water lasts 3 minutes', () => {
   run(t.kernel, 300);
   expect(t.crops.at(4, Y, 4)).toMatchObject({ stage: 0, wet: 0 });
 
-  // Turnips need 75 seconds a stage, so one watering of 180 seconds brings two stages and no more.
+  // Wheat needs 400 seconds a stage, so it takes three waterings of 180 seconds to gain one.
   expect(t.crops.till(8, Y, 8)).toBe(true);
-  expect(t.crops.plant(8, Y, 8, 'turnip_seeds')).toBe(true);
+  expect(t.crops.plant(8, Y, 8, 'wheat_seeds')).toBe(true);
   t.crops.water(8, Y, 8);
   expect(t.crops.at(8, Y, 8)?.wet).toBe(180);
   run(t.kernel, 179);
@@ -83,7 +88,12 @@ test('dry soil does not grow, and water lasts 3 minutes', () => {
   run(t.kernel, 1.1);
   expect(t.crops.at(8, Y, 8)?.wet).toBe(0);
   run(t.kernel, 300);
-  expect(t.crops.at(8, Y, 8)).toMatchObject({ crop: 'turnip', stage: 2, ripe: false });
+  expect(t.crops.at(8, Y, 8)).toMatchObject({ crop: 'wheat', stage: 0 });
+  t.crops.water(8, Y, 8);
+  run(t.kernel, 181);
+  t.crops.water(8, Y, 8);
+  run(t.kernel, 41);
+  expect(t.crops.at(8, Y, 8)?.stage).toBe(1);
 });
 
 test('rain waters every crop under open sky', () => {
@@ -97,7 +107,7 @@ test('rain waters every crop under open sky', () => {
   expect(t.crops.at(4, Y, 4)?.wet).toBeGreaterThan(179);
   expect(t.crops.at(6, Y, 4)?.wet).toBe(0);
   // While it rains the soil stays wet, and afterwards the water runs down.
-  run(t.kernel, 200);
+  run(t.kernel, 1201);
   expect(t.crops.at(4, Y, 4)?.wet).toBeGreaterThan(179);
   expect(t.crops.at(4, Y, 4)?.ripe).toBe(true);
   expect(t.crops.at(6, Y, 4)?.stage).toBe(0);
@@ -124,38 +134,44 @@ test('rain forced through the time system waters the field', () => {
   expect(crops.at(4, Y, 4)?.wet).toBeGreaterThan(170);
 });
 
-test('sleep adds two stages to a wet crop only', () => {
+test('a night\'s sleep runs its skipped seconds: all night beside a ditch, as long as the water lasted under the can', () => {
   const t = setup();
   sow(t, 4, 4);
   sow(t, 8, 8);
   sow(t, 12, 12);
+  // The first crop is watered by the can, the third has a ditch beside it, the second stays dry.
+  ditch(t, 13, 12);
+  run(t.kernel, 1);
   t.crops.water(4, Y, 4);
-  // The third crop is one stage from ripe: it stops at ripe.
-  t.crops.water(12, Y, 12);
-  run(t.kernel, 91);
-  t.crops.water(4, Y, 4);
-  run(t.kernel, 10);
-  expect(t.crops.at(12, Y, 12)?.stage).toBe(2);
+  expect(t.crops.at(12, Y, 12)?.wet).toBeGreaterThan(170);
 
-  // A crop at stage 0 for the count of two: plant it now, in soil that the can reaches.
-  expect(t.crops.till(5, Y, 4)).toBe(true);
-  t.crops.water(4, Y, 4);
-  expect(t.crops.plant(5, Y, 4, 'wheat_seeds')).toBe(true);
-  expect(t.crops.at(5, Y, 4)).toMatchObject({ stage: 0, wet: 180 });
-
-  t.game.events.emit('slept', { day: 2 });
-  expect(t.crops.at(5, Y, 4)).toMatchObject({ stage: 2, ripe: false });
+  t.game.events.emit('slept', { day: 2, skipped: 840 });
+  // 180 seconds of water under the can: no stage yet. 840 beside the ditch: two stages and 40 seconds.
+  expect(t.crops.at(4, Y, 4)).toMatchObject({ stage: 0, ripe: false, wet: 0 });
   expect(t.crops.at(8, Y, 8)).toMatchObject({ stage: 0, ripe: false });
+  expect(t.crops.at(12, Y, 12)).toMatchObject({ stage: 2, ripe: false });
+  // The ditch keeps its soil wet by morning; another night ripens it, and ripe is the end.
+  expect(t.crops.at(12, Y, 12)?.wet).toBeGreaterThan(170);
+  t.game.events.emit('slept', { day: 3, skipped: 840 });
   expect(t.crops.at(12, Y, 12)).toMatchObject({ stage: 3, ripe: true });
-  // The night dries the soil.
-  expect(t.crops.at(5, Y, 4)?.wet).toBe(0);
+});
+
+test('a sprinkler slowed by a short shaft grows its crops at its speed', () => {
+  const t = setup();
+  sow(t, 4, 4);
+  // A stand-in for the machines system: one sprinkler at two thirds, over the soil at 4, 4.
+  t.kernel.add('machines', { sprinkled: (x: number, _y: number, z: number) => (x === 4 && z === 4 ? 2 / 3 : 0) } as never, {});
+  run(t.kernel, 600 - 0.05);
+  expect(t.crops.at(4, Y, 4)?.stage).toBe(0);
+  run(t.kernel, 0.2);
+  expect(t.crops.at(4, Y, 4)?.stage).toBe(1);
 });
 
 test('the primary button on a ripe crop harvests 2 wheat into the bag', () => {
   const t = setup();
   sow(t, 4, 4);
-  t.crops.water(4, Y, 4);
-  run(t.kernel, 134);
+  ditch(t, 5, 4);
+  run(t.kernel, 1199);
   // Not ripe yet: the click is left for the next handler.
   expect(t.actions.use({ hit: topOf(t.world, 4, Y, 4), held: null, button: 'primary' })).toBe(false);
   expect(t.bag.count('wheat')).toBe(0);
@@ -184,7 +200,7 @@ test('a harvest gives back a seed about one time in three', () => {
     }
   }
   t.game.ambient.rain = 1;
-  run(t.kernel, 135);
+  run(t.kernel, 1201);
   for (const { x, y, z } of [...t.crops.all()]) expect(t.crops.harvest(x, y, z)).toBe(true);
   expect(t.bag.count('wheat')).toBe(ripe * 2);
   const share = t.bag.count('wheat_seeds') / ripe;
@@ -195,8 +211,8 @@ test('a harvest gives back a seed about one time in three', () => {
 test('a full bag leaves the ripe crop standing', () => {
   const t = setup(flatStage(), 1);
   sow(t, 4, 4);
-  t.crops.water(4, Y, 4);
-  run(t.kernel, 135);
+  ditch(t, 5, 4);
+  run(t.kernel, 1201);
   expect(t.crops.harvest(4, Y, 4)).toBe(false);
   expect(t.bag.count('wheat')).toBe(0);
   expect(t.crops.at(4, Y, 4)?.ripe).toBe(true);
@@ -328,7 +344,10 @@ test('save then load keeps a half-grown crop', () => {
   t.crops.till(10, Y, 10);
   t.crops.water(4, Y, 4);
   t.crops.water(10, Y, 10);
+  ditch(t, 5, 4);
   // One stage and 20 seconds of the next.
+  run(t.kernel, 420);
+  t.crops.water(10, Y, 10);
   run(t.kernel, 65);
   const save = JSON.parse(JSON.stringify(t.kernel.save()));
 
@@ -336,14 +355,14 @@ test('save then load keeps a half-grown crop', () => {
   again.kernel.load(save);
   expect(again.crops.all().length).toBe(2);
   expect(again.crops.at(4, Y, 4)).toMatchObject({ crop: 'wheat', stage: 1, ripe: false });
-  expect(again.crops.at(4, Y, 4)?.wet).toBeCloseTo(115, 1);
+  expect(again.crops.at(4, Y, 4)?.wet).toBeGreaterThan(175);
   expect(again.crops.at(8, Y, 8)).toMatchObject({ crop: 'wheat', stage: 0, wet: 0 });
-  // The 20 seconds were kept: stage 2 comes 25 seconds later, not 45.
-  run(again.kernel, 24.9);
-  expect(again.crops.at(4, Y, 4)?.stage).toBe(1);
-  run(again.kernel, 0.2);
-  expect(again.crops.at(4, Y, 4)?.stage).toBe(2);
   // The bare wet soil was kept too: a seed planted there now is in wet soil.
   expect(again.crops.plant(10, Y, 10, 'wheat_seeds')).toBe(true);
   expect(again.crops.at(10, Y, 10)?.wet).toBeGreaterThan(80);
+  // The 85 seconds were kept: stage 2 comes 315 seconds later, not 400.
+  run(again.kernel, 314.9);
+  expect(again.crops.at(4, Y, 4)?.stage).toBe(1);
+  run(again.kernel, 0.2);
+  expect(again.crops.at(4, Y, 4)?.stage).toBe(2);
 });

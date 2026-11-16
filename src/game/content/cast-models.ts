@@ -100,4 +100,8 @@ export const CAST: Readonly<Record<string, CastLook>> = {
 export const CAST_BY_ID: Readonly<Record<string, CastColours>> = {};
 
 /** The sprite a character uses while doing something, to the character's own sprite. */
-export const CAST_ALIAS: Readonly<Record<string, string>> = { 'hero-swing': 'hero' };
+export const CAST_ALIAS: Readonly<Record<string, string>> = {
+  'hero-swing': 'hero',
+  // Stand-ins until the settlers have models of their own: the nearest old look for each.
+  hobb: 'odo', dax: 'brack', mina: 'juniper', tansy: 'mira', holt: 'villager-a',
+};

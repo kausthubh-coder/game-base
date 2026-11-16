@@ -1,10 +1,12 @@
-// Repairs a checkout and reports each result. Child output stays off stdout for --json.
-import { copyFile, access, constants, realpath } from 'node:fs/promises';
+// Inspects a checkout and reports each result. Child output stays off stdout for --json.
+import { access, constants, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
-import { availablePort, formatResults, portForFolder } from './lib/doctor.mjs';
+import { formatResults, portIsFree } from './lib/doctor.mjs';
+
+import { checkoutPaths, devEnvIsSafe, devEnvForCheckout } from './lib/checkout.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const json = process.argv.includes('--json');
@@ -30,45 +32,35 @@ async function check(item, task) {
   if (!json) console.log(formatResults(items.slice(-1)));
 }
 await check('dependencies', async () => {
-  const present = existsSync(join(root, 'node_modules'));
-  // Bun reconciles its installed package metadata with the lock, including removed packages.
-  const output = await run('bun', ['install', '--frozen-lockfile']);
-  const changed = !present || !output.includes('(no changes)');
-  return { status: changed ? 'fixed' : 'ok', reason: changed ? 'bun install --frozen-lockfile reconciled node_modules with bun.lock' : 'node_modules matches bun.lock' };
+  await access(join(root, 'node_modules/.bin/vite'), constants.X_OK);
+  if (!existsSync(join(root, 'node_modules/.game-lock')) || await readFile(join(root, 'node_modules/.game-lock'), 'utf8') !== await readFile(join(root, 'bun.lock'), 'utf8')) throw new Error('dependencies differ from lockfile; bun tools/setup.mjs');
+  return { status: 'ok', reason: 'dependencies match bun.lock' };
 });
-let mainRoot;
 await check('env', async () => {
-  const worktrees = await run('git', ['worktree', 'list', '--porcelain']);
-  const first = worktrees.split('\n')[0];
-  if (!first.startsWith('worktree ')) throw new Error('git did not report a main checkout');
-  mainRoot = await realpath(first.slice(9));
-  if (existsSync(join(root, '.env.local'))) return { status: 'ok', reason: '.env.local present' };
-  const source = join(mainRoot, '.env.local');
-  if (existsSync(source)) {
-    await copyFile(source, join(root, '.env.local'), constants.COPYFILE_EXCL);
-    return { status: 'fixed', reason: 'copied .env.local from the main checkout' };
+  if (existsSync(join(root, '.env.local'))) {
+    const text = await readFile(join(root, '.env.local'), 'utf8');
+    if (!devEnvIsSafe(root === checkoutPaths(root).main ? devEnvForCheckout(text) : text)) throw new Error('dev env contains production settings or deployment credentials');
   }
-  return { status: 'ok', reason: '.env.local absent in both checkouts; game runs without keys' };
+  return { status: 'ok', reason: 'dev env checked; no backend started or deployed; signed-in cloud saves use the configured shared backend' };
 });
 await check('chrome', async () => {
-  // Match tools/shot.mjs. Keep this path in sync when the shared launcher lands.
-  const executablePath = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-  await access(executablePath, constants.X_OK);
-  const { chromium } = await import('playwright-core');
-  const browser = await chromium.launch({ executablePath, headless: true, timeout: 30000 });
-  try {
-    const page = await browser.newPage();
-    await page.goto('data:text/html,<title>doctor</title>');
-    if (await page.title() !== 'doctor') throw new Error('headless page did not start');
-    return { status: 'ok', reason: `headless Chrome ${browser.version()} starts` };
-  } finally { await browser.close(); }
+  const { launchChrome } = await import('./lib/chrome.mjs');
+  const browser = await launchChrome();
+  try { return { status: 'ok', reason: `Chrome ${browser.version()} starts` }; }
+  finally { await browser.close(); }
 });
 await check('port', async () => {
-  if (!mainRoot) throw new Error('main checkout could not be determined');
-  const main = await realpath(root) === mainRoot;
-  const start = portForFolder(root, main);
-  const port = await availablePort(start, main);
-  return { status: port === start ? 'ok' : 'fixed', reason: `PORT=${port}; export PORT=${port} PLAY_PORT=${port}`, port, env: `export PORT=${port} PLAY_PORT=${port}` };
+  const config = JSON.parse(await readFile(join(root, '.artifacts/checkout.json'), 'utf8'));
+  if (config.root !== root || !Number.isInteger(config.port)) throw new Error('checkout config missing or copied; bun tools/setup.mjs');
+  const paths = checkoutPaths(root);
+  const reservations = JSON.parse(await readFile(join(paths.common, 'game-ports.json'), 'utf8'));
+  if (reservations[root] !== config.port) throw new Error('port reservation missing; bun tools/setup.mjs');
+  if (!await portIsFree(config.port)) throw new Error(`reserved port ${config.port} is occupied; stop only your own process by PID`);
+  return { status: 'ok', reason: `PORT=${config.port}; export PORT=${config.port} PLAY_PORT=${config.port}`, port: config.port };
+});
+await check('main', async () => {
+  const behind = await run('git', ['rev-list', '--count', 'HEAD..origin/main']);
+  return { status: 'ok', reason: `${behind} commits behind origin/main` };
 });
 if (!process.argv.includes('--quick')) await check('check', async () => {
   const output = await run('bun', ['run', 'check'], 300000);

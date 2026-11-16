@@ -75,12 +75,29 @@ export const effects = {
   // ---- items
   trail: { shape: 'spark', blend: 'add', count: 14, life: [0.5, 0.9], radius: 0.2, speed: [1.2, 2.4], aim: { up: 1, any: 0.25 }, gravity: -1.5, drag: 1.5, wobble: [0.18, 1.4], size: [0.24, 0.05], color: [0xfff0a0, 0x7df0d0], glow: 2.6, fade: [0.05, 0.4] },
 
+  // ---- the ancients' lume: small teal motes that drift up from a woken lamp or the Heartstone.
+  lume: { shape: 'glow', blend: 'add', count: 2, life: [3.5, 6], radius: 0.45, height: [0.2, 1.1], speed: [0.12, 0.3], aim: { up: 1 }, gravity: 0, wobble: [0.25, 0.2], size: [0.15, 0.05], color: [0x7fffd0, 0x3fe0c8], glow: 2.4, fade: [0.2, 0.5] },
+
+  // ---- camp. Play at the fire's ground origin; the director owns the emission cadence.
+  ember: { shape: 'glow', blend: 'add', count: 3, life: [0.7, 1.5], radius: 0.18, height: [0.25, 0.5], speed: [0.45, 0.8], aim: { up: 1, any: 0.15 }, gravity: -0.12, drag: 0.6, wind: 0.08, wobble: [0.08, 1.4], size: [0.045, 0.008], color: [0xefab7a, 0x894949], glow: 1.8, alpha: [0.85, 0], fade: [0.05, 0.6] },
+  campsmoke: { shape: 'puff', blend: 'normal', count: 1, life: [1.4, 2.2], radius: 0.1, height: [0.65, 0.8], speed: [0.3, 0.45], aim: { up: 1 }, gravity: -0.08, drag: 0.4, wind: 0.12, wobble: [0.12, 0.3], spin: 0.08, size: [0.12, 0.45], color: [0x918f88, 0xb2a8b0], alpha: [0.12, 0], fade: [0.25, 0.6] },
+
   // ---- weather. `count` is particles a second at full strength.
   rain: { shape: 'streak', blend: 'normal', facing: 'motion', count: 1300, life: [0.6, 0.9], radius: 1.2, speed: [15, 19], aim: { up: -1 }, gravity: 0, wind: 0.75, stretch: 18, size: [0.018, 0.018], color: [0xd4e4f8, 0xd4e4f8], alpha: [0.23, 0.16], glow: 1, fade: [0.05, 0.05], weather: true },
   rainSplash: { shape: 'ring', blend: 'normal', facing: 'ground', count: 1, life: [0.25, 0.35], speed: [0, 0], gravity: 0, size: [0.06, 0.32], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.3, 0], fade: [0, 0.3], weather: true },
   rainDrop: { shape: 'puff', blend: 'normal', count: 1, life: [0.22, 0.32], speed: [1.2, 2.2], aim: { up: 1, any: 0.5 }, gravity: 9, size: [0.07, 0.03], color: [0xe6f2ff, 0xe6f2ff], alpha: [0.8, 0.3], weather: true },
   leaf: { shape: 'leaf', blend: 'normal', count: 4, life: [6, 10], speed: [0.7, 1.1], aim: { up: -1 }, gravity: 0, wind: 0.6, wobble: [0.4, 0.34], spin: 0.4, size: [0.2, 0.2], color: [0x7cc24e, 0xe0b84a], pickColor: true, fade: [0.05, 0.1], lands: true, weather: true },
   windLine: { shape: 'streak', blend: 'normal', facing: 'motion', count: 12, life: [0.7, 1.1], speed: [10, 16], gravity: 0, wobble: [0.15, 0.5], stretch: 70, size: [0.045, 0.045], color: [0xffffff, 0xffffff], alpha: [0.3, 0.3], fade: [0.3, 0.4], weather: true },
+
+  // world/biomes: the air of each kind of land (KIND_AIR in src/content/painted.ts). One play starts one, somewhere round the hero.
+  // The grey forest's flecks: pale like ash, they rise slowly from the ground and are gone.
+  ash: { shape: 'square', blend: 'normal', count: 1, life: [4, 7], radius: 12, height: [0, 3], speed: [0.12, 0.3], aim: { up: 1, any: 0.25 }, gravity: -0.02, wobble: [0.25, 0.12], spin: 0.25, size: [0.13, 0.05], color: [0xeeece4, 0xc4c2ba], alpha: [0.9, 0], fade: [0.3, 0.5], weather: true },
+  // The marsh at night: warm lights that drift low over the water and blink.
+  lanternfly: { shape: 'glow', blend: 'add', count: 1, life: [7, 11], radius: 12, height: [0.4, 2.4], speed: [0.08, 0.25], aim: { any: 1 }, gravity: 0, wobble: [1.2, 0.06], size: [0.34, 0.3], color: [0xffc46e, 0xff9a4e], glow: 2.6, blink: true, fade: [0.15, 0.2], weather: true },
+  // The marsh at dawn: low mist lying on the ground.
+  marshMist: { shape: 'puff', blend: 'normal', count: 1, life: [9, 13], radius: 14, height: [0.1, 0.7], speed: [0.1, 0.3], aim: { any: 1 }, gravity: 0, wind: 0.15, size: [5, 9], color: [0xf4f5f2, 0xf4f5f2], alpha: [0.38, 0], fade: [0.4, 0.5], weather: true },
+  // The old forest by day: specks drifting in the light between the trees.
+  pollen: { shape: 'glow', blend: 'add', count: 1, life: [6, 9], radius: 11, height: [0.5, 5], speed: [0.05, 0.15], aim: { any: 1 }, gravity: -0.01, wobble: [0.5, 0.1], size: [0.07, 0.06], color: [0xfff2c0, 0xffe6a0], glow: 1.5, fade: [0.2, 0.3], weather: true },
   firefly: { shape: 'glow', blend: 'add', count: 5, life: [6, 10], speed: [0.05, 0.2], aim: { any: 1 }, gravity: 0, wobble: [0.9, 0.08], size: [0.22, 0.22], color: [0xd8ff6a, 0xa8e84a], glow: 2.4, blink: true, fade: [0.1, 0.1], weather: true },
   mote: { shape: 'glow', blend: 'add', count: 16, life: [9, 14], speed: [0.4, 0.7], aim: { up: -1 }, gravity: 0, wind: 0.3, wobble: [0.5, 0.13], size: [0.26, 0.2], color: [0x7fffd0, 0xfff2a0], pickColor: true, glow: 2.4, fade: [0.08, 0.12], lands: true, weather: true },
 } satisfies Record<string, EffectEntry>;

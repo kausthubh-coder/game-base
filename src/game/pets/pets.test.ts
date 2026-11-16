@@ -371,3 +371,17 @@ test('the leaftail is as act 1 says', () => {
     finds: { item: 'wheat_seeds', surface: 'grass', toast: 'Your leaftail found a seed.' },
   });
 });
+
+test('the unbonded fox leads toward the forest marker without paying the pact early, and resumes after Continue', () => {
+ const s=makeStage({chunks:4,places:{'dead.garden':GARDEN,boar:[32,8]},install:[installNav,install]});
+ s.player(32,32);s.run(.05);
+ s.kernel.game.flags.set('quest.greywood.step','follow');
+ s.run(2);
+ expect(pet(s).pos.z).toBeLessThan(31);
+ expect(pet(s).bonded).toBe(false);
+ expect(s.kernel.game.systems.pets.companion()).toBeNull();
+ expect(s.count('pet.bonded')).toBe(0);
+ const saved=s.kernel.save();s.kernel.load(saved);s.run(1);
+ expect(pet(s).pos.z).toBeLessThan(31);
+ expect(pet(s).bonded).toBe(false);
+});

@@ -11,6 +11,7 @@ import type { ViewContext, ViewSystem } from '../../engine/system.ts';
 import { CameraRig, type PerStep, type RigOptions } from './rig.sim.ts';
 import { CutawayRule, type BlockProbe, type CutawayOptions, type CutawayState } from './cutaway.sim.ts';
 import { FIRST_PERSON, FREE_ORBIT, OrbitRig, type OrbitOptions } from './orbit.sim.ts';
+import { SightRule, type Roof, type SightOptions } from './sight.sim.ts';
 import { LOOK_PROFILES, type LookProfile } from './profiles.ts';
 
 /** `tilt` is the 2.5D camera, `free` orbits the hero, `first` looks from the eyes. */
@@ -25,6 +26,7 @@ export interface CameraOptions {
   fov?: PerStep;
   rig?: Partial<RigOptions>;
   cutaway?: Partial<CutawayOptions>;
+  sight?: Partial<SightOptions>;
   /** The mode to start in. `tilt` by default. */
   mode?: CameraMode;
   free?: Partial<OrbitOptions>;
@@ -57,6 +59,13 @@ export interface CameraView extends ViewSystem {
   readonly cutaway: CutawayState;
   /** True when the cutaway hides this block. Hand it to a ray cast so clicks pass through hidden blocks. */
   hides(x: number, y: number, z: number): boolean;
+  /**
+   * What is seen through so the hero, the person talking and the enemy stay in sight, for what is drawn as models.
+   * The game keeps its points each frame, once the lens is placed (sight.sim.ts).
+   */
+  readonly sight: SightRule;
+  /** The floor plans of what has a roof: a view that draws a building with a room adds it, and the sight lifts the roof. */
+  readonly roofs: Roof[];
 
   readonly mode: CameraMode;
   /** Changes the mode at once. The free and first-person cameras start looking the way the camera looked. */
@@ -88,6 +97,8 @@ function openCutaway(): CutawayState {
 export function createCamera(ctx: ViewContext, options: CameraOptions = {}): CameraView {
   const rig = new CameraRig(options.rig);
   const rule = new CutawayRule(options.cutaway);
+  const sight = new SightRule(options.sight);
+  const roofs: Roof[] = [];
   const fov = options.fov ?? 20;
   const target = { x: 0, y: 0, z: 0 };
   const stop = new AbortController();
@@ -149,6 +160,8 @@ export function createCamera(ctx: ViewContext, options: CameraOptions = {}): Cam
     stepped: (value) => rig.step(value),
     get cutaway() { return mode === 'tilt' ? rule.state : open; },
     hides: (x, y, z) => mode === 'tilt' && rule.hides(x, y, z),
+    sight,
+    roofs,
 
     get mode() { return mode; },
     setMode(next) {

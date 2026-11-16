@@ -11,7 +11,7 @@ export const befriendAPet: Scenario = {
   name: 'befriend-a-pet',
   about: 'Running at the leaftail startles it. Three berries held out after a soft walk bond it, with a click and with E, and it follows the hero.',
   seed: 15,
-  start: { quest: 'leaftail', give: { berry: 4 } },
+  start: { quest: 'blessing', give: { berry: 4 } },
   inputs: [
     { do: 'teleport', to: { place: 'dead.garden', dx: 14 } },
     { do: 'wait', seconds: 1 },
@@ -35,7 +35,6 @@ export const befriendAPet: Scenario = {
       [`it followed the hero (${distance2d(one.pos, p.game.player.pos).toFixed(1)} blocks away)`, distance2d(one.pos, p.game.player.pos) <= 4],
       ['it ate three berries and one is left', count(p, 'pet.fed') === 3 && p.count('berry') === 1],
       ['it bonded once', count(p, 'pet.bonded') === 1],
-      ['the quest moved on to showing it', p.game.flags.get('quest.leaftail.step') === 'show'],
     ];
   },
 };

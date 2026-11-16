@@ -189,7 +189,7 @@ test('the Almanac is never a thing in the bag: adding it gives the book, and it 
 test('an old save with the Almanac in a slot loads with the book given and the slot free', () => {
   const { kernel, inventory } = bag();
   kernel.load({
-    version: 1,
+    version: 2,
     flags: [['met.tamsin', true]],
     player: { x: 0, y: 0, z: 0, facing: 0 },
     clock: { day: 1, timeOfDay: 0.3, seconds: 40 },

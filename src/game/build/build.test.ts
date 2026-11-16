@@ -210,10 +210,16 @@ test('a chest turns its back to the wall beside it, and to the player with no wa
   const s = makeBuildStage();
   const game = s.kernel.game;
   s.hold('chest', 4);
-  // The player looks north (facing 0), so a thing that faces the player has its front to the south: two turns.
-  game.player.facing = 0;
+  // The player stands south of the cell, looking any way: a thing that faces the player has its front to the south,
+  // two turns. Build mode does not turn the hero to the cursor, so where they stand decides, not where they look.
+  Object.assign(game.player.pos, { x: 3.5, z: 11.5 });
+  game.player.facing = Math.PI / 2;
   s.point(3, 8);
   expect(s.build.plan()!.turns).toBe(2);
+  // Off to the east of it, the front turns east.
+  Object.assign(game.player.pos, { x: 7.5, z: 8.5 });
+  expect(s.build.plan()!.turns).toBe(1);
+  Object.assign(game.player.pos, { x: 3.5, z: 11.5 });
 
   // A wall east of the cell: the back goes to it, so the front faces west.
   s.world.setBlock(4, s.floor + 1, 8, PLANK);
@@ -229,7 +235,7 @@ test('a chest turns its back to the wall beside it, and to the player with no wa
 test('a turn by hand holds until another item is in the hand', () => {
   const s = makeBuildStage();
   const { inventory } = s.kernel.game.systems;
-  s.kernel.game.player.facing = 0;
+  Object.assign(s.kernel.game.player.pos, { x: 3.5, z: 11.5 });
   s.hold('chest', 2);
   s.hold('hoe');
   inventory.selected = 0;
@@ -306,20 +312,17 @@ test('the can wets the soil it is dragged over and sends one event', () => {
   expect(watered).toEqual([{ x: 5, y: s.floor, z: 3 }]);
 });
 
-test('a sprinkler keeps the soil two blocks around it wet', () => {
+test('a sprinkler sets down like any piece, and with no wheel to turn it the soil stays dry', () => {
   const s = makeBuildStage();
-  const { crops } = s.kernel.game.systems;
+  const { crops, placeables } = s.kernel.game.systems;
   s.hold('hoe');
   s.stroke(2, 8, 8, 8);
   s.hold('wheat_seeds', 7);
   expect(s.stroke(2, 8, 8, 8)).toBe(7);
   s.hold('sprinkler', 1);
   expect(s.stroke(5, 9, 5, 9)).toBe(1);
-  s.wait(0.1);
-  const wet = [2, 3, 4, 5, 6, 7, 8].map((x) => crops.at(x, s.floor, 8)!.wet > 0);
-  expect(wet).toEqual([false, true, true, true, true, true, false]);
-  expect(s.heard.filter((e) => e.name === 'sprinkler.ran').map((e) => e.data)).toEqual([{ x: 5, y: s.floor + 1, z: 9, reach: 2 }]);
-  // Soil dries in 180 seconds. It is still wet after 400.
-  s.wait(400);
-  expect(crops.at(4, s.floor, 8)!.wet).toBeGreaterThan(0);
+  expect(placeables.at(5, s.floor + 1, 9)?.kind).toBe('sprinkler');
+  // A sprinkler is a machine part: it wets the eight blocks round it only while a shaft brings it power.
+  s.wait(2);
+  expect([2, 3, 4, 5, 6, 7, 8].map((x) => crops.at(x, s.floor, 8)!.wet > 0)).toEqual([false, false, false, false, false, false, false]);
 });

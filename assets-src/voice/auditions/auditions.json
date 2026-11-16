@@ -1,0 +1,1296 @@
+{
+ "stag": {
+  "mossbeard": {
+   "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+   "name": "Mossbeard - The God of the Wild",
+   "why": "\"Gnarly voice of an ancient creature. Creaking subharmonics. Bark-textured bass. Glacial. Immense. Tender.\" A god of a wood.",
+   "takes": [
+    {
+     "text": "Small. Marked.",
+     "say": "Small. Marked.",
+     "hash": "2e1ecd838594",
+     "file": "stag/mossbeard/2e1ecd838594.mp3",
+     "seconds": 2.32,
+     "pitchHz": 112,
+     "wordsPerSecond": 1.52,
+     "transcript": "Small. Marked.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "She was kinder, before.",
+     "say": "She was kinder, before.",
+     "hash": "2c45bf704523",
+     "file": "stag/mossbeard/2c45bf704523.mp3",
+     "seconds": 2.96,
+     "pitchHz": 77,
+     "wordsPerSecond": 1.87,
+     "transcript": "She was kinder before",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "gravel": {
+   "voiceId": "M5E055lOUxMi0kJpGyE9",
+   "name": "Gravel Midnight – Deep Grit Character Voice",
+   "why": "Old, British, deep and rough with a strong low end.",
+   "takes": [
+    {
+     "text": "Small. Marked.",
+     "say": "Small. Marked.",
+     "hash": "fe3e82140edd",
+     "file": "stag/gravel/fe3e82140edd.mp3",
+     "seconds": 2,
+     "pitchHz": 154,
+     "wordsPerSecond": 1.92,
+     "transcript": "Small. Marked.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "She was kinder, before.",
+     "say": "She was kinder, before.",
+     "hash": "e31fffc897c5",
+     "file": "stag/gravel/e31fffc897c5.mp3",
+     "seconds": 2.24,
+     "pitchHz": 165,
+     "wordsPerSecond": 2.56,
+     "transcript": "She was kinder before",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "eldrin": {
+   "voiceId": "LvmvHEBEmMJBJw9UuhwO",
+   "name": "Eldrin - Wise Ancient Wizard Storyteller",
+   "why": "Deep, resonant, a gentle rasp and a patient cadence.",
+   "takes": [
+    {
+     "text": "Small. Marked.",
+     "say": "Small. Marked.",
+     "hash": "20d28ad88036",
+     "file": "stag/eldrin/20d28ad88036.mp3",
+     "seconds": 2.16,
+     "pitchHz": 121,
+     "wordsPerSecond": 1.69,
+     "transcript": "Small. Marked.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "She was kinder, before.",
+     "say": "She was kinder, before.",
+     "hash": "02ae2b91272f",
+     "file": "stag/eldrin/02ae2b91272f.mp3",
+     "seconds": 2.32,
+     "pitchHz": 184,
+     "wordsPerSecond": 2.47,
+     "transcript": "Kubesimplify",
+     "heard": 0,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "custodian": {
+  "grimblewood": {
+   "voiceId": "ouL9IsyrSnUkCmfnD02u",
+   "name": "Grimblewood Thornwhisker - Snarky Gnome & Magical Maintainer",
+   "why": "Old, British, high and raspy: a small creature that keeps a place running, with snark.",
+   "takes": [
+    {
+     "text": "(one eye opening) You're late.",
+     "say": "You're late.",
+     "hash": "d8dcee29174c",
+     "file": "custodian/grimblewood/d8dcee29174c.mp3",
+     "seconds": 1.2,
+     "pitchHz": 158,
+     "wordsPerSecond": 3.33,
+     "transcript": "You're late.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Any order. I did not say they would be pleasant.",
+     "say": "Any order. I did not say they would be pleasant.",
+     "hash": "8982cc037dc2",
+     "file": "custodian/grimblewood/8982cc037dc2.mp3",
+     "seconds": 3.36,
+     "pitchHz": 134,
+     "wordsPerSecond": 4.9,
+     "transcript": "Any order. I did not say they would be pleasant",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "gerald": {
+   "voiceId": "fGIZlgPQ75MMlvQ6WxgY",
+   "name": "Gerald - Exciting Older Character",
+   "why": "Old, British, eccentric and raspy. Less of a cartoon than a gnome.",
+   "takes": [
+    {
+     "text": "(one eye opening) You're late.",
+     "say": "You're late.",
+     "hash": "c468e6af899f",
+     "file": "custodian/gerald/c468e6af899f.mp3",
+     "seconds": 1.28,
+     "pitchHz": 160,
+     "wordsPerSecond": 2.22,
+     "transcript": "You're late",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Any order. I did not say they would be pleasant.",
+     "say": "Any order. I did not say they would be pleasant.",
+     "hash": "1052526efe21",
+     "file": "custodian/gerald/1052526efe21.mp3",
+     "seconds": 3.52,
+     "pitchHz": 138,
+     "wordsPerSecond": 3.33,
+     "transcript": "Any order. I did not say they would be pleasant",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "daniel": {
+   "voiceId": "htZQqY7WtacRNV7s62Iy",
+   "name": "Daniel - The Gruff Old British Wizard",
+   "why": "Old, British, gruff with dry wit. The low end of grumpy.",
+   "takes": [
+    {
+     "text": "(one eye opening) You're late.",
+     "say": "You're late.",
+     "hash": "47384da31289",
+     "file": "custodian/daniel/47384da31289.mp3",
+     "seconds": 1.28,
+     "pitchHz": 126,
+     "wordsPerSecond": 2.56,
+     "transcript": "You're late",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Any order. I did not say they would be pleasant.",
+     "say": "Any order. I did not say they would be pleasant.",
+     "hash": "fe8a98de2575",
+     "file": "custodian/daniel/fe8a98de2575.mp3",
+     "seconds": 3.6,
+     "pitchHz": 151,
+     "wordsPerSecond": 3.82,
+     "transcript": "Any order. I did not say they would be pleasant",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "dax": {
+  "johnny": {
+   "voiceId": "8JVbfL6oEdmuxKn5DK2C",
+   "name": "Johnny Kid - Serious and Calm Narrator",
+   "why": "Young British man, serious and calm. Plain, never hurried.",
+   "takes": [
+    {
+     "text": "Gate. Fence. Road. Fine.",
+     "say": "Gate. Fence. Road. Fine.",
+     "hash": "cfb1488598a7",
+     "file": "dax/johnny/cfb1488598a7.mp3",
+     "seconds": 3.92,
+     "pitchHz": 140,
+     "wordsPerSecond": 2.67,
+     "transcript": "Gate. Fence. Road. Fine.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Ground's hard. Not complaining. Saying.",
+     "say": "Ground's hard. Not complaining. Saying.",
+     "hash": "ee7629fb1dae",
+     "file": "dax/johnny/ee7629fb1dae.mp3",
+     "seconds": 3.52,
+     "pitchHz": 144,
+     "wordsPerSecond": 2.53,
+     "transcript": "Ground's hard. Not complaining, saying",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "archie": {
+   "voiceId": "kmSVBPu7loj4ayNinwWM",
+   "name": "Archie - Social Media Narrator",
+   "why": "Young British man, warm and deep.",
+   "takes": [
+    {
+     "text": "Gate. Fence. Road. Fine.",
+     "say": "Gate. Fence. Road. Fine.",
+     "hash": "7ff1afe4fd25",
+     "file": "dax/archie/7ff1afe4fd25.mp3",
+     "seconds": 3.76,
+     "pitchHz": 84,
+     "wordsPerSecond": 2.33,
+     "transcript": "Gate, fence, road, fine",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Ground's hard. Not complaining. Saying.",
+     "say": "Ground's hard. Not complaining. Saying.",
+     "hash": "a24f00ec5840",
+     "file": "dax/archie/a24f00ec5840.mp3",
+     "seconds": 3.52,
+     "pitchHz": 113,
+     "wordsPerSecond": 2.34,
+     "transcript": "Ground's hard. Not complaining, saying",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "cillian": {
+   "voiceId": "B5jEZPqk2OJ2vkPw3wBM",
+   "name": "Cillian - Low, Calm and Authentic",
+   "why": "Young Irish man, low and calm.",
+   "takes": [
+    {
+     "text": "Gate. Fence. Road. Fine.",
+     "say": "Gate. Fence. Road. Fine.",
+     "hash": "c99b6c945296",
+     "file": "dax/cillian/c99b6c945296.mp3",
+     "seconds": 3.68,
+     "pitchHz": 103,
+     "wordsPerSecond": 2.25,
+     "transcript": "Gate. Fence. Road. Fine.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Ground's hard. Not complaining. Saying.",
+     "say": "Ground's hard. Not complaining. Saying.",
+     "hash": "1f248c732c92",
+     "file": "dax/cillian/1f248c732c92.mp3",
+     "seconds": 3.52,
+     "pitchHz": 116,
+     "wordsPerSecond": 2.36,
+     "transcript": "Ground's hard. Not complaining, saying",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "mina": {
+  "emmaline": {
+   "voiceId": "nDJIICjR9zfJExIFeSCN",
+   "name": "Emmaline - young British girl",
+   "why": "A young British girl, bright and exact diction, \"precocious\". The girl who read every map.",
+   "takes": [
+    {
+     "text": "I can't draw in the dark. I tried. It's a very bad map.",
+     "say": "I can't draw in the dark. I tried. It's a very bad map.",
+     "hash": "c211e97b633f",
+     "file": "mina/emmaline/c211e97b633f.mp3",
+     "seconds": 4.8,
+     "pitchHz": 232,
+     "wordsPerSecond": 4.19,
+     "transcript": "I can't draw in the dark. I tried. It's a very bad map",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(looking at your hand) Couldn't. I'm going to need a bigger table.",
+     "say": "Couldn't. I'm going to need a bigger table.",
+     "hash": "e8ad56b370b0",
+     "file": "mina/emmaline/e8ad56b370b0.mp3",
+     "seconds": 2.88,
+     "pitchHz": 239,
+     "wordsPerSecond": 3.96,
+     "transcript": "Couldn't. I'm going to need a bigger table",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "lucy": {
+   "voiceId": "lcMyyd2HUfFzxdCaC4Ta",
+   "name": "Lucy - Fresh & Casual",
+   "why": "Young British, energetic and quick.",
+   "takes": [
+    {
+     "text": "I can't draw in the dark. I tried. It's a very bad map.",
+     "say": "I can't draw in the dark. I tried. It's a very bad map.",
+     "hash": "1d81f324a008",
+     "file": "mina/lucy/1d81f324a008.mp3",
+     "seconds": 4.56,
+     "pitchHz": 198,
+     "wordsPerSecond": 3.94,
+     "transcript": "I can't draw in the dark. I tried. It's a very bad map",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(looking at your hand) Couldn't. I'm going to need a bigger table.",
+     "say": "Couldn't. I'm going to need a bigger table.",
+     "hash": "1b13e3379150",
+     "file": "mina/lucy/1b13e3379150.mp3",
+     "seconds": 2.8,
+     "pitchHz": 222,
+     "wordsPerSecond": 3.77,
+     "transcript": "Couldn't. I'm going to need a bigger table",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "charlotte": {
+   "voiceId": "6fZce9LFNG3iEITDfqZZ",
+   "name": "Charlotte - Warm, Clear, Modern, Distinctive",
+   "why": "Young British, crisp and bright.",
+   "takes": [
+    {
+     "text": "I can't draw in the dark. I tried. It's a very bad map.",
+     "say": "I can't draw in the dark. I tried. It's a very bad map.",
+     "hash": "161e9d736dfb",
+     "file": "mina/charlotte/161e9d736dfb.mp3",
+     "seconds": 4.48,
+     "pitchHz": 203,
+     "wordsPerSecond": 4.33,
+     "transcript": "I can't draw in the dark. I tried. It's a very bad map",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(looking at your hand) Couldn't. I'm going to need a bigger table.",
+     "say": "Couldn't. I'm going to need a bigger table.",
+     "hash": "d35dda32d64b",
+     "file": "mina/charlotte/d35dda32d64b.mp3",
+     "seconds": 2.88,
+     "pitchHz": 229,
+     "wordsPerSecond": 3.92,
+     "transcript": "I couldn't. I'm going to need a bigger table",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "wren": {
+  "emily": {
+   "voiceId": "1cxc5c3E9K6F1wlqOJGV",
+   "name": "Emily - Gentle, Soft and Meditative",
+   "why": "Young Northern Irish woman, soft and gentle, close to a whisper. Talks to beasts first.",
+   "takes": [
+    {
+     "text": "(softly, to the trees) Easy. It's only me. Same as yesterday.",
+     "say": "[softly] Easy. It's only me. Same as yesterday.",
+     "hash": "56fa0aa9cfe1",
+     "file": "wren/emily/56fa0aa9cfe1.mp3",
+     "seconds": 3.84,
+     "pitchHz": 216,
+     "wordsPerSecond": 10.29,
+     "transcript": "Easy. It's only me, same as yesterday",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "His name is Bramble. I raised him on a bottle.",
+     "say": "His name is Bramble. I raised him on a bottle.",
+     "hash": "73911f501dd9",
+     "file": "wren/emily/73911f501dd9.mp3",
+     "seconds": 3.36,
+     "pitchHz": 246,
+     "wordsPerSecond": 9.26,
+     "transcript": "His name is Bramble. I raised him on a bottle",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "labhaoise": {
+   "voiceId": "sgk995upfe3tYLvoGcBN",
+   "name": "Labhaoise - Warm and Grounded",
+   "why": "Young Irish woman, warm and grounded, a level lilt.",
+   "takes": [
+    {
+     "text": "(softly, to the trees) Easy. It's only me. Same as yesterday.",
+     "say": "[softly] Easy. It's only me. Same as yesterday.",
+     "hash": "97cd4c1b69a4",
+     "file": "wren/labhaoise/97cd4c1b69a4.mp3",
+     "seconds": 3.52,
+     "pitchHz": 174,
+     "wordsPerSecond": 3.72,
+     "transcript": "Easy. It's only me. Same as yesterday",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "His name is Bramble. I raised him on a bottle.",
+     "say": "His name is Bramble. I raised him on a bottle.",
+     "hash": "e79013bf52d2",
+     "file": "wren/labhaoise/e79013bf52d2.mp3",
+     "seconds": 2.96,
+     "pitchHz": 193,
+     "wordsPerSecond": 4.95,
+     "transcript": "His name is Bramble. I raised him on a bottle",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "alba": {
+   "voiceId": "eh9GHWIaYsZB3Alk8wrY",
+   "name": "Alba Mac - Animated Scottish",
+   "why": "Young Edinburgh woman, soft.",
+   "takes": [
+    {
+     "text": "(softly, to the trees) Easy. It's only me. Same as yesterday.",
+     "say": "[softly] Easy. It's only me. Same as yesterday.",
+     "hash": "3606a0369a3a",
+     "file": "wren/alba/3606a0369a3a.mp3",
+     "seconds": 3.52,
+     "pitchHz": 232,
+     "wordsPerSecond": 5.22,
+     "transcript": "Easy. It's only me, same as yesterday",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "His name is Bramble. I raised him on a bottle.",
+     "say": "His name is Bramble. I raised him on a bottle.",
+     "hash": "122847e6a3dc",
+     "file": "wren/alba/122847e6a3dc.mp3",
+     "seconds": 3.2,
+     "pitchHz": 246,
+     "wordsPerSecond": 7.69,
+     "transcript": "His name is Bramble. I raised him on a bottle",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "elowen": {
+  "beatrice": {
+   "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+   "name": "Beatrice - Mature, Gentle and Engaging",
+   "why": "Old, British, warm and gentle, a calm pace. Already on the account from Tamsin's auditions.",
+   "takes": [
+    {
+     "text": "Look at you. A season ago you had a tent.",
+     "say": "Look at you. A season ago you had a tent.",
+     "hash": "3755a7d5b88e",
+     "file": "elowen/beatrice/3755a7d5b88e.mp3",
+     "seconds": 3.6,
+     "pitchHz": 246,
+     "wordsPerSecond": 3.73,
+     "transcript": "Look at you. A season ago you had a tent",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Have you eaten? You have the look of someone who forgets.",
+     "say": "Have you eaten? You have the look of someone who forgets.",
+     "hash": "3e339b9819fa",
+     "file": "elowen/beatrice/3e339b9819fa.mp3",
+     "seconds": 3.76,
+     "pitchHz": 225,
+     "wordsPerSecond": 4.33,
+     "transcript": "Have you eaten? You have the look of someone who forgets",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "frances": {
+   "voiceId": "mFgXOmlOfXfr6suoQkRH",
+   "name": "Frances - Soft, Warm and Calm",
+   "why": "Irish, soft and warm with a husk. Already on the account from Hobb's auditions.",
+   "takes": [
+    {
+     "text": "Look at you. A season ago you had a tent.",
+     "say": "Look at you. A season ago you had a tent.",
+     "hash": "e0e27c8f0f38",
+     "file": "elowen/frances/e0e27c8f0f38.mp3",
+     "seconds": 3.44,
+     "pitchHz": 219,
+     "wordsPerSecond": 3.85,
+     "transcript": "Look at you. A season ago, you had a tent",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Have you eaten? You have the look of someone who forgets.",
+     "say": "Have you eaten? You have the look of someone who forgets.",
+     "hash": "27de90deebd4",
+     "file": "elowen/frances/27de90deebd4.mp3",
+     "seconds": 3.6,
+     "pitchHz": 203,
+     "wordsPerSecond": 4.51,
+     "transcript": "Have you eaten? You have the look of someone who forgets",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "colleen": {
+   "voiceId": "1OYA2kgM85gF2eGN8HEp",
+   "name": "Colleen - Warm Southern Irish Woman",
+   "why": "Southern Irish, soft and warm.",
+   "takes": [
+    {
+     "text": "Look at you. A season ago you had a tent.",
+     "say": "Look at you. A season ago you had a tent.",
+     "hash": "67695f652072",
+     "file": "elowen/colleen/67695f652072.mp3",
+     "seconds": 3.44,
+     "pitchHz": 271,
+     "wordsPerSecond": 4.03,
+     "transcript": "Look at you. A season ago, you had a tent",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Have you eaten? You have the look of someone who forgets.",
+     "say": "Have you eaten? You have the look of someone who forgets.",
+     "hash": "2e9cb292ae8f",
+     "file": "elowen/colleen/2e9cb292ae8f.mp3",
+     "seconds": 3.6,
+     "pitchHz": 246,
+     "wordsPerSecond": 4.87,
+     "transcript": "Have you eaten? You have the look of someone who forgets",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "calla": {
+  "jade": {
+   "voiceId": "tfvhQIydLdGEZP6h00c5",
+   "name": "Jade - Polished, Sophisticated Narrator",
+   "why": "Young British, polished, a precise and crisp accent.",
+   "takes": [
+    {
+     "text": "For your safety. These places fall in. What did you find?",
+     "say": "For your safety. These places fall in. What did you find?",
+     "hash": "54716fcb1d10",
+     "file": "calla/jade/54716fcb1d10.mp3",
+     "seconds": 4.48,
+     "pitchHz": 258,
+     "wordsPerSecond": 3.74,
+     "transcript": "For your safety, these places fall in. What did you find?",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(through the stone, very calm) That is not in my instructions.",
+     "say": "[calmly] That is not in my instructions.",
+     "hash": "96a34b7338bd",
+     "file": "calla/jade/96a34b7338bd.mp3",
+     "seconds": 2.48,
+     "pitchHz": 229,
+     "wordsPerSecond": 2.94,
+     "transcript": "That is not in my instructions",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "lucynews": {
+   "voiceId": "EQu48Nbp4OqDxsnYh27f",
+   "name": "Lucy - Engaging News Reporter",
+   "why": "Young British, clear and polished, a professional reading out what is so.",
+   "takes": [
+    {
+     "text": "For your safety. These places fall in. What did you find?",
+     "say": "For your safety. These places fall in. What did you find?",
+     "hash": "6ff8a21556a3",
+     "file": "calla/lucynews/6ff8a21556a3.mp3",
+     "seconds": 4.32,
+     "pitchHz": 286,
+     "wordsPerSecond": 3.99,
+     "transcript": "For your safety. These places fall in. What did you find?",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(through the stone, very calm) That is not in my instructions.",
+     "say": "[calmly] That is not in my instructions.",
+     "hash": "1e79409f3900",
+     "file": "calla/lucynews/1e79409f3900.mp3",
+     "seconds": 2.72,
+     "pitchHz": 225,
+     "wordsPerSecond": 2.88,
+     "transcript": "That is not in my instructions",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "shelley": {
+   "voiceId": "4CrZuIW9am7gYAxgo2Af",
+   "name": "Shelley - Clear, Confident and British",
+   "why": "Young British, crisp, clear and sincere.",
+   "takes": [
+    {
+     "text": "For your safety. These places fall in. What did you find?",
+     "say": "For your safety. These places fall in. What did you find?",
+     "hash": "edb8905a64c0",
+     "file": "calla/shelley/edb8905a64c0.mp3",
+     "seconds": 4.72,
+     "pitchHz": 302,
+     "wordsPerSecond": 4.23,
+     "transcript": "For your safety, these places fall in. What did you find?",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(through the stone, very calm) That is not in my instructions.",
+     "say": "[calmly] That is not in my instructions.",
+     "hash": "26ac8d59f318",
+     "file": "calla/shelley/26ac8d59f318.mp3",
+     "seconds": 2.56,
+     "pitchHz": 225,
+     "wordsPerSecond": 3.41,
+     "transcript": "That is not in my instructions",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "aldric": {
+  "tarquin": {
+   "voiceId": "7cOBG34AiHrAzs842Rdi",
+   "name": "Tarquin - Posh & English RP",
+   "why": "Middle aged, posh RP: the formal half of him.",
+   "takes": [
+    {
+     "text": "(out of breath) Is it true? No. Do not show me. She is coming herself.",
+     "say": "[out of breath] Is it true? No. Do not show me. She is coming herself.",
+     "hash": "567591bf35a3",
+     "file": "aldric/tarquin/567591bf35a3.mp3",
+     "seconds": 4.72,
+     "pitchHz": 136,
+     "wordsPerSecond": 4.14,
+     "transcript": "Is it true? No, do not show me. She is coming herself",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Bless you. Is that... may I... no. No. Bless you.",
+     "say": "Bless you. Is that... may I... no. No. Bless you.",
+     "hash": "90b445ccf240",
+     "file": "aldric/tarquin/90b445ccf240.mp3",
+     "seconds": 5.28,
+     "pitchHz": 152,
+     "wordsPerSecond": 3.97,
+     "transcript": "Bless you. Is that... May I? No, no. Bless you",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "soifur": {
+   "voiceId": "1SgtCdnh90xU4Bpehczp",
+   "name": "Soifur",
+   "why": "British and anxious by its description: the flustered half.",
+   "takes": [
+    {
+     "text": "(out of breath) Is it true? No. Do not show me. She is coming herself.",
+     "say": "[out of breath] Is it true? No. Do not show me. She is coming herself.",
+     "hash": "8e76d29ec64c",
+     "file": "aldric/soifur/8e76d29ec64c.mp3",
+     "seconds": 4.72,
+     "pitchHz": 200,
+     "wordsPerSecond": 3.57,
+     "transcript": "Is it true no do not show me she is coming herself",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Bless you. Is that... may I... no. No. Bless you.",
+     "say": "Bless you. Is that... may I... no. No. Bless you.",
+     "hash": "b2f4753eef57",
+     "file": "aldric/soifur/b2f4753eef57.mp3",
+     "seconds": 5.04,
+     "pitchHz": 160,
+     "wordsPerSecond": 4,
+     "transcript": "Bless you. Is that... May I? No. No. Bless you",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "luke": {
+   "voiceId": "DEn2UKxERg5VSUMgGDLH",
+   "name": "Luke - Polished, Warm and Versatile",
+   "why": "Middle aged, RP, warm and polished.",
+   "takes": [
+    {
+     "text": "(out of breath) Is it true? No. Do not show me. She is coming herself.",
+     "say": "[out of breath] Is it true? No. Do not show me. She is coming herself.",
+     "hash": "79592afa5c06",
+     "file": "aldric/luke/79592afa5c06.mp3",
+     "seconds": 4.96,
+     "pitchHz": 143,
+     "wordsPerSecond": 4.48,
+     "transcript": "Is it true? No, do not show me. She is coming herself",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Bless you. Is that... may I... no. No. Bless you.",
+     "say": "Bless you. Is that... may I... no. No. Bless you.",
+     "hash": "0d893ef3c3c5",
+     "file": "aldric/luke/0d893ef3c3c5.mp3",
+     "seconds": 5.68,
+     "pitchHz": 160,
+     "wordsPerSecond": 4.17,
+     "transcript": "Bless you. Is that... May I? No. No. Bless you",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "tansy": {
+  "michelle": {
+   "voiceId": "C92s6vssSLlabgIln1iY",
+   "name": "Michelle - Direct and Natural",
+   "why": "Middle aged, Northern Irish, \"an authentic straight talker\". Warm, then blunt.",
+   "takes": [
+    {
+     "text": "Honey's not supper. People think it is. It isn't.",
+     "say": "Honey's not supper. People think it is. It isn't.",
+     "hash": "11cb0ac9cf12",
+     "file": "tansy/michelle/11cb0ac9cf12.mp3",
+     "seconds": 3.84,
+     "pitchHz": 262,
+     "wordsPerSecond": 4.29,
+     "transcript": "Honey's not supper. People think it is. It isn't",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "I slept with the hive. They don't mind. I do.",
+     "say": "I slept with the hive. They don't mind. I do.",
+     "hash": "cdf4441ed6cb",
+     "file": "tansy/michelle/cdf4441ed6cb.mp3",
+     "seconds": 3.52,
+     "pitchHz": 152,
+     "wordsPerSecond": 4.67,
+     "transcript": "I slept with the hive. They don't mind. I do",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "hannah": {
+   "voiceId": "73fZMjboCm1aBVyxTbBp",
+   "name": "Hannah - Welsh And friendly",
+   "why": "Middle aged, Welsh, friendly and soft.",
+   "takes": [
+    {
+     "text": "Honey's not supper. People think it is. It isn't.",
+     "say": "Honey's not supper. People think it is. It isn't.",
+     "hash": "d0816a8dbda8",
+     "file": "tansy/hannah/d0816a8dbda8.mp3",
+     "seconds": 4,
+     "pitchHz": 308,
+     "wordsPerSecond": 3.57,
+     "transcript": "Honey's not supper. People think it is. It isn't",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "I slept with the hive. They don't mind. I do.",
+     "say": "I slept with the hive. They don't mind. I do.",
+     "hash": "d457b18ce45f",
+     "file": "tansy/hannah/d457b18ce45f.mp3",
+     "seconds": 3.68,
+     "pitchHz": 205,
+     "wordsPerSecond": 4.2,
+     "transcript": "I slept with the hive. They don't mind. I do",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "isla": {
+   "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+   "name": "Isla - Youthful, Relaxed, and Warm",
+   "why": "Middle aged, Scottish, warm.",
+   "takes": [
+    {
+     "text": "Honey's not supper. People think it is. It isn't.",
+     "say": "Honey's not supper. People think it is. It isn't.",
+     "hash": "0b47abb81f8b",
+     "file": "tansy/isla/0b47abb81f8b.mp3",
+     "seconds": 3.92,
+     "pitchHz": 296,
+     "wordsPerSecond": 4.05,
+     "transcript": "Honey's not supper. People think it is. It isn't",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "I slept with the hive. They don't mind. I do.",
+     "say": "I slept with the hive. They don't mind. I do.",
+     "hash": "5a36d0477d5b",
+     "file": "tansy/isla/5a36d0477d5b.mp3",
+     "seconds": 3.44,
+     "pitchHz": 176,
+     "wordsPerSecond": 5,
+     "transcript": "I slept with the hive. They don't mind. I do",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "holt": {
+  "alder": {
+   "voiceId": "nTMUXLFSfbWmdKKy7nDC",
+   "name": "Alder - Warm, Raspy and Comforting",
+   "why": "Old, Irish, a gentle rasp, slow.",
+   "takes": [
+    {
+     "text": "A lamp is a promise. Somebody walks toward it.",
+     "say": "A lamp is a promise. Somebody walks toward it.",
+     "hash": "4ea09215c62c",
+     "file": "holt/alder/4ea09215c62c.mp3",
+     "seconds": 4,
+     "pitchHz": 167,
+     "wordsPerSecond": 4.69,
+     "transcript": "A lamp is a promise. Somebody walks toward it",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(looking at the arches) No. Ask me about any other lamp.",
+     "say": "[quietly] No. Ask me about any other lamp.",
+     "hash": "c8a52c7cc36a",
+     "file": "holt/alder/c8a52c7cc36a.mp3",
+     "seconds": 3.12,
+     "pitchHz": 0,
+     "wordsPerSecond": 8.14,
+     "transcript": "No. Ask me about any other lamp",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "steve": {
+   "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+   "name": "Steve - Calm, Expressive and Balanced",
+   "why": "An old Northern English man from Lancashire, calm.",
+   "takes": [
+    {
+     "text": "A lamp is a promise. Somebody walks toward it.",
+     "say": "A lamp is a promise. Somebody walks toward it.",
+     "hash": "bbfa7a962a6e",
+     "file": "holt/steve/bbfa7a962a6e.mp3",
+     "seconds": 3.92,
+     "pitchHz": 143,
+     "wordsPerSecond": 3.24,
+     "transcript": "A lamp is a promise. Somebody walks toward it",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(looking at the arches) No. Ask me about any other lamp.",
+     "say": "[quietly] No. Ask me about any other lamp.",
+     "hash": "580cb0acb7db",
+     "file": "holt/steve/580cb0acb7db.mp3",
+     "seconds": 2.88,
+     "pitchHz": 116,
+     "wordsPerSecond": 4.67,
+     "transcript": "No. Ask me about any other lamp",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "beezle": {
+   "voiceId": "BBfN7Spa3cqLPH1xAS22",
+   "name": "Beezle Wheezelby",
+   "why": "Old, British, soft and wizened.",
+   "takes": [
+    {
+     "text": "A lamp is a promise. Somebody walks toward it.",
+     "say": "A lamp is a promise. Somebody walks toward it.",
+     "hash": "a613a44635a8",
+     "file": "holt/beezle/a613a44635a8.mp3",
+     "seconds": 4,
+     "pitchHz": 119,
+     "wordsPerSecond": 3.63,
+     "transcript": "A lamp is a promise. Somebody walks toward it",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "(looking at the arches) No. Ask me about any other lamp.",
+     "say": "[quietly] No. Ask me about any other lamp.",
+     "hash": "d0f421803296",
+     "file": "holt/beezle/d0f421803296.mp3",
+     "seconds": 2.96,
+     "pitchHz": 119,
+     "wordsPerSecond": 5.38,
+     "transcript": "No ask me about any other lamp",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "ren": {
+  "adam": {
+   "voiceId": "N7ZPtMSz30kJ869b58WE",
+   "name": "Adam - Middle Eastern Calm Male",
+   "why": "Young, a light Middle Eastern accent, warm. From far off, and the desert.",
+   "takes": [
+    {
+     "text": "(bowing too low) I can carry forty days of it. I have counted.",
+     "say": "I can carry forty days of it. I have counted.",
+     "hash": "5556952af8f1",
+     "file": "ren/adam/5556952af8f1.mp3",
+     "seconds": 3.28,
+     "pitchHz": 131,
+     "wordsPerSecond": 8.47,
+     "transcript": "I can carry 40 days of it. I have counted",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "The Mother chose me. I want you to know I asked first.",
+     "say": "The Mother chose me. I want you to know I asked first.",
+     "hash": "d5a2f66aded3",
+     "file": "ren/adam/d5a2f66aded3.mp3",
+     "seconds": 4.24,
+     "pitchHz": 119,
+     "wordsPerSecond": 6.45,
+     "transcript": "The mother chose me. I want you to know I asked first",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "mahmoud": {
+   "voiceId": "Os2frcqCuUz8b9F93RuI",
+   "name": "Mahmoud - Deep, Warm, and Clear",
+   "why": "Young, Arab, warm and natural.",
+   "takes": [
+    {
+     "text": "(bowing too low) I can carry forty days of it. I have counted.",
+     "say": "I can carry forty days of it. I have counted.",
+     "hash": "61f570b4bb0f",
+     "file": "ren/mahmoud/61f570b4bb0f.mp3",
+     "seconds": 3.28,
+     "pitchHz": 167,
+     "wordsPerSecond": 4.2,
+     "transcript": "I can carry forty days of it I have counted.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "The Mother chose me. I want you to know I asked first.",
+     "say": "The Mother chose me. I want you to know I asked first.",
+     "hash": "90f6a2484d76",
+     "file": "ren/mahmoud/90f6a2484d76.mp3",
+     "seconds": 4.72,
+     "pitchHz": 139,
+     "wordsPerSecond": 3.92,
+     "transcript": "The mother chose me. I want you to know I asked first",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "sara": {
+   "voiceId": "jAAHNNqlbAX9iWjJPEtE",
+   "name": "Sara - Soft, Calm and Gentle",
+   "why": "Young, Jordanian, calm. The handbook never says whether Ren is a boy or a girl.",
+   "takes": [
+    {
+     "text": "(bowing too low) I can carry forty days of it. I have counted.",
+     "say": "I can carry forty days of it. I have counted.",
+     "hash": "bd1c8109fe59",
+     "file": "ren/sara/bd1c8109fe59.mp3",
+     "seconds": 3.36,
+     "pitchHz": 229,
+     "wordsPerSecond": 4.24,
+     "transcript": "I can carry 40 days of it. I have counted.",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "The Mother chose me. I want you to know I asked first.",
+     "say": "The Mother chose me. I want you to know I asked first.",
+     "hash": "98080f5f06dd",
+     "file": "ren/sara/98080f5f06dd.mp3",
+     "seconds": 4.16,
+     "pitchHz": 239,
+     "wordsPerSecond": 4.2,
+     "transcript": "The mother chose me. I want you to know I asked first",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "guildmaster": {
+  "nathaniel": {
+   "voiceId": "AkzTpEeeEWvyZf4umyCJ",
+   "name": "Nathaniel C – Breaking News & Public Broadcast",
+   "why": "Middle aged, British, formal and calm: words read out for the hundredth time.",
+   "takes": [
+    {
+     "text": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+     "say": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+     "hash": "c781eae90cf5",
+     "file": "guildmaster/nathaniel/c781eae90cf5.mp3",
+     "seconds": 6.48,
+     "pitchHz": 138,
+     "wordsPerSecond": 3.85,
+     "transcript": "Ward of the Guild, sixteen years. By right of the grant, Plot forty-one, Greenhollow",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "grant": {
+   "voiceId": "VC6vCXhVaI8BZefRtXZV",
+   "name": "Grant Gravitas - Rich, warm, cinematic",
+   "why": "Old, British, \"could have read the news on the BBC in 1965\".",
+   "takes": [
+    {
+     "text": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+     "say": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+     "hash": "a53efab1f3e4",
+     "file": "guildmaster/grant/a53efab1f3e4.mp3",
+     "seconds": 6.72,
+     "pitchHz": 119,
+     "wordsPerSecond": 3.32,
+     "transcript": "Ward of the Guild, sixteen years. By right of the grant, Plot forty-one, Greenhollow",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "damiaan": {
+   "voiceId": "L3NacDtfFuYL0m0wJjjq",
+   "name": "Damiaan - Academic, British English",
+   "why": "Middle aged, formal academic RP.",
+   "takes": [
+    {
+     "text": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+     "say": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+     "hash": "f035275a0401",
+     "file": "guildmaster/damiaan/f035275a0401.mp3",
+     "seconds": 6.72,
+     "pitchHz": 111,
+     "wordsPerSecond": 3.46,
+     "transcript": "Ward of the Guild, sixteen years. By right of the grant, Plot forty-one, Greenhollow",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "ilara": {
+  "zoey": {
+   "voiceId": "f4EpLLfw2IURnw62TRtz",
+   "name": "Zoey - Upbeat & Refreshing",
+   "why": "Young, whimsical, a slight Celtic lilt. Teasing.",
+   "takes": [
+    {
+     "text": "He wants to meet you. I said you are frightened of big things.",
+     "say": "He wants to meet you. I said you are frightened of big things.",
+     "hash": "e1669a477531",
+     "file": "ilara/zoey/e1669a477531.mp3",
+     "seconds": 4.8,
+     "pitchHz": 242,
+     "wordsPerSecond": 2.97,
+     "transcript": "He wants to meet you. I said you are frightened of big things",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Put your hand flat. Flat. He isn't a dog.",
+     "say": "Put your hand flat. Flat. He isn't a dog.",
+     "hash": "2f388cc59c2f",
+     "file": "ilara/zoey/2f388cc59c2f.mp3",
+     "seconds": 4.56,
+     "pitchHz": 267,
+     "wordsPerSecond": 2.71,
+     "transcript": "Put your hand flat. Flat. He isn't a dog",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "ana": {
+   "voiceId": "rCmVtv8cYU60uhlsOo1M",
+   "name": "Ana - Emotional, Warm and Expressive",
+   "why": "Young British woman, warm and expressive.",
+   "takes": [
+    {
+     "text": "He wants to meet you. I said you are frightened of big things.",
+     "say": "He wants to meet you. I said you are frightened of big things.",
+     "hash": "f1ad510d5550",
+     "file": "ilara/ana/f1ad510d5550.mp3",
+     "seconds": 4.64,
+     "pitchHz": 262,
+     "wordsPerSecond": 4.36,
+     "transcript": "He wants to meet you. I said you are frightened of big things",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Put your hand flat. Flat. He isn't a dog.",
+     "say": "Put your hand flat. Flat. He isn't a dog.",
+     "hash": "037f59581da9",
+     "file": "ilara/ana/037f59581da9.mp3",
+     "seconds": 4.16,
+     "pitchHz": 296,
+     "wordsPerSecond": 4.09,
+     "transcript": "Put your hand flat. Flat. He isn't a dog",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "niamh": {
+   "voiceId": "1e9Gn3OQenGu4rjQ3Du1",
+   "name": "Niamh - Soft, Engaging and Friendly",
+   "why": "Young Irish woman, soft, a slight lilt.",
+   "takes": [
+    {
+     "text": "He wants to meet you. I said you are frightened of big things.",
+     "say": "He wants to meet you. I said you are frightened of big things.",
+     "hash": "44a70f17efc9",
+     "file": "ilara/niamh/44a70f17efc9.mp3",
+     "seconds": 4.48,
+     "pitchHz": 242,
+     "wordsPerSecond": 5.8,
+     "transcript": "He wants to meet you. I said, \"You are frightened of big things.\"",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "Put your hand flat. Flat. He isn't a dog.",
+     "say": "Put your hand flat. Flat. He isn't a dog.",
+     "hash": "45a8a6fac029",
+     "file": "ilara/niamh/45a8a6fac029.mp3",
+     "seconds": 4.16,
+     "pitchHz": 250,
+     "wordsPerSecond": 5.7,
+     "transcript": "Put your hand flat. Flat. He isn't a dog",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ },
+ "auren": {
+  "rory": {
+   "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+   "name": "Rory - Natural, Warm and Lively",
+   "why": "A young Dublin man, warm and lively, easy to like.",
+   "takes": [
+    {
+     "text": "Sit down, Nan. I'll fetch the other two.",
+     "say": "Sit down, Nan. I'll fetch the other two.",
+     "hash": "46a0089ee298",
+     "file": "auren/rory/46a0089ee298.mp3",
+     "seconds": 2.32,
+     "pitchHz": 110,
+     "wordsPerSecond": 4.82,
+     "transcript": "Sit down, Nan. I'll fetch the other two",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "I'm not frightened. I'm being respectful. From over here.",
+     "say": "I'm not frightened. I'm being respectful. From over here.",
+     "hash": "10791dde1314",
+     "file": "auren/rory/10791dde1314.mp3",
+     "seconds": 3.84,
+     "pitchHz": 182,
+     "wordsPerSecond": 4.41,
+     "transcript": "I'm not frightened. I'm being respectful. From over here",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "samwelsh": {
+   "voiceId": "DikmR0aoFXAp1A3NcovW",
+   "name": "Sam - Soft, Slightly Welsh and Friendly",
+   "why": "A young Welsh man, soft, deep and friendly.",
+   "takes": [
+    {
+     "text": "Sit down, Nan. I'll fetch the other two.",
+     "say": "Sit down, Nan. I'll fetch the other two.",
+     "hash": "d17ca8cae1d8",
+     "file": "auren/samwelsh/d17ca8cae1d8.mp3",
+     "seconds": 2.4,
+     "pitchHz": 101,
+     "wordsPerSecond": 4.88,
+     "transcript": "Sit down, Nan. I'll fetch the other two",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "I'm not frightened. I'm being respectful. From over here.",
+     "say": "I'm not frightened. I'm being respectful. From over here.",
+     "hash": "598961fd7ea9",
+     "file": "auren/samwelsh/598961fd7ea9.mp3",
+     "seconds": 4.08,
+     "pitchHz": 152,
+     "wordsPerSecond": 3.46,
+     "transcript": "I'm not frightened. I'm being respectful from over here",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  },
+  "asher": {
+   "voiceId": "UaYTS0wayjmO9KD1LR4R",
+   "name": "Asher - Confident, Charismatic & Playful",
+   "why": "A young British man, charismatic and playful.",
+   "takes": [
+    {
+     "text": "Sit down, Nan. I'll fetch the other two.",
+     "say": "Sit down, Nan. I'll fetch the other two.",
+     "hash": "b7804ad8c9c2",
+     "file": "auren/asher/b7804ad8c9c2.mp3",
+     "seconds": 2.48,
+     "pitchHz": 89,
+     "wordsPerSecond": 4.35,
+     "transcript": "Sit down, Nan. I'll fetch the other two",
+     "heard": 1,
+     "tagsReadOut": []
+    },
+    {
+     "text": "I'm not frightened. I'm being respectful. From over here.",
+     "say": "I'm not frightened. I'm being respectful. From over here.",
+     "hash": "aaa33eb62c7a",
+     "file": "auren/asher/aaa33eb62c7a.mp3",
+     "seconds": 3.92,
+     "pitchHz": 200,
+     "wordsPerSecond": 3.38,
+     "transcript": "I'm not frightened. I'm being respectful. From over here",
+     "heard": 1,
+     "tagsReadOut": []
+    }
+   ]
+  }
+ }
+}

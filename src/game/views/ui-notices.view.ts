@@ -31,6 +31,10 @@ const STYLE = /* css */ `
 }
 /* A phone held upright: the hint and the Almanac's note share the strip beside the minimap, so both are set smaller to end above the tracker. */
 @container gu (width < 560px) {
+  .ui-book .gu-toasts { width: calc(100% - 32px); min-width: 0; }
+  .ui-book .gu-toast { box-sizing: border-box; min-width: 0; max-width: 100%; }
+  .ui-book .gu-toast-text { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+  .ui-book .gu-toast > .gu-pic, .ui-book .gu-toast-count { flex: none; }
   .ui-book .gu-top { left: 8px; top: 8px; gap: 6px; width: calc(100% - 156px); }
   .ui-book .gu-hint { padding-left: 12px; }
   .ui-book .gu-hint-text { font-size: 14px; line-height: 1.35; }
@@ -47,7 +51,7 @@ export function install(view: GameView): void {
   game.events.on('item.gained', ({ id, count }) => {
     // With the bag or the Make panel open, the new thing is already in front of the player.
     if (!view.started || book.panel === 'bag' || book.panel === 'make') return;
-    let name = id, icon = id;
+    let name: string = id, icon: string = id;
     try {
       const def = book.sys.items?.get(id);
       if (def) { name = def.name; icon = def.icon; }

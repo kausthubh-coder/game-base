@@ -117,8 +117,6 @@ function createBook(view: GameView): Book {
       setMouse: (style) => view.settings.setMouse(style),
       tiltTurn: () => view.settings.tiltTurn,
       setTiltTurn: (turn) => view.settings.setTiltTurn(turn),
-      characters: () => view.settings.characters,
-      setCharacters: (look) => view.settings.setCharacters(look),
     },
     debug: { get: () => view.settings.debug, set: (show) => view.settings.setDebug(show) },
     setInterfaceSize(next) {

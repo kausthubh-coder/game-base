@@ -28,8 +28,13 @@ const FEATURES: Readonly<Record<string, string>> = {
   crops: 'crops',
   'wet-soil': 'crops',
   'painted-water': 'water',
+  wilds: 'wilds',
   // What people made.
   'town models': 'town',
+  city: 'city',
+  landmarks: 'landmarks',
+  'far-buildings': 'far buildings',
+  saltgate: 'saltgate',
   'river-lamps': 'lamps',
   'river-lamp-glow': 'lamps',
   // The sky.

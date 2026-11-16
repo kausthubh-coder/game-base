@@ -1,6 +1,6 @@
 // The parts of the interface that are plain data in, plain data out. No page here, so tests can run them.
 
-import type { AlmanacPage, ItemDef, Recipe } from '../api.sim.ts';
+import type { AlmanacPage, ItemDef, ItemId, Recipe } from '../api.sim.ts';
 import type { KeyHint, Quality, Settings } from './types.ui.ts';
 
 export const DEFAULT_SETTINGS: Settings = { quality: 'auto', music: 0.7, ambience: 0.7, effects: 0.8, voice: 0.8, size: 1 };
@@ -51,7 +51,7 @@ export function initials(name: string): string {
 }
 
 /** Why a recipe cannot be made, in words for the player, or null when it can. */
-export function missingReason(recipe: Recipe, have: (id: string) => number, nameOf: (id: string) => string, canMake: boolean): string | null {
+export function missingReason(recipe: Recipe, have: (id: ItemId) => number, nameOf: (id: ItemId) => string, canMake: boolean): string | null {
   const short = recipe.needs.filter((need) => have(need.id) < need.count).map((need) => nameOf(need.id).toLowerCase());
   if (short.length === 0) return canMake ? null : 'Cannot make this right now';
   const last = short.pop();

@@ -1,0 +1,31 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "hero": {
+    "reference": "public/assets/sprites/hero.png",
+    "concept": "assets-src/concept/people-home/hero.webp (look A)",
+    "source": "assets-src/camp-sprites/hero-camp-look-a.png",
+    "attempts": [
+      {
+        "source": "assets-src/camp-sprites/hero-camp-look-a-attempt1.png",
+        "prompt": "Redraw the old camp sheet as exactly the new approved hero, using hero.png for pixel style and the concept look A for identity. Strawberry blond swept wedge hair, pale face, slate navy canvas jacket, cream cuffs and shirt, key, diagonal brown satchel strap and bag, trousers and boots; no cape. Transparent 4-column 9-row grid. Sit front/back/right profile, two frames each; look up front/back/right profile, two frames each; rise front/back/right profile, four frames each, seated through standing. Equal head scale, upper-left warm light, dark tinted outlines. No ground or text.",
+        "result": "Identity matched; front rise frame 2 turned sideways. Superseded."
+      },
+      {
+        "source": "assets-src/camp-sprites/hero-camp-look-a.png",
+        "prompt": "Correct attempt 1 against approved hero.png. Keep 4 columns and 9 rows, unused cells transparent. Row seven must stay front facing in all four rise steps, with both eyes and frontal open jacket visible; correct column 2 from side to front. Keep back rows without faces and side rows right-facing. Same strawberry blond swept wedge, navy jacket, cream cuffs and shirt, brass key, satchel strap, trousers and boots. First rise pose seated, second half rising, third nearly standing, fourth approved idle. Same large head dimensions throughout. Crisp pixel art; no cape, shadows, text or ground.",
+        "result": "Kept. Front rise corrected; all frames reviewed beside hero at 3x, native and half size."
+      }
+    ],
+    "processing": "Uniform cell slicing, alpha cleanup, snap to shipped hero own colours, whole-figure nearest scaling to directional head width, ground alignment at [64,120]. Final rise cells are exact shipped hero idle frame 0. No body-part replacement or hand-drawn pixels. Removed old hero-base pin. Manifest and fox sheet byte-identical."
+  },
+  "fox": {
+    "prompt": "Use case: identity-preserve. Approved grey fox sheet is reference/edit target, preserve the SAME animal's huge ears, dull eyes, grey fur and muted cream chest, chibi proportions and pixel art clusters. Create new animation sheet STRICT FOUR columns SIX rows equal square cells. First THREE rows STALK front/back(no face)/right profile, four successive slow cautious walking steps: thin frightened fox head LOW, tail lowered near ground, paws carefully placed, hunched, NOT monster, no glow or snarl. Last THREE rows SHAKE front/back/right profile, four cells containing two alternating poses repeated: fox stands hunched and trembles, ears/fur move very slightly, feet fixed. Transparent background, ample padding, NO ground, shadow, text, grid or scenery. Whole animal in each cell, equal ground baseline and same head/body dimensions as approved reference. Keep grey colours and dull eyes. Front looks toward viewer; back has no face; side faces right.",
+    "reference": "public/assets/sprites/fox-blighted.png",
+    "source": "assets-src/camp-sprites/fox-camp-3.png",
+    "attempts": 1,
+    "processingRevisions": 1,
+    "note": "Alpha hardened and snapped to approved fox colours. Original six rows retained pixel-for-pixel from fox-blighted-base.png. On act1-integrate the base became act1's remade fox (assets-src/beasts); the stalk and shake rows were snapped again to its colours."
+  },
+  "build": "bun tools/sprites/camp-sprites.mjs",
+  "preview": "bun tools/sprites/preview-camp.mjs"
+}

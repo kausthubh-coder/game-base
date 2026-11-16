@@ -28,7 +28,7 @@ try {
   console.log(`page ${response?.status()} ${url}`);
   await page.waitForFunction(() => !document.querySelector('#loading') && '__game' in window, null, { timeout: 120_000 });
   await page.screenshot({ path: resolve(out, 'title.png') });
-  await page.getByText('New game', { exact: true }).click({ timeout: 30_000 });
+  await page.locator('[data-key="title:new"]').click({ timeout: 30_000 });
   await page.waitForFunction(() => window.__game.started === true, null, { timeout: 60_000 });
   await page.evaluate(() => window.__game.settle());
   await page.waitForTimeout(1500);

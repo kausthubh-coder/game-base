@@ -1,15 +1,20 @@
 import { expect, test } from 'bun:test';
-import type { GameEvents } from '../api.sim.ts';
-import { CONVERSATIONS, VILLAGER_LINES, type Conversation, type Line } from '../content/dialogue.ts';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import type { GameEvents, NpcId } from '../api.sim.ts';
+import { CONVERSATIONS, SCENE, SPEAKERS, VILLAGER_LINES, type Conversation, type Line } from '../content/dialogue.ts';
+import { SETTLERS } from '../content/people.ts';
+import { SCENES } from '../content/scenes.ts';
+import { VOICES } from '../uiview/voices.ts';
 import { QUESTS, type Condition } from '../content/quests.ts';
 import { holds } from '../quests/rules.sim.ts';
 import { GROUND, stage, type Stage } from '../story/fakes.ts';
 import { createTalk } from './index.sim.ts';
 
-const NAMED = ['tamsin', 'maren', 'odo', 'gus', 'mira', 'wren', 'juniper', 'brack'];
-const MAX_WORDS = 18;
-
-const words = (text: string): number => text.trim().split(/\s+/).length;
+/** A speaker made up for these tests. */
+const X = 'x' as NpcId;
+/** Chapter 22's rule: a line fits the box, two lines of about 60 characters, a stage cue included. */
+const MAX_CHARACTERS = 120;
 
 /** Every string a player can read in a list of lines: the lines, the choices and what follows them. */
 function texts(lines: readonly (string | Line)[], out: string[] = []): string[] {
@@ -30,22 +35,35 @@ function texts(lines: readonly (string | Line)[], out: string[] = []): string[] 
 /** The lines over the limit, as `id: text`. */
 function tooLong(conversations: readonly Conversation[]): string[] {
   const out: string[] = [];
-  for (const c of conversations) for (const text of texts(c.lines)) if (words(text) > MAX_WORDS) out.push(`${c.id}: ${text}`);
+  for (const c of conversations) for (const text of texts(c.lines)) if (text.length > MAX_CHARACTERS) out.push(`${c.id}: ${text}`);
   return out;
 }
 
-const said = (id: string): string => texts(CONVERSATIONS.find((c) => c.id === id)!.lines).join(' ');
+const said = (id: string): string[] => texts(CONVERSATIONS.find((c) => c.id === id)!.lines);
+const manifest = JSON.parse(readFileSync(resolve(import.meta.dirname, '../../../public/assets/manifest.json'), 'utf8')) as { portraits: { names: Record<string, unknown> } };
+
+/** Every line of a conversation with who says it. */
+function spoken(c: Conversation, lines: readonly (string | Line)[] = c.lines, out: Line[] = []): Line[] {
+  for (const raw of lines) {
+    const line: Line = typeof raw === 'string' ? { text: raw, by: c.npc } : { ...raw, by: raw.by ?? c.npc };
+    out.push(line);
+    for (const choice of line.choices ?? []) spoken(c, choice.then ?? [], out);
+  }
+  return out;
+}
 
 // ---------------------------------------------------------------------------------------- the words
 
-test('every line is at most 18 words', () => {
+test('every line fits the box: two lines of about 60 characters', () => {
   expect(tooLong(CONVERSATIONS)).toEqual([]);
-  expect(VILLAGER_LINES.filter((line) => words(line.text) > MAX_WORDS)).toEqual([]);
+  expect(VILLAGER_LINES.filter((line) => line.text.length > MAX_CHARACTERS)).toEqual([]);
+  // The dinner table's asks, which the settlement's panel shows.
+  for (const settler of SETTLERS) for (const text of settler.ask ? [settler.ask.text, settler.ask.granted, settler.ask.other] : []) expect(text.length).toBeLessThanOrEqual(MAX_CHARACTERS);
 });
 
-test('the scan fails a line of 19 words', () => {
-  const long = 'one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen';
-  expect(tooLong([{ id: 'long', npc: 'x', lines: ['Short.', { text: 'Pick.', choices: [{ text: 'A', then: [long] }] }] }])).toEqual([`long: ${long}`]);
+test('the scan fails a line that does not fit', () => {
+  const long = 'x'.repeat(MAX_CHARACTERS + 1);
+  expect(tooLong([{ id: 'long', npc: X, lines: ['Short.', { text: 'Pick.', choices: [{ text: 'A', then: [long] }] }] }])).toEqual([`long: ${long}`]);
 });
 
 test('no line offers more than three choices, and no line is empty', () => {
@@ -63,22 +81,34 @@ test('no line offers more than three choices, and no line is empty', () => {
   }
 });
 
-test('the three sample exchanges and the last scene are word for word', () => {
-  expect(said('tamsin.meet')).toContain(
-    'Twelve people have asked me for this plot. You are the first who looked at the ground before the view. ' +
-    'Take the book. It has been blank for forty years. I only ever looked at things to price them.',
-  );
-  expect(said('maren.ask')).toContain(
-    '(waking) Forty sacks. I counted twice. It is not enough, and counting again will not make it enough. ' +
-    'Twenty sheaves by the festival. I can pay you in thanks and one good meal.',
-  );
-  expect(said('gus.seeds.first')).toContain('Soil\'s tired. Not lazy. Tired. You\'d be too.');
-  expect(said('gus.first')).toContain('Soil\'s tired. Not lazy. Tired. You\'d be too.');
-  expect(texts(CONVERSATIONS.find((c) => c.id === 'tamsin.end')!.lines)).toEqual([
-    'Good harvest. Small, and good.',
-    '(looking west) Evening came early again. A little sooner every week.',
-    'Go on. Float your lamp.',
+test('each of the 38 scenes is one conversation, and every one the quests start exists', () => {
+  const played = new Map<number, string[]>();
+  for (const c of CONVERSATIONS) if (c.scene) played.set(c.scene, [...(played.get(c.scene) ?? []), c.id]);
+  // Scene 9 is a film with no lines: content/cutscenes.ts.
+  for (let n = 1; n <= 38; n++) if (n !== 9) expect(played.get(n), `scene ${n}`).toHaveLength(1);
+  expect(SCENES.map((scene) => scene.n) as number[]).toEqual(Array.from({ length: 38 }, (_, i) => i + 1));
+  const ids = new Set(CONVERSATIONS.map((c) => c.id));
+  for (const quest of QUESTS) for (const step of quest.steps) if (step.talk) expect(ids.has(step.talk), `${quest.id}.${step.id}`).toBe(true);
+  // A step that plays a scene names one the hall plays, the film plays, or a conversation `scene.<n>`.
+  for (const quest of QUESTS) {
+    for (const step of quest.steps) {
+      if (step.kind !== 'scene' || !step.scene) continue;
+      const start = SCENES[step.scene - 1].start;
+      if (start !== 'hall' && start !== 'film') expect(ids.has(`scene.${step.scene}`), `scene.${step.scene}`).toBe(true);
+    }
+  }
+});
+
+test('the scenes are chapter 22, word for word', () => {
+  expect(said('custodian.wake').slice(2, 4)).toEqual([
+    '(one eye opening) You\'re late.',
+    'A thousand years and sixty-one days late. I counted. There was nothing else to do.',
   ]);
+  expect(said('scene.37')).toEqual(['On the terraces, the Stag watches the white figure go down the road.', 'She was kinder, before.', 'It will not say more.']);
+  expect(said('scene.38').at(-1)).toBe('(from the pack) West, then. I have not been west in a thousand years. Walk smoothly.');
+  expect(said('scene.16')).toContain('May I see it? You may say no. People forget they may say no to me.'.replace('May', '(to you) May'));
+  expect(said('scene.25')).toContain('(writing) "Found nothing." (a look at your pack) Very well. Nothing.');
+  expect(said('scene.20')).toContain('His name is Bramble. I raised him on a bottle.');
 });
 
 test('nobody states the theme', () => {
@@ -88,28 +118,32 @@ test('nobody states the theme', () => {
   expect(all).not.toContain('only keep');
 });
 
-test('Brack says the river is lower in one line, the last of its conversation, with no reply offered', () => {
-  const river = CONVERSATIONS.filter((c) => texts(c.lines).some((text) => /lower/i.test(text)));
-  expect(river.map((c) => c.id)).toEqual(['brack.first']);
-  const last = river[0].lines[river[0].lines.length - 1] as Line;
-  expect(last.text).toMatch(/lower/);
-  expect(last.choices).toBeUndefined();
-  expect(river[0].lines.filter((line) => /lower/i.test(typeof line === 'string' ? line : line.text))).toHaveLength(1);
+test('every speaker has a name, a voice, and a face for each mood their lines ask for', () => {
+  const names = manifest.portraits.names;
+  for (const c of CONVERSATIONS) {
+    for (const line of spoken(c)) {
+      const by = line.by!;
+      if (by === 'narrator' || by === SCENE) continue;
+      expect(SPEAKERS[by], `${c.id}: who is ${by}`).toBeTruthy();
+      expect(VOICES[by], `${c.id}: ${by} has no voice`).toBeTruthy();
+      if (line.mood && !by.startsWith('voice.')) expect(names[`${by}-${line.mood}`], `${c.id}: no portrait ${by}-${line.mood}`).toBeTruthy();
+    }
+  }
 });
 
-test('each of the eight has a first meeting, a fallback that comes last, and ids that are unique', () => {
+test('the old story is gone: no old quest, no old cast, no festival', () => {
+  const all = JSON.stringify(CONVERSATIONS);
+  for (const old of ['old.', 'festival', 'juniper', 'brack', 'odo', 'mira', 'leaftail', 'river_lamp']) expect(all.includes(`"${old}`) || all.includes(`'${old}`) || all.includes(old + '.'), old).toBe(false);
+});
+
+test('each person you can walk up to ends on a fallback, and the ids are unique', () => {
   expect(new Set(CONVERSATIONS.map((c) => c.id)).size).toBe(CONVERSATIONS.length);
-  for (const npc of NAMED) {
+  const people = new Set(CONVERSATIONS.filter((c) => c.npc !== SCENE && !c.id.startsWith('scene.') && !c.id.startsWith('choice.')).map((c) => c.npc));
+  for (const npc of people) {
     const own = CONVERSATIONS.filter((c) => c.npc === npc);
-    expect(own.length).toBeGreaterThanOrEqual(6);
-    const open = own.filter((c) => !c.when);
-    expect(open.map((c) => c.id)).toEqual([`${npc}.fallback`]);
-    expect(own[own.length - 1].id).toBe(`${npc}.fallback`);
-    // On a new game the first words from anyone are a first meeting, never the fallback.
-    const s = stage({ story: false });
-    s.run(0.1);
-    s.talk(npc);
-    expect(s.lastConversation()).not.toBe(`${npc}.fallback`);
+    const last = own[own.length - 1];
+    expect(last.id, npc).toBe(`${npc}.fallback`);
+    expect(last.when, npc).toBeUndefined();
   }
   expect(VILLAGER_LINES).toHaveLength(12);
 });
@@ -117,10 +151,10 @@ test('each of the eight has a first meeting, a fallback that comes last, and ids
 // ---------------------------------------------------------------------------------------- the interpreter
 
 const SMALL: Conversation[] = [
-  { id: 'secret', npc: 'x', when: { flag: 'knows' }, lines: ['You know.'] },
+  { id: 'secret', npc: X, when: { flag: 'knows' }, lines: ['You know.'] },
   {
     id: 'ask',
-    npc: 'x',
+    npc: X,
     lines: [
       'Hello.',
       { text: 'Skipped.', when: { flag: 'never' } },
@@ -149,11 +183,11 @@ test('a conversation shows its lines in order, keeps the player busy, and says w
   const talk = s.game.systems.talk;
   expect(talk.active).toBe(false);
   expect(talk.current()).toBeNull();
-  talk.talkTo('x');
+  talk.talkTo(X);
   expect(talk.active).toBe(true);
   expect(s.game.player.busy).toBe(true);
-  expect(s.events('talk.started')).toEqual([{ npc: 'x', conversation: 'ask' }]);
-  expect(talk.current()).toMatchObject({ npc: 'x', text: 'Hello.', choices: [] });
+  expect(s.events('talk.started')).toEqual([{ npc: X, conversation: 'ask' }]);
+  expect(talk.current()).toMatchObject({ npc: X, text: 'Hello.', choices: [] });
   talk.advance();
   // The line whose condition is false is skipped, and a choice that is hidden is not offered.
   expect(talk.current()).toMatchObject({ text: 'Left or right?', choices: ['Left', 'Right'] });
@@ -173,34 +207,34 @@ test('a conversation shows its lines in order, keeps the player busy, and says w
   expect(talk.active).toBe(false);
   expect(talk.current()).toBeNull();
   expect(s.game.player.busy).toBe(false);
-  expect(s.events('talk.ended')).toEqual([{ npc: 'x', conversation: 'ask' }]);
+  expect(s.events('talk.ended')).toEqual([{ npc: X, conversation: 'ask' }]);
 });
 
 test('a choice branches: each one says and does something else', () => {
   const left = small();
-  expect(left.talk('x', 0)).toEqual(['Hello.', 'Left or right?', 'Left it is.', 'Mind the step.', 'Goodbye.']);
+  expect(left.talk(X, 0)).toEqual(['Hello.', 'Left or right?', 'Left it is.', 'Mind the step.', 'Goodbye.']);
   expect(left.bag.get('berry')).toBe(2);
   expect(left.game.flags.is('went.right')).toBe(false);
 
   const right = small();
-  expect(right.talk('x', 1)).toEqual(['Hello.', 'Left or right?', 'Right, then.', 'Goodbye.']);
+  expect(right.talk(X, 1)).toEqual(['Hello.', 'Left or right?', 'Right, then.', 'Goodbye.']);
   expect(right.bag.get('berry')).toBeUndefined();
   expect(right.game.flags.is('went.right')).toBe(true);
 });
 
 test('a condition that is false hides a conversation, and the first one that holds wins', () => {
   const s = small();
-  s.talk('x');
+  s.talk(X);
   expect(s.lastConversation()).toBe('ask');
   s.game.flags.set('knows', true);
-  expect(s.talk('x')).toEqual(['You know.']);
+  expect(s.talk(X)).toEqual(['You know.']);
   expect(s.lastConversation()).toBe('secret');
 });
 
 test('effects run when the conversation ends, so one cut short gives nothing', () => {
   const s = small();
   const talk = s.game.systems.talk;
-  talk.talkTo('x');
+  talk.talkTo(X);
   talk.advance();
   talk.choose(0);
   expect(s.game.flags.is('asked')).toBe(false);
@@ -219,60 +253,153 @@ test('effects run when the conversation ends, so one cut short gives nothing', (
 test('a second talk cannot start while one is open, and a named conversation can be started directly', () => {
   const s = small();
   const talk = s.game.systems.talk;
-  talk.talkTo('x');
+  talk.talkTo(X);
   talk.start('secret');
-  talk.talkTo('x');
+  talk.talkTo(X);
   expect(s.events('talk.started')).toHaveLength(1);
   s.through();
   talk.start('secret');
-  expect(talk.current()).toMatchObject({ npc: 'x', text: 'You know.' });
+  expect(talk.current()).toMatchObject({ npc: X, text: 'You know.' });
   s.through();
   talk.start('no.such.conversation');
   expect(talk.active).toBe(false);
+});
+
+test('a scene sets its flag and sends scene.played as it ends; the lines before its fight do not', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
+  const talk = s.game.systems.talk;
+  talk.start('scene.19.before');
+  s.through();
+  expect(s.game.flags.is('scene.19')).toBe(false);
+  talk.start('scene.19');
+  expect(talk.current()).toMatchObject({ kind: 'staged', scene: 19, npc: null });
+  s.through();
+  expect(s.game.flags.is('scene.19')).toBe(true);
+  expect(s.events('scene.played')).toEqual([{ scene: 19 }]);
+  // A scene that has played does not send it twice.
+  talk.start('scene.19');
+  s.through();
+  expect(s.events('scene.played')).toHaveLength(1);
+});
+
+test('a line carries its speaker\'s face, and how its scene is shown', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
+  const talk = s.game.systems.talk;
+  talk.start('scene.1');
+  expect(talk.current()).toMatchObject({ npc: 'hobb', name: 'Hobb', portrait: 'hobb', face: 'hobb-glad', voice: 'hobb', kind: 'staged', scene: 1 });
+  talk.advance();
+  expect(talk.current()).toMatchObject({ npc: null, name: '', face: '' });
+  talk.advance();
+  expect(talk.current()).toMatchObject({ npc: 'hobb', face: 'hobb' });
+  s.through();
+  talk.start('scene.3');
+  expect(talk.current()).toMatchObject({ kind: 'talk', scene: 3, npc: 'mina' });
+  s.through();
+  talk.talkTo('tamsin');
+  expect(talk.current()).toMatchObject({ kind: 'talk', scene: 0 });
+});
+
+test('skip ends a film at once, with what it does done', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
+  const talk = s.game.systems.talk;
+  talk.start('scene.27.dark');
+  expect(talk.current()!.kind).toBe('film');
+  talk.skip();
+  expect(talk.active).toBe(false);
+  expect(s.game.player.busy).toBe(false);
+  expect(s.game.flags.is('road.dark')).toBe(true);
+});
+
+test('the log keeps what was said and the choice taken, across conversations', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
+  const talk = s.game.systems.talk;
+  talk.start('scene.2');
+  s.through();
+  talk.start('scene.25');
+  s.through(1);
+  const log = talk.log();
+  expect(log[0]).toEqual({ name: '', text: 'Dax at a table of locks. Every one has a chalk cross on it but one.' });
+  expect(log.find((entry) => entry.chose)).toEqual({ name: 'Calla', text: 'For your safety. These places fall in. What did you find?', chose: 'Say nothing' });
+  expect(log.at(-1)!.text).toBe('(writing) "Found nothing." (a look at your pack) Very well. Nothing.');
+  expect(s.game.flags.get('choice.calla')).toBe('kept');
+});
+
+test('a pool says one of its lines, the same all day and another the next', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
+  s.game.systems.quests.skipTo('pilgrimage');
+  const first = s.talk('ren');
+  expect(first).toHaveLength(1);
+  expect(s.talk('ren')).toEqual(first);
+  const days = new Set<string>();
+  for (let day = 0; day < 6; day++) {
+    s.game.clock.day = day;
+    days.add(s.talk('ren')[0]);
+  }
+  expect(days.size).toBeGreaterThan(1);
+});
+
+test('walk-up lines: an unmet need first, then a wish granted that day, once, then the chapter', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
+  s.game.systems.quests.skipTo('kitchen');
+  s.run(0.6);
+  expect(s.talk('gus')).toEqual(['Field\'s grey. Pump\'s still humming in it. Soil\'s not dead. Soil\'s tired.']);
+  s.game.flags.set('need.gus.meal', true);
+  expect(s.talk('gus')).toEqual(['No supper. A man can farm hungry. Not well.']);
+  s.game.flags.set('need.gus.meal', false);
+  s.game.flags.set('wish.gus', true);
+  expect(s.talk('gus')).toEqual(['Row\'s resting. Good. Come back in two weeks. You\'ll see.']);
+  expect(s.talk('gus')).toEqual(['Field\'s grey. Pump\'s still humming in it. Soil\'s not dead. Soil\'s tired.']);
+  s.game.systems.quests.skipTo('echo');
+  s.run(0.6);
+  expect(s.talk('gus')).toEqual(['Wet it. Rest it. One row in four. Same as my father did.']);
 });
 
 test('a load closes an open conversation and frees the player, and nothing of it is saved', () => {
   const s = stage({ story: false });
   s.run(0.1);
   const save = s.kernel.save();
-  s.game.systems.talk.talkTo('tamsin');
+  s.game.systems.talk.start('scene.22', 'maren');
   s.game.systems.talk.advance();
   expect(s.game.player.busy).toBe(true);
   const middle = s.kernel.save();
   expect(middle.systems.talk).toBeNull();
-  expect(new Map(middle.flags).get('plot.met')).toBeUndefined();
+  expect(new Map(middle.flags).get('scene.22')).toBeUndefined();
   s.kernel.load(save);
   expect(s.game.systems.talk.active).toBe(false);
   expect(s.game.player.busy).toBe(false);
-  expect(s.bag.get('axe')).toBeUndefined();
+  expect(s.bag.get('wheat_seeds')).toBeUndefined();
   // Starting again plays it from the first line.
-  s.game.systems.talk.talkTo('tamsin');
-  expect(s.game.systems.talk.current()!.text).toBe('Twelve people have asked me for this plot.');
+  s.game.systems.talk.start('scene.22', 'maren');
+  expect(s.game.systems.talk.current()!.text).toBe('(waking, not getting up) Forty sacks. I counted twice. Counting a third time won\'t help.');
 });
 
 test('the dialogue box gets the speaker from the people system, and the narrator has no name', () => {
   const s = stage({ story: false });
-  s.game.flags.set('quest.bread.started', true);
-  s.game.flags.set('quest.bread.step', 'queen');
-  s.game.systems.talk.talkTo('maren');
+  s.run(0.1);
+  s.game.systems.talk.start('scene.22', 'maren');
+  // The fake people system names her Maren.
+  expect(s.game.systems.talk.current()).toMatchObject({ npc: 'maren', name: 'Maren', portrait: 'maren', face: 'maren-troubled', voice: 'maren' });
+  for (let i = 0; i < 4; i++) s.game.systems.talk.advance();
   expect(s.game.systems.talk.current()).toMatchObject({ npc: null, name: '', portrait: '', voice: '' });
-  s.game.systems.talk.advance();
-  expect(s.game.systems.talk.current()).toMatchObject({ npc: 'maren', name: 'Maren', portrait: 'maren', voice: 'maren' });
-  expect(s.game.systems.talk.current()!.text.startsWith('(waking) Forty sacks.')).toBe(true);
 });
 
 test('a line said once is not said again', () => {
   const s = stage({ story: false });
   s.run(0.1);
-  s.talk('brack');
-  s.game.ambient.rain = 1;
-  s.talk('brack');
-  expect(s.lastConversation()).toBe('brack.rain');
-  s.talk('brack');
-  expect(s.lastConversation()).toBe('brack.fallback');
+  s.game.systems.quests.skipTo('kitchen');
+  s.game.flags.set('burrow.dug', true);
+  s.game.flags.set('settler.hobb', true);
+  expect(s.talk('hobb')[0]).toContain('You dug them out');
+  expect(s.talk('hobb')[0]).toBe('Three mouths, one pot. I\'ve fed forty wards on less. Don\'t make me prove it.');
 });
 
-test('a background villager has one line a day from the pool, and a festival line during the festival', () => {
+test('a background villager has one line a day from the pool, and a line for the moment while it holds', () => {
   const s = stage({ story: false });
   s.run(0.1);
   const everyday = VILLAGER_LINES.filter((line) => !line.when).map((line) => line.text);
@@ -282,11 +409,10 @@ test('a background villager has one line a day from the pool, and a festival lin
   expect(s.talk('villager-1')).toEqual(first);
   expect(s.events('talk.started').at(-1)).toMatchObject({ npc: 'villager-1' });
   // Different villagers do not all share one line.
-  const lines = new Set(['villager-1', 'villager-2', 'villager-3', 'villager-4', 'villager-5', 'villager-6'].map((id) => s.talk(id)[0]));
+  const lines = new Set((['villager-1', 'villager-2', 'villager-3', 'villager-4', 'villager-5', 'villager-6'] as const).map((id) => s.talk(id)[0]));
   expect(lines.size).toBeGreaterThan(2);
-  s.game.flags.set('festival.started', true);
-  const festival = VILLAGER_LINES.filter((line) => line.id === 'villager.9' || line.id === 'villager.10').map((line) => line.text);
-  expect(festival).toContain(s.talk('villager-1')[0]);
+  s.game.flags.set('scene.34', true);
+  expect(s.talk('villager-1')[0]).toBe('The wood\'s green. All of it. My boy\'s been up there since dawn, shouting at birds.');
 });
 
 // ---------------------------------------------------------------------------------------- reachability
@@ -294,13 +420,16 @@ test('a background villager has one line a day from the pool, and a festival lin
 /** Makes a condition true on the stage, as far as a test can. */
 function force(s: Stage, c: Condition): void {
   const { game } = s;
-  if ('flag' in c) game.flags.set(c.flag, c.is ?? true);
+  if ('flag' in c) game.flags.set(c.flag, 'atLeast' in c ? c.atLeast : c.is ?? true);
   else if ('not' in c) deny(s, c.not);
   else if ('all' in c) for (const part of c.all) force(s, part);
   else if ('any' in c) force(s, c.any[0]);
   else if ('bag' in c) s.bag.set(typeof c.bag === 'string' ? c.bag : c.bag[0], c.atLeast ?? 1);
   else if ('quest' in c) forceQuest(s, c);
-  else if ('place' in c) s.moveTo(c.place);
+  else if ('place' in c) {
+    if (c.ever) game.flags.set(`been.${c.place}`, true);
+    else s.moveTo(c.place);
+  }
   else if ('page' in c) for (const fact of game.systems.almanac.page(c.page)!.facts) game.systems.almanac.learn(c.page, fact.id);
   else if ('known' in c) game.systems.almanac.learn(c.known, c.column);
   else if ('placed' in c) {
@@ -316,6 +445,7 @@ function force(s: Stage, c: Condition): void {
   } else if ('raining' in c) game.ambient.rain = 1;
   else if ('dark' in c) game.clock.timeOfDay = 0.8;
   else if ('npcNear' in c) s.moveTo('grant.stone');
+  else if ('chapter' in c) game.systems.quests.skipTo(QUESTS.find((q) => q.chapter === c.chapter)!.id);
   else {
     s.bag.set(c.short, 0);
     s.bag.set(c.seed, 0);
@@ -352,14 +482,16 @@ const BASES: ((s: Stage) => void)[] = [
   () => {},
   ...QUESTS.map((q) => (s: Stage) => s.game.systems.quests.skipTo(q.id)),
   (s) => {
-    s.game.systems.quests.skipTo('festival');
-    for (const flag of ['festival.started', 'festival.lamp.given', 'festival.lamp', 'festival.ended', 'festival.over']) s.game.flags.set(flag, true);
+    s.game.systems.quests.skipTo('pilgrimage');
+    s.game.flags.set('quest.pilgrimage.done', true);
   },
 ];
 
 test('every conversation an NPC can start is reachable through talkTo', () => {
   const unreachable: string[] = [];
   for (const c of CONVERSATIONS) {
+    // A scene is started by its id, by the system that runs that moment. src/game/hall tests its own.
+    if (c.npc === SCENE) continue;
     let reached = false;
     for (const base of BASES) {
       for (const met of [false, true]) {
@@ -406,9 +538,10 @@ test('every line and every choice of every conversation can be shown', () => {
         Object.assign(s.pet.pos, s.game.player.pos);
       } else s.pet.pos.x += 500;
       s.game.ambient.rain = variant & 2 ? 1 : 0;
-      s.game.flags.set('festival.lamp.given', variant >= 4);
-      if (c.id === 'juniper.trade') s.game.flags.set('juniper.secrets', variant % 4);
-      if (c.id === 'tamsin.after') s.bag.set('river_lamp', variant & 1);
+      // A pool says another of its lines each day.
+      s.game.clock.day = variant;
+      // Scene 17 says one thing with the pump running and another with it in its crate.
+      s.game.flags.set('pump.running', (variant & 1) === 1);
       const talk = s.game.systems.talk;
       for (const choice of [0, 1, 2]) {
         talk.start(c.id);
@@ -426,19 +559,15 @@ test('every line and every choice of every conversation can be shown', () => {
   expect(missing).toEqual([]);
 });
 
-test('job barks follow the assigned appearance and yield to festival lines', () => {
-  const s = stage({story: false});
-  s.run(.1);
+test('job barks follow the assigned appearance and yield to a line for the moment', () => {
+  const s = stage({ story: false });
+  s.run(0.1);
   s.people.get('villager-1')!.sprite = 'town-pell';
   const talk = s.game.systems.talk;
   talk.talkTo('villager-1');
   expect(talk.current()?.text).toBe('Fish took my bait. Left me the hook. Polite of them.');
   s.through();
-  s.people.get('villager-1')!.sprite = 'town-pip';
+  s.game.flags.set('scene.34', true);
   talk.talkTo('villager-1');
-  expect(talk.current()?.text).toBe('Mira let me sort the nails. Bent ones have their own pot.');
-  s.through();
-  s.game.flags.set('festival.started', true);
-  talk.talkTo('villager-1');
-  expect(VILLAGER_LINES.filter(l => l.when).map(l => l.text)).toContain(talk.current()?.text ?? '');
+  expect(VILLAGER_LINES.filter((l) => l.when).map((l) => l.text)).toContain(talk.current()?.text ?? '');
 });

@@ -1,7 +1,9 @@
 // The town's sound as numbers: how much the hero is in each zone, how loud each recorded bed should be for
 // where they stand and the hour, when the next spot sound is due, and what a foot is standing on. No Web
 // Audio here: src/game/views/core-sound.view.ts reads these and drives the engine.
-import { BEDS, SPOTS, ZONES, type BedRule, type SoundHours, type SoundZone, type SpotRule, type ZoneId } from '../content/soundscape.ts';
+import { BEDS, MUSIC_BANDS, MUSIC_REGIONS, REGION_OF_BIOME, SPOTS, ZONES, type BedRule, type MusicRegion, type SoundBand, type SoundHours, type SoundZone, type SpotRule, type ZoneId } from '../content/soundscape.ts';
+import { toMap } from '../content/greenhollow.ts';
+import { biomeAt, highRoadDistance, riverBank } from '../region/greenhollow.sim.ts';
 import type { Surface } from '../../engine/types.ts';
 
 /** What a foot is on, finer than a block's surface. The same names as the sound engine's. */
@@ -39,9 +41,62 @@ export interface Where {
   hour: number;
   /** 0 to 1: how much of the sky above is tree crowns. */
   forest: number;
+  /** The weight of each region and band here, from `regionsAt`. A bed with a `region` is silent without it. */
+  regions?: Readonly<Record<string, number>>;
 }
 
 export type Zones = Record<ZoneId, number>;
+
+/** A weight for every region with music, which sum to 1, and for each band, 0 to 1 on its own. */
+export type Regions = Record<MusicRegion | SoundBand, number>;
+
+export function newRegions(): Regions {
+  const out = { river: 0, sea: 0, road: 0 } as Regions;
+  for (const id of MUSIC_REGIONS) out[id] = id === 'meadow' ? 1 : 0;
+  return out;
+}
+
+/** Lays a band over the regions: everything else gives up `weight` of its share, and `id` takes it. */
+function overlay(out: Regions, id: MusicRegion, weight: number): void {
+  if (weight <= 0) return;
+  for (const other of MUSIC_REGIONS) out[other] *= 1 - weight;
+  out[id] += weight;
+}
+
+/**
+ * Which region's music plays at a column, as weights that sum to 1, and how much of each band is there. The
+ * kinds of land are sampled round the hero, so crossing an edge moves the weights a little each block; the
+ * High Road, the river and the sea air are laid over them, and the town's sound zone last of all. Every part
+ * is a function of position, so walking back undoes it and nothing ever jumps.
+ */
+export function regionsAt(x: number, z: number, town: number, out: Regions): Regions {
+  for (const id of MUSIC_REGIONS) out[id] = 0;
+  // The grid is skewed by a fifth of a step a row, so no two samples share a row or a column: the land's edges
+  // run along the map's axes, and an edge crossed in one block turns one sample over, never a whole row of five.
+  const step = MUSIC_BANDS.spacing, skew = step / 5;
+  for (let dz = -2; dz <= 2; dz++) for (let dx = -2; dx <= 2; dx++) out[REGION_OF_BIOME[biomeAt(x + dx * step + dz * skew, z + dz * step - dx * skew)]] += 1 / 25;
+  const { road, river, sea } = MUSIC_BANDS;
+  const my = toMap(x, z)[1];
+  out.road = road.weight * (1 - smooth(road.near, road.far, highRoadDistance(x, z)));
+  out.river = river.weight * (1 - smooth(river.near, river.far, riverBank(x, z))) * smooth(river.from, river.to, my);
+  out.sea = sea.weight * smooth(sea.from, sea.to, my);
+  // The river and the sea air are the Mere's music where they run through open meadow; in the marsh, the
+  // forests and the hills the land keeps its own tune and the water is only heard in its bed.
+  const open = out.meadow;
+  overlay(out, 'highRoad', out.road);
+  overlay(out, 'mere', Math.max(out.river, out.sea) * open);
+  overlay(out, 'town', clamp01(town));
+  return out;
+}
+
+/** The summed weight of a rule's regions and bands, or 1 for a rule that names none. */
+function regionShare(names: readonly string[] | undefined, regions: Readonly<Record<string, number>> | undefined): number {
+  if (!names) return 1;
+  if (!regions) return 0;
+  let sum = 0;
+  for (const id of names) sum += regions[id] ?? 0;
+  return clamp01(sum);
+}
 
 export function zonesAt(x: number, z: number, into: Zones): Zones {
   for (const id of Object.keys(ZONES) as ZoneId[]) into[id] = zoneWeight(ZONES[id], x, z);
@@ -61,6 +116,7 @@ export function bedLevel(rule: BedRule, zones: Zones, where: Where): number {
   for (const id of rule.out ?? []) level *= 1 - zones[id];
   if (rule.wild === 'open') level *= 1 - where.forest;
   else if (rule.wild === 'forest') level *= where.forest;
+  level *= regionShare(rule.region, where.regions);
   return clamp01(level);
 }
 
@@ -71,9 +127,9 @@ export function bedLevels(zones: Zones, where: Where, into: Record<string, numbe
 }
 
 /** How much a spot rule's zone holds where the hero is. `wild` is everywhere outside town. */
-export function spotWeight(rule: SpotRule, zones: Zones, hour: number): number {
+export function spotWeight(rule: SpotRule, zones: Zones, hour: number, regions?: Readonly<Record<string, number>>): number {
   const zone = rule.zone === 'wild' ? 1 - zones.town : zones[rule.zone];
-  return zone * hoursWeight(rule.hours, hour);
+  return zone * hoursWeight(rule.hours, hour) * regionShare(rule.region, regions);
 }
 
 /**
@@ -87,10 +143,10 @@ export class SpotClock {
   }
 
   /** Calls `fire` for each rule due at `now`, with its weight (0 to 1) where the hero is. */
-  step(now: number, zones: Zones, hour: number, fire: (rule: SpotRule, weight: number) => void): void {
+  step(now: number, zones: Zones, hour: number, fire: (rule: SpotRule, weight: number) => void, regions?: Readonly<Record<string, number>>): void {
     for (let i = 0; i < this.rules.length; i++) {
       const rule = this.rules[i] as SpotRule;
-      const weight = spotWeight(rule, zones, hour);
+      const weight = spotWeight(rule, zones, hour, regions);
       if (weight < 0.15) {
         this.next[i] = -1;
         continue;

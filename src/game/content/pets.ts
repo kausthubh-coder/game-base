@@ -1,5 +1,7 @@
 // Pets, as data. The pets system reads every number here.
 
+import type { ItemId } from './ids.ts';
+
 export interface PetDef {
   kind: string;
   name: string;
@@ -12,7 +14,7 @@ export interface PetDef {
   /** Seconds it rests at a bed before walking to the next: the least and the most. */
   rest: [min: number, max: number];
   /** The item it eats. Any item marked as a treat works too. */
-  treat: string;
+  treat: ItemId;
   /** Feedings until it bonds. */
   trustToBond: number;
   /** The flag set when it bonds. */
@@ -48,7 +50,7 @@ export interface PetDef {
   /** Blocks a second: tending its beds, keeping up with a walking player, running. */
   speed: { walk: number; trot: number; run: number };
   /** What a bonded one digs up while the player stands on this surface. */
-  finds: { item: string; surface: string; every: [min: number, max: number]; toast: string };
+  finds: { item: ItemId; surface: string; every: [min: number, max: number]; toast: string };
 }
 
 export const PETS: readonly PetDef[] = [

@@ -15,7 +15,7 @@ export const fellATree: Scenario = {
   name: 'fell-a-tree',
   about: 'Two trees are felled whole, one with the axe and one by hand, and an oak over the mossy rocks refuses the axe.',
   seed: 14,
-  start: { quest: 'roof' },
+  start: { quest: 'ground' },
   inputs: [
     { do: 'teleport', to: 'grant.center' },
     { do: 'take', item: 'axe' },

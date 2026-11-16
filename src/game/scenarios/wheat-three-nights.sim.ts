@@ -1,8 +1,11 @@
-// Wheat planted at dusk, watered and slept on for three nights, then harvested: the bag holds wheat.
-// A night in wet soil is worth two stages, so the first morning finds every plant at stage 2.
+// Wheat planted at dusk beside a ditch and slept on for three nights, then harvested: the bag holds wheat.
+// Wheat is ripe in one day of wet soil, and a ditch keeps its soil wet through the night that sleep skips, so
+// the first morning finds every plant at stage 1 and the second every plant ripe. The plot has no stream of its
+// own yet, so the scenario lets water into the ditch beside the field itself.
 import type { Cell, Input } from '../play/inputs.sim.ts';
 import type { Fact, Scenario, Start } from '../play/scenario.sim.ts';
 import type { Play } from '../play/harness.sim.ts';
+import { blockId } from '../../content/blocks.ts';
 import { NO_ROOF_TOAST, TOO_EARLY_TOAST } from '../placeables/index.sim.ts';
 
 /** A block of the grant's meadow, counted from its middle. `dy` -1 is the ground. */
@@ -18,7 +21,7 @@ const night: readonly Input[] = [
   { do: 'interact', prompt: 'Sleep' },
 ];
 
-export const WHEAT_START: Start = { quest: 'roof', give: { hoe: 1, watering_can: 1, wheat_seeds: 6, bed: 1, plank: 3 } };
+export const WHEAT_START: Start = { quest: 'ground', give: { hoe: 1, watering_can: 1, wheat_seeds: 6, bed: 1, plank: 3 } };
 
 export const WHEAT_INPUTS: readonly Input[] = [
   // Two blocks east of the field, come to from the south, so the hero faces north and the bed lies north to south.
@@ -44,8 +47,15 @@ export const WHEAT_INPUTS: readonly Input[] = [
   ...FIELD.map((cell): Input => ({ do: 'use', at: cell })),
   { do: 'take', item: 'wheat_seeds' },
   ...FIELD.map((cell): Input => ({ do: 'use', at: cell })),
+  { do: 'run', name: 'water comes down a ditch along the field\'s north side and back along its south', run: (p) => {
+    const c = center(p);
+    for (const dx of [-1, 0, 1]) for (const dz of [-2, 1]) p.world.setBlock(Math.floor(c.x) + dx, c.y - 1, Math.floor(c.z) + dz, blockId('water'));
+  } },
+  // The first night of the night quest is the Shut Door's, which keeps the player awake. This game is still on
+  // the quest before it, so its nights are plain nights.
+  { do: 'check', what: 'the night quest has not begun', that: (p) => !p.game.flags.is('quest.night.started') },
   ...night,
-  { do: 'check', what: 'on the morning of day 2 every plant is at stage 2', that: (p) => p.game.clock.day === 2 && p.sys.crops.all().length === 6 && p.sys.crops.all().every((crop) => crop.state.stage === 2) },
+  { do: 'check', what: 'on the morning of day 2 every plant is at stage 1', that: (p) => p.game.clock.day === 2 && p.sys.crops.all().length === 6 && p.sys.crops.all().every((crop) => crop.state.stage === 1) },
   ...night,
   { do: 'check', what: 'on the morning of day 3 every plant is ripe', that: (p) => p.game.clock.day === 3 && p.sys.crops.all().every((crop) => crop.state.ripe) },
   ...night,
@@ -62,13 +72,13 @@ export function wheatFacts(p: Play): Fact[] {
     ['the harvest was counted', p.game.flags.get('harvested.wheat') === 12],
     ['nothing is left in the ground', p.sys.crops.all().length === 0],
     ['three nights were slept', p.heard.filter((event) => event.name === 'slept').length === 3],
-    ['a bed under a roof and a night in it finished the quest of the roof', p.game.flags.is('quest.roof.done')],
+    ['the night quest never began, so the Shut Door kept nobody awake', !p.game.flags.is('quest.night.started')],
   ];
 }
 
 export const wheatThreeNights: Scenario = {
   name: 'wheat-three-nights',
-  about: 'Wheat planted at dusk, watered and slept on for three nights, then harvested: the bag holds 12 wheat.',
+  about: 'Wheat planted at dusk beside a ditch and slept on for three nights, then harvested: the bag holds 12 wheat.',
   seed: 11,
   start: WHEAT_START,
   inputs: WHEAT_INPUTS,

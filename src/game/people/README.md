@@ -15,15 +15,15 @@ The townspeople and their routines. It implements `PeopleApi`. The data is `src/
 | Id | Where |
 |---|---|
 | `tamsin` | `grant.stone` until the flag `quest.plot.done` is set. Then `lodge` from 6:00 and three blocks beside it from 20:00. |
-| `maren`, `odo`, `gus`, `mira`, `wren`, `brack` | `granary`, `bakery`, `gus.field`, `carpenter`, `kennel`, `ferry`, at every hour |
-| `juniper` | Walks between `town.square` and `river.bank`. She stands about 150 seconds at each. |
+| `maren` | `granary` until scene 22, then `town.hall` |
+| `gus`, `wren` | `gus.field`, `kennel`, at every hour, until the settlement walks them |
 | `villager-1` to `villager-6` | Walk between `town.square`, `river.bank` and `town.gate`. Each stands for a time of their own at each place, from about 70 seconds for `villager-1` to about 145 for `villager-6`, a few blocks off the place. Odd numbers use the sprite `villager-a`, even numbers `villager-b`. |
 
-For the eight named people the sprite, the portrait and the voice are the id. The hour is `game.clock.timeOfDay * 24`.
+For the four named people the sprite, the portrait and the voice are the id. The hour is `game.clock.timeOfDay * 24`.
 
 ## What a person does
 
-- Each person is an actor `npc:<id>` in `game.actors`. `anim` is `walk` or `idle`. `NpcState.pos` and the actor's `pos` are one object.
+- Each person is an actor `npc:<id>` in `game.actors`. `anim` is `walk`, `idle`, or `sit` on a seat the settlement gave them (the sprite view draws `sit` as the idle frame set lower, behind the table). `NpcState.pos` and the actor's `pos` are one object.
 - Each person adds an Interactable with the id `npc:<id>`, the prompt `Talk to <name>` and a radius of 2.5 blocks. Its `act()` calls `game.systems.talk.talkTo(id)`.
 - A person walks at 2.2 blocks a second along a path from `game.systems.nav`. Standing, they face a player within 3 blocks.
 - A person more than 60 blocks from the player does not walk. They jump to their place.
@@ -31,12 +31,15 @@ For the eight named people the sprite, the portrait and the voice are the id. Th
 - Two people never stand on one block. The second one takes the nearest free block.
 - A person in a conversation stands still until `talk.ended`.
 - After `slept`, everybody is at their morning place at once.
+- Someone with `appears` in `content/people.ts` is not in the world until that flag is set: the actor is hidden, `all()` and `get()` leave them out, and they have no prompt. Hobb, Dax, Mina, Tansy and Holt wait for `settler.<id>`, then walk in from the grant stone (or appear at their spot when the player is far).
+- Someone who lives on the player's land (`settler.<id>`, Gus and Wren too) stands where `settlement.spot(id)` says, by the hour, and "E" on them sends `settler.opened` for their card, unless the quest marks them, when it talks as before.
 
 ## The api
 
 - `send(id, place, offset?)` walks someone to a place now. They stay there until the day number changes, then follow their routine again. A place the region does not have is ignored. `offset` is `{ x, z }` in blocks east and south of the place. The festival uses it to stand fourteen people a few blocks apart. It is new in the contract.
 - `hold(id, true)` stops someone where they are and keeps them out of their routine. Someone who was sent first still finishes that walk and then stays, whatever the day. `hold(id, false)` returns them to the routine.
 - `befriend(id, amount)` keeps friendship between 0 and 5.
+- `lead(id, true)` walks someone a block and a half behind the player, with a new path each time the player has moved two and a half blocks. The settlement uses it to walk a settler to their job's room. `lead(id, false)` returns them to their routine.
 - `setMark(id, mark)` sets the actor's mark.
 - An id that does not exist does nothing.
 

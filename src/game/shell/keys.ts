@@ -19,6 +19,7 @@ import { RightDrag } from './drag.ts';
 /** Something that happens once. */
 export type Press =
   | { kind: 'interact' }
+  | { kind: 'fight'; action: 'dodge' | 'use' | 'skill' }
   /** 1 turns the view a quarter turn to the right, -1 to the left. */
   | { kind: 'turn'; direction: 1 | -1 }
   /** Positive zooms out one step. */
@@ -45,7 +46,22 @@ export type Press =
 /** How the mouse turns the camera. See the top of this file. */
 export type MouseMode = 'point' | 'drag' | 'lock';
 
+/** Touch controls feed the same actions as the mouse, without keyboard events or pointer lock. */
+export interface TouchInput {
+  readonly active: boolean;
+  readonly calmHeld: boolean;
+  calm(down: boolean): void;
+  move(right: number, forward: number): void;
+  jump(down: boolean): void;
+  aim(x: number, y: number): void;
+  look(x: number, y: number): void;
+  primary(down: boolean): void;
+  press(press: Exclude<Press, { kind: 'letGo' }>): void;
+  cancel(): void;
+}
+
 export interface Keys {
+  readonly touch: TouchInput;
   /** -1 to 1, relative to the camera. */
   readonly right: number;
   readonly forward: number;
@@ -100,6 +116,10 @@ function typing(target: EventTarget | null): boolean {
   return target.isContentEditable || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT';
 }
 
+export function touchDevice(): boolean {
+  return navigator.maxTouchPoints > 0 || matchMedia('(any-pointer: coarse)').matches;
+}
+
 export function createKeys(canvas: HTMLElement): Keys {
   const stop = new AbortController();
   const on = { signal: stop.signal };
@@ -108,6 +128,7 @@ export function createKeys(canvas: HTMLElement): Keys {
   const pointer = { x: 0, y: 0, over: false };
   const dragEnds = new Set<() => void>();
   let primary = false, capture = false;
+  let touchActive = false, touchRight = 0, touchForward = 0, touchJump = false, touchPrimary = false, touchCalm = false;
   let mode: MouseMode = 'point', cursorFree = false, lockFailed = false, lookX = 0, lookY = 0;
   /** True while something holds the player that took the lock away, so letting go takes it again. */
   let relock = false, relocking = false;
@@ -124,8 +145,36 @@ export function createKeys(canvas: HTMLElement): Keys {
   function letGo(why: 'up' | 'lost'): void {
     if (!primary) return;
     primary = false;
-    send({ kind: 'letGo', why });
+    if (!touchPrimary) send({ kind: 'letGo', why });
   }
+
+  function cancelTouch(): void {
+    touchRight = touchForward = 0;
+    touchJump = touchCalm = false;
+    lookX = lookY = 0;
+    const was = touchPrimary;
+    touchPrimary = false;
+    if (was && !primary) send({ kind: 'letGo', why: 'lost' });
+  }
+  const unit = (value: number): number => Number.isFinite(value) ? Math.max(-1, Math.min(1, value)) : 0;
+  const touch: TouchInput = {
+    get active() { return touchActive; },
+    get calmHeld() { return touchCalm; },
+    calm(down) { touchCalm = down && !cursorFree; },
+    move(x, y) { if (cursorFree) return; touchActive = true; touchRight = unit(x); touchForward = unit(y); },
+    jump(down) { touchActive = true; touchJump = down && !cursorFree; },
+    aim(x, y) { if (cursorFree) return; touchActive = true; pointer.x = unit(x); pointer.y = unit(y); pointer.over = true; },
+    look(x, y) { if (cursorFree) return; touchActive = true; if (Number.isFinite(x) && Number.isFinite(y)) { lookX += x; lookY += y; } },
+    primary(down) {
+      if (down && cursorFree) return;
+      touchActive = true;
+      if (down === touchPrimary) return;
+      touchPrimary = down;
+      if (!primary) send(down ? { kind: 'use', button: 'primary' } : { kind: 'letGo', why: 'up' });
+    },
+    press(press) { if (!cursorFree) { touchActive = true; send(press); } },
+    cancel: cancelTouch,
+  };
 
   /** The press a key stands for, or null when the key is only ever held. */
   function pressOf(code: string): Press | null {
@@ -164,6 +213,7 @@ export function createKeys(canvas: HTMLElement): Keys {
   }
   /** Forgets a right-button press without using anything. */
   function cancelRight(): void {
+    lookX = lookY = 0;
     if (!right.down) return;
     const was = right.dragging;
     right.cancel();
@@ -197,6 +247,15 @@ export function createKeys(canvas: HTMLElement): Keys {
   }
 
   window.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
+      held.clear();
+      cancelTouch();
+      letGo('lost');
+      cancelRight();
+      relock = false;
+      if (isLocked()) document.exitPointerLock();
+      return;
+    }
     // Alt gives the cursor back, as in Genshin.
     if ((e.code === 'AltLeft' || e.code === 'AltRight') && mode === 'lock') {
       e.preventDefault();
@@ -219,9 +278,12 @@ export function createKeys(canvas: HTMLElement): Keys {
     // Alt let go on its own would put Windows' focus on the browser's menu.
     if ((e.code === 'AltLeft' || e.code === 'AltRight') && mode === 'lock') e.preventDefault();
   }, on);
-  window.addEventListener('blur', () => { held.clear(); letGo('lost'); cancelRight(); }, on);
+  window.addEventListener('blur', () => { held.clear(); cancelTouch(); letGo('lost'); cancelRight(); }, on);
 
   canvas.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
+    // A release can happen outside the browser, without delivering pointerup.
+    if (right.down && e.button !== 2 && (e.buttons & 2) === 0) cancelRight();
     // A second button pressed or let go while another is held comes as a move with `button` set.
     if (e.button === 0 || e.button === 2) {
       const bit = e.button === 0 ? 1 : 2;
@@ -238,9 +300,11 @@ export function createKeys(canvas: HTMLElement): Keys {
   }, on);
   canvas.addEventListener('pointerleave', () => { pointer.over = false; letGo('lost'); }, on);
   // A captured pointer that is taken away before the button came up.
-  canvas.addEventListener('lostpointercapture', () => letGo('lost'), on);
+  canvas.addEventListener('lostpointercapture', () => { letGo('lost'); cancelRight(); }, on);
   canvas.addEventListener('contextmenu', (e) => e.preventDefault(), on);
   canvas.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'touch') return;
+    touchActive = false;
     movePointer(e);
     if (mayLock() && !isLocked()) {
       // This click takes the mouse and does nothing else.
@@ -250,6 +314,7 @@ export function createKeys(canvas: HTMLElement): Keys {
     buttonDown(e);
   }, on);
   window.addEventListener('pointerup', (e) => {
+    if (e.pointerType === 'touch') return;
     if (e.button === 0) letGo('up');
     else if (e.button === 2) endRight(e);
   }, on);
@@ -257,6 +322,7 @@ export function createKeys(canvas: HTMLElement): Keys {
   document.addEventListener('pointerlockerror', () => { if (!relocking) lockFailed = true; }, on);
   document.addEventListener('pointerlockchange', () => { if (!isLocked()) letGo('lost'); }, on);
   document.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch') return;
     // Without the lock (a browser that refuses it) the mouse turns the view while it is over the world.
     if (mode !== 'lock' || cursorFree || !(isLocked() || (lockFailed && e.target === canvas))) return;
     lookX += e.movementX;
@@ -284,11 +350,12 @@ export function createKeys(canvas: HTMLElement): Keys {
   const down = (...codes: string[]): boolean => codes.some((code) => held.has(code));
 
   return {
-    get right() { return (down('KeyD', 'ArrowRight') ? 1 : 0) - (down('KeyA', 'ArrowLeft') ? 1 : 0); },
-    get forward() { return (down('KeyW', 'ArrowUp') ? 1 : 0) - (down('KeyS', 'ArrowDown') ? 1 : 0); },
-    get jump() { return held.has('Space'); },
+    touch,
+    get right() { return unit((down('KeyD', 'ArrowRight') ? 1 : 0) - (down('KeyA', 'ArrowLeft') ? 1 : 0) + touchRight); },
+    get forward() { return unit((down('KeyW', 'ArrowUp') ? 1 : 0) - (down('KeyS', 'ArrowDown') ? 1 : 0) + touchForward); },
+    get jump() { return held.has('Space') || touchJump; },
     get soft() { return down('ShiftLeft', 'ShiftRight'); },
-    get primary() { return primary; },
+    get primary() { return primary || touchPrimary; },
     pointer,
 
     onPress(listener) {
@@ -310,6 +377,7 @@ export function createKeys(canvas: HTMLElement): Keys {
 
     release() {
       held.clear();
+      cancelTouch();
       letGo('lost');
       cancelRight();
     },
@@ -331,7 +399,7 @@ export function createKeys(canvas: HTMLElement): Keys {
     freeCursor(free) {
       const wasFree = cursorFree;
       cursorFree = free;
-      if (free) cancelRight();
+      if (free) { cancelTouch(); cancelRight(); }
       if (free && isLocked()) {
         relock = true;
         document.exitPointerLock();

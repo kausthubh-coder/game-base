@@ -33,6 +33,8 @@ export interface MapOptions {
   worldSize?: number;
   /** Draw the beam and the edge arrow for the active waypoint. True by default. */
   beam?: boolean;
+  /** Interface the beam's distance never sits on. */
+  avoid?: () => Iterable<Element>;
   /** Where the map saves itself. `localStorage` by default. Pass null and call `save` and `load` yourself. */
   storage?: MapStorage | null;
   storageKey?: string;
@@ -113,7 +115,7 @@ export function createMap(ctx: ViewContext, options: MapOptions): MapView {
     edgeArrows: options.edgeArrows,
     onOpen: () => full.open(),
   });
-  const beacon: Beacon | null = options.beam === false ? null : createBeacon(ctx, rules.marks, { parent });
+  const beacon: Beacon | null = options.beam === false ? null : createBeacon(ctx, rules.marks, { parent, avoid: options.avoid });
 
   let playerX = 0, playerZ = 0, facing = 0, yaw = 0;
   let markers: readonly MapMarker[] = [];

@@ -87,15 +87,19 @@ export function readScreen() {
     const hit = stack.find((e) => shown(e));
     const control = stack[0] !== hit && stack[0]?.matches(PRESS) && !stack[0].disabled;
     if (!hit || hit === el || el.contains(hit) || hit.contains(el)) return control ? { control: true } : null;
-    let layer = false;
+    let layer = false, painted = false;
     for (let top = hit; top && !top.contains(el) && !layer; top = top.parentElement) {
       const h = top.getBoundingClientRect();
       const big = (Math.max(0, Math.min(h.right, W) - Math.max(h.left, 0)) * Math.max(0, Math.min(h.bottom, H) - Math.max(h.top, 0))) / (W * H) >= 0.5;
       if (!big) continue;
       // The HUD's root is as big as the screen and is no layer: it paints nothing and lets clicks through.
       const cs = getComputedStyle(top);
-      layer = cs.pointerEvents !== 'none' || cs.backgroundImage !== 'none' || !/^(transparent|rgba\(.*,\s*0\))$/.test(cs.backgroundColor);
+      painted = cs.backgroundImage !== 'none' || !/^(transparent|rgba\(.*,\s*0\))$/.test(cs.backgroundColor);
+      layer = cs.pointerEvents !== 'none' || painted;
     }
+    // A layer with no background of its own (the dialogue) lets what is under it show: its words over another
+    // piece's words are text over text, not a modal doing its job.
+    if (layer && !painted && hasOwnText(hit) && hasOwnText(el)) layer = false;
     return { what: describe(hit), layer };
   };
   const items = [];

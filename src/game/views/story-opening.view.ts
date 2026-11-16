@@ -1,82 +1,94 @@
-// The opening scene: on a new game chosen from the title, before the player has control, a few shots of
-// the valley with one line each, letterbox bars and soft fades. The real camera moves over the real world.
-// A Skip button and Esc end it at any point. It plays once per new game and never on Continue.
+// The opening film: on a new game begun from the title, before the player can move, the painted-layers cut that
+// Kausthubh picked (handbook chapter 29, `demos/opening`: the cut-out renderer, the eleven shots timed to Hobb's
+// lines, the score and the effects). It ends on the guild's door, and the hero wakes behind it, in the bunk room
+// at Saltgate. It plays once a game, by the flag `story.opening`, and never on Continue.
 //
-// The shots are src/game/content/opening.ts and the clock is src/game/uiview/opening.ts. This file draws
-// them: it moves the lens after the game's camera has placed it each frame, so the rig, the cutaway and
-// the world's focus still follow the hero and the last shot lands exactly where play begins.
+// The world loads behind it: the hero is set down in the bunk room the moment the film begins, the rules wait,
+// and the film's art comes in shot by shot, its first two before it starts and the rest while it plays. A shot
+// whose pictures are not in yet holds the film, and the sound with it, until they are.
 //
-// While it plays the rules are paused (once the people are in the world, so Tamsin is at her stone), the
-// player is busy, the HUD steps out, and every key and the wheel belong to it.
+// Any key or press shows "Hold to skip"; holding it a second skips. Once this browser has seen the film, one
+// press skips. The Skip pill skips when clicked. Every key and the wheel are the film's while it plays.
 //
-// `?opening-at=<seconds>` holds the scene at that moment, for screenshots.
-import * as THREE from 'three';
-import type { Vec3 } from '../../engine/types.ts';
-import { OPENING, type Offset, type OpeningShot } from '../content/opening.ts';
+// `?opening-at=<seconds>` holds the film at that moment, for screenshots.
+import titleArt from '../../../demos/opening/art/title.webp?url';
+import type { CreateRenderer, Film, FilmRenderer, Soundtrack } from '../../../demos/opening/types.ts';
+import { FLAG } from '../content/flags.ts';
+import { SPOTS } from '../content/saltgate.ts';
+import { saltgateAt } from '../opening/land.sim.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
-import { OPENING_FLAG, createOpening, playsOpening, takeNewGame, type Opening, type OpeningFrame } from '../uiview/opening.ts';
+import { playsOpening, takeNewGame } from '../uiview/opening.ts';
 import { addStyle } from '../uiview/theme.ts';
 
-/** The game's own lens, which the last shot widens back to. */
-const GAME_FOV = 20;
-/** Seconds the rules may run at the start, at most, while the people are put in the world. */
-const SETTLE = 1.5;
+/** Seconds a press is held to skip. */
+const HOLD = 1;
+/** Seconds the film takes to fade into the bunk room at its end. */
+const FADE_OUT = 1.2;
+/** Seconds after the last key or move that the skip pill stays up. */
+const PILL = 3;
+/** This browser has watched the film once: one press skips it after that. */
+const SEEN_KEY = 'greenhollow.film.seen';
+/** Chunks made at once round the bunk, each way, so the rules never see a hole when the film ends. */
+const LOAD_REACH = 3;
 
 const STYLE = /* css */ `
-.st-cinema { position: absolute; inset: 0; z-index: 50; pointer-events: none; overflow: hidden; --st-black: 1; --st-bars: 1; --st-words: 0; }
-.st-cinema[hidden] { display: none; }
-.st-veil { position: absolute; inset: 0; background: oklch(0.12 0.012 60); opacity: var(--st-black); }
-.st-bar { position: absolute; left: 0; right: 0; height: clamp(56px, 12vh, 132px); background: oklch(0.13 0.014 60); display: flex; align-items: center; justify-content: center; padding: 0 clamp(16px, 4vw, 48px); }
-.st-bar-top { top: 0; transform: translateY(calc(-100% * (1 - var(--st-bars)))); justify-content: flex-end; }
-.st-bar-bottom { bottom: 0; transform: translateY(calc(100% * (1 - var(--st-bars)))); }
-.st-line {
-  margin: 0; max-width: 36em;
-  font: 400 clamp(17px, 1.9vw, 23px) / 1.45 var(--ui-font);
-  letter-spacing: 0.005em; text-align: center; text-wrap: balance;
-  color: oklch(0.93 0.035 85);
-  -webkit-font-smoothing: antialiased;
-  opacity: var(--st-words);
+/* The title is the film's last picture: the guild's door on grant morning, the door the hero walks out of. */
+.ui-book .gu-art-title .gu-stage-title, .ui-book.ui-unstarted .gu-art-title .gu-stage-settings { --gu-title-art: url("${titleArt}"); image-rendering: auto; }
+.st-film { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; background: #000; pointer-events: auto; cursor: default; opacity: 1; transition: opacity ${FADE_OUT}s ease-in; }
+.st-film[hidden] { display: none; }
+.st-film.st-out { opacity: 0; pointer-events: none; }
+.st-film-stage { position: relative; width: min(100%, 100cqh * 16 / 9); aspect-ratio: 16 / 9; overflow: hidden; container-type: inline-size; }
+.ui-book .st-film-stage { width: min(100%, calc(100vh * 16 / 9)); }
+.st-film-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.st-film-say {
+  position: absolute; left: 50%; bottom: 7%; z-index: 3; width: min(80%, 34em); margin: 0; transform: translate(-50%, 10px);
+  font: 700 clamp(14px, 2.15cqw, 30px) / 1.42 var(--ui-font); color: var(--ui-glass-ink); text-align: center; text-wrap: balance;
+  text-shadow: 0 1px 2px rgb(10 12 20 / 0.95), 0 0 14px rgb(10 12 20 / 0.7);
+  opacity: 0; transition: opacity 200ms ease-out, transform 0s 200ms; pointer-events: none;
 }
-.st-title {
-  position: absolute; left: 0; right: 0; top: 30%;
-  display: grid; justify-items: center; gap: 12px;
-  color: oklch(0.96 0.03 88);
-  text-shadow: 0 2px 24px oklch(0.15 0.03 60 / 0.7), 0 1px 3px oklch(0.15 0.03 60 / 0.6);
-  opacity: var(--st-words);
-  transform: translateY(calc(10px * (1 - var(--st-words))));
+.st-film-say.on { opacity: 1; transform: translate(-50%, 0); transition: transform 220ms var(--ui-ease); }
+.st-film-say.cut { transition: none; }
+.st-film-title { position: absolute; left: 8%; top: 11%; z-index: 3; margin: 0; display: grid; gap: 0.5em; pointer-events: none; opacity: 0; transform: translateY(10px); transition: opacity 200ms ease-out, transform 0s 200ms; }
+.st-film-title.on { opacity: 1; transform: none; transition: transform 900ms var(--ui-ease); }
+.st-film-title::before { content: ''; position: absolute; inset: -45% -35% -40% -30%; z-index: -1; background: radial-gradient(closest-side, rgb(10 12 20 / 0.5), rgb(10 12 20 / 0)); }
+.st-film-title small { display: flex; align-items: center; gap: 0.7em; font: 800 clamp(11px, 1.4cqw, 20px) / 1 var(--ui-font); letter-spacing: 0.32em; text-transform: uppercase; color: var(--ui-gold-bright); text-shadow: 0 1px 2px rgb(10 12 20 / 0.9); }
+.st-film-title small::before { content: ''; width: 0.55em; height: 0.55em; background: var(--ui-gold-bright); transform: rotate(45deg); box-shadow: 0 0 8px rgb(240 212 138 / 0.7); }
+.st-film-title b { position: relative; padding-bottom: 0.18em; font: 650 clamp(28px, 6.4cqw, 96px) / 1 var(--ui-display); letter-spacing: -0.01em; color: var(--ui-paper-light); text-shadow: 0 2px 4px rgb(10 12 20 / 0.6), 0 0 30px rgb(10 12 20 / 0.5); }
+.st-film-title b::after { content: ''; position: absolute; left: 0; bottom: 0; width: 70%; height: max(2px, 0.03em); background: linear-gradient(90deg, var(--ui-gold-bright), rgb(240 212 138 / 0)); transform-origin: left; transform: scaleX(0); transition: transform 0s 200ms; }
+.st-film-title.on b::after { transform: none; transition: transform 1200ms 300ms var(--ui-ease); }
+.st-film-skip {
+  position: absolute; right: clamp(16px, 3vw, 40px); bottom: clamp(16px, 3vw, 40px); z-index: 4;
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 18px 6px 8px;
+  font: 700 15px / 1 var(--ui-font); color: var(--ui-glass-ink); background: var(--ui-glass); border: 0; border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--ui-glass-line), var(--ui-glass-shadow); cursor: pointer;
+  opacity: 0; transition: opacity 300ms ease-out;
 }
-.st-title[hidden] { display: none; }
-.st-eyebrow { font: 600 13px / 1 var(--ui-font); letter-spacing: 0.22em; text-transform: uppercase; color: oklch(0.86 0.09 84); }
-.st-name { margin: 0; font: 400 clamp(44px, 8vw, 96px) / 1 var(--ui-font); letter-spacing: -0.015em; }
-.st-rule { width: 72px; height: 2px; background: var(--ui-brass); box-shadow: 0 1px 6px oklch(0.15 0.03 60 / 0.5); }
-.st-skip {
-  pointer-events: auto;
-  display: inline-flex; align-items: center; gap: 10px;
-  min-height: 40px; padding: 0 10px 0 16px;
-  font: 600 15px / 1 var(--ui-font); letter-spacing: 0.02em;
-  color: oklch(0.93 0.035 85);
-  background: transparent;
-  border: 1px solid oklch(0.93 0.035 85 / 0.35); border-radius: 2px;
-  cursor: pointer;
-  opacity: max(var(--st-bars), 0.0001);
-}
-.st-skip:hover { background: oklch(0.93 0.035 85 / 0.1); border-color: oklch(0.93 0.035 85 / 0.6); }
-.st-skip:active { background: oklch(0.93 0.035 85 / 0.16); }
-.st-skip:focus-visible { outline: 2px solid var(--ui-brass); outline-offset: 2px; }
-.st-skip kbd {
-  display: inline-grid; place-items: center; min-width: 30px; height: 22px; padding: 0 6px;
-  font: 600 12px / 1 var(--ui-font); color: oklch(0.86 0.04 85);
-  border: 1px solid oklch(0.93 0.035 85 / 0.3); border-radius: 2px;
-}
-/* The HUD, the prompt, hints, toasts, the waypoint and the marks over heads (placed with the game's camera) step out while the scene plays. */
-.ui-book.st-cinema-on .gb-hud, .ui-book.st-cinema-on .gb-beacon, .ui-book.st-cinema-on .gu-top,
-.ui-book.st-cinema-on .gu-toasts, .ui-book.st-cinema-on .gu-prompt, .ui-book.st-cinema-on .gb-dialogue,
-.ui-book.st-cinema-on .marks { visibility: hidden; }
-@container gu (width < 560px) {
-  .st-bar { height: 96px; }
-}
+/* Faded until a key, a press or the pointer near it shows it; a click on it skips at once. */
+.st-film-skip.on, .st-film-skip:hover, .st-film-skip:focus-visible { opacity: 1; }
+.st-film-skip:hover { background: rgb(22 26 38 / 0.78); }
+.st-film-skip:focus-visible { outline: 2px solid var(--ui-gold-bright); outline-offset: 3px; }
+.st-film-ring { width: 26px; height: 26px; transform: rotate(-90deg); }
+.st-film-ring circle { fill: none; stroke-width: 2.5; }
+.st-film-ring circle:first-child { stroke: rgb(246 241 231 / 0.25); }
+.st-film-ring .fill { stroke: var(--ui-gold-bright); stroke-dasharray: 100; stroke-dashoffset: 100; stroke-linecap: round; }
+.st-film-wait { position: absolute; left: 50%; top: 50%; z-index: 2; width: 10px; height: 10px; margin: -5px; background: var(--ui-gold-bright); transform: rotate(45deg); opacity: 0; transition: opacity 300ms; box-shadow: 0 0 12px rgb(240 212 138 / 0.7); }
+.st-film-wait.on { opacity: 0.85; animation: st-film-pulse 1.2s ease-in-out infinite alternate; }
+@keyframes st-film-pulse { from { opacity: 0.3; } to { opacity: 0.9; } }
+/* The HUD and everything over the world step out while the film plays. */
+.ui-book.st-film-on .gb-hud, .ui-book.st-film-on .gb-beacon, .ui-book.st-film-on .gu-top, .ui-book.st-film-on .gu-toasts,
+.ui-book.st-film-on .gu-prompt, .ui-book.st-film-on .gb-dialogue, .ui-book.st-film-on .marks { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .st-film-say, .st-film-title, .st-film-title b::after { transition: none; } .st-film-wait.on { animation: none; } }
 `;
+
+const clamp01 = (x: number): number => Math.max(0, Math.min(1, x));
+
+function seenBefore(): boolean {
+  try { return localStorage.getItem(SEEN_KEY) === '1'; } catch { return false; }
+}
+function markSeen(): void {
+  try { localStorage.setItem(SEEN_KEY, '1'); } catch { /* no storage: it asks for a hold next time too */ }
+}
 
 export function install(view: GameView): void {
   const book = bookOf(view);
@@ -84,138 +96,252 @@ export function install(view: GameView): void {
   addStyle(root, 'story-opening', STYLE);
   const params = new URLSearchParams(location.search);
   const holdAt = params.has('opening-at') ? Number(params.get('opening-at')) : null;
-  const still = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---- the page
-  const cinema = document.createElement('div');
-  cinema.className = 'st-cinema';
-  cinema.hidden = true;
-  cinema.innerHTML = /* html */ `
-    <div class="st-veil"></div>
-    <div class="st-title" hidden><span class="st-eyebrow">The first part</span><h1 class="st-name"></h1><span class="st-rule"></span></div>
-    <div class="st-bar st-bar-top"><button class="st-skip" type="button" data-key="opening:skip">Skip <kbd>Esc</kbd></button></div>
-    <div class="st-bar st-bar-bottom"><p class="st-line" aria-live="polite"></p></div>`;
-  root.append(cinema);
-  const title = cinema.querySelector<HTMLElement>('.st-title')!;
-  const name = cinema.querySelector<HTMLElement>('.st-name')!;
-  const line = cinema.querySelector<HTMLElement>('.st-line')!;
-  const skipButton = cinema.querySelector<HTMLButtonElement>('.st-skip')!;
+  const box = document.createElement('div');
+  box.className = 'st-film';
+  box.hidden = true;
+  box.innerHTML = /* html */ `
+    <div class="st-film-stage">
+      <span class="st-film-wait"></span>
+      <p class="st-film-title"><small></small><b></b></p>
+      <p class="st-film-say" aria-live="polite"></p>
+    </div>
+    <button class="st-film-skip" type="button" data-key="opening:skip"><svg class="st-film-ring" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="10.5" pathLength="100"/><circle class="fill" cx="13" cy="13" r="10.5" pathLength="100"/></svg><span>Hold to skip</span></button>`;
+  root.append(box);
+  const stage = box.querySelector<HTMLElement>('.st-film-stage')!;
+  const say = box.querySelector<HTMLElement>('.st-film-say')!;
+  const title = box.querySelector<HTMLElement>('.st-film-title')!;
+  const wait = box.querySelector<HTMLElement>('.st-film-wait')!;
+  const skipButton = box.querySelector<HTMLButtonElement>('.st-film-skip')!;
+  const skipWords = skipButton.querySelector('span')!;
+  const ring = skipButton.querySelector<SVGCircleElement>('.fill')!;
 
-  let run: Opening | null = null;
-  let since = 0, paused = false, shown = -1;
-  const frame: OpeningFrame = { shot: 0, move: 0, black: 1, bars: 1, words: 0, done: false };
+  let film: Film | null = null;
+  let renderer: FilmRenderer | null = null;
+  let sound: Soundtrack | null = null;
+  let titleCard: { shot: string; beat: string } | null = null;
+  let running = false, playing = false, waiting = false, ending = false;
+  let t = 0, held = -1, lastInput = -Infinity, now = 0;
+  let oneTap = false;
+  let openingId = 0;
 
-  function skip(): void {
-    if (!run || run.skipped) return;
-    run.skip();
-    game.events.emit('ui.sound', { sound: 'click' });
+  /** Sets the hero down in the bunk room under the painted wall, and makes the land round it, while the film plays. */
+  function wakeInSaltgate(): void {
+    const bunk = saltgateAt(SPOTS.bunk.x, SPOTS.bunk.z);
+    const cx = Math.floor(bunk.x) >> 4, cz = Math.floor(bunk.z) >> 4;
+    for (let dx = -LOAD_REACH; dx <= LOAD_REACH; dx++) for (let dz = -LOAD_REACH; dz <= LOAD_REACH; dz++) view.world.sim.load(cx + dx, cz + dz);
+    view.hero.teleport(bunk.x, bunk.y, bunk.z, SPOTS.bunk.facing);
+    // The rules are paused, so nothing else moves the drawn hero: the land loads round where it is drawn.
+    view.hero.blend(1);
+    view.camera.follow(bunk.x, bunk.y, bunk.z);
+    view.camera.snap();
+    view.world.setFocus(bunk.x, bunk.z);
   }
-  skipButton.addEventListener('click', skip);
 
-  function begin(): void {
-    game.flags.set(OPENING_FLAG, true);
-    run = createOpening(OPENING);
-    since = 0;
-    paused = false;
-    shown = -1;
-    cinema.hidden = false;
-    root.classList.add('st-cinema-on');
-    game.player.busy = true;
-    skipButton.focus({ preventScroll: true });
+  async function begin(): Promise<void> {
+    if (running && !ending) end();
+    const id = ++openingId;
+    const current = (): boolean => id === openingId && running && !ending;
+    sound = null;
+    renderer = null;
+    film = null;
+    running = true;
+    playing = waiting = ending = false;
+    t = 0;
+    view.setAudioMuted('opening', true);
+    try {
+      oneTap = seenBefore();
+      skipWords.textContent = oneTap ? 'Skip' : 'Hold to skip';
+      box.hidden = false;
+      box.classList.remove('st-out');
+      root.classList.add('st-film-on');
+      view.setPaused('opening', true);
+      game.player.busy = true;
+      wakeInSaltgate();
+      wait.classList.add('on');
+      // The film's code and art load only now, after Begin: none of it is in the game's first load.
+      const [{ makeFilm, TITLE }, { create }, { createSoundtrack, VOICES }] = await Promise.all([
+        import('../../../demos/opening/film.ts'),
+        import('../../../demos/opening/cutout/index.ts') as Promise<{ create: CreateRenderer }>,
+        import('../../../demos/opening/sound/index.ts'),
+      ]);
+      if (!current()) return;
+      // Hobb's first take until Kausthubh picks one (docs/opening-lab.md).
+      const track = await createSoundtrack({ voice: VOICES[0].id, volume: view.settings.volume('master') });
+      if (!current()) { track.dispose(); return; }
+      sound = track;
+      film = makeFilm(track.voiceSeconds);
+      titleCard = { shot: TITLE.shot, beat: TITLE.beat };
+      (title.querySelector('small') as HTMLElement).textContent = TITLE.eyebrow;
+      (title.querySelector('b') as HTMLElement).textContent = TITLE.name;
+      const cut = renderer = create(film, { quality: view.ctx.quality });
+      stage.prepend(cut.canvas);
+      try {
+        await cut.load(film.shots.slice(0, 2));
+      } finally {
+        // Loading may finish after Skip's cleanup. Drop pictures it added after disposal too.
+        if (id !== openingId || !running) cut.dispose();
+      }
+      if (!current()) return;
+      // The rest comes in while the first shots play.
+      void cut.load(film.shots)
+        .catch((error) => {
+          if (!current()) return;
+          console.warn('[opening] the film\'s art did not all load:', error);
+          end(id);
+        })
+        .finally(() => { if (id !== openingId || !running) cut.dispose(); });
+      wait.classList.remove('on');
+      playing = true;
+      if (holdAt === null) sound.play(film, 0);
+    } catch (error) {
+      if (!current()) return;
+      // No film: the game goes on without it, from the bunk room.
+      console.error('[opening] the film could not play:', error);
+      end(id);
+    }
   }
 
-  function end(): void {
-    run = null;
-    cinema.hidden = true;
-    root.classList.remove('st-cinema-on');
-    if (paused) view.setPaused('opening', false);
-    paused = false;
-    if (document.activeElement === skipButton) skipButton.blur();
-    book.settle();
+  /** The film is over, played or skipped: it fades into the bunk room, and grant day begins. */
+  function end(id = openingId): void {
+    if (id !== openingId || !running || ending) return;
+    ending = true;
+    playing = false;
+    const track = sound, cut = renderer;
+    // Keep the world quiet through the soundtrack's stop tail and the picture's fade.
+    // Schedule cleanup before any scene callback can throw.
+    window.setTimeout(() => {
+      try {
+        track?.dispose();
+      } finally {
+        try {
+          cut?.dispose();
+          cut?.canvas.remove();
+        } finally {
+          if (id === openingId) {
+            running = false;
+            box.hidden = true;
+            root.classList.remove('st-film-on');
+            renderer = null;
+            sound = null;
+            film = null;
+            view.setAudioMuted('opening', false);
+          }
+        }
+      }
+    }, FADE_OUT * 1000);
+    try {
+      track?.stop();
+      markSeen();
+      if (game.systems.opening) game.systems.opening.filmDone();
+      else game.flags.set(FLAG.opening, true);
+      box.classList.add('st-out');
+      skipButton.classList.remove('on');
+      say.classList.remove('on');
+      title.classList.remove('on');
+    } finally {
+      view.setPaused('opening', false);
+      game.player.busy = false;
+      book.settle();
+    }
   }
 
   book.onStart((fresh) => {
     const chosen = takeNewGame();
-    if (playsOpening({ fresh, chosen, flags: game.flags })) begin();
+    if (playsOpening({ fresh, chosen, flags: game.flags })) void begin();
   });
 
-  // ---- every key and the wheel are the scene's. Esc skips. In the capture phase, so the panels, the
-  // pause menu and the game's keys never see them. This view installs before the ui-* views.
+  // ---- skipping: hold anything for a second, or once this browser has seen the film, press once
+  function press(): void {
+    if (!running || ending) return;
+    lastInput = now;
+    if (oneTap) return end();
+    if (held < 0) held = now;
+  }
+  function letGo(): void {
+    held = -1;
+    ring.style.strokeDashoffset = '100';
+  }
+  skipButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    end();
+  });
+  box.addEventListener('pointerdown', (event) => {
+    if ((event.target as Element).closest('button')) return;
+    press();
+  });
+  window.addEventListener('pointerup', letGo);
+  window.addEventListener('pointercancel', letGo);
+  box.addEventListener('pointermove', () => { lastInput = now; }, { passive: true });
+
+  // Every key and the wheel are the film's. In the capture phase, so the pause menu and the game never see them.
   window.addEventListener('keydown', (event) => {
-    if (!run) return;
-    if (event.code === 'Escape' && !event.repeat) skip();
-    // The Skip button still answers Enter and Space when it has the focus.
-    if (document.activeElement === skipButton && (event.code === 'Enter' || event.code === 'Space' || event.code === 'NumpadEnter')) return;
+    if (!running) return;
+    if (document.activeElement === skipButton && (event.code === 'Enter' || event.code === 'Space')) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    if (!event.repeat && !event.metaKey && !event.ctrlKey) press();
+  }, { capture: true });
+  window.addEventListener('keyup', (event) => {
+    if (!running) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    letGo();
   }, { capture: true });
   window.addEventListener('wheel', (event) => {
-    if (!run) return;
+    if (!running) return;
     event.preventDefault();
     event.stopImmediatePropagation();
   }, { capture: true, passive: false });
 
-  // ---- the camera
-  const lens = view.ctx.camera as THREE.PerspectiveCamera;
-  const rigPos = new THREE.Vector3(), rigLook = new THREE.Vector3();
-  const from = new THREE.Vector3(), to = new THREE.Vector3(), look = new THREE.Vector3(), lookTo = new THREE.Vector3();
-  const base: Vec3 = { x: 0, y: 0, z: 0 };
-
-  const at = (out: THREE.Vector3, offset: Offset): THREE.Vector3 => out.set(base.x + offset[0], base.y + offset[1], base.z + offset[2]);
-
-  function aim(shot: OpeningShot, move: number): void {
-    const place = view.game.systems.region?.place(shot.place)?.at;
-    if (place) { base.x = place.x; base.y = place.y; base.z = place.z; } else { base.x = view.playerPosition.x; base.y = view.playerPosition.y; base.z = view.playerPosition.z; }
-    at(from, shot.from);
-    at(look, shot.look);
-    let fov = shot.fov;
-    if (shot.land) {
-      // The game's camera has placed the lens for this frame already: that is where the shot ends.
-      to.copy(rigPos);
-      lookTo.copy(rigLook);
-      fov = shot.fov + (GAME_FOV - shot.fov) * move;
-    } else {
-      at(to, shot.to);
-      at(lookTo, shot.lookTo);
-    }
-    lens.position.lerpVectors(from, to, move);
-    look.lerp(lookTo, move);
-    lens.lookAt(look);
-    lens.fov = fov;
-    lens.near = 0.5;
-    lens.far = Math.max(lens.far, 600);
-    lens.updateProjectionMatrix();
-  }
-
+  // ---- the frame
   view.onFrame((dt) => {
-    if (!run) return;
-    // The people are made on the first step of the rules. Once Tamsin stands at her stone, the world waits.
-    since += dt;
-    if (!paused && (game.actors.has('npc:tamsin') || since >= SETTLE)) {
-      paused = true;
-      view.setPaused('opening', true);
-    }
+    now += dt;
+    if (!running || ending) return;
     game.player.busy = true;
-
-    if (holdAt !== null && Number.isFinite(holdAt) && !run.skipped) run.advance(Math.max(0, holdAt - run.time));
-    else run.advance(dt);
-    run.frame(frame);
-
-    rigPos.copy(lens.position);
-    rigLook.set(view.playerPosition.x, view.playerPosition.y + 1, view.playerPosition.z);
-    const shot = OPENING[frame.shot];
-    const move = still ? (shot.land ? 1 : 0.5) : frame.move;
-    aim(shot, frame.done ? 1 : move);
-
-    if (frame.shot !== shown) {
-      shown = frame.shot;
-      line.textContent = shot.line;
-      title.hidden = !shot.title;
-      name.textContent = shot.title ?? '';
+    if (held >= 0) {
+      const p = clamp01((now - held) / HOLD);
+      ring.style.strokeDashoffset = String(100 - p * 100);
+      if (p >= 1) { letGo(); end(); return; }
     }
-    cinema.style.setProperty('--st-black', frame.black.toFixed(3));
-    cinema.style.setProperty('--st-bars', frame.bars.toFixed(3));
-    cinema.style.setProperty('--st-words', frame.words.toFixed(3));
-    if (frame.done) end();
+    skipButton.classList.toggle('on', now - lastInput < PILL || held >= 0);
+    if (!film || !renderer || !sound) return;
+
+    // The clock, held at a shot whose pictures are not in yet.
+    if (holdAt !== null && Number.isFinite(holdAt)) t = Math.min(holdAt, film.length - 0.01);
+    else if (playing) {
+      const next = film.shots.find((s) => s.at > t);
+      const ready = !next || !renderer.ready || renderer.ready(next.id);
+      if (!ready && t + dt >= next.at) {
+        if (!waiting) { waiting = true; sound.stop(); wait.classList.add('on'); }
+      } else {
+        if (waiting) { waiting = false; sound.play(film, t); wait.classList.remove('on'); }
+        t += dt;
+      }
+    }
+    if (t >= film.length) { end(); return; }
+    try {
+      renderer.draw(t);
+    } catch (error) {
+      console.error('[opening] the film could not draw:', error);
+      end();
+      return;
+    }
+
+    // Hobb's line under the picture, and the act's title over the last shot.
+    const shot = film.at(t);
+    const into = t - shot.at;
+    const spoken = sound.voiceSeconds[shot.id];
+    if (say.textContent !== shot.say) {
+      // A new line cuts in, and the old one is gone at once.
+      say.classList.add('cut');
+      say.classList.remove('on');
+      say.textContent = shot.say;
+      void say.offsetWidth;
+      say.classList.remove('cut');
+    }
+    say.classList.toggle('on', into >= film.lead && into < (spoken ? film.lead + spoken + 0.5 : shot.len - 0.8));
+    title.classList.toggle('on', !!titleCard && shot.id === titleCard.shot && into >= (shot.beats[titleCard.beat] ?? Infinity));
   });
 }

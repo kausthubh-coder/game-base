@@ -16,6 +16,8 @@ the shell's `GameView`.
 | `ui-notices.view.ts` | Places the prompt, hints and toasts beside the HUD, and sends a toast for each thing gained |
 | `ui-show.view.ts` | `?show=<state>` opens one state of the interface, for `critly check` |
 | `story-opening.view.ts` | The opening scene on a new game chosen from the title: four shots with the real camera, letterbox bars, fades, a line each, a Skip button and Esc. Once per new game, never on Continue. `?opening-at=<seconds>` holds it at one moment. |
+| `story-cutscene.view.ts` | The director: plays a film of `content/cutscenes.ts` when the rules first set its flag near its place, once a save, never online. Bars, black, timed words, Skip and Esc, puppets for the hero and the fox, the lens after the game's camera, the hour and the fire held. Puts the player where the film ends as it starts, so a skip leaves the same world. `?scene=9` starts a game set up for scene 9, `?cut-at=<seconds>` holds it. |
+| `ui-experiment.view.ts` | At `/experiment/` (or `?experiment=1`): a badge that says it is the experiment build, with a button that plays scene 9 in place, so its click starts the sound |
 | `story-sleep.view.ts` | Sleep fades to dark, the card ("Day 2", the hour), then morning fades in |
 | `story-almanac.view.ts` | The card that rises when Tamsin hands over the Almanac. It names the Tab key, holds the hints back while it shows and skips the "Press Tab" hint. |
 
@@ -33,6 +35,9 @@ Each feature is used in one file: hud in `ui-hud`, map in `ui-map`, dialogue in 
 | `voices.ts` | A sound-engine voice for each speaker's voice id |
 | `opening.ts` | The opening's clock (`createOpening`), its rule (`playsOpening`: fresh, chosen from the title, the flag `story.opening` not set) and the title's mark in sessionStorage |
 | `sleep.ts` | The sleep card's clock, on the rules' steps. It hands the time system a sleep curtain, so the morning comes once the screen is dark. |
+| `cutscene.ts` | A film's frame as numbers, a pure function of the film and a time (`filmFrame`), its clock with skip (`createFilm`), and the rule for when a film starts (`startsFilm`) |
+| `cutscene-stage.ts` | `stageOf(view).play(scene)`: how another view asks the director for a film |
+| `film-sound.ts` | The fire's crackle, the twig, the pop and the held note, made by code on the effects bus |
 | `clear.ts` | `clearOfPanels`: slides the waypoint's edge arrow along its edge until it touches no HUD panel. `ui-map.view.ts` calls it after the map has placed the arrow. |
 
 ## Keys
@@ -52,6 +57,7 @@ capture phase, so the full map, a panel and the pause menu never answer the same
 | Title, pause, Settings, the end card | no | hidden |
 | Bag, Make, Almanac, quest log | yes, and `player.busy` is true | hidden |
 | Full map | yes, and `player.busy` is true | hidden |
+| A film | no | hidden, with the marks over heads and the badges |
 | A conversation | yes, and `player.busy` is true | shown, without the quick slots. Toasts sit above the box. |
 
 `book.covered` is true while a panel or the full map is open, and the views' root has the class

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "mode": "door",
+  "seed": 7,
+  "size": "1366x768",
+  "inputs": [
+    {
+      "type": "door",
+      "method": "newGame",
+      "args": []
+    },
+    {
+      "type": "door",
+      "method": "skipTo",
+      "args": [
+        "count"
+      ]
+    },
+    {
+      "type": "door",
+      "method": "teleport",
+      "args": [
+        "town.granary"
+      ]
+    },
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    }
+  ]
+}

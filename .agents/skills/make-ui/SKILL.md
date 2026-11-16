@@ -25,7 +25,12 @@ fits the rules, and goes into both token blocks.
    palette and the kit's rules from `docs/ui-look.md`: drawn at 2x, transparent, no text, ornament only in the corners
    of a nine-slice, plain stretchable edges. It adds the file to `public/assets/ui/kit/`, the name to `uikit.images`
    in the manifest, the prompt to `assets-src/ui-kit-prompts.json` and the slice to `assets-src/ui-kit-slices.json`.
-   Drawing art in CSS or code stands in for a picture only as the fallback under `ui-kit`.
+   Then `bun tools/art/see.mjs --only kit` and open `.artifacts/art/see/kit-<n>.png`: the piece on the dark well and on
+   parchment beside every other piece. Done when its gold, its line weight and its corner ornament are its
+   neighbours'. Drawing art in CSS or code stands in for a picture only as the fallback under `ui-kit`.
+   **Icons and portraits are sprites**: make them with the `make-sprite` skill. An icon is judged at 32 pixels on
+   parchment, where the bag draws it (`bun tools/art/see.mjs --only icons`), and a portrait in the real dialogue box
+   (`--only talk` with the game running).
 5. **After shots.** Run `bun tools/ui-shots.mjs .artifacts/ui/after`. Compare both sheets at 1440 and at 390. Done
    when every state you touched reads as the same look as its neighbours, nothing overlaps or clips, text on the
    world is readable on bright grass, and the phone sheet keeps 44 px targets.

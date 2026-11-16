@@ -1,16 +1,20 @@
 // The save: the kernel's state and the world's changed blocks, as one string in localStorage under one key.
 // Every read and write is inside try and catch: a private window or a full disk must not stop the game.
 import type { WorldSave } from '../../features/world/index.ts';
-import type { GameSave } from '../kernel.sim.ts';
+import { SAVE_VERSION, type GameSave } from '../kernel.sim.ts';
 
 /** A test scene (`?scene=build` in the address) keeps its own save, so trying things there never touches the real game's. */
 const scene = typeof location === 'undefined' ? null : new URLSearchParams(location.search).get('scene');
-export const SAVE_KEY = scene ? `greenhollow.save.${scene}` : 'greenhollow.save';
+/** The playtest copy at /playtest/ and the experiment copy at /experiment/ keep their own saves too, so the game at / still opens on its own save. */
+const path = typeof location === 'undefined' ? '' : location.pathname;
+const SAVE_ROOT = path.startsWith('/playtest') ? 'greenhollow.playtest.save' : path.startsWith('/experiment') ? 'greenhollow.experiment.save' : 'greenhollow.save';
+export const SAVE_KEY = scene ? `${SAVE_ROOT}.${scene}` : SAVE_ROOT;
 /** What the page should do straight after it reloads: a game already in progress cannot be reset in place. */
 const AFTER_RELOAD_KEY = 'greenhollow.after-reload';
 
 export interface SaveFile {
-  version: 1;
+  /** The same as the game's own, `SAVE_VERSION`. */
+  version: typeof SAVE_VERSION;
   /** When it was written, in milliseconds since 1970. */
   at: number;
   world: WorldSave;
@@ -24,7 +28,7 @@ export function readSave(): SaveFile | null {
     const text = localStorage.getItem(SAVE_KEY);
     if (!text) return null;
     const file = JSON.parse(text) as Partial<SaveFile>;
-    if (file.version !== 1 || !file.world || !file.game) return null;
+    if (file.version !== SAVE_VERSION || !file.world || !file.game) return null;
     return { shell: { wheat: 0, blocks: 0 }, ...file } as SaveFile;
   } catch {
     return null;
@@ -34,6 +38,21 @@ export function readSave(): SaveFile | null {
 export function hasSave(): boolean {
   try {
     return localStorage.getItem(SAVE_KEY) !== null && readSave() !== null;
+  } catch {
+    return false;
+  }
+}
+
+/** The words a player sees when a save from before act 1 is put aside for a new game. */
+export const OLD_SAVE_TOAST = 'Your save is from before act 1, so a new game has begun.';
+
+/** True when a save is stored that this version does not load: one from before act 1. Read before a new game clears it. */
+export function hasOldSave(): boolean {
+  try {
+    const text = localStorage.getItem(SAVE_KEY);
+    if (!text) return false;
+    const version = (JSON.parse(text) as { version?: unknown } | null)?.version;
+    return typeof version === 'number' && version < SAVE_VERSION;
   } catch {
     return false;
   }

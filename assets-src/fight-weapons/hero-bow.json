@@ -1,0 +1,17 @@
+{
+  "name": "hero-bow",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "public/assets/sprites/hero.png"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: stylized-concept. Production pixel-art RPG weapon sprite sheet HERO-BOW. Reference hero.png is the EXACT character identity, not merely inspiration. Preserve his broad head 50 pixels wide and 42 high, broad short torso, ochre cloak, cream collar, tousled chestnut hair, belt, satchel and boots. Do NOT make him slimmer or turn front faces sideways. STRICT uniform FOUR columns THREE rows of equal SQUARE cells, landscape 4:3 sheet, transparent background, no text/grid/ground/shadow. Target final cells 128x128, standing hero 108 pixels tall, ample padding for weapons without shrinking body. Row 0 faces viewer SQUARELY with both eyes symmetric throughout; row1 BACK no face; row2 RIGHT profile. All rows show four distinct bow poses: col0 NOCK short plain wooden bow raised in LEFT hand, right hand at string, arrow nocked; col1 FULL DRAW string at cheek, arrow level; col2 RELEASE string forward, right hand OPEN by cheek, NO arrow; col3 LOWER bow lowered, right hand reaching BACK OVER SHOULDER to small quiver on back. Same body/head dimensions in all cells, feet baseline equal. Preserve the approved pixel clusters and brown tinted 1-2px outlines, warm top-left cream highlights and brown/violet shadows. NO teal. Only bow, arrows and small quiver added. Whole figure visible, nothing crosses cell boundaries.",
+      "source": "assets-src/fight-weapons/hero-bow-attempt-1.png",
+      "selected": true
+    }
+  ],
+  "raw": "assets-src/raw/hero-bow-3.png",
+  "processing": "bun tools/sprites/build-story.mjs"
+}

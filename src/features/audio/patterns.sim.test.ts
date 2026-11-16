@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import { palettes, worldMotif } from '../../content/palettes/index.ts';
+import { greenhollowPalettes, palettes as starting, worldMotif } from '../../content/palettes/index.ts';
 import type { Palette } from '../../content/palettes/types.ts';
 import { pitchMask } from './blend.sim.ts';
 import { TICKS_PER_BAR } from './conductor.sim.ts';
@@ -7,6 +7,8 @@ import {
   chordFor, createComposer, degreeSemis, pickupNote, planBoss, planFightDrums, planStinger, planTension, talkNote, type Mode, type NoteEvent,
 } from './patterns.sim.ts';
 
+/** The starting lands and Greenhollow's regions, each once. */
+const palettes: Palette[] = [...new Set([...starting, ...greenhollowPalettes])];
 const calm: Mode = { fight: false, night: false, town: false, rain: false, resolve: false };
 const pc = (midi: number): number => ((midi % 12) + 12) % 12;
 const inScale = (p: Palette, midi: number): boolean => p.scale.includes(pc(midi - p.root));
@@ -22,8 +24,8 @@ function notes(p: Palette, mode: Mode, bars: number, layer?: NoteEvent['layer'])
 }
 
 test('there are seven palettes, named by land, in the brief order, and the town of Hollowmere after them', () => {
-  expect(palettes.map((p) => p.id)).toEqual(['meadow', 'desert', 'coast', 'rainvalley', 'highlands', 'forge', 'center', 'town']);
-  expect(palettes.map((p) => p.tempo)).toEqual([84, 96, 72, 100, 120, 80, 60, 92]);
+  expect(starting.map((p) => p.id)).toEqual(['meadow', 'desert', 'coast', 'rainvalley', 'highlands', 'forge', 'center', 'town']);
+  expect(starting.map((p) => p.tempo)).toEqual([84, 96, 72, 100, 120, 80, 60, 92]);
 });
 
 test('every palette is well formed', () => {
@@ -136,6 +138,13 @@ test('night is thinner and has a different lead', () => {
     expect(night.every((n) => n.patch === p.melody.night)).toBe(true);
     expect(day.some((n) => n.patch !== p.melody.night)).toBe(true);
   }
+});
+
+test('the marsh comes alive at night: its little bells are the lanternflies', () => {
+  const p = byName('marsh');
+  const count = (night: boolean): number => notes(p, { ...calm, night }, 64, 'sparkle').length;
+  expect(count(true)).toBeGreaterThan(count(false) * 1.8);
+  expect(count(false)).toBeGreaterThan(0);
 });
 
 test('a town adds a second voice and more harmony', () => {

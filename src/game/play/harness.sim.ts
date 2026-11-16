@@ -42,7 +42,16 @@ import { install as installRegion } from '../region/index.sim.ts';
 import { install as installSprinklers } from '../sprinklers/index.sim.ts';
 import { install as installStory } from '../story/index.sim.ts';
 import { install as installTalk } from '../talk/index.sim.ts';
+import { install as installHall } from '../hall/index.sim.ts';
 import { install as installTime } from '../time/index.sim.ts';
+import { install as installBench } from '../bench/index.sim.ts';
+import { install as installFarms } from '../farms/index.sim.ts';
+import { install as installFights } from '../fights/index.sim.ts';
+import { install as installGoods } from '../goods/index.sim.ts';
+import { install as installMachines } from '../machines/index.sim.ts';
+import { install as installOpening } from '../opening/index.sim.ts';
+import { install as installRuins } from '../ruins/index.sim.ts';
+import { install as installSettlement } from '../settlement/index.sim.ts';
 
 /** The seeds the shell uses: the world's, and the kernel's for `game.random()`. */
 export const WORLD_SEED = 1;
@@ -80,8 +89,17 @@ export const INSTALLS: readonly (readonly [name: string, install: (kernel: Kerne
   ['almanac', installAlmanac],
   ['creatures', installCreatures],
   ['pets', installPets],
+  ['machines', installMachines],
+  ['farms', installFarms],
+  ['bench', installBench],
   ['people', installPeople],
+  ['settlement', installSettlement],
+  ['goods', installGoods],
   ['talk', installTalk],
+  ['hall', installHall],
+  ['fights', installFights],
+  ['ruins', installRuins],
+  ['opening', installOpening],
   ['quests', installQuests],
   ['story', installStory],
 ];

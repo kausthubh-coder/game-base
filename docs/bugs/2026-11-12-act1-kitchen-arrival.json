@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "mode": "door",
+  "seed": 7,
+  "size": "1366x768",
+  "inputs": [
+    {
+      "type": "door",
+      "method": "newGame",
+      "args": []
+    },
+    {
+      "type": "door",
+      "method": "skipTo",
+      "args": [
+        "kitchen"
+      ]
+    },
+    {
+      "type": "door",
+      "method": "teleport",
+      "args": [
+        "plot"
+      ]
+    },
+    {
+      "type": "hold",
+      "key": "KeyS",
+      "ms": 1800
+    },
+    {
+      "type": "hold",
+      "key": "KeyD",
+      "ms": 1500
+    },
+    {
+      "type": "wait",
+      "ms": 500
+    }
+  ]
+}

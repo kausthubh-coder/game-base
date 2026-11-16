@@ -1,0 +1,28 @@
+{
+  "name": "stag",
+  "tool": "image_gen.imagegen",
+  "baseCommit": "fcefd6d",
+  "references": [
+    "public/assets/sprites/boar.png",
+    "public/assets/sprites/hero.png"
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, matching the reference boar and hero. Transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT rectangular uniform grid FOUR columns THREE rows, 12 equal SQUARE cells, landscape 4:3 canvas. Every cell contains exactly one whole creature with ample transparent padding. Row 1 FRONT, row 2 BACK (no face), row 3 RIGHT PROFILE. All four columns repeat idle breathing variations: weary standing head slightly low; chest slowly expands and relaxes, one ear flick. Same creature, accessories and proportions throughout. Hooves baseline equal in each cell. Full body visible including antler tips, nothing crosses cell boundaries. References show approved style only; generate a NEW creature. VERDANT STAG: an ancient gentle forest god tall as an oak, mighty heavy chest and long bark-brown legs, pale cream chest and throat, warm moss green back and shoulders, broad many-pointed crown of bark antlers like old oak boughs with a few leaves and tiny cream blossoms. Calm deep readable dark eyes, tired and noble, never evil or fierce. ONE plain heavy gold collar at base of neck, no other gold. NO chains. No teal. Restrained locked palette: outlines #302529 #493335 #65453a, bark #916534 #9b6f3e #b78b5a, leaves #3c5537 #516b3c #6c8043 #8d9a4a, cream highlights and brown/violet shadows. Pixel art at final 384-square cells, 1-2 pixel brown outlines and clear chunky clusters, not smooth painting. Camera looks down 35 degrees, see top of back. Back height eight blocks, antler tips eleven blocks. Side silhouette about as long as tall. Preserve body and antler geometry in all twelve cells; only subtle breathing changes. Leave 20 percent clear vertical space above antlers to permit taller rearing poses on the matching action sheet. No enormous foliage canopy; branching antlers remain readable.",
+      "source": "assets-src/fight-stag/stag-attempt-1.png",
+      "selected": false,
+      "defects": "Legs too short and back too low relative to antlers."
+    },
+    {
+      "number": 2,
+      "prompt": "Revise attached Verdant Stag idle sprite sheet. Keep exact same gentle ancient moss-backed bark-brown cream-chested forest god, eyes, ONE plain gold collar, warm green moss, small cream blossoms, branching brown oak antlers, cozy pixel-art style. STRICT FOUR columns THREE rows equal square cells, front / back NO FACE / right-facing profile. Four subtle idle breathing frames per row. Genuine transparent background, no ground, no shadows, no grid, no text, no chains, no teal. Main correction: MUCH LONGER LEGS and TALLER HEAVY CHEST. Hooves-to-back must be eight blocks and hooves-to-antler-tips eleven blocks. Therefore BACK HEIGHT is 73 percent of full animal height, not 45 percent like current reference. Tall majestic elk body on long legs, not short stocky reindeer. Antlers broad and branching but vertical crown only three blocks above eight-block back. Same proportions in every frame. Side silhouette about as long as tall. Leave padding all around. Dark brown 1-2 pixel outline, chunky pixel clusters, restrained green bark cream palette. Same oak bough antler shape throughout. Upper-left warm light. Healthy colors. All hooves aligned baseline. Body stays same size across cells, only tiny head and ear and breathing shifts.",
+      "source": "assets-src/raw/stag-3.png",
+      "references": [
+        "assets-src/fight-stag/stag-attempt-1.png"
+      ],
+      "selected": true
+    }
+  ],
+  "processing": "Standard build-story.mjs; size 384 anchor [192,364], height 320, worldHeight 13.2. No tool extension. Palette snapping shifts moss toward olive. No drawn replacement pixels."
+}

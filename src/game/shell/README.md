@@ -134,3 +134,7 @@ Open the page with `?hold=1` to stop the automatic start, `?quality=high` to hol
 ## What to know about the world
 
 The world keeps only the chunks around the player in memory, about 100 blocks each way. A system that reads blocks farther off gets air. A teleport, a new game and a load make the chunks around the player on the spot, 3 chunks each way, so the rules never run over a hole.
+
+## Touch input
+
+`Keys.touch` owns touch movement, jump, aim, camera look, primary use and held calm independently of keyboard and mouse holds. Its typed presses enter `onPress`, including fight actions. `ui-touch.view.ts` installs the controls on touch devices. `freeCursor(true)` discards touch holds and look movement while a menu or conversation owns input. See [mobile controls](../../../docs/mobile-controls.md) for the gestures and browser proof command.

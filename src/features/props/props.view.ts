@@ -17,7 +17,10 @@
 // - A prop casts shadow through a few stretched balls and boxes its builder listed, not through its own
 //   triangles. Every ball in the world is one draw call and every box is another. They live on a layer
 //   only the sun's shadow camera sees.
-// - All props share one material, so one shader program.
+// - All props share one material, so one shader program. A part's painted texture is a layer of one texture
+//   array, so skins add no draw call. The textures load the first time the quality level wants them.
+// - The soft forms (rocks, sweeps, lathes) are cut more coarsely at a lower `propDetail`. When the level
+//   changes it, the models that use them are built again, once.
 import * as THREE from 'three';
 import { propDef, type PropDef, type PropKind } from '../../content/props.ts';
 import type { ViewContext, ViewSystem } from '../../engine/system.ts';
@@ -26,8 +29,9 @@ import { QUALITY } from '../../content/quality.ts';
 import { buildProp, propExtras } from './build.ts';
 import { hash3, jitterAt, type Jitter } from './jitter.sim.ts';
 import { darkness } from './light.sim.ts';
-import { createPropMaterial } from './material.view.ts';
+import { createPropMaterial, paintedLightLive } from './material.view.ts';
 import type { ShapeExtras } from './shape.ts';
+import { loadSkins } from './skins.view.ts';
 
 /** The side of a cell, in blocks. */
 export const CELL = 8;
@@ -50,6 +54,13 @@ export interface PropsOptions {
   vary?: boolean;
   /** False draws every small plant however small it is on screen. For previews, contact sheets and counts. Default true. */
   thin?: boolean;
+  /** The assets folder, whose manifest lists the paintings the skins load. Null loads none and draws skins plain. Default './assets/'. */
+  skins?: string | null;
+  /**
+   * Lights the parts that wear a skin with the painted world's light. The default follows the painted world:
+   * on while it is drawn, Lambert like the other parts when it is not.
+   */
+  painted?: boolean;
 }
 
 /** A light a placed prop gives, for the world to light the blocks around it. */
@@ -115,6 +126,7 @@ interface Batch {
 /** One kind and variant: its geometry and the mesh that draws every copy. */
 interface Model {
   kind: PropKind;
+  variant: number;
   def: PropDef;
   extras: ShapeExtras;
   height: number;
@@ -176,6 +188,8 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   const vary = options.vary ?? true;
   const thin = options.thin ?? true;
   const { material, uniforms } = createPropMaterial();
+  const skinBase = options.skins === undefined ? './assets/' : options.skins;
+  let skinsAsked = false;
   const shadowMaterial = new THREE.MeshBasicMaterial();
   const group = new THREE.Group();
   group.name = 'props';
@@ -212,8 +226,12 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     const mesh = new THREE.InstancedMesh(geometry, shadow ? shadowMaterial : material, capacity);
     mesh.count = 0;
     mesh.visible = false;
-    // The cells decide what is drawn, so the mesh itself is never tested against the view.
-    mesh.frustumCulled = false;
+    // Cells conservatively select copies. Rigid batches can additionally reject their
+    // complete geometry bounds; shader-deformed props and shadow proxies keep the cell test.
+    const fx = geometry.getAttribute('aFx');
+    let rigid = !shadow;
+    if (fx) for (let i = 0; i < fx.count; i++) if (fx.getX(i) !== 0) { rigid = false; break; }
+    mesh.frustumCulled = rigid;
     mesh.matrixAutoUpdate = false;
     if (shadow) {
       mesh.castShadow = true;
@@ -253,17 +271,31 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
   const balls = makeBatch(ballGeometry, 'props:shadow-balls', true);
   const boxes = makeBatch(boxGeometry, 'props:shadow-boxes', true);
 
+  /** The skins' textures load the first time a level wants them, and only in a page. */
+  function wantSkins(): void {
+    const on = QUALITY[quality].propTextures;
+    uniforms.uSkinOn.value = on ? 1 : 0;
+    if (!on || skinsAsked || skinBase === null || typeof document === 'undefined') return;
+    skinsAsked = true;
+    void loadSkins(skinBase).then((texture) => {
+      uniforms.uSkinMap.value.dispose();
+      uniforms.uSkinMap.value = texture;
+    });
+  }
+  let detail = QUALITY[quality].propDetail;
+  wantSkins();
+
   function modelFor(kind: PropKind, variant: number): Model {
     const key = `${kind}:${variant}`;
     let model = models.get(key);
     if (!model) {
       const def = propDef(kind);
-      const geometry = buildProp(kind, variant);
+      const geometry = buildProp(kind, variant, detail);
       if (!geometry.boundingBox) geometry.computeBoundingBox();
       const box = geometry.boundingBox!;
       const height = box.max.y;
       const radius = Math.hypot(Math.max(-box.min.x, box.max.x), Math.max(-box.min.z, box.max.z));
-      model = { kind, def, extras: propExtras(geometry), height, radius, batch: makeBatch(geometry, `props:${key}`, false) };
+      model = { kind, variant, def, extras: propExtras(geometry), height, radius, batch: makeBatch(geometry, `props:${key}`, false) };
       models.set(key, model);
     }
     return model;
@@ -371,6 +403,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     for (const batch of batches) {
       const { mesh, count } = batch;
       mesh.count = count;
+      if (count && mesh.frustumCulled) mesh.computeBoundingSphere();
       mesh.visible = count > 0;
       if (count === 0) continue;
       mesh.instanceMatrix.clearUpdateRanges();
@@ -393,9 +426,28 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
     refill = false;
   }
 
+  /** Builds the models that use soft forms again at the new detail. Their meshes keep their copies. */
+  function redetail(): void {
+    for (const model of models.values()) {
+      if (!model.extras.detailed) continue;
+      const geometry = buildProp(model.kind, model.variant, detail);
+      const old = model.batch.mesh.geometry;
+      model.batch.mesh.geometry = geometry;
+      model.batch.triangles = (geometry.index ? geometry.index.count : geometry.attributes.position.count) / 3;
+      model.extras = propExtras(geometry);
+      old.dispose();
+    }
+  }
+
   function setQuality(next: Quality): void {
     if (next === quality) return;
     quality = next;
+    wantSkins();
+    const nextDetail = QUALITY[quality].propDetail;
+    if (nextDetail !== detail) {
+      detail = nextDetail;
+      redetail();
+    }
     for (const cell of cellList) cell.stale = true;
     refill = true;
   }
@@ -494,6 +546,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
       uniforms.uPropWind.value.set(Math.cos(a.windDir), Math.sin(a.windDir), reduceMotion ? 0 : a.wind);
       glow = darkness(a.timeOfDay);
       uniforms.uPropNight.value = glow;
+      uniforms.uPropPaint.value = (options.painted ?? paintedLightLive()) ? 1 : 0;
       if (frame.quality !== quality) setQuality(frame.quality);
 
       // Which cells are in view. Copy rows only when that set, or a cell in it, has changed.
@@ -539,6 +592,7 @@ export function createProps(ctx: ViewContext, options: PropsOptions = {}): Props
         batch.mesh.dispose();
       }
       material.dispose();
+      uniforms.uSkinMap.value.dispose();
       shadowMaterial.dispose();
       batches.length = 0;
       models.clear();

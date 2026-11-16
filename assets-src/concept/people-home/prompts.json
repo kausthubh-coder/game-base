@@ -1,0 +1,80 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "date": "2026-11-12",
+  "mode": "edit",
+  "sharedDirection": "Repaint original in same warm painted anime parchment style and composition. Keep front/right-side/back, three calm/glad/troubled expressions, equipment insets, corrected palette and pixel mock. Apply new identity to all views. Warm upper-left light, brown outlines, natural proportions in paintings; no generic chestnut curls. Footer CONCEPT READABILITY - NOT FINAL SPRITE.",
+  "characterBriefs": "The repaint table in each folder's README records each character's face, complexion, hair, build, colour key and story equipment supplied to the generator.",
+  "sources": [
+    {
+      "name": "hobb",
+      "folder": "people-home",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-b707f2b8-d5e4-4ca2-8ffc-40cde6e27d75.png"
+    },
+    {
+      "name": "hero",
+      "folder": "people-home",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-c9c5a4b5-dfc7-4d37-a970-8a3120862a8b.png"
+    },
+    {
+      "name": "dax",
+      "folder": "people-home",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-55099001-859e-4706-83af-5f5e5a243ea7.png"
+    },
+    {
+      "name": "mina",
+      "folder": "people-home",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-7030e037-6770-42d5-bd09-e84791acf93a.png"
+    },
+    {
+      "name": "wren",
+      "folder": "people-home",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-f01bc46f-1139-4c2a-9121-1bb315c37fcb.png"
+    },
+    {
+      "name": "tansy",
+      "folder": "people-home",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-32fdeaec-bf13-4bfe-b795-7de1c1bb3613.png"
+    },
+    {
+      "name": "maren",
+      "folder": "people-world",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-fa3202a5-c5c4-4fc0-bdcd-81a9faf8a476.png"
+    },
+    {
+      "name": "calla",
+      "folder": "people-world",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-a9910eda-d740-4e44-90d0-a4a2fc81dcc0.png"
+    },
+    {
+      "name": "aldric",
+      "folder": "people-world",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-f528b74c-5ba6-4063-b835-f6acb7616768.png"
+    },
+    {
+      "name": "ren",
+      "folder": "people-world",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-5dde2bf3-8c48-4890-9a5a-9036efc2d2de.png"
+    },
+    {
+      "name": "ilara",
+      "folder": "people-old",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-4154c22f-df13-4cd2-82b3-ceae2f471658.png"
+    },
+    {
+      "name": "auren",
+      "folder": "people-old",
+      "source": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-47e7e21f-2205-4649-be00-91735290654d.png"
+    }
+  ],
+  "attempts": {
+    "others": 1,
+    "ilara": {
+      "count": 3,
+      "kept": 1,
+      "defect": "The initial repaint and both targeted symbol corrections draw eight teal points despite explicit seven-point requests. Kept initial painting; exact seven-point Mark remains unresolved.",
+      "correction1": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-b10aac18-d4e0-4a31-abfd-771c3a8934f5.png",
+      "correction2": "/Users/dabot/.codex/generated_images/01a1ce5c-f8b6-7713-aae4-b1e515ade62b/exec-b9ac61be-8840-4886-ada1-a388fdafca12.png"
+    }
+  },
+  "postprocessing": "WebP, width1600, quality82. Ren footer cropped to remove invented Guild affiliation. Lineup.mjs crops and cleans background, discards detached lettering, scales bodies and labels the board; it does not paint character pixels."
+}

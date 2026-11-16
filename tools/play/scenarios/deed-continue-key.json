@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "mode": "human",
+  "seed": 7,
+  "query": "opening=deed",
+  "size": "960x540",
+  "inputs": [
+    {
+      "type": "click",
+      "text": "Begin"
+    },
+    {
+      "type": "check",
+      "path": "talk.npc",
+      "equals": "guildmaster",
+      "timeout": 15000
+    },
+    {
+      "type": "see",
+      "text": "Ward of the guild",
+      "timeout": 8000
+    },
+    {
+      "type": "wait",
+      "ms": 9000
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "see",
+      "text": "Somebody laughs",
+      "timeout": 8000
+    },
+    {
+      "type": "wait",
+      "ms": 9000
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "see",
+      "text": "You sign.",
+      "timeout": 8000
+    },
+    {
+      "type": "wait",
+      "ms": 9000
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "see",
+      "text": "Let them laugh",
+      "timeout": 8000
+    },
+    {
+      "type": "wait",
+      "ms": 9000
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "wait",
+      "ms": 200
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "wait",
+      "ms": 300
+    },
+    {
+      "type": "press",
+      "key": "KeyE"
+    },
+    {
+      "type": "see",
+      "text": "Deed of grant",
+      "timeout": 5000
+    },
+    {
+      "type": "gone",
+      "text": "Your name: ",
+      "timeout": 1500
+    },
+    {
+      "type": "type",
+      "text": "Ash"
+    },
+    {
+      "type": "see",
+      "text": "Your name: Ash"
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "gone",
+      "text": "Deed of grant",
+      "timeout": 5000
+    },
+    {
+      "type": "check",
+      "path": "player.busy",
+      "equals": false,
+      "timeout": 10000
+    },
+    {
+      "type": "see",
+      "text": "The guild gate",
+      "timeout": 8000
+    }
+  ]
+}

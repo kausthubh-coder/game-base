@@ -484,6 +484,30 @@ export function createPets(game: Game, defs: readonly PetDef[] = PETS): Pets {
     },
   };
 
+  // Before the pact, the fox shows the way north. It waits for the hero instead of bonding or finding gifts.
+  const guideGoal = { x: 0, y: 0, z: 0 };
+  function guide(pet: Pet, dt: number): boolean {
+    if (pet.def.kind !== 'leaftail' || flags.get('quest.greywood.step') !== 'follow') return false;
+    let target: Vec3;
+    try { target = game.systems.region.place('boar').at; } catch { return false; }
+    const pos = pet.state.pos;
+    if (distance2d(pos, player.pos) > pet.def.follow.appearBeyond) beside(pet);
+    if (player.busy || distance2d(pos, player.pos) > 8) { pet.actor.anim = 'idle'; return true; }
+    pet.again -= dt;
+    if (pet.again <= 0) {
+      pet.again = .75;
+      const dx = target.x - player.pos.x, dz = target.z - player.pos.z, d = Math.hypot(dx, dz) || 1;
+      guideGoal.x = player.pos.x + dx / d * Math.min(5, d);
+      guideGoal.z = player.pos.z + dz / d * Math.min(5, d);
+      guideGoal.y = world.heightAt(Math.floor(guideGoal.x), Math.floor(guideGoal.z));
+      const stand = game.systems.nav.near(guideGoal, 3);
+      setPath(pet, stand ? game.systems.nav.path(pos, stand, 600) : null);
+    }
+    const facing = pet.path ? walkAlong(world, pos, pet, pet.def.speed.trot, dt) : null;
+    turned(pet, facing);
+    return true;
+  }
+
   const system: SimSystem = {
     step(dt) {
       if (!ready()) return;
@@ -502,7 +526,7 @@ export function createPets(game: Game, defs: readonly PetDef[] = PETS): Pets {
         if (pet.wary > 0) pet.wary -= dt;
         if (pet.heart > 0 && (pet.heart -= dt) <= 0) pet.actor.mark = '';
         if (pet.state.bonded) follow(pet, dt);
-        else wild(pet, dt);
+        else if (!guide(pet, dt)) wild(pet, dt);
       }
     },
     save(): PetsSave {

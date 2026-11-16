@@ -28,6 +28,7 @@ import type { WorldView } from '../../features/world/index.ts';
 import type { Game } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import type { Keys, Press } from './keys.ts';
+import type { PlayerRig } from './player.ts';
 
 /** A point on the page, in CSS pixels from the top left of `view.root`. */
 export interface ScreenPoint {
@@ -72,9 +73,6 @@ export const MOUSE_STYLES: readonly MouseStyle[] = ['drag', 'lock'];
  */
 export type TiltTurn = 'quarter' | 'smooth';
 export const TILT_TURNS: readonly TiltTurn[] = ['quarter', 'smooth'];
-/** How people, the pet and the creatures are drawn: pixel-art sprites, the default, or 3D models. */
-export type CharacterLook = 'sprites' | 'models';
-export const CHARACTER_LOOKS: readonly CharacterLook[] = ['sprites', 'models'];
 /**
  * The debug overlays in the top left, each on or off: `fps` a small frame-rate counter, `meter` the full performance
  * meter with the quality buttons (F3), `info` the debug panel: where the hero is, the time, the camera, what is aimed at.
@@ -108,16 +106,12 @@ export interface ViewSettings {
   readonly tiltTurn: TiltTurn;
   /** Takes effect at once, and is stored. Quarter turns brings a camera that rests between two quarters to the nearest. */
   setTiltTurn(turn: TiltTurn): void;
-  /** `?chars=models` in the address holds a look for this visit. */
-  readonly characters: CharacterLook;
-  /** Takes effect at once, with no reload, and is stored. */
-  setCharacters(look: CharacterLook): void;
   /** `?perf=1` in the address shows the meter for this visit. The same object every time. */
   readonly debug: Readonly<DebugShow>;
   /** Takes effect at once, and is stored. F3 flips `meter`. */
   setDebug(show: Partial<DebugShow>): void;
-  /** Runs `fn` after the camera mode, the mouse style, the 2.5D turning, the character look or the debug overlays changed. Returns a function that stops it. */
-  onChange(fn: (setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters' | 'debug') => void): () => void;
+  /** Runs `fn` after the camera mode, the mouse style, the 2.5D turning, the debug overlays changed. Returns a function that stops it. */
+  onChange(fn: (setting: 'camera' | 'mouse' | 'tiltTurn' | 'debug') => void): () => void;
 }
 
 /** What the aim is on: the block under the pointer, or under the crosshair when the mouse is locked, when it is in reach. Else null. */
@@ -173,10 +167,14 @@ export interface GameView {
   readonly audio: AudioSystem | null;
   /** Runs `fn` when the sound engine starts, or at once when it already has. */
   onAudio(fn: (audio: AudioSystem) => void): void;
+  /** Temporarily silences world sound for a film. Each reason releases only its own mute. */
+  setAudioMuted(reason: string, muted: boolean): void;
   /** Every key, button and wheel the game reads. */
   readonly keys: Keys;
 
   // ---- the two clocks
+  /** Adjusts the lens after the camera rig, before aiming and world-view projection. Returns a function that stops it. */
+  onCamera(fn: (dt: number) => void): () => void;
   /** Runs `fn` once a frame, after the simulation and the camera and before the picture is drawn. Returns a function that stops it. */
   onFrame(fn: (dt: number) => void): () => void;
   /** Runs `fn` after every simulation step, 20 times a second of game time, with dt = 0.05. It also runs during `window.__game.advance`. */
@@ -188,6 +186,8 @@ export interface GameView {
    * Pass `out` to have it filled and returned, so a call every frame makes no garbage.
    */
   project(x: number, y: number, z: number, out?: ScreenPoint): ScreenPoint | null;
+  /** The hero's body and actor, for a view that moves the hero itself: see `PlayerRig.drive`. */
+  readonly hero: PlayerRig;
   /** Where the player's feet are drawn this frame. Smoother than `game.player.pos`, which moves in steps. */
   readonly playerPosition: Readonly<Vec3>;
   /** The block under the pointer, when it is in reach. The same object every frame. */
@@ -224,6 +224,11 @@ export interface GameView {
    * half a block from the tops of the blocks. NaN where the land is not drawn yet, and everywhere without painted land.
    */
   groundAt(x: number, z: number): number;
+  /**
+   * What solid thing stands between the lens and a body standing at this point, or null. It casts a ray through
+   * the scene, so a scene calls it when it chooses where to stand the hero, never every frame.
+   */
+  blocked(x: number, y: number, z: number): string | null;
   /** How far above the block it stands on a thing at this point is drawn. 0 without painted land. */
   lift(x: number, y: number, z: number): number;
   /**

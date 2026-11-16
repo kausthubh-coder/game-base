@@ -57,7 +57,7 @@ export function makeStage(seed = 1, save?: GameSave): Stage {
     isProtected: (x) => x >= TOWN_X,
   };
   const clock: TimeApi = {
-    dayLength: 720,
+    dayLength: 1200,
     canSleep: () => time.canSleep,
     sleep: () => void time.slept++,
     setWeather: () => {},

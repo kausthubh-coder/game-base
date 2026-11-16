@@ -90,7 +90,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
   root.innerHTML = `
     <div class="gb-map-page">
       <div class="gb-map-view">
-        <canvas tabindex="0" aria-label="The map. Arrow keys move it, plus and minus zoom, a click drops a waypoint."></canvas>
+        <div class="gb-map-chart"><canvas tabindex="0" aria-label="The map. Arrow keys move it, plus and minus zoom, a click drops a waypoint."></canvas></div>
         <div class="gb-map-north" aria-hidden="true">${svgIcon(ARROW_PATH)}<span>N</span></div>
         <div class="gb-map-note" role="status"></div>
         <div class="gb-map-picker" role="group" aria-label="Waypoint" hidden>
@@ -118,6 +118,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
         <button type="button" data-do="out" data-icon="zoom-out" aria-label="Zoom out">${lineIcon(ZOOM_OUT_LINES)}</button>
         <button type="button" data-do="center" data-icon="find-me" aria-label="Find me">${lineIcon(FIND_ME_LINES)}</button>
         <button type="button" data-do="here" data-icon="pin" aria-label="Pin where I stand">${lineIcon(PIN_LINES)}</button>
+        <button type="button" data-do="marks" aria-label="Show marked places">${lineIcon(FIND_ME_LINES)}</button>
         <span class="gb-map-count"></span>
       </div>
       <footer class="gb-map-foot">
@@ -131,7 +132,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     </div>`;
   options.parent.append(root);
 
-  const view = root.querySelector<HTMLElement>('.gb-map-view')!;
+  const view = root.querySelector<HTMLElement>('.gb-map-chart')!;
   const canvas = root.querySelector('canvas')!;
   const g = canvas.getContext('2d')!;
   const count = root.querySelector<HTMLElement>('.gb-map-count')!;
@@ -481,6 +482,15 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     if (action === 'close') api.close();
     else if (action === 'in') zoomAt(1.5, width / 2, height / 2);
     else if (action === 'out') zoomAt(1 / 1.5, width / 2, height / 2);
+    else if (action === 'marks') {
+      if (marks.pins.length) {
+        let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+        for (const pin of marks.pins) { x0 = Math.min(x0, pin.x); x1 = Math.max(x1, pin.x); z0 = Math.min(z0, pin.z); z1 = Math.max(z1, pin.z); }
+        centerX = (x0 + x1) / 2; centerZ = (z0 + z1) / 2;
+        scale = Math.min(MAX_SCALE, Math.max(minScale(), Math.min((width - 136) / Math.max(1, x1 - x0), (height - 76) / Math.max(1, z1 - z0))));
+        dirty = true;
+      }
+    }
     else if (action === 'center') { centerX = playerX; centerZ = playerZ; dirty = true; }
     else if (action === 'here') { centerX = playerX; centerZ = playerZ; drop(playerX, playerZ); }
   }, { signal });
@@ -516,6 +526,11 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
   };
   const label = (text: string, x: number, y: number): void => {
     g.font = '600 13px Fraunces, ui-serif, Georgia, "Times New Roman", serif';
+    // Keep a visible pin's words inside the chart, including at narrow zooms.
+    if (x < -20 || y < -20 || x > width + 20 || y > height + 20) return;
+    const half = g.measureText(text).width / 2;
+    x = Math.max(half + 4, Math.min(width - half - 4, x));
+    y = Math.max(4, Math.min(height - 20, y));
     g.textAlign = 'center';
     g.textBaseline = 'top';
     g.lineWidth = 3;
@@ -684,7 +699,7 @@ export function createFullMap(rules: MapRules, options: FullMapOptions): FullMap
     g.restore();
 
     // Names last, so no mark covers one.
-    if (scale >= 1.2) for (const p of marks.pins) label(p.label || PIN_NAMES[p.kind], toScreenX(p.x), toScreenY(p.z) + 12);
+    for (const p of marks.pins) if (scale >= 1.2 || p.kind === 'vault') label(p.label || PIN_NAMES[p.kind], toScreenX(p.x), toScreenY(p.z) + 12);
     for (const w of marks.crew) label(w.owner, toScreenX(w.x), toScreenY(w.z) + 11);
     for (const w of marks.waypoints) {
       if (w === active) label(`${Math.round(Math.hypot(w.x - playerX, w.z - playerZ))} blocks`, toScreenX(w.x), toScreenY(w.z) + 17);

@@ -1,0 +1,219 @@
+// How a fight of the fight lab feels: each event the rules send becomes a freeze of the fight, a jolt on a
+// fighter, a shake of the screen, a short flash on the ground, particles and a sound. The table is `hear`.
+// Nothing here moves a body or changes the fight: the freeze is a number the body's step reads (`keys.ts`), and
+// the jolts and flashes are numbers `draw.ts` draws.
+//
+// The shake moves the picture, not the camera: a few pixels of offset on the lens, so the world, the aim and
+// the shadows stay where they are. The card's switch and the game's "reduce motion" both turn it off.
+import type * as THREE from 'three';
+import { SHAKE, SWORD, WEAPONS } from '../content/fight.ts';
+import type { Fight, FightEvent } from '../fight/fight.sim.ts';
+import type { GameView } from '../shell/view.ts';
+import { CALM } from './calm.ts';
+import { MARK } from './ground.ts';
+import { PALE, TEAL, WHITE } from './looks.ts';
+
+/** What a hit leaves on a fighter for a moment: a white flash, a shake, a squash. Each runs down to 0. */
+export interface Jolt { flash: number; shake: number; squash: number }
+export const jolt = (): Jolt => ({ flash: 0, shake: 0, squash: 0 });
+
+/** Runs a jolt down by one frame. The flash is gone in two frames (note 05's feel list). */
+export function settle(j: Jolt, dt: number): void {
+  j.flash = Math.max(0, j.flash - dt * 30);
+  j.shake = Math.max(0, j.shake - dt * 0.9);
+  j.squash = Math.max(0, j.squash - dt * 12);
+}
+
+/** A short mark on the ground: the ring of a spin, a burst or a skill. Alive for `span` seconds. */
+export interface Flash { kind: number; x: number; z: number; facing: number; reach: number; width: number; life: number; span: number; color: THREE.Color; grow: number }
+
+/** A drawn fighter, as the feel of a hit needs it: its jolt, and the clock of its calming (`looks.ts`, `calm.ts`). */
+export interface Felt { jolt: Jolt; calmT: number; calmOn: boolean }
+
+export interface FeelHooks {
+  /** A short line under the bars. */
+  say(text: string): void;
+  /** The drawn beast nearest a point, or null when none is drawn. */
+  nearest(x: number, z: number): Felt | null;
+  /** The height of the ground a fighter stands on. */
+  groundY(x: number, z: number): number;
+}
+
+export interface Feel {
+  /** Seconds the fight stands still: the freeze of a hit. Only the picture goes on. The body's step spends it. */
+  freeze: number;
+  /** False turns the screen's shake off. */
+  shakes: boolean;
+  /** Pixels the picture is moved by right now, for the door. */
+  readonly shaken: number;
+  readonly hero: Jolt;
+  readonly companion: Jolt;
+  /** The short marks on the ground, a fixed few. `life` at or under 0 is a free one. */
+  readonly flashes: readonly Flash[];
+  /** One event of the fight. */
+  hear(e: FightEvent): void;
+  /** Once a frame, after the camera moved and before the picture is drawn: the shake. */
+  frame(dt: number): void;
+}
+
+export function createFeel(view: GameView, fight: Fight, hooks: FeelHooks): Feel {
+  const { say, nearest, groundY } = hooks;
+  const flashes: Flash[] = Array.from({ length: 8 }, () => ({ kind: 0, x: 0, z: 0, facing: 0, reach: 0, width: 0, life: 0, span: 1, color: WHITE, grow: 0 }));
+  function flashAt(kind: number, x: number, z: number, facing: number, reach: number, width: number, span: number, color: THREE.Color, grow = 0): void {
+    let slot = flashes[0] as Flash;
+    for (const f of flashes) if (f.life <= 0 || f.life < slot.life) slot = f;
+    Object.assign(slot, { kind, x, z, facing, reach, width, life: span, span, color, grow });
+  }
+
+  const spot = { x: 0, y: 0, z: 0 };
+  function effect(id: Parameters<GameView['effects']['play']>[0], x: number, z: number, lift = 0.4, color?: number, scale?: number): void {
+    spot.x = x; spot.z = z; spot.y = groundY(x, z) + lift;
+    view.effects.play(id, spot, color === undefined && scale === undefined ? undefined : { color, scale });
+  }
+  const sound = (event: Parameters<NonNullable<GameView['audio']>['emit']>[0]): void => { view.audio?.emit(event); };
+
+  // ---------------------------------------------------------------- the shake of the screen
+  const lens = view.ctx.camera as THREE.PerspectiveCamera;
+  /** Pixels at its start, seconds it lasts, seconds left. */
+  let shakePx = 0, shakeTime = 1, shakeLeft = 0, shakeClock = 0, offset = false, shaken = 0;
+  function shake(px: number, time: number): void {
+    if (!feel.shakes || view.settings.graphics.reduceMotion) return;
+    // A stronger shake takes over. A weaker one does not cut a stronger one short.
+    if (shakeLeft > 0 && shakePx * (shakeLeft / shakeTime) > px) return;
+    shakePx = px;
+    shakeTime = shakeLeft = time;
+  }
+  function frame(dt: number): void {
+    shakeClock += dt;
+    if (shakeLeft > 0 && feel.shakes) {
+      shakeLeft = Math.max(0, shakeLeft - dt);
+      const k = shakeLeft / shakeTime, w = view.canvas.clientWidth || innerWidth, h = view.canvas.clientHeight || innerHeight;
+      // As far as the shake says, in a direction that turns fast and unevenly, so it does not slide along one line.
+      const turn = shakeClock * 97 + Math.sin(shakeClock * 53) * 2, dx = Math.cos(turn) * shakePx * k, dy = Math.sin(turn) * shakePx * k;
+      lens.setViewOffset(w, h, dx, dy, w, h);
+      offset = true;
+      shaken = Math.hypot(dx, dy);
+    } else if (offset) {
+      lens.clearViewOffset();
+      offset = false;
+      shaken = 0;
+    }
+  }
+
+  const feel: Feel = {
+    freeze: 0,
+    shakes: true,
+    get shaken() { return shaken; },
+    hero: jolt(),
+    companion: jolt(),
+    flashes,
+    hear,
+    frame,
+  };
+  const stop = (frames: number): void => { feel.freeze = Math.max(feel.freeze, frames / 60); };
+  const heroJolt = feel.hero, companionJolt = feel.companion;
+  /** Frames a hit freezes the fight, by the move that landed it. Note 05: 4 for a cut, 6 for a spin, 2 for an arrow. */
+  const FREEZE: Record<string, number> = { cut: 4, spin: 6, arrow: 2, drawn: 5, bolt: 2, burst: 5 };
+
+  function hear(e: FightEvent): void {
+    spot.x = e.x; spot.z = e.z; spot.y = groundY(e.x, e.z) + 0.5;
+    switch (e.type) {
+      case 'brought': effect('pop', e.x, e.z, 0.05); break;
+      case 'wake': sound({ type: 'pet', mood: 'alert', at: spot }); break;
+      case 'tell': sound({ type: 'pet', mood: 'curious', at: spot }); break;
+      case 'strike':
+        if (e.text === 'needles' || e.text === 'stomp' || e.text === 'spin' || e.text === 'slam') { effect('popDust', e.x, e.z, 0.1, undefined, 2); sound({ type: 'land', surface: 'grass', at: spot }); }
+        else if (e.text === 'quills' || e.text === 'quills2' || e.text === 'hurl' || e.text === 'hurl2') { effect('popDust', e.x, e.z, 0.1, undefined, 1.4); sound({ type: 'land', surface: 'grass', at: spot }); }
+        else if (e.text === 'toss' || e.text === 'toss2') sound({ type: 'machine', at: spot });
+        break;
+      case 'swing': {
+        // A spin's ring shows as it starts. A cut's arc is drawn as it lands, by `draw.ts`. A shot sounds as it leaves.
+        const h = fight.hero;
+        if (e.text === 'spin') flashAt(MARK.circle, h.x, h.z, 0, SWORD.held.reach, 0, 0.2, PALE);
+        if (e.text === 'cut' || e.text === 'spin') sound({ type: 'jump', at: spot });
+        else if (e.text === 'burst') sound({ type: 'spell', element: 'tide', at: spot });
+        break;
+      }
+      case 'shot': sound(e.text === 'bolt' ? { type: 'spell', element: 'spark', at: spot } : { type: 'spell', element: 'gale', at: spot }); break;
+      case 'hit':
+        stop(FREEZE[e.text] ?? 4);
+        if (e.text === 'spin' || e.text === 'drawn') shake(SHAKE.spin.px, SHAKE.spin.time);
+        if (e.text === 'bolt') effect('trail', e.x, e.z, 0.6, 0x7df0d0, 0.35);
+        else effect('chips', e.x, e.z, 0.5, 0xfff2c8, e.text === 'arrow' ? 0.3 : 0.5);
+        sound(e.text === 'bolt' ? { type: 'pickup', at: spot } : { type: 'hit', at: spot });
+        break;
+      case 'burst':
+        flashAt(MARK.ring, e.x, e.z, 0, e.n, 0.1, 0.4, TEAL, 0.8);
+        effect('trail', e.x, e.z, 0.4, 0x7df0d0, 1.2);
+        break;
+      case 'slowed': effect('trail', e.x, e.z, 0.2, 0x9fc8ff, 0.6); break;
+      case 'guard': { if (e.text === 'world') break; const d = nearest(e.x, e.z); if (d) { d.jolt.flash = e.text === 'hero' ? 1 : 0.6; d.jolt.shake = 0.12; d.jolt.squash = 1; } break; }
+      case 'charged': effect('trail', e.x, e.z, 0.6, e.text === 'burst' ? 0x7df0d0 : 0xfff2c8, 0.5); sound({ type: 'ui', sound: 'open' }); break;
+      case 'swap': sound({ type: 'ui', sound: 'click' }); say(`${WEAPONS.find((w) => w.kind === e.text)?.name ?? e.text} in hand.`); break;
+      case 'enraged':
+        // Half its guard is gone: a stop, a puff of ash, a shake and a cry. It comes faster from now on.
+        stop(6);
+        shake(SHAKE.spin.px, SHAKE.spin.time * 2);
+        effect('popDust', e.x, e.z, 0.3, undefined, 2.4);
+        effect('chips', e.x, e.z, 1, 0x6a6460, 1.2);
+        sound({ type: 'spell', element: 'flame', at: spot });
+        sound({ type: 'pet', mood: 'alert', at: spot });
+        say('It is angry. It comes faster now.');
+        break;
+      case 'dodge': effect('dust', e.x, e.z, 0.05); sound({ type: 'jump', at: spot }); break;
+      case 'dodged': effect('trail', e.x, e.z, 0.8, 0x9ff5e6, 0.4); break;
+      case 'heroHurt':
+        stop(5);
+        heroJolt.flash = 1;
+        heroJolt.shake = e.n ? 0.2 : 0.12;
+        if (e.n) shake(SHAKE.heavy.px, SHAKE.heavy.time);
+        sound({ type: 'hit', at: spot });
+        effect('dust', e.x, e.z, 0.3);
+        break;
+      case 'faint': sound({ type: 'pet', mood: 'sad', at: spot }); break;
+      case 'segment': stop(8); effect('pop', e.x, e.z, 0.1); sound({ type: 'blockBroken', surface: 'stone', at: spot }); break;
+      case 'dizzy': stop(6); effect('pop', e.x, e.z, 0.1); sound({ type: 'ui', sound: 'open' }); break;
+      case 'crash': stop(8); effect('chips', e.x, e.z, 0.8, 0xc9c4b6, 1.5); effect('popDust', e.x, e.z, 0.3, undefined, 2); sound({ type: 'blockBroken', surface: 'stone', at: spot }); break;
+      case 'stall': effect('splash', e.x, e.z, 0.1); break;
+      case 'calmed': {
+        // The release: 10 frames of freeze on a bright frame. The rest of the moment plays on the drawn beast's
+        // own clock, from the end of the freeze (`calm.ts`). The stinger waits for the bow.
+        stop(10);
+        const d = nearest(e.x, e.z);
+        if (d) { d.calmOn = true; d.calmT = -CALM.release; }
+        sound({ type: 'spell', element: 'bloom', at: spot });
+        say(`It leaves you something: ${e.text}.`);
+        break;
+      }
+      case 'shotHit': if (e.text === 'drawn') effect('chips', e.x, e.z, 0.7, 0xfff2c8, 0.8); break;
+      case 'companionStrike': stop(2); effect('chips', e.x, e.z, 0.4, 0xbff5d0, e.text === 'pounce' ? 0.6 : 0.3); sound({ type: 'hit', at: spot }); companionJolt.squash = 1; break;
+      case 'skill': {
+        flashAt(MARK.ring, e.x, e.z, 0, 0.9, 0.07, 0.4, TEAL, 1.5);
+        if (e.text === 'Brace') sound({ type: 'blockPlaced', surface: 'stone', at: spot });
+        else if (e.text === 'Mend' || e.text === 'Bloom') sound({ type: 'spell', element: 'bloom', at: spot });
+        else sound({ type: 'pet', mood: 'alert', at: spot });
+        break;
+      }
+      case 'mend': effect('trail', e.x, e.z, 0.8, 0xa8f5a0, 1); say(`Mended ${Math.round(e.n)}.`); break;
+      case 'blocked': stop(8); effect('pop', e.x, e.z, 0.2); sound({ type: 'blockBroken', surface: 'stone', at: spot }); companionJolt.flash = 1; break;
+      case 'guarded': effect('pop', e.x, e.z, 0.3); sound({ type: 'land', surface: 'stone', at: spot }); companionJolt.flash = 0.8; companionJolt.shake = 0.08; break;
+      case 'strongReady': effect('trail', e.x, e.z, 0.9, 0xfff2c8, 0.5); sound({ type: 'ui', sound: 'open' }); break;
+      case 'strongHit': stop(6); shake(SHAKE.spin.px, SHAKE.spin.time); effect('pop', e.x, e.z, 0.5); effect('chips', e.x, e.z, 0.6, 0xffffff, 0.9); break;
+      case 'rigPlaced': sound({ type: 'blockPlaced', surface: 'wood', at: spot }); break;
+      case 'rig': stop(6); effect('pop', e.x, e.z, 0.1); effect('trail', e.x, e.z, 0.5, e.text === 'channel' ? 0x9fd8ff : 0x7df0d0, 0.8); sound({ type: 'machine', at: spot }); break;
+      case 'denied': say(e.text); break;
+      // Act 1.
+      case 'beyond': effect('trail', e.x, e.z, 0.6, 0x9a9690, 0.8); sound({ type: 'ui', sound: 'close' }); say(`${e.text} Its depth is ${e.n}.`); break;
+      case 'plated': effect('chips', e.x, e.z, 0.6, 0xd8c48a, 0.4); sound({ type: 'machine', at: spot }); break;
+      case 'grabbed': stop(6); effect('popDust', e.x, e.z, 0.2, undefined, 1.6); sound({ type: 'pet', mood: 'sad', at: spot }); say('It has your companion. Cut the vines.'); break;
+      case 'freed': effect('chips', e.x, e.z, 0.6, 0xa8f5a0, 0.8); sound({ type: 'pet', mood: 'happy', at: spot }); break;
+      case 'revived': effect('trail', e.x, e.z, 0.9, 0xa8f5a0, 1.4); sound({ type: 'spell', element: 'bloom', at: spot }); say('Your fox gets you up.'); break;
+      case 'slid': effect('splash', e.x, e.z, 0.1); break;
+      case 'bolted': effect('popDust', e.x, e.z, 0.2, undefined, 1.2); sound({ type: 'pet', mood: 'alert', at: spot }); break;
+      case 'salve': effect('trail', e.x, e.z, 0.8, 0xa8f5a0, 1); sound({ type: 'pickup', at: spot }); break;
+      default: break;
+    }
+  }
+
+  return feel;
+}

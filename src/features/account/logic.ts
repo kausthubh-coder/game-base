@@ -23,11 +23,15 @@ export interface SaveFacts {
 /** Where a save's text is kept: `localStorage`, or a stand-in for it in a test. */
 export type SaveStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
+/** The version of the game's save that this reads: `SAVE_VERSION` in src/game/kernel.sim.ts, which a test keeps the same. */
+export const SAVE_VERSION = 2;
+
 const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
 /**
  * The facts of a save, or null when the text is not a save this game loads. It asks for what
- * `readSave` in src/game/shell/save.ts asks for: version 1, a world and a game.
+ * `readSave` in src/game/shell/save.ts asks for: version 2 (`SAVE_VERSION`, act 1), a world and a game. A save from
+ * before act 1 is not one, so the account neither offers it nor counts it.
  */
 export function readSaveText(text: string): SaveFacts | null {
   let file: unknown;
@@ -36,7 +40,7 @@ export function readSaveText(text: string): SaveFacts | null {
   } catch {
     return null;
   }
-  if (!isObject(file) || file.version !== 1 || !isObject(file.world) || !isObject(file.game)) return null;
+  if (!isObject(file) || file.version !== SAVE_VERSION || !isObject(file.world) || !isObject(file.game)) return null;
   const clock = isObject(file.game.clock) ? file.game.clock : {};
   return {
     at: typeof file.at === 'number' && Number.isFinite(file.at) ? file.at : 0,

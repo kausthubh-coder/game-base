@@ -1,0 +1,140 @@
+{
+  "shot": "wall",
+  "frame": [
+    1920,
+    1080
+  ],
+  "layers": [
+    {
+      "id": "room",
+      "file": "room.webp",
+      "x": -192,
+      "y": -108,
+      "w": 2304,
+      "h": 1296,
+      "z": 0,
+      "depth": 0.65,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Opaque overscan. Empty dormitory, no left lantern or candle illumination."
+    },
+    {
+      "id": "wall",
+      "file": "wall.webp",
+      "x": 248,
+      "y": 2,
+      "w": 1110,
+      "h": 760,
+      "z": 10,
+      "depth": 0.65,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Neutral fresco surface for code light. Same plane as room; do not slide independently. The legend renderer may replace this panel."
+    },
+    {
+      "id": "doorway-glow",
+      "file": "doorway-glow.webp",
+      "x": 1324,
+      "y": 187,
+      "w": 462,
+      "h": 706,
+      "z": 20,
+      "depth": 0.55,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Optional light-only mask. Use screen blending or opacity modulation."
+    },
+    {
+      "id": "hobb",
+      "file": "hobb-1.webp",
+      "x": 1430,
+      "y": 400,
+      "w": 260,
+      "h": 505,
+      "z": 30,
+      "depth": 0.52,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "frames": [
+        "hobb-2.webp"
+      ],
+      "note": "Past fifty, waiting then head tilt. Same box and baseline."
+    },
+    {
+      "id": "child",
+      "file": "child-1.webp",
+      "x": 924,
+      "y": 520,
+      "w": 205,
+      "h": 390,
+      "z": 40,
+      "depth": 0.34,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "frames": [
+        "child-2.webp",
+        "child-3.webp"
+      ],
+      "note": "Rear view. Low, half-raised, raised candle. Flame is separate; translate it with the candle hand."
+    },
+    {
+      "id": "flame",
+      "file": "flame-1.webp",
+      "x": 1108,
+      "y": 650,
+      "w": 16,
+      "h": 27,
+      "z": 50,
+      "depth": 0.34,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "frames": [
+        "flame-2.webp",
+        "flame-3.webp"
+      ],
+      "note": "Low pose flame. Match hand position when changing child pose; code adds candle light."
+    },
+    {
+      "id": "bunk-left",
+      "file": "bunk-1.webp",
+      "x": -23,
+      "y": 814,
+      "w": 555,
+      "h": 272,
+      "z": 60,
+      "depth": 0.03,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Near left wood and blanket."
+    },
+    {
+      "id": "bunk-right",
+      "file": "bunk-2.webp",
+      "x": 1399,
+      "y": 827,
+      "w": 552,
+      "h": 259,
+      "z": 61,
+      "depth": 0.03,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Near right wood and blanket."
+    }
+  ]
+}

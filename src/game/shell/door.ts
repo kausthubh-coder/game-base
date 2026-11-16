@@ -6,17 +6,22 @@ import type { CostReport, FlightReport } from '../../features/perf/index.ts';
 import { LANDMARKS, spawnPoint } from '../../features/world/index.ts';
 import { BLOCKS } from '../../content/blocks.ts';
 import type { Systems } from '../api.sim.ts';
+import { isItemId, isQuestId, QUEST_IDS } from '../content/ids.ts';
 import { STEP } from '../kernel.sim.ts';
+import { worldProps } from '../worldview/props.ts';
 import type { Shell } from './game.ts';
-import type { CameraMode, CharacterLook } from './view.ts';
+import type { CameraMode } from './view.ts';
 
 export interface DebugDoor {
   /** Plain data: player, clock, quests, bag, flags, counts of actors, and what the shell knows. */
   state(): Record<string, unknown>;
   /** Steps the simulation that many seconds without drawing. Returns the kernel steps it ran. */
   advance(seconds: number): number;
-  /** Moves the player to a named place of the region, to `spawn`, or to x, y, z. Without y it stands on the ground. */
-  teleport(place: string | number, y?: number, z?: number): Vec3 | null;
+  /**
+   * Moves the player to a named place of the region, to `spawn`, or to x, y, z. Without y it stands on the ground.
+   * `facing` turns the hero too, in radians like `Player.facing`: a film uses it to stand the player where it ends.
+   */
+  teleport(place: string | number, y?: number, z?: number, facing?: number): Vec3 | null;
   /** Adds to the bag. Returns how many did not fit. */
   give(item: string, count?: number): number;
   /**
@@ -64,8 +69,6 @@ export interface DebugDoor {
   turn(direction: 1 | -1): void;
   /** The camera mode, as the View setting picks it: `tilt` (2.5D), `free` or `first`. Stored like the setting. */
   setCamera(mode: CameraMode): void;
-  /** How characters are drawn, as the View setting picks it: `sprites` or `models`. Stored like the setting. */
-  setCharacters(look: CharacterLook): void;
   /**
    * Free and first person: sets the view, in degrees. The 2.5D camera ignores it; drag it with the right button. `yaw` 0 looks north and 90 west; `pitch` is how far it looks
    * down, negative up. `distance` is the free camera's, in meters. Returns the camera as `state().camera` has it.
@@ -84,6 +87,17 @@ export interface DebugDoor {
   settle(): Promise<void>;
   /** The block id and key at a cell. */
   block(x: number, y: number, z: number): { id: number; key: string };
+  /**
+   * Stands a prop of src/content/props.ts on the ground at x, z, always drawn, `turn` radians around y (at 0 its
+   * front faces south). Returns its handle and the ground's height, or null for a kind the props do not have.
+   * `tools/props-beside.mjs` uses it to show a model on the painted land in the game's own light.
+   */
+  stand(kind: string, variant: number, x: number, z: number, turn?: number): { handle: number; y: number } | null;
+  /**
+   * The hero, the person talking, a scene's people and a fight's beasts: where each is on screen, whether it is in
+   * the frame, and what hides it if anything does. It casts rays through the scene, so a check calls it, not a frame.
+   */
+  sight(): import('./sight.ts').Seen[];
   /** The whole view, for poking from the console. */
   readonly view: Shell['view'];
 }
@@ -168,7 +182,7 @@ export function createDoor(shell: Shell): DebugDoor {
         aim: view.aim ? { x: view.aim.x, y: view.aim.y, z: view.aim.z, id: view.aim.id } : null,
         stats: view.stats(),
         camera: cameraState(),
-        characters: view.settings.characters,
+        characters: 'sprites',
         sound: view.audio ? view.audio.debug().running : false,
         sprites: { count: view.sprites.count, missing: [...view.sprites.missing] },
         quality: view.ctx.quality,
@@ -181,7 +195,7 @@ export function createDoor(shell: Shell): DebugDoor {
 
     advance,
 
-    teleport(place, y, z) {
+    teleport(place, y, z, facing) {
       let at: Vec3 | null;
       if (typeof place === 'string') {
         at = named(place);
@@ -202,11 +216,12 @@ export function createDoor(shell: Shell): DebugDoor {
       if (!Number.isFinite(at.y)) at.y = sim.heightAt(at.x, at.z);
       // Never inside a block: a named place may be the block to stand on, or the air above it.
       for (let lift = 0; lift < 6 && (solid(at.x, at.y, at.z) || solid(at.x, at.y + 1, at.z)); lift++) at.y = Math.floor(at.y) + 1;
-      shell.place(at.x, at.y, at.z);
+      shell.place(at.x, at.y, at.z, facing);
       return at;
     },
 
     give(item, count = 1) {
+      if (!isItemId(item)) throw new Error(`no item is called ${item}`);
       return sys.inventory ? sys.inventory.add(item, count) : count;
     },
 
@@ -252,6 +267,7 @@ export function createDoor(shell: Shell): DebugDoor {
     },
 
     skipTo(quest) {
+      if (!isQuestId(quest)) throw new Error(`no quest is called ${quest}. The quests: ${QUEST_IDS.join(', ')}`);
       sys.quests?.skipTo(quest);
     },
 
@@ -284,7 +300,6 @@ export function createDoor(shell: Shell): DebugDoor {
     },
     turn: (direction) => view.camera.turn(direction),
     setCamera: (mode) => view.settings.setCamera(mode),
-    setCharacters: (look) => view.settings.setCharacters(look),
     look(yaw, pitch, distance) {
       view.camera.setLook(yaw / DEG, pitch / DEG, distance);
       return cameraState();
@@ -296,10 +311,17 @@ export function createDoor(shell: Shell): DebugDoor {
     manual: (on = true) => view.setPaused('door', on),
     frames: (count) => shell.frames(count),
     settle: () => shell.settled(),
+    stand(kind, variant, x, z, turn = 0) {
+      const props = worldProps(view);
+      if (!props.has(kind)) return null;
+      const y = sim.heightAt(x, z);
+      return { handle: props.place(kind, variant, x, y, z, turn, 1, true), y };
+    },
     block(x, y, z) {
       const id = sim.getBlock(Math.floor(x), Math.floor(y), Math.floor(z));
       return { id, key: BLOCKS[id]?.key ?? '' };
     },
+    sight: () => shell.sight.report(),
     view,
   };
 }

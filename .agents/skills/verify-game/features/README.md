@@ -7,6 +7,7 @@ One file for each part of the game an agent can prove by itself. Each says how a
 | `rules.md` | Anything the rules decide: farming, crafting, building, quests, pets. No browser. |
 | `browser.md` | The game in Chrome: moving, talking, the menus, what is drawn |
 | `build-mode.md` | Build mode: drag to till, plant and fence, undo |
+| `fight-lab.md` | The fight lab behind `?scene=fight`: three weapons, four companions, one or two beasts, the traps, the difficulty table, the bot and real keys, and the Stag's hall |
 | `account.md` | Sign-in, and the save that follows a player between devices |
 
 Not covered yet: sound (nobody can hear it here; check the request and the decode) and the opening film.

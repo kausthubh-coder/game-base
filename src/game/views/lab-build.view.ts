@@ -8,14 +8,14 @@
 // Without `?scene=build` this file does nothing.
 import * as THREE from 'three';
 import { blockId } from '../../content/blocks.ts';
-import type { Systems } from '../api.sim.ts';
+import type { ItemId, Systems } from '../api.sim.ts';
 import { clearSave } from '../shell/save.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
 import { addStyle } from '../uiview/theme.ts';
 
 /** What the bag starts with, in the order of the quick slots. */
-const KIT: readonly (readonly [item: string, count: number])[] = [
+const KIT: readonly (readonly [item: ItemId, count: number])[] = [
   ['hoe', 1], ['wheat_seeds', 60], ['watering_can', 1], ['fence', 60], ['chest', 4], ['sprinkler', 3], ['plank', 80], ['workbench', 1], ['bed', 1],
 ];
 const FLAG = 'lab.build';

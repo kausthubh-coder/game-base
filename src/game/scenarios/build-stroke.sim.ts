@@ -18,7 +18,7 @@ export const buildStroke: Scenario = {
   name: 'build-stroke',
   about: 'In build mode a stroke tills twelve cells, ten seeds plant ten of them, a stroke waters them, and six fences go down, come back with undo and go down again.',
   seed: 12,
-  start: { quest: 'roof', give: { hoe: 1, watering_can: 1, wheat_seeds: 10, fence: 8 } },
+  start: { quest: 'ground', give: { hoe: 1, watering_can: 1, wheat_seeds: 10, fence: 8 } },
   inputs: [
     { do: 'teleport', to: { place: 'grant.center', dz: 4 } },
     { do: 'build', on: true },

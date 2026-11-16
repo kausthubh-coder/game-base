@@ -32,7 +32,7 @@ Clerk has nothing to deploy. The live copy uses Clerk's development instance unt
 4. **Check the live copy**, reading only:
    - `bun tools/live-look.mjs https://game-base.kausthubh2007.workers.dev` opens it like a player, starts a new game and ends with `PASS`. Look at `.artifacts/live/playing.png`.
    - When the account or the save changed: `bun tools/play-cloud-save.mjs --url https://game-base.kausthubh2007.workers.dev` signs a fresh test user in on two browsers and plays the save between them through the live database.
-5. **Update the main checkout**, `~/dev/sandbox/game-base`: when it is clean and on `main`, `git -C ~/dev/sandbox/game-base pull --ff-only`, then `bun tools/doctor.mjs --quick` there. When it is dirty or on another branch, leave it and say so.
+5. **Update the main checkout**, `~/dev/sandbox/game-base`: when it is clean and on `main`, `git -C ~/dev/sandbox/game-base pull --ff-only`, then `bun tools/setup.mjs` there. When it is dirty or on another branch, leave it and say so.
 6. **Clean up.** Delete the merged branch here and on the remote. A thread cannot remove its own worktree: list it for removal.
 7. **Report** in a few lines: what shipped, the evidence, anything skipped.
 

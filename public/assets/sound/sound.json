@@ -82,6 +82,130 @@
       "lufs": -30,
       "peak": -17.4
     },
+    "bed.oldforest.day": {
+      "file": "sound/bed.oldforest.day.mp3",
+      "kind": "bed",
+      "seconds": 16.5,
+      "channels": 2,
+      "lufs": -28,
+      "peak": -4.5
+    },
+    "bed.greyforest": {
+      "file": "sound/bed.greyforest.mp3",
+      "kind": "bed",
+      "seconds": 12.5,
+      "channels": 2,
+      "lufs": -33,
+      "peak": -22.1
+    },
+    "bed.marsh": {
+      "file": "sound/bed.marsh.mp3",
+      "kind": "bed",
+      "seconds": 16.5,
+      "channels": 2,
+      "lufs": -28,
+      "peak": -7.6
+    },
+    "bed.caves": {
+      "file": "sound/bed.caves.mp3",
+      "kind": "bed",
+      "seconds": 12.5,
+      "channels": 2,
+      "lufs": -30,
+      "peak": -3.4
+    },
+    "bed.river": {
+      "file": "sound/bed.river.mp3",
+      "kind": "bed",
+      "seconds": 14.5,
+      "channels": 2,
+      "lufs": -27,
+      "peak": -14.7
+    },
+    "bed.saltgate": {
+      "file": "sound/bed.saltgate.mp3",
+      "kind": "bed",
+      "seconds": 14.5,
+      "channels": 2,
+      "lufs": -28,
+      "peak": -8
+    },
+    "bed.highroad.wind": {
+      "file": "sound/bed.highroad.wind.mp3",
+      "kind": "bed",
+      "seconds": 14.5,
+      "channels": 2,
+      "lufs": -30,
+      "peak": -18
+    },
+    "spot.creak": {
+      "file": "sound/spot.creak.mp3",
+      "kind": "shot",
+      "seconds": 5.9995,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          2.8446
+        ],
+        [
+          3.0046,
+          2.9148
+        ]
+      ],
+      "lufs": -35.4,
+      "peak": -14
+    },
+    "spot.crow": {
+      "file": "sound/spot.crow.mp3",
+      "kind": "shot",
+      "seconds": 6.23,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          3
+        ],
+        [
+          3.16,
+          2.99
+        ]
+      ],
+      "lufs": -32.1,
+      "peak": -16
+    },
+    "spot.market": {
+      "file": "sound/spot.market.mp3",
+      "kind": "shot",
+      "seconds": 6.2368,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          3
+        ],
+        [
+          3.16,
+          2.9968
+        ]
+      ],
+      "lufs": -35.7,
+      "peak": -16
+    },
+    "spot.bells": {
+      "file": "sound/spot.bells.mp3",
+      "kind": "shot",
+      "seconds": 4.1049,
+      "channels": 1,
+      "slices": [
+        [
+          0.08,
+          3.9449
+        ]
+      ],
+      "lufs": -27.4,
+      "peak": -10
+    },
     "spot.well": {
       "file": "sound/spot.well.mp3",
       "kind": "shot",

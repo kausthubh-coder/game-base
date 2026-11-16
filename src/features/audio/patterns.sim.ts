@@ -335,7 +335,7 @@ function sparkle(p: Palette, bar: number, chord: Chord, mode: Mode, out: NoteEve
   const rng = mulberry32(seedOf(p.id, 'sparkle', bar));
   const steps = p.grid * 4;
   const step = TICKS_PER_BAR / steps;
-  const chance = s.chance * (mode.town ? 1.8 : 1) * (mode.night ? 0.7 : 1) * (mode.fight ? 0.5 : 1);
+  const chance = s.chance * (mode.town ? 1.8 : 1) * (mode.night ? (s.night ?? 0.7) : 1) * (mode.fight ? 0.5 : 1);
   const pool = chord.tones.map((t) => near(chord.root) + (t % 12)).concat(p.color ?? []);
   let count = 0;
   for (let i = 0; i < steps && count < 3; i++) {

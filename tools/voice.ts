@@ -7,18 +7,20 @@
 // It reads every conversation in src/game/content/dialogue.ts. A line said by someone in src/game/content/cast.ts
 // becomes public/assets/voice/<speaker>/<hash>.mp3, made with the cast's model and that person's voice. The hash
 // is of the words given to the voice, the voice, the model, the settings and the format, so a clip is made again
-// only when one of those changes, and a line that is gone loses its clip. public/assets/voice/voice.json lists
+// only when one of those changes, and a line that is gone loses its clip. A take tools/voice/audition.ts made with
+// the same hash is copied, not bought again. public/assets/voice/voice.json lists
 // every clip by `<speaker>|<text>` with its length and the moment each letter of the box's text appears.
 // public/assets/manifest.json points at it (see the voice section of docs/assets.md).
 //
 // Nobody here can listen, so every new clip is transcribed back with ElevenLabs Scribe and scored by the words
 // heard. The scores and transcripts go to assets-src/voice/report.json, not to the game. It stops before making
 // anything when the run would cost more than LIMIT credits.
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { CAST, DIRECTION, VOICE_FORMAT, VOICE_MODEL, type VoicedId } from '../src/game/content/cast.ts';
 import { CONVERSATIONS } from '../src/game/content/dialogue.ts';
 import { analyse, decode } from './voice/analyse.ts';
+import { AUDITION_DIR, AUDITION_INDEX, type AuditionIndex } from './voice/audition.ts';
 import { speakWithTimestamps, transcribe, usage } from './voice/eleven.ts';
 import { clipHash, heardShare, revealTimes, spokenLines, tagsReadOut, voiceText, withoutCues } from './voice/lines.ts';
 
@@ -62,6 +64,16 @@ interface Report {
 
 const readJson = <T>(file: string, fallback: T): T => (existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as T) : fallback);
 const oldReport = readJson<Report>(REPORT, {});
+/** Takes tools/voice/audition.ts made, by hash. The same hash is the same request, so the take is the clip. */
+const auditioned = new Map<string, { mp3: string; align: string; transcript: string }>();
+for (const tried of Object.values(readJson<AuditionIndex>(AUDITION_INDEX, {}))) {
+  for (const c of Object.values(tried)) {
+    for (const t of c.takes) {
+      const mp3 = resolve(AUDITION_DIR, t.file);
+      if (existsSync(mp3)) auditioned.set(t.hash, { mp3, align: mp3.replace(/\.mp3$/, '.json'), transcript: t.transcript });
+    }
+  }
+}
 
 const voiced = spokenLines(CONVERSATIONS).filter((line) => line.speaker in CAST);
 const plan = voiced.map((line) => {
@@ -71,7 +83,7 @@ const plan = voiced.map((line) => {
   const file = `voice/${line.speaker}/${hash}.mp3`;
   const old = oldReport[line.key];
   const made = old?.hash === hash && existsSync(resolve(ASSETS, file));
-  return { line, voice, say, hash, file, made };
+  return { line, voice, say, hash, file, made, take: made ? undefined : auditioned.get(hash) };
 });
 // A direction must name a line that exists, or it is a typo that would leave the line undirected.
 for (const text of Object.keys(DIRECTION)) {
@@ -79,10 +91,11 @@ for (const text of Object.keys(DIRECTION)) {
   if (withoutCues(text) !== withoutCues(DIRECTION[text].replace(/\[[^\]]*\]\s*/g, ''))) throw new Error(`DIRECTION changes the words of "${text}"`);
 }
 
-const todo = plan.filter((p) => !p.made);
+const todo = plan.filter((p) => !p.made && !p.take);
+const copied = plan.filter((p) => p.take).length;
 const chars = todo.reduce((sum, p) => sum + p.say.length, 0);
 const cost = Math.ceil(chars * CREDITS_PER_CHARACTER);
-console.log(`${plan.length} voiced lines, ${plan.length - todo.length} made already, ${todo.length} to make: ${chars} characters, about ${cost} credits`);
+console.log(`${plan.length} voiced lines, ${plan.length - todo.length - copied} made already, ${copied} copied from the auditions, ${todo.length} to make: ${chars} characters, about ${cost} credits`);
 if (cost > LIMIT) {
   console.error(`STOP: this run would use about ${cost} credits, over the limit of ${LIMIT}. Nothing was made.`);
   process.exit(1);
@@ -102,23 +115,29 @@ async function make(p: (typeof plan)[number]): Promise<void> {
   let entry = p.made && old ? { ...old, ids: p.line.ids } : null;
   if (!entry) {
     mkdirSync(resolve(OUT, p.line.speaker), { recursive: true });
-    const made = await speakWithTimestamps({ voiceId: p.voice.voiceId, text: p.say, modelId: VOICE_MODEL, settings: p.voice.settings, format: VOICE_FORMAT });
-    writeFileSync(target, made.audio);
-    const alignment = made.alignment;
+    let alignment: unknown;
+    if (p.take) {
+      copyFileSync(p.take.mp3, target);
+      alignment = JSON.parse(readFileSync(p.take.align, 'utf8'));
+    } else {
+      const made = await speakWithTimestamps({ voiceId: p.voice.voiceId, text: p.say, modelId: VOICE_MODEL, settings: p.voice.settings, format: VOICE_FORMAT });
+      writeFileSync(target, made.audio);
+      alignment = made.alignment;
+    }
     const facts = analyse(decode(target));
     entry = {
       ids: p.line.ids, file: p.file, hash: p.hash, voiceId: p.voice.voiceId, model: VOICE_MODEL, say: p.say, chars: p.say.length,
-      seconds: +facts.seconds.toFixed(3), pitchHz: Math.round(facts.pitchHz), aligned: false,
+      seconds: +facts.seconds.toFixed(3), pitchHz: Math.round(facts.pitchHz), aligned: false, transcript: p.take?.transcript,
     };
     mkdirSync(resolve(alignFileOf(p.file), '..'), { recursive: true });
     writeFileSync(alignFileOf(p.file), JSON.stringify(alignment));
   }
-  if (!entry.transcript || recheck || !p.made) entry.transcript = (await transcribe(new Blob([readFileSync(target)]), 'scribe_v2')).text;
+  if (!entry.transcript || recheck) entry.transcript = (await transcribe(new Blob([readFileSync(target)]), 'scribe_v2')).text;
   // Scored again every run from the kept transcript, so a change to the scoring costs nothing.
   entry.heard = +heardShare(withoutCues(p.say.replace(/\[[^\]]*\]/g, ' ')), entry.transcript).toFixed(3);
   entry.tagsReadOut = tagsReadOut(p.say, entry.transcript);
   report[p.line.key] = entry;
-  if (!p.made) console.log(`  ${p.line.ids[0]}: ${entry.seconds.toFixed(2)} s, heard ${((entry.heard ?? 0) * 100).toFixed(0)}%${entry.tagsReadOut?.length ? `, TAG READ OUT: ${entry.tagsReadOut.join(' ')}` : ''}`);
+  if (!p.made) console.log(`  ${p.line.ids[0]}${p.take ? ' (audition)' : ''}: ${entry.seconds.toFixed(2)} s, heard ${((entry.heard ?? 0) * 100).toFixed(0)}%${entry.tagsReadOut?.length ? `, TAG READ OUT: ${entry.tagsReadOut.join(' ')}` : ''}`);
 }
 
 // A few at a time, in order.

@@ -1,0 +1,144 @@
+{
+  "shot": "mark",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m8-hand.jpg",
+  "layers": [
+    {
+      "id": "plaster-ground",
+      "file": "ground.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Mirrored empty plaster patch from the approved plate; original gold edge bands."
+    },
+    {
+      "id": "hand",
+      "file": "hand.webp",
+      "x": 678,
+      "y": 86,
+      "w": 485,
+      "h": 751,
+      "z": 20,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Wrist fades at the original ground line."
+    },
+    {
+      "id": "rays",
+      "file": "rays.webp",
+      "x": 278,
+      "y": 33,
+      "w": 1325,
+      "h": 780,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.65
+      ],
+      "note": "Extracted gold rays, no hand or palm points."
+    },
+    {
+      "id": "stag",
+      "file": "stag.webp",
+      "x": 222,
+      "y": 748,
+      "w": 269,
+      "h": 207,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "lion",
+      "file": "lion.webp",
+      "x": 486,
+      "y": 789,
+      "w": 226,
+      "h": 166,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "serpent",
+      "file": "serpent.webp",
+      "x": 707,
+      "y": 795,
+      "w": 250,
+      "h": 160,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "elephant",
+      "file": "elephant.webp",
+      "x": 952,
+      "y": 800,
+      "w": 246,
+      "h": 155,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "bird",
+      "file": "bird.webp",
+      "x": 1193,
+      "y": 798,
+      "w": 237,
+      "h": 157,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "tortoise",
+      "file": "tortoise.webp",
+      "x": 1425,
+      "y": 793,
+      "w": 278,
+      "h": 162,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    }
+  ],
+  "mark": {
+    "center": [
+      950,
+      520
+    ],
+    "radius": 100,
+    "points": 7,
+    "darkPoint": 6
+  },
+  "palmCenter": [
+    950,
+    520
+  ],
+  "markRadius": 100
+}

@@ -8,7 +8,7 @@ test('counts the shipped tree and rejects an incomplete export',()=>{
  expect(()=>inspectGlb(tree.subarray(0,tree.length-4))).toThrow('invalid GLB header');
 });
 test('counts the small models within their declared budgets',()=>{
- for(const [name,count] of [['rock-11',188],['rock-37',188],['bush-29',280]]){
+ for(const [name,count] of [['rock-11',44],['rock-37',44],['bush-29',280]]){
   expect(inspectGlb(fs.readFileSync(new URL(`../../public/assets/models/${name}.glb`,import.meta.url))).triangles).toBe(count);
  }
 });

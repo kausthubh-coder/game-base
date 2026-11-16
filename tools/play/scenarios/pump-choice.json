@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "mode": "door",
+  "seed": 7,
+  "size": "1366x768",
+  "inputs": [
+    { "type": "door", "method": "newGame", "args": [] },
+    { "type": "door", "method": "skipTo", "args": ["blessing"] },
+    { "type": "door", "method": "teleport", "args": ["grant.stone"] },
+    { "type": "wait", "ms": 3000 },
+    { "type": "press", "key": "Escape" },
+    { "type": "see", "text": "Leave it in its crate", "timeout": 15000 },
+    { "type": "clean" }
+  ]
+}

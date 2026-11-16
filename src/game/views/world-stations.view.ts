@@ -42,14 +42,14 @@ export function install(view: GameView): void {
   const shown: Shown[] = [];
   const byId = new Map<string, Shown>();
   /** The prop and the size in blocks of each kind of station, from the definitions. */
-  const defOf = new Map<string, { prop: string; size: readonly [number, number, number]; joins: boolean }>();
+  const defOf = new Map<string, { prop: string; size: readonly [number, number, number]; joins: boolean; drawnBy?: string }>();
   let pass = 0;
 
-  function defFor(kind: string): { prop: string; size: readonly [number, number, number]; joins: boolean } {
+  function defFor(kind: string): { prop: string; size: readonly [number, number, number]; joins: boolean; drawnBy?: string } {
     let def = defOf.get(kind);
     if (def === undefined) {
       const found = (game.systems as Partial<Systems>).placeables?.defs().find((d) => d.kind === kind);
-      def = { prop: found?.prop ?? kind, size: found?.size ?? [1, 1, 1], joins: found?.joins === true };
+      def = { prop: found?.prop ?? kind, size: found?.size ?? [1, 1, 1], joins: found?.joins === true, drawnBy: found?.drawnBy };
       defOf.set(kind, def);
     }
     return def;
@@ -60,6 +60,8 @@ export function install(view: GameView): void {
 
   function draw(placed: Placed): number {
     const def = defFor(placed.kind);
+    // A machine part is drawn by the machines view, with its state and its moving piece.
+    if (def.drawnBy) return 0;
     if (!props.has(def.prop) || (flatChests && placed.kind === 'chest')) return 0;
     if (def.joins) return props.place(def.prop, POST, placed.x + 0.5, placed.y, placed.z + 0.5, 0, 1, true);
     const [sx, , sz] = footprint(def.size, placed.quarterTurns);

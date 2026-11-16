@@ -1,0 +1,243 @@
+{
+  "shot": "roads",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m4-roads.jpg",
+  "layers": [
+    {
+      "id": "plaster",
+      "file": "../shared/plaster.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0
+    },
+    {
+      "id": "city-center",
+      "file": "city-center.webp",
+      "x": 773,
+      "y": 325,
+      "w": 366,
+      "h": 308,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "city-northwest",
+      "file": "city-northwest.webp",
+      "x": 621,
+      "y": 95,
+      "w": 224,
+      "h": 181,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "city-northeast",
+      "file": "city-northeast.webp",
+      "x": 1067,
+      "y": 100,
+      "w": 223,
+      "h": 180,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "city-west",
+      "file": "city-west.webp",
+      "x": 426,
+      "y": 363,
+      "w": 219,
+      "h": 216,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "city-east",
+      "file": "city-east.webp",
+      "x": 1233,
+      "y": 363,
+      "w": 235,
+      "h": 218,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "city-southwest",
+      "file": "city-southwest.webp",
+      "x": 635,
+      "y": 675,
+      "w": 227,
+      "h": 213,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "city-southeast",
+      "file": "city-southeast.webp",
+      "x": 1045,
+      "y": 681,
+      "w": 221,
+      "h": 207,
+      "z": 40,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original city paint; outside green removed by a boundary-connected matte. Enclosed green clothes remain intact."
+    },
+    {
+      "id": "ship-1",
+      "file": "ship-1.webp",
+      "x": 383,
+      "y": 212,
+      "w": 109,
+      "h": 107,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original ship paint; outside sea removed by a boundary-connected matte."
+    },
+    {
+      "id": "ship-2",
+      "file": "ship-2.webp",
+      "x": 1415,
+      "y": 211,
+      "w": 107,
+      "h": 111,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original ship paint; outside sea removed by a boundary-connected matte."
+    },
+    {
+      "id": "ship-3",
+      "file": "ship-3.webp",
+      "x": 294,
+      "y": 439,
+      "w": 104,
+      "h": 115,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original ship paint; outside sea removed by a boundary-connected matte."
+    },
+    {
+      "id": "ship-4",
+      "file": "ship-4.webp",
+      "x": 1502,
+      "y": 472,
+      "w": 99,
+      "h": 107,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original ship paint; outside sea removed by a boundary-connected matte."
+    },
+    {
+      "id": "ship-5",
+      "file": "ship-5.webp",
+      "x": 352,
+      "y": 700,
+      "w": 108,
+      "h": 122,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original ship paint; outside sea removed by a boundary-connected matte."
+    },
+    {
+      "id": "ship-6",
+      "file": "ship-6.webp",
+      "x": 1436,
+      "y": 711,
+      "w": 106,
+      "h": 113,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original ship paint; outside sea removed by a boundary-connected matte."
+    },
+    {
+      "id": "roads",
+      "file": "roads.webp",
+      "x": 498,
+      "y": 163,
+      "w": 878,
+      "h": 714,
+      "z": 25,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Complete gold and ivory road paint. Reveal along road-paths.json, clipped by this alpha. No keyed holes in the white leaf pattern."
+    },
+    {
+      "id": "island",
+      "file": "island.webp",
+      "x": 403,
+      "y": 46,
+      "w": 1086,
+      "h": 969,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original coastline and original visible vegetation. Clean underpaint fills ONLY newly exposed city/road footprints; no replacement of visible orchards, flowers, lamps or bread."
+    },
+    {
+      "id": "sea",
+      "file": "sea.webp",
+      "x": 198,
+      "y": 38,
+      "w": 1495,
+      "h": 1005,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original wave edge; repeated original sea paint continues under island. No land, city, ship or road remains in this layer."
+    }
+  ]
+}

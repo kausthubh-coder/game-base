@@ -1,0 +1,15 @@
+# Repair desktop UI displacement and finish replay coverage
+
+Continue in existing act1-wilds-forest with GPT 6.1 Sol. Read docs/ui-replay-migration.md, docs/ui-replay-coverage.md, .artifacts/ui-replay-migration/issues.md and .artifacts/ui-review/report.md. Preserve the migration and all existing behavior checks.
+
+The coordinator independently reproduced the desktop replay's three layout failures. The hint is x379,y-104,w480,h65 in a 1440x900 viewport after Settings interactions; the Settings plate also appears displaced. Diagnose actual document scroll, focus, container transforms and layout bounds with a small repeatable probe before fixing. Those are hypotheses, not established causes. Reproduce through real Settings input and normal opening. Do not patch screenshots, force scroll in the test to hide a product defect, hide HUD or relax layout tolerances. Make the narrow production correction and preserve keyboard access and scrolling within menus on phone and desktop.
+
+Coordinator scope decision: production quests have no count step. Do not add a fake or new numeric quest just for verification. Replace the obsolete bread 7/20 browser assertion with before/after tracker progress for a current production step completed by real UI input, such as the pump choice already exercised. Assert the intended step/visible text changes and that completed state survives Continue. Keep existing numeric counter unit tests unchanged and document explicitly that numeric browser coverage has no current content. This is a coverage replacement, not a claim that numbers were tested in the browser. Update the coverage mapping.
+
+Own narrowly required src/game UI layout/view files and CSS, tests for the actual layout cause, tools/play-ui.mjs and its helpers, and related verification instructions. Load make-ui and its relevant style guidance for production UI work, without redesigning it. No story text/order/reward changes, model/assets, shader/scene/root changes, verification selection, screenshots approvals, tolerance/budget/dependency/cloud changes. The obsolete tools/play-act1.mjs remains enabled and separate.
+
+Coordinator fixed stale GLB rock inspection expectations in 79cf897d after checking raw indices. All 85 tools tests and lint pass. Preserve that fix.
+
+Run a deterministic red-to-green layout check and several focused repetitions to cover the intermittent Settings path, then the complete freshly built UI replay across desktop/phone/world. Inspect all affected captures. Run default verify with six unchanged approved shots, tools tests and relevant typechecks. No busy-state bypass, skipped audio tests, or invented earned rewards. Report any genuine game defect that remains instead of weakening its check.
+
+Commit source/evidence locally, evidence in .artifacts/ui-layout-recovery. No helpers, checkout changes, push, merge or deployment. Finish owned jobs and close only owned servers/browsers. Report PASS/ISSUES/BLOCKED, tested/evidence SHAs, precise cause, coverage replacement, commands, inspected best/worst images and limits. Full Act 1 migration and forest art remain pending.

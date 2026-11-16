@@ -2,7 +2,7 @@
 // two styles can be judged side by side. A style is `?style=<name>` in the address; `base` is the game as it is.
 //
 //   bun tools/style-lab.mjs --style <name> --url http://127.0.0.1:<port>/ [--out .artifacts/style-lab/<name>]
-//     [--query chars=models] [--places spawn,garden,town,meadow] [--quality high] [--skip-places] [--fish [sprite]]
+//     [--query camera=tilt] [--places spawn,garden,town,meadow] [--quality high] [--skip-places] [--fish [sprite]]
 //
 // It writes into the out folder:
 //   places/<place>.png and places/<place>-low.png   the 2.5D camera, and the closest zoom low toward the horizon

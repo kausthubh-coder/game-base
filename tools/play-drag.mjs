@@ -92,9 +92,13 @@ try {
   await page.goto(`http://127.0.0.1:${PORT}/?quality=medium`, { waitUntil: 'load' });
   await page.waitForSelector('[data-key="title:new"]');
   await page.click('[data-key="title:new"]');
-  await page.waitForSelector('.st-cinema:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
+  await page.waitForSelector('.st-film:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
   await page.click('[data-key="opening:skip"]');
   await page.waitForFunction(() => window.__game.started && !window.__game.view.game.player.busy && !window.__game.view.paused);
+  // The story opens grant day's first scene a moment after the film. Clicked through, as a player would.
+  await page.waitForFunction(() => window.__game.view.game.systems.talk?.active, null, { timeout: 6000 }).catch(() => {});
+  await game(() => window.__game.talkThrough());
+  await page.waitForFunction(() => !window.__game.view.game.player.busy && !window.__game.view.paused);
 
   /** Stands the hero at a place at noon with planks in hand, the land drawn. */
   async function standAt(place) {
@@ -243,7 +247,7 @@ try {
   await page.locator('.gu-panel-pause button', { hasText: 'Settings' }).click();
   await page.waitForSelector('input[name="gu-mouse"]');
   const rows = await game(() => [...document.querySelectorAll('.gu-settings-view legend')].map((e) => e.textContent));
-  check('Settings: the View section has Camera, Mouse, 2.5D turning and Characters', rows.join() === 'Camera,Mouse,2.5D turning,Characters', rows.join(', '));
+  check('Settings: View offers only Camera, Mouse and 2.5D turning', rows.join() === 'Camera,Mouse,2.5D turning', rows.join(', '));
   check('Settings: Drag to turn and Quarter turns are picked', await page.locator('input[name="gu-mouse"][value="drag"]').isChecked() && await page.locator('input[name="gu-tiltTurn"][value="quarter"]').isChecked());
   await page.locator('input[name="gu-tiltTurn"][value="smooth"]').check();
   check('Settings: 2.5D turning Smooth applies at once', (await game(() => window.__game.view.settings.tiltTurn)) === 'smooth');

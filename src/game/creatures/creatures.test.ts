@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { blockId } from '../../content/blocks.ts';
 import { emptyHit } from '../../features/world/world.sim.ts';
-import type { ActionsApi, CreatureState, ItemsApi, UseContext } from '../api.sim.ts';
+import type { ActionsApi, CreatureState, ItemId, ItemsApi, UseContext } from '../api.sim.ts';
 import { CREATURES, type CreatureKind } from '../content/creatures.ts';
 import { facingOf } from '../move.sim.ts';
 import { FEET, FLOOR, makeStage, roof, type Stage } from './stage.testkit.ts';
@@ -140,14 +140,14 @@ test('a mossling steps down one block and back up, and never drops off a taller 
 test('a mossling on damp ground leaves a moss tuft every 20 seconds', () => {
   const stage = island(true);
   stage.run(19.5);
-  expect(stage.bag.get('moss_tuft')).toBeUndefined();
+  expect(stage.bag.get('moss_fiber')).toBeUndefined();
   stage.run(1);
-  expect(stage.bag.get('moss_tuft')).toBe(1);
+  expect(stage.bag.get('moss_fiber')).toBe(1);
   const gave = stage.heard.find((e) => e.name === 'creature.gave')!.data as { kind: string; item: string; at: { x: number; y: number; z: number } };
-  expect({ kind: gave.kind, item: gave.item }).toEqual({ kind: 'mossling', item: 'moss_tuft' });
+  expect({ kind: gave.kind, item: gave.item }).toEqual({ kind: 'mossling', item: 'moss_fiber' });
   expect([Math.floor(gave.at.x), gave.at.y, Math.floor(gave.at.z)]).toEqual([8, FEET, 8]);
   stage.run(20.5);
-  expect(stage.bag.get('moss_tuft')).toBe(2);
+  expect(stage.bag.get('moss_fiber')).toBe(2);
   expect(stage.count('creature.gave')).toBe(2);
 });
 
@@ -174,11 +174,11 @@ test('watered ground is damp for 3 minutes, then dry again', () => {
   expect(stage.bag.size).toBe(0);
   stage.kernel.game.events.emit('crop.watered', { x: 7, y: FLOOR, z: 8 });
   stage.run(1);
-  expect(stage.bag.get('moss_tuft')).toBe(1);
+  expect(stage.bag.get('moss_fiber')).toBe(1);
   stage.run(178); // 179 seconds after the water: tufts at 0, 20, 40 ... 160
-  expect(stage.bag.get('moss_tuft')).toBe(9);
+  expect(stage.bag.get('moss_fiber')).toBe(9);
   stage.run(120);
-  expect(stage.bag.get('moss_tuft')).toBe(9);
+  expect(stage.bag.get('moss_fiber')).toBe(9);
 });
 
 test('rain makes the ground damp', () => {
@@ -186,7 +186,7 @@ test('rain makes the ground damp', () => {
   stage.run(30);
   stage.kernel.game.ambient.rain = 0.6;
   stage.run(1);
-  expect(stage.bag.get('moss_tuft')).toBe(1);
+  expect(stage.bag.get('moss_fiber')).toBe(1);
 });
 
 test('the watering can on plain ground makes it damp, and leaves tilled soil to the crops system', () => {
@@ -197,7 +197,7 @@ test('the watering can on plain ground makes it damp, and leaves tilled soil to 
   stage.kernel.add('items', items, {});
   stage.run(30);
   expect(handlers).toHaveLength(1);
-  const use = (held: string | null, block: string, button: UseContext['button'] = 'secondary'): boolean =>
+  const use = (held: ItemId | null, block: string, button: UseContext['button'] = 'secondary'): boolean =>
     handlers[0]({ hit: { ...emptyHit(), x: 8, y: FLOOR, z: 8, id: blockId(block) }, held: held ? { id: held, count: 1 } : null, button });
 
   expect(use('axe', 'mossy_stone')).toBe(false);
@@ -211,7 +211,7 @@ test('the watering can on plain ground makes it damp, and leaves tilled soil to 
   expect(use('watering_can', 'mossy_stone')).toBe(true);
   expect(stage.heard.at(-1)).toEqual({ name: 'crop.watered', data: { x: 8, y: FLOOR, z: 8 } });
   stage.run(1);
-  expect(stage.bag.get('moss_tuft')).toBe(1);
+  expect(stage.bag.get('moss_fiber')).toBe(1);
 });
 
 test('the tuft reaches the bag only when the player is within 10 blocks', () => {
@@ -227,36 +227,34 @@ test('the tuft reaches the bag only when the player is within 10 blocks', () => 
 
   stage.player(8, 8 + 9);
   stage.run(20);
-  expect(stage.bag.get('moss_tuft')).toBe(1);
+  expect(stage.bag.get('moss_fiber')).toBe(1);
   expect(stage.count('creature.gave')).toBe(1);
 });
 
 // ------------------------------------------------------------------------------------------ watching
 
-test('both mossling facts are learned by watching, and the page completes', () => {
+test('what a mossling comes to and what it gives are learned by watching; a farm proves the rest of its page', () => {
   const stage = island(true);
   stage.player(8, 8 + 9);
   stage.run(2.5);
   expect(mossling(stage).seen).toBe(true);
-  expect(known(stage, 'needs')).toBe(false);
+  expect(known(stage, 'comes')).toBe(false);
   stage.run(1);
-  expect(known(stage, 'needs')).toBe(true);
+  expect(known(stage, 'comes')).toBe(true);
   expect(known(stage, 'gives')).toBe(false);
   expect(mossling(stage).complete).toBe(false);
 
   stage.run(17);
   expect(known(stage, 'gives')).toBe(true);
-  expect(mossling(stage).complete).toBe(true);
+  expect(mossling(stage).complete).toBe(false);
   const story = stage.heard.filter((e) => e.name === 'fact.learned' || e.name === 'page.completed');
   expect(story).toEqual([
-    { name: 'fact.learned', data: { page: 'mossling', column: 'needs', fact: 'needs' } },
+    { name: 'fact.learned', data: { page: 'mossling', column: 'needs', fact: 'comes' } },
     { name: 'fact.learned', data: { page: 'mossling', column: 'gives', fact: 'gives' } },
-    { name: 'page.completed', data: { page: 'mossling' } },
   ]);
 
   stage.run(60);
   expect(stage.count('fact.learned')).toBe(2);
-  expect(stage.count('page.completed')).toBe(1);
 });
 
 test('watching teaches nothing until the player has the Almanac, by its flag or by the book in the bag', () => {
@@ -267,17 +265,17 @@ test('watching teaches nothing until the player has the Almanac, by its flag or 
     roof(stage, 6, 6, 10, 10);
     stage.run(50);
     // The mossling gave tufts all the same.
-    expect(stage.bag.get('moss_tuft')).toBe(2);
+    expect(stage.bag.get('moss_fiber')).toBe(2);
     expect(mossling(stage).seen).toBe(false);
     expect(stage.count('fact.learned')).toBe(0);
 
     if (how === 'flag') stage.kernel.game.flags.set('has.almanac', true);
     else stage.bag.set('almanac', 1);
     stage.run(4);
-    expect(known(stage, 'needs')).toBe(true);
+    expect(known(stage, 'comes')).toBe(true);
     expect(known(stage, 'gives')).toBe(false);
     stage.run(20);
-    expect(mossling(stage).complete).toBe(true);
+    expect(known(stage, 'gives')).toBe(true);
   }
 });
 
@@ -296,10 +294,10 @@ test('a mossling that is not on mossy stone does not teach what it needs', () =>
   expect(creatures(stage)).toHaveLength(1);
   stage.set(8, FLOOR, 8, 'stone');
   stage.run(20);
-  expect(known(stage, 'needs')).toBe(false);
+  expect(known(stage, 'comes')).toBe(false);
   stage.set(8, FLOOR, 8, 'mossy_stone');
   stage.run(3.5);
-  expect(known(stage, 'needs')).toBe(true);
+  expect(known(stage, 'comes')).toBe(true);
 });
 
 // ------------------------------------------------------------------------------------------ far away
@@ -349,7 +347,7 @@ const pebblehog: CreatureKind = {
   appears: { block: 'sand', within: 2, light: [15, 15], max: 2, around: 'player', radius: 6, every: 1 },
   moves: { mode: 'walk', radius: 3, speed: 2, pause: [0.5, 1], home: 0.2 },
   fears: [{ of: 'player', within: 3 }],
-  gives: { item: 'pebble', every: 5, when: { kind: 'on', block: 'stone' }, reach: 20 },
+  gives: { item: 'stone', every: 5, when: { kind: 'on', block: 'stone' }, reach: 20 },
   awake: { from: 0.3, to: 0.7 },
   watch: null,
 };
@@ -369,8 +367,8 @@ test('a second kind written only as data runs in the same engine', () => {
   const hogs = creatures(stage);
   expect(hogs.map((c) => c.id).sort()).toEqual(['creature:pebblehog:1', 'creature:pebblehog:2']);
   expect(game.actors.get('creature:pebblehog:1')!.sprite).toBe('pet');
-  expect(stage.bag.get('pebble')).toBeGreaterThanOrEqual(4);
-  expect(stage.bag.has('moss_tuft')).toBe(false);
+  expect(stage.bag.get('stone')).toBeGreaterThanOrEqual(4);
+  expect(stage.bag.has('moss_fiber')).toBe(false);
 
   // It fears the player: stand beside one and it runs.
   // The player stands on its far side from the middle of the floor, so it has room to run.
@@ -408,7 +406,10 @@ test('lanternflies come out at night near water, up to 6, and are gone by day', 
 
   game.clock.timeOfDay = 0.9;
   let most = 0;
-  stage.run(90, () => (most = Math.max(most, creatures(stage).length)));
+  stage.run(90, () => {
+    most = Math.max(most, creatures(stage).length);
+    for (const c of creatures(stage)) expect(game.actors.get(c.id)!.anim).toBe('flutter');
+  });
   expect(most).toBe(6);
   for (const c of creatures(stage)) {
     expect(c.id.startsWith('creature:lanternfly:')).toBe(true);
@@ -441,8 +442,7 @@ test('lanternflies drift to a lamp, and watching them there fills their page', (
   const near = flies.filter((c) => Math.hypot(c.pos.x - 12.5, c.pos.z - 12.5) < 3).length;
   expect(near).toBeGreaterThanOrEqual(4);
   const page = game.systems.almanac.page('lanternfly')!;
-  expect(page.facts.map((f) => f.known)).toEqual([true, true]);
-  expect(page.complete).toBe(true);
+  expect(page.facts.map((f) => [f.id, f.known])).toEqual([['comes', true], ['fears', false], ['gives', false], ['proved', false]]);
 });
 
 test('lanternflies left more than 48 blocks behind are let go', () => {
@@ -462,7 +462,7 @@ test('save then load keeps the creatures, their timers, the damp ground and the 
   stage.player(8, 8 + 5);
   stage.kernel.game.events.emit('crop.watered', { x: 8, y: FLOOR, z: 8 });
   stage.run(27);
-  expect(stage.bag.get('moss_tuft')).toBe(1);
+  expect(stage.bag.get('moss_fiber')).toBe(1);
   const save = JSON.parse(JSON.stringify(stage.kernel.save()));
 
   const again = island(false);
@@ -473,14 +473,13 @@ test('save then load keeps the creatures, their timers, the damp ground and the 
   ]);
   expect(again.kernel.game.actors.get('creature:mossling:1')!.pos).toBe(creatures(again)[0].pos);
   expect([...again.kernel.game.actors.keys()]).toEqual(['creature:mossling:1']);
-  expect(mossling(again).facts.map((f) => f.known)).toEqual([true, true]);
-  expect(mossling(again).complete).toBe(true);
+  expect(mossling(again).facts.map((f) => f.known)).toEqual([true, false, true, false]);
 
   // The timer and the damp ground carry on: the next tuft comes 40 seconds after the water, not 20 after loading.
   again.run(12);
   expect(again.bag.size).toBe(0);
   again.run(2);
-  expect(again.bag.get('moss_tuft')).toBe(1);
+  expect(again.bag.get('moss_fiber')).toBe(1);
   // Nothing already known is announced a second time.
   expect(again.count('fact.learned')).toBe(0);
   // A mossling that appears later gets a new number.

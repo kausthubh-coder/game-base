@@ -1,23 +1,23 @@
 import { expect, test } from 'bun:test';
 import type { AlmanacPage, Recipe } from '../api.sim.ts';
-import type { ItemDef } from '../api.sim.ts';
+import type { ItemDef, ItemId } from '../api.sim.ts';
 import { DEFAULT_SETTINGS, addToast, expireToasts, gridMove, groupPages, half, initials, itemUse, missingReason, readSettings, slotMove, type ToastLine } from './logic.ui.ts';
 
-const bed: Recipe = { id: 'bed', makes: { id: 'bed', count: 1 }, needs: [{ id: 'planks', count: 6 }, { id: 'fiber', count: 3 }], station: 'workbench' };
-const names: Record<string, string> = { planks: 'Planks', fiber: 'Fiber' };
+const bed: Recipe = { id: 'bed', makes: { id: 'bed', count: 1 }, needs: [{ id: 'plank', count: 6 }, { id: 'fiber', count: 3 }], station: 'workbench' };
+const names: Record<string, string> = { plank: 'Planks', fiber: 'Fiber' };
 const reason = (bag: Record<string, number>, canMake: boolean): string | null => missingReason(bed, (id) => bag[id] ?? 0, (id) => names[id], canMake);
 
 test('a recipe with everything in the bag has no reason', () => {
-  expect(reason({ planks: 6, fiber: 3 }, true)).toBeNull();
+  expect(reason({ plank: 6, fiber: 3 }, true)).toBeNull();
 });
 
 test('the reason names each thing the bag is short of', () => {
-  expect(reason({ planks: 2, fiber: 3 }, false)).toBe('Not enough planks');
-  expect(reason({ planks: 2 }, false)).toBe('Not enough planks and fiber');
+  expect(reason({ plank: 2, fiber: 3 }, false)).toBe('Not enough planks');
+  expect(reason({ plank: 2 }, false)).toBe('Not enough planks and fiber');
 });
 
 test('a recipe that cannot be made for another cause still gets a reason', () => {
-  expect(reason({ planks: 6, fiber: 3 }, false)).toBe('Cannot make this right now');
+  expect(reason({ plank: 6, fiber: 3 }, false)).toBe('Cannot make this right now');
 });
 
 test('a repeated toast becomes one line with a count and a fresh three seconds', () => {
@@ -97,7 +97,7 @@ test('a split takes the bigger half', () => {
 });
 
 test('an item says what it is for by what it does', () => {
-  const item = (more: Partial<ItemDef>): ItemDef => ({ id: 'x', name: 'X', icon: 'x', stack: 99, description: '', ...more });
+  const item = (more: Partial<ItemDef>): ItemDef => ({ id: 'x' as ItemId, name: 'X', icon: 'x', stack: 99, description: '', ...more });
   expect(itemUse(item({ tool: { kind: 'axe', tier: 1 } }))).toBe('Tool. Hold the left button on a tree to fell it.');
   expect(itemUse(item({ seed: 'wheat' }))).toBe('The right button plants it in tilled soil.');
   expect(itemUse(item({ placeable: 'bed' }))).toBe('The right button sets it down.');

@@ -1,0 +1,39 @@
+{
+  "name": "thistlehog",
+  "tool": "image_gen.imagegen",
+  "baseCommit": "0c26a77",
+  "references": [
+    "public/assets/sprites/critter.png",
+    "public/assets/sprites/leaftail.png"
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, matching the reference creatures. Transparent background, NO text, NO grids, NO cast shadows, no ground.\nSTRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells, image ratio 2:3. Every cell contains exactly one whole creature with ample transparent padding.\nRows 1-3 idle: front, back (no face), right profile; all four columns repeat idle variations.\nRows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing.\nSame creature, accessories and proportions throughout. Feet baseline equal in each cell. Full body visible, nothing crosses cell boundaries.\nReferences show approved style only; generate a NEW creature. Match chunky clusters and restrained detail. No teal. Brown outlines #302529 #493335 #65453a, warm cream highlights, violet/brown shadows.\nTHISTLEHOG: round hedgehog-like meadow beast, back of olive green thistle spines with a few purple thistle flowers, warm tan face, small dark snout, clear brown eyes, short legs. Knee-high friendly animal, round low body, no leaf tail. Roughly 68 pixels tall in final 96-square cells.",
+      "source": "assets-src/raw/thistlehog-3.png",
+      "selected": true
+    }
+  ],
+  "fight": {
+    "references": [
+      "assets-src/raw/thistlehog-3.png"
+    ],
+    "attempts": [
+      {
+        "number": 1,
+        "prompt": "Use case: stylized-concept. Production combat POSE sprite sheet for cozy anime pixel RPG. Create a NEW four-column THREE-row sheet of the EXACT SAME creature in attached base sheet. Reference is identity, size, proportions, palette, outline and pixel density. Transparent background, NO white matte or pale halo, NO grid, NO text, NO shadow, no ground. STRICT FOUR columns THREE rows, twelve equal square cells, 4:3 canvas aspect ratio. Every cell contains one whole creature with generous transparent padding. Row 1 FRONT, row 2 BACK with NO FACE OR EYES, row 3 RIGHT PROFILE. Four columns in EVERY row are: column 1 TELL, column 2 ATTACK, column 3 DIZZY, column 4 CALM. Preserve base body size across poses, compress/tilt for action only, do not scale character. Warm top-left light, brown outlines, chunky pixel art. No teal. The back view communicates same pose through body posture without a face.\nTHISTLEHOG: round hedgehog-like meadow beast, back of olive green thistle spines with a few purple thistle flowers, warm tan face, small dark snout, clear brown eyes, short legs. Knee-high friendly animal, round low body, no leaf tail. Roughly 68 pixels tall in final 96-square cells.\nTell: puffed up to twice its roundness, spines raised, bracing. Attack: spines flared straight out in EVERY direction like sharp radial thistle needles, clear difference from tell. Dizzy: flopped on belly, spines drooping, swirl eyes. Calm: sitting up relaxed, eyes closed in smile. Keep tan muzzle, dark snout, purple flowers and green thistles identical to reference, thistles must read as needles not merely leaves.",
+        "source": "assets-src/raw/thistlehog-fight-3.png",
+        "selected": true
+      }
+    ]
+  },
+  "processing": "bun tools/sprites/build-story.mjs; bun tools/sprites/defringe.mjs public/assets/sprites/thistlehog.png. Only generated pixels sliced, alpha cleaned, palette snapped and scaled.",
+  "defects": [
+    "Thistles read somewhat as pointed leaves rather than needles.",
+    "Tell puffs less than twice roundness, especially in side view.",
+    "Attack extends primarily sideways rather than evenly in every direction.",
+    "Small silhouette and flower placement wobble across base frames.",
+    "Calm sits only subtly more upright than idle.",
+    "Fight muzzle and flowers differ slightly in proportions from base."
+  ]
+}

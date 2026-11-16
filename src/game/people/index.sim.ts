@@ -1,10 +1,15 @@
 // The townspeople. Each one follows a routine from src/game/content/people.ts: the hour picks a named
 // place, they walk there along a path, and they stand facing the player when the player comes close.
 // The story can send someone somewhere, or hold them where they are.
+//
+// Someone with `appears` is not in the world until that flag is set. Someone who lives on the player's land
+// (`settler.<id>`) stands where the settlement says by the hour (`SettlementApi.spot`), and "E" on them shows
+// their card, unless the quest marks them. The settlement can lead one behind the hero to a room (`lead`).
 
 import type { Vec3 } from '../../engine/types.ts';
 import type { Actor, Game, NpcState, PeopleApi, SimSystem } from '../api.sim.ts';
-import { CROWD_SPRITES, FACE_RANGE, PEOPLE, TALK_RANGE, WALK_RANGE, WALK_SPEED, type PersonDef } from '../content/people.ts';
+import { FLAG } from '../content/flags.ts';
+import { CROWD_SPRITES, FACE_RANGE, PEOPLE, TALK_RANGE, WALK_RANGE, WALK_SPEED, isSettler, type PersonDef } from '../content/people.ts';
 import type { Kernel } from '../kernel.sim.ts';
 import { distance2d, facingOf } from '../move.sim.ts';
 import { walkAlong } from '../nav/walk.sim.ts';
@@ -13,7 +18,16 @@ import { walkAlong } from '../nav/walk.sim.ts';
 interface Stop {
   place: string;
   offset?: { x: number; z: number };
+  /** A spot of its own, for a stop that is not a named place: a settler's door, or behind the hero. */
+  at?: Vec3;
 }
+
+/** Someone led walks to this far behind the hero, and picks a new spot once the hero is this far from the last. */
+const LEAD_BEHIND = 1.6, LEAD_MOVED = 2.5;
+/** Where someone who has just come to live on the player's land walks in from. */
+const ARRIVES_AT = 'grant.stone';
+/** Someone who stopped this close to their seat has reached it: the walk ends on the whole block beside it. */
+const SEAT_REACH = 1.5;
 
 interface Person {
   def: PersonDef;
@@ -47,6 +61,13 @@ interface Person {
   blocked: number;
   fails: number;
   check: number;
+  /** In the world: no `appears` flag, or it is set. */
+  present: boolean;
+  /** Walking behind the hero, and the stop that is now. */
+  led: boolean;
+  leadStop: Stop | null;
+  /** The settlement's spot for them, kept while its key is the same, and the way they face sitting there. */
+  home: { key: string; stop: Stop; seat?: number } | null;
 }
 
 interface PersonSave {
@@ -78,6 +99,7 @@ const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.m
 export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): People {
   const { world, clock, flags, player } = game;
   const people: Person[] = [];
+  /** The people in the world now: `all()` hands this out. */
   const states: NpcState[] = [];
   const byId = new Map<string, Person>();
   let started = false;
@@ -97,7 +119,32 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
     }
   }
 
+  /** A spot just behind the hero, on the side the led person is on. The same stop until the hero moves on. */
+  function leadStop(p: Person): Stop {
+    const last = p.leadStop;
+    if (last?.at && distance2d(last.at, player.pos) < LEAD_MOVED) return last;
+    const dx = p.state.pos.x - player.pos.x, dz = p.state.pos.z - player.pos.z, d = Math.hypot(dx, dz) || 1;
+    p.leadStop = { place: 'grant.center', at: { x: player.pos.x + (dx / d) * LEAD_BEHIND, y: player.pos.y, z: player.pos.z + (dz / d) * LEAD_BEHIND } };
+    return p.leadStop;
+  }
+
+  /** Someone who lives on the player's land. */
+  const settled = (p: Person): boolean => isSettler(p.def.id) && flags.is(FLAG.settler(p.def.id));
+
+  function settlementStop(p: Person): Stop | null {
+    const id = p.def.id;
+    const spot = isSettler(id) ? game.systems.settlement?.spot(id) : null;
+    if (!spot) return null;
+    if (p.home?.key !== spot.key) p.home = { key: spot.key, stop: { place: spot.place, at: spot.at }, seat: spot.seat };
+    return p.home.stop;
+  }
+
   function routineStop(p: Person): Stop {
+    if (p.led) return leadStop(p);
+    if (settled(p)) {
+      const stop = settlementStop(p);
+      if (stop) return stop;
+    }
     if (p.stay && !flags.is(p.def.stay!.until)) return p.stay;
     if (p.wanderStops.length > 0) return p.wanderStops[p.wanderIndex];
     const routine = p.def.routine, hour = clock.timeOfDay * 24;
@@ -108,7 +155,7 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
 
   /** Picks the exact spot for a stop: the nearest free block to stand on by the place. */
   function resolve(p: Person, stop: Stop): void {
-    const at = placeAt(stop.place) ?? game.systems.region.spawn();
+    const at = stop.at ?? placeAt(stop.place) ?? game.systems.region.spawn();
     const spread = p.def.wander && stop !== p.stay && stop !== p.sent?.stop ? p.def.wander.spread : 0;
     // Someone who wanders stands a few blocks off the place, somewhere new each time.
     const aside = (): number => (spread > 0 ? Math.round((game.random() * 2 - 1) * spread) : 0);
@@ -212,7 +259,24 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
     }
   }
 
+  /**
+   * On a seat the settlement gave them, and there: they sit on it, facing the table. The sprite view draws `sit` as
+   * the standing frame set lower, so the bench and the table hide the legs.
+   */
+  function sitting(p: Person): boolean {
+    const home = p.home;
+    if (home?.seat === undefined || p.goal !== home.stop || p.path !== null || !home.stop.at) return false;
+    const pos = p.state.pos, at = home.stop.at;
+    if (distance2d(pos, at) > SEAT_REACH) return false;
+    pos.x = at.x;
+    pos.z = at.z;
+    p.actor.facing = home.seat;
+    p.actor.anim = 'sit';
+    return true;
+  }
+
   function stand(p: Person): void {
+    if (sitting(p)) return;
     const pos = p.state.pos;
     p.actor.anim = 'idle';
     const dx = player.pos.x - pos.x, dz = player.pos.z - pos.z;
@@ -275,7 +339,35 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
       goal: null, target: { x: 0, y: 0, z: 0 }, settled: false,
       path: null, next: 0, partial: false, plan: false, at: null,
       held: false, sent: null, talking: false, blocked: 0, fails: 0, check: 0,
+      present: !def.appears || flags.is(def.appears), led: false, leadStop: null, home: null,
     };
+  }
+
+  /** Brings the list of people in the world in line with who is present. Someone who arrives walks in from the gate. */
+  function presence(): void {
+    let changed = false;
+    for (const p of people) {
+      const present = !p.def.appears || flags.is(p.def.appears);
+      if (present === p.present) continue;
+      p.present = present;
+      p.actor.visible = present;
+      changed = true;
+      if (!present) continue;
+      const gate = placeAt(ARRIVES_AT);
+      if (gate && distance2d(gate, player.pos) <= WALK_RANGE) {
+        const pos = p.state.pos;
+        const spot = game.systems.nav.near({ x: Math.floor(gate.x) + 0.5, y: gate.y, z: Math.floor(gate.z) + 0.5 }, 4, () => false) ?? gate;
+        pos.x = spot.x; pos.y = spot.y; pos.z = spot.z;
+        p.at = ARRIVES_AT;
+        p.goal = null;
+      } else {
+        setGoal(p, routineStop(p));
+        appear(p);
+      }
+    }
+    if (!changed && states.length > 0) return;
+    states.length = 0;
+    for (const p of people) if (p.present) states.push(p.state);
   }
 
   /** People need the region for their places, so they are made on the first step or call, not while installing. */
@@ -295,8 +387,8 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
         : definition;
       const p = build(def, n);
       people.push(p);
-      states.push(p.state);
       byId.set(def.id, p);
+      p.actor.visible = p.present;
       game.actors.set(p.actor.id, p.actor);
       const prompt = 'Talk to ' + def.name;
       game.systems.interact?.add({
@@ -304,6 +396,7 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
         pos: () => p.state.pos,
         radius: TALK_RANGE,
         prompt: () => {
+          if (!p.present) return null;
           // A festival passer can cross directly through a guest who is handing over a quest.
           // Yield only when the player is already within one step of that marked guest.
           if (p.actor.mark !== 'quest' && p.held && p.sent && (p.plan || p.path !== null)) {
@@ -313,13 +406,19 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
           }
           return prompt;
         },
-        act: () => game.systems.talk.talkTo(def.id),
+        act: () => {
+          // Someone who lives here shows their card, unless the story wants a word with them.
+          const id = def.id;
+          if (isSettler(id) && settled(p) && p.actor.mark !== 'quest') game.events.emit('settler.opened', { who: id });
+          else game.systems.talk.talkTo(def.id);
+        },
       });
     });
     for (const p of people) {
       setGoal(p, routineStop(p));
       appear(p);
     }
+    presence();
     if (pending) {
       restore(pending);
       pending = null;
@@ -381,7 +480,8 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
     },
     get(id) {
       ready();
-      return byId.get(id)?.state;
+      const p = byId.get(id);
+      return p?.present ? p.state : undefined;
     },
     send(id, place, offset) {
       if (!ready()) return;
@@ -410,6 +510,14 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
       const p = byId.get(id);
       if (p) p.state.friendship = clamp(p.state.friendship + amount, 0, 5);
     },
+    lead(id, on) {
+      if (!ready()) return;
+      const p = byId.get(id);
+      if (!p || p.led === on) return;
+      p.led = on;
+      p.leadStop = null;
+      p.goal = null;
+    },
     setMark(id, mark) {
       if (!ready()) return;
       const p = byId.get(id);
@@ -422,7 +530,9 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
       if (!ready()) return;
       plans = 1;
       const talk = game.systems.talk;
+      presence();
       for (const p of people) {
+        if (!p.present) continue;
         // A conversation that ended without saying so must not freeze anyone.
         if (p.talking && talk && !talk.active) p.talking = false;
         if (!p.held) {

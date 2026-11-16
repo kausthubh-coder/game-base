@@ -3,7 +3,7 @@
 // where the town's land or the hero's own body is in the way.
 import * as THREE from 'three';
 import { BLOCKS } from '../../content/blocks.ts';
-import type { Systems } from '../api.sim.ts';
+import type { ItemId, Systems } from '../api.sim.ts';
 import { footprint } from '../content/placeables.ts';
 import type { GameView } from '../shell/view.ts';
 
@@ -37,12 +37,12 @@ export function install(view: GameView): void {
   view.scene.add(ghost);
 
   // What the ghost is drawn as, worked out again only when the held item changes.
-  let heldId: string | null = null, blockId = -1, plannedKind: string | null = null;
+  let heldId: ItemId | null = null, blockId = -1, plannedKind: string | null = null;
   let size: readonly [number, number, number] = [1, 1, 1];
   /** The station's floor plan at the last turn, kept so a frame makes no new array. */
   let turned = -1, fp: [number, number, number] = [1, 1, 1];
 
-  function hold(id: string | null): void {
+  function hold(id: ItemId | null): void {
     heldId = id;
     blockId = -1;
     plannedKind = null;

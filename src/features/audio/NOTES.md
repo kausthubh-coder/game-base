@@ -113,6 +113,39 @@ The town and the meadow share D E F# A B, and their tempos (92 and 84) are close
 from one to the other over the border band. The game sets `regions: { meadow, town }` from the town's zone, so
 walking in through the gate is the same crossfade as any border.
 
+## Greenhollow's regions
+
+The game does not play the seven lands above. `src/game/shell/sound.ts` hands the engine `greenhollowPalettes`
+from `src/content/palettes/index.ts`: the meadow and Hollowmere, and one palette for each region of the map.
+
+| Region | Key and scale | Tempo | Drone | Harmony | Lead, and at night | Percussion |
+|---|---|---|---|---|---|---|
+| meadow (your plot, the fields) | as above | 84 | | | | |
+| town (Hollowmere) | as above; market hours (8 to 18) play the fuller arrangement | 92 | | | | |
+| oldForest | E Dorian pentatonic, the major IV for light through the canopy | 66 | bowed pad on E and B | harp, a note a beat | low wooden flute, glass bell | low hand drum, a woodpecker click |
+| greyForest | E Aeolian with the flat sixth, i VI iv Vsus | 56 | still pad, four bars | harp, sparse | one soft bell far apart, a glass tone | a slow pulse |
+| highRoad (and the north) | D major pentatonic, with the bVII (C) | 76 | bowed pad on the chords | harp in eighths | low horn, wooden flute | deep drum on one and three, a tom |
+| terraces (and the Stag) | A Aeolian, i VI VII v | 58 | low choir, and a bell that tolls every four bars | slow drone strings | low horn, soft bell | deep drum, frame drum |
+| marsh (Lantern Marsh) | G major with the major seventh, Imaj9 vi9 IVmaj7 | 68 | misty glass pad | glass bells | glass tone, soft bell; the little bells three times as often at night (the lanternflies) | shaker, low hand drum |
+| caves | B minor pentatonic | 62 | choir | glass bells for the crystals | glass tone, a drip bell | drips on a click, a deep drum |
+| mere (the river, the landing, south toward Saltgate) | D major pentatonic, a dotted rocking lute | 80 | bowed pad on the chords | lute | wooden flute and dulcimer trading, glass bell | frame drum, shaker |
+
+Where each plays is `regionsAt` in `src/game/sound/soundscape.sim.ts`: the plan's kinds of land sampled on a
+5 by 5 grid round the hero, then the High Road along its line, the river and the sea air (only through open
+meadow), and the town's sound zone last. The weights sum to 1 and move by little each block, so every edge is
+the same layer-by-layer crossfade as above. Every two regions that meet share at least four notes (a test in
+`blend.sim.test.ts`). The caves and the terraces send the effects to the stone space. Night is the engine's
+own: the night lead, thinner, slower; `sparkle.night` in a palette sets how its little bells change at night.
+
+Each region also has a recorded bed (`bed.oldforest.day`, `bed.greyforest`, `bed.marsh`, `bed.caves`,
+`bed.river`, `bed.saltgate`, `bed.highroad.wind`) and some spot sounds (`spot.creak`, `spot.crow`,
+`spot.market`, `spot.bells`), placed by `src/game/content/soundscape.ts`.
+
+`bun tools/region-music.mjs --port <port>` renders each region alone (day, night, Hollowmere in and out of
+market hours) and five runs across the map with the game's own weights, to `.artifacts/sound/regions`.
+`bun tools/sound-walk-regions.mjs --dist <build> --port <port>` runs the hero across the real game and logs
+which music and beds play where.
+
 ## Recordings, space and placement
 
 - **Steps.** `footstep` takes a `material` (grass, dirt, path, cobble, stone, wood, floor, sand, water, leaves)

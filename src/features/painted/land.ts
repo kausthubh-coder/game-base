@@ -10,11 +10,19 @@
 // Colour comes from the top ground block of each column (meadow greens, path, sand, rock), softened the same
 // way as the heights, and the painted meadow texture varies it. A slope too steep for grass shows earth.
 // Ground that somebody made is painted on the same surface: furrows on tilled soil, stones on paving.
+//
+// Each kind of land paints its grass in its own greens and lays its own ground between (`nature.ts`): moss in
+// the old forest, mud and standing pools in the marsh, scree on the cave hills, carved flags on the terraces.
+// Where the land is grey every colour is drained toward ash.
 import * as THREE from 'three';
 import { BLOCKS } from '../../content/blocks.ts';
-import { FLAT_DROP, LAND_BLOCKS, LAND_COLORS, MADE_GROUND } from '../../content/land.ts';
+import { FLAT_DROP, LAND_BLOCKS, LAND_COLORS, MADE_GROUND, POOLS } from '../../content/land.ts';
+import { createGround, MEADOW_ONLY, POOL_AT, type Ground, type Nature } from './nature.ts';
+import { fbm, smoothstep } from './noise.ts';
 import { paint } from './paint.ts';
 import type { Textures } from './textures.ts';
+
+export { fbm, smoothstep };
 
 /** What the land asks of the block world. */
 export interface LandBlocks {
@@ -41,6 +49,10 @@ export interface Land {
   colorAt(x: number, z: number, out: THREE.Color): boolean;
   /** A number that changes when the land of a chunk is made again, or -1 while it is not made. */
   stampAt(cx: number, cz: number): number;
+  /** What the land is at a point, as a reading of `ground` written into `out`. False where no tile is made yet. */
+  natureAt(x: number, z: number, out: Float32Array): boolean;
+  /** How the land reads its kinds: the layout of a reading. */
+  readonly ground: Ground;
   readonly tiles: number;
   readonly triangles: number;
 }
@@ -69,28 +81,6 @@ for (const block of BLOCKS) {
 const GRASS = { light: new THREE.Color(LAND_COLORS.grass.light), mid: new THREE.Color(LAND_COLORS.grass.mid), deep: new THREE.Color(LAND_COLORS.grass.deep), straw: new THREE.Color(LAND_COLORS.grass.straw) };
 const EARTH = new THREE.Color(LAND_COLORS.earth), CLIFF = new THREE.Color(LAND_COLORS.cliff), BED = new THREE.Color(LAND_COLORS.bed), SHORE = new THREE.Color(LAND_COLORS.shore);
 
-function hash(ix: number, iy: number, seed: number): number {
-  let n = (ix * 73856093) ^ (iy * 19349663) ^ (seed * 83492791);
-  n = Math.imul(n ^ (n >>> 13), 1274126177);
-  return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
-}
-function noise(x: number, y: number, seed: number): number {
-  const ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy;
-  const u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
-  const a = hash(ix, iy, seed), b = hash(ix + 1, iy, seed), c = hash(ix, iy + 1, seed), d = hash(ix + 1, iy + 1, seed);
-  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
-}
-/** Layered noise between 0 and 1. */
-export function fbm(x: number, y: number, octaves: number, seed: number): number {
-  let sum = 0, amp = 0.5, freq = 1, total = 0;
-  for (let i = 0; i < octaves; i++) { sum += amp * noise(x * freq, y * freq, seed + i * 17); total += amp; amp *= 0.5; freq *= 2; }
-  return sum / total;
-}
-export const smoothstep = (a: number, b: number, x: number): number => {
-  const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
-  return t * t * (3 - 2 * t);
-};
-
 /** The meadow's green at a spot: broad drifts of light and deep green and of dry straw. */
 export function meadowColor(x: number, z: number, out: THREE.Color): THREE.Color {
   out.copy(GRASS.mid).lerp(GRASS.light, smoothstep(0.35, 0.68, fbm(x / 36, z / 36, 3, 21)));
@@ -114,13 +104,15 @@ interface Tile {
   heights: Float32Array;
   bare: Float32Array;
   colors: Float32Array;
+  /** Per vertex: a reading of the land's kind (`Ground.read`). */
+  nature: Float32Array;
   /** Stepped land only: the height of each column's top. */
   tops: Float32Array;
   triangles: number;
 }
 
 // The stepped land's vertices as they are gathered for one tile. They are copied into the tile's geometry.
-const sp: number[] = [], sn: number[] = [], sc: number[] = [], sg: number[] = [], sm: number[] = [], si: number[] = [];
+const sp: number[] = [], sn: number[] = [], sc: number[] = [], sg: number[] = [], sm: number[] = [], sk: number[] = [], sw: number[] = [], si: number[] = [];
 /** Adds a four-cornered face. Corners 0 and 1 are its upper edge, 2 and 3 lie under them. `n` is the way it faces. */
 function face(x0: number, y0: number, z0: number, x1: number, y1: number, z1: number, x2: number, y2: number, z2: number, x3: number, y3: number, z3: number, nx: number, ny: number, nz: number): number {
   const first = sp.length / 3;
@@ -134,21 +126,34 @@ function face(x0: number, y0: number, z0: number, x1: number, y1: number, z1: nu
   return first;
 }
 
-export function createLand(blocks: LandBlocks, textures: Textures, stepped = false): Land {
+export function createLand(blocks: LandBlocks, textures: Textures, stepped = false, nature: Nature = MEADOW_ONLY): Land {
   const group = new THREE.Group();
   group.name = 'land';
   const material = paint({
     vertexColors: true, brush: 0.3, bands: 0.3, wrap: 0.25, brushScale: 0.06, dapple: 1,
-    uniforms: { uGround: { value: textures.ground }, uGroundMean: { value: textures.groundMean }, uRock: { value: textures.rock }, uCobble: { value: textures.cobble } },
-    vertexPars: 'attribute vec2 aGlow, aMade; varying vec3 vLand; varying vec2 vMade;',
+    uniforms: {
+      uGround: { value: textures.ground }, uGroundMean: { value: textures.groundMean }, uRock: { value: textures.rock }, uCobble: { value: textures.cobble },
+      uMoss: { value: textures.paintings.moss }, uMud: { value: textures.paintings.mud }, uScree: { value: textures.paintings.scree }, uFlags: { value: textures.paintings['terrace-stone'] },
+      uMossMean: { value: textures.means.moss }, uMudMean: { value: textures.means.mud }, uScreeMean: { value: textures.means.scree }, uFlagsMean: { value: textures.means['terrace-stone'] },
+      uPoolDeep: { value: new THREE.Color(POOLS.deep) }, uPoolAt: { value: POOL_AT },
+    },
+    vertexPars: 'attribute vec2 aGlow, aMade, aWild; attribute vec4 aKind; varying vec3 vLand; varying vec2 vMade, vWild; varying vec4 vKind;',
     // Lamp light, how bare the ground is, and how level it lies. Then how much of it is a tilled field, and how much is paved.
-    vertexBegin: 'vLand = vec3(aGlow, normal.y); vMade = aMade;',
-    fragmentPars: 'uniform sampler2D uGround, uRock, uCobble; uniform vec3 uGroundMean, uLamp; varying vec3 vLand; varying vec2 vMade;',
+    // Then the share of the old forest, the marsh, the cave hills and the terraces, and the marsh's pool field and how much is a bare patch.
+    vertexBegin: 'vLand = vec3(aGlow, normal.y); vMade = aMade; vKind = aKind; vWild = aWild;',
+    fragmentPars: 'uniform sampler2D uGround, uRock, uCobble, uMoss, uMud, uScree, uFlags; uniform vec3 uGroundMean, uLamp, uMossMean, uMudMean, uScreeMean, uFlagsMean, uPoolDeep; uniform float uPoolAt; varying vec3 vLand; varying vec2 vMade, vWild; varying vec4 vKind;',
     // The painted meadow texture at two sizes, divided by its own average: it varies the colour, it does not tint it.
     fragmentAlbedo: /* glsl */ `
       float steep = 1.0 - smoothstep(0.55, 0.8, vLand.z);
       vec3 dabs = texture2D(uGround, vPaintWorld.xz * 0.13).rgb * 0.55 + texture2D(uGround, vPaintWorld.xz * 0.031 + 0.37).rgb * 0.45;
       vec3 vary = dabs / uGroundMean;
+      // Each kind of land's own painting: moss over the old forest, mud on the marsh's bare ground, scree on the
+      // hills' and carved stone on the terraces'. Each is divided by its own average too.
+      vec2 at = vPaintWorld.xz;
+      vary = mix(vary, texture2D(uMoss, at * 0.11).rgb / uMossMean, vKind.x * 0.8);
+      vary = mix(vary, texture2D(uMud, at * 0.09 + 0.21).rgb / uMudMean, vKind.y * vLand.y);
+      vary = mix(vary, texture2D(uScree, at * 0.15).rgb / uScreeMean, vKind.z * vLand.y);
+      vary = mix(vary, texture2D(uFlags, at * 0.07).rgb / uFlagsMean, vKind.w * vLand.y);
       // Bare ground keeps the brush marks and loses their green.
       vary = mix(vary, vec3(dot(vary, vec3(0.3333))), vLand.y);
       diffuseColor.rgb *= mix(vec3(1.0), vary, 0.5 * (1.0 - steep));
@@ -161,14 +166,25 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
       // Paving: stones set close together. At the rim of the paving single stones lie in the grass.
       vec4 stone = texture2D(uCobble, vPaintWorld.xz * 0.37);
       float laid = step(stone.g * 0.8 + 0.1, vMade.y) * (1.0 - steep);
-      diffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb, vec3(0.74, 0.72, 0.68), 0.75 * stone.b) * (0.55 + 0.55 * stone.r), laid);`,
+      diffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb, vec3(0.74, 0.72, 0.68), 0.75 * stone.b) * (0.55 + 0.55 * stone.r), laid);
+      // A marsh pool: still water, deeper toward its middle, that holds the colour of the sky.
+      float pool = smoothstep(uPoolAt, uPoolAt + 0.012, vWild.x);
+      float deep = smoothstep(uPoolAt + 0.01, uPoolAt + 0.09, vWild.x);
+      vec3 water = mix(diffuseColor.rgb, uPoolDeep, 0.55 + 0.4 * deep) * 0.9;
+      diffuseColor.rgb = mix(diffuseColor.rgb, water, pool);`,
     // A lamp's light lies on the ground as its own colour, on top of the day's light.
-    fragmentFinal: 'vec3 outgoingLight = paintHaze(paintShade(diffuseColor.rgb, paintLit(0.0)) + diffuseColor.rgb * uLamp * vLand.x * vLand.x) + totalEmissiveRadiance;',
+    // A pool is lit flat and takes the sky's colour toward the horizon, a glint you see from far off.
+    fragmentFinal: /* glsl */ `
+      vec3 lit = paintShade(diffuseColor.rgb, paintLit(0.0)) + diffuseColor.rgb * uLamp * vLand.x * vLand.x;
+      vec3 sky = mix(uHazeNear, uHaze, 0.6) * (0.75 + 0.35 * uSunTint);
+      float graze = 1.0 - abs(normalize(vPaintWorld - cameraPosition).y);
+      float glint = pool * (0.08 + 0.5 * graze * graze);
+      vec3 outgoingLight = paintHaze(mix(lit, sky, glint)) + totalEmissiveRadiance;`,
   });
   // ---- smooth land: one mesh. Each tile owns a run of 17 by 17 vertices in it. The runs in use are kept
   // together at the front: when a tile goes, the last one moves into its place, and only that many are drawn.
   const RUN = SIDE * SIDE, RUN_INDEX = CHUNK * CHUNK * 6;
-  const PARTS = [['position', 3], ['normal', 3], ['color', 3], ['aGlow', 2], ['aMade', 2]] as const;
+  const PARTS = [['position', 3], ['normal', 3], ['color', 3], ['aGlow', 2], ['aMade', 2], ['aKind', 4], ['aWild', 2]] as const;
   const sheet = new THREE.Mesh(new THREE.BufferGeometry(), material);
   sheet.name = 'land-sheet';
   sheet.receiveShadow = true;
@@ -260,7 +276,11 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
   const top = new Float32Array(COLS * COLS), glow = new Float32Array(COLS * COLS), kind = new Uint8Array(COLS * COLS), wet = new Uint8Array(COLS * COLS), made = new Uint8Array(COLS * COLS), work = new Uint8Array(COLS * COLS);
   const VERTS = CHUNK + 3;
   const vHeight = new Float32Array(VERTS * VERTS), vBare = new Float32Array(VERTS * VERTS), vGlow = new Float32Array(VERTS * VERTS), vColor = new Float32Array(VERTS * VERTS * 3), vMade = new Float32Array(VERTS * VERTS * 2);
-  const color = new THREE.Color(), part = new THREE.Color(), normal = new THREE.Vector3();
+  const ground = createGround(nature), NS = ground.size;
+  const vKind = new Float32Array(VERTS * VERTS * 4), vWild = new Float32Array(VERTS * VERTS * 2), vNature = new Float32Array(VERTS * VERTS * NS), reading = new Float32Array(NS);
+  /** Which kinds go into the shader's four shares: the old forest, the marsh, the cave hills and the terraces. */
+  const SHADER_KINDS = ['oldForest', 'marsh', 'caveHills', 'terraces'];
+  const color = new THREE.Color(), part = new THREE.Color(), green = new THREE.Color(), normal = new THREE.Vector3();
 
   /**
    * Finds the ground of one column: its height, what it is made of, whether water lies on it. The ground is
@@ -320,23 +340,33 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
         const v = j * VERTS + i, wx = x0 + i - 1, wz = z0 + j - 1;
         let h = 0, lo = Infinity, hi = -Infinity, bare = 0, water = 0, lamp = 0, soil = 0, paving = 0;
         color.setRGB(0, 0, 0);
+        ground.read(wx, wz, reading);
+        ground.green(wx, wz, reading, green);
         for (let c = 0; c < 4; c++) {
           const at = (j + (c >> 1)) * COLS + i + (c & 1), t = top[at], k = kind[at];
           h += t; lo = Math.min(lo, t); hi = Math.max(hi, t);
-          if (k === KIND_GRASS && !made[at]) meadowColor(wx, wz, part);
+          if (k === KIND_GRASS && !made[at]) part.copy(green);
           else { part.copy(kindColor[k === KIND_GRASS ? KIND_NONE : k] ?? CLIFF); if (k === KIND_GRASS || k === KIND_NONE) part.copy(CLIFF); bare += 0.25; }
           if (wet[at]) water += 0.25;
           if (work[at] === 1) soil += 0.25; else if (work[at] === 2) paving += 0.25;
           lamp += (glow[at] as number) * 0.25;
           color.r += part.r * 0.25; color.g += part.g * 0.25; color.b += part.b * 0.25;
         }
+        // The kind of land's bare patches and pools lie on its grass only, not on a path or a field.
+        const grassy = 1 - bare;
+        ground.finish(reading, grassy, color);
         // A drop of two blocks or more across one corner is a bank or a cliff: earth and rock, not grass.
         const steep = stepped ? 0 : smoothstep(1.3, 2.6, hi - lo);
         color.lerp(CLIFF, steep);
         // Under water the bed, and a pale wet shore where water meets land.
         if (water > 0) color.lerp(water >= 1 ? BED : SHORE, water >= 1 ? 0.85 : 0.7);
+        ground.grey(reading, color);
+        const patch = (reading[ground.PATCH] as number) * grassy, soaked = ground.wet(reading) * grassy;
         vHeight[v] = h / 4;
-        vBare[v] = Math.min(1, bare + steep + water);
+        vBare[v] = Math.min(1, bare + steep + water + patch + soaked);
+        for (let s4 = 0; s4 < 4; s4++) vKind[v * 4 + s4] = ground.share(reading, SHADER_KINDS[s4] as string);
+        vWild[v * 2] = (reading[ground.POOL] as number) * grassy; vWild[v * 2 + 1] = patch;
+        vNature.set(reading, v * NS);
         vGlow[v] = lamp;
         vMade[v * 2] = soil; vMade[v * 2 + 1] = paving;
         vColor[v * 3] = color.r; vColor[v * 3 + 1] = color.g; vColor[v * 3 + 2] = color.b;
@@ -347,6 +377,7 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
       for (let i = 0; i < SIDE; i++) {
         const v = (j + 1) * VERTS + i + 1, n = j * SIDE + i;
         tile.heights[n] = vHeight[v] as number; tile.bare[n] = vBare[v] as number;
+        tile.nature.set(vNature.subarray(v * NS, v * NS + NS), n * NS);
         tile.colors[n * 3] = vColor[v * 3] as number; tile.colors[n * 3 + 1] = vColor[v * 3 + 1] as number; tile.colors[n * 3 + 2] = vColor[v * 3 + 2] as number;
       }
     }
@@ -360,6 +391,7 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
     const geometry = sheet.geometry, first = tile.slot * RUN;
     const positions = geometry.getAttribute('position') as THREE.BufferAttribute, normals = geometry.getAttribute('normal') as THREE.BufferAttribute, colors = geometry.getAttribute('color') as THREE.BufferAttribute;
     const glows = geometry.getAttribute('aGlow') as THREE.BufferAttribute, mades = geometry.getAttribute('aMade') as THREE.BufferAttribute;
+    const kinds = geometry.getAttribute('aKind') as THREE.BufferAttribute, wilds = geometry.getAttribute('aWild') as THREE.BufferAttribute;
     let low = Infinity, high = -Infinity;
     for (let j = 0; j < SIDE; j++) {
       for (let i = 0; i < SIDE; i++) {
@@ -371,6 +403,8 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
         colors.setXYZ(n, vColor[v * 3], vColor[v * 3 + 1], vColor[v * 3 + 2]);
         glows.setXY(n, vGlow[v] as number, vBare[v] as number);
         mades.setXY(n, vMade[v * 2] as number, vMade[v * 2 + 1] as number);
+        kinds.setXYZW(n, vKind[v * 4] as number, vKind[v * 4 + 1] as number, vKind[v * 4 + 2] as number, vKind[v * 4 + 3] as number);
+        wilds.setXY(n, vWild[v * 2] as number, vWild[v * 2 + 1] as number);
       }
     }
     tile.ball.center.set(x0 + 8, (low + high) / 2, z0 + 8);
@@ -384,13 +418,18 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
 
   /** Stepped land: a flat top for every column, and a riser of earth wherever the next column stands lower. */
   function buildSteps(tile: Tile, x0: number, z0: number): void {
-    sp.length = sn.length = sc.length = sg.length = sm.length = si.length = 0;
+    sp.length = sn.length = sc.length = sg.length = sm.length = sk.length = sw.length = si.length = 0;
+    const kindOfCorner = (v: number, earth: boolean): void => {
+      sk.push(vKind[v * 4] as number, vKind[v * 4 + 1] as number, vKind[v * 4 + 2] as number, vKind[v * 4 + 3] as number);
+      sw.push(earth ? 0 : vWild[v * 2] as number, earth ? 0 : vWild[v * 2 + 1] as number);
+    };
     const paintCorner = (v: number, toEarth: number): void => {
       color.setRGB(vColor[v * 3] as number, vColor[v * 3 + 1] as number, vColor[v * 3 + 2] as number).lerp(EARTH, toEarth);
       sc.push(color.r, color.g, color.b);
       sg.push(vGlow[v] as number, toEarth > 0 ? 1 : vBare[v] as number);
       // A riser is earth, whatever lies on top.
       sm.push(toEarth > 0 ? 0 : vMade[v * 2] as number, toEarth > 0 ? 0 : vMade[v * 2 + 1] as number);
+      kindOfCorner(v, toEarth > 0);
     };
     let low = Infinity, high = -Infinity;
     for (let j = 0; j < CHUNK; j++) {
@@ -410,6 +449,7 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
           sc.push(EARTH.r, EARTH.g, EARTH.b, EARTH.r, EARTH.g, EARTH.b);
           sg.push(vGlow[v + az * VERTS + ax] as number, 1, vGlow[v + bz * VERTS + bx] as number, 1);
           sm.push(0, 0, 0, 0);
+          kindOfCorner(v + az * VERTS + ax, true); kindOfCorner(v + bz * VERTS + bx, true);
         }
       }
     }
@@ -419,6 +459,8 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
     geometry.setAttribute('color', new THREE.Float32BufferAttribute(sc, 3));
     geometry.setAttribute('aGlow', new THREE.Float32BufferAttribute(sg, 2));
     geometry.setAttribute('aMade', new THREE.Float32BufferAttribute(sm, 2));
+    geometry.setAttribute('aKind', new THREE.Float32BufferAttribute(sk, 4));
+    geometry.setAttribute('aWild', new THREE.Float32BufferAttribute(sw, 2));
     geometry.setIndex(si);
     geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(x0 + 8, (low + high) / 2, z0 + 8), Math.hypot(11.4, (high - low) / 2 + 0.5));
     tile.triangles = si.length / 3;
@@ -434,7 +476,7 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
       mesh.matrixAutoUpdate = false;
       group.add(mesh);
     }
-    return { cx, cz, mesh, slot: -1, ball: new THREE.Sphere(), stamp: -2, heights: new Float32Array(SIDE * SIDE), bare: new Float32Array(SIDE * SIDE), colors: new Float32Array(SIDE * SIDE * 3), tops: new Float32Array(stepped ? CHUNK * CHUNK : 0), triangles: CHUNK * CHUNK * 2 };
+    return { cx, cz, mesh, slot: -1, ball: new THREE.Sphere(), stamp: -2, heights: new Float32Array(SIDE * SIDE), bare: new Float32Array(SIDE * SIDE), colors: new Float32Array(SIDE * SIDE * 3), nature: new Float32Array(SIDE * SIDE * NS), tops: new Float32Array(stepped ? CHUNK * CHUNK : 0), triangles: CHUNK * CHUNK * 2 };
   }
 
   /** The tile and the place inside it of a point, for the three lookups below. */
@@ -496,6 +538,13 @@ export function createLand(blocks: LandBlocks, textures: Textures, stepped = fal
       return true;
     },
     stampAt: (cx, cz) => tiles.get(key(cx, cz))?.stamp ?? -1,
+    natureAt(x, z, out) {
+      if (!locate(x, z) || !at.tile) return false;
+      const c = at.tile.nature;
+      for (let k = 0; k < NS; k++) out[k] = blend(c, at.n, NS, k, at.fx, at.fz);
+      return true;
+    },
+    ground,
     get tiles() { return tiles.size; },
     get triangles() { if (!stepped) return drawn; let n = 0; for (const tile of tiles.values()) n += tile.triangles; return n; },
   };

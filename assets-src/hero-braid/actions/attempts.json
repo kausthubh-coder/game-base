@@ -1,0 +1,18 @@
+{
+  "tool": "image_gen.imagegen",
+  "cut": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Input 1 accepted Braid idle/walk is the exact character identity, head size, proportions and costume to preserve. Input 2 accepted Braid tool action shows continuity. Input 3 concept option D lower right and pixel mock D defines identity. Input 4 Copper cut sheet is pose and weapon reference ONLY, never copy its orange hair, face or clothes. Generate STRICT FOUR columns THREE rows, twelve equal square cells, whole sheet 4:3. Rows front, back with absolutely no face, RIGHT profile. Columns sword windup behind shoulder, distinct forward strike across body, follow-through low opposite side, recovery upright guard. Match the short silver iron sword with brown grip in Copper cut, no axe. Clearly different blade and arm silhouette at windup/strike/follow/recovery in ALL directions. Same olive square face, clipped scalp, long connected brown braid, pale sage jacket, cream shirt, charcoal legs, brown boots/satchel/brass key. Same head size and torso size as Braid every frame, final body ~110 pixels in 128-square cell. Fit sword diagonally into margin without shrinking body. Feet planted stable, allow intentional arm and shoulder lean. Warm upper-left light, chunky crisp pixels, closed dark tinted brown outline 1-2 pixels at target, no black outline, gradients, pale rim, shadow, floor, text or grid. Genuine transparent background. Ample equal margins, no parts crossing cells. Recovery returns naturally to accepted Braid idle.",
+      "references": [
+        "public/assets/sprites/hero-braid.png",
+        "public/assets/sprites/hero-braid-swing.png",
+        "assets-src/concept/people-home/hero.webp",
+        "public/assets/sprites/hero-cut.png"
+      ],
+      "raw": "cut-attempt-1.png",
+      "toolOutput": "/Users/dabot/.codex/generated_images/01a1d9a9-b778-7452-8fb4-d2cb09b2b04e/exec-c6da4c59-430d-4d83-84f5-428f463f2c23.png",
+      "verdict": "REJECTED: back row undersized. Final complete attempt inventory is provenance.json."
+    }
+  ]
+}

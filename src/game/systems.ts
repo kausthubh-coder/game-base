@@ -11,6 +11,11 @@
 //   - time before crops, so crops read this step's rain.
 //   - actions before the systems that add click handlers to it (placeables, crops, creatures, pets).
 //   - build and sprinklers after crops and placeables, which they work through.
+//   - act 1 (docs/act1-foundation.md): machines, farms and the bench after crops, placeables and creatures,
+//     which they work through; the settlement after them and after people, since it counts living farms and
+//     settlers; goods after farms; the fights after the settlement and the bench, whose Heartstone and gear
+//     they read; ruins after the fights.
+//   - the opening (grant day at Saltgate) after talk and time, whose conversations and clock it uses.
 //   - quests and story last: they judge what the step did.
 import type { SimSystem } from './api.sim.ts';
 import type { Kernel } from './kernel.sim.ts';
@@ -32,8 +37,17 @@ export const SYSTEM_ORDER: readonly string[] = [
   'almanac',
   'creatures',
   'pets',
+  'machines',
+  'farms',
+  'bench',
   'people',
+  'settlement',
+  'goods',
   'talk',
+  'hall',
+  'fights',
+  'ruins',
+  'opening',
   'quests',
   'story',
 ];

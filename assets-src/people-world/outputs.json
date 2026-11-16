@@ -1,0 +1,392 @@
+[
+  {
+    "name": "maren",
+    "kind": "world",
+    "prompt": "Production sprite sheet. Identity costume colours silhouette from concept; pixel style outline light head size proportions from maren sprite. Maren nineteen copper brown skin diamond face tired almond eyes jet black jaw bob blunt fringe bronze circlet matte river teal overdress cream front apron rolled cuffs brown ledger. Four columns six rows idle front back right, walk front back right, transparent.",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-world/maren.webp"
+    ],
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/maren-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "tamsin",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/tamsin.png",
+      "assets-src/concept/people-world/tamsin.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Tamsin lean older woman warden age late sixties weathered warm skin silver braid broad brown travel hat feather faded grey long coat rust lining cut badge seams brown gloves boots. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/tamsin-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "elowen",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-world/elowen.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Elowen small old woman silver braid laughing wrinkled eyes white robe green stole gold hem amber throat stone. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/elowen-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "calla",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-world/calla.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Calla seventeen pale cool skin triangular face platinum straight hair hard high knot tall rigid narrow silhouette crisp grey full coat broad WHITE mantle white collar gold piping six-upper-ray half-sun clasp oxblood ledger. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/calla-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "aldric",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-world/aldric.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Brother Aldric forty short soft pear shaped body pale pink skin long pear shaped face prominent nose receding chin BALD crown scant mouse grey side hair CLEAN SHAVEN oversized white and gold coat prayer book amber pendant six-upper-ray half sun clasp. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/aldric-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "ren",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-world/ren.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Ren sixteen compact athletic bronze sun brown skin trapezoid face tight short black curls clipped sides sand linen small rust scarf diagonal white sash gold edge TWO large water skins one per hip no Mark no cloak. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/ren-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "ilara",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-old/ilara.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Ilara about twenty slim tawny skin long oval face wide green eyes long loose straight dark ash blond hair leaf green tunic brown trousers cream waist tie brown boots left hand Mark SEVEN places exactly SIX teal lit dots ONE dark unlit place no fox companion inside sheet. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/ilara-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "auren",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/maren.png",
+      "assets-src/concept/people-old/auren.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production sprite sheet cozy anime pixel RPG warm top-left light dark brown tinted outline chunky pixel clusters LARGE HEAD SMALL FEET matching reference sprite not painting proportions. Transparent background NO text NO grids NO cast shadow NO ground. STRICT FOUR columns SIX rows 24 equal cells whole character ample padding. Rows 1-3 idle FRONT, BACK no face, RIGHT profile. Rows 4-6 walk FRONT BACK RIGHT profile four distinct step phases. Same character costume proportions head every frame feet baseline equal. Identity costume colours silhouette from concept painting; pixel style outline light head size proportions from reference sprites. Auren young farm boy tall sturdy broad chest ruddy tan skin rectangular face short thick sandy dark blond wavy hair swept off forehead cream linen burnt orange russet waistcoat brown trousers boots hoe pail warm friendly face. No glowing cloth.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/auren-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "custodian",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/custodian.png",
+      "assets-src/concept/people-old/custodian.webp"
+    ],
+    "prompt": "Production cozy anime RPG pixel art sprite sheet. Identity costume colours silhouette from concept painting; pixel style outline light proportions from reference sprite. Transparent background NO ground shadows text grids. Warm upper left light brown tinted outlines chunky pixel clusters no gradients. CUSTODIAN small grumpy fox badger moss grey fur cream muzzle brass ear and side plates winding key teal eyes. FOUR columns SEVEN rows: first three idle front back right side; next three walk front back right side four distinct step phases; final row curled sleeping front, four slight variations. Same small animal all frames, no larger person, no hat. STRICT uniform equal cells ample transparent padding equal feet baseline same body scale in every frame. Entire animal antlers legs visible within every cell.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/custodian-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "stag",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/stag.png",
+      "assets-src/concept/people-old/stag.webp"
+    ],
+    "prompt": "Production cozy anime RPG pixel art sprite sheet. Identity costume colours silhouette from concept painting; pixel style outline light proportions from reference sprite. Transparent background NO ground shadows text grids. Warm upper left light brown tinted outlines chunky pixel clusters no gradients. CERNWYN VERDANT STAG ancient enormous deer bark brown fur pale cream chest moss ferns hanging from shoulders bare TREE BRANCH ANTLERS not rounded foliage or flowers, mature noble deer long legs. FOUR columns THREE rows, FRONT then BACK no face then RIGHT SIDE. Bound, gold collar and four gold chains extending down to pins, four subtle idle phases per row. STRICT uniform equal cells ample transparent padding equal feet baseline same body scale in every frame. Entire animal antlers legs visible within every cell.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/stag-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "stag-free",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/stag-free.png",
+      "assets-src/concept/people-old/stag.webp"
+    ],
+    "prompt": "Production cozy anime RPG pixel art sprite sheet. Identity costume colours silhouette from concept painting; pixel style outline light proportions from reference sprite. Transparent background NO ground shadows text grids. Warm upper left light brown tinted outlines chunky pixel clusters no gradients. CERNWYN VERDANT STAG ancient enormous deer bark brown fur pale cream chest moss ferns hanging from shoulders bare TREE BRANCH ANTLERS not rounded foliage or flowers, mature noble deer long legs. FOUR columns THREE rows, FRONT then BACK no face then RIGHT SIDE. FREED no gold collar NO CHAINS, teal eyes, columns calm standing, lowering head, raised proud head, gentle step. STRICT uniform equal cells ample transparent padding equal feet baseline same body scale in every frame. Entire animal antlers legs visible within every cell.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/stag-free-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "stag-fight",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/stag-fight.png",
+      "assets-src/concept/people-old/stag.webp"
+    ],
+    "prompt": "Production cozy anime RPG pixel art sprite sheet. Identity costume colours silhouette from concept painting; pixel style outline light proportions from reference sprite. Transparent background NO ground shadows text grids. Warm upper left light brown tinted outlines chunky pixel clusters no gradients. CERNWYN VERDANT STAG ancient enormous deer bark brown fur pale cream chest moss ferns hanging from shoulders bare TREE BRANCH ANTLERS not rounded foliage or flowers, mature noble deer long legs. FOUR columns THREE rows, FRONT then BACK no face then RIGHT SIDE. BOUND gold collar, gold chains, match reference action positions precisely: columns braced sweep, low lunge head down, rearing, grounded recovery. Same positions as reference sheet and same deer costume as concept. STRICT uniform equal cells ample transparent padding equal feet baseline same body scale in every frame. Entire animal antlers legs visible within every cell.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/stag-fight-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "maren",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-world/maren.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Maren nineteen copper brown skin diamond face tired almond eyes jet black jaw bob blunt fringe bronze circlet matte river teal overdress cream front apron rolled cuffs brown ledger. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/maren-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "tamsin",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-world/tamsin.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Tamsin lean older woman warden age late sixties weathered warm skin silver braid broad brown travel hat feather faded grey long coat rust lining cut badge seams brown gloves boots. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/tamsin-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "elowen",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-world/elowen.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Elowen small old woman silver braid laughing wrinkled eyes white robe green stole gold hem amber throat stone. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/elowen-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "calla",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-world/calla.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Calla seventeen pale cool skin triangular face platinum straight hair hard high knot tall rigid narrow silhouette crisp grey full coat broad WHITE mantle white collar gold piping six-upper-ray half-sun clasp oxblood ledger. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/calla-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "aldric",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-world/aldric.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Brother Aldric forty short soft pear shaped body pale pink skin long pear shaped face prominent nose receding chin BALD crown scant mouse grey side hair CLEAN SHAVEN oversized white and gold coat prayer book amber pendant six-upper-ray half sun clasp. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/aldric-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "ren",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-world/ren.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Ren sixteen compact athletic bronze sun brown skin trapezoid face tight short black curls clipped sides sand linen small rust scarf diagonal white sash gold edge TWO large water skins one per hip no Mark no cloak. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/ren-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "ilara",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-old/ilara.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Ilara about twenty slim tawny skin long oval face wide green eyes long loose straight dark ash blond hair leaf green tunic brown trousers cream waist tie brown boots left hand Mark SEVEN places exactly SIX teal lit dots ONE dark unlit place no fox companion inside sheet. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/ilara-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "auren",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-old/auren.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Auren young farm boy tall sturdy broad chest ruddy tan skin rectangular face short thick sandy dark blond wavy hair swept off forehead cream linen burnt orange russet waistcoat brown trousers boots hoe pail warm friendly face. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/auren-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "custodian",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-old/custodian.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Custodian small fox badger moss and grey fur cream muzzle brass ear plate brass side plate winding key teal eyes. Three expressions DRY PATIENCE, RELUCTANT FONDNESS, OLD GRIEF. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/custodian-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "stag",
+    "kind": "portrait",
+    "refs": [
+      "public/assets/portraits/portraits.png",
+      "assets-src/concept/people-old/stag.webp"
+    ],
+    "prompt": "Use case stylized-concept. Cozy anime RPG PIXEL ART PORTRAIT strip THREE columns ONE row three equal square cells. Genuinely transparent background NO words grid shadows. Head and shoulders bust facing slightly LEFT, dark tinted brown outline warm top left light chunky pixels clear expression. Image 1 pixel portrait style reference, image 2 identity costume age and expressions reference. Identity costume colours silhouette from concept painting; pixel style outline light from reference portraits. Cernwyn ancient oak tall Verdant Stag bark brown fur pale cream chest giant bare tree antlers moss ferns teal eyes. Three expressions ENDURANCE, RELIEF, OLD SORROW. Left to right CALM GLAD TROUBLED as concept expressions unless named above. Keep SAME person face hair costume in all three expressions. Each bust fits entirely inside own cell ample transparent padding. No full bodies, no parchment, no palette swatches.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/stag-portrait.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-roan",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-roan.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Quay runner boy age ten bronze skin short dark curls russet hooded top brown knee trousers crossbody satchel boots. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-roan-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-hesper",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-hesper.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Potter apprentice woman nineteen warm light skin long dark braid plum dress cream apron sleeves rolled clay pot. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-hesper-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-pell",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-corin.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY River fisher man thirty five tan skin short dark hair stubble river indigo waistcoat cream rolled sleeves tan trousers fishing net brown boots. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-corin-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-corin",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-pell.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Baker woman forty eight fair warm skin red brown hair bun russet dress cream full apron cream hair ribbon wooden baking peel. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-pell-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-isolde",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-isolde.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Weaver man sixty two pale skin silver wavy short hair slim long moss green coat russet woven shoulder bag small spindle. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-isolde-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-nessa",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-nessa.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Herbalist woman seventy eight dark brown skin silver curls bun short round build plum shawl moss green tunic brown skirt herb basket on back. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-nessa-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-acolyte-a",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-pell.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Order acolyte woman twenty four brown skin short wavy dark bob white gold full robe mantle prayer book six upper rays half sun. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-acolyte-a-world.webp",
+    "referenceCommit": "8603e73"
+  },
+  {
+    "name": "town-acolyte-b",
+    "kind": "world",
+    "refs": [
+      "public/assets/sprites/town-pell.png",
+      "assets-src/concept/people-world/townsfolk.webp"
+    ],
+    "prompt": "Use case stylized-concept. Production cozy anime RPG pixel art sprite sheet. Image 1 approved pixel style image 2 concept identity. Create ONLY Order acolyte man fifty light skin balding brown side hair short brown beard white gold full robe mantle small brass hand bell six upper rays half sun. Use that person's matching concept panel. Identity costume colours silhouette from concept painting; pixel style outline light large head small feet from reference sprite. Transparent NO text grids shadows ground. STRICT FOUR columns SIX rows 24 equal cells. Rows 1-3 idle FRONT BACK RIGHT SIDE; rows 4-6 walk FRONT BACK RIGHT SIDE four step phases. Same head costume scale throughout, no face on back side faces right. Full body in each cell ample padding equal feet baseline. Warm upper left light dark brown tinted outline chunky pixel clusters no glow or painterly gradients.",
+    "tool": "image_gen.imagegen",
+    "attempt": 1,
+    "source": "assets-src/people-world/sources/town-acolyte-b-world.webp",
+    "referenceCommit": "8603e73"
+  }
+]

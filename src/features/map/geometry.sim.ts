@@ -111,3 +111,19 @@ export function clampToScreen(ndcX: number, ndcY: number, behind: boolean, width
   out.y = halfH + dy;
   return out;
 }
+
+/**
+ * Where the beam's distance goes across the screen so it sits on no piece of interface: `x` moved aside, along x,
+ * to the nearer side of each box it would cover that leaves it on screen. The distance is a box `w` by `h` centred
+ * on x, just under the point (`below`) or just over it. `boxes` is left, top, right, bottom, four numbers a box.
+ */
+export function clearOfInterface(x: number, y: number, below: boolean, width: number, boxes: readonly number[], w: number, h: number): number {
+  const top = below ? y + 12 : y - 12 - h, bottom = top + h;
+  for (let i = 0; i + 3 < boxes.length; i += 4) {
+    const l = boxes[i] as number, t = boxes[i + 1] as number, r = boxes[i + 2] as number, b = boxes[i + 3] as number;
+    if (bottom < t || top > b || x + w / 2 < l || x - w / 2 > r) continue;
+    const left = l - w / 2, right = r + w / 2;
+    x = (x - left <= right - x && left >= w / 2) || right > width - w / 2 ? left : right;
+  }
+  return x;
+}

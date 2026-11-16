@@ -17,7 +17,7 @@ of blocks, and farming and building still snap to that grid.
 | A tree | A trunk to fell, with a box | A leafy tree, `trees.ts`, that tips over when it is felled |
 | A scattered rock or bush | A prop | A painted boulder or a mound of leaves, `scatter.ts` |
 | A column of stone the plan stands in the wild (the grant's standing stone, the boulders by the pool) | Blocks | A painted stone large enough to hold its blocks |
-| Hollowmere's buildings and street pieces | Barrier blocks | The town kit's models in the painted light, `src/game/views/world-town.view.ts` |
+| Hollowmere's buildings and street pieces | Barrier blocks | The town kit's models in the painted light, `src/game/views/world-town.view.ts` and `world-city.view.ts`; past the distance a building is drawn whole, its far version, `far-buildings.ts` |
 | The Hollow Oak | Two blocks of trunk | A great painted oak, drawn leaf by leaf from any distance |
 | Grass tufts and flowers | Nothing | Blades, tufts and flowers grown where the land is green, `grass.ts` |
 
@@ -33,7 +33,7 @@ from there to the horizon. None of them needs a chunk.
 
 | Thing | Where | From |
 |---|---|---|
-| The far land, `far.ts` | From the near land's edge to 300 blocks | `landHeight`, `surfaceAt` and `forestAt` in `terrain.sim.ts`, a point every 8 blocks |
+| The far land, `far.ts` | From the near land's edge to 300 blocks | `landHeight`, `surfaceAt` and `forestAt` in `terrain.sim.ts`, a point every 8 blocks (14 at low) |
 | Far trees, `impostors.ts` | From 62 blocks to 288 | `treesInArea`: the trees the hero will find there. Each is a picture of its tree, taken when the game starts |
 | Ridges, `sky.ts` | Behind the far land | Fixed shapes that follow the hero. The nearest ring's foot is as green as the far land, so the land runs on into it |
 
@@ -82,8 +82,9 @@ pale line that breathes at the bank, and where the painted ripples slide. The sk
 you look across, so it turns with the hour and the weather. Rings spread from feet (the game's own
 `water.ripple`) and from rain. Its colours are `PAINTED_WATER` in `src/content/painted.ts`.
 
-A sheet is made after its chunk's land and again whenever a block near it changes. Past the near world the
-far land carries the water on as one flat colour.
+A sheet is made after its chunk's land and again whenever a block near it changes. All the sheets are one mesh,
+as the land's tiles are, so the water is one draw call however many chunks of it are in view. Past the near world
+the far land carries the water on as one flat colour.
 
 ## The final picture
 
@@ -107,6 +108,34 @@ A body that walks is drawn on the land itself while natural ground holds it up (
 when its leading edge reaches it and down when its trailing edge leaves it, so for a third of a block its feet
 are a whole block off the column under its middle. Drawn at its block height it hovered and dropped at every
 step. `bun tools/hero-ground.mjs` walks the hero over slopes and fails on any gap.
+
+## The kinds of land
+
+The plan of Greenhollow says which kind of land each column is and how grey it is (`biomeMix` and `blightAt`
+in `src/game/region/greenhollow.sim.ts`). The view hands both to the painted feature as a `Nature`, and
+`nature.ts` turns them into a reading of the land at a point. The near land, the far land, the grass and the
+wilds all read it, so a kind's edge is the same in each.
+
+| Kind | Ground and grass | Small things (`wilds.ts`, `WILDS`) | Air (`KIND_AIR`) |
+|---|---|---|---|
+| Old forest | Darker greens, the moss painting, painted fern cards | Ferns, surface roots, fallen logs, mushrooms | Green shade, shafts of sun (`shafts.ts`), pollen by day, fireflies at night |
+| Grey forest | Pale dry greens, short grass, no flowers | Grey grass, fallen logs | Paler air, the wind dies, ash rises and vanishes |
+| Marsh | Long grass, mud patches, standing pools painted into the land | Bulrushes and painted reed cards on pool rims, lily pads and stepping stones in pools | Mist at dawn, lanternflies at night |
+| Cave hills | Thin turf, scree patches | Scree | Cool and clear |
+| Terraces | Carved stone (`terrace-stone`) between grey moss | Surface roots, scree, grey grass | A little gold |
+
+The looks are data: `LAND_KINDS`, `GREY` and `POOLS` in `src/content/land.ts`, the trees, `GREY_LOOKS`,
+`WILDS` and `KIND_AIR` in `src/content/painted.ts`. Grey drains every colour toward ash, each tree by its own
+`blightAt` (`Placement.grey`). `?grey=a` (default) keeps the crowns full; `?grey=b` thins them so bare boughs
+show. The old oaks (`oldOak`) and willows (`willow`) are drawn for those tree kinds when the terrain grows them;
+`?wildtrees=1` previews them on today's trees.
+
+In a thick wood the trees are held to `treeTriangles` (`src/content/quality.ts`): the nearest lose their
+shadows and fine leaves first, then the far trees' pictures come closer. They never stand leaf by leaf past
+`treeReach`, which is shorter at low. Each kind of tree costs its own draw calls, so two variants with the same
+shape and leaves share one stand, and a stand whose trees are all off screen is not drawn. Boulders and bushes
+are drawn within `scatterReach`, a bush in its full leaves within `fineBushReach`. `bun tools/biome-shots.mjs` shoots each
+kind close and from 80 blocks off with its costs, and `bun tools/biome-sheet.mjs` lays pictures out in a grid.
 
 ## Where things are
 

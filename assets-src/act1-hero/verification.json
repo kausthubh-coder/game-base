@@ -1,0 +1,68 @@
+{
+  "status": "ISSUES",
+  "branch": "act1-sprites-hero",
+  "base": "8603e73",
+  "runtimeCodeChanged": false,
+  "manifestChanged": false,
+  "baselinesChanged": false,
+  "sheets": [
+    "hero",
+    "hero-moves",
+    "hero-swing",
+    "hero-cut",
+    "hero-cut-back",
+    "hero-bow",
+    "hero-staff",
+    "hero-call"
+  ],
+  "frames": 114,
+  "checks": {
+    "doctor": "PASS",
+    "check": "PASS before and first post-change run",
+    "spriteCheck": "FAIL frozen original hero SHA256 after frame geometry/palette checks pass",
+    "storyCheck": "FAIL frozen original hero SHA256 after frame geometry/palette checks pass",
+    "assets": "FAIL sprite-check only; other eight checks pass",
+    "build": "PASS",
+    "shots": "FAIL town, farm, river; river failed before edits; latest farm/town captures show model placeholders",
+    "play": "FAIL session startup initially; retry times out in cancel-bag-drag.json and first-talk.json",
+    "walking": "PASS actual game movement, Metal renderer, no console errors",
+    "fightPoses": "PASS all hero states and three directions, low quality Metal renderer, no console errors"
+  },
+  "pictures": {
+    "walking": ".artifacts/hero/walking.png",
+    "actions": ".artifacts/hero/actions.png",
+    "sword": ".artifacts/hero/sword.png",
+    "bow": ".artifacts/hero/bow.png",
+    "staff": ".artifacts/hero/staff.png",
+    "beside": {
+      "hero": ".artifacts/sprites/beside-hero.png",
+      "hero-moves": ".artifacts/sprites/beside-hero-moves.png",
+      "hero-swing": ".artifacts/sprites/beside-hero-swing.png",
+      "hero-cut": ".artifacts/sprites/beside-hero-cut.png",
+      "hero-cut-back": ".artifacts/sprites/beside-hero-cut-back.png",
+      "hero-bow": ".artifacts/sprites/beside-hero-bow.png",
+      "hero-staff": ".artifacts/sprites/beside-hero-staff.png",
+      "hero-call": ".artifacts/sprites/beside-hero-call.png"
+    },
+    "before": {
+      "hero": ".artifacts/hero/before-hero.png",
+      "hero-moves": ".artifacts/hero/before-hero-moves.png",
+      "hero-swing": ".artifacts/hero/before-hero-swing.png",
+      "hero-cut": ".artifacts/hero/before-hero-cut.png",
+      "hero-cut-back": ".artifacts/hero/before-hero-cut-back.png",
+      "hero-bow": ".artifacts/hero/before-hero-bow.png",
+      "hero-staff": ".artifacts/hero/before-hero-staff.png",
+      "hero-call": ".artifacts/hero/before-hero-call.png"
+    }
+  },
+  "visualIssues": [
+    "Glove visibility and handedness vary in back and gripping poses",
+    "Staff boots are lighter than idle"
+  ],
+  "notChecked": [
+    "Sustained real-key combat; fight captures set actual rule states through debug door",
+    "Weak-device performance",
+    "Looks B, C, D not made while A has unresolved checks"
+  ],
+  "cleanup": "Own capture server and play session stopped; no push or merge"
+}

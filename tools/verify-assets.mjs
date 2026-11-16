@@ -15,8 +15,9 @@ import { pathToFileURL } from 'node:url';
 const MB = 1024 * 1024;
 // The folder was 12 MB. It is 24 MB since the Hollowmere town kit (models/town/, about 0.5 MB with Draco) came on
 // top of 11.5 MB of sprites, tiles and voiced lines: the voice keeps growing, and the town's models are fetched
-// only as the hero nears the town, so the folder is no longer what a first load costs.
-export const LIMITS = { png: 1 * MB, folder: 24 * MB };
+// only as the hero nears the town, so the folder is no longer what a first load costs. It is 30 MB since every
+// person in act 1 has a voice (2026-11-12): 253 clips, 9 MB, each fetched only when its conversation starts.
+export const LIMITS = { png: 1 * MB, folder: 30 * MB };
 
 // A palette that leaves a layer out on purpose, with the reason. Anything else missing is a failure.
 export const LAYER_EXEMPT = {
@@ -374,6 +375,19 @@ export function checkManifest(root) {
   return result(manifest, `${summary.join('; ')}; ${plural(used.size - 1, 'file')} listed and found`);
 }
 
+// -------------------------------------------------------------------------------- the art check
+
+/** Runs tools/art/check.mjs: every sheet, portrait and icon against the style sheet, the contract and the ledger. */
+export function checkArt(root) {
+  const script = 'tools/art/check.mjs';
+  if (!fs.existsSync(path.join(root, script))) return { failures: [`${script} is missing.`], warnings: [], detail: '' };
+  const run = spawnSync(process.execPath, [script], { cwd: root, encoding: 'utf8', timeout: 300_000 });
+  const out = (run.stdout ?? '').split('\n').map((l) => l.trimEnd()).filter(Boolean);
+  const failures = out.filter((l) => l.startsWith('FAIL   ')).map((l) => l.slice(7).replace(/\s+/g, ' '));
+  if (run.status !== 0 && !failures.length) failures.push(`bun ${script} failed: ${(run.stderr ?? '').split('\n').find((l) => /rror/.test(l)) ?? `exit ${run.status}`}`);
+  return { failures, warnings: out.filter((l) => l.startsWith('fixed  ')).map((l) => l.slice(7).replace(/\s+/g, ' ')), detail: (out.at(-1) ?? '').replace(/^(PASS|FAIL) art: /, '') };
+}
+
 // -------------------------------------------------------------------------------- 2. sprite check
 
 /** Runs tools/sprites/check.mjs and turns a failed assertion into lines a reader can act on. */
@@ -643,6 +657,7 @@ export async function loadPalettes(root) {
   const dir = path.join(root, folder);
   const found = new Map(); // palette object -> label
   const warnings = [], failures = [];
+  // Every palette list index.ts exports counts: the starting lands' and Greenhollow's regions'.
   let listed = null;
   if (!fs.existsSync(dir)) return { palettes: [], warnings, failures: [`${folder} does not exist.`] };
   for (const file of fs.readdirSync(dir).filter((f) => f.endsWith('.ts') && !/\.test\.ts$/.test(f)).sort()) {
@@ -654,7 +669,7 @@ export async function loadPalettes(root) {
       continue;
     }
     for (const [name, value] of Object.entries(module)) {
-      if (file === 'index.ts' && name === 'palettes' && Array.isArray(value)) listed = value;
+      if (file === 'index.ts' && Array.isArray(value) && value.length > 0 && value.every(looksLikePalette)) listed = [...(listed ?? []), ...value];
       for (const item of Array.isArray(value) ? value : [value]) {
         if (looksLikePalette(item) && !found.has(item)) found.set(item, typeof item.id === 'string' ? item.id : `${name} (${file})`);
       }
@@ -662,7 +677,7 @@ export async function loadPalettes(root) {
   }
   if (listed) {
     for (const [palette, label] of found) {
-      if (!listed.includes(palette)) warnings.push(`${folder}: palette ${label} is not in the list in index.ts, so the sound engine never plays it.`);
+      if (!listed.includes(palette)) warnings.push(`${folder}: palette ${label} is in no list in index.ts, so the sound engine never plays it.`);
     }
   }
   return { palettes: [...found].map(([palette, label]) => ({ label, palette })), warnings, failures };
@@ -778,6 +793,7 @@ export function checkSound(root, manifest) {
 const USUAL_FIX = {
   manifest: 'make manifest.json and the files agree: rebuild with the script that owns the entry, or correct the path. Never hand-edit a sheet.',
   'sprite-check': 'find the message in .agents/skills/make-sprite/check-failures.md, fix the build step it names, rebuild, and run bun tools/sprites/check.mjs --complete alone until it passes.',
+  art: 'the rule each line names is in .agents/skills/make-sprite/check-failures.md with its fix. `bun tools/art/review.mjs <sheet>` draws the sheet beside its reference. Never add a fault to assets-src/art-ledger.json to pass.',
   names: 'correct the name in the content file, or make the asset under that exact name (.agents/skills/make-sprite/SKILL.md).',
   'block-tiles': 'correct the tile name in src/content/blocks.ts, or make the tile (.agents/skills/make-sprite/SKILL.md).',
   props: 'simplify the builder (fewer segments, merged faces). Raise the budget only inside the limits in docs/style-sheet.md.',
@@ -794,6 +810,7 @@ export async function verify({ root, strict = false, self }) {
   const manifest = checkManifest(root);
   add('manifest', manifest);
   add('sprite-check', checkSprites(root));
+  add('art', checkArt(root));
 
   if (manifest.manifest) {
     const names = checkNames(root, manifest.manifest);

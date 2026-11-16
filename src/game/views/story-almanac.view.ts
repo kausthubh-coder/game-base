@@ -1,8 +1,8 @@
-// The moment Tamsin hands over the Almanac. The book is the flag `has.almanac`, never a thing in the bag,
-// so no "item gained" toast says so. Instead a card rises under the hint strip as her first talk closes
-// (a talk's effects land when it ends): the book, its name, and whose it was. Her line "Take the book"
-// and a narrated line of her putting it in your hands come first. The HUD's book button glows the first
-// time it shows (ui-hud.view.ts).
+// The moment the Custodian hands over Ilara's field book, the Almanac, at the end of scene 14 in the Hall. The book
+// is the flag `has.almanac`, never a thing in the bag, so no "item gained" toast says so. Instead a card rises under
+// the hint strip as the scene closes (a talk's effects land when it ends): the book, its name, and whose it was. The
+// narrated line of it nosing the book off the plinth comes first. The HUD's book button glows the first time it
+// shows (ui-hud.view.ts).
 //
 // While the card shows, the hint and the Almanac's note at the top step aside and wait, so the screen says one thing
 // at a time. The card names the Tab key, so the hint "Press Tab to open the Almanac" is not shown after it.
@@ -68,7 +68,7 @@ export function install(view: GameView): void {
     card.append(icon);
   }
   card.insertAdjacentHTML('beforeend', /* html */ `
-    <span class="st-gift-eyebrow">Received from Tamsin</span>
+    <span class="st-gift-eyebrow">Received from the Custodian</span>
     <h2 class="st-gift-name">The ${name}</h2>
     <span class="st-gift-text">Blank for forty years. Yours to fill, and to keep.</span>
     <span class="st-gift-key"><kbd>Tab</kbd> opens it</span>`);

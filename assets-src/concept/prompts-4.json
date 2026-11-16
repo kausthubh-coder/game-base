@@ -1,0 +1,49 @@
+{
+  "tool": "built-in image_gen",
+  "basePrompt": "Use case: stylized-concept. Paint a polished production concept sheet for Greenhollow, a cozy grand-scale browser RPG. Landscape sheet about 1600px wide, warm pale cream paper, soft gouache painted surfaces, clean bright colour, Genshin-like warmth, ochre light upper left, lavender shadows, yellow-green moss. Match the reference images: cream honey limestone, broad worn bevels, restrained incised botanical/geometric bands; oak umber bark, fresh green moss; pale lavender natural rock. BUILDABLE from simple meshes, rings and swept roots, maximum 6000 triangles imagined. Main three-quarter view large at left; orthographic FRONT and SIDE at right of SAME design; minimal readable labels naming dimensions and material swatches. Show brown-haired traveller in ochre shirt, brown trousers, 1.8 blocks high next to every main model, accurately tiny. No voxel blocks, no grimdark, no intricate filigree. Dimensions W x D x H. ",
+  "sheets": [
+    [
+      "7-ways-down/caveMouth",
+      "caveMouth, 10 x 6 x 8 blocks. Natural root cave mouth cut into a low rounded rock hill beyond the river. Three overlapping rounded lavender-grey rock masses, open irregular mouth 4 blocks wide 4 tall, thick oak roots sweeping over roof and one side, thin turf above, a few pale crystals in clefts. No masonry, no lamps. Show a dark short cave throat distinct from the stone. Simple swept roots, broad clean rock faces. Labels dimensions and honey oak roots, lavender stone, turf."
+    ],
+    [
+      "7-ways-down/vaultRoots",
+      "vaultRoots, 14 x 12 x 10 blocks. Seed Vault sealed ancient double door beneath a roof of LIVING oak roots in the Old Forest. Low wide hummock of roots over cream honey limestone round-arched door, large intertwined roots 1 block thick sweep from rear 12-block depth to front buttresses. Simple solid bronze wooden double door with a small unmistakable GOLD SUN SEAL spanning the central seam, Calla of the Order sealed it. Do not turn entire door into glowing gold. Worn steps and small ferns. No full tree canopy that hides root architecture. Labels: Calla's gold seal; living oak; honey limestone; 14 x 12 x 10."
+    ],
+    [
+      "7-ways-down/crystals",
+      "crystals. TWO VARIANTS on ONE sheet, clearly distinct rows labeled SMALL and LARGE, each with three-quarter, FRONT and SIDE and 1.8-block hero. LARGE cluster fits 3 x 3 x 4 blocks; SMALL cluster fits 1.5 x 1.5 x 2 blocks. Clusters of 3 to 5 broad faceted hexagonal prisms with blunt pyramidal points emerging from lavender-grey rock base. Pale milk-white quartz, faint lilac shade, very restrained pale cyan inner tint, NO neon glow. Small variant two major crystals and a chip, large variant five crystals tiered. Broad readable silhouette, no needle forest. Material labels and exact sizes."
+    ],
+    [
+      "8-set-pieces/rockArch",
+      "rockArch, 16 x 6 x 12 blocks. GRAND NATURAL ROCK ARCH, broad eroded limestone bridge as a wilderness gate, 9-block-wide clear opening 8 blocks high. Asymmetric thick rounded piers, slanted single sweeping arch mass, turf and moss cap with a few tufts. Natural lavender-grey rock with warm cream lit planes, 5 to 7 broad eroded faces. No carved masonry, no brick joints. Hero VERY small under the opening. Show front, side 6-block thickness, and three-quarter. Clear ground clearance and buildable contiguous arch."
+    ],
+    [
+      "8-set-pieces/boulders",
+      "boulders, THREE VARIANTS on ONE landscape sheet: rows ONE, PAIR, PILE. Each row has three-quarter view, front, side, accurately 1.8-block traveller. Maximum envelope each group 6 x 6 x 5 blocks. ONE solitary broad rounded boulder, PAIR two asymmetrical leaning boulders with a narrow cleft, PILE three large rocks with two small chocks forming stable broad mound. Lavender-grey broad stone facets, cream sunlit faces, olive and fresh green moss on top only. Simple low-poly rounded forms, no pebble noise. Dimensions labels ONE 5x4x4, PAIR 6x5x5, PILE 6x6x5. Consistent variants in all views."
+    ],
+    [
+      "8-set-pieces/fallenGiant",
+      "fallenGiant, 24 x 5 x 5 blocks. Ancient fallen hollow OAK, grand horizontal trunk as LONG WALKABLE TUNNEL, not a little log. Main view long diagonal, near hollow end shows 3-block-wide clear bore and daylight at distant other end, hero 1.8 blocks INSIDE near opening. 24 length along X, 5 diameter. Dark umber bark in wide swept ribs, warm ochre heartwood cut rim, mossy top with 2 small ferns. Two stout broken branch stubs only; low roots at far end must not block bore. FRONT is end-on circular open bore; SIDE shows full 24-block length, uninterrupted floor passage. Label 24 length, 5 diameter, clear bore 3; swept bark ribs; moss; oak heartwood."
+    ],
+    [
+      "8-set-pieces/stiltHut",
+      "stiltHut, 8 x 8 x 8 blocks total, warm modest marsh shelter on four timber STILTS, raised 2 blocks above water. Timber hut wall mass 5 x 5, broad ochre thatched hipped roof, tiny porch and open doorway. Simple pale plaster panels between brown timber, roof muted wheat not orange, weathered umber stilts with diagonal braces. Boardwalk reaches porch at same height, 2 blocks wide. No stone foundation. Main three-quarter, front and side show 8-block height from mud to roof and structural stilts. Warm window amber, reeds only as small base context. Friendly practical silhouette, simple roof planes."
+    ],
+    [
+      "8-set-pieces/boardwalk",
+      "boardwalk, modular segment 2 wide x 8 long x 1 high blocks. Plank walkway on short timber posts for Lantern Marsh, plain weathered oak planks across two long stringers, two pairs of posts per segment, no railing. Main three-quarter shows THREE IDENTICAL SEGMENTS JOINING END TO END straight over shallow water, mark seams with subtle arrows and label 8 + 8 + 8 blocks, total 24. Front view shows 2-block width and 1-block height, SIDE shows one full 8-block segment. Hero 1.8 blocks tall standing on planks. Inset underside joint: butt planks at boundary, stringer ends meet on shared post line, no steps or gaps. Quiet moss, warm grey-brown wood, no ornate connectors."
+    ]
+  ],
+  "vistas": [
+    [
+      "7-ways-down/vista",
+      "Paint a wide cinematic LANDSCAPE ENVIRONMENT CONCEPT VISTA for Greenhollow, cozy grand-scale RPG, soft gouache warm sunshine, Genshin-like clean bright greens and lavender shadows. A composed TRIPTYCH of three generous landscapes within ONE panoramic painting, clearly separated by narrow cream gutters, tiny unobtrusive captions. LEFT cave hills beyond the river: broad lavender rock shelves and hardy pines, root-draped natural cave entrance 10m wide 8m high, pale crystals in clefts, river visible far below. CENTRE underground Lamp Gallery: honey limestone grand arch 10m tall, two DEAD brass lamps NO luminous cores, dark reflective mirror panels, warm natural shaft of daylight from cave fissure above, quiet lilac reflected light. RIGHT Old Forest: shafts of golden daylight through huge oaks, root-roofed Seed Vault 14m wide 10m high, simple honey stone doorway, thick living oak roots over it, Calla's small gold sun seal across closed door seam. A tiny 1.8m ochre-shirt brown-trouser traveller in each landscape for scale. No neon, no grimdark, no cubes. Show terrain and approach paths and breathable distance, not isolated prop renders. Caption locations truthfully, these are separate places, not one adjacent site."
+    ],
+    [
+      "8-set-pieces/vista",
+      "Paint one coherent wide cinematic LANDSCAPE ENVIRONMENT CONCEPT VISTA of Lantern Marsh at early dusk in Greenhollow cozy RPG. Soft gouache, Genshin-like warm golden last sunlight on dry hillside, lavender dusk sky reflected in shallow pools, clean yellow-greens, welcoming. Main right: modest warm-window timber hut on 2m stilts, wheat thatch roof, connected timber boardwalk with repeated 2m-wide 8m-long modules on low posts across reeds and ponds; a gentle short ramp reaches higher hut porch. Tiny amber lanternflies above reeds, not hanging lanterns. Foreground left DRY Old Forest margin: giant fallen oak hollow trunk 24m long diameter5m, near open 3m bore with tiny 1.8m ochre-shirt traveller beside it, continuous passage through oak visible, mossy top. Mossy boulders alongside dry path. Middle distance on DRY lavender rock ridge an enormous natural rock arch16m wide12m high as gate, clear opening9m wide8m high, a second tiny traveller underneath. Willow silhouettes, lily pads, green far hill in blue air. Atmospheric grand scale; distinct connected landforms, no impossible floating construction, no masonry in natural arch. No text except small location title Lantern Marsh."
+    ]
+  ],
+  "reference": "galleryMouth source sheet, map pieces, rock and meadow paintings; see report-4.md"
+}

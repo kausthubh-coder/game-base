@@ -1,0 +1,204 @@
+{
+  "pixelsPerMetre": 160,
+  "baseline": 1190,
+  "cast": [
+    {
+      "name": "Hero A",
+      "file": "people-home/hero.webp",
+      "crop": [
+        210,
+        75,
+        175,
+        625
+      ],
+      "heightMetres": 1.54
+    },
+    {
+      "name": "Hobb",
+      "file": "people-home/hobb.webp",
+      "crop": [
+        200,
+        80,
+        235,
+        640
+      ],
+      "heightMetres": 1.48
+    },
+    {
+      "name": "Dax",
+      "file": "people-home/dax.webp",
+      "crop": [
+        190,
+        60,
+        245,
+        660
+      ],
+      "heightMetres": 1.8
+    },
+    {
+      "name": "Mina",
+      "file": "people-home/mina.webp",
+      "crop": [
+        185,
+        70,
+        215,
+        640
+      ],
+      "heightMetres": 1.5
+    },
+    {
+      "name": "Gus",
+      "file": "people-home/gus.webp",
+      "crop": [
+        190,
+        65,
+        245,
+        640
+      ],
+      "heightMetres": 1.7
+    },
+    {
+      "name": "Wren",
+      "file": "people-home/wren.webp",
+      "crop": [
+        205,
+        65,
+        195,
+        640
+      ],
+      "heightMetres": 1.75
+    },
+    {
+      "name": "Tansy",
+      "file": "people-home/tansy.webp",
+      "crop": [
+        175,
+        65,
+        240,
+        645
+      ],
+      "heightMetres": 1.52
+    },
+    {
+      "name": "Holt",
+      "file": "people-home/holt.webp",
+      "crop": [
+        200,
+        90,
+        225,
+        620
+      ],
+      "heightMetres": 1.72
+    },
+    {
+      "name": "Maren",
+      "file": "people-world/maren.webp",
+      "crop": [
+        525,
+        5,
+        165,
+        455
+      ],
+      "heightMetres": 1.6
+    },
+    {
+      "name": "Tamsin",
+      "file": "people-world/tamsin.webp",
+      "crop": [
+        360,
+        15,
+        200,
+        465
+      ],
+      "heightMetres": 1.68
+    },
+    {
+      "name": "Elowen",
+      "file": "people-world/elowen.webp",
+      "crop": [
+        535,
+        5,
+        170,
+        450
+      ],
+      "heightMetres": 1.42
+    },
+    {
+      "name": "Calla",
+      "file": "people-world/calla.webp",
+      "crop": [
+        525,
+        4,
+        165,
+        445
+      ],
+      "heightMetres": 1.78
+    },
+    {
+      "name": "Aldric",
+      "file": "people-world/aldric.webp",
+      "crop": [
+        490,
+        65,
+        220,
+        365
+      ],
+      "heightMetres": 1.5
+    },
+    {
+      "name": "Ren",
+      "file": "people-world/ren.webp",
+      "crop": [
+        515,
+        10,
+        170,
+        430
+      ],
+      "heightMetres": 1.6
+    },
+    {
+      "name": "Ilara",
+      "file": "people-old/ilara.webp",
+      "crop": [
+        545,
+        5,
+        145,
+        420
+      ],
+      "heightMetres": 1.64
+    },
+    {
+      "name": "Auren",
+      "file": "people-old/auren.webp",
+      "crop": [
+        515,
+        5,
+        180,
+        435
+      ],
+      "heightMetres": 1.82
+    },
+    {
+      "name": "Custodian",
+      "file": "people-old/custodian.webp",
+      "crop": [
+        490,
+        150,
+        160,
+        230
+      ],
+      "heightMetres": 0.7
+    },
+    {
+      "name": "Cernwyn",
+      "file": "people-old/stag.webp",
+      "crop": [
+        365,
+        40,
+        245,
+        290
+      ],
+      "heightMetres": 6.4
+    }
+  ]
+}

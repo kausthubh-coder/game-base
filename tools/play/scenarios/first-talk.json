@@ -5,36 +5,148 @@
   "inputs": [
     {
       "type": "click",
-      "text": "New game"
+      "text": "Begin"
+    },
+    {
+      "type": "wait",
+      "ms": 1500
+    },
+    {
+      "type": "hold",
+      "key": "Escape",
+      "ms": 1400
+    },
+    {
+      "type": "check",
+      "path": "talk.npc",
+      "equals": "hobb",
+      "timeout": 15000
+    },
+    {
+      "type": "see",
+      "text": "Up, Button",
+      "timeout": 10000
     },
     {
       "type": "press",
-      "key": "Escape"
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
+    },
+    {
+      "type": "press",
+      "key": "Enter"
+    },
+    {
+      "type": "wait",
+      "ms": 250
     },
     {
       "type": "check",
       "path": "player.busy",
       "equals": false,
-      "timeout": 15000
-    },
-    {
-      "type": "hold",
-      "key": "KeyD",
-      "ms": 180
+      "timeout": 10000
     },
     {
       "type": "hold",
       "key": "KeyS",
-      "ms": 210
+      "ms": 1000
+    },
+    {
+      "type": "hold",
+      "key": "KeyD",
+      "ms": 1000
     },
     {
       "type": "press",
       "key": "KeyE"
     },
     {
-      "type": "check",
-      "path": "talk.npc",
-      "equals": "tamsin"
+      "type": "see",
+      "text": "The mirror",
+      "timeout": 10000
     }
   ]
 }

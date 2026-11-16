@@ -44,7 +44,8 @@ export function install(kernel: Kernel): void {
       const logs=Math.max(3,Math.round(4*t.size)), leaves=20;
       game.systems.inventory.add('oak_log',logs);
       game.systems.inventory.add('fiber',Math.max(1,Math.round(leaves/15)));
-      const id=blockId(`${t.kind}_log`);
+      const trunk=t.kind==='pine'?'pine':t.kind==='birch'?'birch':'oak';
+      const id=blockId(`${trunk}_log`);
       game.events.emit('block.broken',{x:t.x,y:t.y,z:t.z,id,by:'player'});
       game.events.emit('tree.felled',{x:t.x,y:t.y,z:t.z,id,logs,leaves,box:t.box});
       return true;

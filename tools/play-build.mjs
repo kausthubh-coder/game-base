@@ -1,6 +1,6 @@
 // Build mode in the browser: builds the game, serves it, opens the build lab (`?scene=build`) and works it with
 // the real mouse and keys. It tills a field with one drag, plants it, waters it, runs two fences that cross,
-// backs a chest onto a wall, shows a sprinkler's reach, picks a chest up again, takes a stroke back, and
+// backs a chest onto a wall, sets down a sprinkler with no wheel to turn it, picks a chest up again, takes a stroke back, and
 // checks that a right click, a lost window and a release over the HUD each end a stroke the right way.
 //   bun tools/play-build.mjs [--port 5461] [--dist dist-build] [--no-build] [--shots .artifacts/build]
 // It writes a screenshot of each step into the shots folder. This Mac draws WebGL in software, so it checks
@@ -184,9 +184,11 @@ try {
   await shot('11-sprinkler-reach.png');
   await click([-3, 3]);
   await game(() => window.__game.advance(1));
-  // It reaches two blocks: the patch's two near columns, three cells each, and not the far one.
+  // A sprinkler uses one power (handbook chapter 30): with no wheel on its shaft it is starved and wets nothing.
+  // Its reach once a wheel turns it is src/game/machines' test.
   const reached = await wetSoil();
-  check('a sprinkler wets the soil in its reach and no further', (await placed()).some((p) => p.kind === 'sprinkler') && reached.length === 6 && reached.every((dx) => dx === -5 || dx === -4), JSON.stringify(reached));
+  const sprinkler = await game(() => window.__game.view.game.systems.machines.parts().find((p) => p.kind === 'sprinkler')?.state ?? null);
+  check('a sprinkler with no wheel to turn it is starved and wets nothing', (await placed()).some((p) => p.kind === 'sprinkler') && sprinkler === 'starved' && reached.length === 0, JSON.stringify({ sprinkler, reached }));
   await frames(2);
   await shot('11b-sprinkler-placed.png');
 

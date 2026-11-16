@@ -19,7 +19,7 @@ export const nothingLeftFloating: Scenario = {
   name: 'nothing-left-floating',
   about: 'A fence with a fence standing on it cannot be taken back: not with the button held on it, not with a press in build mode, not with undo.',
   seed: 18,
-  start: { quest: 'roof', give: { fence: 4 } },
+  start: { quest: 'ground', give: { fence: 4 } },
   inputs: [
     { do: 'teleport', to: { place: 'grant.center', dz: 3 } },
     // One fence on the ground and one on top of it.

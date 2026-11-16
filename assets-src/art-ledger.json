@@ -1,0 +1,506 @@
+{
+ "about": "What each 2D asset breaks today, as audited. Written by `bun tools/art/check.mjs --ledger`; `grade` (1 to 5), `seen` (5 always on screen, 1 not in act 1), `eyes` (what the picture showed) and `owner` (another lead redraws it) are the audit's. docs/act1-2d-audit.md explains.", "sheets": {
+  "hero": {
+   "sha": "800c712b7382", "grade": 4.5,
+   "seen": 5,
+   "eyes": "The reference. Slimmer and smaller-headed than the rest of the cast (2.6 heads tall, they are 2), so he reads as from another game beside Dax or Hobb.", "known": []
+  },
+  "hero-moves": {
+   "sha": "15ab9441098e", "grade": 2.5,
+   "seen": 5,
+   "eyes": "Stockier body, bigger head, yellower hair, both eyes with highlights.", "known": []
+  },
+  "hero-swing": {
+   "sha": "6785e32ea771", "grade": 2.5,
+   "seen": 5,
+   "eyes": "Face redrawn with two large eyes and a fuller fringe; the idle shows one eye. The most used action in the game.", "known": []
+  },
+  "hero-cut": {
+   "sha": "cfc205192cbf", "grade": 3,
+   "seen": 5,
+   "eyes": "Close. Lighter hair, both eyes, head a little larger.", "known": []
+  },
+  "hero-cut-back": {
+   "sha": "4c9cc554b035", "grade": 3,
+   "seen": 4,
+   "eyes": "Close. Spikier, redder hair.", "known": []
+  },
+  "hero-bow": {
+   "sha": "4ba22923d57d", "grade": 3,
+   "seen": 4,
+   "eyes": "Close. Both eyes show.", "known": []
+  },
+  "hero-camp": {
+   "sha": "4f94a3534d50", "grade": 3.5,
+   "seen": 2,
+   "eyes": "Good seat and rise. Both eyes show.", "known": []
+  },
+  "hobb": {
+   "sha": "3c0925e38fbd", "grade": 4,
+   "seen": 4,
+   "eyes": "Clean and true to her sheet. Crimson went maroon in the palette.", "known": []
+  },
+  "dax": {
+   "sha": "c202e89c96c7", "grade": 4,
+   "seen": 4,
+   "eyes": "Clean. Pixels 16% larger than the hero's from the stretch to his height.", "known": []
+  },
+  "mina": {
+   "sha": "d3c2a978da5f", "grade": 4,
+   "seen": 4,
+   "eyes": "Clean, the tube reads.", "known": []
+  },
+  "tansy": {
+   "sha": "cf21de0f7d5c", "grade": 3.5,
+   "seen": 4,
+   "eyes": "Clean. The honey-yellow apron went ochre in the palette, so she joins the brown crowd.", "known": []
+  },
+  "holt": {
+   "sha": "39b761c22cf2", "grade": 4,
+   "seen": 4,
+   "eyes": "Clean.", "known": []
+  },
+  "gus": {
+   "sha": "6ec78aaee86a", "grade": 3.5,
+   "seen": 4,
+   "eyes": "Clean, but a cartoon moustache face where the sheet is a sun-worn farmer.", "known": []
+  },
+  "wren": {
+   "sha": "7b7ade7b43d6", "grade": 4,
+   "seen": 4,
+   "eyes": "Clean.", "known": []
+  },
+  "tamsin": {
+   "sha": "98dcb4f38c2c", "grade": 2,
+   "seen": 4,
+   "eyes": "Reads as a little girl in a big hat; the sheet is a lean older warden a head taller. Speckled coat, light hair with no outline.", "known": ["scale", "outline"]
+  },
+  "maren": {
+   "sha": "20cff7f569dc", "grade": 2.5,
+   "seen": 4,
+   "eyes": "A child's proportions and a flower crown; the sheet and her portrait have a nineteen-year-old with a pushed-back crown in river teal. A smudge on the face.", "known": []
+  },
+  "elowen": {
+   "sha": "139002c01eba", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Eyes shut laughing in every frame, walking too. The green stole went brown.", "known": []
+  },
+  "calla": {
+   "sha": "b6f6552f9355", "grade": 3,
+   "seen": 3,
+   "eyes": "The tallest woman of the cast stands shorter than the hero. Her grey coat came out half brown.", "known": []
+  },
+  "aldric": {
+   "sha": "dc4ff3e5ca97", "grade": 2.5,
+   "seen": 3,
+   "eyes": "The nose is a red streak across the face.", "known": []
+  },
+  "ren": {
+   "sha": "5d1fa229c340", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good, and small: a sixteen-year-old drawn at 0.89 heroes.", "known": []
+  },
+  "ilara": {
+   "sha": "f79f28921489", "grade": 3,
+   "seen": 3,
+   "eyes": "Leaf-green tunic went brown; teal on both hands where the Mark is on the left.", "known": []
+  },
+  "auren": {
+   "sha": "c48c52724f4c", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Burnt-orange waistcoat went maroon; stands a hero tall where the sheet has him the tallest.", "known": []
+  },
+  "custodian": {
+   "sha": "deb1cbbc02b0", "grade": 3,
+   "seen": 4,
+   "eyes": "A third smaller than its sheet and than its own waking sheet; fur tan where the sheet is moss grey.", "known": []
+  },
+  "custodian-wake": {
+   "sha": "c5adec9dd247", "grade": 2.5,
+   "seen": 2,
+   "eyes": "Four single frames with nothing between them: no eye opening, no stretch.", "known": []
+  },
+  "fox": {
+   "sha": "b0a4157cbfe3", "grade": 4,
+   "seen": 4,
+   "eyes": "Good.", "known": []
+  },
+  "fox-blighted": {
+   "sha": "79a5e91a75df", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good. The leaf tail greys with it.", "owner": "act1-lead-story", "known": []
+  },
+  "fox-blighted-fight": {
+   "sha": "bc85251b492a", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good; the fourth pose is the well fox on purpose.", "owner": "act1-lead-story", "known": []
+  },
+  "thistlehog": {
+   "sha": "95089ec6c6bc", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "thistlehog-calmed": {
+   "sha": "95089ec6c6bc", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "thistlehog-blighted": {
+   "sha": "323d9bc2d50d", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good, and 8% larger than the well form it turns into.", "known": []
+  },
+  "thistlehog-fight": {
+   "sha": "9ea12f6190fd", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "gearling": {
+   "sha": "90754883de18", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "gearling-fight": {
+   "sha": "354a8dd6fad0", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "boar": {
+   "sha": "c1ba47180650", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good drawing. Nearly twice the height its sheet gives (shoulder 1.6 blocks beside a 1.8-block hero).", "known": ["scale"]
+  },
+  "boar-calmed": {
+   "sha": "c1ba47180650", "grade": 3.5,
+   "seen": 3,
+   "eyes": "As the boar.", "known": ["scale"]
+  },
+  "boar-blighted": {
+   "sha": "88cb29a48538", "grade": 2.5,
+   "seen": 3,
+   "eyes": "Brown with glowing gold cracks; every other Blighted creature is drained grey with ash. 8% smaller than the well boar it becomes.", "known": ["scale"]
+  },
+  "boar-fight": {
+   "sha": "f6082256f8f9", "grade": 2.5,
+   "seen": 3,
+   "eyes": "As the Blighted boar, and 13% smaller again.", "known": []
+  },
+  "lynx": {
+   "sha": "a87765c3ee98", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good. Pixels twice the size of the fox's beside it.", "known": []
+  },
+  "lynx-fight": {
+   "sha": "4702d3d09f7b", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good. A stray pixel right of the side frame.", "known": []
+  },
+  "rootsnare": {
+   "sha": "1504a7db40ad", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good. The side row barely differs from the front.", "known": ["outline"]
+  },
+  "rootsnare-calmed": {
+   "sha": "9c70be1a8adc", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good.", "known": ["jump"]
+  },
+  "rootsnare-fight": {
+   "sha": "8ea379fa871e", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good.", "known": ["outline"]
+  },
+  "mossling": {
+   "sha": "c4b9263a9da0", "grade": 4,
+   "seen": 3,
+   "eyes": "Good. Pixels less than half the hero's.", "known": ["density"]
+  },
+  "burrower": {
+   "sha": "954fb12add40", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "frog": {
+   "sha": "aabe7a00e744", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": ["density", "jump", "steady"]
+  },
+  "bee": {
+   "sha": "5b06d2606e3f", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": ["density", "outline"]
+  },
+  "lanternfly-world": {
+   "sha": "0a4e13d7d9e9", "grade": 4,
+   "seen": 3,
+   "eyes": "Good.", "known": []
+  },
+  "lanternfly-glow": {
+   "sha": "0a44b1974045", "grade": 3.5,
+   "seen": 3,
+   "eyes": "A glow, no outline by design.", "known": ["steady"]
+  },
+  "stag": {
+   "sha": "e31c4b389b12", "grade": 3,
+   "seen": 2,
+   "eyes": "Painted with no outline and pixels twice the hero's, so it looks low-resolution beside him at the act's climax. Half again taller than its sheet.", "known": ["density", "scale", "outline"]
+  },
+  "stag-fight": {
+   "sha": "46b76d0d1941", "grade": 3,
+   "seen": 2,
+   "eyes": "As the Stag, and 10% taller than the chained sheet it follows.", "known": ["density", "outline"]
+  },
+  "stag-free": {
+   "sha": "15aa3f69e9a0", "grade": 3,
+   "seen": 2,
+   "eyes": "As the Stag.", "known": ["density", "outline"]
+  },
+  "villager-a": {
+   "sha": "8f3a971b0a94", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old cast.", "known": []
+  },
+  "villager-b": {
+   "sha": "5da7ce797a20", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old cast.", "known": []
+  },
+  "pet": {
+   "sha": "4314d3fb3819", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old pet.", "known": []
+  },
+  "critter": {
+   "sha": "df7ef52abdd3", "grade": 3,
+   "seen": 1,
+   "eyes": "Old critter.", "known": []
+  },
+  "odo": {
+   "sha": "3055baf42dc8", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old cast.", "known": []
+  },
+  "mira": {
+   "sha": "3cd19b380bfe", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old cast.", "known": []
+  },
+  "juniper": {
+   "sha": "9c956e03eb5c", "grade": 2.5,
+   "seen": 1,
+   "eyes": "Old cast. A pale halo on the back rows.", "known": ["outline", "fringe"]
+  },
+  "brack": {
+   "sha": "0ecd96ddecd6", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old cast.", "known": []
+  },
+  "leaftail": {
+   "sha": "28be8b7e7e7a", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Fight lab.", "known": []
+  },
+  "leaftail-fight": {
+   "sha": "cc3b9a1df1ef", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Fight lab.", "known": []
+  },
+  "lanternfly": {
+   "sha": "0de6e8fb8d30", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Old, one animation.", "known": ["contract"]
+  },
+  "pebblepup": {
+   "sha": "a5cb76550bc4", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Fight lab.", "known": []
+  },
+  "pebblepup-fight": {
+   "sha": "735815708dc3", "grade": 3.5,
+   "seen": 1,
+   "eyes": "Fight lab.", "known": []
+  },
+  "town-pell": {
+   "sha": "821652f20706", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-corin": {
+   "sha": "1d3994f579bb", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-hesper": {
+   "sha": "81ee0922d398", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-dunn": {
+   "sha": "e9ebbc929c42", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-isolde": {
+   "sha": "d2f6d37843f0", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-roan": {
+   "sha": "569749b205b2", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-nessa": {
+   "sha": "1eb55f9f4d9c", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-pip": {
+   "sha": "36d7e9d9df14", "grade": 4,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-acolyte-a": {
+   "sha": "75325151b4df", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  },
+  "town-acolyte-b": {
+   "sha": "b180af856f44", "grade": 3.5,
+   "seen": 3,
+   "eyes": "Good and alike: maroon, cream and brown on every one.", "owner": "act1-lead-story", "known": []
+  }
+ },
+ "portraits": {
+  "elowen": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Golden hair and an olive robe; her sprite and sheet have silver hair and white.", "known": ["portrait"]
+  },
+  "custodian": {
+   "grade": 3,
+   "seen": 4,
+   "eyes": "Brown fur; the sheet is moss grey with a cream muzzle.", "known": ["portrait"]
+  },
+  "aldric": {
+   "grade": 4,
+   "seen": 3,
+   "eyes": "The portrait is right; the sprite is what differs.", "known": ["portrait"]
+  },
+  "maren": {
+   "grade": 3.5,
+   "seen": 4,
+   "eyes": "True to the sheet; the sprite is what differs.", "known": []
+  },
+  "juniper": {
+   "grade": 2.5,
+   "seen": 1,
+   "eyes": "Old cast. A stray mark right of the head.", "known": ["portrait"]
+  }
+ },
+ "icons": {
+  "act1-farm/moss-fiber": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "A tan knot beside the tan seed sack and the tan rope.", "known": []
+  },
+  "main/bow": {
+   "known": ["icon-outline"]
+  },
+  "story/plank": {
+   "known": ["icon-twin"]
+  },
+  "story/bread": {
+   "known": ["icon-twin"]
+  },
+  "story/workbench": {
+   "known": ["icon-outline", "icon-twin"]
+  },
+  "story/chest": {
+   "known": ["icon-twin"]
+  },
+  "story/map": {
+   "known": ["icon-outline"]
+  },
+  "mark/mark": {
+   "known": ["icon-outline"]
+  },
+  "act1-farm/wax": {
+   "known": ["icon-outline"]
+  },
+  "act1-kit/pusher-plate": {
+   "known": ["icon-outline"]
+  },
+  "act1-found/heartwood": {
+   "known": ["icon-twin"]
+  },
+  "act1-found/plank": {
+   "known": ["icon-twin"]
+  },
+  "act1-found/hobbs-meal": {
+   "known": ["icon-twin"]
+  },
+  "act1-found/bread": {
+   "known": ["icon-twin"]
+  },
+  "act1-weapons/sword-tusk": {
+   "known": ["icon-outline"]
+  },
+  "act1-equipment/quill-edge": {
+   "known": ["icon-outline"]
+  },
+  "act1-equipment/axe": {
+   "known": ["icon-outline"]
+  },
+  "act1-weapons/bow": {
+   "grade": 3,
+   "seen": 4,
+   "eyes": "Redrawn 2026-11-12 with a dark outline and its own limbs, and drawn upright: a sliver 12 to 14 pixels wide in its slot. Second pass: on the diagonal.", "known": ["icon-thin"]
+  },
+  "act1-weapons/bow-spring": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 with a dark outline and its own limbs, and drawn upright: a sliver 12 to 14 pixels wide in its slot. Second pass: on the diagonal.", "known": ["icon-thin"]
+  },
+  "act1-weapons/staff": {
+   "grade": 3,
+   "seen": 4,
+   "eyes": "Redrawn 2026-11-12 with a dark outline and its own head, and drawn upright: a sliver 12 to 14 pixels wide in its slot. Second pass: on the diagonal.", "known": ["icon-thin"]
+  },
+  "act1-weapons/staff-copper": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 with a dark outline and its own head, and drawn upright: a sliver 12 to 14 pixels wide in its slot. Second pass: on the diagonal.", "known": ["icon-thin"]
+  },
+  "act1-weapons/staff-brass": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 with a dark outline and its own head, and drawn upright: a sliver 12 to 14 pixels wide in its slot. Second pass: on the diagonal.", "known": ["icon-thin"]
+  },
+  "act1-weapons/staff-rootwood": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 with a dark outline and its own head, and drawn upright: a sliver 12 to 14 pixels wide in its slot. Second pass: on the diagonal.", "known": ["icon-thin"]
+  },
+  "act1-equipment/canvas-jacket": {
+   "grade": 2.5,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 as a wide flat shirt 12 pixels high: unlike the padded jacket now, and too small to read as a jacket.", "known": ["icon-thin"]
+  },
+  "act1-kit/lamp-post": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 as a lantern on a stake, readable, 11 pixels wide.", "known": ["icon-thin"]
+  },
+  "act1-found/old-brass": {
+   "grade": 2.5,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 as a toothed bracket; still not named without its label.", "known": []
+  },
+  "act1-kit/quill-strip": {
+   "grade": 3,
+   "seen": 3,
+   "eyes": "Redrawn 2026-11-12 darker; reads as a tuft, not a strip of quills on a board.", "known": []
+  }
+ }
+}

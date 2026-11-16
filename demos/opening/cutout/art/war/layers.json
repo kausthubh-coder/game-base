@@ -1,0 +1,253 @@
+{
+  "shot": "war",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m1-war.jpg",
+  "layers": [
+    {
+      "id": "plaster",
+      "file": "../shared/plaster.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0
+    },
+    {
+      "id": "banner-green",
+      "file": "banner-green.webp",
+      "x": 240,
+      "y": 270,
+      "w": 202,
+      "h": 137,
+      "z": 40,
+      "pivot": [
+        1,
+        0.4
+      ],
+      "note": "Approved cloth paint. The two frames deform the same paint by up to three source pixels, pinned at the pole.",
+      "frames": [
+        "banner-green-2.webp",
+        "banner-green-3.webp"
+      ]
+    },
+    {
+      "id": "banner-red",
+      "file": "banner-red.webp",
+      "x": 449,
+      "y": 281,
+      "w": 189,
+      "h": 128,
+      "z": 40,
+      "pivot": [
+        1,
+        0.4
+      ],
+      "note": "Approved cloth paint. The two frames deform the same paint by up to three source pixels, pinned at the pole.",
+      "frames": [
+        "banner-red-2.webp",
+        "banner-red-3.webp"
+      ]
+    },
+    {
+      "id": "banner-blue",
+      "file": "banner-blue.webp",
+      "x": 646,
+      "y": 286,
+      "w": 186,
+      "h": 125,
+      "z": 40,
+      "pivot": [
+        1,
+        0.4
+      ],
+      "note": "Approved cloth paint. The two frames deform the same paint by up to three source pixels, pinned at the pole.",
+      "frames": [
+        "banner-blue-2.webp",
+        "banner-blue-3.webp"
+      ]
+    },
+    {
+      "id": "banner-violet",
+      "file": "banner-violet.webp",
+      "x": 1077,
+      "y": 280,
+      "w": 193,
+      "h": 130,
+      "z": 40,
+      "pivot": [
+        0,
+        0.4
+      ],
+      "note": "Approved cloth paint. The two frames deform the same paint by up to three source pixels, pinned at the pole.",
+      "frames": [
+        "banner-violet-2.webp",
+        "banner-violet-3.webp"
+      ]
+    },
+    {
+      "id": "banner-white",
+      "file": "banner-white.webp",
+      "x": 1277,
+      "y": 280,
+      "w": 175,
+      "h": 114,
+      "z": 40,
+      "pivot": [
+        0,
+        0.4
+      ],
+      "note": "Approved cloth paint. The two frames deform the same paint by up to three source pixels, pinned at the pole.",
+      "frames": [
+        "banner-white-2.webp",
+        "banner-white-3.webp"
+      ]
+    },
+    {
+      "id": "banner-grey",
+      "file": "banner-grey.webp",
+      "x": 1460,
+      "y": 268,
+      "w": 213,
+      "h": 136,
+      "z": 40,
+      "pivot": [
+        0,
+        0.4
+      ],
+      "note": "Approved cloth paint. The two frames deform the same paint by up to three source pixels, pinned at the pole.",
+      "frames": [
+        "banner-grey-2.webp",
+        "banner-grey-3.webp"
+      ]
+    },
+    {
+      "id": "group-green",
+      "file": "group-green.webp",
+      "x": 201,
+      "y": 236,
+      "w": 271,
+      "h": 639,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved painting, with upright spears, banner pole and meadow under feet."
+    },
+    {
+      "id": "group-red",
+      "file": "group-red.webp",
+      "x": 467,
+      "y": 245,
+      "w": 190,
+      "h": 630,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved painting, with upright spears, banner pole and meadow under feet."
+    },
+    {
+      "id": "group-blue",
+      "file": "group-blue.webp",
+      "x": 653,
+      "y": 246,
+      "w": 208,
+      "h": 629,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved painting, with upright spears, banner pole and meadow under feet."
+    },
+    {
+      "id": "group-violet",
+      "file": "group-violet.webp",
+      "x": 1050,
+      "y": 247,
+      "w": 220,
+      "h": 628,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved painting, with upright spears, banner pole and meadow under feet."
+    },
+    {
+      "id": "group-white",
+      "file": "group-white.webp",
+      "x": 1265,
+      "y": 241,
+      "w": 193,
+      "h": 634,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved painting, with upright spears, banner pole and meadow under feet."
+    },
+    {
+      "id": "group-grey",
+      "file": "group-grey.webp",
+      "x": 1448,
+      "y": 236,
+      "w": 271,
+      "h": 639,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved painting, with upright spears, banner pole and meadow under feet."
+    },
+    {
+      "id": "spring",
+      "file": "spring.webp",
+      "x": 848,
+      "y": 472,
+      "w": 218,
+      "h": 403,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "White-gold fountain; light is separated by luminance from plaster."
+    },
+    {
+      "id": "rays",
+      "file": "rays.webp",
+      "x": 591,
+      "y": 62,
+      "w": 734,
+      "h": 461,
+      "z": 5,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": ""
+    },
+    {
+      "id": "spring-ground",
+      "file": "spring-ground.webp",
+      "x": 838,
+      "y": 763,
+      "w": 225,
+      "h": 112,
+      "z": 25,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": ""
+    }
+  ]
+}

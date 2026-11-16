@@ -1,0 +1,3 @@
+The road lighting could start at midday, and the following morning's grass objective had no writer. Both block the authored Gold on the arches sequence.
+
+`bun test src/game/story/gold-arches.test.ts` reproduces both failures with the real quest, talk and story systems. `story-red.log` and `morning-red.log` under `.artifacts/gold-arches-input` retain the failures. Scene 23 now waits until dusk. Its completion records its day in saved flags. During a later daylight visit to the arches, the director completes the grass observation. The regression saves during the lighting night and reloads before that observation.

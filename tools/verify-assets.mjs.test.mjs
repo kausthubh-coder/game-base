@@ -72,6 +72,7 @@ function repoWith(files = {}) {
     'src/content/palettes/index.ts': "import { meadow } from './meadow.ts';\nimport { coast } from './coast.ts';\nexport const palettes = [meadow, coast];\n",
     'src/game/content/items.ts': "export const items = [{ id: 'log', icon: 'wood' }];\n",
     'tools/sprites/check.mjs': "console.log('OK hero');\nconsole.log('PASS 2 sprite frames');\n",
+    'tools/art/check.mjs': "console.log('PASS art: 1 sheet, no new fault');\n",
     ...files,
   };
   for (const [file, content] of Object.entries(all)) {
@@ -221,11 +222,11 @@ describe('names that code refers to', () => {
     const plain = run(root);
     expect(plain.status).toBe(0);
     expect(plain.out).toContain("  - [names] src/game/content/items.ts:2  icon 'plank' is not in manifest.icons.names or a sheet under manifest.icons.sheets");
-    expect(plain.out).toEndWith('TOTAL PASS: 9 checks, 9 passed, 0 failed, 3 warnings\n');
+    expect(plain.out).toEndWith('TOTAL PASS: 10 checks, 10 passed, 0 failed, 3 warnings\n');
     const strict = run(root, '--strict');
     expect(strict.status).toBe(1);
     expect(strict.out).toContain('FAILED names: 3 failures');
-    expect(strict.out).toEndWith('TOTAL FAIL: 9 checks, 8 passed, 1 failed, 0 warnings. First failure: names\n');
+    expect(strict.out).toEndWith('TOTAL FAIL: 10 checks, 9 passed, 1 failed, 0 warnings. First failure: names\n');
   });
 });
 
@@ -381,9 +382,9 @@ describe('the command', () => {
     const { status, out } = run(repoWith());
     expect(status).toBe(0);
     expect(out.split('\n').filter((l) => /^(PASS|FAIL) /.test(l)).map((l) => l.split(/\s+/).slice(0, 2).join(' '))).toEqual([
-      'PASS manifest', 'PASS sprite-check', 'PASS names', 'PASS block-tiles', 'PASS props', 'PASS palettes', 'PASS sizes', 'PASS voice', 'PASS sound',
+      'PASS manifest', 'PASS sprite-check', 'PASS art', 'PASS names', 'PASS block-tiles', 'PASS props', 'PASS palettes', 'PASS sizes', 'PASS voice', 'PASS sound',
     ]);
-    expect(out).toEndWith('TOTAL PASS: 9 checks, 9 passed, 0 failed, 0 warnings\n');
+    expect(out).toEndWith('TOTAL PASS: 10 checks, 10 passed, 0 failed, 0 warnings\n');
   });
 
   test('it exits 1, lists every failure of the first failing check, and only counts the later ones', () => {
@@ -397,15 +398,15 @@ describe('the command', () => {
     expect(out).toContain('FAILED manifest: 2 failures\n  - sprites.hero.sheet is "sprites/gone.png". No such file in public/assets/.\n  - icons.names.stone: cell [9, 9]');
     expect(out).toContain('Also failing: block-tiles (1). Fix manifest first, or list everything with --all.');
     expect(out).not.toContain('FAILED block-tiles');
-    expect(out).toEndWith('TOTAL FAIL: 9 checks, 7 passed, 2 failed, 1 warning. First failure: manifest\n');
+    expect(out).toEndWith('TOTAL FAIL: 10 checks, 8 passed, 2 failed, 1 warning. First failure: manifest\n');
     expect(run(root, '--all').out).toContain("FAILED block-tiles: 1 failure\n  - tile 'dirt' (block grass) has no cell in manifest.blocks.tiles");
   });
 
-  test('on this repo it prints a line for each of the nine checks and exits 1 exactly when one says FAIL', () => {
+  test('on this repo it prints a line for each of the ten checks and exits 1 exactly when one says FAIL', () => {
     const result = spawnSync(process.execPath, [script], { cwd: repo, encoding: 'utf8' });
     const lines = result.stdout.split('\n').filter((l) => /^(PASS|FAIL) /.test(l));
-    expect(lines.map((l) => l.split(/\s+/)[1])).toEqual(['manifest', 'sprite-check', 'names', 'block-tiles', 'props', 'palettes', 'sizes', 'voice', 'sound']);
+    expect(lines.map((l) => l.split(/\s+/)[1])).toEqual(['manifest', 'sprite-check', 'art', 'names', 'block-tiles', 'props', 'palettes', 'sizes', 'voice', 'sound']);
     expect(result.status).toBe(lines.some((l) => l.startsWith('FAIL')) ? 1 : 0);
-    expect(result.stdout).toMatch(/\nTOTAL (PASS|FAIL): 9 checks, \d passed, \d failed, \d+ warnings?(\. First failure: [a-z-]+)?\n$/);
+    expect(result.stdout).toMatch(/\nTOTAL (PASS|FAIL): 10 checks, \d+ passed, \d failed, \d+ warnings?(\. First failure: [a-z-]+)?\n$/);
   });
 });

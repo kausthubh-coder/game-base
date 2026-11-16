@@ -1,0 +1,77 @@
+{
+  "result": "PASS",
+  "scope": "Source concept delivery only; layout defaults and illustrative discrepancies in README",
+  "files": [
+    {
+      "file": "vista-arrival.webp",
+      "bytes": 360600,
+      "dimensions": [
+        1600,
+        1024
+      ]
+    },
+    {
+      "file": "vista-tired.webp",
+      "bytes": 449310,
+      "dimensions": [
+        1600,
+        1024
+      ]
+    },
+    {
+      "file": "vista-alive.webp",
+      "bytes": 443830,
+      "dimensions": [
+        1600,
+        1024
+      ]
+    },
+    {
+      "file": "vista-night.webp",
+      "bytes": 235504,
+      "dimensions": [
+        1600,
+        1024
+      ]
+    },
+    {
+      "file": "plan.webp",
+      "bytes": 452950,
+      "dimensions": [
+        1600,
+        1024
+      ]
+    },
+    {
+      "file": "kit-meadow.webp",
+      "bytes": 173942,
+      "dimensions": [
+        1600,
+        1200
+      ]
+    },
+    {
+      "file": "kit-road.webp",
+      "bytes": 304882,
+      "dimensions": [
+        1600,
+        1099
+      ]
+    },
+    {
+      "file": "kit-garden.webp",
+      "bytes": 304808,
+      "dimensions": [
+        1600,
+        1100
+      ]
+    },
+    {
+      "file": "README.md",
+      "bytes": 12246
+    }
+  ],
+  "visualInspection": "All eight final compressed WebPs opened; references listed in README",
+  "changedPaths": "Only assets-src/concept/region-home/",
+  "base": "d7ee5aa"
+}

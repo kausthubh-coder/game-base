@@ -18,7 +18,13 @@ const iconButton = (ctx: UiContext, icon: string, label: string, onclick: () => 
   return element;
 };
 
-/** `account` is true when a view has given the interface an Account panel: signing in there brings a save from another device. */
+/**
+ * The title: one button, Begin, because a browser holds sound back until the first press and the film begins with
+ * Hobb's voice. With nothing saved, Begin starts a new game and its film. With a save, Begin carries on from it, and a
+ * quieter New game under it starts over, after asking. Settings and Account are small round buttons at the foot.
+ * `account` is true when a view has given the interface an Account panel: signing in there brings a save from
+ * another device.
+ */
 export function titlePanel(ctx: UiContext, account: boolean): PanelView {
   const body = h('div', { class: 'gu-plate' });
   /** True while New game waits for a second click, because a save would be replaced. */
@@ -28,8 +34,17 @@ export function titlePanel(ctx: UiContext, account: boolean): PanelView {
     ctx.options.newGame();
     ctx.ui.close();
   };
+  const carryOn = (): void => {
+    ctx.sound('click');
+    ctx.options.continueGame();
+    ctx.ui.close();
+  };
+  /** A small round button with a line icon and a name for the ear and the pointer. */
+  const round = (icon: string, label: string, onclick: () => void, key: string): HTMLButtonElement =>
+    h('button', { class: 'gu-title-round', type: 'button', 'aria-label': label, title: label, 'data-key': key, onclick },
+      ctx.options.ornament?.(icon) ?? h('span', { 'aria-hidden': true }, label[0]));
   const view: PanelView = {
-    title: 'A plot of your own',
+    title: 'The Mark',
     className: 'gu-panel-plate',
     framed: false,
     body,
@@ -40,24 +55,28 @@ export function titlePanel(ctx: UiContext, account: boolean): PanelView {
         menu.append(
           h('p', { class: 'gu-menu-note' }, 'A new game replaces the one you saved.'),
           button('Start a new game', start, { 'data-key': 'title:replace' }),
-          button('Keep my save', () => { asking = false; view.render(); body.querySelector<HTMLElement>('[data-key="title:new"]')?.focus(); }, { 'data-key': 'title:keep', class: 'gu-btn gu-primary' }),
+          button('Keep my save', () => { asking = false; view.render(); body.querySelector<HTMLElement>('[data-key="title:continue"]')?.focus(); }, { 'data-key': 'title:keep', class: 'gu-btn gu-primary' }),
         );
       } else {
         add(menu,
-          button('New game', () => {
-            if (!saved) return start();
+          saved
+            ? button('Begin', carryOn, { 'data-key': 'title:continue', class: 'gu-btn gu-primary gu-title-begin' })
+            : button('Begin', start, { 'data-key': 'title:new', class: 'gu-btn gu-primary gu-title-begin' }),
+          h('p', { class: 'gu-menu-note gu-title-note' }, saved ? 'Carries on from your save.' : 'With sound. Hold any key to skip the film.'),
+          saved && button('New game', () => {
             asking = true;
             view.render();
             body.querySelector<HTMLElement>('[data-key="title:keep"]')?.focus();
-          }, { 'data-key': 'title:new', class: saved ? 'gu-btn' : 'gu-btn gu-primary' }),
-          button('Continue', () => { ctx.sound('click'); ctx.options.continueGame(); ctx.ui.close(); },
-            { 'data-key': 'title:continue', class: saved ? 'gu-btn gu-primary' : 'gu-btn', disabled: !saved, 'aria-describedby': saved ? null : 'gu-no-save' }),
-          saved ? null : h('p', { class: 'gu-menu-note', id: 'gu-no-save' }, 'Nothing saved yet.'),
-          iconButton(ctx, 'settings', 'Settings', () => ctx.ui.open('settings'), { 'data-key': 'title:settings' }),
-          account && iconButton(ctx, 'account', 'Account', () => ctx.ui.open('account'), { 'data-key': 'title:account' }),
+          }, { 'data-key': 'title:new', class: 'gu-btn gu-title-quiet' }),
         );
       }
-      body.replaceChildren(h('h1', { class: 'gu-chapter' }, 'A plot of your own'), menu);
+      const foot = h('div', { class: 'gu-title-foot' });
+      add(foot,
+        round('settings', 'Settings', () => ctx.ui.open('settings'), 'title:settings'),
+        account && round('account', 'Account', () => ctx.ui.open('account'), 'title:account'),
+      );
+      body.replaceChildren(h('h1', { class: 'gu-chapter gu-title-name' }, h('small', { class: 'gu-title-act' }, 'Act 1 · First-half beta'), 'The Mark'), menu);
+      if (!asking) body.append(h('p', { class: 'gu-menu-note' }, 'This beta covers the story through the Lamp Gallery. Later chapters are unfinished.'), foot);
     },
   };
   return view;
@@ -149,7 +168,7 @@ function graphicsControls(ctx: UiContext): HTMLElement {
 
 /**
  * The View section, right after Picture: how the camera stands, how the mouse turns the free camera, where the 2.5D
- * camera rests after a drag, and how characters are drawn. The game stores them all.
+ * camera rests after a drag. The game stores them all.
  */
 function viewControls(ctx: UiContext): HTMLElement | null {
   const view = ctx.options.view;
@@ -158,7 +177,6 @@ function viewControls(ctx: UiContext): HTMLElement | null {
     choices('camera', 'Camera', ['tilt', 'free', 'first'] as const, ['2.5D', 'Free', 'First person'], view.camera(), (mode) => view.setCamera(mode)),
     choices('mouse', 'Mouse', ['drag', 'lock'] as const, ['Drag to turn', 'Lock to turn'], view.mouse(), (style) => view.setMouse(style)),
     choices('tiltTurn', '2.5D turning', ['quarter', 'smooth'] as const, ['Quarter turns', 'Smooth'], view.tiltTurn(), (turn) => view.setTiltTurn(turn)),
-    choices('characters', 'Characters', ['sprites', 'models'] as const, ['Sprites', '3D models'], view.characters(), (look) => view.setCharacters(look)),
   );
 }
 
@@ -222,7 +240,7 @@ export function settingsPanel(ctx: UiContext): PanelView {
 export function endPanel(ctx: UiContext): PanelView {
   const body = h('div', { class: 'gu-end' });
   return {
-    title: 'End of the first part',
+    title: 'End of act 1',
     className: 'gu-panel-end',
     framed: false,
     body,
@@ -230,14 +248,15 @@ export function endPanel(ctx: UiContext): PanelView {
       const stats = ctx.options.stats();
       const stat = (value: number, label: string): HTMLElement => h('div', { class: 'gu-stat' }, h('dt', null, label), h('dd', { class: 'gu-num' }, String(value)));
       body.replaceChildren(
-        h('h1', { class: 'gu-end-title' }, 'End of the first part'),
+        // Chapter 22's end card.
+        h('h1', { class: 'gu-end-title' }, 'End of act 1. The Mark.'),
         h('dl', { class: 'gu-stats' },
           stat(stats.days, stats.days === 1 ? 'day played' : 'days played'),
           stat(stats.wheat, 'wheat grown'),
           stat(stats.blocks, stats.blocks === 1 ? 'block placed' : 'blocks placed'),
-          stat(stats.pages, stats.pages === 1 ? 'Almanac page complete' : 'Almanac pages complete'),
+          stat(stats.pages, stats.pages === 1 ? 'field book page complete' : 'field book pages complete'),
         ),
-        h('p', { class: 'gu-end-line' }, 'The second part is not built yet. You can keep playing.'),
+        h('p', { class: 'gu-end-line' }, 'Act 2 is not built yet. You can keep playing.'),
         button('Keep playing', () => ctx.ui.close(), { class: 'gu-btn gu-primary' }),
       );
     },

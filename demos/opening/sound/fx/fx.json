@@ -1,0 +1,87 @@
+{
+ "version": 1,
+ "model": "eleven_text_to_sound_v3",
+ "sounds": {
+  "steps-away": {
+   "file": "fx/steps-away.mp3",
+   "kind": "shot",
+   "seconds": 7,
+   "hit": 0.21,
+   "lufs": -34.9,
+   "peak": -9.2,
+   "hash": "d7d095cab9.3.-9"
+  },
+  "thunder": {
+   "file": "fx/thunder.mp3",
+   "kind": "shot",
+   "seconds": 6.93,
+   "hit": 1.6,
+   "lufs": -24.8,
+   "peak": -6.3,
+   "hash": "51c9c554f4.3.-6"
+  },
+  "rain": {
+   "file": "fx/rain.mp3",
+   "kind": "bed",
+   "seconds": 20.5,
+   "hit": 0,
+   "lufs": -24.3,
+   "peak": -5,
+   "hash": "305dc3ee38.3.-24"
+  },
+  "creak": {
+   "file": "fx/creak.mp3",
+   "kind": "shot",
+   "seconds": 2.48,
+   "hit": 1.95,
+   "lufs": -34.5,
+   "peak": -12.5,
+   "hash": "8d629d8067.3.-12"
+  },
+  "morning": {
+   "file": "fx/morning.mp3",
+   "kind": "bed",
+   "seconds": 20.5,
+   "hit": 0,
+   "lufs": -27.4,
+   "peak": -6,
+   "hash": "6cb6b00239.3.-27"
+  },
+  "candle-room": {
+   "file": "fx/candle-room.mp3",
+   "kind": "bed",
+   "seconds": 14.5,
+   "hit": 0,
+   "lufs": -34.5,
+   "peak": -18.8,
+   "hash": "9b9af5b8e7.3.-34"
+  },
+  "paint": {
+   "file": "fx/paint.mp3",
+   "kind": "shot",
+   "seconds": 4,
+   "hit": 0.19,
+   "lufs": -38.4,
+   "peak": -14.3,
+   "hash": "2646814e0c.3.-14"
+  },
+  "breath": {
+   "file": "fx/breath.mp3",
+   "kind": "bed",
+   "seconds": 8.5,
+   "hit": 0,
+   "lufs": -32.4,
+   "peak": -19.1,
+   "hash": "601fe299e2.3.-32"
+  },
+  "chain": {
+   "file": "fx/chain.mp3",
+   "kind": "shot",
+   "seconds": 2.88,
+   "hit": 0.91,
+   "lufs": -33.4,
+   "peak": -14.4,
+   "hash": "7aee3dd67b.3.-14"
+  }
+ }
+}

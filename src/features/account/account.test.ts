@@ -10,7 +10,7 @@ import type { Database, Session, SessionUser, UploadLabel, UploadResult } from '
 const KEY = 'greenhollow.save';
 const MARK = markKey(KEY);
 const ctx = {} as ViewContext;
-const saveText = (day: number, at = 5_000): string => JSON.stringify({ version: 1, at, world: { edits: [] }, game: { clock: { day } } });
+const saveText = (day: number, at = 5_000): string => JSON.stringify({ version: 2, at, world: { edits: [] }, game: { clock: { day } } });
 const cloud = (day: number, savedAt: number): CloudSave => ({ bytes: 100, savedAt, uploadedAt: savedAt + 1, day });
 const markText = (here: number, there: number, player = 'profile_ada'): string => JSON.stringify({ player, here, there });
 const ADA: SessionUser = { name: 'Ada Lovelace', email: 'ada@example.com' };

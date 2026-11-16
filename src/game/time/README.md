@@ -8,7 +8,7 @@ Implements `TimeApi` as `game.systems.time`: the clock, day and night, sleep, an
 
 - `install(kernel)`, which adds the system under the name `time`.
 - `createTime(game)`, which returns `{ api, system }`.
-- The constants `DAY_LENGTH` (720), `MORNING` (0.27), `EVENING` (0.66) and `BED_REACH` (4).
+- The constants `DAY_LENGTH` (1200), `MORNING` (0.27), `EVENING` (0.66) and `BED_REACH` (4).
 
 Every step it writes `game.clock` (`day`, `timeOfDay`, `seconds`) and all of `game.ambient`.
 
@@ -16,7 +16,7 @@ The API:
 
 | Call | What it does |
 |---|---|
-| `dayLength` | 720 seconds of real time. |
+| `dayLength` | 1,200 seconds of real time: 20 minutes. |
 | `canSleep()` | True when the time of day is 0.66 or later, or before 0.23, a `bed` station stands within 4 blocks of the player, and a block is over the player or over that bed. A bed fills its block, so the player stands beside it. One block over the bed is the whole roof the quest asks for. |
 | `sleep()` | Jumps to 0.27 of the next day, then sends `day.started` and `slept`. It does not ask `canSleep()` first. The caller does. |
 | `setWeather(kind, now?)` | Holds a kind of weather until the next call. `null` hands the weather back. With `now` set to true the kind is there at once with no front, and the ground with it: soaked in rain, dry otherwise. The festival uses it after the player waits out the afternoon. `now` is new in the contract. |

@@ -19,6 +19,8 @@ export const FONTS = (base: string): string => /* css */ `
 `;
 
 export const TOKENS = /* css */ `
+/* The viewport must not scroll when a menu control takes focus. Menu bodies own scrolling. */
+#ui.ui-book { overflow: clip; }
 .ui-book {
   /* The same values as .gu-root in src/game/ui/styles.ui.ts. */
   --ui-paper: #ece5d8;

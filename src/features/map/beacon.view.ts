@@ -7,6 +7,7 @@ import type { Quality } from '../../engine/types.ts';
 import { QUALITY } from '../../content/quality.ts';
 import { clampToScreen, emptyEdgeMark } from './geometry.sim.ts';
 import { ARROW_PATH, hex, svgIcon } from './icons.ts';
+import { clearOfInterface } from './geometry.sim.ts';
 import { WAYPOINT_COLORS, type Marks, type Waypoint } from './marks.sim.ts';
 
 export interface Beacon {
@@ -22,7 +23,14 @@ export interface BeaconOptions {
   margin?: number;
   /** The beam's height in blocks. */
   height?: number;
+  /** Interface the distance never sits on: the quest list, the minimap, the quick slots. Measured twice a second. */
+  avoid?: () => Iterable<Element>;
 }
+
+/** How wide and how tall the distance is, about, and how far round a piece of interface it keeps. */
+const CHIP_W = 96, CHIP_H = 30, AVOID_PAD = 8;
+/** Seconds between two measures of the interface it avoids. */
+const AVOID_EVERY = 0.5;
 
 /** The glow's radius in blocks. The bright core inside it is a third as wide. */
 const BEAM_RADIUS = 0.55;
@@ -137,6 +145,20 @@ export function createBeacon(ctx: ViewContext, marks: Marks, options: BeaconOpti
   let shown: Waypoint | null = null;
   let shownColor = '', baseY = 0, sinceGround = 99;
   let lastX = NaN, lastY = NaN, lastAngle = NaN, lastOff: boolean | null = null, lastBlocks = -1, lastBelow: boolean | null = null;
+  /** The boxes of the interface it avoids, left, top, right, bottom, in the parent's pixels. */
+  const keepOut: number[] = [];
+  let sinceAvoid = AVOID_EVERY;
+
+  function measureAvoid(): void {
+    keepOut.length = 0;
+    const own = options.parent.getBoundingClientRect();
+    for (const piece of options.avoid?.() ?? []) {
+      const box = piece.getBoundingClientRect();
+      if (box.width === 0 || box.height === 0) continue;
+      keepOut.push(box.left - own.left - AVOID_PAD, box.top - own.top - AVOID_PAD, box.right - own.left + AVOID_PAD, box.bottom - own.top + AVOID_PAD);
+    }
+  }
+
 
   return {
     element,
@@ -183,7 +205,10 @@ export function createBeacon(ctx: ViewContext, marks: Marks, options: BeaconOpti
       point.applyMatrix4(camera.projectionMatrix);
       clampToScreen(point.x, point.y, behind, width, height, margin, mark);
 
-      const x = Math.round(mark.x), y = Math.round(mark.y);
+      sinceAvoid += dt;
+      if (sinceAvoid >= AVOID_EVERY) { sinceAvoid = 0; measureAvoid(); }
+      const y = Math.round(mark.y);
+      const x = Math.round(clearOfInterface(mark.x, y, y < height - margin - 30, width, keepOut, CHIP_W, CHIP_H));
       if (x !== lastX || y !== lastY) {
         lastX = x; lastY = y;
         element.style.transform = `translate(${x}px, ${y}px)`;

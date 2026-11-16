@@ -83,7 +83,9 @@ export class Build {
     const shape = this.rig.wave(wave);
     if (shape instanceof PeriodicWave) o.setPeriodicWave(shape);
     else o.type = shape;
-    o.frequency.value = freq;
+    // Use the node's bounds, which follow this context's sample rate. The browser
+    // already clamps out-of-range pitches; doing it here avoids its warning.
+    o.frequency.value = Math.max(o.frequency.minValue, Math.min(o.frequency.maxValue, freq));
     this.nodes.push(o);
     this.sources.push({ node: o, offset: -1 });
     return o;

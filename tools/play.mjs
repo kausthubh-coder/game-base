@@ -110,4 +110,4 @@ else if (command === 'start') {
     console.log(`${copied.notes}\n${copied.pictures.length} pictures in ${resolve(to)}`);
   }
 } else if (command) console.log(JSON.stringify(await request(command, argv.slice(1)), null, 2));
-else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--live] [--size 1366x768] [--touch] [--port 5525] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> [--step <n>] <words> | journal [--to <folder> [--with 1,4]] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');
+else console.log('usage: bun tools/play.mjs start [--mode human|door] [--blind] [--live] [--size 1366x768] [--touch] [--port 5525] [--query opening=deed] | look [name] | act <input> [name] | film <input> [name] [--fps 10] | note <bug|polish|question> [--step <n>] <words> | journal [--to <folder> [--with 1,4]] | state | shot <png> | do <JSON> | record <name|stop> | replay <json|all> | stop');

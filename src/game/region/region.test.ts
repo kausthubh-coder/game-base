@@ -9,6 +9,7 @@ import type { Vec3 } from '../../engine/types.ts';
 import type { GameSave, Kernel } from '../kernel.sim.ts';
 import { createKernel } from '../kernel.sim.ts';
 import { PETS } from '../content/pets.ts';
+import { PLACES as PLAN_PLACES } from '../content/greenhollow.ts';
 import { REGION } from '../content/region.ts';
 import { install as installInteract } from '../interact/index.sim.ts';
 import { install as installInventory } from '../inventory/index.sim.ts';
@@ -16,8 +17,10 @@ import { install as installItems } from '../items/index.sim.ts';
 import { standable } from '../move.sim.ts';
 import { install as installNav } from '../nav/index.sim.ts';
 import { BUSH_REACH, REGROW_SECONDS, install as installRegion } from './index.sim.ts';
-import { BOUNDS, built, placedModels, regionProps } from './land.sim.ts';
+import { BOUNDS, built, placedModels, regionProps, scatterBlocked } from './land.sim.ts';
 import { TOWN_MODELS } from '../../content/town-kit.ts';
+import { CITY_KIT, cityPlan, NUCLEUS } from '../content/town/city.ts';
+import { riverBank } from './greenhollow.sim.ts';
 
 const SEED = 1;
 const id = (key: string): number => blockId(key);
@@ -28,8 +31,14 @@ const OAK = id('oak_log'), BIRCH = id('birch_log'), TILLED = id('tilled_soil'), 
 const PLACES = [
   'grant.stone', 'grant.center', 'grant.rocks', 'dead.garden', 'town.gate', 'town.square', 'lodge', 'granary',
   'bakery', 'gus.field', 'carpenter', 'kennel', 'river.bank', 'ferry',
+  'shut.door', 'hall.door', 'hall.heart', 'hall.custodian', 'hall.gate', 'hall.mural',
+  'camp', 'camp.seat', 'camp.edge', 'camp.trees',
 ];
 const TOWN_PLACES = ['town.square', 'lodge', 'granary', 'bakery', 'gus.field', 'carpenter', 'kennel', 'river.bank', 'ferry'];
+/** Spots the act's quests name under an older place, and Saltgate where the south road leaves the map (index.sim.ts). */
+const SPOTS = ['plot.pond', 'plot.field', 'plot.stone', 'plot.camp', 'town.green', 'saltgate'];
+/** The city's places round the old town (content/town/city.ts). */
+const CITY_PLACES = cityPlan().places.map((p) => p.name).filter((name) => !PLACES.includes(name));
 
 const cx0 = BOUNDS.x0 >> 4, cx1 = BOUNDS.x1 >> 4, cz0 = BOUNDS.z0 >> 4, cz1 = BOUNDS.z1 >> 4;
 
@@ -66,13 +75,22 @@ describe('places', () => {
     for (const name of PLACES) {
       const p = region.place(name);
       expect(p.name).toBe(name);
-      expect(p.label.length, name).toBeGreaterThan(0);
+      // The spots inside Ilara's Hall are kept off the map: nobody knows what is behind the door. Of the camp,
+      // only the fire is on the map.
+      if (!name.startsWith('hall.') && !name.startsWith('camp.')) expect(p.label.length, name).toBeGreaterThan(0);
       expect(standable(world, p.at.x, p.at.y, p.at.z), `${name} at ${p.at.x}, ${p.at.y}, ${p.at.z}`).toBe(true);
       // The feet are on the ground there, not on a roof or in a hole.
       expect(Number.isInteger(p.at.y)).toBe(true);
       expect(block(p.at.x, p.at.y, p.at.z), name).toBe(0);
     }
-    expect(region.places().map((p) => p.name).sort()).toEqual([...PLACES].sort());
+    // Then every place of the plan of Greenhollow that the region did not have, by its id.
+    const plan = PLAN_PLACES.map((p) => p.id).filter((id) => !PLACES.includes(id));
+    expect(region.places().map((p) => p.name).sort()).toEqual([...PLACES, ...CITY_PLACES, ...SPOTS, ...plan].sort());
+    // A spot stands where its place does, and one not laid out yet stands at its place.
+    expect(at('plot.pond')).toEqual(at('grant.rocks'));
+    expect(at('saltgate.yard')).toEqual(at('saltgate'));
+    // The city's places are on its streets, where somebody can stand.
+    for (const name of CITY_PLACES) expect(standable(world, at(name).x, at(name).y, at(name).z), name).toBe(true);
   });
 
   test('a place that does not exist throws an error that names it and lists the real ones', () => {
@@ -87,12 +105,21 @@ describe('places', () => {
       if (indoors) expect(doors.has(`${Math.floor(p.x)},${Math.floor(p.z)}`), name).toBe(true);
     }
     // The granary's place is its doorway: the wall stands on both sides of it and the way out is open. A
-    // granary of the town kit has no inside, so its place is the doorstep in front of its doors.
-    const granary = built().find((b) => b.plan.id === 'granary') ?? placedModels().find((m) => m.plan.id === 'granary')!;
-    expect(at('granary')).toEqual({ x: granary.door.x + 0.5, y: granary.door.y, z: granary.door.z + 0.5 });
-    if ('cells' in granary) expect(block(granary.door.x - 1, granary.door.y, granary.door.z)).not.toBe(0);
-    else expect(standable(world, granary.door.x, granary.door.y, granary.door.z)).toBe(true);
-    expect(standable(world, granary.outside.x, granary.outside.y, granary.outside.z)).toBe(true);
+    // granary of the town kit or the city kit has no inside, so its place is the doorstep in front of its doors.
+    const granary = built().find((b) => b.plan.id === 'granary') ?? placedModels().find((m) => m.plan.id === 'granary');
+    if (granary) {
+      expect(at('granary')).toEqual({ x: granary.door.x + 0.5, y: granary.door.y, z: granary.door.z + 0.5 });
+      if ('cells' in granary) expect(block(granary.door.x - 1, granary.door.y, granary.door.z)).not.toBe(0);
+      else expect(standable(world, granary.door.x, granary.door.y, granary.door.z)).toBe(true);
+      expect(standable(world, granary.outside.x, granary.outside.y, granary.outside.z)).toBe(true);
+    } else {
+      const city = cityPlan().buildings.find((b) => b.id === 'granary')!;
+      expect(at('granary')).toEqual({ x: city.door.x + 0.5, y: REGION.townGround, z: city.door.z + 0.5 });
+      expect(at('town.granary')).toEqual(at('granary'));
+      // Its doors stand behind the doorstep: its body solid, the way out open.
+      expect(block(city.door.x, REGION.townGround, city.z1)).not.toBe(0);
+      expect(standable(world, city.door.x, REGION.townGround, city.door.z + 1)).toBe(true);
+    }
   });
 
   test('the sites lie as far apart as the design says', () => {
@@ -245,7 +272,8 @@ describe('the path and the town', () => {
       for (let k = 0; k <= n; k++) {
         const x = Math.round(ax + ((bx - ax) * k) / n), z = Math.round(az + ((bz - az) * k) / n);
         const h = world.heightAt(x, z);
-        expect(world.getBlock(x, h - 1, z), `${x}, ${z}`).toBe(PATH);
+        // Where the Mere crosses it, the path is a plank bridge.
+        expect([PATH, PLANK], `${x}, ${z}`).toContain(world.getBlock(x, h - 1, z));
         expect(standable(world, x, h, z), `${x}, ${z}`).toBe(true);
         if (last >= 0) expect(Math.abs(h - last), `${x}, ${z}`).toBeLessThanOrEqual(1);
         last = h;
@@ -356,8 +384,8 @@ describe('the path and the town', () => {
     // Both lie east of their places, between the lane and the river.
     const field = at('gus.field');
     expect(count(TILLED, Math.floor(field.x), Math.floor(field.z) - 9, Math.floor(field.x) + 10, Math.floor(field.z) + 9)).toBeGreaterThan(100);
-    const t = REGION.town;
-    expect(t.x1 - Math.floor(field.x)).toBeLessThan(25);
+    // At the edge of the old town, which the city has since grown round.
+    expect(NUCLEUS.x1 - Math.floor(field.x)).toBeLessThan(25);
     // Standing at the kennel's place, the yard is one step east: grass ringed by blocks one high, with one gap.
     const k = at('kennel');
     const x0 = Math.floor(k.x) + 1, z = Math.floor(k.z);
@@ -372,6 +400,43 @@ describe('the path and the town', () => {
     expect([ring, open]).toEqual([31, 1]);
     // Room for the animals: the yard's floor is open but for the hutch.
     expect(inside).toBe(7 * 7 - 4);
+  });
+});
+
+describe('Hollowmere, the city', () => {
+  const city = cityPlan();
+  const nav = game.systems.nav;
+
+  test('all sixteen buildings of the city kit stand in it, none on another, a street, the river or the old town', () => {
+    expect([...new Set(city.buildings.map((b): string => b.model))].sort()).toEqual(Object.keys(CITY_KIT).sort());
+    expect(city.buildings.length).toBeGreaterThan(50);
+    const inside = (r: { x0: number; z0: number; x1: number; z1: number }, x: number, z: number): boolean => x >= r.x0 && x <= r.x1 && z >= r.z0 && z <= r.z1;
+    for (const a of city.buildings) {
+      for (const b of city.buildings) if (a !== b) expect(a.x1 < b.x0 || b.x1 < a.x0 || a.z1 < b.z0 || b.z1 < a.z0, `${a.id} and ${b.id}`).toBe(true);
+      // The mill's wheel stands over its race, and the granary in the old town's granary-hall's place.
+      if (a.model === 'cityTownMill' || a.id === 'granary') continue;
+      for (let x = a.x0; x <= a.x1; x++) for (let z = a.z0; z <= a.z1; z++) {
+        expect(city.streets.some((s) => inside(s, x, z)), `${a.id} on a street at ${x}, ${z}`).toBe(false);
+        expect(inside(NUCLEUS, x, z), `${a.id} in the old town at ${x}, ${z}`).toBe(false);
+        expect(riverBank(x + 0.5, z + 0.5), `${a.id} in the river at ${x}, ${z}`).toBeGreaterThan(2);
+      }
+    }
+  });
+
+  test('every door of the city opens on ground somebody can stand on, and a walk from the gate reaches it', () => {
+    const missed: string[] = [];
+    for (const b of city.buildings) {
+      const door = { x: b.door.x + 0.5, y: REGION.townGround, z: b.door.z + 0.5 };
+      if (!standable(world, b.door.x, REGION.townGround, b.door.z) || !nav.path(at('town.gate'), door, 40000)) missed.push(`${b.id} (${b.model}) at ${b.door.x}, ${b.door.z}`);
+    }
+    expect(missed).toEqual([]);
+    for (const p of city.places) expect(nav.path(at('town.gate'), at(p.name), 40000), p.name).not.toBeNull();
+  });
+
+  test('the city and its fields are the town\'s: protected, with no wild tree on a street', () => {
+    for (const p of city.places) expect(region.isProtected(at(p.name).x, at(p.name).y, at(p.name).z), p.name).toBe(true);
+    const logs = (x: number, z: number): boolean => [OAK, BIRCH].includes(world.getBlock(x, REGION.townGround, z));
+    for (const s of city.streets) for (let x = s.x0; x <= s.x1; x += 3) for (let z = s.z0; z <= s.z1; z += 3) expect(logs(x, z), `${s.x0}, ${s.z0}: ${x}, ${z}`).toBe(false);
   });
 });
 
@@ -431,7 +496,7 @@ describe('berry bushes', () => {
     expect(far.length).toBe(4);
     for (const b of far) {
       // Beside the path: a path block within 4 blocks, and not on the path itself.
-      expect(count(PATH, Math.floor(b.x) - 4, Math.floor(b.z) - 4, Math.floor(b.x) + 4, Math.floor(b.z) + 4)).toBeGreaterThan(0);
+      expect(count(PATH, Math.floor(b.x) - 4, Math.floor(b.z) - 4, Math.floor(b.x) + 4, Math.floor(b.z) + 4) + count(PLANK, Math.floor(b.x) - 4, Math.floor(b.z) - 4, Math.floor(b.x) + 4, Math.floor(b.z) + 4)).toBeGreaterThan(0);
       expect(block(b.x, b.y - 1, b.z)).toBe(GRASS);
     }
     for (const b of bushes) {
@@ -556,7 +621,7 @@ describe('berry bushes', () => {
     k.step();
     k.game.systems.interact.act();
     expect(k.game.systems.region.berryBushes!()[4].ripe).toBe(false);
-    k.game.events.emit('slept', { day: 2 });
+    k.game.events.emit('slept', { day: 2, skipped: 600 });
     expect(k.game.systems.region.berryBushes!().every((b) => b.ripe)).toBe(true);
   });
 });
@@ -648,9 +713,11 @@ describe('what a view reads', () => {
       }
     }
 
-    // Keeping trees out costs the meadow about one plant in nine there, not its grass.
+    // Keeping trees out costs the meadow about one plant in nine there, not its grass. The plain scatter keeps
+    // everything else the region keeps bare (the paths' verges, the ground under the planned trees), so the two
+    // differ only by the trees kept out.
     const near = (p: { x: number; z: number }): boolean => p.x >= g.x - 8 && p.x < g.x + g.width + 20 && p.z >= g.z + g.depth && p.z < g.z + g.depth + 14;
-    const plain = scatter(SEED, world, { area, density: s.density, blocked: (x, z) => region.isProtected(x, 21, z) });
+    const plain = scatter(SEED, world, { area, density: s.density, blocked: (x, z) => scatterBlocked(x, z) || region.isProtected(x, 21, z) });
     const kept = found.props.filter((p) => !isTree(p) && near(p)).length, usual = plain.props.filter((p) => !isTree(p) && near(p)).length;
     expect(usual).toBeGreaterThan(100);
     expect(kept / usual).toBeGreaterThan(0.8);

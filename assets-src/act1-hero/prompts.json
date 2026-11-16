@@ -1,0 +1,129 @@
+{
+  "tool": "image_gen.imagegen",
+  "date": "2026-11-12",
+  "base": "8603e73",
+  "hero": "Create the FINAL production pixel-art hero sprite sheet. Image 1 is the EDIT TARGET: preserve EXACT layout 6 columns by 7 rows, square equal cells, poses/directions and blank cells. Image 2 is identity/costume reference ONLY: LOOK A, sixteen-year-old fair freckled boy, straight strawberry-blond asymmetric wedge fringe, BLUE canvas hooded jacket with cream shirt and rolled cream cuffs, charcoal trousers, brown boots, brown crossbody satchel, small brass key necklace, LEFT brown glove. Remove the old tan cape entirely. Preserve image 1's chibi big-head pixel cast style, head about 50x42 in a 128-square cell, body drawn height 108, warm upper-left lighting, crisp clusters, brown outline, no soft painting. All frames SAME KID and same dimensions and costume. Row 1 front idle 4 frames then 2 empty cells; row 2 BACK idle 4 then 2 empty, back has NO face; row 3 RIGHT PROFILE idle 4 then 2 empty; row 4 front walk 6; row 5 back walk 6; row 6 RIGHT PROFILE walk 6; row 7 front tool action 3 frames then 3 empty. Preserve pose geometry of edit target including tool. Every cell feet at same baseline 94% cell height, head at 9%, centered. True transparent background. No grid, labels, ground shadow, scenery. Exact evenly spaced sprite grid. Do not copy painting proportions or tiny concept mock. Keep the kid's hairstyle straight wedge, no spiky brown hair. Jacket blue ALL frames.",
+  "actions": {
+    "hero-moves": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 4 columns x 3 rows, twelve equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Four poses exactly as edit target: low forward dodge lunge, recoil eyes shut stagger, open palm guard, open palm with small teal magic mark.",
+      "references": [
+        "public/assets/sprites/hero-moves.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1
+    },
+    "hero-swing": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 3 columns x 3 rows, nine equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Three axe poses exactly as edit target: raise iron axe over shoulder, chop downward middle swing, low extended recovery.",
+      "references": [
+        "public/assets/sprites/hero-swing.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1
+    },
+    "hero-cut": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 4 columns x 3 rows, twelve equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Four poses sword raised by shoulder, diagonal slash, low followthrough, upright recovery. Simple guild iron short sword. Preserve pose timing of target.",
+      "references": [
+        "public/assets/sprites/hero-cut.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1
+    },
+    "hero-cut-back": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 4 columns x 3 rows, twelve equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Four phases reverse sword cut: low blade ready, upward diagonal slash, blade high followthrough, recovery. Simple guild iron sword. FOUR distinct full frames no empty fourth cell.",
+      "references": [
+        "public/assets/sprites/hero-cut-back.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1
+    },
+    "hero-bow": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 4 columns x 3 rows, twelve equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Four poses ready, full draw arrow pulled to cheek, release open hand, recover. Simple guild issue wooden bow and pale grip, iron arrow. Preserve pose timing of target.",
+      "references": [
+        "public/assets/sprites/hero-bow.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1
+    },
+    "hero-staff": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 4 columns x 3 rows, twelve equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Four poses upright ready staff, point staff forward casting, raised staff channel, lower recover. Simple guild issue round wooden crown with a small teal magic spark. Preserve pose timing of target.",
+      "references": [
+        "public/assets/sprites/hero-staff.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1,
+      "retry2": {
+        "prompt": "Targeted guild-issue wooden disc crown and persistent left glove correction",
+        "references": [
+          "public/assets/sprites/hero-staff.png",
+          "assets-src/concept/gear/staff.webp",
+          "public/assets/sprites/hero.png"
+        ],
+        "result": "Disc crown retained; rejected warm trouser recolor"
+      }
+    },
+    "hero-call": {
+      "prompt": "Use case: stylized-concept. FINAL production pixel RPG sheet, exactly 4 columns x 3 rows, twelve equal square cells. True transparent background, NO text, grid or ground shadow. Image 1 is EDIT TARGET, preserve its exact frame poses, tool positions, directions and uniform layout. Image 2 is the approved NEW hero walk/idle sheet, identity and pixel style reference. Image 3 concept LOOK A ONLY identity. Redraw image 1 as precisely the SAME KID as image 2: straight strawberry-blond wedge fringe, fair face, blue canvas hooded jacket, cream shirt and rolled cuffs, charcoal trousers, brown boots, crossbody satchel, brass key necklace, LEFT glove. NO cape and NO brown spiky hair. All heads same 50x42 in 128 cell, 108 pixel body height, warm upper-left light, dark brown pixel outline and chunky pixel clusters. Crisp pixel art, no soft painting. Row1 FRONT, row2 BACK no face, row3 RIGHT profile. Every frame same head, shoulders, costume and proportions as NEW idle. Preserve enough padding to fit tools without shrinking body. Feet baseline 94% cell height. Four gestures exactly as edit target: raise tiny teal call stone, beckon open palm, hand near mouth calling, point straight forward. No weapon.",
+      "references": [
+        "public/assets/sprites/hero-call.png",
+        "assets-src/act1-hero/sources/hero.png",
+        "assets-src/concept/people-home/hero.webp"
+      ],
+      "attempt": 1
+    }
+  },
+  "identityRedraw": {
+    "date": "2026-11-12",
+    "tool": "image_gen.imagegen",
+    "sheets": {
+      "hero-staff": {
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Image 1 is the ONLY identity and pixel style authority, shipped hero.png. Image 2 is pose/layout reference ONLY, hero-staff, whose costume and head are WRONG. Image 3 is concept supporting reference, ignore its proportions. Redraw image 2 as exactly the kid in image 1, copying his actual head pixel clusters, strawberry-blond asymmetric swept fringe covering HIS RIGHT EYE (viewer left), only ONE eye visible in all front poses, head 50 pixels wide 42 pixels tall including hair at final 128 frame scale. Same warm orange strawberry hair shape and swept pointed locks, same back haircut and right profile. Same NAVY jacket, cream rolled cuffs and shirt, BROWN trousers, DARK BROWN boots, brown crossbody satchel and strap, brass key. Never slate jacket/navy trousers/tan boots. Body same lean 2.6-head proportions as idle. STRICT 4 columns 3 rows, 12 equal square cells. Transparent background NO text NO grid NO cast shadow NO ground. Whole body ample padding each cell. Row1 front, row2 back NO face, row3 RIGHT-facing profile. Columns preserve EXACT staff gestures of image 2: 1 upright ready staff with round wooden disc crown next to head, 2 staff pointed diagonally forward casting, 3 staff raised diagonally channeling, 4 staff lowered with crown near ground recovering. Small reserved teal spark in crown. Staff never grows taller than kid. Feet same baseline in each cell, head same size and shape every frame. Warm upper-left light, dark brown tinted closed 1-2 pixel outlines, chunky crisp pixel clusters, no black outline no pale rim no soft painting. Match image 1's colours and silhouette exactly. Every frame same kid, never both eyes from front.",
+            "references": [
+              "public/assets/sprites/hero.png",
+              "public/assets/sprites/hero-staff.png",
+              "assets-src/concept/people-home/hero.webp"
+            ],
+            "source": "sources/hero-staff-attempt1.png",
+            "result": "PASS visual rubric and art rules; all 12 frames reviewed"
+          }
+        ],
+        "keptAttempt": 1
+      },
+      "hero-call": {
+        "attempts": [
+          {
+            "attempt": 1,
+            "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Image 1 is the ONLY identity and pixel style authority, shipped hero.png. Image 2 is pose/layout reference ONLY, hero-call, whose hair and face are WRONG. Image 3 is concept supporting reference, ignore its proportions. Redraw image 2 as exactly the kid in image 1, copying his actual head pixel clusters, strawberry-blond asymmetric swept fringe covering HIS RIGHT EYE (viewer left), only ONE eye visible in all front poses, head 50 pixels wide 42 pixels tall including hair at final 128 frame scale. Same warm orange strawberry hair shape and swept pointed locks, same back haircut and right profile. Same NAVY jacket, cream rolled cuffs and shirt, BROWN trousers, DARK BROWN boots, brown crossbody satchel and strap, brass key. Never slate jacket/navy trousers/tan boots. Body same lean 2.6-head proportions as idle. STRICT 4 columns 3 rows, 12 equal square cells. Transparent background NO text NO grid NO cast shadow NO ground. Whole body ample padding each cell. Row1 front, row2 back NO face, row3 RIGHT-facing profile. Columns preserve EXACT companion call gestures of image 2: 1 raise a tiny teal call stone near shoulder, 2 beckon with open palm, 3 hand near mouth calling with other hand open, 4 point straight forward. NO staff or weapon. Same satchel stays visible. In each row repeat exactly the idle reference's head size and hair shape, especially the orange strawberry rear haircut, never flat drab yellow-brown. Keep the pointing hand INSIDE its cell with generous padding. Feet same baseline in each cell, head same size and shape every frame. Warm upper-left light, dark brown tinted closed 1-2 pixel outlines, chunky crisp pixel clusters, no black outline no pale rim no soft painting. Match image 1's colours and silhouette exactly. Every frame same kid, never both eyes from front.",
+            "references": [
+              "public/assets/sprites/hero.png",
+              "public/assets/sprites/hero-call.png",
+              "assets-src/concept/people-home/hero.webp"
+            ],
+            "source": "sources/hero-call-attempt1.png",
+            "result": "FAIL visual review: back frames 1-4 spikier haircut than idle"
+          },
+          {
+            "attempt": 2,
+            "prompt": "Use case: identity-preserve. Production pixel RPG action sprite sheet. Image 1 is the ONLY identity and pixel style authority, shipped hero.png. Image 2 is pose/layout reference ONLY, hero-call, whose hair and face are WRONG. Image 3 is concept supporting reference, ignore its proportions. Redraw image 2 as exactly the kid in image 1, copying his actual head pixel clusters, strawberry-blond asymmetric swept fringe covering HIS RIGHT EYE (viewer left), only ONE eye visible in all front poses, head 50 pixels wide 42 pixels tall including hair at final 128 frame scale. Same warm orange strawberry hair shape and swept pointed locks, same back haircut and right profile. Same NAVY jacket, cream rolled cuffs and shirt, BROWN trousers, DARK BROWN boots, brown crossbody satchel and strap, brass key. Never slate jacket/navy trousers/tan boots. Body same lean 2.6-head proportions as idle. STRICT 4 columns 3 rows, 12 equal square cells. Transparent background NO text NO grid NO cast shadow NO ground. Whole body ample padding each cell. Row1 front, row2 back NO face, row3 RIGHT-facing profile. Columns preserve EXACT companion call gestures of image 2: 1 raise a tiny teal call stone near shoulder, 2 beckon with open palm, 3 hand near mouth calling with other hand open, 4 point straight forward. NO staff or weapon. Same satchel stays visible. In each row repeat exactly the idle reference's head size and hair shape, especially the orange strawberry rear haircut, never flat drab yellow-brown. Keep the pointing hand INSIDE its cell with generous padding. Feet same baseline in each cell, head same size and shape every frame. Warm upper-left light, dark brown tinted closed 1-2 pixel outlines, chunky crisp pixel clusters, no black outline no pale rim no soft painting. Match image 1's colours and silhouette exactly. Every frame same kid, never both eyes from front. RETRY 2: Image 2 is now attempt 1. Preserve its correct gestures and costume. Correct the back hair in ALL FOUR back frames: directly copy image 1's round low oval back-of-head silhouette and compact orange pixel clusters, no extra outward spikes at left/right crown, no big pointed wings, no new long tufts. Copy image 1's front and profile head as well. Exact same head size at final game pixels, same haircut, same kid. Front fringe reaches low enough to cover the right eye exactly like idle, no second eye.",
+            "references": [
+              "public/assets/sprites/hero.png",
+              "assets-src/act1-hero/sources/hero-call-attempt1.png",
+              "assets-src/concept/people-home/hero.webp"
+            ],
+            "source": "sources/hero-call-attempt2.png",
+            "result": "PASS art and visual rubric: all 12 frames; no world rows, allowed by lead"
+          }
+        ],
+        "keptAttempt": 2
+      }
+    }
+  }
+}

@@ -7,7 +7,7 @@ import { readGraphics, type Graphics } from './graphics.ts';
 // written and the picture is drawn through post-processing.
 import * as THREE from 'three';
 import type { ViewContext } from '../../engine/system.ts';
-import { calmNoon } from '../../engine/types.ts';
+import { calmNoon, type Vec3 } from '../../engine/types.ts';
 import { LEVELS, QUALITY, levelOf, type Level } from '../../content/quality.ts';
 import { flatWorld } from '../../engine/world-query.ts';
 import { BLOCKS } from '../../content/blocks.ts';
@@ -23,15 +23,16 @@ import { createWaterMaterial } from '../../features/water/index.ts';
 import { createWorld, emptyHit, spawnPoint, groundHeight } from '../../features/world/index.ts';
 import { reachDistance } from '../actions/index.sim.ts';
 import type { Systems, UseContext } from '../api.sim.ts';
-import { STEP, createKernel } from '../kernel.sim.ts';
+import { SAVE_VERSION, STEP, createKernel } from '../kernel.sim.ts';
 import { installSystems, type Installed } from '../systems.ts';
 import { loadArt, makeSprites } from './art.ts';
 import { HINTS } from '../content/hints.ts';
-import { createKeys, type MouseMode, type Press } from './keys.ts';
+import { createKeys, touchDevice, type MouseMode, type Press } from './keys.ts';
 import { HERO_STEP, createPlayer, type PlayerRig } from './player.ts';
-import { clearSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
+import { OLD_SAVE_TOAST, clearSave, hasOldSave, hasSave, readSave, reloadInto, writeSave } from './save.ts';
 import { BUSES, DEFAULT_VOLUMES, createSound } from './sound.ts';
-import { CAMERA_MODES, CHARACTER_LOOKS, DEBUG_OVERLAYS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type CharacterLook, type DebugShow, type GameView, type Look, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
+import { CAMERA_MODES, DEBUG_OVERLAYS, MOUSE_STYLES, TILT_TURNS, type CameraMode, type DebugShow, type GameView, type Look, type MouseStyle, type QualityMode, type ScreenPoint, type TiltTurn } from './view.ts';
+import { createSight, type Sight } from './sight.ts';
 import { dressWater } from './water.ts';
 
 /** The camera's distance at each wheel step, nearest first. A person is about 90 pixels tall at the first on a 900 pixel screen. */
@@ -80,6 +81,8 @@ export interface Shell {
   readonly errors: string[];
   /** True when a title screen, or `?hold` in the address, asked the game not to start by itself. */
   readonly holdsStart: boolean;
+  /** What the camera keeps in sight, and whether it is seen. */
+  readonly sight: Sight;
 }
 
 interface StoredSettings {
@@ -89,12 +92,11 @@ interface StoredSettings {
   camera: CameraMode;
   mouse: MouseStyle;
   tiltTurn: TiltTurn;
-  characters: CharacterLook;
   debug: DebugShow;
 }
 
 function readSettings(): StoredSettings {
-  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', mouse: 'drag', tiltTurn: 'quarter', characters: 'sprites', debug: { fps: false, meter: false, info: false } };
+  const settings: StoredSettings = { graphics: readGraphics(null), quality: 'auto', volumes: { ...DEFAULT_VOLUMES }, camera: 'tilt', mouse: 'drag', tiltTurn: 'quarter', debug: { fps: false, meter: false, info: false } };
   try {
     const stored = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? 'null') as Partial<StoredSettings> | null;
     if (stored?.quality === 'auto' || LEVELS.includes(stored?.quality as Level)) settings.quality = stored!.quality as QualityMode;
@@ -102,7 +104,6 @@ function readSettings(): StoredSettings {
     if (CAMERA_MODES.includes(stored?.camera as CameraMode)) settings.camera = stored!.camera as CameraMode;
     if (MOUSE_STYLES.includes(stored?.mouse as MouseStyle)) settings.mouse = stored!.mouse as MouseStyle;
     if (TILT_TURNS.includes(stored?.tiltTurn as TiltTurn)) settings.tiltTurn = stored!.tiltTurn as TiltTurn;
-    if (CHARACTER_LOOKS.includes(stored?.characters as CharacterLook)) settings.characters = stored!.characters as CharacterLook;
     for (const key of DEBUG_OVERLAYS) if (typeof stored?.debug?.[key] === 'boolean') settings.debug[key] = stored.debug[key];
     for (const bus of BUSES) {
       const value = stored?.volumes?.[bus];
@@ -121,15 +122,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // `?quality=low` holds a level for this visit only. It is how a test gets the same picture every time.
   const asked = levelOf(params.get('quality'));
   let mode: QualityMode = asked ?? settings.quality;
-  // `?camera=free`, `?mouse=lock`, `?turn=smooth` and `?chars=models` hold a camera mode, a mouse style, the 2.5D
-  // turning and a character look for this visit, so a test or a comparison shot gets the same picture whatever was stored.
+  // Camera query options override stored settings for reproducible views.
   let cameraMode: CameraMode = CAMERA_MODES.find((m) => m === params.get('camera')) ?? settings.camera;
   let mouseStyle: MouseStyle = MOUSE_STYLES.find((m) => m === params.get('mouse')) ?? settings.mouse;
   let tiltTurn: TiltTurn = TILT_TURNS.find((t) => t === params.get('turn')) ?? settings.tiltTurn;
-  let characterLook: CharacterLook = CHARACTER_LOOKS.find((l) => l === params.get('chars')) ?? settings.characters;
   // `?perf=1` shows the meter for this visit, whatever was stored.
   const debug: DebugShow = { ...settings.debug, meter: settings.debug.meter || params.get('perf') === '1' };
-  const changeListeners: ((setting: 'camera' | 'mouse' | 'tiltTurn' | 'characters' | 'debug') => void)[] = [];
+  const changeListeners: ((setting: 'camera' | 'mouse' | 'tiltTurn' | 'debug') => void)[] = [];
 
   // ---------------------------------------------------------------- the renderer and the scene
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
@@ -172,6 +171,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       sprites.setQuality?.(quality);
       post.setQuality?.(quality);
       sound.audio?.setQuality?.(quality);
+      camera.sight.setMost(QUALITY[quality].seeThrough);
+      camera.sight.setGroveWidth(QUALITY[quality].groveSight);
       basePostScale = post.settings.renderScale;
       appliedScale = -1;
       applyGraphics();
@@ -238,6 +239,10 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // A closer step than the base's three, and the game opens on it, so a face and the pet read at a glance.
   const camera = createCamera(ctx, { blocks: world.sim, input: false, rig: cam?.rig ?? { distances: CAMERA_DISTANCES, zoom: 0 }, fov: cam?.fov, mode: cameraMode });
+  camera.sight.setMost(QUALITY[startLevel].seeThrough);
+  camera.sight.setGroveWidth(QUALITY[startLevel].groveSight);
+  // Where a beast's figure is drawn: on the painted land, or on the blocks where there is none (src/game/fightview/draw.ts).
+  const sight = createSight(game, camera, lens, (x, z) => { const g = groundAt(x, z); return g === g ? g : world.sim.heightAt(Math.floor(x), Math.floor(z)); }, scene, root, () => player.position);
   // The painted world paints its own clouds (src/features/painted/sky.ts), so the sky leaves its flat ones out.
   const sky = createSky(ctx, { shadowRange: 40, clouds: !painted });
   // The painted world's water is the pale blue of the painted meadow's pond.
@@ -268,11 +273,10 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
    */
   const mouseOf = (mode: CameraMode): MouseMode => (mode === 'tilt' ? 'point' : mode === 'first' || mouseStyle === 'lock' ? 'lock' : 'drag');
 
-  /** Puts the camera mode into effect: the camera, the mouse, and the hero's body hidden in first person. */
+  /** Puts the camera mode into effect. Actor drawing owns first-person body concealment. */
   function applyCamera(next: CameraMode): void {
     camera.setMode(next);
     keys.setMouse(mouseOf(next));
-    player.actor.visible = next !== 'first';
     lastRange = lastZoom = -1;
   }
   /** The shadow range and the zoom the sky was last given, so it is told only when they change. */
@@ -280,7 +284,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
   // A hint that names camera keys is worded for the mouse in use when it is sent. The shell hears it before any view.
   game.events.on('hint', (e) => {
-    const worded = HINTS.find((hint) => hint.id === e.id)?.mouse?.[keys.mouse];
+    const hint = HINTS.find((hint) => hint.id === e.id);
+    const worded = (touchDevice() ? hint?.touch : undefined) ?? hint?.mouse?.[keys.mouse];
     if (worded) e.text = worded;
   });
 
@@ -293,6 +298,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   // ---------------------------------------------------------------- listeners of views
   type Listener = (dt: number) => void;
   const frameListeners: Listener[] = [];
+  const cameraListeners: Listener[] = [];
   const stepListeners: Listener[] = [];
   const errors: string[] = [];
 
@@ -326,7 +332,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   function takeAim(): void {
     aimed = false;
     // A locked mouse aims from the middle of the screen, where the crosshair is. A free cursor aims where it is.
-    const centre = keys.mouse === 'lock';
+    const centre = keys.mouse === 'lock' && !keys.touch.active;
     const pointer = keys.pointer;
     // A drag turning the camera aims at nothing, so no box or ghost sweeps over the land while it turns.
     if (!centre && (!pointer.over || keys.dragging)) return;
@@ -389,10 +395,30 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     sinceSave = 0;
     saveDue = false;
     try {
-      return writeSave({ version: 1, at: Date.now(), world: world.save(), game: kernel.save(), shell: { wheat, blocks } });
+      return writeSave({ version: SAVE_VERSION, at: Date.now(), world: world.save(), game: kernel.save(), shell: { wheat, blocks } });
     } catch (error) {
       console.warn('[game] a system could not be saved:', error);
       return false;
+    }
+  }
+
+  /**
+   * `?at=<place>` starts a new game at a named place of the region or the plan of Greenhollow (`hall`, `caves`,
+   * `shrine-marsh`), and `?at=x,z` at a column, for testers and pictures. Null when the address asks for neither.
+   */
+  function startAt(): Vec3 | null {
+    const asked = params.get('at');
+    if (!asked) return null;
+    const column = /^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/.exec(asked);
+    if (column) {
+      const x = Math.floor(Number(column[1])), z = Math.floor(Number(column[2]));
+      return { x: x + 0.5, y: groundHeight(world.sim.seed, x, z), z: z + 0.5 };
+    }
+    try {
+      return sys.region?.place(asked).at ?? null;
+    } catch {
+      console.warn(`[game] ?at=${asked} names no place of the region`);
+      return null;
     }
   }
 
@@ -403,9 +429,13 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       reloadInto('new');
       return;
     }
-    const at = sys.region?.spawn() ?? spawnPoint();
+    // A save from before act 1 cannot be continued. It is put aside, and the player is told why the game is new.
+    const old = hasOldSave();
+    if (old) clearSave();
+    const at = startAt() ?? sys.region?.spawn() ?? spawnPoint();
     place(at.x, at.y, at.z, Math.PI);
     started = dirty = true;
+    if (old) game.events.emit('toast', { text: OLD_SAVE_TOAST });
   }
 
   function continueGame(): boolean {
@@ -539,6 +569,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     camera.follow(p.x, p.y + (camera.mode === 'first' && player.body.swimming ? SWIM_EYE : 0), p.z);
     if (settings.graphics.reduceMotion) camera.snap();
     camera.update(settings.graphics.reduceMotion ? 1 : Math.min(dt, 0.1), ctx);
+    call(cameraListeners, dt, 'camera');
     world.setFocus(p.x, p.z);
     world.setCutaway(camera.cutaway);
     world.update(dt, ctx);
@@ -580,6 +611,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
 
     takeAim();
     call(frameListeners, dt, 'frame');
+    // After the views, which may have moved the lens for a scene.
+    sight.frame(settings.graphics.reduceMotion ? 1 : Math.min(dt, 0.1), p);
     sprites.update(dt, ctx);
 
     // The meter lowers the render size before it lowers the quality level. The size is post's to set.
@@ -623,7 +656,8 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     sky.sun.castShadow = g.shadows !== 'off';
     sky.sun.shadow.radius = g.shadows === 'sharp' ? 0 : 3;
     sprites.setShadowsEnabled(g.shadows !== 'off');
-    const type = g.shadows === 'sharp' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
+    // PCF handles both modes; radius above selects sharp or soft edges.
+    const type = THREE.PCFShadowMap;
     if (renderer.shadowMap.type !== type) {
       renderer.shadowMap.type = type;
       scene.traverse((object) => { const m = (object as THREE.Mesh).material; if (m) { if (Array.isArray(m)) m.forEach(x => x.needsUpdate = true); else m.needsUpdate = true; } });
@@ -641,8 +675,10 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     assets: art.assets,
     get audio() { return sound.audio; },
     onAudio: (fn) => sound.onStart(fn),
+    setAudioMuted: (reason, muted) => sound.setMuted(reason, muted),
     keys,
 
+    onCamera: (fn) => listen(cameraListeners, fn),
     onFrame: (fn) => listen(frameListeners, fn),
     onSimStep: (fn) => listen(stepListeners, fn),
 
@@ -654,6 +690,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       point.y = ((1 - projected.y) / 2) * size.height;
       return point;
     },
+    hero: player,
     playerPosition: player.position,
     get aim() { return aimed ? hit : null; },
 
@@ -700,14 +737,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
         if (next === 'quarter') camera.settle();
         for (const fn of [...changeListeners]) fn('tiltTurn');
       },
-      get characters() { return characterLook; },
-      setCharacters(next) {
-        settings.characters = next;
-        store();
-        if (next === characterLook) return;
-        characterLook = next;
-        for (const fn of [...changeListeners]) fn('characters');
-      },
       get debug() { return debug; },
       setDebug(next) {
         for (const key of DEBUG_OVERLAYS) if (typeof next[key] === 'boolean') debug[key] = next[key];
@@ -741,6 +770,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
     painted,
     look,
     groundAt: (x, z) => groundAt(x, z),
+    blocked: (x, y, z) => sight.blocked(x, y, z),
     lift,
     liftOnLand: look === 'smooth' ? liftOnLand : lift,
     setGround(heightAt) { groundAt = heightAt; },
@@ -782,5 +812,6 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
       await until(() => quiet >= 3);
     },
     get holdsStart() { return held; },
+    sight,
   };
 }

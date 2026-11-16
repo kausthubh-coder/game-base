@@ -198,6 +198,12 @@ export interface AudioSystem extends ViewSystem {
   readonly live: boolean;
   /** The engine's clock, in seconds. Things paced by sound (the town's spot sounds) count on it. */
   readonly now: number;
+  /**
+   * The engine's context and where a sound made outside the engine goes in: the effects bus, under the player's
+   * Effects volume. A film's own fire and its held note play through here.
+   */
+  readonly context: BaseAudioContext;
+  readonly effectsInput: AudioNode;
   /** Decodes a compressed clip (an mp3 of a voiced line) for `speak`. */
   decode(data: ArrayBuffer): Promise<AudioBuffer>;
   /**
@@ -518,6 +524,9 @@ export function createAudio(ctx: BaseAudioContext, options: AudioOptions = {}): 
     get now() {
       return ctx.currentTime;
     },
+
+    context: ctx,
+    effectsInput: mixer.effects,
 
     decode(data) {
       return ctx.decodeAudioData(data);

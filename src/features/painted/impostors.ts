@@ -15,8 +15,8 @@ export interface Impostors {
   readonly group: THREE.Group;
   /** Starts the list of far trees again. */
   clear(): void;
-  /** Adds a tree: its foot, its scale, and which sitter it is. False when there is no room for it. */
-  add(x: number, y: number, z: number, scale: number, kind: number): boolean;
+  /** Adds a tree: its foot, its scale, which sitter it is, and how grey it is. False when there is no room for it. */
+  add(x: number, y: number, z: number, scale: number, kind: number, grey?: number): boolean;
   /** Shows the trees added since `clear`. */
   commit(): void;
   readonly count: number;
@@ -89,16 +89,20 @@ export function createImpostors(renderer: THREE.WebGLRenderer, sitters: readonly
   geometry.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, -0.5, 1, 0, 0.5, 1, 0], 3));
   geometry.setIndex([0, 1, 2, 2, 1, 3]);
   const places = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 4), 4), tiles = new THREE.InstancedBufferAttribute(new Float32Array(capacity * 4), 4);
-  places.setUsage(THREE.DynamicDrawUsage); tiles.setUsage(THREE.DynamicDrawUsage);
+  const greys = new THREE.InstancedBufferAttribute(new Float32Array(capacity), 1);
+  places.setUsage(THREE.DynamicDrawUsage); tiles.setUsage(THREE.DynamicDrawUsage); greys.setUsage(THREE.DynamicDrawUsage);
   geometry.setAttribute('aPlace', places);
+  geometry.setAttribute('aGrey', greys);
   geometry.setAttribute('aTile', tiles);
   geometry.instanceCount = 0;
   const material = new THREE.ShaderMaterial({
     uniforms: { ...shared, uSheet: { value: target.texture }, uTileSize: { value: 1 / across }, uBrushAmt: { value: 0 }, uBands: { value: 0 }, uWrap: { value: 0 }, uBrushScale: { value: 0.05 }, uDapple: { value: 0 } },
     vertexShader: /* glsl */ `
       attribute vec4 aPlace, aTile;
+      attribute float aGrey;
       uniform float uTileSize;
       varying vec2 vUv;
+      varying float vGrey;
       varying vec3 vPaintWorld;
       void main() {
         // The card stands upright on the tree's foot and turns round it to face the camera.
@@ -106,17 +110,24 @@ export function createImpostors(renderer: THREE.WebGLRenderer, sitters: readonly
         vec2 side = normalize(vec2(to.y, -to.x));
         vec3 world = aPlace.xyz + vec3(side.x, 0.0, side.y) * (position.x * aTile.z * aPlace.w) + vec3(0.0, position.y * aTile.w * aPlace.w, 0.0);
         vUv = aTile.xy + vec2(position.x + 0.5, position.y) * uTileSize;
+        vGrey = aGrey;
         vPaintWorld = world;
         gl_Position = projectionMatrix * viewMatrix * vec4(world, 1.0);
       }`,
     fragmentShader: /* glsl */ `
       ${FRAGMENT_PARS}
       uniform sampler2D uSheet;
-      uniform vec3 uLeafSun, uLeafShade;
+      uniform vec3 uLeafSun, uLeafShade, uGreyLeaf;
+      uniform float uGreyDrain, uGreyThin;
       varying vec2 vUv;
+      varying float vGrey;
       void main() {
         vec4 t = texture2D(uSheet, vUv);
         if (t.a < 0.5) discard;
+        // A grey tree far off: drained, and a dying one thinned by a coarse pattern of its own.
+        vec2 cell = floor(vUv * 900.0);
+        if (fract(sin(dot(cell, vec2(12.9898, 78.233))) * 43758.5453) < vGrey * uGreyThin * 0.45 && t.g > t.r) discard;
+        t.rgb = mix(t.rgb, uGreyLeaf * dot(t.rgb, vec3(0.3, 0.59, 0.11)) / dot(uGreyLeaf, vec3(0.3, 0.59, 0.11)), vGrey * uGreyDrain);
         // Only where the tree itself is not drawn.
         if (paintTreeEdge() <= paintDither()) discard;
         gl_FragColor = vec4(paintAir(t.rgb * mix(uLeafShade, uLeafSun, 0.62) * paintClouds()), 1.0);
@@ -133,8 +144,9 @@ export function createImpostors(renderer: THREE.WebGLRenderer, sitters: readonly
   return {
     group,
     clear() { n = 0; },
-    add(x, y, z, scale, kind) {
+    add(x, y, z, scale, kind, grey = 0) {
       if (n >= capacity) return false;
+      greys.setX(n, grey);
       const frame = frames[kind] ?? (frames[0] as [number, number]);
       places.setXYZW(n, x, y, z, scale);
       tiles.setXYZW(n, (kind % across) / across, Math.floor(kind / across) / across, frame[0], frame[1]);
@@ -144,7 +156,7 @@ export function createImpostors(renderer: THREE.WebGLRenderer, sitters: readonly
     commit() {
       geometry.instanceCount = n;
       mesh.visible = n > 0;
-      places.needsUpdate = tiles.needsUpdate = true;
+      places.needsUpdate = tiles.needsUpdate = greys.needsUpdate = true;
     },
     get count() { return geometry.instanceCount; },
   };

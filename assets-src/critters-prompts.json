@@ -1,0 +1,58 @@
+{
+  "mossling": {
+    "prompt": "Use case: stylized-concept. Production PIXEL ART sprite sheet for cozy anime RPG. Reference image 1 is identity of M O S S L I N G: round yellow olive moss body, tiny cream face, two-leaf sprout, few butter yellow flowers, small brown feet. Rocks are habitat, NOT attached shell. Image 2 is pixel STYLE: match its chunky clusters and dark brown 1-2 pixel outline, warm upper-left light, flat limited earth palette. Simplify painting into same cast style. Transparent background, no text, no grid lines, NO shadows. STRICT FOUR columns NINE rows, 36 equal square cells. Rows 1-3 idle front, faceless back, right profile. Rows 4-6 waddle front, faceless back, right profile: four small step phases. Rows 7-9 settling on low wet grey stone front, faceless back, right profile: approach crouch, settle, doze, wake; keep same body/sprout size. Every cell one whole creature, consistent scale 68 pixels drawn in future 96px cell, ample margins. Same mossling in every frame, no ears, no teal, no gradients. No props except low stone in final three rows.",
+    "tool": "image_gen.imagegen",
+    "references": [
+      "assets-src/concept/creatures/mossling.webp",
+      "public/assets/sprites/critter.png"
+    ],
+    "attempts": [
+      "Kept attempt 1."
+    ]
+  },
+  "burrower": {
+    "prompt": "Use case: stylized-concept. Production PIXEL ART sprite sheet for cozy anime RPG. Input 1 BURROWER identity: plump russet mole, cream pointed snout, pink brown nose, sleepy slit eyes, THREE huge pale digging claws on each hand, small cream toe tips. No copper on body. Input 2 pixel STYLE only: flat limited earth tones, dark brown tinted outline, chunky clusters, warm upper-left light. STRICT FOUR columns NINE rows, 36 equal square cells. Rows 1-3 idle front, faceless back, right profile. Rows 4-6 shuffling digging walk front, back, right profile four distinct steps. Rows 7-9 SURFACING front/back/right: first head and claws only above soil, then half emerged, then full mole, then full mole alert. These frames reverse for diving. Ground soil only tiny rim in surfacing rows; NO cast shadows, NO text/grid/props. Fully transparent background. Equal margins, same creature size across all cells, no crop, no soft painting, no teal. Aim future 96px cells with 68px creature. Preserve body size through surface action; do not scale smaller for underground poses.",
+    "tool": "image_gen.imagegen",
+    "references": [
+      "assets-src/concept/creatures/burrower.webp",
+      "public/assets/sprites/critter.png"
+    ],
+    "attempts": [
+      "Kept attempt 1."
+    ]
+  },
+  "frog": {
+    "prompt": "Use case: stylized-concept. Production PIXEL ART sprite sheet cozy anime RPG. Identity from first image POND FROG, olive green squat round frog with big gold eyes, cream throat, ochre spots, broad haunches. Pixel style ONLY from second image: chunky readable flat pixel clusters, dark brown tinted outline, warm top-left light, limited earth palette, no soft painted shading. STRICT FOUR columns NINE rows 36 equal square cells. Rows 1-3 idle front, faceless back, right profile, breathe/blink. Rows 4-6 hop front/back/right profile: crouch, lift, legs extend, land; same body size and eye size. Rows 7-9 catch fly front/back/right profile: notice, mouth open, long pink tongue flick upward-forward to tiny golden fly, retract swallow. Back row must face AWAY even when feeding; tongue extends beyond head away from camera. Keep whole action inside cell, same frog body size throughout, enough headroom tongue. All frames transparent background with ample padding. NO text, no lines, no shadow, no scenery, no teal. Future 96px cells with frog about 55-65px tall, 1-2px brown outline.",
+    "tool": "image_gen.imagegen",
+    "references": [
+      "assets-src/concept/creatures/frog.webp",
+      "public/assets/sprites/critter.png"
+    ],
+    "attempts": [
+      "Kept attempt 1."
+    ]
+  },
+  "lanternfly": {
+    "prompt": "Use case: stylized-concept. Production PIXEL ART sprite sheet for cozy anime RPG. First image identity: LANTERNFLY brown round face, two gold tipped antennae, FOUR cream wings, warm amber abdomen, tiny dark feet. Second image pixel style: match existing game's simple chunky clusters, dark brown outlines, warm upper-left light, flat limited earth palette. STRICT FOUR columns SIX rows, 24 equal square cells. Rows 1-3 idle hover FRONT, FACELESS BACK, RIGHT PROFILE. Rows 4-6 moving flight FRONT, FACELESS BACK, RIGHT PROFILE. Four distinct wingbeat phases in each row, wings raised, horizontal, lowered, horizontal, with identical head and body scale. All four cells of each row SAME DIRECTION. Keep antenna/body size and baseline constant, wing motion only. No face on back. Transparent background, no text, no grids, NO shadows, no halo haze, no glow outside body. Amber abdomen must be separate clear shape for emissive mask extraction, no teal. Each cell whole insect with ample margins, target 58px occupied height in 96px cell. NO soft painted shading or tiny veins.",
+    "tool": "image_gen.imagegen",
+    "references": [
+      "assets-src/concept/creatures/lanternfly.webp",
+      "public/assets/sprites/lanternfly.png"
+    ],
+    "attempts": [
+      "Kept attempt 1. Alpha inspection confirmed transparent low-alpha background, removed by pipeline threshold.",
+      "Background removal edit produced same image; discarded."
+    ]
+  },
+  "bee": {
+    "prompt": "Use case: stylized-concept. Production PIXEL ART sprite sheet cozy anime RPG. Identity from image 1 BEE: plump golden fuzzy bee with russet brown abdominal stripes, cream wings, brown antennae and legs, two small golden pollen baskets. Style ONLY from image 2: simple chunky flat pixel clusters, dark brown tinted outlines 1-2 final pixels, warm upper-left light, locked earth tones. STRICT FOUR columns SIX rows, 24 equal square cells. ROW 1 all four cells FRONT idle hover. ROW 2 all four FACELESS BACK idle hover. ROW 3 all four RIGHT PROFILE idle hover. ROW 4 all FRONT moving flight. ROW 5 all BACK moving flight. ROW 6 all RIGHT PROFILE moving flight. Four wingbeat phases raised-horizontal-lowered-horizontal. Same head/body size throughout, equal baseline, ample margins. Completely TRANSPARENT background, no scenery, no cast shadows, no floor, NO text, NO grid lines, no teal, no soft shading, no wing blur. Pollen baskets are round yellow marks by hind legs; simplify leg clusters to readable few pixels. Target creature 58px tall inside 96px frame.",
+    "tool": "image_gen.imagegen",
+    "references": [
+      "assets-src/concept/creatures/bee.webp",
+      "public/assets/sprites/lanternfly.png"
+    ],
+    "attempts": [
+      "Kept attempt 1."
+    ]
+  }
+}

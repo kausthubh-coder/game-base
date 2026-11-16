@@ -1,0 +1,106 @@
+{
+  "shot": "doorstep",
+  "frame": [
+    1920,
+    1080
+  ],
+  "layers": [
+    {
+      "id": "harbour",
+      "file": "harbour.webp",
+      "x": -192,
+      "y": -108,
+      "w": 2304,
+      "h": 1296,
+      "z": 0,
+      "depth": 1,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Opaque painted harbour/sky continuation behind foreground architecture. 10 percent overscan."
+    },
+    {
+      "id": "street",
+      "file": "street.webp",
+      "x": -192,
+      "y": -108,
+      "w": 1241,
+      "h": 1296,
+      "z": 10,
+      "depth": 0.65,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Empty left house fronts and road. No baked rain or people. Concealed margin under near plane."
+    },
+    {
+      "id": "door-step-wisteria",
+      "file": "door-step-wisteria.webp",
+      "x": 715,
+      "y": -108,
+      "w": 1397,
+      "h": 1296,
+      "z": 30,
+      "depth": 0.25,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Shared night/day mask. Keep door frame, step and trunk on this plane."
+    },
+    {
+      "id": "walker",
+      "file": "walker-1.webp",
+      "x": 507,
+      "y": 457,
+      "w": 100,
+      "h": 217,
+      "z": 20,
+      "depth": 0.62,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "frames": [
+        "walker-2.webp",
+        "walker-3.webp",
+        "walker-4.webp",
+        "walker-5.webp",
+        "walker-6.webp"
+      ],
+      "note": "Rear-view six-drawing walk. Fixed box and bottom baseline, 1-6 then repeat; animate position toward harbour."
+    },
+    {
+      "id": "lamp-glow",
+      "file": "lamp-glow.webp",
+      "x": 1100,
+      "y": 117,
+      "w": 287,
+      "h": 354,
+      "z": 40,
+      "depth": 0.25,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Light-only mask for screen blending or opacity modulation. Code draws rain and ripples."
+    },
+    {
+      "id": "basket",
+      "file": "basket-1.webp",
+      "x": 1265,
+      "y": 645,
+      "w": 228,
+      "h": 179,
+      "z": 50,
+      "depth": 0.23,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Sleeping baby. Small brass key and visible dark cord; key is smaller than face."
+    }
+  ]
+}

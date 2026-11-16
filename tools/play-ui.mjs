@@ -1,7 +1,7 @@
 // The interface check: builds the game, serves it on port 5332, opens it in headless Chrome and walks
 // the interface with real keys and clicks, helped by the debug door (window.__game). It saves a
 // screenshot of every screen to .artifacts/play/ui-*.png and fails on a console error or a failed check.
-//   bun tools/play-ui.mjs [--port 5332] [--no-build] [--quality low|medium|high] [--only desktop|phone|world]
+//   bun tools/play-ui.mjs [--port 5332] [--no-build] [--quality low|medium|high] [--only desktop|phone|world|layout] [--repeat 1]
 //
 // The pictures are 1440 by 900: the title, Settings, the first seconds of a new game with the HUD, a
 // hint, a toast, every panel, a conversation mid-line and at a choice, the map, pause and the end card.
@@ -61,7 +61,24 @@ console.log(`serving ${site} on ${BASE}  pid ${serverPid}`);
 const checks = [];
 const errors = [];
 const shots = [];
+const snapshots = [];
 const notes = [];
+const layoutProbes = [];
+async function probeLayout(t, label) {
+  const value = await t.game(() => ({
+    scrolls: window.__layoutScrolls,
+    ancestors: (() => { const result = []; for (let e = document.querySelector('.gu-root')?.parentElement; e; e = e.parentElement) result.push({class: e.className, rect: e.getBoundingClientRect().toJSON(), x: e.scrollLeft, y: e.scrollTop, overflow: getComputedStyle(e).overflow, transform: getComputedStyle(e).transform}); return result; })(),
+    document: { x: scrollX, y: scrollY, height: document.documentElement.scrollHeight },
+    focus: document.activeElement?.outerHTML.slice(0, 240),
+    boxes: [...document.querySelectorAll('.gu-root, .gu-stage:not([hidden]), .gu-panel, .gu-panel-body, .gu-top, .gu-hint')].filter(e => e.checkVisibility()).map(e => ({
+      class: e.className, rect: e.getBoundingClientRect().toJSON(), scroll: e.scrollTop, height: e.scrollHeight, client: e.clientHeight,
+      overflow: getComputedStyle(e).overflow, transform: getComputedStyle(e).transform,
+    })),
+  }));
+  layoutProbes.push({ label, ...value });
+  console.log('layout probe ' + label + ' ' + JSON.stringify(value));
+  return value;
+}
 const check = (name, pass, detail = '') => {
   checks.push({ name, pass: Boolean(pass), detail: String(detail) });
   console.log(`${pass ? 'ok  ' : 'FAIL'} ${name}${detail ? '  ' + detail : ''}`);
@@ -82,6 +99,7 @@ async function open(browser, width, height, query = '') {
   const shot = async (name) => {
     await page.screenshot({ path: resolve(out, name) });
     shots.push(name);
+    snapshots.push({ name, state: await game(() => window.__game.state()) });
     console.log(`     wrote .artifacts/play/${name}`);
   };
   /** Waits until the page has drawn `count` more frames, so what the rules changed is on the screen. */
@@ -106,7 +124,7 @@ async function open(browser, width, height, query = '') {
     }
     const wrong = [];
     for (const { selector, box } of boxes) {
-      if (box.left < -0.5 || box.top < -0.5 || box.right > innerWidth + 0.5 || box.bottom > innerHeight + 0.5) wrong.push(`${selector} leaves the screen`);
+      if (box.left < -0.5 || box.top < -0.5 || box.right > innerWidth + 0.5 || box.bottom > innerHeight + 0.5) wrong.push(`${selector} leaves the screen ${JSON.stringify(box.toJSON())}`);
     }
     for (let a = 0; a < boxes.length; a++) {
       for (let b = a + 1; b < boxes.length; b++) {
@@ -121,6 +139,13 @@ async function open(browser, width, height, query = '') {
     check(`${width}: nothing overlaps or is clipped, ${what}`, wrong.length === 0, wrong.join('; '));
   };
 
+  await page.addInitScript(() => {
+    window.__layoutScrolls = [];
+    document.addEventListener('scroll', e => {
+      const el = e.target;
+      if (el instanceof Element && (el.id === 'ui' || el.classList.contains('gu-root'))) window.__layoutScrolls.push({ at: performance.now(), target: el.id || el.className, x: el.scrollLeft, y: el.scrollTop, focus: document.activeElement?.outerHTML.slice(0, 180) });
+    }, true);
+  });
   await page.goto(`${BASE}?quality=${quality}${query}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__game !== undefined);
   await page.waitForSelector('#loading', { state: 'detached' });
@@ -131,33 +156,41 @@ async function open(browser, width, height, query = '') {
 async function newGame(t) {
   await t.page.click('[data-key="title:new"]');
   // The opening scene plays first. It is skipped with its real Skip button.
-  await t.page.waitForSelector('.st-cinema:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
+  await t.page.waitForSelector('.st-film:not([hidden]) [data-key="opening:skip"]', { timeout: 30000 });
   await t.page.click('[data-key="opening:skip"]');
-  await t.page.waitForSelector('.st-cinema', { state: 'hidden', timeout: 60000 });
+  await t.page.waitForSelector('.st-film', { state: 'hidden', timeout: 60000 });
   await t.page.waitForFunction(() => window.__game.started);
   await t.game(() => window.__game.settle());
   await t.frames(3);
 }
 
-/** Starts a talk with Tamsin: at her side with E when the people are in the game, else by the conversation's id. */
-async function talkToTamsin(t) {
-  const there = await t.game(() => {
-    const g = window.__game, tamsin = g.view.game.actors.get('npc:tamsin');
-    if (!tamsin) return false;
-    g.teleport(tamsin.pos.x + 1.2, tamsin.pos.z + 0.4);
-    g.advance(0.3);
-    return true;
+/** Current opening dialogue is already active after the film. Never start a second conversation over it. */
+async function openingTalk(t) {
+  await t.page.waitForFunction(() => window.__game.state().talk?.name === 'Hobb');
+  const line = (await t.state()).talk;
+  check(`${t.width}: opening is Hobb waking Button on Grant day`, line.name === 'Hobb' && line.text.includes('Up, Button. Grant day.'));
+}
+
+/** A fresh supplied world, independent of the opening. No earned progression claim. */
+async function laterFixture(t) {
+  await t.page.reload({ waitUntil: 'load' });
+  await t.page.waitForFunction(() => window.__game !== undefined);
+  await t.page.waitForSelector('#loading', { state: 'detached' });
+  await t.game(() => {
+    const g = window.__game;
+    g.newGame();
+    g.skipTo('blessing');
+    g.teleport('grant.center');
+    g.advance(0.6);
   });
-  if (there) {
-    await t.frames(2);
-    const prompt = (await t.state()).prompt;
-    check(`${t.width}: the prompt names Tamsin`, prompt === 'Talk to Tamsin', String(prompt));
-    await t.page.keyboard.press('e');
-  } else {
-    await t.game(() => window.__game.view.game.systems.talk.start('tamsin.meet', 'tamsin'));
-  }
-  await t.page.waitForFunction(() => document.querySelector('.gb-dialogue') && !document.querySelector('.gb-dialogue').hidden);
-  return there;
+  await t.game(() => window.__game.settle());
+  await t.page.waitForFunction(() => !window.__game.state().talk && !window.__game.state().player.busy);
+  // skipTo supplies the Almanac flag and triggers its real gift banner. Let that lifecycle finish.
+  await t.page.waitForFunction(() => document.querySelector('.st-gift')?.hidden === true);
+  await t.page.waitForFunction(() => !document.querySelector('.gu-note')?.checkVisibility());
+  check(`${t.width}: supplied fixture tracks The blessing`, (await t.state()).tracked === 'blessing');
+  const supplied = await t.state();
+  check(`${t.width}: supplied Almanac is a key flag and the supplied axe is in the bag`, supplied.flags['has.almanac'] === true && !supplied.bag.some((s) => s.id === 'almanac') && supplied.bag.some((s) => s.id === 'axe' && s.count === 1));
 }
 
 async function desktop(browser) {
@@ -169,14 +202,15 @@ async function desktop(browser) {
   await page.waitForSelector('.gu-stage-title');
   const title = await game(() => ({
     started: window.__game.started,
-    art: getComputedStyle(document.querySelector('.gu-stage-title')).backgroundImage,
-    continueOff: document.querySelector('[data-key="title:continue"]').disabled,
+    art: getComputedStyle(document.querySelector('.gu-stage-title')).getPropertyValue('--gu-title-art'),
+    continueAbsent: document.querySelector('[data-key="title:continue"]') === null,
+    newGameEnabled: document.querySelector('[data-key="title:new"]')?.disabled === false,
     hud: !document.querySelector('.gb-hud').hidden,
     seconds: window.__game.state().clock.seconds,
   }));
   check('the game opens on the title and nothing has started', title.started === false);
-  check('the title shows the picture from the manifest, ui/title.png', /ui\/title(?:\.[a-f0-9]+)?\.(?:png|webp)/.test(title.art), title.art.slice(0, 90));
-  check('Continue is off without a save', title.continueOff === true);
+  check('the title uses the Grant morning guild door image', /title(?:[-.][A-Za-z0-9_-]+)?\.webp/.test(title.art), title.art.slice(0, 90));
+  check('without a save, Begin starts a new game and Continue is absent', title.newGameEnabled && title.continueAbsent);
   check('the HUD is hidden behind the title', title.hud === false);
   await frames(3);
   check('the world is not stepped while the title shows', (await state()).clock.seconds === title.seconds, `${title.seconds} seconds`);
@@ -199,7 +233,11 @@ async function desktop(browser) {
   check('Graphics shadows reach the light', await game(() => window.__game.view.sky.sun.castShadow));
   check('Graphics bloom reaches post processing', !(await game(() => window.__game.view.post.settings.bloom)));
   for (const [name,value] of [['shadowDistance',60],['plantDensity',.3],['viewDistance',.7]]) {
-    await page.locator(`#gu-${name}`).evaluate((el,value) => {el.value=String(value);el.dispatchEvent(new Event('input',{bubbles:true}));},value);
+    const slider = page.locator(`#gu-${name}`);
+    const range = await slider.evaluate((el) => ({ min: Number(el.min), step: Number(el.step) || 1 }));
+    await slider.focus();
+    await key('Home');
+    for (let i = 0; i < Math.round((value - range.min) / range.step); i++) await key('ArrowRight');
     check(`Graphics ${name} applies`, (await game(name => window.__game.view.settings.graphics[name],name)) === value);
   }
   await page.getByRole('button',{name:'Reset graphics overrides',exact:true}).click();
@@ -218,11 +256,48 @@ async function desktop(browser) {
   check('F3 hides the meter and turns its setting off', !(await shown('.perf-meter')) && !(await game(() => window.__game.view.settings.debug.meter)));
   for (const [name] of overlays) await page.locator(`input[name="gu-debug-${name}"][value="off"]`).check();
   for (const [name, selector] of overlays) check(`Debug ${name} off hides it`, !(await shown(selector)));
+  const settingsLayout = await probeLayout(t, 'settings after inputs');
+  const plate = settingsLayout.boxes.find(b => b.class.includes('gu-panel-settings'))?.rect;
+  check('Settings stays within the viewport after real control input', plate && plate.x >= -0.5 && plate.y >= -0.5 && plate.right <= 1440.5 && plate.bottom <= 900.5, JSON.stringify(plate));
+  check('focus scrolls the Settings body without scrolling the UI viewport', settingsLayout.boxes.some(b => b.class === 'gu-panel-body' && b.scroll > 0) && settingsLayout.ancestors.every(a => a.x === 0 && a.y === 0) && settingsLayout.scrolls.length === 0, JSON.stringify(settingsLayout.scrolls));
   await shot('ui-02-settings.png');
   await key('Escape');
   check('Esc goes back from Settings to the title', (await panel()) === 'title');
 
   // ------------------------------------------------------------------ 2. a new game and the HUD
+  const sound = await game(() => {
+    // The first key of the walk started the sound engine. Count the voice blips it is sent.
+    const audio = window.__game.view.audio;
+    window.__conversations = [];
+    window.__game.view.game.events.on('talk.started', (e) => window.__conversations.push(e.conversation));
+    window.__blips = [];
+    window.__spoken = [];
+
+    if (!audio) return false;
+    const emit = audio.emit.bind(audio);
+    audio.emit = (event) => { if (event.type === 'talk') window.__blips.push(event.char); return emit(event); };
+    return true;
+  });
+  // Every drawn frame from the moment the line opens notes how much of it is typed. On a slow machine one frame
+  // can last longer than the whole line, and then typing cannot be seen at all, which is not the game's fault.
+  await game(() => {
+    const seen = (window.__typing = { partial: false, frames: 0, opened: 0, full: 0 });
+    const tick = () => {
+      for (const record of window.__voice?.log ?? []) {
+        if (['playing', 'ended'].includes(record.status) && !window.__spoken.includes(record.key)) window.__spoken.push(record.key);
+      }
+      const typed = document.querySelector('.gb-dialogue-typed')?.textContent ?? '';
+      const rest = document.querySelector('.gb-dialogue-untyped')?.textContent ?? '';
+      if (typed.length + rest.length > 0) {
+        if (!seen.opened) seen.opened = performance.now();
+        seen.frames++;
+        if (typed.length > 0 && rest.length > 0) seen.partial = true;
+        if (rest.length === 0 && !seen.full) seen.full = performance.now();
+      }
+      if (seen.frames < 400) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
   await newGame(t);
   // The frames go on stepping the rules, slowly on this Mac. `advance` steps them further at once. The debug
   // door's `manual(true)` is not used: it pauses the game, and a paused game takes no E and no number key.
@@ -243,11 +318,13 @@ async function desktop(browser) {
     minimap: Boolean(document.querySelector('.gb-hud-minimap .gb-minimap canvas')),
   }));
   check('the HUD shows nine quick slots, and no health bars', hud.shown && hud.slots === 9 && hud.bars === 'none', JSON.stringify({ slots: hud.slots, bars: hud.bars }));
-  check('the tracker shows the tracked quest and its steps', hud.quest === 'A plot of your own' && hud.steps.length === 3, `${hud.quest}: ${hud.steps.join(' / ')}`);
+  check('the tracker shows the tracked quest and its steps', start.tracked === 'grantday' && hud.quest === 'Grant day' && hud.steps.length === 10 && hud.steps[1] === 'Wake in the bunk room, and pick your look at the mirror', `${hud.quest}: ${hud.steps.join(' / ')}`);
   check('the clock, the day and the weather show', /^\d\d:\d\d$/.test(hud.clock) && hud.day === 'Day 1' && hud.weather !== '', `${hud.day} ${hud.clock} ${hud.weather}`);
   check('the minimap is in its corner', hud.minimap);
   await shot('ui-03-hud.png');
   await clean('at the start');
+  await probeLayout(t, 'opening');
+  if (only === 'layout') { await t.context.close(); return; }
 
   // ------------------------------------------------------------------ 3. a hint
   // The director sends "Move with W, A, S and D" in the first seconds. If it has gone by, one is sent by hand.
@@ -259,34 +336,7 @@ async function desktop(browser) {
   await clean('with a hint');
 
   // ------------------------------------------------------------------ 4. talking
-  const sound = await game(() => {
-    // The first key of the walk started the sound engine. Count the voice blips it is sent.
-    const audio = window.__game.view.audio;
-    window.__blips = [];
-    if (!audio) return false;
-    const emit = audio.emit.bind(audio);
-    audio.emit = (event) => { if (event.type === 'talk') window.__blips.push(event.char); return emit(event); };
-    return true;
-  });
-  // Every drawn frame from the moment the line opens notes how much of it is typed. On a slow machine one frame
-  // can last longer than the whole line, and then typing cannot be seen at all, which is not the game's fault.
-  await game(() => {
-    const seen = (window.__typing = { partial: false, frames: 0, opened: 0, full: 0 });
-    const tick = () => {
-      const typed = document.querySelector('.gb-dialogue-typed')?.textContent ?? '';
-      const rest = document.querySelector('.gb-dialogue-untyped')?.textContent ?? '';
-      if (typed.length + rest.length > 0) {
-        if (!seen.opened) seen.opened = performance.now();
-        seen.frames++;
-        if (typed.length > 0 && rest.length > 0) seen.partial = true;
-        if (rest.length === 0 && !seen.full) seen.full = performance.now();
-      }
-      if (seen.frames < 400) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  });
-  const beside = await talkToTamsin(t);
-  if (!beside) note('The people are not in the game yet, so the conversation was started by its id and not with E beside Tamsin.');
+  await openingTalk(t);
   await frames(3);
   const mid = await game(() => ({
     name: document.querySelector('.gb-dialogue-name').textContent,
@@ -296,7 +346,7 @@ async function desktop(browser) {
     line: window.__game.state().talk?.text,
     busy: window.__game.state().player.busy,
   }));
-  check('the box shows the talk system\'s line, with the name', mid.name === 'Tamsin' && mid.whole === mid.line, `${mid.name}: ${mid.whole}`);
+  check('the box shows the talk system\'s line, with the name', mid.name === 'Hobb' && mid.whole.includes('Up, Button. Grant day.') && mid.whole === 'Up, Button. Grant day. Nobody signs a deed on an empty stomach.' && mid.line === '(from the door) Up, Button. Grant day. Nobody signs a deed on an empty stomach.', `${mid.name}: ${mid.whole}`);
   check('the portrait comes from the manifest\'s portraits sheet', /portraits\/portraits(?:\.[a-f0-9]+)?\.(?:png|webp)/.test(mid.portrait), mid.portrait.slice(0, 80));
   await page.waitForFunction(() => window.__typing.partial || window.__typing.full, null, { timeout: 15000 });
   const typing = await game(() => window.__typing);
@@ -304,10 +354,11 @@ async function desktop(browser) {
   else note(`Typing could not be seen: the whole line showed within ${typing.frames} drawn frame(s) (${Math.round(typing.full - typing.opened)} ms), so this machine is too slow to watch it.`);
   check('the player is busy while a line shows', mid.busy === true);
   // A voiced person's line plays their recorded clip and types in time with it, with no blips. Anyone else blips.
+  check('the sound engine is active', sound);
   if (sound) {
-    const said = await game((text) => ({ blips: window.__blips.length, clip: (window.__voice?.log ?? []).find((r) => r.key.endsWith('|' + text))?.status ?? null }), mid.line);
+    const said = await game((text) => ({ played: window.__spoken.some((key) => key.startsWith('hobb|') && key.endsWith(text)), blips: window.__blips.length, clip: (window.__voice?.log ?? []).find((r) => r.key.endsWith('|' + text))?.status ?? null }), mid.line);
     // A clip that already played to its end has spoken too: on a slow machine it can be over in a few frames.
-    check('the line speaks: a recorded clip, or a voice blip for each typed letter', said.blips > 0 || ['loading', 'playing', 'ended'].includes(said.clip), `${said.blips} blips, clip ${said.clip ?? 'none'} for "${mid.typed}"`);
+    check('the line speaks: a recorded clip, or a voice blip for each typed letter', said.blips > 0 || said.played || ['playing', 'ended'].includes(said.clip), `${said.blips} blips, clip ${said.clip ?? 'none'} for "${mid.typed}"`);
   }
   else note('The sound engine had not started, so the voice blips were not counted.');
   await shot('ui-05-talk.png');
@@ -320,6 +371,7 @@ async function desktop(browser) {
     const e = document.querySelector('.gb-dialogue');
     return {
       open: Boolean(e) && !e.hidden,
+      identity: window.__conversations?.at(-1),
       line: window.__game.state().talk?.text ?? null,
       untyped: document.querySelector('.gb-dialogue-untyped')?.textContent ?? '',
       choices: [...document.querySelectorAll('.gb-dialogue-choices:not([hidden]) button')].map((b) => b.textContent),
@@ -340,7 +392,7 @@ async function desktop(browser) {
     if (!fresh) { note(`The conversation was over before ${name} could be tried on a line still typing.`); return; }
     await press();
     const whole = await box();
-    check(`${name} shows the whole line`, whole.line === fresh.line && whole.untyped === '', `"${String(whole.line).slice(0, 40)}"`);
+    check(`${name} shows the whole line`, whole.identity === fresh.identity && whole.line === fresh.line && whole.untyped === '', `"${String(whole.line).slice(0, 40)}"`);
     await press();
     const next = await box();
     check(`${name} again moves on`, next.line !== fresh.line, next.line === null ? 'the conversation ended' : `"${next.line.slice(0, 40)}"`);
@@ -357,13 +409,22 @@ async function desktop(browser) {
   const after = await state();
   check('Enter carries the conversation to its end', after.talk === null && after.player.busy === false && !(await visible('.gb-dialogue')), `${presses} presses`);
   // The Almanac is a key item: a flag, never a thing in the bag.
-  check('Tamsin gave the Almanac and the axe', after.flags['has.almanac'] === true && !after.bag.some((s) => s.id === 'almanac') && after.bag.some((s) => s.id === 'axe'), `book ${after.flags['has.almanac']}, bag ${after.bag.map((s) => s.id).join(', ')}`);
+  check('Hobb wake ends without inventing the old Tamsin rewards', after.bag.length === 0 && after.tracked === 'grantday' && after.flags['has.almanac'] !== true);
   await frames(2);
 
-  // A line with choices: Maren asks for the wheat.
-  await game(() => { window.__game.skipTo('bread'); window.__game.advance(0.6); window.__game.view.game.systems.talk.start('maren.ask', 'maren'); });
+  // Independent current choice fixture, no opening progression claim.
+  await laterFixture(t);
+  // Supply the earlier bell scene only. The pump step below must be completed by input.
+  await game(() => { window.__game.view.game.flags.set('scene.16', true); window.__game.advance(0.2); });
+  const trackerNow = () => game(() => [...document.querySelectorAll('.gb-hud-quest li')].filter(e => e.checkVisibility()).map(e => e.textContent));
+  const pumpStep = "Set the Order's pump running in your field, or leave it in its crate";
+  await page.waitForFunction(text => [...document.querySelectorAll('.gb-hud-quest li')].some(e => e.checkVisibility() && e.textContent === text), pumpStep);
+  check('before the pump choice, the visible tracker asks for the pump decision', JSON.stringify(await trackerNow()) === JSON.stringify([pumpStep]));
+  await shot('ui-06-tracker-before.png');
+  await game(() => window.__game.view.game.systems.talk.start('choice.pump'));
   for (let i = 0; i < 30 && (await box()).open && (await box()).choices.length === 0; i++) await key('Space');
   const offer = await box();
+  check('choice.pump offers the current crate choices', offer.line === 'The crate sits at the edge of your field. The pump shines in its straw.' && offer.choices.length === 2 && offer.choices[1].includes('Leave it in its crate'));
   if (offer.choices.length > 0) {
     await frames(1);
     await shot('ui-06-talk-choice.png');
@@ -371,16 +432,38 @@ async function desktop(browser) {
     const before = (await state()).selected;
     await key('2');
     const picked = await box();
-    check('a number key picks a choice, and leaves the quick slot alone', picked.line !== offer.line && (await state()).selected === before, `picked "${offer.choices[1]?.slice(1) ?? ''}"`);
+    check('a number key picks a choice, and leaves the quick slot alone', picked.line === 'You put the lid back on. The straw smells of incense.' && (await state()).selected === before, `picked "${offer.choices[1]?.slice(1) ?? ''}"`);
   } else {
-    check('the conversation maren.ask offers a choice', false, JSON.stringify(offer));
+    check('the conversation choice.pump offers a choice', false, JSON.stringify(offer));
   }
   for (let i = 0; i < 60 && (await box()).open; i++) {
     if ((await box()).choices.length > 0) await page.click('.gb-dialogue-choices button');
     else await key('Space');
   }
-  check('the conversation with choices ends', !(await box()).open && (await state()).player.busy === false);
-  await frames(1);
+  check('the conversation with choices ends and stores the second choice', !(await box()).open && (await state()).player.busy === false && (await state()).flags['choice.pump'] === 'crated');
+  await page.waitForFunction(() => [...document.querySelectorAll('.gb-hud-quest li')].some(e => e.checkVisibility() && e.textContent === 'That evening, hear what the Custodian thinks'));
+  check('the pump choice advances the visible tracker to the Custodian', JSON.stringify(await trackerNow()) === JSON.stringify(['That evening, hear what the Custodian thinks']));
+  await shot('ui-06-tracker-after.png');
+
+  // Walk-up prompt coverage uses a current chapter-two Tamsin line, independently of her old meeting.
+  await game(() => {
+    const g = window.__game, npc = g.view.game.actors.get('npc:tamsin');
+    if (!npc) throw new Error('fixture has no Tamsin');
+    g.teleport(npc.pos.x + 1.2, npc.pos.z + 0.4);
+    g.advance(0.3);
+  });
+  await page.waitForFunction(() => window.__game.state().prompt === 'Talk to Tamsin');
+  check('the nearby prompt names Tamsin', (await state()).prompt === 'Talk to Tamsin');
+  await key('e');
+  const walkup = (await state()).talk;
+  check('E starts the current Tamsin chapter-two walk-up', walkup?.name === 'Tamsin' && walkup?.text === "The Mother's kind. She's always been kind. Keep the glove on anyway.", JSON.stringify(walkup));
+  // Wait until the voiced line has begun typing before reveal/advance input.
+  await page.waitForFunction(() => document.querySelector('.gb-dialogue-typed')?.textContent.length > 0);
+  await key('Enter');
+  await page.waitForFunction(() => document.querySelector('.gb-dialogue-untyped')?.textContent === '');
+  await key('Enter');
+  await page.waitForFunction(() => !window.__game.state().talk && !window.__game.state().player.busy);
+  check('the walk-up ends and releases the player', !(await state()).talk && !(await state()).player.busy);
 
   // ------------------------------------------------------------------ 5. toasts, and the bag's quick row
   await game(() => {
@@ -406,8 +489,6 @@ async function desktop(browser) {
   const picked = await game(() => [...document.querySelectorAll('.gb-hud-slots .gb-slot')].findIndex((b) => b.getAttribute('aria-pressed') === 'true'));
   await frames(1);
   check('3 picks the third quick slot, and the HUD marks it', (await state()).selected === 2 && (await game(() => [...document.querySelectorAll('.gb-hud-slots .gb-slot')].findIndex((b) => b.getAttribute('aria-pressed') === 'true'))) === 2, `was ${picked}`);
-  const tracker = await game(() => [...document.querySelectorAll('.gb-hud-quest li')].map((e) => e.textContent));
-  check('the tracker shows a count on a step that counts', tracker.some((text) => /7\/20$/.test(text)), tracker.join(' / '));
   await shot('ui-07-toast.png');
   await clean('with toasts');
 
@@ -490,6 +571,7 @@ async function desktop(browser) {
   check('Keep playing closes the end card', (await panel()) === null && !(await game(() => window.__game.view.paused)));
 
   // ------------------------------------------------------------------ 9. back to the title, and Continue
+  const saved = await state();
   check('the game saves', await game(() => window.__game.save()));
   await page.reload({ waitUntil: 'load' });
   await page.waitForFunction(() => window.__game !== undefined);
@@ -501,7 +583,8 @@ async function desktop(browser) {
   await game(() => window.__game.settle());
   await frames(3);
   const back = await state();
-  check('Continue brings back the bag and the quest', back.tracked === 'bread' && back.bag.some((s) => s.id === 'oak_log'), `tracked ${back.tracked}, ${back.bag.length} stacks`);
+  check('Continue brings back the bag and the quest', back.tracked === 'blessing' && JSON.stringify(back.bag) === JSON.stringify(saved.bag) && back.bag.some((s) => s.id === 'oak_log' && s.count === 14), `tracked ${back.tracked}, ${back.bag.length} stacks`);
+  check('Continue preserves the pump decision and visible tracker progress', back.flags['choice.pump'] === 'crated' && JSON.stringify(await trackerNow()) === JSON.stringify(['That evening, hear what the Custodian thinks']));
   await shot('ui-16-continued.png');
   await t.context.close();
 }
@@ -770,7 +853,7 @@ async function keysTheHintsName(t) {
   const planksAfter = (await state()).bag.find((s) => s.id === 'plank')?.count ?? 0;
   check('hint "use": the right button sets down the plank in the hand', heldNow === 'plank' && planksAfter === planks - 1, `held ${heldNow}, planks ${planks} to ${planksAfter}`);
 
-  // "Press E to talk to someone close by." was pressed beside Tamsin in the conversation above, when she is in the game.
+  // "Press E to talk to someone close by." advances the actual Hobb opening above; the workbench below checks a nearby prompt.
   // "Sleep in a bed ... press E beside it" and the workbench use the same key through the prompt.
   await frames(1);
 }
@@ -780,24 +863,32 @@ async function phone(browser) {
   const { page, game, shot, frames, panel, clean, mapOpen } = t;
   await page.waitForSelector('.gu-stage-title');
   await shot('ui-20-phone-title.png');
+  await page.click('[data-key="title:settings"]');
+  await page.locator('input[name="gu-debug-info"][value="off"]').focus();
+  await page.keyboard.press('Tab');
+  const settings = await probeLayout(t, 'phone Settings keyboard focus');
+  const plate = settings.boxes.find(b => b.class.includes('gu-panel-settings'))?.rect;
+  check('390: Settings keeps keyboard focus and inner scrolling within the viewport', plate && plate.x >= -0.5 && plate.y >= -0.5 && plate.right <= 390.5 && plate.bottom <= 844.5 && settings.boxes.some(b => b.class === 'gu-panel-body' && b.scroll > 0) && settings.ancestors.every(a => a.x === 0 && a.y === 0));
+  await shot('ui-20-phone-settings.png');
+  await page.keyboard.press('Escape');
   await newGame(t);
   await game(() => window.__game.advance(6));
   await frames(2);
   await shot('ui-21-phone-hud.png');
   await clean('at the start');
 
-  await talkToTamsin(t);
+  await openingTalk(t);
   await game(() => window.__game.view.game.events.emit('hint', { id: 'check-talk', text: 'A hint that arrives while someone is talking.' }));
   await frames(3);
   await shot('ui-22-phone-talk.png');
   await clean('in a conversation with a hint up');
-  await game(() => window.__game.talkThrough());
+  for (let i = 0; i < 20 && (await t.state()).talk; i++) await page.keyboard.press('Enter');
   await frames(1);
   check('390: the box closes when the conversation ends', !(await t.visible('.gb-dialogue')));
 
+  await laterFixture(t);
   await game(() => {
     const g = window.__game;
-    g.skipTo('bread');
     g.give('oak_log', 14); g.give('plank', 9); g.give('berry', 3); g.give('wheat', 7);
     g.advance(0.6);
   });
@@ -843,9 +934,11 @@ try {
     headless: true,
     args: ['--autoplay-policy=no-user-gesture-required'],
   });
-  if (!only || only === 'desktop') await desktop(browser);
-  if (!only || only === 'phone') await phone(browser);
-  if (!only || only === 'world') await worldTitle(browser);
+  for (const [name, walk] of [['desktop', desktop], ['phone', phone], ['world', worldTitle]]) {
+    if (only && only !== name && !(only === 'layout' && name === 'desktop')) continue;
+    try { for (let run = 0; run < Number(opt('repeat', 1)); run++) await walk(browser); }
+    catch (error) { check(`${name}: the walk ran to its end`, false, error.stack ?? String(error)); }
+  }
   check('the page logged no console error', errors.length === 0, errors.join(' | ').slice(0, 600));
 } catch (error) {
   check('the walk ran to its end', false, error instanceof Error ? error.stack ?? error.message : String(error));
@@ -856,6 +949,6 @@ try {
 }
 
 const failed = checks.filter((c) => !c.pass);
-writeFileSync(resolve(out, 'ui.json'), JSON.stringify({ at: new Date().toISOString(), quality, checks, notes, errors, shots }, null, 2));
+writeFileSync(resolve(out, 'ui.json'), JSON.stringify({ at: new Date().toISOString(), quality, checks, notes, errors, shots, snapshots, layoutProbes }, null, 2));
 console.log(`\n${checks.length - failed.length} of ${checks.length} checks pass. ${shots.length} screenshots in .artifacts/play/. Report: .artifacts/play/ui.json`);
 process.exit(failed.length ? 1 : 0);

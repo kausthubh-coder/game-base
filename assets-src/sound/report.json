@@ -119,6 +119,174 @@
     "lufs": -30,
     "peak": -17.4
   },
+  "bed.oldforest.day": {
+    "prompt": "Deep inside an ancient old-growth forest of giant oaks on a still day: old trunks creaking slowly, a woodpecker tapping far off, a few birds calling with long pauses between, deep and hushed, no wind gusts, no voices, no music",
+    "hash": "2da2230740",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.oldforest.day.mp3",
+    "kind": "bed",
+    "seconds": 16.5,
+    "channels": 2,
+    "lufs": -28,
+    "peak": -4.5
+  },
+  "bed.greyforest": {
+    "prompt": "The hushed air of a silent dead grey forest with no birds and no insects: a very faint soft dry hiss like fine ash drifting down, a low empty hush, utterly still and even, no ticking, no clicks, no wind gusts, no voices, no music",
+    "hash": "b845a92dc8",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.greyforest.mp3",
+    "kind": "bed",
+    "seconds": 12.5,
+    "channels": 2,
+    "lufs": -33,
+    "peak": -22.1
+  },
+  "bed.marsh": {
+    "prompt": "A misty marsh at dusk: many small frogs croaking and chirping among the reeds, gentle water trickling between shallow pools, a soft plop now and then, reeds rustling softly, calm, no voices, no music",
+    "hash": "9069c7ec40",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.marsh.mp3",
+    "kind": "bed",
+    "seconds": 16.5,
+    "channels": 2,
+    "lufs": -28,
+    "peak": -7.6
+  },
+  "bed.caves": {
+    "prompt": "Inside a large cool rock cave: slow water drips falling into small pools and echoing off stone, a soft low hollow wind breathing from deeper in, spacious reverb, no voices, no music",
+    "hash": "e83b28ee41",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.caves.mp3",
+    "kind": "bed",
+    "seconds": 12.5,
+    "channels": 2,
+    "lufs": -30,
+    "peak": -3.4
+  },
+  "bed.river": {
+    "prompt": "A wide gentle river flowing steadily past a grassy bank and an old wooden landing, water lapping at the posts, calm and continuous, no wind, no birds, no voices, no music",
+    "hash": "b59ce3cbd7",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.river.mp3",
+    "kind": "bed",
+    "seconds": 14.5,
+    "channels": 2,
+    "lufs": -27,
+    "peak": -14.7
+  },
+  "bed.saltgate": {
+    "prompt": "A small harbour on the sea on a breezy day: seagulls crying in the distance, rigging and ropes of moored sailing boats creaking and clinking, waves washing against the stone harbour wall, no voices, no music",
+    "hash": "b3510be2ee",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.saltgate.mp3",
+    "kind": "bed",
+    "seconds": 14.5,
+    "channels": 2,
+    "lufs": -28,
+    "peak": -8
+  },
+  "bed.highroad.wind": {
+    "prompt": "Soft natural wind high up on an old stone bridge over a wide valley, a smooth airy breeze rising and falling gently, a faint whistle past the stone, calm, no harsh gusts, no birds, no voices, no music",
+    "hash": "50c330111b",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/bed.highroad.wind.mp3",
+    "kind": "bed",
+    "seconds": 14.5,
+    "channels": 2,
+    "lufs": -30,
+    "peak": -18
+  },
+  "spot.creak": {
+    "prompt": "A single huge old oak tree trunk creaking slowly and deeply as it sways, one long wooden groan, in a quiet forest, no birds, no voices, no music",
+    "hash": "d63e35d4e3",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.creak.mp3",
+    "kind": "shot",
+    "seconds": 5.9995,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        2.8446
+      ],
+      [
+        3.0046,
+        2.9148
+      ]
+    ],
+    "lufs": -35.4,
+    "peak": -14
+  },
+  "spot.crow": {
+    "prompt": "One crow cawing twice far away across an empty silent forest, distant and lonely, no other birds, no wind, no voices, no music",
+    "hash": "8c898ecd52",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.crow.mp3",
+    "kind": "shot",
+    "seconds": 6.23,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        3
+      ],
+      [
+        3.16,
+        2.99
+      ]
+    ],
+    "lufs": -32.1,
+    "peak": -16
+  },
+  "spot.market": {
+    "prompt": "A market seller in a medieval town calling out once to passers-by from a little way off, cheerful, the words indistinct, then a few coins clinking, no music",
+    "hash": "ef08b18543",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 2,
+    "file": "sound/spot.market.mp3",
+    "kind": "shot",
+    "seconds": 6.2368,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        3
+      ],
+      [
+        3.16,
+        2.9968
+      ]
+    ],
+    "lufs": -35.7,
+    "peak": -16
+  },
+  "spot.bells": {
+    "prompt": "A single bronze chapel bell ringing three slow strokes from a small tower across a quiet town, warm, with a long ring after, outdoors, no voices, no music",
+    "hash": "4af377c44d",
+    "model": "eleven_text_to_sound_v3",
+    "takes": 1,
+    "file": "sound/spot.bells.mp3",
+    "kind": "shot",
+    "seconds": 4.1049,
+    "channels": 1,
+    "slices": [
+      [
+        0.08,
+        3.9449
+      ]
+    ],
+    "lufs": -27.4,
+    "peak": -10
+  },
   "spot.well": {
     "prompt": "A wooden bucket on a creaking rope lowered into a stone village well, then a splash and water dripping, heard from a few meters away, no voices, no music",
     "hash": "a0bcabf95d",

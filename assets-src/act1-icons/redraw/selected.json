@@ -1,0 +1,78 @@
+{
+  "act1-weapons": {
+    "source": "act1-weapons-attempt1.png",
+    "cols": 4,
+    "rows": 2,
+    "names": [
+      "bow",
+      "bow-copper",
+      "bow-spring",
+      "bow-tusk",
+      "staff",
+      "staff-copper",
+      "staff-brass",
+      "staff-rootwood"
+    ]
+  },
+  "act1-story": {
+    "source": "act1-story-attempt1.png",
+    "cols": 3,
+    "rows": 1,
+    "names": [
+      "pump-house-keystone",
+      "lamp-gallery-keystone",
+      "seed-vault-keystone"
+    ]
+  },
+  "act1-equipment": {
+    "source": "act1-equipment-attempt1.png",
+    "cols": 5,
+    "rows": 1,
+    "names": [
+      "canvas-jacket",
+      "padded-jacket",
+      "padded-grip",
+      "spring-hilt",
+      "honey-binding"
+    ],
+    "overrides": {
+      "canvas-jacket": {
+        "source": "act1-equipment-attempt2.png",
+        "cols": 2,
+        "rows": 1,
+        "index": 0
+      },
+      "padded-jacket": {
+        "source": "act1-equipment-attempt2.png",
+        "cols": 2,
+        "rows": 1,
+        "index": 1
+      }
+    }
+  },
+  "act1-farm": {
+    "source": "act1-farm-attempt1.png",
+    "cols": 1,
+    "rows": 1,
+    "names": [
+      "shed-pelt"
+    ]
+  },
+  "act1-found": {
+    "source": "act1-found-attempt1.png",
+    "cols": 1,
+    "rows": 1,
+    "names": [
+      "old-brass"
+    ]
+  },
+  "act1-kit": {
+    "source": "act1-kit-attempt1.png",
+    "cols": 2,
+    "rows": 1,
+    "names": [
+      "quill-strip",
+      "lamp-post"
+    ]
+  }
+}

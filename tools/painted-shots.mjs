@@ -1,8 +1,14 @@
 // Pictures of the painted world from fixed places, to judge the look after a change. It builds the game, serves
 // it, starts a game through the debug door, hides the interface and shoots each view.
 //   bun tools/painted-shots.mjs [--port 5470] [--dist dist-painted] [--no-build] [--out .artifacts/painted]
-//     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,green,street,town,farm,wide,knoll,south,west,vale,low] [--query "look=blocks"] [--tag blocks] [--time 0.5]
+//     [--views spawn,meadow,grant,pond,road,hill,cliff,river,gate,square,green,street,town,farm,wide,knoll,south,west,vale,low,door,hall,court] [--query "look=blocks"] [--tag blocks] [--time 0.5]
 //     [--frames 30] [--quality high] [--at 20,-236] [--weather clear] [--moments 0.5:clear,0.5:rain,0.9:clear]
+//     [--views greenhollow]: the ten places of Greenhollow's map, `gh-*`. Add `--query landmarks=boxes` to see where
+//     the landmarks not made yet will stand.
+//     [--views wilds]: the forests, the marsh, the river works and the caves, `wild-*`.
+//     [--views city]: four views of Hollowmere, `city-*`, after the vistas in assets-src/concept/region-hollowmere.
+//     [--flags scene.23=true,ledger.granary.filled=true,fight.12.won=true]: story flags set after the new game, so the
+//     land shows that part of the story (src/game/region/story.sim.ts). `--views story` shoots the land's states.
 // A view is a place, a camera and a zoom. `--tag` goes into the file names, so two looks can sit side by side.
 // `--moments` shoots every view at several hours and weathers in one go: each is an hour of the day (0.5 is
 // noon) and a weather of src/content/weather.ts, and both go into the file names.
@@ -24,6 +30,7 @@ const time = Number(opt('time', '0.5'));
 const settleFrames = Number(opt('frames', '30'));
 const quality = opt('quality', 'high');
 const weather = opt('weather', 'clear');
+const flags = opt('flags', '').split(',').filter(Boolean).map((f) => { const [k, v] = f.split('='); return [k, v === undefined || v === 'true' ? true : v === 'false' ? false : Number.isNaN(Number(v)) ? v : Number(v)]; });
 const moments = opt('moments', '') ? opt('moments', '').split(',').map((m) => { const [t, w] = m.split(':'); return { time: Number(t), weather: w ?? 'clear', name: `-${t}-${w ?? 'clear'}` }; }) : [{ time, weather, name: '' }];
 mkdirSync(out, { recursive: true });
 
@@ -62,12 +69,72 @@ const VIEWS = {
   west: { at: [30, -221], camera: 'free', yaw: 80, pitch: 4, distance: 10 },
   vale: { at: [100, -210], camera: 'free', yaw: 250, pitch: 5, distance: 12 },
   low: { at: 'spawn', camera: 'tilt', zoom: 2, quarter: 0 },
+  // Greenhollow's whole map: the ten places to judge it from (docs/greenhollow-world.md). `--views greenhollow`
+  // shoots them all. Each `at` is a place of the plan, where the region stands you in front of its landmark.
+  'gh-plot': { at: 'grant.center', camera: 'free', yaw: 8, pitch: 4, distance: 16 },
+  'gh-oak-shrine': { at: 'shrine-oak', camera: 'free', yaw: 112, pitch: 9, distance: 14 },
+  'gh-bridge': { at: 'bridge', camera: 'free', yaw: 233, pitch: 7, distance: 13 },
+  'gh-boar': { at: 'boar', camera: 'free', yaw: 20, pitch: 10, distance: 15 },
+  'gh-old-gate': { at: [32, -352], camera: 'free', yaw: 323, pitch: 5, distance: 12 },
+  'gh-cave-mouth': { at: 'caves', camera: 'free', yaw: 280, pitch: 6, distance: 14 },
+  'gh-pump-house': { at: [272, -114], camera: 'free', yaw: 251, pitch: 7, distance: 12 },
+  'gh-marsh-shrine': { at: 'shrine-marsh', camera: 'free', yaw: 180, pitch: 5, distance: 12 },
+  'gh-seed-vault': { at: 'seedvault', camera: 'free', yaw: 90, pitch: 8, distance: 14 },
+  'gh-terrace-shrine': { at: 'shrine-terrace', camera: 'free', yaw: 0, pitch: 2, distance: 12 },
+  // Ilara's Hall: the stone door from the plot, the court from the game's own camera, and from above.
+  door: { at: 'shut.door', camera: 'free', yaw: 350, pitch: 12, distance: 11 },
+  hall: { at: 'hall.heart', camera: 'tilt', zoom: 1, quarter: 0 },
+  court: { at: 'hall.heart', camera: 'free', yaw: 325, pitch: 30, distance: 17 },
 };
+// Hollowmere, the city, as the four vistas of its concept package see it: across the Mere, down the market street, the
+// quay to the green at blue hour, and the market from above. A view's own `time` wins over `--time`.
+VIEWS['city-wide'] = { at: [182, -90], camera: 'free', yaw: 345, pitch: 17, distance: 55 };
+VIEWS['city-street'] = { at: [236, -175], camera: 'free', yaw: 88, pitch: 7, distance: 13 };
+VIEWS['city-quay'] = { at: [234, -131], camera: 'free', yaw: 78, pitch: 10, distance: 16, time: 0.79 };
+VIEWS['city-market'] = { at: [226, -172], camera: 'free', yaw: 300, pitch: 24, distance: 30 };
+// The story on the land: the grass under the relit arches from the north path, a pumped field, the grey wood.
+VIEWS['story-arches'] = { at: [95, -292], camera: 'free', yaw: 0, pitch: 14, distance: 30 };
+VIEWS['story-field'] = { at: [300, -193], camera: 'free', yaw: 270, pitch: 24, distance: 34 };
+VIEWS['story-greywood'] = { at: 'boar', camera: 'free', yaw: 0, pitch: 8, distance: 20 };
+// Beyond the ten: the falls of the Mere from below, and the High Road's deck from the north path's stair.
+VIEWS['land-falls'] = { at: [225, -430], camera: 'free', yaw: 320, pitch: 2, distance: 10 };
+VIEWS['land-road'] = { at: [14, -306], camera: 'free', yaw: 300, pitch: 6, distance: 18 };
+// The wild lands (assets-src/concept/region-forests and region-southeast): each place from the game's own camera
+// (`-game`), at eye height after its vista (`-eye`), and from a hill (`-hill`). `--views wilds` shoots them all.
+VIEWS['wild-forest-game'] = { at: [-220, -252], camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-forest-eye'] = { at: [-220, -252], camera: 'free', yaw: 80, pitch: 3, distance: 9 };
+VIEWS['wild-grove-hill'] = { at: [-325, -148], camera: 'free', yaw: 20, pitch: 24, distance: 48 };
+VIEWS['wild-vault-game'] = { at: 'seedvault', camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-vault-eye'] = { at: 'seedvault', camera: 'free', yaw: 90, pitch: 6, distance: 14 };
+VIEWS['wild-stair-game'] = { at: 'ruin-stair', camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-shrine-game'] = { at: 'shrine-forest', camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-grey-game'] = { at: [-270, -366], camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-grey-eye'] = { at: [-270, -366], camera: 'free', yaw: 180, pitch: 5, distance: 12 };
+VIEWS['wild-edge-game'] = { at: 'boar', camera: 'tilt', zoom: 0, quarter: 0 };
+// The grey wood from the game camera's height and angle on the free camera, which cuts nothing: what stands there.
+VIEWS['wild-grey-above'] = { at: [-270, -366], camera: 'free', yaw: 45, pitch: 35, distance: 34 };
+// From the foxes' ground at the west edge of Bramble's clearing, east across it to the boar's oak.
+VIEWS['wild-edge-eye'] = { at: [4, -328], camera: 'free', yaw: 280, pitch: 6, distance: 12 };
+VIEWS['wild-marsh-game'] = { at: 'shrine-marsh', camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-marsh-eye'] = { at: [316, -46], camera: 'free', yaw: 200, pitch: 6, distance: 12 };
+VIEWS['wild-marsh-night'] = { at: [316, -46], camera: 'free', yaw: 200, pitch: 6, distance: 12, time: 0.93 };
+VIEWS['wild-marsh-night-game'] = { at: 'shrine-marsh', camera: 'tilt', zoom: 0, quarter: 0, time: 0.93 };
+VIEWS['wild-marsh-hill'] = { at: [310, -48], camera: 'free', yaw: 160, pitch: 26, distance: 50 };
+VIEWS['wild-pump-game'] = { at: 'pumphouse', camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-pump-eye'] = { at: [272, -114], camera: 'free', yaw: 251, pitch: 7, distance: 12 };
+VIEWS['wild-caves-game'] = { at: 'caves', camera: 'tilt', zoom: 0, quarter: 0 };
+VIEWS['wild-caves-eye'] = { at: 'caves', camera: 'free', yaw: 280, pitch: 6, distance: 14 };
+VIEWS['wild-caves-hill'] = { at: [222, -316], camera: 'free', yaw: 300, pitch: 22, distance: 46 };
+VIEWS['wild-gallery-game'] = { at: 'lampgallery', camera: 'tilt', zoom: 0, quarter: 0 };
 // Looking round from the hero's own eyes, six ways, to judge the sky and the far land: `--views pano` shoots them all.
 // `--at x,z` says where to stand.
 const stand = opt('at', '20,-236').split(',').map(Number);
 for (let i = 0; i < 6; i++) VIEWS[`pano${i}`] = { at: stand, camera: 'first', yaw: i * 60, pitch: 0 };
-const views = opt('views', Object.keys(VIEWS).filter((k) => !k.startsWith('pano')).join(',')).split(',').flatMap((k) => (k === 'pano' ? [0, 1, 2, 3, 4, 5].map((i) => `pano${i}`) : [k]));
+const GREENHOLLOW = Object.keys(VIEWS).filter((k) => k.startsWith('gh-'));
+const CITY = Object.keys(VIEWS).filter((k) => k.startsWith('city-'));
+const STORY = Object.keys(VIEWS).filter((k) => k.startsWith('story-'));
+const WILDS = Object.keys(VIEWS).filter((k) => k.startsWith('wild-'));
+const views = opt('views', Object.keys(VIEWS).filter((k) => !k.startsWith('pano') && !k.startsWith('gh-') && !k.startsWith('city-') && !k.startsWith('story-') && !k.startsWith('wild-')).join(',')).split(',').flatMap((k) => (k === 'pano' ? [0, 1, 2, 3, 4, 5].map((i) => `pano${i}`) : k === 'greenhollow' ? GREENHOLLOW : k === 'city' ? CITY : k === 'story' ? STORY : k === 'wilds' ? WILDS : [k]));
 
 if (!args.includes('--no-build')) {
   const build = spawnSync('bun', ['x', 'vite', 'build', '--outDir', dist, '--emptyOutDir', '--logLevel', 'error'], { cwd: root, stdio: 'inherit' });
@@ -94,9 +161,10 @@ try {
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.goto(`http://127.0.0.1:${PORT}/?hold=1&quality=${quality}${query ? '&' + query : ''}`, { waitUntil: 'load' });
   await page.waitForFunction(() => window.__game !== undefined);
-  await page.evaluate((t) => {
+  await page.evaluate(({ t, flags }) => {
     const g = window.__game;
     g.newGame();
+    for (const [k, v] of flags) g.view.game.flags.set(k, v);
     g.manual(true);
     g.view.game.systems.time?.setWeather('clear', true);
     g.setTime(t);
@@ -104,7 +172,7 @@ try {
     g.view.root.style.visibility = 'hidden';
     const beam = g.view.scene.getObjectByName('waypoint-beam');
     if (beam) beam.material.visible = false;
-  }, time);
+  }, { t: time, flags });
   const home = await page.evaluate(() => window.__game.view.camera.zoom);
 
   for (const moment of moments) for (const key of views) {
@@ -133,8 +201,9 @@ try {
       // The water's sheets are made two a frame, nearest first, after the land under them.
       await g.frames(50);
       const c = g.counters();
-      return { drawCalls: c.drawCalls, triangles: c.triangles };
-    }, { view, home, frames: settleFrames, t: moment.time, weather: moment.weather });
+      const costs = g.costs?.();
+      return { drawCalls: c.drawCalls, triangles: c.triangles, landmarks: costs?.features?.find((f) => f.feature === 'landmarks') ?? null, features: costs?.features ?? null };
+    }, { view, home, frames: settleFrames, t: view.time ?? moment.time, weather: moment.weather });
     const name = `${key}${moment.name}${tag ? '-' + tag : ''}.png`;
     await page.screenshot({ path: resolve(out, name) });
     console.log(`${name}  draw calls ${counts[key + moment.name].drawCalls}  triangles ${counts[key + moment.name].triangles}`);

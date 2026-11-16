@@ -6,6 +6,7 @@ dist
 assets-src/raw
 assets-src/ghibli/raw
 play-serve
+.claude/skills
 
 # Each agent and check builds into its own dist-<name> folder.
 dist-*

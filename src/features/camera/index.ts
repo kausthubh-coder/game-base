@@ -4,3 +4,4 @@ export { CameraRig, DEFAULT_RIG, type PerStep, type RigOptions } from './rig.sim
 export { FIRST_PERSON, FREE_ORBIT, OrbitRig, clearance, type OrbitOptions } from './orbit.sim.ts';
 export { CAMERA_PROFILES, LOOK_PROFILES, cameraProfile, type CameraProfile, type LookProfile } from './profiles.ts';
 export { CutawayRule, DEFAULT_CUTAWAY, type BlockProbe, type CutawayMode, type CutawayOptions, type CutawayState } from './cutaway.sim.ts';
+export { DEFAULT_SIGHT, SIGHT_POINTS, SightRule, under, type Roof, type SightOptions, type SightState } from './sight.sim.ts';

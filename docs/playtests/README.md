@@ -9,6 +9,9 @@ per playtest, `<date>-<charter>.md`, with its pictures in `img/`.
 |---|---|---|
 | `2026-11-11-new-player-first-quest.md` | New, blind, 960x540 | The Almanac's answers are below the fold; the hero vanishes under a tree; nothing names the key that advances talk; dashed lines on the meadow. It led to the watch step that finishes by itself. |
 | `2026-11-11-menus-small-screen.md` | Thorough, 1366x768 | Settings offers 3D characters whose model is missing; Settings once opened without its parchment; the menus, bag, quests and map otherwise worked. |
+| `2026-11-12-grant-day.md` | Hurried and New, real keys, 960x540 | Grant day played from a new game left the bag empty (fixed: the axe comes up the river); E typed into the deed; the way out of the guild hall and yard is hard to find; the narrator's line over the tracker; a flicker into a wood on the first river shot. |
+| `2026-11-12-act1-run-1.md` | New, 1366x768, real keys with documented checkpoint jumps | Through first night, Chapter 2 samples and Chapter 3 mill; foliage and landmark occlusion, clipped spade recipe, arrival staging and grey-wood checkpoint stall. |
+| `2026-11-12-act1-feel.md` | Feel, story and look, door mode, 1280x720 | The scenes' words are strong and the pictures rarely show them: a lush plot for "ground nobody wanted", a roofless Hall, the Mark with the hero's back turned, an empty market on market day, a city that reads as a village. Ten ranked changes with their owners. |
 
 ## The parts of the game
 
@@ -19,6 +22,7 @@ when the game grows a part.
 |---|---|---|---|
 | The title and its settings | Open the page | `play-ui.mjs` | 2026-11-11 |
 | The opening film | New game | `play-act1.mjs` | 2026-11-11 |
+| Grant day at Saltgate and the ferry | Begin, then skip the film | `grant-day`, `first-talk.json` | 2026-11-12 |
 | First steps: the tips, walking, the camera | Skip the film, then W A S D, Q and R, the right button, the wheel | `first-talk.json`, `play-drag.mjs` | 2026-11-11 |
 | Talking, and the quest tracker | E at Tamsin by the grant stone | `first-talk.json`, `act1.test.ts` | 2026-11-11 |
 | The Almanac and watching a creature | After Tamsin, at the mossy rocks | `act1.test.ts` | 2026-11-11 |
@@ -36,3 +40,6 @@ when the game grows a part.
 | The festival and the end card | The last quest of the first part | `festival.json`, `play-act1.mjs` | never |
 | An account: sign in, back up, the world list | Settings on the title | `play-together-signed-in.mjs` | never |
 | Playing together | An invite link | `play-together.mjs`, the join model | never |
+| First night: fox, opened door and Custodian | After camp at dusk | `first-night` | 2026-11-12, partial with jumps |
+| Chapter 2 objectives and town | After the Hall | Act 1 scenarios | 2026-11-12, sampled checkpoints |
+| Chapter 3 first Echo and old mill | After town | Act 1 scenarios | 2026-11-12, sampled checkpoints |

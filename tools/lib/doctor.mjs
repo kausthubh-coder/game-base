@@ -1,10 +1,10 @@
-import { basename } from 'node:path';
+import { resolve } from 'node:path';
 import { createServer } from 'node:net';
 
 export function portForFolder(folder, main = false) {
   if (main) return 5300;
   let hash = 2166136261;
-  for (const char of basename(folder)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
+  for (const char of resolve(folder)) hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
   return 5400 + hash % 600;
 }
 

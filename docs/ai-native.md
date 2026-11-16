@@ -54,16 +54,11 @@ Each step makes the next one cheaper. Steps 1 to 3 are a day of work and remove 
 
 ### 2. A worktree that runs after one command
 
-`bun tools/doctor.mjs` checks and repairs, then prints one line per item:
+`bun tools/setup.mjs` repairs packages and dev env, links the project skills, and reserves a port for the full checkout path. `bun run dev` reads that reservation. Idle worktrees keep their ports, so another checkout cannot take their browser origin.
 
-- `node_modules` is present. If not, it links the main checkout's copy or runs `bun install`.
-- `.env.local` is present. If not, it copies it from the main checkout.
-- Chrome is at the expected path and gives a GPU renderer.
-- The port. The script derives one from the worktree's name, in 5400 to 5999, and checks it is free.
-  `PLAY_PORT` already moves the play scripts.
-- `bun run check` passes on a clean tree.
+`bun tools/doctor.mjs` checks dependencies, env, Chrome, the reservation and the game checks without repairs. `--quick` omits the game checks. It also reports how far the checkout is behind `origin/main`.
 
-The `worktree-game` skill is three lines: run the doctor, read its output, use the port it printed.
+The `worktree-game` skill owns setup, browser selection, backend limitations and cleanup. Local saves are isolated by origin. Signed-in cloud saves still use the configured shared dev backend.
 
 ### 3. Chrome on the GPU
 

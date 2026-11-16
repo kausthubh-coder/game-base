@@ -22,7 +22,14 @@ bun tools/sim.ts --replay 8 --until 90386         a bot's game to the step befor
 | `workbench-crafting` | Logs to planks to a workbench, then 8 fences and a sprinkler, which keeps soil wet for 200 seconds |
 | `fell-a-tree` | A tree felled with the axe, one by hand, and an oak over the mossy rocks that refuses |
 | `befriend-a-pet` | A run startles the leaftail, three berries bond it, and it follows |
+| `grant-day` | Grant day at Saltgate from waking to the landing, each step by walking up and pressing E, saved and loaded in the bout |
 | `town-is-protected` | On the town's grass nothing is placed, dug, tilled or built |
+| `story-blessing` | Act 1's blessing at the grant stone plays by itself as a film, the pump's choice follows, and the Custodian's scene in the Hall reads it |
+| `story-vaults` | The three vaults open together, the tracker follows the one picked, and Calla's seal plays at the first vault cleared |
+| `story-dinner` | The first dinner waits for evening; Gus and Hobb ask, one is granted, the other says their line |
+| `fights-in-the-world` | Fight 2 at night with Dax, fight 4 held out of reach, and the Sluice Keeper shut down, each started by walking to it with its step open |
+| `calm-by-the-heartstone` | The settlement played to Heartstone 2 calms fight 3's three foxes, and three living farms with nobody wanting (3) calm fight 5's lynx; nothing sets the stone |
+| `land-follows-the-story` | The relit road greys the land under it, the pumps come out as the ledger fills, the grey wood heals after the Stag, the plot greens further |
 | `nothing-set-down-on-a-crop` | A bug a bot found: a bed could be set down on wheat |
 | `nothing-left-floating` | A bug a bot found: taking back a fence left the fence on top of it in the air |
 

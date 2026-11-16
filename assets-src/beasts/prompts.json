@@ -1,0 +1,160 @@
+[
+  {
+    "name": "fox-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Production grey Blighted fox. Four columns nine rows: idle front/back/right, walk front/back/right, combat front/back/right columns idle/tell/pounce/hurt. Concept identity and existing fox-blighted pixel style; transparent, 96px frames; warm upper-left light.",
+    "reference": [
+      "assets-src/beasts/fox-reference.png",
+      "public/assets/sprites/fox-blighted.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-52cd3c7d-aef0-46ca-9ec3-4affcdb4beab.png",
+    "kept": "assets-src/raw/fox-act1-3.png",
+    "referenceBase": "553e6d1",
+    "sha256": "65a57862a247ae11c38866c679fcffe16c8443780e34d40b018d93ed05eb8c2b"
+  },
+  {
+    "name": "thistlehog-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production pixel RPG sprite sheet. Identity silhouette materials from concept first reference; pixel style and proportions from sprite second reference. Grey Blighted thistlehog: cream round face, brown tiny feet, round mound of ash-violet quill-shaped leaves, wilted thistle flowers. Tell puffs up quills; attack curls forward for roll; hurt flattened. Calmed bright olive green leaves pink flowers. Warm upper left light, dark tinted brown outlines, chunky pixel clusters, no soft painted shading. Transparent background, NO text, grids, ground, shadows, dust or effects. STRICT FOUR columns NINE rows equal square cells, image aspect 4:9. Each cell contains exactly one whole same creature, ample padding. Rows 1 2 3 idle FRONT, BACK no face, RIGHT profile four breathing variations. Rows 4 5 6 walk FRONT, BACK, RIGHT profile four distinct step phases. Rows 7 8 9 combat FRONT, BACK, RIGHT profile: columns 1 tell, 2 attack, 3 hurt, 4 calmed as described. Same anatomy head body size every frame, fixed feet baseline. All directions exactly as named. Sized for 96 pixel final cells, 68 pixels drawn height. No captions.",
+    "reference": [
+      "assets-src/beasts/thistlehog-reference.png",
+      "public/assets/sprites/thistlehog.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-a03a7970-e816-4be5-96b0-17790efd504e.png",
+    "kept": "assets-src/raw/thistlehog-act1-3.png",
+    "referenceBase": "553e6d1",
+    "sha256": "bf11df0a4dfe4928473908ee1d146d050e7fd771fec4813542466e2c68683b1e"
+  },
+  {
+    "name": "boar-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production pixel RPG sprite sheet. Identity silhouette materials from concept first reference; pixel style and proportions from sprite second reference. Bramble cart-sized BOAR: enormous ivory tusks, broad snout, arched mane, brambles over back. Blighted grey-violet coat, dry grey brambles. Tell paws ground head lowered, attack charging tusks out, hurt kneeling stagger. Calmed russet coat golden mane olive brambles small cream flowers. Warm upper left light, dark tinted brown outlines, chunky pixel clusters, no soft painted shading. Transparent background, NO text, grids, ground, shadows, dust or effects. STRICT FOUR columns NINE rows equal square cells, image aspect 4:9. Each cell contains exactly one whole same creature, ample padding. Rows 1 2 3 idle FRONT, BACK no face, RIGHT profile four breathing variations. Rows 4 5 6 walk FRONT, BACK, RIGHT profile four distinct step phases. Rows 7 8 9 combat FRONT, BACK, RIGHT profile: columns 1 tell, 2 attack, 3 hurt, 4 calmed as described. Same anatomy head body size every frame, fixed feet baseline. All directions exactly as named. Sized for 192 pixel final cells, 136 pixels drawn height. No captions.",
+    "reference": [
+      "assets-src/beasts/boar-reference.png",
+      "public/assets/sprites/boar.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-6bd114f1-cb69-4a07-bc9a-79625d8ff70b.png",
+    "kept": "assets-src/raw/boar-act1-3.png",
+    "referenceBase": "553e6d1",
+    "sha256": "02fef0ce53d4f394de084f685522c03a5058b8d22bfa04ffd1e71cd7ce0b2c58"
+  },
+  {
+    "name": "lynx-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production pixel RPG sprite sheet. Identity silhouette materials from concept first reference; pixel style and proportions from sprite second reference. BLIGHTED LYNX: grey violet fur, cream cheek ruff, very tall tufted ears, powerful hindquarters, short bobtail, low feline crouch. Tell deep hindleg crouch, attack long extended pounce, hurt recoil ears back. Calm relaxed low crouch. Warm upper left light, dark tinted brown outlines, chunky pixel clusters, no soft painted shading. Transparent background, NO text, grids, ground, shadows, dust or effects. STRICT FOUR columns NINE rows equal square cells, image aspect 4:9. Each cell contains exactly one whole same creature, ample padding. Rows 1 2 3 idle FRONT, BACK no face, RIGHT profile four breathing variations. Rows 4 5 6 walk FRONT, BACK, RIGHT profile four distinct step phases. Rows 7 8 9 combat FRONT, BACK, RIGHT profile: columns 1 tell, 2 attack, 3 hurt, 4 calmed as described. Same anatomy head body size every frame, fixed feet baseline. All directions exactly as named. Sized for 96 pixel final cells, 68 pixels drawn height. No captions.",
+    "reference": [
+      "assets-src/beasts/lynx-reference.png",
+      "public/assets/sprites/fox-blighted.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-31a95c61-b0ef-4f9e-9133-49b9a3d674a9.png",
+    "kept": "assets-src/raw/lynx-act1-3.png",
+    "referenceBase": "553e6d1",
+    "sha256": "1eb1e6fefabb703dc44f5c6ef8e09ba5e51eb03cdc96c8f4c6a5f02cf3e58f11"
+  },
+  {
+    "name": "gearling-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production pixel RPG sprite sheet. Identity silhouette materials from concept first reference; pixel style and proportions from sprite second reference. GEARLING ancient brass round automaton: round cream panels, two-loop brass winding key on top, two short brass feet, round teal core FRONT only, side brass ports, exposed round gear mechanism BACK only. Tell winding key leaning forward, attack straight stomp, hurt tipped sideways, calmed INERT core dark no teal. Never organic or Blighted. Warm upper left light, dark tinted brown outlines, chunky pixel clusters, no soft painted shading. Transparent background, NO text, grids, ground, shadows, dust or effects. STRICT FOUR columns NINE rows equal square cells, image aspect 4:9. Each cell contains exactly one whole same creature, ample padding. Rows 1 2 3 idle FRONT, BACK no face, RIGHT profile four breathing variations. Rows 4 5 6 walk FRONT, BACK, RIGHT profile four distinct step phases. Rows 7 8 9 combat FRONT, BACK, RIGHT profile: columns 1 tell, 2 attack, 3 hurt, 4 calmed as described. Same anatomy head body size every frame, fixed feet baseline. All directions exactly as named. Sized for 96 pixel final cells, 68 pixels drawn height. No captions.",
+    "reference": [
+      "assets-src/beasts/gearling-reference.png",
+      "public/assets/sprites/gearling.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-e006ffbc-7909-4a43-adb5-7e29cee31021.png",
+    "kept": "assets-src/raw/gearling-act1-3.png",
+    "referenceBase": "553e6d1",
+    "sha256": "c9c93b467b2477b970a5e4c8aa33e35893e6f979d197760fab81db350c14b81e"
+  },
+  {
+    "name": "rootsnare-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production pixel RPG sprite sheet. Identity silhouette materials from concept first reference; pixel style and proportions from sprite second reference. BLIGHTED ROOTSNARE: woody root pod, ash violet twisted vines encase single amber vertical slit heart FRONT; side shows sliver amber, back solid woven roots NO eye. Curling vine arms and root feet. Tell coils arm, attack extends one binding vine, hurt opens amber heart. Calmed warm brown bark olive leaves closed sleepy amber eye. Warm upper left light, dark tinted brown outlines, chunky pixel clusters, no soft painted shading. Transparent background, NO text, grids, ground, shadows, dust or effects. STRICT FOUR columns NINE rows equal square cells, image aspect 4:9. Each cell contains exactly one whole same creature, ample padding. Rows 1 2 3 idle FRONT, BACK no face, RIGHT profile four breathing variations. Rows 4 5 6 walk FRONT, BACK, RIGHT profile four distinct step phases. Rows 7 8 9 combat FRONT, BACK, RIGHT profile: columns 1 tell, 2 attack, 3 hurt, 4 calmed as described. Same anatomy head body size every frame, fixed feet baseline. All directions exactly as named. Sized for 96 pixel final cells, 68 pixels drawn height. No captions.",
+    "reference": [
+      "assets-src/beasts/rootsnare-reference.png",
+      "public/assets/sprites/thistlehog.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-4215a217-92cc-456d-aed9-34b2c34f6693.png",
+    "kept": "assets-src/raw/rootsnare-act1-3.png",
+    "referenceBase": "553e6d1",
+    "sha256": "3affbc687e1baaf81dee8fb54b613c02e9eb697ffe5105aa86b8bcd60e27eb9e"
+  },
+  {
+    "name": "fox-well-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, large head and small feet, matching reference sprite. Concept first reference supplies identity silhouette and materials; sprite second supplies pixel style and proportions. RUSSET ORANGE healthy fox, cream bib inner ears, huge ears small paws, one broad OLIVE GREEN LEAF TAIL. Bright alert gentle face. Transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells. Each cell one whole creature with ample transparent padding. Rows 1-3 idle: front, back NO face, right profile; four slight breathing variations. Rows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing. Same creature anatomy head body size materials and colours every frame. Feet baseline equal. Full body visible no crossing cell boundaries. Flat pixel shading, no painted gradients. Designed for 96px square final frames.",
+    "reference": [
+      "assets-src/beasts/fox-reference.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-a44136d7-120a-4624-8d3f-5c119080ad33.png",
+    "defect": "Opaque smooth backdrop; removed by border flood in rebuild script. rootsnare uses directions in columns, remapped by slicing.",
+    "referenceBase": "553e6d1"
+  },
+  {
+    "name": "thistlehog-well-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, large head and small feet, matching reference sprite. Concept first reference supplies identity silhouette and materials; sprite second supplies pixel style and proportions. CALMED healthy thistlehog, cream round face brown tiny paws, round mound of OLIVE GREEN quill shaped leaves, pink thistle flowers. Same round silhouette and head every frame. Transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells. Each cell one whole creature with ample transparent padding. Rows 1-3 idle: front, back NO face, right profile; four slight breathing variations. Rows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing. Same creature anatomy head body size materials and colours every frame. Feet baseline equal. Full body visible no crossing cell boundaries. Flat pixel shading, no painted gradients. Designed for 96px square final frames.",
+    "reference": [
+      "assets-src/beasts/thistlehog-reference.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-a8cbbfa4-ca14-4caa-9952-3d05ce9b6263.png",
+    "kept": "assets-src/raw/thistlehog-well-act1-3.png",
+    "defect": "Opaque smooth backdrop; removed by border flood in rebuild script. rootsnare uses directions in columns, remapped by slicing.",
+    "referenceBase": "553e6d1",
+    "sha256": "fa4d5ade2c9f96271cc209df7beb0cc04ef4a777a30d8f809ba72d1fbbe4c410"
+  },
+  {
+    "name": "boar-well-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, large head and small feet, matching reference sprite. Concept first reference supplies identity silhouette and materials; sprite second supplies pixel style and proportions. BRAMBLE THE BOAR recovered healthy form, enormous ivory tusks broad pink snout russet coat golden arched mane olive living brambles draped on back, tiny cream blossoms. Same cart-sized stocky body every frame. Transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells. Each cell one whole creature with ample transparent padding. Rows 1-3 idle: front, back NO face, right profile; four slight breathing variations. Rows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing. Same creature anatomy head body size materials and colours every frame. Feet baseline equal. Full body visible no crossing cell boundaries. Flat pixel shading, no painted gradients. Designed for 192px square final frames.",
+    "reference": [
+      "assets-src/beasts/boar-reference.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-ab5cf041-0856-45f6-8c28-467a4b2588c9.png",
+    "kept": "assets-src/raw/boar-well-act1-3.png",
+    "defect": "Opaque smooth backdrop; removed by border flood in rebuild script. rootsnare uses directions in columns, remapped by slicing.",
+    "referenceBase": "553e6d1",
+    "sha256": "fb1a1b3e77eb4dd1ab1e3a3c3186b3963e9d284b5b4bdec63f1bffd5a4e3f6a8"
+  },
+  {
+    "name": "rootsnare-well-act1",
+    "attempt": 1,
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, large head and small feet, matching reference sprite. Concept first reference supplies identity silhouette and materials; sprite second supplies pixel style and proportions. CALMED ROOTSNARE woody twisted warm brown root pod encloses single amber slit heart, olive leaves at curled vine tips, root feet. BACK woven roots WITHOUT eye or face. SIDE right sliver amber heart. Same pod and vine arms every frame. Transparent background, NO text, NO grids, NO cast shadows, no ground. STRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells. Each cell one whole creature with ample transparent padding. Rows 1-3 idle: front, back NO face, right profile; four slight breathing variations. Rows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing. Same creature anatomy head body size materials and colours every frame. Feet baseline equal. Full body visible no crossing cell boundaries. Flat pixel shading, no painted gradients. Designed for 96px square final frames.",
+    "reference": [
+      "assets-src/beasts/rootsnare-reference.png"
+    ],
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-8893bed1-5007-4858-8e04-f726283d9222.png",
+    "kept": "assets-src/raw/rootsnare-well-act1-3.png",
+    "defect": "Opaque smooth backdrop; removed by border flood in rebuild script. rootsnare uses directions in columns, remapped by slicing.",
+    "referenceBase": "553e6d1",
+    "sha256": "330284e6e457af1d5c6a7032d9e5e9660d48c3dfb026adfaa0c9f7b5e1071f0c"
+  },
+  {
+    "name": "fox-well-act1",
+    "attempt": 2,
+    "tool": "image_gen.imagegen",
+    "prompt": "Remove all brown background completely. Genuine transparent alpha outside the creature silhouettes. Preserve exactly the existing pixel creatures, poses, colours, outlines, grid positions and dimensions, four columns six rows. No ground no shadows no matte no halo. Change ONLY background to actual transparency.",
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-035713bd-2900-4b9e-a25c-e899385a5ce7.png",
+    "defect": "Backdrop remained opaque; no improvement.",
+    "referenceBase": "553e6d1",
+    "kept": "assets-src/raw/fox-well-act1-3.png",
+    "sha256": "779736bbc5120d44ca242c374e39bf0907a877d210a7b94c1296354776f22421"
+  },
+  {
+    "name": "thistlehog-well-act1",
+    "attempt": 2,
+    "tool": "image_gen.imagegen",
+    "prompt": "Remove all brown background completely. Genuine transparent alpha outside the creature silhouettes. Preserve exactly the existing pixel creatures, poses, colours, outlines, grid positions and dimensions, four columns six rows. No ground no shadows no matte no halo. Change ONLY background to actual transparency.",
+    "source": "/Users/dabot/.codex/generated_images/01a1ce5d-1e9b-7e62-ab19-07039254e0b0/exec-06bb84af-f671-413d-815a-0174dae117f8.png",
+    "defect": "Backdrop remained opaque; no improvement.",
+    "referenceBase": "553e6d1"
+  }
+]

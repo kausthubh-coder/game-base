@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "mode": "door",
+  "seed": 7,
+  "size": "1366x768",
+  "inputs": [
+    {
+      "type": "door",
+      "method": "newGame",
+      "args": []
+    },
+    {
+      "type": "door",
+      "method": "skipTo",
+      "args": [
+        "pump"
+      ]
+    },
+    {
+      "type": "door",
+      "method": "teleport",
+      "args": [
+        "ruin-mill"
+      ]
+    },
+    {
+      "type": "wait",
+      "ms": 2000
+    },
+    {
+      "type": "hold",
+      "key": "KeyF",
+      "ms": 2200
+    }
+  ]
+}

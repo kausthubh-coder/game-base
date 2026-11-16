@@ -61,8 +61,14 @@ export function createRandom(seed: number): () => number {
   };
 }
 
+/**
+ * The save's version. 2 is act 1: its quests, items and clock are not the old story's, so a save of version 1 is
+ * not loaded. The shell starts a new game in its place and says why (src/game/shell/save.ts).
+ */
+export const SAVE_VERSION = 2;
+
 export interface GameSave {
-  version: 1;
+  version: typeof SAVE_VERSION;
   flags: [string, FlagValue][];
   player: { x: number; y: number; z: number; facing: number };
   clock: { day: number; timeOfDay: number; seconds: number };
@@ -113,7 +119,7 @@ export function createKernel(world: World, seed: number): Kernel {
       for (const [name, system] of systems) if (system.save) out[name] = system.save();
       const p = game.player;
       return {
-        version: 1,
+        version: SAVE_VERSION,
         flags: [...flags.values],
         player: { x: p.pos.x, y: p.pos.y, z: p.pos.z, facing: p.facing },
         clock: { ...game.clock },

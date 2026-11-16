@@ -1,0 +1,237 @@
+{
+  "tool": "image_gen.imagegen (built-in)",
+  "status": "Pending Kausthubh approval",
+  "base": "9161b86",
+  "commonPrompt": "Use case: stylized-concept. Create ONE polished creature concept approval sheet for a cozy anime browser RPG, landscape about 1600 pixels wide. Warm ivory paper, restrained brown captions, generous space, consistent hand-painted gouache/anime production art, warm upper-left light, brown/violet shadows, dark brown contours. Reference paintings establish identity; sprite contact sheet establishes current pixel silhouette. No gore, no horror, no weapons or clothing on beasts. Layout: title; upper half front, right-facing side, faceless back turnaround; middle row clearly separate IDLE, MOVE, TELL and HURT poses for fighters; lower area species variants/farm behavior, full-body small brown-haired green-caped HERO scale reference labelled 1.8 BLOCKS with creature on same baseline, named palette swatches, and pixel-art 96x96 frame mock (about 68 occupied pixels) with crisp pixel clusters. Leave bottommost 120 pixels empty for an authentic current-sprite comparison to be composited later. Depict actual 2D character designs, not 3D renders. Teal only for magic/old machines. Blighted forms have grey drained fur, dull eyes, sparse ash flecks, sad tense expression; calmed forms recover warm color and leave a grey shed coat like empty fur cloth, never skin or carcass. Clear short readable labels only. ",
+  "laterConstraints": " Strict: status is PENDING APPROVAL, never 'approved'. No extra variants beyond requested. ALL side views face RIGHT. Do not call any healthy farm animal a fighter. Identical plain cream editorial grid across all sheets; avoid excessive decorative borders. Bottom 120 pixels truly blank. ",
+  "species": [
+    {
+      "id": "fox",
+      "brief": "Well russet fox and Blighted grey fox; leaf tail; pounce crouch and hurt; seed gifting at hedge; healer companion; 0.75 blocks.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-4c18c3c6-31e3-473b-a29d-1ebd0f19471a.png",
+      "attempts": 3,
+      "sourceSha256": "adf581315b004a47e71cd36830cebd8050c7f1aedd76bc80c8b7d6f549228007",
+      "currentSprite": "sprites/fox-blighted.png",
+      "currentFrame": [
+        96,
+        96
+      ],
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 225350,
+      "mockSourceCrop": [
+        116,
+        764,
+        232,
+        866
+      ]
+    },
+    {
+      "id": "thistlehog",
+      "brief": "THISTLEHOG. Keep round hedgehog cream face, small feet, leaf/quill mound with purple thistle flowers from references. Main BLIGHTED grey wilted thistles turnaround plus CALMED olive-green living turnaround, same anatomy. Idle sniff, move short run, tell PUFFS UP quills for radial attack; extra CURL before line roll; hurt flattened with lowered quills. Farm rubs post while grazing thistles, sheds intact quills; sudden noise sends straight bolt. Proposal 0.65 blocks. Not a pig.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-9514cbb9-ce71-496e-b5c8-419120cee524.png",
+      "attempts": 2,
+      "sourceSha256": "63b46549ccf75a519a25bc233147732d00d0f90606af969fcbe4620ea36b83b7",
+      "currentSprite": "sprites/thistlehog.png",
+      "currentFrame": [
+        96,
+        96
+      ],
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 237502,
+      "mockSourceCrop": [
+        1350,
+        618,
+        1484,
+        744
+      ]
+    },
+    {
+      "id": "boar",
+      "brief": "BRAMBLE THE BOAR. Reference boar has heavy arched shoulders, large ivory tusks, mane and broad snout. Cart-sized main BLIGHTED grey form, three views. A second WELL AFTER CALMING russet-brown mossy bramble-tuft form three views, identical mass. Same individual named Bramble. Hero 1.8 blocks, Bramble shoulder 1.6 blocks, length 2.8 blocks. Poses idle, moving charge, TELL pawing ground, extra head lowered to one side for tusk sweep and rearing before stomp, HURT stagger onto foreknees. Sad, powerful, no evil eyes. Grey shed pelt after calming. Farm rooting a tilled furrow, small naturally shed tusk tip at post, follows Wren. Do not fit saddle or harness.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-e0241851-4018-4853-97cb-efd800f8818a.png",
+      "attempts": 3,
+      "sourceSha256": "0338fe78ff0da14a4ec353536eead694d729732015fab531db3df71c47ec0c2a",
+      "currentSprite": "sprites/boar.png",
+      "currentFrame": [
+        192,
+        192
+      ],
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 254306,
+      "mockSourceCrop": [
+        1318,
+        613,
+        1485,
+        755
+      ]
+    },
+    {
+      "id": "lynx",
+      "brief": "BLIGHTED LYNX only. Preserve painting's long dark ear tufts, cheek ruff, powerful hindlegs, short bobtail, low athletic silhouette. Distinguish from fox, no long fluffy tail. Grey ash and dusty lavender coat, dull weary eyes. Main front side back. Poses IDLE tense low crouch, MOVE quick circling stride, TELL deep hindleg crouch before POUNCE, landing recovery forelegs extended, HURT recoils with ears back. Hero 1.8 blocks, lynx shoulder 0.95 blocks. Small trap vignette quill strip where pounce lands, lamp restricts approach. No farm goods invented; calming leaves grey pelt. Palette ash grey, dusty violet, cream, charcoal brown.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-2653d2c8-0036-4e48-bbb4-82398f4164da.png",
+      "attempts": 2,
+      "sourceSha256": "34f52c24d8cc8e223163ba4d7d34f1f78b9c47aebd4eae6a94a6606b8cca23ea",
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 223054,
+      "mockSourceCrop": [
+        1354,
+        670,
+        1506,
+        778
+      ]
+    },
+    {
+      "id": "gearling",
+      "brief": "GEARLING. Old round brass automaton, not a living Blighted beast. Preserve painted spherical segmented shell, circular teal lume core and sprite's two-loop winding key. Main front side back; rear exposed winding mechanism is weak point after straight charge, readable. Four stubby spring feet. IDLE key upright, MOVE straight stomp, TELL winds key drawn backward, extra spin-up pose, HURT tipped sideways, SHUT DOWN inert no magic glow. Hero 1.8 blocks, body 0.85 blocks excluding key. Farm follows running machine within 16 blocks; dark pit stops it, drops a coiled spring; fence guides it and pusher lets it return. Tiny diagram bright-to-dark, no cruelty. Palette aged brass, cream metal, brown, reserved teal core.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-ddf02849-9941-4e3c-b368-b2d12a9fac9c.png",
+      "attempts": 2,
+      "sourceSha256": "918aca6f3668b889250c44b387a87ec4ab3d3c277b2a3d23c0b37de424af05b8",
+      "currentSprite": "sprites/gearling.png",
+      "currentFrame": [
+        96,
+        96
+      ],
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 258784,
+      "mockSourceCrop": [
+        1355,
+        605,
+        1475,
+        755
+      ]
+    },
+    {
+      "id": "rootsnare",
+      "brief": "ROOTSNARE. Match reference rooted woody tangle wrapped around single vertical amber heart/eye within a trunk pod, two curling vine arms, squat root feet. Not humanoid, no mouth. Main BLIGHTED grey dry bark three views; small CALMED warmer brown/olive version. IDLE folded vine arms, MOVE dragging roots, TELL coiled vine reaching toward companion, capture wraps an empty cloth training bundle away from vulnerable central heart; HURT flinches open revealing heart. Hero 1.8 blocks, root pod 1.15 blocks with curled vine reaching 1.6. Farm sun through roof hatch makes it sleep with closed eye and grow usable vine coils. Palette bark brown, ash grey, olive, muted amber heart, not red.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-c085fce9-c5cb-4044-935d-e6adb0c37932.png",
+      "attempts": 2,
+      "sourceSha256": "c9e50b84eb0ba56dc2d1686642cb4c4d90f2a79968347e95bed801ebbe4ed132",
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 233116,
+      "mockSourceCrop": [
+        1330,
+        653,
+        1479,
+        787
+      ]
+    },
+    {
+      "id": "mossling",
+      "brief": "MOSSLING peaceful wild creature. Match painted round yellow-olive moss cushion with tiny black-brown eyes, tiny root feet, clover sprouts, damp stone refuge. Three views front right side faceless back; IDLE settled, MOVE tiny waddling hop, FEED, REST IN SHADE. No attack or hurt poses, not a fighter. Tiny farm vignette fed pair with smaller third, damp mossy stone under shade, loose shed moss fiber beside stone. Hero 1.8 blocks, mossling height 0.45 blocks. Keep reference sprite critter's legibility, two sprouts, broad moss silhouette; painted mossling richer than generic green ball. Palette soft olive, moss green, butter yellow, brown, slate stone. Do not imply it carries a permanent rock shell.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-2a15e4f8-b31c-4179-807c-f8b8eacd47d3.png",
+      "attempts": 2,
+      "sourceSha256": "e36ec0206643f70db1c51626d19f865fc9332f98d2fec5f00ea97d2611745e43",
+      "currentSprite": "sprites/critter.png",
+      "currentFrame": [
+        96,
+        96
+      ],
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 257384,
+      "mockSourceCrop": [
+        1333,
+        585,
+        1485,
+        755
+      ]
+    },
+    {
+      "id": "burrower",
+      "brief": "BURROWER peaceful wild mole-like creature from painting: round earth-russet fur, cream snout, huge pale digging claws, closed tiny eyes, no visible big ears, short hidden tail, copper glints in soil only. Front side back, idle, tunnelling move with claws forward, night surfacing under carrots, recoiling from LAMP. Not a fighter. Hero 1.8 blocks, above-ground body 0.55 blocks. Farm at darkest carrots at night; no light; copper left behind in soil after feeding, no copper armor. Palette russet soil fur, cream claws, dark brown, muted copper. Show body fully in turnarounds not permanently obscured by dirt.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-292689b8-2870-4d48-9a57-4742d2d753e5.png",
+      "attempts": 2,
+      "sourceSha256": "dd119dac5fa9ee95e4100b1981468370a67ff8730295ae8e585f662dc235423b",
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 170314,
+      "mockSourceCrop": [
+        1320,
+        625,
+        1500,
+        760
+      ]
+    },
+    {
+      "id": "lanternfly",
+      "brief": "LANTERNFLY peaceful wild insect. Match sprite rounded brown thorax, two antennae, four pale cream-gold wings, tiny legs, warm golden lantern abdomen. Front side back, idle hovering, move wings beating, drawn to brightest lamp, dust shedding. No attack or hurt. Hero 1.8 blocks, wing span 0.35 blocks, body 0.18 blocks, deliberately enlarged sprite mock for readability. Attraction to brightest light within 12 blocks; frog eats flies within 3 blocks; pond and dry dust lamp compete for same flies. Farm tiny vignette fork toward pond frog OR dry collector. Amber bioluminescence, no teal. Palette warm gold, cream translucent wings, brown.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-7063570b-cbce-4b53-b5eb-134581739e20.png",
+      "attempts": 3,
+      "sourceSha256": "924a8ab28697f8ccbf950fdb10eb0e474e723a53e83fe4a18f9df38fea4ca5aa",
+      "currentSprite": "sprites/lanternfly.png",
+      "currentFrame": [
+        96,
+        96
+      ],
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 192634,
+      "mockSourceCrop": [
+        1345,
+        575,
+        1515,
+        714
+      ]
+    },
+    {
+      "id": "frog",
+      "brief": "FROG peaceful pond creature. Reference stout moss-olive frog with large cream throat, copper-gold eyes, mottled haunches, small forefeet and wide webbed hindfeet. Front side back, idle, MOVE squat hop, feeding tongue extends toward small golden lanternfly, resting slick bead on reed. No combat. Hero 1.8 blocks, sitting crown 0.4 blocks. Eats lanternflies within 3 blocks, gives frog slick after feeding, pond remains habitat; gentle no gore. Do not paint slick as frog eggs. Palette moss olive, cream, ochre spots, brown, clear slick sheen.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-eda97f62-9c38-44c4-a47b-23e020c7ac53.png",
+      "attempts": 2,
+      "sourceSha256": "daa36b48fbc31ec36d6006e96e7b9df25a750b8fb226743036b7b611df07fa0c",
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 182848,
+      "mockSourceCrop": [
+        1340,
+        630,
+        1490,
+        765
+      ]
+    },
+    {
+      "id": "bee",
+      "brief": "BEE peaceful wild creature. Match painted plump fuzzy golden bee, russet-brown stripes, tiny face with antennae, cream translucent paired wings, six small legs, pollen baskets. Front side back, IDLE hover, MOVE wings up, flower visit, box return with pollen. No fight poses, no weaponlike stinger. Hero 1.8 blocks, body length 0.22 blocks with 0.35 wing span; deliberately enlarged sprite readability shown separately. Farm flowers within 10 blocks between box and wheat; honey and wax; living land required, Take drives bees away. Palette honey gold, cream wings, russet stripes, brown. No teal.",
+      "selectedSource": "/Users/dabot/.codex/generated_images/01a1ce49-c63a-7281-8ac8-a8b3eb8aec3d/exec-ab200930-e906-4191-9b23-3980a9228169.png",
+      "attempts": 2,
+      "sourceSha256": "6cdddf19e40cfb3480dc559a95433ccadffba110bf00bfdf5930bae4ad6d75e9",
+      "exportDimensions": [
+        1600,
+        1283
+      ],
+      "bytes": 193132,
+      "mockSourceCrop": [
+        1338,
+        610,
+        1505,
+        760
+      ]
+    }
+  ]
+}

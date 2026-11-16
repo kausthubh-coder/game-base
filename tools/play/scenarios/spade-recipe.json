@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "mode": "door",
+  "seed": 7,
+  "size": "1366x768",
+  "inputs": [
+    {
+      "type": "door",
+      "method": "newGame",
+      "args": []
+    },
+    {
+      "type": "door",
+      "method": "skipTo",
+      "args": [
+        "ground"
+      ]
+    },
+    {
+      "type": "press",
+      "key": "KeyI"
+    },
+    {
+      "type": "click",
+      "text": "By hand"
+    },
+    {
+      "type": "click",
+      "text": "Spade, not enough to make"
+    },
+    {
+      "type": "see",
+      "text": "Digs a hole"
+    },
+    {
+      "type": "clean"
+    }
+  ]
+}

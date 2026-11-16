@@ -1,0 +1,31 @@
+{
+  "name": "stag-fight",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "assets-src/raw/stag-3.png"
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Production combat POSE sprite sheet for cozy anime pixel RPG. Create NEW FOUR columns THREE rows equal SQUARE cells 4:3 landscape transparent canvas of EXACT SAME VERDANT STAG from attached idle sheet. Identity reference: keep long legs, heavy chest, same anatomical body size, branching oak crown with cream blossoms and few warm green leaves, moss back, pale chest, bark brown legs, readable gentle dark eyes, plain heavy GOLD collar. Upper left warm light, dark brown outlines, chunky pixels. No teal, NO chains, no text, no grid, no shadows, no ground. Row 1 FRONT, row 2 BACK NO FACE, row 3 RIGHT PROFILE. Four columns in EVERY row: 1 WINDUP head down and pulled back to one side, antlers level with ground poised to sweep. 2 SWEEP head swung across to OPPOSITE side, antlers LOW and forward, neck stretched. 3 REAR front legs both lifted well off ground, hind hooves planted, head thrown UP. 4 STAMP front hooves driven down hard, head low, front legs braced wide. Make each action emphatic, visibly distinct. Windup and sweep face opposite directions through twisted neck, body retains row orientation. Preserve SAME deer scale, body length, torso dimensions and antler crown geometry throughout, pose bends limbs and neck only. Do not shrink animal to fit rear; leave extra room around ALL cells instead. Keep antlers fully in frame with generous padding. All ground hooves share baseline. Ancient tired god thrashing against captivity, never an evil monster. Only gold is collar. Use attached shipped sprite as size/color/identity reference.",
+      "source": "assets-src/fight-stag/stag-fight-attempt-1.png",
+      "selected": false,
+      "defects": "Windup too high; rear touches upper cell edge."
+    },
+    {
+      "number": 2,
+      "prompt": "Revise attached combat sheet using attached idle for exact identity. Preserve four columns three rows front/back/right profile, whole long-legged moss-backed ancient Stag with same cream chest and oak crown and gold collar. Transparent background no text/grid/chains/shadow/ground. FIX: every cell needs 12 percent transparent padding ALL sides. Highest antler tips of rearing deer MUST NOT touch/cross cell edge or neighbor row. Keep entire animal wholly within its own cell. Preserve anatomical scale among all cells, use taller cell space rather than shrink only rear. Main pose fix COLUMN ONE windup: head pulled LOW and BACK to one side with antlers at shoulder level or LOWER, long neck curled aside, preparing horizontal sweep. COLUMN TWO sweep neck STRETCHED and head LOW to OTHER side, antlers forward almost level with ground. Make these two heads clearly opposite arcs. COLUMN THREE rear front feet raised hind feet planted head up, leave air above antler tips. COLUMN FOUR stamp both front hooves planted braced head low. Same crown branching and flowers, same plain gold collar width, no other gold, no teal, warm healthy greens brown cream. Exact same sprite pixel art. ALL twelve silhouettes fit their cells. Big chest and long legs from idle. Antlers are a broad oak bough crown not a round shrub. Back row no face.",
+      "source": "assets-src/fight-stag/stag-fight-attempt-2.png",
+      "selected": false,
+      "defects": "Back sweep shows a face."
+    },
+    {
+      "number": 3,
+      "prompt": "Correct this Verdant Stag fight sheet, preserve EXACT four-column three-row layout, all other poses/identity/colors/scale. Critical correction MIDDLE ROW is BACK VIEW. In middle row column TWO there is a visible face and eye. REMOVE THAT FACE from back view: turn head away from camera, show only backs of ears and antlers, neck joining away-facing muzzle hidden behind torso. ALL FOUR MIDDLE ROW cells must show absolutely NO EYES NO FACE NO NOSE. Also keep ALL antler tips fully inside each cell with clear margins, especially rearing column THREE. Top row front, bottom row side facing right remain identical. Windup head low angled left, sweep head low angled right, rear front feet lifted, stamp front hooves planted. Keep long legs and mighty chest of idle reference. Same plain heavy gold collar, no chains no teal, transparent background no text no grid no shadows. Same animal and branch crown. Do not add detached pieces. Use original idle as strict identity reference. Keep anatomical scale across poses. Brown pixel outline.",
+      "source": "assets-src/raw/stag-fight-3.png",
+      "selected": true,
+      "defects": "Crown shape, blossoms and collar width drift. Windup antlers stay above ground level. Side windup and sweep do not fully twist to opposite sides. Anatomical size changes slightly."
+    }
+  ],
+  "processing": "Standard build-story.mjs. No tool edits or drawn replacement pixels."
+}

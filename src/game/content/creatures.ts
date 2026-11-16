@@ -4,6 +4,8 @@
 // Distances are in blocks. "Within n blocks" of a block means a box of n blocks each way around it,
 // and never more than 4 blocks up or down.
 
+import type { ItemId } from './ids.ts';
+
 /** Something that is true or false about one creature where it stands. */
 export type CreatureCondition =
   | { kind: 'always' }
@@ -22,6 +24,8 @@ export interface CreatureKind {
   name: string;
   /** A sprite name from public/assets/manifest.json. */
   sprite: string;
+  /** Animation names supplied by this sprite, when they differ from idle and walk. */
+  animations?: { idle: string; walk: string };
 
   /** Where and when a new one appears. */
   appears: {
@@ -69,7 +73,7 @@ export interface CreatureKind {
    * What it leaves, or null. It is ready `every` seconds after the last one and leaves it as soon as
    * `when` holds. The item reaches the player's bag only when the player is within `reach` blocks.
    */
-  gives: { item: string; every: number; when: CreatureCondition; reach: number } | null;
+  gives: { item: ItemId; every: number; when: CreatureCondition; reach: number } | null;
 
   /** The part of the day it is out, as times of day from 0 to 1. `from` may be later than `to` for a night. Null is always. */
   awake: { from: number; to: number } | null;
@@ -95,13 +99,13 @@ export const CREATURES: readonly CreatureKind[] = [
     appears: { block: 'mossy_stone', within: 0, light: [0, 14], max: 3, around: { place: 'grant.rocks' }, radius: 10, every: 2 },
     moves: { mode: 'walk', radius: 6, speed: 1.1, pause: [3, 6], home: 0.45, toward: { block: 'water', within: 6, chance: 0.3 } },
     fears: [],
-    gives: { item: 'moss_tuft', every: 20, when: { kind: 'damp', water: 2, lasts: 180 }, reach: 10 },
+    gives: { item: 'moss_fiber', every: 20, when: { kind: 'damp', water: 2, lasts: 180 }, reach: 10 },
     awake: null,
     watch: {
       page: 'mossling',
       within: 10,
       facts: [
-        { fact: 'needs', seeing: { kind: 'on', block: 'mossy_stone' }, seconds: 3 },
+        { fact: 'comes', seeing: { kind: 'on', block: 'mossy_stone' }, seconds: 3 },
         { fact: 'gives', seeing: 'gives' },
       ],
     },
@@ -110,6 +114,7 @@ export const CREATURES: readonly CreatureKind[] = [
     id: 'lanternfly',
     name: 'Lanternfly',
     sprite: 'lanternfly',
+    animations: { idle: 'flutter', walk: 'flutter' },
     appears: { block: 'water', within: 12, light: [0, 15], max: 6, around: 'player', radius: 12, every: 3 },
     moves: { mode: 'fly', radius: 5, speed: 1.4, pause: [0.5, 2], home: 0.1, hover: 1.6, toward: { block: 'lamp', within: 12, chance: 1 } },
     fears: [],
@@ -120,8 +125,7 @@ export const CREATURES: readonly CreatureKind[] = [
       page: 'lanternfly',
       within: 10,
       facts: [
-        { fact: 'needs', seeing: { kind: 'always' }, seconds: 3 },
-        { fact: 'gives', seeing: { kind: 'near', block: 'lamp', within: 3 }, seconds: 3 },
+        { fact: 'comes', seeing: { kind: 'near', block: 'lamp', within: 3 }, seconds: 3 },
       ],
     },
   },

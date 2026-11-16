@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "demos/opening/art/plates/m3-friends.jpg",
+  "prompt": "Use case: identity-preserve. Reference is approved temple fresco. Draw ONLY the small seated red fox at the right end, on actual transparent background, matching its exact kind upward-looking face, red-orange fur, white throat, warm dark outline, painted tempera facets and gold-leaf fresco finish. Same seated pose facing up and to left. One change: white tipped tail lifts slightly upward and curls to the left instead of lying flat along the ground. Entire fox in frame, no human silhouette, no ground, no plaster, no text. This is an alternate animation drawing, so preserve the head, chest and body pose exactly."
+}

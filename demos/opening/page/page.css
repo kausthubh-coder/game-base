@@ -1,0 +1,221 @@
+/* The opening lab's page. Two looks on purpose: the film's words, the title and the player's buttons wear the
+   game's interface look (docs/ui-look.md: Fraunces and Nunito, cream ink, gold for picked, pills), and the lab's
+   controls are plain, dark and quiet so they never compete with the picture. */
+
+@font-face { font-family: 'Fraunces'; src: url('/fonts/fraunces.woff2') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Nunito'; src: url('/fonts/nunito.woff2') format('woff2'); font-weight: 400 800; font-style: normal; font-display: swap; }
+
+:root {
+  /* The game's tokens (src/game/uiview/theme.ts). */
+  --paper-light: #f6f1e7;
+  --ink: #3b4255;
+  --navy: #4a5366;
+  --night: #1f2433;
+  --night-2: #2b3245;
+  --gold: #d3bc8e;
+  --gold-bright: #f0d48a;
+  --bronze: #a6895a;
+  --glass: rgb(22 26 38 / 0.62);
+  --glass-line: rgb(211 188 142 / 0.45);
+  --glass-ink: #f6f1e7;
+  --glass-ink-2: #d9d2c3;
+  --font: 'Nunito', ui-rounded, 'SF Pro Rounded', ui-sans-serif, system-ui, sans-serif;
+  --display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* The lab's own: near-black, two greys of text, one quiet line. Gold marks only what is picked or now. */
+  --lab-bg: #0b0d12;
+  --lab-fill: rgb(255 255 255 / 0.06);
+  --lab-fill-hover: rgb(255 255 255 / 0.11);
+  --lab-line: rgb(255 255 255 / 0.1);
+  --lab-text: #e6e3dc;
+  --lab-text-2: #9a9fab;
+  --lab-font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --lab-target: 36px;
+}
+@media (pointer: coarse) { :root { --lab-target: 44px; } }
+
+html, body { margin: 0; height: 100%; background: var(--lab-bg); color: var(--lab-text); }
+body { overflow: hidden; font: 13px/1.4 var(--lab-font); -webkit-font-smoothing: antialiased; }
+button, select, input { font: inherit; color: inherit; }
+
+/* ---- The frame: the film fills what the controls leave, at 16:9, with black around it. ---- */
+#app { display: grid; grid-template-rows: minmax(0, 1fr) auto; height: 100dvh; }
+#view { position: relative; display: grid; place-items: center; min-height: 0; container-type: size; overflow: hidden; background: #000; }
+/* In the lab the picture keeps a margin of letterbox around it, so its edges read and the controls never touch it. */
+body:not(.watch, .bare) #view { box-sizing: border-box; border: solid var(--lab-bg); border-width: 12px 16px 6px; background: var(--lab-bg); }
+#stage { position: relative; width: min(100cqw, 100cqh * 16 / 9); aspect-ratio: 16 / 9; overflow: hidden; background: #000; container-type: inline-size; cursor: pointer; }
+#stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* ---- The film's words: Hobb's line, as the game sets a narrator's line, and the act's title. ---- */
+#say {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; margin: 0; padding: 8cqw 9% 5.5cqw;
+  font: 700 clamp(13px, 2.15cqw, 30px)/1.42 var(--font); color: var(--glass-ink); text-align: center; text-wrap: balance;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.75), 0 0 18px rgb(10 12 20 / 0.6);
+  background: linear-gradient(0deg, rgb(10 12 20 / 0.5), rgb(10 12 20 / 0));
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: opacity 160ms ease-out, transform 0s 160ms;
+}
+/* A line rises into place; it does not fade in (docs/ui-look.md rule 8). */
+#say.on { opacity: 1; transform: none; transition: transform 220ms var(--ease); }
+#say.cut { transition: none; }
+
+#title { position: absolute; left: 8%; top: 11%; z-index: 5; margin: 0; pointer-events: none; opacity: 0; transform: translateY(10px); transition: opacity 200ms ease-out, transform 0s 200ms; }
+#title.on { opacity: 1; transform: none; transition: transform 900ms var(--ease); }
+/* A soft shade behind the title, as the game's title screen has, so it reads over a busy sky. */
+#title::before { content: ''; position: absolute; inset: -45% -35% -40% -30%; z-index: -1; background: radial-gradient(closest-side, rgb(10 12 20 / 0.5), rgb(10 12 20 / 0)); pointer-events: none; }
+#title small { display: flex; align-items: center; gap: 0.7em; font: 800 clamp(11px, 1.4cqw, 20px)/1 var(--font); letter-spacing: 0.32em; text-transform: uppercase; color: var(--gold-bright); text-shadow: 0 1px 2px rgb(10 12 20 / 0.9), 0 0 10px rgb(10 12 20 / 0.6); }
+#title small::before { content: ''; width: 0.55em; height: 0.55em; background: var(--gold-bright); transform: rotate(45deg); box-shadow: 0 0 8px rgb(240 212 138 / 0.7); }
+#title b {
+  position: relative; display: block; margin-top: 0.22em; padding-bottom: 0.32em;
+  font: 650 clamp(28px, 6.4cqw, 96px)/1 var(--display); letter-spacing: -0.01em; color: var(--paper-light);
+  text-shadow: 0 2px 4px rgb(10 12 20 / 0.6), 0 0 30px rgb(10 12 20 / 0.5);
+}
+#title b::after { content: ''; position: absolute; left: 0; bottom: 0; width: 70%; height: max(2px, 0.03em); background: linear-gradient(90deg, var(--gold-bright), rgb(240 212 138 / 0)); transform-origin: left; transform: scaleX(0); transition: transform 0s 200ms; }
+#title.on b::after { transform: none; transition: transform 1200ms 300ms var(--ease); }
+
+/* A way that has not loaded, or broke, says so where its picture should be. */
+.notice { position: absolute; inset: 0; z-index: 4; display: grid; place-content: center; gap: 6px; padding: 24px; text-align: center; color: var(--lab-text-2); background: #12151c; font: 13px/1.4 var(--lab-font); }
+.notice[hidden] { display: none; }
+.notice b { font-size: 16px; font-weight: 600; color: var(--lab-text); }
+.notice span { max-width: 60ch; overflow-wrap: anywhere; }
+
+/* ---- The lab's controls ---- */
+#lab {
+  display: grid; gap: 10px; width: min(100%, 1240px); box-sizing: border-box; margin: 0 auto;
+  padding: 10px max(16px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  transition: opacity 400ms ease-out;
+  /* Its own layer from the start, so the first fade does not stop the film while the browser makes one. */
+  will-change: opacity;
+}
+/* While the film plays, the controls step back. They keep their place, so the film never moves. */
+#lab.away { opacity: 0; transition-duration: 900ms; }
+body.bare #lab, body.watch #lab { display: none; }
+body.watch #stage, body.bare #stage { cursor: default; }
+
+.btn, .cut, .take {
+  display: inline-flex; align-items: center; gap: 6px; min-height: var(--lab-target); padding: 0 12px; box-sizing: border-box;
+  background: var(--lab-fill); border: 0; border-radius: 8px; color: var(--lab-text-2); cursor: pointer; white-space: nowrap;
+  transition: transform 80ms ease-out;
+}
+.btn:hover, .cut:hover, .take:hover { background: var(--lab-fill-hover); color: var(--lab-text); }
+.btn:active, .cut:active { transform: scale(0.97); }
+:is(.btn, .cut, .take, .shot, .scrub):focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+.btn svg { width: 14px; height: 14px; flex: none; }
+.btn.play { min-width: 92px; justify-content: center; color: var(--lab-text); background: rgb(255 255 255 / 0.12); }
+.btn.toggle[aria-pressed='true'] { color: var(--lab-text); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.5); }
+.btn.toggle[aria-pressed='false'] { text-decoration: line-through; text-decoration-color: rgb(255 255 255 / 0.35); }
+.take { padding-right: 8px; }
+.take:disabled { cursor: default; opacity: 0.6; }
+.take:disabled:hover { background: var(--lab-fill); color: var(--lab-text-2); }
+
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.time { font-variant-numeric: tabular-nums; color: var(--lab-text); padding: 0 4px; }
+.time .total { color: var(--lab-text-2); margin-left: 4px; }
+.where { color: var(--lab-text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.gap { flex: 1; }
+.stats { font-variant-numeric: tabular-nums; color: var(--lab-text-2); }
+.stats:empty { display: none; }
+
+/* The shots, each as wide as it lasts, its plate faint behind its number. The one on screen is lit; one gold line marks now. */
+.timeline { display: grid; gap: 2px; }
+.strip { position: relative; display: flex; gap: 2px; height: 40px; }
+.shot {
+  position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: end; gap: 5px; padding: 0 6px 5px; overflow: hidden;
+  background: #1a1d25; border: 0; border-radius: 4px; color: var(--lab-text-2); cursor: pointer; text-align: left; font-size: 12px;
+}
+.shot::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(0deg, rgb(11 13 18 / 0.85), rgb(11 13 18 / 0.45)); }
+.shot > span { position: relative; z-index: 2; }
+.shot .thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.shot:first-child { border-radius: 8px 4px 4px 8px; }
+.shot:nth-last-child(2) { border-radius: 4px 8px 8px 4px; }
+.shot:hover, .shot.on { color: var(--lab-text); }
+.shot:hover::before { background: linear-gradient(0deg, rgb(11 13 18 / 0.7), rgb(11 13 18 / 0.2)); }
+.shot.on::before { background: linear-gradient(0deg, rgb(11 13 18 / 0.6), rgb(11 13 18 / 0.05)); box-shadow: inset 0 2px 0 var(--gold); }
+.shot .n { font-variant-numeric: tabular-nums; font-weight: 600; }
+.shot .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.head { position: absolute; inset: -3px 0; z-index: 3; pointer-events: none; will-change: transform; }
+.head::before { content: ''; position: absolute; left: -1px; top: 0; bottom: 0; width: 2px; border-radius: 1px; background: var(--gold-bright); box-shadow: 0 0 6px rgb(240 212 138 / 0.6); }
+
+.scrub { width: 100%; height: 18px; margin: 0; accent-color: var(--gold); background: transparent; cursor: pointer; }
+
+/* The six cuts, each with its key. The one on screen is gold-rimmed; one loading pulses. */
+.cuts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 6px; }
+.cut { justify-content: flex-start; gap: 8px; white-space: normal; text-align: left; line-height: 1.2; padding: 4px 10px; }
+.cut kbd { flex: none; display: grid; place-items: center; width: 20px; height: 20px; font: 600 11px/1 var(--lab-font); color: var(--lab-text-2); background: rgb(255 255 255 / 0.08); border-radius: 5px; }
+.cut[aria-checked='true'] { color: var(--lab-text); background: rgb(211 188 142 / 0.12); box-shadow: inset 0 0 0 1px var(--gold); }
+.cut[aria-checked='true'] kbd { color: var(--night); background: var(--gold); }
+.cut.loading { box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.5); animation: pulse 1s ease-in-out infinite alternate; }
+@keyframes pulse { to { background: rgb(211 188 142 / 0.16); } }
+.about { margin: 0; min-height: 1.4em; color: var(--lab-text-2); }
+.about.bad { color: #e8a48a; }
+
+/* ---- Watching as a player: the game's own buttons over the film. ---- */
+.w-begin, .w-end { position: absolute; inset: 0; z-index: 8; display: grid; place-content: center; justify-items: center; gap: 16px; padding: 24px; }
+.w-begin { background: radial-gradient(closest-side, var(--night-2), rgb(10 12 20)); will-change: opacity; transition: opacity 700ms ease-out; }
+/* Begin gives way to the film by fading, so the wall seems to come out of the dark. */
+.w-begin.gone { opacity: 0; pointer-events: none; }
+.w-begin.gone .w-btn { animation: none; }
+.w-end { align-content: end; grid-auto-flow: column; padding-bottom: max(8cqh, 24px); }
+.w-begin[hidden], .w-end[hidden], .w-skip[hidden], .w-leave[hidden] { display: none; }
+.w-begin p { margin: 0; font: 700 14px/1.4 var(--font); color: var(--glass-ink-2); text-shadow: 0 1px 3px rgb(10 12 20 / 0.8); }
+.w-btn {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 50px; min-width: 200px; padding: 0 28px;
+  font: 700 17px/1 var(--font); letter-spacing: 0.01em; color: var(--paper-light); cursor: pointer;
+  background: linear-gradient(180deg, #56607a, var(--navy) 55%, #424a5c); border: 0; border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.14), 0 2px 6px rgb(10 12 20 / 0.22);
+  transition: transform 80ms var(--ease), filter 120ms var(--ease);
+  animation: w-in 220ms var(--ease) both;
+}
+.w-btn.w-primary { color: var(--night); background: linear-gradient(180deg, #f6dfa0, #e2c07a 55%, #cfa863); box-shadow: inset 0 0 0 1px rgb(255 247 220 / 0.7), 0 0 0 1px var(--bronze), 0 2px 10px rgb(201 162 94 / 0.45); }
+.w-begin .w-btn { min-width: 220px; font-size: 19px; }
+.w-btn:hover { filter: brightness(1.12); }
+.w-btn:active { transform: scale(0.97); filter: brightness(0.95); }
+.w-btn:focus-visible, .w-leave:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+@keyframes w-in { from { transform: translateY(8px); } }
+
+.w-skip {
+  position: absolute; right: max(20px, 3cqw); bottom: max(20px, 3cqh); z-index: 8; display: flex; align-items: center; gap: 10px;
+  padding: 6px 16px 6px 6px; font: 700 14px/1 var(--font); color: var(--glass-ink); background: var(--glass); border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--glass-line), 0 2px 12px rgb(10 12 20 / 0.28); pointer-events: none;
+  opacity: 0; transition: opacity 600ms ease-out; will-change: opacity;
+}
+.w-skip.on { opacity: 1; transition-duration: 150ms; }
+.w-ring { width: 26px; height: 26px; transform: rotate(-90deg); }
+.w-ring circle { fill: none; stroke: rgb(255 255 255 / 0.15); stroke-width: 3; }
+.w-ring .w-fill { stroke: var(--gold-bright); stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 100; }
+
+.w-leave {
+  position: absolute; left: max(16px, 2.5cqw); top: max(16px, 2.5cqh); z-index: 9; min-height: 40px; padding: 0 16px 0 12px;
+  font: 700 14px/1 var(--font); color: var(--glass-ink); cursor: pointer; background: var(--glass); border: 0; border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--glass-line); opacity: 0; transition: opacity 600ms ease-out; will-change: opacity;
+}
+.w-leave::before { content: '←'; margin-right: 6px; color: var(--gold-bright); }
+.w-leave.on, .w-leave:focus-visible { opacity: 1; transition-duration: 150ms; }
+
+/* ---- A phone: the film on top, the controls under it in one column. ---- */
+@media (max-width: 640px) {
+  #lab { gap: 8px; padding-top: 8px; }
+  .strip { height: 34px; }
+  .shot { justify-content: center; padding: 0 0 5px; }
+  .shot .name, .where { display: none; }
+  .cuts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .btn.watch span { display: none; }
+  .w-end { grid-auto-flow: row; }
+}
+@media (orientation: portrait) and (max-width: 640px) {
+  #app { grid-template-rows: auto 1fr; }
+  #view { container-type: inline-size; height: auto; place-items: start center; }
+  #stage { width: 100cqw; }
+  #lab { align-content: start; overflow-y: auto; }
+  body.watch #app, body.bare #app { grid-template-rows: 1fr; }
+  body.watch #view, body.bare #view { container-type: size; height: 100%; place-items: center; }
+  body.watch #stage, body.bare #stage { width: min(100cqw, 100cqh * 16 / 9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #say, #say.on, #title, #title.on, #title b::after, #title.on b::after { transition: none; transform: none; }
+  #title.on b::after { transform: none; }
+  .w-btn { animation: none; }
+  .cut.loading { animation: none; }
+}

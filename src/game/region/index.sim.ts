@@ -3,13 +3,22 @@
 //
 // The land itself is made by the terrain from the same plan (src/game/content/region.ts), so this
 // system writes no blocks. It only answers questions about them, and runs the bushes.
+import { joinGround } from './ground.sim.ts';
 import type { Vec3 } from '../../engine/types.ts';
 import { forestAt, groundHeight } from '../../features/world/terrain.sim.ts';
 import type { BerryBush, Game, Interactable, Place, RegionApi, RegionScatter, SimSystem } from '../api.sim.ts';
+import { FLAG } from '../content/flags.ts';
+import { LAND_RING } from '../content/goods.ts';
 import { REGION } from '../content/region.ts';
 import type { Kernel } from '../kernel.sim.ts';
+import { PATHS, PLACES as PLAN_PLACES, toWorld } from '../content/greenhollow.ts';
+import { greenhollowWoods, planStands, waterLevelAt } from './greenhollow-land.sim.ts';
 import { built, clearing, onPath, placedModels, regionProps, scatterBlocked } from './land.sim.ts';
+import { landState, writeLandState } from './story.sim.ts';
 import { isTreeSpot } from './tree-spots.sim.ts';
+
+/** Where the south road leaves the map for Saltgate. */
+const SOUTH_ROAD_END = (() => { const road = PATHS.find((p) => p.id === 'south')!; return road.points[road.points.length - 1]; })();
 
 /** Seconds of game time a picked bush stays bare. */
 export const REGROW_SECONDS = 120;
@@ -38,10 +47,42 @@ export function createRegion(game: Game): Region {
     const at = want.at === 'door' ? b.door : b.outside;
     places.push({ name: want.name, at: feetAt(at.x, at.y, at.z), label: want.label });
   }
+  // Every place of the plan of Greenhollow (content/greenhollow.ts), by its id, where to stand there. The three that
+  // were built before the plan (your plot, the dead garden, Hollowmere) have their own places above, so theirs stay
+  // off the map.
+  for (const stand of planStands()) {
+    if (places.some((p) => p.name === stand.id)) continue;
+    const built = PLAN_PLACES.find((p) => p.id === stand.id)?.world !== undefined;
+    // A place over water (the bridge) is stood on its planks, a block over the water.
+    let y = groundHeight(game.world.seed, stand.x, stand.z);
+    const water = waterLevelAt(stand.x, stand.z);
+    if (y < water) y = water + 2;
+    places.push({ name: stand.id, at: feetAt(stand.x, y, stand.z), label: built || stand.id === 'dawn' ? '' : stand.name });
+  }
+  // The spots the act's quests and people name inside a place (`PlaceRef` in content/ids.ts) that the land already
+  // has under an older name, and Saltgate, off the map to the south, where the south road leaves it.
+  const also = (name: string, as: string, label = ''): void => {
+    const p = places.find((q) => q.name === as);
+    if (p && !places.some((q) => q.name === name)) places.push({ name, at: { ...p.at }, label });
+  };
+  also('plot.pond', 'grant.rocks');
+  also('plot.field', 'grant.center');
+  also('plot.stone', 'grant.stone');
+  also('plot.camp', 'camp');
+  also('town.green', 'town.square');
+  {
+    const end = toWorld(SOUTH_ROAD_END);
+    places.push({ name: 'saltgate', at: feetAt(end.x, Math.max(groundHeight(game.world.seed, end.x, end.z), waterLevelAt(end.x, end.z) + 1), end.z), label: 'To Saltgate' });
+  }
   const byName = new Map(places.map((p) => [p.name, p]));
 
   const g = REGION.grant, town = REGION.town;
-  const inGrant = (x: number, z: number): boolean => x >= g.x && x < g.x + g.width && z >= g.z && z < g.z + g.depth;
+  /** The grant grows by a ring of land for each one bought with coin (src/game/goods). */
+  const ring = (): number => LAND_RING.blocks * (Number(game.flags.get(FLAG.landRings)) || 0);
+  const inGrant = (x: number, z: number): boolean => {
+    const r = ring();
+    return x >= g.x - r && x < g.x + g.width + r && z >= g.z - r && z < g.z + g.depth + r;
+  };
 
   // ------------------------------------------------------------------------------------ berry bushes
   const bushes: BerryBush[] = REGION.bushes.map((b, i) => ({
@@ -84,6 +125,7 @@ export function createRegion(game: Game): Region {
     const interact = game.systems.interact;
     if (!interact) return;
     for (const target of targets) interact.add(target);
+    joinGround(game);
     joined = true;
   }
 
@@ -104,7 +146,7 @@ export function createRegion(game: Game): Region {
       if (scatterBlocked(x, z)) return true;
       return clearing(x, z) >= 0.5 && isTreeSpot(seed, Math.floor(x), Math.floor(z));
     },
-    forest: (x, z) => forestAt(seed, Math.floor(x), Math.floor(z)) * (1 - clearing(x, z)),
+    forest: (x, z) => greenhollowWoods(Math.floor(x), Math.floor(z), forestAt(seed, Math.floor(x), Math.floor(z))) * (1 - clearing(x, z)),
   };
 
   // ------------------------------------------------------------------------------------ the api
@@ -113,16 +155,21 @@ export function createRegion(game: Game): Region {
     spawnFacing: () => REGION.spawn.facing,
     places: () => places,
     place(name) {
-      const found = byName.get(name);
+      // A spot not laid out yet (`saltgate.yard`) stands at its place, so a quest's waypoint still points somewhere.
+      const found = byName.get(name) ?? (name.includes('.') ? byName.get(name.slice(0, name.indexOf('.'))) : undefined);
       if (!found) throw new Error(`the region has no place called "${name}". It has: ${places.map((p) => p.name).join(', ')}`);
       return found;
     },
-    grant: () => ({ x: g.x, z: g.z, width: g.width, depth: g.depth }),
+    grant: () => {
+      const r = ring();
+      return { x: g.x - r, z: g.z - r, width: g.width + 2 * r, depth: g.depth + 2 * r };
+    },
     isProtected(x, _y, z) {
       const fx = Math.floor(x), fz = Math.floor(z);
       // The grant is the player's, even where the path starts at its corner.
       if (inGrant(fx, fz)) return false;
       if (fx >= town.x0 && fx <= town.x1 && fz >= town.z0 && fz <= town.z1) return true;
+      for (const r of REGION.sealed) if (fx >= r.x0 && fx <= r.x1 && fz >= r.z0 && fz <= r.z1) return true;
       return onPath(fx, fz);
     },
     berryBushes: () => bushes,
@@ -134,6 +181,8 @@ export function createRegion(game: Game): Region {
   const system: SimSystem = {
     step(dt) {
       if (!joined) join();
+      // The story on the land: the relit road, the pumps, the healed wood, your plot's green.
+      writeLandState(game.flags, landState(game.flags));
       for (let i = 0; i < bushes.length; i++) {
         if (wait[i] <= 0) continue;
         wait[i] -= dt;

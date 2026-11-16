@@ -21,7 +21,7 @@ A charter is one part of the game, one player, and a budget of about 60 actions.
 ## 2. Start
 
 ```sh
-bun tools/doctor.mjs                                # once in a worktree; export the PLAY_PORT it prints
+bun tools/setup.mjs                                 # once in a worktree; export the PLAY_PORT it prints
 bun tools/play.mjs start --mode human --blind       # real keys and clicks only; the game's state is hidden
 ```
 

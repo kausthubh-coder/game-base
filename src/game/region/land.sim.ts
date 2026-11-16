@@ -9,6 +9,7 @@ import { stamp } from '../../features/buildings/stamp.sim.ts';
 import type { RegionProp } from '../api.sim.ts';
 import { TOWN_MODELS } from '../../content/town-kit.ts';
 import { REGION, type PlanBuilding, type PlanModel, type Rect } from '../content/region.ts';
+import { onDeck, planPathReach } from './greenhollow-land.sim.ts';
 
 /** A building of the plan after it was turned and put down. */
 export interface Built {
@@ -98,6 +99,12 @@ export function shaped(x: number, z: number): boolean {
 
 /** The ground height of a column after the plan: `natural` is what the land would be without it. */
 export function shapeGround(x: number, z: number, natural: number): number {
+  return shapeLevel(x, z, shapeRise(x, z, natural));
+}
+
+/** The plan's first stage: the vales bring high ground down and the knolls rise. */
+export function shapeRise(x: number, z: number, natural: number): number {
+  if (!inBounds(x, z)) return natural;
   let h = natural;
   for (const v of REGION.vales) {
     const w = ease(1 - (reachOf(v.points, x, z) - v.half) / v.fade);
@@ -108,6 +115,13 @@ export function shapeGround(x: number, z: number, natural: number): number {
     const d = ((x - k.x) * (x - k.x) + (z - k.z) * (z - k.z)) / (k.radius * k.radius);
     if (d < 4) h += k.height * Math.exp(-d * 1.6);
   }
+  return h;
+}
+
+/** The plan's last stage: level ground for the sites, and the basins dug down. */
+export function shapeLevel(x: number, z: number, natural: number): number {
+  if (!inBounds(x, z)) return natural;
+  let h = natural;
   for (let i = 0; i < REGION.levels.length; i++) {
     const w = levelWeight(i, x, z);
     if (w > 0) h += (REGION.levels[i].ground - h) * w;
@@ -160,6 +174,7 @@ export function treeAllowed(x: number, z: number): boolean {
 /** True where nothing is scattered: the grant's middle, the path, the town, the garden's beds, and where the plan put a tree, a bush or a rock. */
 export function scatterBlocked(x: number, z: number): boolean {
   const fx = Math.floor(x), fz = Math.floor(z);
+  if (planPathReach(fx, fz) <= 1 || onDeck(fx, fz)) return true;
   if (!inBounds(fx, fz)) return false;
   for (const r of REGION.bare) if (inside(r, fx, fz)) return true;
   return pathReach(fx, fz) <= 1;

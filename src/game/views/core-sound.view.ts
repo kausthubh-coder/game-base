@@ -12,8 +12,8 @@ import type { Surface, Vec3 } from '../../engine/types.ts';
 import type { AudioSystem, SampleInfo } from '../../features/audio/index.ts';
 import type { Place, Systems } from '../api.sim.ts';
 import { REGION } from '../content/region.ts';
-import { FOLK_STEPS, LANE_AT, QUAY, WELL_AT, type SpotRule } from '../content/soundscape.ts';
-import { bedLevels, gaitOf, SpotClock, stepMaterial, zonesAt, type Zones } from '../sound/soundscape.sim.ts';
+import { FOLK_STEPS, LANE_AT, MUSIC_REGIONS, QUAY, WELL_AT, type SpotRule } from '../content/soundscape.ts';
+import { bedLevels, gaitOf, hoursWeight, newRegions, regionsAt, SpotClock, stepMaterial, zonesAt, type Zones } from '../sound/soundscape.sim.ts';
 import type { GameView } from '../shell/view.ts';
 
 /** The recordings' list, as tools/sound.ts writes it. */
@@ -241,10 +241,12 @@ export function install(view: GameView): void {
   for (const name of ['grant.rocks', 'river.bank', 'ferry']) {
     try { const place = sys.region?.place(name); if (place) waterPlaces.push(place); } catch { /* Optional in another region. */ }
   }
-  const regions = { meadow: 1, town: 0 };
+  // The music's weight per region (palette ids only), and the regions with the bands, for the beds.
+  const regions: Record<string, number> = {};
+  const here = newRegions();
   const state = { regions, town: 0, indoors: 0, nearWater: 0, trees: 0, stone: 0 };
   const zones: Zones = { town: 0, square: 0, bank: 0, lane: 0 };
-  const where = { x: 0, z: 0, hour: 12, forest: 0 };
+  const where = { x: 0, z: 0, hour: 12, forest: 0, regions: here };
   const beds: Record<string, number> = {};
   const quayAt = { x: 0, y: QUAY.y, z: QUAY.z };
   const spots = new SpotClock(Math.random);
@@ -267,15 +269,18 @@ export function install(view: GameView): void {
     return Math.min(1, solid / 2.5);
   }
 
-  /** Reads the land around the player a few times a second: the zones of the town, a roof, water and trees. */
+  /** Reads the land around the player a few times a second: the region, the zones of the town, a roof, water and trees. */
   function look(p: Vec3): void {
     zonesAt(p.x, p.z, zones);
-    // The town's music comes in as the town's zone does, so the gate is the border band.
-    regions.town = zones.town;
-    regions.meadow = 1 - zones.town;
-    state.town = zones.town;
-    // Cobbles and walls: the square rings most, the streets a little.
-    state.stone = Math.max(zones.square, 0.55 * zones.town);
+    where.hour = (game.ambient.timeOfDay * 24) % 24;
+    // Which region's music: the kinds of land, the High Road, the river and the town's zone, so the gate is
+    // the border band into Hollowmere and every edge of the map is a crossfade.
+    regionsAt(p.x, p.z, zones.town, here);
+    for (const id of MUSIC_REGIONS) regions[id] = here[id];
+    // Market hours are the fuller town arrangement; morning, evening and night keep the town's tune, lighter.
+    state.town = zones.town * (0.62 + 0.38 * hoursWeight('work', where.hour));
+    // Cobbles and walls: the square rings most, the streets a little. Rock rings in the caves and on the terraces.
+    state.stone = Math.max(zones.square, 0.55 * zones.town, 0.75 * here.caves, 0.35 * here.terraces);
     state.indoors = world.query.openSky(p.x, p.y + 1.5, p.z) ? 0 : 1;
     let wet = 0, leafy = 0, columns = 0;
     for (let dx = -8; dx <= 8; dx += 4) {
@@ -303,8 +308,9 @@ export function install(view: GameView): void {
       state.nearWater = Math.max(state.nearWater, Math.max(0, 1 - distance / 18));
     }
     where.x = p.x; where.z = p.z;
-    where.hour = (game.ambient.timeOfDay * 24) % 24;
-    where.forest = state.trees;
+    // The crowns overhead are counted, so the count moves in steps of a few tenths: the beds' share of them
+    // eases at 0.6 a second, as the music does, and the forest bed fades in under the trees.
+    where.forest += Math.max(-0.15, Math.min(0.15, state.trees - where.forest));
     bedLevels(zones, where, beds);
   }
 
@@ -336,7 +342,7 @@ export function install(view: GameView): void {
         const lean = id === 'bed.town.water' ? quayAt : id === 'bed.town.workshop' ? LANE_AT : id === 'bed.town.square' ? WELL_AT : null;
         audio.setBed(id, beds[id] as number, lean);
       }
-      spots.step(audio.now, zones, where.hour, (rule, weight) => playSpot(audio, rule, weight));
+      spots.step(audio.now, zones, where.hour, (rule, weight) => playSpot(audio, rule, weight), here);
     }
     audio.setState(state);
     audio.followAmbient(game.ambient);

@@ -1,0 +1,324 @@
+{
+  "shot": "sickness",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m5-sickness.jpg",
+  "layers": [
+    {
+      "id": "plaster-ground",
+      "file": "ground.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Mirrored empty plaster patch from the approved plate; original gold edge bands."
+    },
+    {
+      "id": "bed-1",
+      "file": "bed-1.webp",
+      "x": 293,
+      "y": 219,
+      "w": 270,
+      "h": 310,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-1",
+      "file": "stone-1.webp",
+      "x": 438,
+      "y": 310,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-1-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-2",
+      "file": "bed-2.webp",
+      "x": 558,
+      "y": 219,
+      "w": 221,
+      "h": 310,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-2",
+      "file": "stone-2.webp",
+      "x": 657,
+      "y": 310,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-2-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-3",
+      "file": "bed-3.webp",
+      "x": 774,
+      "y": 219,
+      "w": 227,
+      "h": 310,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-3",
+      "file": "stone-3.webp",
+      "x": 866,
+      "y": 309,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-3-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-4",
+      "file": "bed-4.webp",
+      "x": 996,
+      "y": 219,
+      "w": 230,
+      "h": 310,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-4",
+      "file": "stone-4.webp",
+      "x": 1082,
+      "y": 310,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-4-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-5",
+      "file": "bed-5.webp",
+      "x": 278,
+      "y": 543,
+      "w": 270,
+      "h": 318,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-5",
+      "file": "stone-5.webp",
+      "x": 417,
+      "y": 635,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-5-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-6",
+      "file": "bed-6.webp",
+      "x": 543,
+      "y": 543,
+      "w": 225,
+      "h": 318,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-6",
+      "file": "stone-6.webp",
+      "x": 640,
+      "y": 635,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-6-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-7",
+      "file": "bed-7.webp",
+      "x": 763,
+      "y": 543,
+      "w": 221,
+      "h": 318,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-7",
+      "file": "stone-7.webp",
+      "x": 851,
+      "y": 636,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-7-dim.webp"
+      ]
+    },
+    {
+      "id": "bed-8",
+      "file": "bed-8.webp",
+      "x": 979,
+      "y": 543,
+      "w": 231,
+      "h": 318,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Sleeper, bed and adjacent flowers; throat stone is separate."
+    },
+    {
+      "id": "stone-8",
+      "file": "stone-8.webp",
+      "x": 1066,
+      "y": 635,
+      "w": 17,
+      "h": 17,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Bright throat stone; frames[0] is dim.",
+      "frames": [
+        "stone-8-dim.webp"
+      ]
+    },
+    {
+      "id": "king",
+      "file": "king.webp",
+      "x": 1204,
+      "y": 291,
+      "w": 371,
+      "h": 456,
+      "z": 15,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "grave-1",
+      "file": "grave-1.webp",
+      "x": 1206,
+      "y": 718,
+      "w": 176,
+      "h": 142,
+      "z": 25,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "grave-2",
+      "file": "grave-2.webp",
+      "x": 1358,
+      "y": 730,
+      "w": 130,
+      "h": 130,
+      "z": 25,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "grave-3",
+      "file": "grave-3.webp",
+      "x": 1470,
+      "y": 717,
+      "w": 159,
+      "h": 143,
+      "z": 25,
+      "pivot": [
+        0.5,
+        0.9
+      ]
+    }
+  ]
+}

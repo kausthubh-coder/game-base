@@ -1,0 +1,25 @@
+{
+  "name": "pebblepup",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "assets-src/raw/pebblepup-3.png",
+    "public/assets/sprites/leaftail.png"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, matching reference leaftail's rendering style ONLY, generate a NEW character PEBBLEPUP. Genuine transparent background, NO text/grid/ground/cast shadows. STRICT FOUR columns SIX rows, 24 equal SQUARE cells. Rows 0-2 idle: FRONT, BACK (no face), right-facing SIDE; all four columns repeat subtle idle variations. Rows 3-5 walk: FRONT, BACK, right-facing SIDE; four distinct step phases feet apart / passing / opposite apart / passing. Stocky low slow guardian pup, warm tan fur beneath rounded GREY river stones and muted green moss forming its back, big paws, short tail, friendly floppy ears. NO teal, no leaf tail, no collar. Head and body stay identical size throughout, about 68 drawn pixels tall in final 96 square cell. Feet baseline equal, full body visible, ample transparent padding, nothing crosses cell boundaries. Output portrait 2:3 aspect ratio.",
+      "source": "assets-src/fight-sprites/pebblepup-attempt-1.png",
+      "selected": false,
+      "defect": "Opaque painted brown background."
+    },
+    {
+      "attempt": 2,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, matching reference leaftail's rendering style ONLY, generate a NEW character PEBBLEPUP. Genuine transparent background, NO text/grid/ground/cast shadows. STRICT FOUR columns SIX rows, 24 equal SQUARE cells. Rows 0-2 idle: FRONT, BACK (no face), right-facing SIDE; all four columns repeat subtle idle variations. Rows 3-5 walk: FRONT, BACK, right-facing SIDE; four distinct step phases feet apart / passing / opposite apart / passing. Stocky low slow guardian pup, warm tan fur beneath rounded GREY river stones and muted green moss forming its back, big paws, short tail, friendly floppy ears. NO teal, no leaf tail, no collar. Head and body stay identical size throughout, about 68 drawn pixels tall in final 96 square cell. Feet baseline equal, full body visible, ample transparent padding, nothing crosses cell boundaries. Output portrait 2:3 aspect ratio.\nCRITICAL CORRECTION: remove the brown background entirely. GENUINE ALPHA TRANSPARENCY, not a painted background or checkerboard. Keep every dog and its poses, directions, proportions, pixel details and grid EXACTLY as in image 1. No drop shadow, no floor, no background pixels at all. Image 2 is approved rendering style only.",
+      "source": "assets-src/fight-sprites/pebblepup-attempt-2.png",
+      "selected": true
+    }
+  ],
+  "raw": "assets-src/raw/pebblepup-3.png",
+  "processing": "bun tools/sprites/build-story.mjs"
+}

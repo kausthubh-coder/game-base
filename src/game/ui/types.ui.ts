@@ -89,7 +89,7 @@ export interface GameUiOptions {
   setVolume(channel: VolumeChannel, value: number): void;
   /** Called with 0.9, 1 or 1.15 so the HUD can match. The panels scale themselves. */
   setInterfaceSize?(size: number): void;
-  /** The View section of Settings: the camera and how characters are drawn. The game stores both. Left out, there is no View section. */
+  /** The View section of Settings: the camera and mouse behavior. The game stores them. Left out, there is no View section. */
   view?: ViewChoices;
   /** The Debug section of Settings: the frame-rate counter, the performance meter and the debug panel. The game stores them. Left out, there is no Debug section. */
   debug?: DebugChoices;
@@ -115,8 +115,6 @@ export interface ViewChoices {
   setMouse(style: ViewMouse): void;
   tiltTurn(): ViewTiltTurn;
   setTiltTurn(turn: ViewTiltTurn): void;
-  characters(): ViewCharacters;
-  setCharacters(look: ViewCharacters): void;
 }
 /** Which debug overlays are shown. The game owns and stores them; Settings only shows them and passes picks on. */
 export interface DebugChoices {
@@ -136,7 +134,6 @@ export type ViewCamera = 'tilt' | 'free' | 'first';
 export type ViewMouse = 'drag' | 'lock';
 /** Where the 2.5D camera rests after a drag: on the nearest quarter turn, or where it was let go. */
 export type ViewTiltTurn = 'quarter' | 'smooth';
-export type ViewCharacters = 'sprites' | 'models';
 
 export interface GameUi {
   /** Opens a panel, replacing any open one. `detail` is a page id for the Almanac. */

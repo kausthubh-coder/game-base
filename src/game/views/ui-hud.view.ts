@@ -105,8 +105,9 @@ const STYLE = /* css */ `
   .ui-bookbtn { right: auto; left: 0; bottom: 100%; margin: 0 0 8px; }
 }
 
-/* While someone talks the dialogue box has the bottom of the screen. */
-.ui-book.ui-talking .gb-hud-slots { visibility: hidden; }
+/* Dialogue needs room for its speakers and choices. Restore these widgets when the talk ends. */
+.ui-book.ui-talking .gb-hud-slots, .ui-book.ui-talking .gb-hud-quest { visibility: hidden; }
+.ui-book.ui-talking .ui-heart { visibility: hidden; pointer-events: none; }
 
 /* A phone held upright: the corner is narrow and the slots wrap to five and four. */
 @media (max-width: 560px) {
@@ -171,7 +172,7 @@ export function install(view: GameView): void {
         hud.setSlot(i, null);
         continue;
       }
-      let name = stack.id, icon = stack.id;
+      let name: string = stack.id, icon: string = stack.id;
       try {
         const def = sys.items?.get(stack.id);
         if (def) { name = def.name; icon = def.icon; }
@@ -284,7 +285,7 @@ export function install(view: GameView): void {
       layer: () => root,
       stackAt: (index) => (free() && index < QUICK ? inventory.slots[index] ?? null : null),
       picture: (stack) => {
-        let icon = stack.id;
+        let icon: string = stack.id;
         try { icon = sys.items?.get(stack.id).icon ?? icon; } catch { /* drawn by its letters */ }
         const element = art.iconElement(icon) ?? letters(stack.id);
         element.style.width = element.style.height = '32px';
@@ -308,7 +309,7 @@ export function install(view: GameView): void {
     button.addEventListener('pointerenter', (event) => {
       const stack = sys.inventory?.slots[i];
       if (event.pointerType === 'touch' || !stack || document.documentElement.classList.contains('gu-dragging')) return;
-      let name = stack.id, use: string | null = null;
+      let name: string = stack.id, use: string | null = null;
       try {
         const def = sys.items?.get(stack.id);
         if (def) { name = def.name; use = itemUse(def); }

@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "../../../../art/plates/m6-ascent.jpg",
+  "prompt": "Background extraction, not a redesign. Extract ONLY the small king from this approved night fresco as a clean transparent RGBA cutout. Match the original king precisely: same young kind face, dark hair, gold halo circle, short green tunic, belt, tan trousers, sandals; left hand holding the complete long brown farmer's hoe with grey transverse blade, right arm extended palm upward. Preserve ALL limbs and objects, including the complete hoe handle through the left hand. The king stands with his feet on the roof in the reference; remove roof, entire city, dome, ALL gold rays, stars, blue plaster, all background colours and ALL borders. Keep exactly this flat tempera and gold leaf painting style and original pose. Full body plus entire hoe and halo, generous transparent space around silhouette. A clean alpha edge with no blue/cream/grey background fringe and no transparent holes inside the skin or clothes. Do not add any new objects.",
+  "use": "Trim alpha, remove specks, fit to original stage bounds [800,321,298,316]. This is a new drawing of the same king; the face, tunic folds and relative proportions differ slightly from the source."
+}

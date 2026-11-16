@@ -1,10 +1,11 @@
-// The opening scene's clock and its one rule: it plays once, on a new game the player chose from the
-// title, and never on Continue. No page and no camera here, so the tests run it. The view is
-// src/game/views/story-opening.view.ts and the shots are src/game/content/opening.ts.
+// The opening's two rules and one clock. The film plays once, on a new game begun from the title, and never on
+// Continue. And a camera move over the real world, shot by shot with a line each, is timed here: the day up the
+// river at the end of grant day (`RIVER` in src/game/content/opening.ts, played by story-grantday.view.ts). No
+// page and no camera here, so the tests run it.
 import type { Flags } from '../api.sim.ts';
 import type { OpeningShot } from '../content/opening.ts';
 
-/** Set when the opening starts, and saved with the game, so a reload or a Continue never plays it again. */
+/** Set when the film ends or is skipped, and saved with the game, so a reload or a Continue never plays it again. */
 export const OPENING_FLAG = 'story.opening';
 
 /** Seconds of the first fade up from black. */

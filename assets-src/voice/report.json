@@ -1,1095 +1,3920 @@
 {
- "tamsin|Twelve people have asked me for this plot.": {
+ "hobb|(from the door) Up, Button. Grant day. Nobody signs a deed on an empty stomach.": {
   "ids": [
-   "tamsin.meet.0"
+   "scene.1.0"
   ],
-  "file": "voice/tamsin/342446e5a44c.mp3",
-  "hash": "342446e5a44c",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/hobb/382ef0ac769b.mp3",
+  "hash": "382ef0ac769b",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
   "model": "eleven_v4_turbo",
-  "say": "Twelve people have asked me for this plot.",
-  "chars": 42,
-  "seconds": 2.8,
-  "pitchHz": 205,
+  "say": "[calling out] Up, Button. Grant day. Nobody signs a deed on an empty stomach.",
+  "chars": 77,
+  "seconds": 4.8,
+  "pitchHz": 276,
   "aligned": true,
-  "transcript": "Twelve people have asked me for this plot",
+  "transcript": "Up, Button. Grant day. Nobody signs a deed on an empty stomach",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|You are the first who looked at the ground before the view.": {
+ "hobb|I kept your basket, you know. Don't tell Dax. He'd want it for kindling.": {
   "ids": [
-   "tamsin.meet.1"
+   "scene.1.3"
   ],
-  "file": "voice/tamsin/8e23f2162ac2.mp3",
-  "hash": "8e23f2162ac2",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/hobb/31a470455b63.mp3",
+  "hash": "31a470455b63",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
   "model": "eleven_v4_turbo",
-  "say": "You are the first who looked at the ground before the view.",
-  "chars": 59,
-  "seconds": 3.6,
-  "pitchHz": 188,
-  "aligned": true,
-  "transcript": "You are the first who looked at the ground before the view",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Take the book. It has been blank for forty years.": {
-  "ids": [
-   "tamsin.meet.2"
-  ],
-  "file": "voice/tamsin/48a1a41158bc.mp3",
-  "hash": "48a1a41158bc",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Take the book. It has been blank for forty years.",
-  "chars": 49,
-  "seconds": 3.92,
-  "pitchHz": 216,
-  "aligned": true,
-  "transcript": "Take the book. It has been blank for forty years.",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|I only ever looked at things to price them.": {
-  "ids": [
-   "tamsin.meet.3"
-  ],
-  "file": "voice/tamsin/da60e435f2e5.mp3",
-  "hash": "da60e435f2e5",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "I only ever looked at things to price them.",
-  "chars": 43,
-  "seconds": 2.72,
-  "pitchHz": 222,
-  "aligned": true,
-  "transcript": "I only ever looked at things to price them",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Mosslings keep the rocks by the pond. Sit near one and write down what you see.": {
-  "ids": [
-   "tamsin.meet.5"
-  ],
-  "file": "voice/tamsin/0884e61c8fbc.mp3",
-  "hash": "0884e61c8fbc",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Mosslings keep the rocks by the pond. Sit near one and write down what you see.",
-  "chars": 79,
-  "seconds": 5.6,
+  "say": "I kept your basket, you know. Don't tell Dax. He'd want it for kindling.",
+  "chars": 72,
+  "seconds": 4.32,
   "pitchHz": 195,
   "aligned": true,
-  "transcript": "Mosslings keep the rocks by the pond. Sit near one and write down what you see",
+  "transcript": "I kept your basket, you know. Don't tell Dax. He'd want it for kindling",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Two columns. What it needs, and what it gives. Fill both.": {
+ "hobb|Sixteen years you've been staring at that wall. Never the nice bits. Always the damp.": {
   "ids": [
-   "tamsin.meet.6"
+   "scene.1.2"
   ],
-  "file": "voice/tamsin/f5d5d74ee45b.mp3",
-  "hash": "f5d5d74ee45b",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/hobb/599757decac6.mp3",
+  "hash": "599757decac6",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
   "model": "eleven_v4_turbo",
-  "say": "Two columns. What it needs, and what it gives. Fill both.",
-  "chars": 57,
-  "seconds": 5.28,
-  "pitchHz": 193,
+  "say": "Sixteen years you've been staring at that wall. Never the nice bits. Always the damp.",
+  "chars": 85,
+  "seconds": 6.24,
+  "pitchHz": 195,
   "aligned": true,
-  "transcript": "Two columns: what it needs and what it gives. Fill both",
+  "transcript": "16 years you've been staring at that wall. Never the nice bits, always the damp",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|And an axe. You will want a roof before you want anything else.": {
+ "dax|Cellar. Sea chest. Older than the hall.": {
   "ids": [
-   "tamsin.meet.7"
+   "scene.2.1"
   ],
-  "file": "voice/tamsin/08e70b7adb1f.mp3",
-  "hash": "08e70b7adb1f",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/dax/18226a08f0f1.mp3",
+  "hash": "18226a08f0f1",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
   "model": "eleven_v4_turbo",
-  "say": "[chuckles] And an axe. You will want a roof before you want anything else.",
-  "chars": 74,
-  "seconds": 5.44,
-  "pitchHz": 211,
-  "aligned": true,
-  "transcript": "[chuckles] And an axe. You will want a roof before you want anything else",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|That is the advice. It weighs more than the axe.": {
-  "ids": [
-   "tamsin.meet.8"
-  ],
-  "file": "voice/tamsin/68e271db9438.mp3",
-  "hash": "68e271db9438",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "That is the advice. It weighs more than the axe.",
-  "chars": 48,
+  "say": "Cellar. Sea chest. Older than the hall.",
+  "chars": 39,
   "seconds": 3.76,
-  "pitchHz": 195,
+  "pitchHz": 113,
   "aligned": true,
-  "transcript": "That is the advice. It weighs more than the axe",
+  "transcript": "Cellar, sea chest. Older than the hall",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Good harvest. Small, and good.": {
+ "hobb|Porridge. All of it. Then go and find Dax. He's been at the lock table since dawn.": {
   "ids": [
-   "tamsin.end.0"
+   "scene.1.4"
   ],
-  "file": "voice/tamsin/6ebed4b5fe5b.mp3",
-  "hash": "6ebed4b5fe5b",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/hobb/3245734542e9.mp3",
+  "hash": "3245734542e9",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
   "model": "eleven_v4_turbo",
-  "say": "Good harvest. Small, and good.",
-  "chars": 30,
-  "seconds": 3.2,
-  "pitchHz": 208,
+  "say": "Porridge. All of it. Then go and find Dax. He's been at the lock table since dawn.",
+  "chars": 82,
+  "seconds": 5.76,
+  "pitchHz": 213,
   "aligned": true,
-  "transcript": "Good harvest, small and good",
+  "transcript": "Porridge, all of it. Then go and find Dax. He's been at the lock table since dawn",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|(looking west) Evening came early again. A little sooner every week.": {
+ "dax|(chalking a cross on the lid) That's all of them, then.": {
   "ids": [
-   "tamsin.end.1"
+   "scene.2.4"
   ],
-  "file": "voice/tamsin/e178520bc4dd.mp3",
-  "hash": "e178520bc4dd",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/dax/3d1f7d11bd4f.mp3",
+  "hash": "3d1f7d11bd4f",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
   "model": "eleven_v4_turbo",
-  "say": "[quietly] Evening came early again. A little sooner every week.",
-  "chars": 63,
-  "seconds": 4.08,
-  "pitchHz": 180,
-  "aligned": true,
-  "transcript": "Evening came early again a little sooner every week",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Go on. Float your lamp.": {
-  "ids": [
-   "tamsin.end.2"
-  ],
-  "file": "voice/tamsin/d443ea458823.mp3",
-  "hash": "d443ea458823",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Go on. Float your lamp.",
-  "chars": 23,
-  "seconds": 2,
-  "pitchHz": 246,
-  "aligned": true,
-  "transcript": "Go on, float your lamp",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|No axe. I will not ask where it went.": {
-  "ids": [
-   "tamsin.axe.0"
-  ],
-  "file": "voice/tamsin/0d485f3a891f.mp3",
-  "hash": "0d485f3a891f",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "No axe. I will not ask where it went.",
-  "chars": 37,
-  "seconds": 3.36,
-  "pitchHz": 186,
-  "aligned": true,
-  "transcript": "No axe. I will not ask where it went",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|(taking another from her belt) This one has a notch. So you will know it.": {
-  "ids": [
-   "tamsin.axe.1"
-  ],
-  "file": "voice/tamsin/927ee9b1a174.mp3",
-  "hash": "927ee9b1a174",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "This one has a notch. So you will know it.",
-  "chars": 42,
-  "seconds": 3.28,
-  "pitchHz": 211,
-  "aligned": true,
-  "transcript": "This one has a notch, so you will know it",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Both columns. Let me see.": {
-  "ids": [
-   "tamsin.tell.0"
-  ],
-  "file": "voice/tamsin/81e9f25871f6.mp3",
-  "hash": "81e9f25871f6",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Both columns. Let me see.",
+  "say": "That's all of them, then.",
   "chars": 25,
-  "seconds": 2.72,
-  "pitchHz": 198,
+  "seconds": 1.52,
+  "pitchHz": 88,
   "aligned": true,
-  "transcript": "Both columns. Let me see",
+  "transcript": "That's all of them, then",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Shade and mossy stone. And it pays in moss, where the ground is damp.": {
+ "dax|Last lock in Saltgate you haven't tried.": {
   "ids": [
-   "tamsin.tell.1"
+   "scene.2.2"
   ],
-  "file": "voice/tamsin/16889ca1b111.mp3",
-  "hash": "16889ca1b111",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/dax/b39edc24648e.mp3",
+  "hash": "b39edc24648e",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
   "model": "eleven_v4_turbo",
-  "say": "Shade and mossy stone. And it pays in moss, where the ground is damp.",
-  "chars": 69,
-  "seconds": 5.68,
-  "pitchHz": 193,
+  "say": "Last lock in Saltgate you haven't tried.",
+  "chars": 40,
+  "seconds": 2.64,
+  "pitchHz": 104,
   "aligned": true,
-  "transcript": "Shade and mossy stone, and it pays in moss where the ground is damp",
+  "transcript": "Last lock in Saltgate you haven't tried",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Forty years I walked past them. I never asked what they wanted.": {
+ "dax|So it opens something that isn't here. Good thing you're leaving.": {
   "ids": [
-   "tamsin.tell.2"
+   "scene.2.5"
   ],
-  "file": "voice/tamsin/3f1269438207.mp3",
-  "hash": "3f1269438207",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/dax/aaf793bdaac7.mp3",
+  "hash": "aaf793bdaac7",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
   "model": "eleven_v4_turbo",
-  "say": "Forty years I walked past them. I never asked what they wanted.",
-  "chars": 63,
-  "seconds": 4.96,
-  "pitchHz": 178,
+  "say": "So it opens something that isn't here. Good thing you're leaving.",
+  "chars": 65,
+  "seconds": 4.24,
+  "pitchHz": 120,
   "aligned": true,
-  "transcript": "Forty years I walked past them. I never asked what they wanted.",
+  "transcript": "So it opens something that isn't here. Good thing you're leaving",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Most things out here have two columns. The book has room.": {
+ "mina|Plot forty-one. Greenhollow, south of Hollowmere. I looked it up before you asked.": {
   "ids": [
-   "tamsin.tell.3"
+   "scene.3.0"
   ],
-  "file": "voice/tamsin/47bfccd14933.mp3",
-  "hash": "47bfccd14933",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/mina/4666517993a1.mp3",
+  "hash": "4666517993a1",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
   "model": "eleven_v4_turbo",
-  "say": "Most things out here have two columns. The book has room.",
-  "chars": 57,
-  "seconds": 4.32,
-  "pitchHz": 198,
+  "say": "Plot forty-one. Greenhollow, south of Hollowmere. I looked it up before you asked.",
+  "chars": 82,
+  "seconds": 6.24,
+  "pitchHz": 235,
   "aligned": true,
-  "transcript": "Most things out here have two columns. The book has room",
-  "heard": 1,
+  "transcript": "Plot 41, Green Hollow, south of Hollowmere. I looked it up before you asked",
+  "heard": 0.929,
   "tagsReadOut": []
  },
- "tamsin|Now. The sun is moving. Cut wood, raise a roof, make a bed. Sleep under it.": {
+ "mina|One dry field, one pond, and a sealed door in the hill. Nobody's ever opened one of those. Anywhere.": {
   "ids": [
-   "tamsin.tell.4"
+   "scene.3.1"
   ],
-  "file": "voice/tamsin/487db805add5.mp3",
-  "hash": "487db805add5",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/mina/590157508f8d.mp3",
+  "hash": "590157508f8d",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
   "model": "eleven_v4_turbo",
-  "say": "Now. The sun is moving. Cut wood, raise a roof, make a bed. Sleep under it.",
-  "chars": 75,
-  "seconds": 7.12,
-  "pitchHz": 200,
-  "aligned": true,
-  "transcript": "Now, the sun is moving. Cut wood, raise a roof, make a bed, sleep under it",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|There is a dead garden off the path. Something still tends it. Go gently, tomorrow.": {
-  "ids": [
-   "tamsin.tell.5"
-  ],
-  "file": "voice/tamsin/ae32ebdde238.mp3",
-  "hash": "ae32ebdde238",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "There is a dead garden off the path. Something still tends it. Go gently, tomorrow.",
-  "chars": 83,
-  "seconds": 6.48,
-  "pitchHz": 193,
-  "aligned": true,
-  "transcript": "There is a dead garden off the path. Something still tends it. Go gently tomorrow",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|I keep the lodge in Hollowmere. Follow the path when you have slept.": {
-  "ids": [
-   "tamsin.tell.6"
-  ],
-  "file": "voice/tamsin/c047a8974c6d.mp3",
-  "hash": "c047a8974c6d",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "I keep the lodge in Hollowmere. Follow the path when you have slept.",
-  "chars": 68,
-  "seconds": 4.32,
-  "pitchHz": 184,
-  "aligned": true,
-  "transcript": "I keep the lodge in Hollowmere. Follow the path when you have slept",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|(looking down) So that is what kept the old garden.": {
-  "ids": [
-   "tamsin.show.0"
-  ],
-  "file": "voice/tamsin/59187960eb25.mp3",
-  "hash": "59187960eb25",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "So that is what kept the old garden.",
-  "chars": 36,
-  "seconds": 2.8,
-  "pitchHz": 186,
-  "aligned": true,
-  "transcript": "So that is what kept the old garden",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|You fed it first. I would have set a snare and priced the tail.": {
-  "ids": [
-   "tamsin.show.1"
-  ],
-  "file": "voice/tamsin/b2a94a1dafa5.mp3",
-  "hash": "b2a94a1dafa5",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "You fed it first. I would have set a snare and priced the tail.",
-  "chars": 63,
-  "seconds": 4.64,
-  "pitchHz": 208,
-  "aligned": true,
-  "transcript": "You fed it first. I would have set a snare and priced the tail",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Take it to Wren at the kennel. She talks to animals first. Do not take offence.": {
-  "ids": [
-   "tamsin.show.2"
-  ],
-  "file": "voice/tamsin/0f15b8960795.mp3",
-  "hash": "0f15b8960795",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Take it to Wren at the kennel. She talks to animals first. Do not take offence.",
-  "chars": 79,
-  "seconds": 5.6,
-  "pitchHz": 195,
-  "aligned": true,
-  "transcript": "Take it to Ren at the kennel. She talks to animals first. Do not take offense",
-  "heard": 0.875,
-  "tagsReadOut": []
- },
- "tamsin|Then the granary. The queen is short of wheat and shorter of sleep.": {
-  "ids": [
-   "tamsin.show.3"
-  ],
-  "file": "voice/tamsin/289c16950aa8.mp3",
-  "hash": "289c16950aa8",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Then the granary. The queen is short of wheat and shorter of sleep.",
-  "chars": 67,
-  "seconds": 5.2,
-  "pitchHz": 200,
-  "aligned": true,
-  "transcript": "Then the granary. The queen is short of wheat and shorter of sleep",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|You have the look of someone followed. Where is it?": {
-  "ids": [
-   "tamsin.show.alone.0"
-  ],
-  "file": "voice/tamsin/b80b76fc4a36.mp3",
-  "hash": "b80b76fc4a36",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "You have the look of someone followed. Where is it?",
-  "chars": 51,
-  "seconds": 3.52,
-  "pitchHz": 219,
-  "aligned": true,
-  "transcript": "You have the look of someone followed. Where is it?",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Fetch it. I would like to see what chose you.": {
-  "ids": [
-   "tamsin.show.alone.1"
-  ],
-  "file": "voice/tamsin/1573f997b9ac.mp3",
-  "hash": "1573f997b9ac",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Fetch it. I would like to see what chose you.",
-  "chars": 45,
-  "seconds": 3.12,
+  "say": "One dry field, one pond, and a sealed door in the hill. Nobody's ever opened one of those. Anywhere.",
+  "chars": 100,
+  "seconds": 8,
   "pitchHz": 229,
   "aligned": true,
-  "transcript": "Fetch it. I would like to see what chose you",
+  "transcript": "One dry field, one pond, and a sealed door in the hill. Nobody's ever opened one of those, anywhere",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Odo has a lamp for you. He will introduce you to a loaf first. Bear it.": {
+ "mina|(looking round at last) Write to me if the door does anything. It will not. Write anyway.": {
   "ids": [
-   "tamsin.festival.0"
+   "scene.3.3"
   ],
-  "file": "voice/tamsin/5a321e646234.mp3",
-  "hash": "5a321e646234",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/mina/062b49e37dd8.mp3",
+  "hash": "062b49e37dd8",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
   "model": "eleven_v4_turbo",
-  "say": "Odo has a lamp for you. He will introduce you to a loaf first. Bear it.",
-  "chars": 71,
-  "seconds": 5.52,
-  "pitchHz": 216,
-  "aligned": true,
-  "transcript": "Odo has a lamp for you. He will introduce you to a loaf first. Bear it",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|(nodding at the water) Lamps go on the river. Not in the pocket.": {
-  "ids": [
-   "tamsin.festival.1"
-  ],
-  "file": "voice/tamsin/37bf0d4718ab.mp3",
-  "hash": "37bf0d4718ab",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Lamps go on the river. Not in the pocket.",
-  "chars": 41,
-  "seconds": 3.12,
-  "pitchHz": 213,
-  "aligned": true,
-  "transcript": "Lamps go on the river, not in the pocket",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Festival tonight. I am told to wear the good coat. I own one coat.": {
-  "ids": [
-   "tamsin.tonight.0"
-  ],
-  "file": "voice/tamsin/4b7c45234a3f.mp3",
-  "hash": "4b7c45234a3f",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Festival tonight. I am told to wear the good coat. I own one coat.",
-  "chars": 66,
-  "seconds": 5.52,
-  "pitchHz": 203,
-  "aligned": true,
-  "transcript": "Festival tonight. I am told to wear the good coat. I own one coat",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Be on the bank at dusk.": {
-  "ids": [
-   "tamsin.tonight.1"
-  ],
-  "file": "voice/tamsin/8e0495700a75.mp3",
-  "hash": "8e0495700a75",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Be on the bank at dusk.",
-  "chars": 23,
-  "seconds": 2,
-  "pitchHz": 235,
-  "aligned": true,
-  "transcript": "Be on the bank at dusk",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|(palm out) Forty years underground. I never once got rained on. Stand in it.": {
-  "ids": [
-   "tamsin.rain.0"
-  ],
-  "file": "voice/tamsin/ab9e438aedd5.mp3",
-  "hash": "ab9e438aedd5",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Forty years underground. I never once got rained on. Stand in it.",
+  "say": "Write to me if the door does anything. It will not. Write anyway.",
   "chars": 65,
-  "seconds": 5.6,
-  "pitchHz": 203,
+  "seconds": 4.32,
+  "pitchHz": 219,
   "aligned": true,
-  "transcript": "40 years underground. I never once got rained on. Stand in it",
+  "transcript": "Write to me if the door does anything. It will not. Write anyway",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|(to the leaftail) Still following? Good judge.": {
+ "mina|And look. Last year's survey has the wood north of you green. This year's has it grey. I don't know why yet.": {
   "ids": [
-   "tamsin.pet.0"
+   "scene.3.2"
   ],
-  "file": "voice/tamsin/74f76033035c.mp3",
-  "hash": "74f76033035c",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/mina/27b1e652b6c7.mp3",
+  "hash": "27b1e652b6c7",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
   "model": "eleven_v4_turbo",
-  "say": "Still following? Good judge.",
-  "chars": 28,
-  "seconds": 2.24,
-  "pitchHz": 232,
+  "say": "And look. Last year's survey has the wood north of you green. This year's has it grey. I don't know why yet.",
+  "chars": 108,
+  "seconds": 7.6,
+  "pitchHz": 262,
   "aligned": true,
-  "transcript": "Still following? Good judge",
+  "transcript": "And look, last year's survey has the wood north of you green. This year's has it gray. I don't know why yet",
+  "heard": 0.955,
+  "tagsReadOut": []
+ },
+ "dax|(shaking out his arm) Fine. You'll do.": {
+  "ids": [
+   "scene.4.2",
+   "grantday.bout.0"
+  ],
+  "file": "voice/dax/b3c20ba38b68.mp3",
+  "hash": "b3c20ba38b68",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Fine. You'll do.",
+  "chars": 16,
+  "seconds": 1.68,
+  "pitchHz": 83,
+  "aligned": true,
+  "transcript": "Fine, you'll do",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Has it brought you a seed yet? It will. Nobody asked it to.": {
+ "dax|Go on. Hit me. Not the face. Hobb counts my teeth.": {
   "ids": [
-   "tamsin.pet.1"
+   "scene.4.before.0",
+   "scene.4.0"
   ],
-  "file": "voice/tamsin/91b20c503a09.mp3",
-  "hash": "91b20c503a09",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/dax/e96168fd3edb.mp3",
+  "hash": "e96168fd3edb",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
   "model": "eleven_v4_turbo",
-  "say": "Has it brought you a seed yet? It will. Nobody asked it to.",
-  "chars": 59,
-  "seconds": 4.64,
-  "pitchHz": 242,
+  "say": "Go on. Hit me. Not the face. Hobb counts my teeth.",
+  "chars": 50,
+  "seconds": 4.56,
+  "pitchHz": 118,
   "aligned": true,
-  "transcript": "Has it brought you a seed yet? It will. Nobody asked it to",
+  "transcript": "Go on, hit me. Not the face. Hob counts my teeth",
+  "heard": 0.909,
+  "tagsReadOut": []
+ },
+ "dax|I'm coming up anyway. Once you've got a roof.": {
+  "ids": [
+   "scene.4.3",
+   "grantday.bout.1"
+  ],
+  "file": "voice/dax/10aafef71b40.mp3",
+  "hash": "10aafef71b40",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "I'm coming up anyway. Once you've got a roof.",
+  "chars": 45,
+  "seconds": 2.8,
+  "pitchHz": 106,
+  "aligned": true,
+  "transcript": "I'm coming up anyway, once you've got a roof",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|You slept under your own roof. It shows. You stand differently.": {
+ "guildmaster|Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.": {
   "ids": [
-   "tamsin.bed.0"
+   "scene.5.0"
   ],
-  "file": "voice/tamsin/c52eb860085a.mp3",
-  "hash": "c52eb860085a",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/guildmaster/a53efab1f3e4.mp3",
+  "hash": "a53efab1f3e4",
+  "voiceId": "VC6vCXhVaI8BZefRtXZV",
   "model": "eleven_v4_turbo",
-  "say": "You slept under your own roof. It shows. You stand differently.",
-  "chars": 63,
-  "seconds": 5.04,
-  "pitchHz": 216,
+  "say": "Ward of the guild, sixteen years. By right of the grant: plot forty-one, Greenhollow.",
+  "chars": 85,
+  "seconds": 6.72,
+  "pitchHz": 119,
   "aligned": true,
-  "transcript": "You slept under your own roof. It shows. You stand differently",
+  "transcript": "Ward of the Guild, sixteen years. By right of the grant, Plot forty-one, Greenhollow",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|Shade and mossy stone. Good. That is what it needs.": {
+ "hobb|(quietly, behind you) Let them laugh. They'll all come visiting once you've got a kitchen.": {
   "ids": [
-   "tamsin.watch.half.0"
+   "scene.5.3"
   ],
-  "file": "voice/tamsin/77f55681c60a.mp3",
-  "hash": "77f55681c60a",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/hobb/27b93eadc64c.mp3",
+  "hash": "27b93eadc64c",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
   "model": "eleven_v4_turbo",
-  "say": "Shade and mossy stone. Good. That is what it needs.",
-  "chars": 51,
-  "seconds": 4.64,
-  "pitchHz": 190,
-  "aligned": true,
-  "transcript": "Shade and mossy stone. Good. That is what it needs",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Now what it gives. Watch the ones on damp ground, by the pond. Be patient.": {
-  "ids": [
-   "tamsin.watch.half.1"
-  ],
-  "file": "voice/tamsin/92ed56d236ff.mp3",
-  "hash": "92ed56d236ff",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Now what it gives. Watch the ones on damp ground, by the pond. Be patient.",
-  "chars": 74,
-  "seconds": 6.24,
-  "pitchHz": 193,
-  "aligned": true,
-  "transcript": "Now what it gives. Watch the ones on damp ground by the pond. Be patient",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|The rocks, in the shade. Sit still. They will not perform for you.": {
-  "ids": [
-   "tamsin.watch.0"
-  ],
-  "file": "voice/tamsin/93b8322c7f15.mp3",
-  "hash": "93b8322c7f15",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "The rocks, in the shade. Sit still. They will not perform for you.",
-  "chars": 66,
-  "seconds": 5.04,
-  "pitchHz": 200,
-  "aligned": true,
-  "transcript": "The rocks in the shade sit still. They will not perform for you",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|(heeling a seedling into a boot print) Go on. The book is waiting.": {
-  "ids": [
-   "tamsin.watch.1"
-  ],
-  "file": "voice/tamsin/966c52e24bf5.mp3",
-  "hash": "966c52e24bf5",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Go on. The book is waiting.",
-  "chars": 27,
-  "seconds": 2.16,
-  "pitchHz": 246,
-  "aligned": true,
-  "transcript": "Go on, the book is waiting",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Oak takes an axe well. Twelve logs will do.": {
-  "ids": [
-   "tamsin.roof.wood.0"
-  ],
-  "file": "voice/tamsin/f7edb105bc27.mp3",
-  "hash": "f7edb105bc27",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Oak takes an axe well. Twelve logs will do.",
-  "chars": 43,
-  "seconds": 3.44,
-  "pitchHz": 203,
-  "aligned": true,
-  "transcript": "Oak takes an axe well. Twelve logs will do",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|(pressing an acorn into the turf) Do not mind me. Old habit.": {
-  "ids": [
-   "tamsin.roof.wood.1"
-  ],
-  "file": "voice/tamsin/2bceb3301910.mp3",
-  "hash": "2bceb3301910",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Do not mind me. Old habit.",
-  "chars": 26,
-  "seconds": 2.56,
-  "pitchHz": 172,
-  "aligned": true,
-  "transcript": "Do not mind me. Old habit",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|A bed wants planks and fiber. Fiber comes off leaves, if you keep at them.": {
-  "ids": [
-   "tamsin.roof.build.0"
-  ],
-  "file": "voice/tamsin/091ab5bb1989.mp3",
-  "hash": "091ab5bb1989",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "A bed wants planks and fiber. Fiber comes off leaves, if you keep at them.",
-  "chars": 74,
-  "seconds": 5.68,
-  "pitchHz": 200,
-  "aligned": true,
-  "transcript": "A bed wants planks and fiber. Fiber comes off leaves if you keep at them",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|And a block over the bed. Rain does not care how tired you are.": {
-  "ids": [
-   "tamsin.roof.build.1"
-  ],
-  "file": "voice/tamsin/76941f092152.mp3",
-  "hash": "76941f092152",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "And a block over the bed. Rain does not care how tired you are.",
-  "chars": 63,
-  "seconds": 4.64,
-  "pitchHz": 186,
-  "aligned": true,
-  "transcript": "And a block over the bed. Rain does not care how tired you are",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Roof is on. Then stop working. The dark is for sleeping.": {
-  "ids": [
-   "tamsin.roof.sleep.0"
-  ],
-  "file": "voice/tamsin/c1add506dd34.mp3",
-  "hash": "c1add506dd34",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Roof is on. Then stop working. The dark is for sleeping.",
-  "chars": 56,
-  "seconds": 5.2,
-  "pitchHz": 208,
-  "aligned": true,
-  "transcript": "Roof is on. Then stop working. The dark is for sleeping",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|The garden's keeper startles. Walk as if the floor were asleep.": {
-  "ids": [
-   "tamsin.leaftail.0"
-  ],
-  "file": "voice/tamsin/ba857a7d85c9.mp3",
-  "hash": "ba857a7d85c9",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "The garden's keeper startles. Walk as if the floor were asleep.",
-  "chars": 63,
-  "seconds": 4.8,
-  "pitchHz": 208,
-  "aligned": true,
-  "transcript": "The garden's keeper startles. Walk as if the floor were asleep.",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Put the berry down. Then do nothing. Do it well.": {
-  "ids": [
-   "tamsin.leaftail.1"
-  ],
-  "file": "voice/tamsin/7d28e2224b04.mp3",
-  "hash": "7d28e2224b04",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Put the berry down. Then do nothing. Do it well.",
-  "chars": 48,
-  "seconds": 4.8,
-  "pitchHz": 188,
-  "aligned": true,
-  "transcript": "Put the berry down. Then do nothing. Do it well.",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|The queen is at the granary. Wake her gently. She has earned the nap.": {
-  "ids": [
-   "tamsin.bread.early.0"
-  ],
-  "file": "voice/tamsin/6216cff9dec9.mp3",
-  "hash": "6216cff9dec9",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "The queen is at the granary. Wake her gently. She has earned the nap.",
-  "chars": 69,
-  "seconds": 5.12,
-  "pitchHz": 188,
-  "aligned": true,
-  "transcript": "The queen is at the granary. Wake her gently. She has earned the nap",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Wheat wants wet soil and patience. Only one of those comes in a can.": {
-  "ids": [
-   "tamsin.bread.grow.0"
-  ],
-  "file": "voice/tamsin/46125bc12bea.mp3",
-  "hash": "46125bc12bea",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Wheat wants wet soil and patience. Only one of those comes in a can.",
-  "chars": 68,
-  "seconds": 5.44,
-  "pitchHz": 193,
-  "aligned": true,
-  "transcript": "Wheat wants wet soil and patience. Only one of those comes in a can",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Twenty. Take them to her before she counts the sacks a third time.": {
-  "ids": [
-   "tamsin.bread.deliver.0"
-  ],
-  "file": "voice/tamsin/26d9d20142e3.mp3",
-  "hash": "26d9d20142e3",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Twenty. Take them to her before she counts the sacks a third time.",
-  "chars": 66,
-  "seconds": 4.72,
-  "pitchHz": 200,
-  "aligned": true,
-  "transcript": "Twenty. Take them to her before she counts the sacks a third time",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "tamsin|Still here. Good. The plot will want you in the morning.": {
-  "ids": [
-   "tamsin.after.0"
-  ],
-  "file": "voice/tamsin/c48170f239cf.mp3",
-  "hash": "c48170f239cf",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
-  "model": "eleven_v4_turbo",
-  "say": "Still here. Good. The plot will want you in the morning.",
-  "chars": 56,
+  "say": "[quietly] Let them laugh. They'll all come visiting once you've got a kitchen.",
+  "chars": 78,
   "seconds": 3.92,
-  "pitchHz": 180,
+  "pitchHz": 184,
   "aligned": true,
-  "transcript": "Still here? Good. The plot will want you in the morning",
+  "transcript": "Let them laugh they'll all come visiting once you've got a kitchen",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|That lamp is no use in a pocket.": {
+ "hobb|Bread, cheese, and a note on the back of your deed. Read it when you land. Not before.": {
   "ids": [
-   "tamsin.after.1"
+   "scene.6.0"
   ],
-  "file": "voice/tamsin/834be259fe5f.mp3",
-  "hash": "834be259fe5f",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/hobb/bd12467879d9.mp3",
+  "hash": "bd12467879d9",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
   "model": "eleven_v4_turbo",
-  "say": "That lamp is no use in a pocket.",
-  "chars": 32,
-  "seconds": 2.56,
-  "pitchHz": 213,
+  "say": "Bread, cheese, and a note on the back of your deed. Read it when you land. Not before.",
+  "chars": 86,
+  "seconds": 5.76,
+  "pitchHz": 208,
   "aligned": true,
-  "transcript": "That lamp is no use in a pocket",
+  "transcript": "Bread, cheese, and a note on the back of your deed. Read it when you land, not before",
   "heard": 1,
   "tagsReadOut": []
  },
- "tamsin|(pressing a seedling into a boot print) Mind where you dig. I only fill it in.": {
+ "custodian|(one eye opening) You're late.": {
   "ids": [
-   "tamsin.fallback.0"
+   "custodian.wake.2"
   ],
-  "file": "voice/tamsin/5dc71b8bc88d.mp3",
-  "hash": "5dc71b8bc88d",
-  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "file": "voice/custodian/47384da31289.mp3",
+  "hash": "47384da31289",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
   "model": "eleven_v4_turbo",
-  "say": "Mind where you dig. I only fill it in.",
+  "say": "You're late.",
+  "chars": 12,
+  "seconds": 1.28,
+  "pitchHz": 126,
+  "aligned": true,
+  "transcript": "You're late",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|(fixing your collar, which was fine) Go on, then, Button. Make it a home.": {
+  "ids": [
+   "scene.6.2"
+  ],
+  "file": "voice/hobb/f218f1fe546f.mp3",
+  "hash": "f218f1fe546f",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Go on, then, Button. Make it a home.",
+  "chars": 36,
+  "seconds": 2.24,
+  "pitchHz": 225,
+  "aligned": true,
+  "transcript": "Go on then, Button. Make it a home",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|A thousand years and sixty-one days late. I counted. There was nothing else to do.": {
+  "ids": [
+   "custodian.wake.3"
+  ],
+  "file": "voice/custodian/11d936dc4ab6.mp3",
+  "hash": "11d936dc4ab6",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "A thousand years and sixty-one days late. I counted. There was nothing else to do.",
+  "chars": 82,
+  "seconds": 6.4,
+  "pitchHz": 137,
+  "aligned": true,
+  "transcript": "A thousand years and sixty-one days late. I counted. There was nothing else to do",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Don't open any doors till I get there.": {
+  "ids": [
+   "scene.6.1"
+  ],
+  "file": "voice/dax/9b846672263e.mp3",
+  "hash": "9b846672263e",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Don't open any doors till I get there.",
   "chars": 38,
-  "seconds": 3.12,
-  "pitchHz": 219,
+  "seconds": 2.48,
+  "pitchHz": 127,
   "aligned": true,
-  "transcript": "Mind where you dig. I only fill it in",
+  "transcript": "Don't open any doors till I get there",
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|Eighteen. Nineteen. Twenty. You brought twenty.": {
+ "custodian|Hand. Show me. (a long look) Yes. That is her mark. So it is you.": {
   "ids": [
-   "maren.deliver.1"
+   "custodian.wake.4"
   ],
-  "file": "voice/maren/f9aa76176bf7.mp3",
-  "hash": "f9aa76176bf7",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "voice/custodian/7366bfcc1924.mp3",
+  "hash": "7366bfcc1924",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
   "model": "eleven_v4_turbo",
-  "say": "Eighteen. Nineteen. Twenty. You brought twenty.",
-  "chars": 47,
-  "seconds": 4.4,
-  "pitchHz": 242,
+  "say": "Hand. Show me. Yes. That is her mark. So it is you.",
+  "chars": 51,
+  "seconds": 6.4,
+  "pitchHz": 170,
   "aligned": true,
-  "transcript": "18, 19, 20. You brought 20",
+  "transcript": "Hand. Show me. Yes, that is her mark. So it is you",
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|Forty sacks and twenty sheaves. That is one more week of bread. I will take a week.": {
+ "custodian|I am the Custodian. I kept this hall for Ilara. It seems I keep it for you now.": {
   "ids": [
-   "maren.deliver.2"
+   "custodian.wake.5"
   ],
-  "file": "voice/maren/feb0ffc5488b.mp3",
-  "hash": "feb0ffc5488b",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "voice/custodian/2df42c43c5c7.mp3",
+  "hash": "2df42c43c5c7",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
   "model": "eleven_v4_turbo",
-  "say": "Forty sacks and twenty sheaves. That is one more week of bread. I will take a week.",
-  "chars": 83,
-  "seconds": 6,
-  "pitchHz": 232,
+  "say": "I am the Custodian. I kept this hall for Ilara. It seems I keep it for you now.",
+  "chars": 79,
+  "seconds": 7.44,
+  "pitchHz": 131,
   "aligned": true,
-  "transcript": "Forty sacks and twenty sheaves. That is one more week of bread. I will take a week",
+  "transcript": "I am the custodian. I kept this hall for Elara. It seems I keep it for you now",
+  "heard": 0.944,
+  "tagsReadOut": []
+ },
+ "custodian|Every roof, every field, every beast that trusts you. It all comes down here.": {
+  "ids": [
+   "heart.first.1"
+  ],
+  "file": "voice/custodian/f0f017b991af.mp3",
+  "hash": "f0f017b991af",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Every roof, every field, every beast that trusts you. It all comes down here.",
+  "chars": 77,
+  "seconds": 6.96,
+  "pitchHz": 145,
+  "aligned": true,
+  "transcript": "Every roof, every field, every beast that trusts you, it all comes down here",
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|Odo gets the first of it tonight. Come to the square at dusk.": {
+ "custodian|The fox, first. It is Blighted, not wicked. Hold out the hand.": {
   "ids": [
-   "maren.deliver.3"
+   "custodian.wake.6"
   ],
-  "file": "voice/maren/86aca5b10145.mp3",
-  "hash": "86aca5b10145",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "voice/custodian/f3b27c315950.mp3",
+  "hash": "f3b27c315950",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
   "model": "eleven_v4_turbo",
-  "say": "Odo gets the first of it tonight. Come to the square at dusk.",
-  "chars": 61,
-  "seconds": 3.84,
-  "pitchHz": 258,
+  "say": "The fox, first. It is Blighted, not wicked. Hold out the hand.",
+  "chars": 62,
+  "seconds": 5.84,
+  "pitchHz": 144,
   "aligned": true,
-  "transcript": "Odo gets the first of it tonight. Come to the square at dusk",
+  "transcript": "The fox first It is blighted, not wicked Hold out the hand",
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|That is the good meal. The thanks is this. Thank you.": {
+ "custodian|That is the Heartstone. It runs on what lives up there, on your land.": {
   "ids": [
-   "maren.deliver.4"
+   "heart.first.0"
   ],
-  "file": "voice/maren/324b7cd18891.mp3",
-  "hash": "324b7cd18891",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "voice/custodian/fc4c3123eda7.mp3",
+  "hash": "fc4c3123eda7",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
   "model": "eleven_v4_turbo",
-  "say": "That is the good meal. The thanks is this. Thank you.",
-  "chars": 53,
-  "seconds": 4.48,
-  "pitchHz": 213,
-  "aligned": true,
-  "transcript": "That is the good meal. The thanks is this. Thank you",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Then do them fast. Dusk does not wait. I have checked.": {
-  "ids": [
-   "maren.deliver.4.1.0"
-  ],
-  "file": "voice/maren/ea99998ab90e.mp3",
-  "hash": "ea99998ab90e",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Then do them fast. Dusk does not wait. I have checked.",
-  "chars": 54,
-  "seconds": 4.24,
-  "pitchHz": 235,
-  "aligned": true,
-  "transcript": "Then do them fast. Dusk does not wait. I have checked",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|(counting your sheaves) That is not twenty. Counting is the one thing I can do.": {
-  "ids": [
-   "maren.deliver.short.0"
-  ],
-  "file": "voice/maren/559735d6fce4.mp3",
-  "hash": "559735d6fce4",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "That is not twenty. Counting is the one thing I can do.",
-  "chars": 55,
-  "seconds": 4.24,
-  "pitchHz": 235,
-  "aligned": true,
-  "transcript": "That is not 20. Counting is the one thing I can do",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Come back with twenty. Gus will spot you seed if you are short.": {
-  "ids": [
-   "maren.deliver.short.1"
-  ],
-  "file": "voice/maren/d53d4bc07824.mp3",
-  "hash": "d53d4bc07824",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Come back with twenty. Gus will spot you seed if you are short.",
-  "chars": 63,
-  "seconds": 4,
-  "pitchHz": 250,
-  "aligned": true,
-  "transcript": "Come back with 20. Gus will spot you seed if you are short",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|(waking) Forty sacks. I counted twice. It is not enough, and counting again will not make it enough.": {
-  "ids": [
-   "maren.ask.1"
-  ],
-  "file": "voice/maren/0dd9f3718c3b.mp3",
-  "hash": "0dd9f3718c3b",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "[sleepily] Forty sacks. I counted twice. It is not enough, and counting again will not make it enough.",
-  "chars": 102,
-  "seconds": 7.68,
-  "pitchHz": 219,
-  "aligned": true,
-  "transcript": "Forty sacks. I counted twice. It is not enough, and counting again will not make it enough",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Twenty sheaves by the festival. I can pay you in thanks and one good meal.": {
-  "ids": [
-   "maren.ask.2"
-  ],
-  "file": "voice/maren/26f7517c35c4.mp3",
-  "hash": "26f7517c35c4",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Twenty sheaves by the festival. I can pay you in thanks and one good meal.",
-  "chars": 74,
-  "seconds": 4.96,
-  "pitchHz": 239,
-  "aligned": true,
-  "transcript": "Twenty sheaves by the festival. I can pay you in thanks and one good meal",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|You are the one on Tamsin's grant. You have a field. I have a winter.": {
-  "ids": [
-   "maren.ask.3"
-  ],
-  "file": "voice/maren/667dcfd33bc4.mp3",
-  "hash": "667dcfd33bc4",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "You are the one on Tamsin's grant. You have a field. I have a winter.",
+  "say": "That is the Heartstone. It runs on what lives up there, on your land.",
   "chars": 69,
-  "seconds": 4.96,
-  "pitchHz": 219,
+  "seconds": 5.76,
+  "pitchHz": 131,
   "aligned": true,
-  "transcript": "You are the one on Tamsin's grunt. You have a field. I have a winter",
+  "transcript": "That is the heartstone. It runs on what lives up there on your land",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Fill the stone and that arch wakes. Now sleep. You look the way the fox did.": {
+  "ids": [
+   "heart.first.5"
+  ],
+  "file": "voice/custodian/b1de9ce4611e.mp3",
+  "hash": "b1de9ce4611e",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Fill the stone and that arch wakes. Now sleep. You look the way the fox did.",
+  "chars": 76,
+  "seconds": 6.48,
+  "pitchHz": 165,
+  "aligned": true,
+  "transcript": "Fill the stone and that arch wakes. Now sleep. You look the way the fox did",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Her field book. It writes down whatever you take the trouble to watch.": {
+  "ids": [
+   "heart.first.4"
+  ],
+  "file": "voice/custodian/83fd2ab642cc.mp3",
+  "hash": "83fd2ab642cc",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Her field book. It writes down whatever you take the trouble to watch.",
+  "chars": 70,
+  "seconds": 4.72,
+  "pitchHz": 145,
+  "aligned": true,
+  "transcript": "Her field book. It writes down whatever you take the trouble to watch",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|(squinting at it) So far: one wet field and one fox. I have seen brighter puddles.": {
+  "ids": [
+   "heart.first.2"
+  ],
+  "file": "voice/custodian/ff0a768a956d.mp3",
+  "hash": "ff0a768a956d",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "So far: one wet field and one fox. I have seen brighter puddles.",
+  "chars": 64,
+  "seconds": 5.92,
+  "pitchHz": 126,
+  "aligned": true,
+  "transcript": "So far, one wet field and one fox. I have seen brighter puddles",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Do not ask me yet. I lost most of it. I only know that I am angry.": {
+  "ids": [
+   "hall.mural.asked.2"
+  ],
+  "file": "voice/custodian/4ece9fd37f83.mp3",
+  "hash": "4ece9fd37f83",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Do not ask me yet. I lost most of it. I only know that I am angry.",
+  "chars": 66,
+  "seconds": 6.8,
+  "pitchHz": 144,
+  "aligned": true,
+  "transcript": "Do not ask me yet. I lost most of it. I only know that I am angry",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|(looking at your hand) So it opened. I've walked past that door for years.": {
+  "ids": [
+   "scene.15.2"
+  ],
+  "file": "voice/tamsin/93bbfabf7576.mp3",
+  "hash": "93bbfabf7576",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "So it opened. I've walked past that door for years.",
+  "chars": 51,
+  "seconds": 4.32,
+  "pitchHz": 208,
+  "aligned": true,
+  "transcript": "So it opened. I've walked past that door for years",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|A Gate. It is dead. Fill the stone and it wakes. Then it goes somewhere.": {
+  "ids": [
+   "hall.gate.asked.1"
+  ],
+  "file": "voice/custodian/e4e87d527fd3.mp3",
+  "hash": "e4e87d527fd3",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "A Gate. It is dead. Fill the stone and it wakes. Then it goes somewhere.",
+  "chars": 72,
+  "seconds": 7.36,
+  "pitchHz": 133,
+  "aligned": true,
+  "transcript": "A gate. It is dead. Thrill the stone and it wakes. Then it goes somewhere",
   "heard": 0.933,
   "tagsReadOut": []
  },
- "maren|Gus has seed. Tell him I said please. He likes that.": {
+ "tamsin|Tamsin. The guild's warden here. I signed your grant. I should have met your boat.": {
   "ids": [
-   "maren.ask.3.0.0"
+   "scene.15.3"
   ],
-  "file": "voice/maren/172d530f92b2.mp3",
-  "hash": "172d530f92b2",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "voice/tamsin/e76679a7320a.mp3",
+  "hash": "e76679a7320a",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
   "model": "eleven_v4_turbo",
-  "say": "Gus has seed. Tell him I said please. He likes that.",
-  "chars": 52,
-  "seconds": 4.08,
-  "pitchHz": 246,
+  "say": "Tamsin. The guild's warden here. I signed your grant. I should have met your boat.",
+  "chars": 82,
+  "seconds": 5.84,
+  "pitchHz": 222,
   "aligned": true,
-  "transcript": "Gus has seed. Tell him I said please. He likes that",
+  "transcript": "Tamsin, the guild's warden here. I signed your grant. I should have met your boat",
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|Same fields, same hands, thinner sacks. Gus says the soil is tired.": {
+ "tamsin|Why? Later.": {
   "ids": [
-   "maren.ask.3.1.0"
+   "scene.15.7"
   ],
-  "file": "voice/maren/fe9f1d3854fc.mp3",
-  "hash": "fe9f1d3854fc",
+  "file": "voice/tamsin/0b518164feac.mp3",
+  "hash": "0b518164feac",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Why? Later.",
+  "chars": 11,
+  "seconds": 1.84,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "Why? Later",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Wear it. In town, and above all near the priests of the Dawn.": {
+  "ids": [
+   "scene.15.5"
+  ],
+  "file": "voice/tamsin/70431fba2386.mp3",
+  "hash": "70431fba2386",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Wear it. In town, and above all near the priests of the Dawn.",
+  "chars": 61,
+  "seconds": 4.8,
+  "pitchHz": 190,
+  "aligned": true,
+  "transcript": "Wear it in town and above all, near the Priests of the Dawn",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|(watching the white coat go) Not that it'll help. He'll be at his bell by now.": {
+  "ids": [
+   "scene.15.6"
+  ],
+  "file": "voice/tamsin/66e65458b048.mp3",
+  "hash": "66e65458b048",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "[dryly] Not that it'll help. He'll be at his bell by now.",
+  "chars": 57,
+  "seconds": 3.6,
+  "pitchHz": 174,
+  "aligned": true,
+  "transcript": "Not that it'll help. He'll be at his bell by now",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "aldric|(out of breath) Is it true? No. Do not show me. She is coming herself.": {
+  "ids": [
+   "scene.16.0"
+  ],
+  "file": "voice/aldric/8e76d29ec64c.mp3",
+  "hash": "8e76d29ec64c",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
+  "model": "eleven_v4_turbo",
+  "say": "[out of breath] Is it true? No. Do not show me. She is coming herself.",
+  "chars": 70,
+  "seconds": 4.72,
+  "pitchHz": 200,
+  "aligned": true,
+  "transcript": "Is it true no do not show me she is coming herself",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|(to you) May I see it? You may say no. People forget they may say no to me.": {
+  "ids": [
+   "scene.16.3"
+  ],
+  "file": "voice/elowen/d6369dfa655c.mp3",
+  "hash": "d6369dfa655c",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "May I see it? You may say no. People forget they may say no to me.",
+  "chars": 66,
+  "seconds": 5.28,
+  "pitchHz": 208,
+  "aligned": true,
+  "transcript": "May I see it? You may say no. People forget they may say no to me",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|Up, up. The grass is wet. You will all catch cold, and then who nurses you? I do.": {
+  "ids": [
+   "scene.16.2"
+  ],
+  "file": "voice/elowen/d729419831b9.mp3",
+  "hash": "d729419831b9",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Up, up. The grass is wet. You will all catch cold, and then who nurses you? I do.",
+  "chars": 81,
+  "seconds": 7.36,
+  "pitchHz": 291,
+  "aligned": true,
+  "transcript": "Up, up! The grass is wet. You will all catch cold, and then who nurses you? I do",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|Forgive me. We have waited a very long time for that hand. All of us.": {
+  "ids": [
+   "scene.16.5"
+  ],
+  "file": "voice/elowen/f558a3bebd82.mp3",
+  "hash": "f558a3bebd82",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Forgive me. We have waited a very long time for that hand. All of us.",
+  "chars": 69,
+  "seconds": 6.24,
+  "pitchHz": 176,
+  "aligned": true,
+  "transcript": "Forgive me. We have waited a very long time for that hand, all of us",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|Set it in your field. Three crops where you now get one, and nothing to wind or mend.": {
+  "ids": [
+   "scene.16.7"
+  ],
+  "file": "voice/elowen/468122e0246f.mp3",
+  "hash": "468122e0246f",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Set it in your field. Three crops where you now get one, and nothing to wind or mend.",
+  "chars": 85,
+  "seconds": 6.88,
+  "pitchHz": 200,
+  "aligned": true,
+  "transcript": "Set it in your field, three crops where you now get one and nothing to wind or mend",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|And this is Calla. She is cleverer than she is gentle. Forgive her that.": {
+  "ids": [
+   "scene.16.8"
+  ],
+  "file": "voice/elowen/7d3fc7cd40bb.mp3",
+  "hash": "7d3fc7cd40bb",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "And this is Calla. She is cleverer than she is gentle. Forgive her that.",
+  "chars": 72,
+  "seconds": 5.52,
+  "pitchHz": 151,
+  "aligned": true,
+  "transcript": "And this is Calla. She is cleverer than she is gentle. Forgive her that",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|(not looking at Tamsin) I know these hills, Mother. I was taught well. For a while.": {
+  "ids": [
+   "scene.16.9"
+  ],
+  "file": "voice/calla/cebf7bf2b6e3.mp3",
+  "hash": "cebf7bf2b6e3",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "I know these hills, Mother. I was taught well. For a while.",
+  "chars": 59,
+  "seconds": 4.48,
+  "pitchHz": 178,
+  "aligned": true,
+  "transcript": "I know these hills, Mother. I was taught well, for a while",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|A god sleeps under the old terraces. Wake it when you are ready, and not before.": {
+  "ids": [
+   "scene.16.10"
+  ],
+  "file": "voice/elowen/d90ec15f1e36.mp3",
+  "hash": "d90ec15f1e36",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "A god sleeps under the old terraces. Wake it when you are ready, and not before.",
+  "chars": 80,
+  "seconds": 6.56,
+  "pitchHz": 165,
+  "aligned": true,
+  "transcript": "A god sleeps under the old terraces. Wake it when you are ready and not before",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|Then this valley will be well again. And then we shall talk, you and I.": {
+  "ids": [
+   "scene.16.11"
+  ],
+  "file": "voice/elowen/dcfc1833464a.mp3",
+  "hash": "dcfc1833464a",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Then this valley will be well again. And then we shall talk, you and I.",
+  "chars": 71,
+  "seconds": 5.2,
+  "pitchHz": 198,
+  "aligned": true,
+  "transcript": "Then this valley will be well again, and then we shall talk, you and I",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|She was here. The old woman. I could smell her through the stone.": {
+  "ids": [
+   "scene.17.0"
+  ],
+  "file": "voice/custodian/8e937b831f11.mp3",
+  "hash": "8e937b831f11",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "She was here. The old woman. I could smell her through the stone.",
+  "chars": 65,
+  "seconds": 5.84,
+  "pitchHz": 132,
+  "aligned": true,
+  "transcript": "She was here, the old woman. I could smell her through the stone",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|That thing in your field hums. Nothing honest hums. Look at the stone.": {
+  "ids": [
+   "scene.17.2"
+  ],
+  "file": "voice/custodian/be167c05cbd9.mp3",
+  "hash": "be167c05cbd9",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "That thing in your field hums. Nothing honest hums. Look at the stone.",
+  "chars": 70,
+  "seconds": 6,
+  "pitchHz": 195,
+  "aligned": true,
+  "transcript": "That thing in your field hums. Nothing honest hums. Look at the stone",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|She smells like the old days. I do not know why that makes me want to bite.": {
+  "ids": [
+   "scene.17.1"
+  ],
+  "file": "voice/custodian/17cb48f995c2.mp3",
+  "hash": "17cb48f995c2",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "She smells like the old days. I do not know why that makes me want to bite.",
+  "chars": 75,
+  "seconds": 5.92,
+  "pitchHz": 129,
+  "aligned": true,
+  "transcript": "She smells like the old days. I do not know why that makes me want to bite",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|You left her gift in its crate. Good. I cannot tell you why. Good.": {
+  "ids": [
+   "scene.17.4"
+  ],
+  "file": "voice/custodian/db429857edfd.mp3",
+  "hash": "db429857edfd",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "You left her gift in its crate. Good. I cannot tell you why. Good.",
+  "chars": 66,
+  "seconds": 5.92,
+  "pitchHz": 136,
+  "aligned": true,
+  "transcript": "You left her gift in its crate. Good. I cannot tell you why. Good",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|I am coming with you. In the pack. I have sat on that plinth long enough.": {
+  "ids": [
+   "scene.17.5"
+  ],
+  "file": "voice/custodian/7908c7737373.mp3",
+  "hash": "7908c7737373",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "I am coming with you. In the pack. I have sat on that plinth long enough.",
+  "chars": 73,
+  "seconds": 5.52,
+  "pitchHz": 150,
+  "aligned": true,
+  "transcript": "I am coming with you in the pack. I have sat on that plinth long enough",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|(setting the crate down) She did. Every mile of the river.": {
+  "ids": [
+   "scene.18.1"
+  ],
+  "file": "voice/dax/5cc3618a2c78.mp3",
+  "hash": "5cc3618a2c78",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "She did. Every mile of the river.",
+  "chars": 33,
+  "seconds": 2.96,
+  "pitchHz": 105,
+  "aligned": true,
+  "transcript": "She did, every mile of the river",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|A miracle, they tell me. Miracles still eat breakfast. Where is your kitchen?": {
+  "ids": [
+   "scene.18.2"
+  ],
+  "file": "voice/hobb/19def992a989.mp3",
+  "hash": "19def992a989",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "A miracle, they tell me. Miracles still eat breakfast. Where is your kitchen?",
+  "chars": 77,
+  "seconds": 5.36,
+  "pitchHz": 216,
+  "aligned": true,
+  "transcript": "A miracle, they tell me. Miracles still eat breakfast. Where is your kitchen?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|No kitchen. (rolling up her sleeves) Dax. The big pot.": {
+  "ids": [
+   "scene.18.4"
+  ],
+  "file": "voice/hobb/9686884abadf.mp3",
+  "hash": "9686884abadf",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "No kitchen. Dax. The big pot.",
+  "chars": 29,
+  "seconds": 3.44,
+  "pitchHz": 219,
+  "aligned": true,
+  "transcript": "No kitchen. Dax, the big pot",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|There you are, Button. Thin as a rake. I knew it. I said so to Dax.": {
+  "ids": [
+   "scene.18.0"
+  ],
+  "file": "voice/hobb/f60454f0f5f9.mp3",
+  "hash": "f60454f0f5f9",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "There you are, Button. Thin as a rake. I knew it. I said so to Dax.",
+  "chars": 67,
+  "seconds": 5.28,
+  "pitchHz": 262,
+  "aligned": true,
+  "transcript": "There you are, Button. Thin as a rake. I knew it. I said so to Dax",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|I'll sleep by the gate. Somebody should.": {
+  "ids": [
+   "scene.18.5"
+  ],
+  "file": "voice/dax/ac57ffe67363.mp3",
+  "hash": "ac57ffe67363",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "I'll sleep by the gate. Somebody should.",
+  "chars": 40,
+  "seconds": 2.56,
+  "pitchHz": 111,
+  "aligned": true,
+  "transcript": "I'll sleep by the gate. Somebody should",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|A meal a day for everyone on this hill. That's what a kitchen's for.": {
+  "ids": [
+   "took.hobb.kitchen.0"
+  ],
+  "file": "voice/hobb/2b04e02424cd.mp3",
+  "hash": "2b04e02424cd",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "A meal a day for everyone on this hill. That's what a kitchen's for.",
+  "chars": 68,
+  "seconds": 4.24,
+  "pitchHz": 203,
+  "aligned": true,
+  "transcript": "A meal a day for everyone on this hill. That's what a kitchen's for",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Gate. Fence. Road. Fine.": {
+  "ids": [
+   "took.dax.watch.0"
+  ],
+  "file": "voice/dax/7ff1afe4fd25.mp3",
+  "hash": "7ff1afe4fd25",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Gate. Fence. Road. Fine.",
+  "chars": 24,
+  "seconds": 3.76,
+  "pitchHz": 84,
+  "aligned": true,
+  "transcript": "Gate, fence, road, fine",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Carry things from there to there. Fine.": {
+  "ids": [
+   "took.dax.yard.0"
+  ],
+  "file": "voice/dax/efc821eb64aa.mp3",
+  "hash": "efc821eb64aa",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Carry things from there to there. Fine.",
+  "chars": 39,
+  "seconds": 2.88,
+  "pitchHz": 112,
+  "aligned": true,
+  "transcript": "Carry things from there to there. Fine",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Meals that keep for the road. So you're planning on going somewhere.": {
+  "ids": [
+   "took.hobb.smokehouse.0"
+  ],
+  "file": "voice/hobb/0e2babf574e6.mp3",
+  "hash": "0e2babf574e6",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Meals that keep for the road. So you're planning on going somewhere.",
+  "chars": 68,
+  "seconds": 4.32,
+  "pitchHz": 262,
+  "aligned": true,
+  "transcript": "Meals that keep for the road. So you're planning on going somewhere?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Huh. (a pause) It's staying, isn't it.": {
+  "ids": [
+   "scene.19.1"
+  ],
+  "file": "voice/dax/1b88c53e6eb6.mp3",
+  "hash": "1b88c53e6eb6",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Huh. It's staying, isn't it.",
+  "chars": 28,
+  "seconds": 2.48,
+  "pitchHz": 96,
+  "aligned": true,
+  "transcript": "Huh. It's staying, isn't it?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Does that work on Hobb?": {
+  "ids": [
+   "scene.19.2"
+  ],
+  "file": "voice/dax/b011a5da56d9.mp3",
+  "hash": "b011a5da56d9",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Does that work on Hobb?",
+  "chars": 23,
+  "seconds": 1.6,
+  "pitchHz": 152,
+  "aligned": true,
+  "transcript": "Does that work on Hob?",
+  "heard": 0.8,
+  "tagsReadOut": []
+ },
+ "dax|(the crate's lid up, like a shield) I will hold it. You do the hand.": {
+  "ids": [
+   "scene.19.before.1"
+  ],
+  "file": "voice/dax/7b21f1da6562.mp3",
+  "hash": "7b21f1da6562",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "I will hold it. You do the hand.",
+  "chars": 32,
+  "seconds": 2.32,
+  "pitchHz": 116,
+  "aligned": true,
+  "transcript": "I will hold it. You do the hand",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|(softly, to the trees) Easy. It's only me. Same as yesterday.": {
+  "ids": [
+   "scene.20.1"
+  ],
+  "file": "voice/wren/97cd4c1b69a4.mp3",
+  "hash": "97cd4c1b69a4",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "[softly] Easy. It's only me. Same as yesterday.",
+  "chars": 47,
+  "seconds": 3.52,
+  "pitchHz": 174,
+  "aligned": true,
+  "transcript": "Easy. It's only me. Same as yesterday",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|(to you, not turning) Stay behind me. He hasn't eaten in two winters. He doesn't know me now.": {
+  "ids": [
+   "scene.20.2"
+  ],
+  "file": "voice/wren/f25764f7cf39.mp3",
+  "hash": "f25764f7cf39",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Stay behind me. He hasn't eaten in two winters. He doesn't know me now.",
+  "chars": 71,
+  "seconds": 4.8,
+  "pitchHz": 205,
+  "aligned": true,
+  "transcript": "Stay behind me. He hasn't eaten in two winters. He doesn't know me now",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|His name is Bramble. I raised him on a bottle.": {
+  "ids": [
+   "scene.20.4"
+  ],
+  "file": "voice/wren/e79013bf52d2.mp3",
+  "hash": "e79013bf52d2",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "His name is Bramble. I raised him on a bottle.",
+  "chars": 46,
+  "seconds": 2.96,
+  "pitchHz": 193,
+  "aligned": true,
+  "transcript": "His name is Bramble. I raised him on a bottle",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|So that's what the bells are about. (nodding at the boar) Do that to him.": {
+  "ids": [
+   "scene.21.before.1"
+  ],
+  "file": "voice/wren/734d891a3fad.mp3",
+  "hash": "734d891a3fad",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "So that's what the bells are about. Do that to him.",
+  "chars": 51,
+  "seconds": 2.88,
+  "pitchHz": 200,
+  "aligned": true,
+  "transcript": "So that's what the bells are about. Do that to him",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|I'm Wren. The queen's forester. For what that's worth out here.": {
+  "ids": [
+   "scene.20.5"
+  ],
+  "file": "voice/wren/3efc82851abe.mp3",
+  "hash": "3efc82851abe",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "I'm Wren. The queen's forester. For what that's worth out here.",
+  "chars": 63,
+  "seconds": 4.16,
+  "pitchHz": 178,
+  "aligned": true,
+  "transcript": "I'm Ren, the Queen's Forester, for what that's worth out here",
+  "heard": 0.909,
+  "tagsReadOut": []
+ },
+ "custodian|His Blight is five deep. Your stone is at two. Go home and build.": {
+  "ids": [
+   "scene.21.2"
+  ],
+  "file": "voice/custodian/c23fde6a2ba5.mp3",
+  "hash": "c23fde6a2ba5",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "His Blight is five deep. Your stone is at two. Go home and build.",
+  "chars": 65,
+  "seconds": 6.4,
+  "pitchHz": 126,
+  "aligned": true,
+  "transcript": "His blight is five deep. Your stone is at two. Go home and build",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|(from the pack) No. Not that one. Not yet.": {
+  "ids": [
+   "scene.21.1"
+  ],
+  "file": "voice/custodian/90492a7e819f.mp3",
+  "hash": "90492a7e819f",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "No. Not that one. Not yet.",
+  "chars": 26,
+  "seconds": 3.12,
+  "pitchHz": 127,
+  "aligned": true,
+  "transcript": "No, not that one. Not yet",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|Then I'll wait. I'm good at it.": {
+  "ids": [
+   "scene.21.3"
+  ],
+  "file": "voice/wren/1bc8338a7ebe.mp3",
+  "hash": "1bc8338a7ebe",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Then I'll wait. I'm good at it.",
+  "chars": 31,
+  "seconds": 2.24,
+  "pitchHz": 308,
+  "aligned": true,
+  "transcript": "Then I'll wait. I'm good at it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|That is a pact. It paid first. They always do. See that you pay back.": {
+  "ids": [
+   "scene.21.5"
+  ],
+  "file": "voice/custodian/d101a6fbe657.mp3",
+  "hash": "d101a6fbe657",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "That is a pact. It paid first. They always do. See that you pay back.",
+  "chars": 69,
+  "seconds": 6.56,
+  "pitchHz": 131,
+  "aligned": true,
+  "transcript": "That is a pact. It paid first. They always do. See that you pay back",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|(waking, not getting up) Forty sacks. I counted twice. Counting a third time won't help.": {
+  "ids": [
+   "scene.22.0"
+  ],
+  "file": "voice/maren/43c67264b25a.mp3",
+  "hash": "43c67264b25a",
   "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
   "model": "eleven_v4_turbo",
-  "say": "Same fields, same hands, thinner sacks. Gus says the soil is tired.",
-  "chars": 67,
-  "seconds": 6.4,
+  "say": "[sleepily] Forty sacks. I counted twice. Counting a third time won't help.",
+  "chars": 74,
+  "seconds": 5.6,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "40 sacks. I counted twice. Counting a third time won't help",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|The Mother's pumps gave us three crops a year. Then two. This year one, and a grey wood.": {
+  "ids": [
+   "scene.22.1"
+  ],
+  "file": "voice/maren/bcb3e3b1e5de.mp3",
+  "hash": "bcb3e3b1e5de",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "The Mother's pumps gave us three crops a year. Then two. This year one, and a grey wood.",
+  "chars": 88,
+  "seconds": 6.96,
+  "pitchHz": 203,
+  "aligned": true,
+  "transcript": "The mother's pumps gave us three crops a year, then two. This year, one and a gray wood",
+  "heard": 0.944,
+  "tagsReadOut": []
+ },
+ "maren|You're the one from the hill. They say your field's green, and there's no pump in it.": {
+  "ids": [
+   "scene.22.2"
+  ],
+  "file": "voice/maren/f824e74fb2bd.mp3",
+  "hash": "f824e74fb2bd",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "You're the one from the hill. They say your field's green, and there's no pump in it.",
+  "chars": 85,
+  "seconds": 4.88,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "You're the one from the hill. They say your field's green and there's no pump in it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|Show me a field that feeds people without one. Then I'll know what to say to the priests.": {
+  "ids": [
+   "scene.22.3"
+  ],
+  "file": "voice/maren/c46a1dc53f52.mp3",
+  "hash": "c46a1dc53f52",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "Show me a field that feeds people without one. Then I'll know what to say to the priests.",
+  "chars": 89,
+  "seconds": 5.12,
+  "pitchHz": 198,
+  "aligned": true,
+  "transcript": "Show me a field that feeds people without one. Then I'll know what to say to the priests",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "aldric|(on a cart, arms raised) For the Ascended, who lit the way! Let it be lit again!": {
+  "ids": [
+   "scene.23.0"
+  ],
+  "file": "voice/aldric/c67843f60dc6.mp3",
+  "hash": "c67843f60dc6",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
+  "model": "eleven_v4_turbo",
+  "say": "[shouting] For the Ascended, who lit the way! Let it be lit again!",
+  "chars": 66,
+  "seconds": 4.32,
+  "pitchHz": 320,
+  "aligned": true,
+  "transcript": "For the ascended who lit the way, let it be lit again",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Four stretches. There were three when I came to this valley.": {
+  "ids": [
+   "scene.23.4"
+  ],
+  "file": "voice/tamsin/7a34726f5387.mp3",
+  "hash": "7a34726f5387",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Four stretches. There were three when I came to this valley.",
+  "chars": 60,
+  "seconds": 4.16,
+  "pitchHz": 186,
+  "aligned": true,
+  "transcript": "Four stretches. There were three when I came to this valley",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.girl|The fox says you're doing it wrong.": {
+  "ids": [
+   "scene.24.2"
+  ],
+  "file": "voice/voice.girl/2ee839525d32.mp3",
+  "hash": "2ee839525d32",
+  "voiceId": "rCmVtv8cYU60uhlsOo1M",
+  "model": "eleven_v4_turbo",
+  "say": "The fox says you're doing it wrong.",
+  "chars": 35,
+  "seconds": 2.32,
+  "pitchHz": 235,
+  "aligned": true,
+  "transcript": "The fox says you're doing it wrong",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.boy|It's a fox. It doesn't say anything.": {
+  "ids": [
+   "scene.24.3"
+  ],
+  "file": "voice/voice.boy/1776b8c68468.mp3",
+  "hash": "1776b8c68468",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "It's a fox. It doesn't say anything.",
+  "chars": 36,
+  "seconds": 2.64,
+  "pitchHz": 123,
+  "aligned": true,
+  "transcript": "It's a fox. It doesn't say anything",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.girl|It says a great deal. Mostly about you.": {
+  "ids": [
+   "scene.24.4"
+  ],
+  "file": "voice/voice.girl/8ea9ff5178c2.mp3",
+  "hash": "8ea9ff5178c2",
+  "voiceId": "rCmVtv8cYU60uhlsOo1M",
+  "model": "eleven_v4_turbo",
+  "say": "It says a great deal. Mostly about you.",
+  "chars": 39,
+  "seconds": 3.6,
+  "pitchHz": 235,
+  "aligned": true,
+  "transcript": "It says a great deal, mostly about you",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|I remember the fox.": {
+  "ids": [
+   "scene.24.7"
+  ],
+  "file": "voice/custodian/e912884b5069.mp3",
+  "hash": "e912884b5069",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "I remember the fox.",
+  "chars": 19,
+  "seconds": 1.92,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "I remember the fox",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.boy|(laughing) Then tell it I'll be king one day. It can say that to my face.": {
+  "ids": [
+   "scene.24.5"
+  ],
+  "file": "voice/voice.boy/f8c82a9a26a7.mp3",
+  "hash": "f8c82a9a26a7",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "[laughing] Then tell it I'll be king one day. It can say that to my face.",
+  "chars": 73,
+  "seconds": 4.96,
+  "pitchHz": 143,
+  "aligned": true,
+  "transcript": "[chuckles] Then tell it I'll be king one day. It can say that to my face.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|There are more stones like that one. Three. I can feel them from here.": {
+  "ids": [
+   "talk.vaults.0"
+  ],
+  "file": "voice/custodian/12a01154a29b.mp3",
+  "hash": "12a01154a29b",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "There are more stones like that one. Three. I can feel them from here.",
+  "chars": 70,
+  "seconds": 5.12,
+  "pitchHz": 163,
+  "aligned": true,
+  "transcript": "There are more stones like that one. Three. I can feel them from here",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|South-east, where the wheel turns. North-east, under the hill. West, under the roots.": {
+  "ids": [
+   "talk.vaults.2"
+  ],
+  "file": "voice/custodian/8166f63695be.mp3",
+  "hash": "8166f63695be",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "South-east, where the wheel turns. North-east, under the hill. West, under the roots.",
+  "chars": 85,
+  "seconds": 8.08,
+  "pitchHz": 126,
+  "aligned": true,
+  "transcript": "Southeast, where the wheel turns. Northeast, under the hill. West, under the roots",
+  "heard": 0.733,
+  "tagsReadOut": []
+ },
+ "custodian|Any order. I did not say they would be pleasant.": {
+  "ids": [
+   "talk.vaults.3"
+  ],
+  "file": "voice/custodian/fe8a98de2575.mp3",
+  "hash": "fe8a98de2575",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Any order. I did not say they would be pleasant.",
+  "chars": 48,
+  "seconds": 3.6,
+  "pitchHz": 151,
+  "aligned": true,
+  "transcript": "Any order. I did not say they would be pleasant",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|A dead stone. They carry sickness. It is in my instructions.": {
+  "ids": [
+   "scene.25.2.0.0"
+  ],
+  "file": "voice/calla/3a5ec6a937f6.mp3",
+  "hash": "3a5ec6a937f6",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "A dead stone. They carry sickness. It is in my instructions.",
+  "chars": 60,
+  "seconds": 4.88,
+  "pitchHz": 213,
+  "aligned": true,
+  "transcript": "A dead stone. They carry sickness. It is in my instructions",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|You went in alone. You are not to go in alone. It is in my instructions.": {
+  "ids": [
+   "scene.25.0"
+  ],
+  "file": "voice/calla/a685203a844e.mp3",
+  "hash": "a685203a844e",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "You went in alone. You are not to go in alone. It is in my instructions.",
+  "chars": 72,
+  "seconds": 5.6,
+  "pitchHz": 254,
+  "aligned": true,
+  "transcript": "You went in alone. You are not to go in alone. It is in my instructions",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|For your safety. These places fall in. What did you find?": {
+  "ids": [
+   "scene.25.2"
+  ],
+  "file": "voice/calla/54716fcb1d10.mp3",
+  "hash": "54716fcb1d10",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "For your safety. These places fall in. What did you find?",
+  "chars": 57,
+  "seconds": 4.48,
+  "pitchHz": 258,
+  "aligned": true,
+  "transcript": "For your safety, these places fall in. What did you find?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|(writing) \"One stone, destroyed.\" Thank you. That was the right thing to do.": {
+  "ids": [
+   "scene.25.2.0.2"
+  ],
+  "file": "voice/calla/b9f2de1baed5.mp3",
+  "hash": "b9f2de1baed5",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "\"One stone, destroyed.\" Thank you. That was the right thing to do.",
+  "chars": 66,
+  "seconds": 5.2,
+  "pitchHz": 219,
+  "aligned": true,
+  "transcript": "One stone destroyed. Thank you. That was the right thing to do",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.old-woman|You'll be a lord one day, Auren. Lords don't carry pails.": {
+  "ids": [
+   "scene.26.1"
+  ],
+  "file": "voice/voice.old-woman/d8c55e1db212.mp3",
+  "hash": "d8c55e1db212",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "model": "eleven_v4_turbo",
+  "say": "You'll be a lord one day, Auren. Lords don't carry pails.",
+  "chars": 57,
+  "seconds": 4.32,
+  "pitchHz": 180,
+  "aligned": true,
+  "transcript": "You'll be a lord one day, Orin. Lords don't carry pails",
+  "heard": 0.909,
+  "tagsReadOut": []
+ },
+ "calla|(writing) \"Found nothing.\" (a look at your pack) Very well. Nothing.": {
+  "ids": [
+   "scene.25.2.1.0"
+  ],
+  "file": "voice/calla/97d988c68042.mp3",
+  "hash": "97d988c68042",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "\"Found nothing.\" Very well. Nothing.",
+  "chars": 36,
+  "seconds": 3.28,
+  "pitchHz": 258,
+  "aligned": true,
+  "transcript": "Found nothing. Very well, nothing",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "auren|Then I will be a poor sort of lord, and your garden will be wet.": {
+  "ids": [
+   "scene.26.2"
+  ],
+  "file": "voice/auren/4078957973db.mp3",
+  "hash": "4078957973db",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "Then I will be a poor sort of lord, and your garden will be wet.",
+  "chars": 64,
+  "seconds": 4.32,
+  "pitchHz": 107,
+  "aligned": true,
+  "transcript": "Then I will be a poor sort of lord, and your garden will be wet",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|Soil is wet, and it rests. That is all it is. Nobody listens to soil.": {
+  "ids": [
+   "scene.27.3"
+  ],
+  "file": "voice/gus/cbe305b52a7f.mp3",
+  "hash": "cbe305b52a7f",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Soil is wet, and it rests. That is all it is. Nobody listens to soil.",
+  "chars": 69,
+  "seconds": 7.04,
+  "pitchHz": 115,
+  "aligned": true,
+  "transcript": "Soil is wet and it rests. That is all it is. Nobody listens to soil",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|Seventy sheaves. On this ground. The best pumped field in my valley gave fifty-two.": {
+  "ids": [
+   "scene.27.0"
+  ],
+  "file": "voice/maren/f3753782bfbd.mp3",
+  "hash": "f3753782bfbd",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "Seventy sheaves. On this ground. The best pumped field in my valley gave fifty-two.",
+  "chars": 83,
+  "seconds": 6.16,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "Seventy sheaves! On this ground. The best pumped field in my valley gave fifty-two",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|How? Do not say a miracle. I have had enough miracles this month.": {
+  "ids": [
+   "scene.27.1"
+  ],
+  "file": "voice/maren/c86d40d96c68.mp3",
+  "hash": "c86d40d96c68",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "How? Do not say a miracle. I have had enough miracles this month.",
+  "chars": 65,
+  "seconds": 5.04,
   "pitchHz": 211,
   "aligned": true,
-  "transcript": "Same fields, same hands, thinner sacks. Gus says the soil is tired",
+  "transcript": "How? Do not say a miracle. I have had enough miracles this month",
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|So am I. Go and see him. He has seed.": {
+ "aldric|Majesty, the pumps are the Mother's own gift. One cannot simply... a gift is not...": {
   "ids": [
-   "maren.ask.3.1.1"
+   "scene.27.4"
   ],
-  "file": "voice/maren/4453b1a311b6.mp3",
-  "hash": "4453b1a311b6",
+  "file": "voice/aldric/130b88da3617.mp3",
+  "hash": "130b88da3617",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
+  "model": "eleven_v4_turbo",
+  "say": "Majesty, the pumps are the Mother's own gift. One cannot simply... a gift is not...",
+  "chars": 83,
+  "seconds": 6.48,
+  "pitchHz": 147,
+  "aligned": true,
+  "transcript": "Majesty, the pumps are the mother's own gift. One cannot simply... A gift is not",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Three.": {
+  "ids": [
+   "scene.27.dark.2"
+  ],
+  "file": "voice/tamsin/5dd6212951ac.mp3",
+  "hash": "5dd6212951ac",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Three.",
+  "chars": 6,
+  "seconds": 0.88,
+  "pitchHz": 184,
+  "aligned": true,
+  "transcript": "Three",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|Her gift gave me three thin harvests and a grey wood. Start pulling them out.": {
+  "ids": [
+   "scene.27.5"
+  ],
+  "file": "voice/maren/bf45493531be.mp3",
+  "hash": "bf45493531be",
   "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
   "model": "eleven_v4_turbo",
-  "say": "So am I. Go and see him. He has seed.",
-  "chars": 37,
+  "say": "Her gift gave me three thin harvests and a grey wood. Start pulling them out.",
+  "chars": 77,
+  "seconds": 5.04,
+  "pitchHz": 232,
+  "aligned": true,
+  "transcript": "Her gift gave me three thin harvests and a gray wood. Start pulling them out",
+  "heard": 0.933,
+  "tagsReadOut": []
+ },
+ "auren|Six realms, and not one sword drawn all year. I didn't do that. You did.": {
+  "ids": [
+   "scene.28.2"
+  ],
+  "file": "voice/auren/df9159df707e.mp3",
+  "hash": "df9159df707e",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "Six realms, and not one sword drawn all year. I didn't do that. You did.",
+  "chars": 72,
+  "seconds": 6,
+  "pitchHz": 125,
+  "aligned": true,
+  "transcript": "Six realms and not one sword drawn all year. I didn't do that. You did",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "ilara|He wants to meet you. I said you are frightened of big things.": {
+  "ids": [
+   "scene.29.1"
+  ],
+  "file": "voice/ilara/f1ad510d5550.mp3",
+  "hash": "f1ad510d5550",
+  "voiceId": "rCmVtv8cYU60uhlsOo1M",
+  "model": "eleven_v4_turbo",
+  "say": "He wants to meet you. I said you are frightened of big things.",
+  "chars": 62,
+  "seconds": 4.64,
+  "pitchHz": 262,
+  "aligned": true,
+  "transcript": "He wants to meet you. I said you are frightened of big things",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "auren|I'm not frightened. I'm being respectful. From over here.": {
+  "ids": [
+   "scene.29.2"
+  ],
+  "file": "voice/auren/10791dde1314.mp3",
+  "hash": "10791dde1314",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "I'm not frightened. I'm being respectful. From over here.",
+  "chars": 57,
+  "seconds": 3.84,
+  "pitchHz": 182,
+  "aligned": true,
+  "transcript": "I'm not frightened. I'm being respectful. From over here",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|Machine, then. I'll find something else to do.": {
+  "ids": [
+   "choice.gus.0.0.0"
+  ],
+  "file": "voice/gus/8463f8620a7d.mp3",
+  "hash": "8463f8620a7d",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Machine, then. I'll find something else to do.",
+  "chars": 46,
+  "seconds": 3.36,
+  "pitchHz": 99,
+  "aligned": true,
+  "transcript": "Machine then. I'll find something else to do",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|Your arms cut the terrace. My field's next to it. Your machine or my hands.": {
+  "ids": [
+   "choice.gus.0"
+  ],
+  "file": "voice/gus/a7811448d397.mp3",
+  "hash": "a7811448d397",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Your arms cut the terrace. My field's next to it. Your machine or my hands.",
+  "chars": 75,
+  "seconds": 6.96,
+  "pitchHz": 138,
+  "aligned": true,
+  "transcript": "Your arms cut the terrace. My field's next to it. Your machine or my hands?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|My rows. Good. One in four rests.": {
+  "ids": [
+   "choice.gus.0.1.0"
+  ],
+  "file": "voice/gus/4bba024e5497.mp3",
+  "hash": "4bba024e5497",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "My rows. Good. One in four rests.",
+  "chars": 33,
+  "seconds": 4,
+  "pitchHz": 140,
+  "aligned": true,
+  "transcript": "My rose. Good. One in four rests",
+  "heard": 0.857,
+  "tagsReadOut": []
+ },
+ "mina|One small ruin a day. I'll have it marked before you've had breakfast.": {
+  "ids": [
+   "took.mina.maproom.0"
+  ],
+  "file": "voice/mina/6bd7d5d2f1f9.mp3",
+  "hash": "6bd7d5d2f1f9",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "One small ruin a day. I'll have it marked before you've had breakfast.",
+  "chars": 70,
+  "seconds": 4.4,
+  "pitchHz": 242,
+  "aligned": true,
+  "transcript": "One small ruin a day. I'll have it marked before you've had breakfast",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|The door opened and you didn't write. I had to hear it from a ferryman. A ferryman!": {
+  "ids": [
+   "scene.30.0"
+  ],
+  "file": "voice/mina/49d91b92cfe3.mp3",
+  "hash": "49d91b92cfe3",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "The door opened and you didn't write. I had to hear it from a ferryman. A ferryman!",
+  "chars": 83,
+  "seconds": 6.32,
+  "pitchHz": 262,
+  "aligned": true,
+  "transcript": "The door opened and you didn't write. I had to hear it from a ferryman. A ferryman",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|(looking at your hand) Couldn't. I'm going to need a bigger table.": {
+  "ids": [
+   "scene.30.2"
+  ],
+  "file": "voice/mina/e8ad56b370b0.mp3",
+  "hash": "e8ad56b370b0",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Couldn't. I'm going to need a bigger table.",
+  "chars": 43,
+  "seconds": 2.88,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "Couldn't. I'm going to need a bigger table",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|Your farms, then. Every rate. I'll know your terrace better than you do.": {
+  "ids": [
+   "took.mina.survey.0"
+  ],
+  "file": "voice/mina/2053a39d809b.mp3",
+  "hash": "2053a39d809b",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Your farms, then. Every rate. I'll know your terrace better than you do.",
+  "chars": 72,
+  "seconds": 4.8,
+  "pitchHz": 246,
+  "aligned": true,
+  "transcript": "Your farms, then, every rate. I'll know your terrace better than you do",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|Sixty years of delvers' notes on this valley. Every ruin they couldn't open.": {
+  "ids": [
+   "scene.30.1"
+  ],
+  "file": "voice/mina/ff42bc966789.mp3",
+  "hash": "ff42bc966789",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Sixty years of delvers' notes on this valley. Every ruin they couldn't open.",
+  "chars": 76,
+  "seconds": 5.44,
+  "pitchHz": 222,
+  "aligned": true,
+  "transcript": "Sixty years of delver's notes on this valley. Every ruin they couldn't open",
+  "heard": 0.923,
+  "tagsReadOut": []
+ },
+ "custodian|Five. It is five now. Break his guard. Then be kind to him.": {
+  "ids": [
+   "scene.31.before.1"
+  ],
+  "file": "voice/custodian/3eda3cbf11d4.mp3",
+  "hash": "3eda3cbf11d4",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Five. It is five now. Break his guard. Then be kind to him.",
+  "chars": 59,
+  "seconds": 5.76,
+  "pitchHz": 148,
+  "aligned": true,
+  "transcript": "Five. It is five now. Break his guard, then be kind to him",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|There. Do you feel it? Look at the arch.": {
+  "ids": [
+   "scene.30.4"
+  ],
+  "file": "voice/custodian/1822cebfa4d0.mp3",
+  "hash": "1822cebfa4d0",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "There. Do you feel it? Look at the arch.",
+  "chars": 40,
+  "seconds": 3.68,
+  "pitchHz": 168,
+  "aligned": true,
+  "transcript": "There. Do you feel it? Look at the arch",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|He's still here. So am I. Don't tell me the number.": {
+  "ids": [
+   "scene.31.before.0"
+  ],
+  "file": "voice/wren/c65f89829e93.mp3",
+  "hash": "c65f89829e93",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "He's still here. So am I. Don't tell me the number.",
+  "chars": 51,
   "seconds": 3.52,
+  "pitchHz": 235,
+  "aligned": true,
+  "transcript": "He's still here. So am I. Don't tell me the number",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|One Gate. As far as the town and no further. Do not be smug. There are seven.": {
+  "ids": [
+   "scene.30.6"
+  ],
+  "file": "voice/custodian/cbb0a861df2e.mp3",
+  "hash": "cbb0a861df2e",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "One Gate. As far as the town and no further. Do not be smug. There are seven.",
+  "chars": 77,
+  "seconds": 7.04,
+  "pitchHz": 128,
+  "aligned": true,
+  "transcript": "One gate. As far as the town and no further. Do not be smug. There are seven",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|(not looking up) We're coming to live on your hill. He'll want a yard. Near water.": {
+  "ids": [
+   "scene.31.3"
+  ],
+  "file": "voice/wren/f96533a29408.mp3",
+  "hash": "f96533a29408",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "We're coming to live on your hill. He'll want a yard. Near water.",
+  "chars": 65,
+  "seconds": 4.32,
+  "pitchHz": 235,
+  "aligned": true,
+  "transcript": "We're coming to live on your hill. He'll want a yard near water",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|I will come down with you. It is in my instructions.": {
+  "ids": [
+   "scene.32.0"
+  ],
+  "file": "voice/calla/cd65d23332be.mp3",
+  "hash": "cd65d23332be",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "I will come down with you. It is in my instructions.",
+  "chars": 52,
+  "seconds": 3.28,
+  "pitchHz": 258,
+  "aligned": true,
+  "transcript": "I will come down with you it is in my instructions",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|(into his neck) You great fool. Two winters. You great fool.": {
+  "ids": [
+   "scene.31.2"
+  ],
+  "file": "voice/wren/4f128dc5ed74.mp3",
+  "hash": "4f128dc5ed74",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "[tearful] You great fool. Two winters. You great fool.",
+  "chars": 54,
+  "seconds": 5.2,
+  "pitchHz": 254,
+  "aligned": true,
+  "transcript": "You great fool. Two winters. You great fool",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|(through the stone, very calm) That is not in my instructions.": {
+  "ids": [
+   "scene.32.2"
+  ],
+  "file": "voice/calla/96a34b7338bd.mp3",
+  "hash": "96a34b7338bd",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "[calmly] That is not in my instructions.",
+  "chars": 40,
+  "seconds": 2.48,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "That is not in my instructions",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|Small. Marked.": {
+  "ids": [
+   "scene.33.1"
+  ],
+  "file": "voice/stag/2e1ecd838594.mp3",
+  "hash": "2e1ecd838594",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "Small. Marked.",
+  "chars": 14,
+  "seconds": 2.32,
+  "pitchHz": 112,
+  "aligned": true,
+  "transcript": "Small, marked",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|(from the pack) Ha.": {
+  "ids": [
+   "scene.32.3"
+  ],
+  "file": "voice/custodian/a7561a2f8bb7.mp3",
+  "hash": "a7561a2f8bb7",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "[dryly] Ha.",
+  "chars": 11,
+  "seconds": 0.88,
+  "pitchHz": 0,
+  "aligned": true,
+  "transcript": "Ha.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|Ilara?": {
+  "ids": [
+   "scene.33.2"
+  ],
+  "file": "voice/stag/83354aa11474.mp3",
+  "hash": "83354aa11474",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "Ilara?",
+  "chars": 6,
+  "seconds": 1.04,
+  "pitchHz": 136,
+  "aligned": true,
+  "transcript": "Ilara?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|It will not know you. Chains do that. Break the pins. Hurt it no more than you must.": {
+  "ids": [
+   "scene.33.before.0"
+  ],
+  "file": "voice/custodian/1985b05cede2.mp3",
+  "hash": "1985b05cede2",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "It will not know you. Chains do that. Break the pins. Hurt it no more than you must.",
+  "chars": 84,
+  "seconds": 7.12,
+  "pitchHz": 122,
+  "aligned": true,
+  "transcript": "It will not know you. Chains do that. Break the pins. Hurt it no more than you must",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|No. Her hand. Not her.": {
+  "ids": [
+   "scene.33.4"
+  ],
+  "file": "voice/stag/bba5efe5fcfb.mp3",
+  "hash": "bba5efe5fcfb",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "No. Her hand. Not her.",
+  "chars": 22,
+  "seconds": 3.76,
+  "pitchHz": 102,
+  "aligned": true,
+  "transcript": "No, her hand, not her",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|Chained. Standing. A thousand years.": {
+  "ids": [
+   "scene.33.5"
+  ],
+  "file": "voice/stag/1488a2e0a735.mp3",
+  "hash": "1488a2e0a735",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "Chained. Standing. A thousand years.",
+  "chars": 36,
+  "seconds": 4.96,
+  "pitchHz": 90,
+  "aligned": true,
+  "transcript": "Chained, standing a thousand years",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|(quietly) Hello, old friend. You have moss on you.": {
+  "ids": [
+   "scene.33.9"
+  ],
+  "file": "voice/custodian/03fd89dca954.mp3",
+  "hash": "03fd89dca954",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "[quietly] Hello, old friend. You have moss on you.",
+  "chars": 50,
+  "seconds": 3.44,
+  "pitchHz": 124,
+  "aligned": true,
+  "transcript": "Hello, old friend. You have moss on you",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|I go with you, small one. With you. Not for you.": {
+  "ids": [
+   "scene.33.7"
+  ],
+  "file": "voice/stag/5cf2c2db07dd.mp3",
+  "hash": "5cf2c2db07dd",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "I go with you, small one. With you. Not for you.",
+  "chars": 48,
+  "seconds": 5.76,
+  "pitchHz": 100,
+  "aligned": true,
+  "transcript": "I go with you, small one. With you, not for you",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|(at your gate, a charter in her hand) I had a speech. I've lost it.": {
+  "ids": [
+   "scene.34.3"
+  ],
+  "file": "voice/maren/72388e70ea21.mp3",
+  "hash": "72388e70ea21",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "I had a speech. I've lost it.",
+  "chars": 29,
+  "seconds": 2.64,
+  "pitchHz": 267,
+  "aligned": true,
+  "transcript": "I had a speech. I've lost it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.a-voice|There you are. I have waited a long time to say thank you.": {
+  "ids": [
+   "scene.35.1"
+  ],
+  "file": "voice/voice.a-voice/91da476fd4bb.mp3",
+  "hash": "91da476fd4bb",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "[whispers] There you are. I have waited a long time to say thank you.",
+  "chars": 69,
+  "seconds": 4.24,
+  "pitchHz": 115,
+  "aligned": true,
+  "transcript": "There you are. I have waited a long time to say thank you",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|You were smiling. Stop it.": {
+  "ids": [
+   "scene.35.4"
+  ],
+  "file": "voice/custodian/6092295d0e96.mp3",
+  "hash": "6092295d0e96",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "You were smiling. Stop it.",
+  "chars": 26,
+  "seconds": 2.64,
+  "pitchHz": 155,
+  "aligned": true,
+  "transcript": "You were smiling. Stop it!",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.a-voice|Rest now. There are five more to wake.": {
+  "ids": [
+   "scene.35.2"
+  ],
+  "file": "voice/voice.a-voice/12f074224f3d.mp3",
+  "hash": "12f074224f3d",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "[whispers] Rest now. There are five more to wake.",
+  "chars": 49,
+  "seconds": 2.96,
+  "pitchHz": 0,
+  "aligned": true,
+  "transcript": "Rest now there are five more to wake",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|The valley round your door is yours. All of it, to the forest. Hold it better than we did.": {
+  "ids": [
+   "scene.34.4"
+  ],
+  "file": "voice/maren/54b39e5ecf1a.mp3",
+  "hash": "54b39e5ecf1a",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "The valley round your door is yours. All of it, to the forest. Hold it better than we did.",
+  "chars": 90,
+  "seconds": 6.32,
+  "pitchHz": 222,
+  "aligned": true,
+  "transcript": "[outro jingle]",
+  "heard": 0,
+  "tagsReadOut": []
+ },
+ "elowen|Five more sleep. The Lion is next, in the desert, west along the High Road.": {
+  "ids": [
+   "scene.36.1"
+  ],
+  "file": "voice/elowen/53bfdd69de2e.mp3",
+  "hash": "53bfdd69de2e",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Five more sleep. The Lion is next, in the desert, west along the High Road.",
+  "chars": 75,
+  "seconds": 6.24,
+  "pitchHz": 200,
+  "aligned": true,
+  "transcript": "Five more sleep. The lion is next in the desert, west along the high road",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|You woke him gently. I heard. I am so glad it was gently.": {
+  "ids": [
+   "scene.36.0"
+  ],
+  "file": "voice/elowen/b03a832806fe.mp3",
+  "hash": "b03a832806fe",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "You woke him gently. I heard. I am so glad it was gently.",
+  "chars": 57,
+  "seconds": 5.28,
+  "pitchHz": 176,
+  "aligned": true,
+  "transcript": "You woke him gently, I heard. I am so glad it was gently",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|This writ opens every chapel door from here to the sea. Eat well. Sleep indoors.": {
+  "ids": [
+   "scene.36.2"
+  ],
+  "file": "voice/elowen/f53a862549e5.mp3",
+  "hash": "f53a862549e5",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "This writ opens every chapel door from here to the sea. Eat well. Sleep indoors.",
+  "chars": 80,
+  "seconds": 6.88,
+  "pitchHz": 203,
+  "aligned": true,
+  "transcript": "This writ opens every chapel door from here to the sea. Eat well, sleep indoors",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|And this is Ren, who asked to carry your water.": {
+  "ids": [
+   "scene.36.3"
+  ],
+  "file": "voice/elowen/6d207cfd0ac8.mp3",
+  "hash": "6d207cfd0ac8",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "And this is Ren, who asked to carry your water.",
+  "chars": 47,
+  "seconds": 3.28,
+  "pitchHz": 195,
+  "aligned": true,
+  "transcript": "And this is Wren, who asked to carry your water",
+  "heard": 0.9,
+  "tagsReadOut": []
+ },
+ "elowen|(to the town) Bless this child's road!": {
+  "ids": [
+   "scene.36.5"
+  ],
+  "file": "voice/elowen/de03875bbc85.mp3",
+  "hash": "de03875bbc85",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Bless this child's road!",
+  "chars": 24,
+  "seconds": 2.24,
+  "pitchHz": 170,
+  "aligned": true,
+  "transcript": "Bless this child's road",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|She was kinder, before.": {
+  "ids": [
+   "scene.37.1"
+  ],
+  "file": "voice/stag/2c45bf704523.mp3",
+  "hash": "2c45bf704523",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "She was kinder, before.",
+  "chars": 23,
+  "seconds": 2.96,
+  "pitchHz": 77,
+  "aligned": true,
+  "transcript": "She was kinder before",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "ren|(bowing too low) I can carry forty days of it. I have counted.": {
+  "ids": [
+   "scene.36.4"
+  ],
+  "file": "voice/ren/61f570b4bb0f.mp3",
+  "hash": "61f570b4bb0f",
+  "voiceId": "Os2frcqCuUz8b9F93RuI",
+  "model": "eleven_v4_turbo",
+  "say": "I can carry forty days of it. I have counted.",
+  "chars": 45,
+  "seconds": 3.28,
+  "pitchHz": 167,
+  "aligned": true,
+  "transcript": "I can carry forty days of it I have counted.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Out there they will tell you what the ruins mean. Look at the ruins yourself.": {
+  "ids": [
+   "scene.38.1"
+  ],
+  "file": "voice/tamsin/2e2c58e2e1bb.mp3",
+  "hash": "2e2c58e2e1bb",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Out there they will tell you what the ruins mean. Look at the ruins yourself.",
+  "chars": 77,
+  "seconds": 5.12,
+  "pitchHz": 195,
+  "aligned": true,
+  "transcript": "Out there, they will tell you what the ruins mean. Look at the ruins yourself",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|I'll mind the plot. Hobb will mind me.": {
+  "ids": [
+   "scene.38.0"
+  ],
+  "file": "voice/tamsin/747a0de0cd17.mp3",
+  "hash": "747a0de0cd17",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "I'll mind the plot. Hobb will mind me.",
+  "chars": 38,
+  "seconds": 3.04,
+  "pitchHz": 186,
+  "aligned": true,
+  "transcript": "I'll mind the plot. Hob will mind me",
+  "heard": 0.875,
+  "tagsReadOut": []
+ },
+ "hobb|Bread for six days. Cheese for four. Eat the cheese first, Button.": {
+  "ids": [
+   "scene.38.2"
+  ],
+  "file": "voice/hobb/da6bc61241ef.mp3",
+  "hash": "da6bc61241ef",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Bread for six days. Cheese for four. Eat the cheese first, Button.",
+  "chars": 66,
+  "seconds": 4.88,
+  "pitchHz": 286,
+  "aligned": true,
+  "transcript": "Bread for six days, cheese for four. Eat the cheese first, Button",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|And write. Not to Mina. To me.": {
+  "ids": [
+   "scene.38.3"
+  ],
+  "file": "voice/hobb/f345052fb8de.mp3",
+  "hash": "f345052fb8de",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "And write. Not to Mina. To me.",
+  "chars": 30,
+  "seconds": 3.36,
+  "pitchHz": 232,
+  "aligned": true,
+  "transcript": "And write, not to Mina, to me",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Gate'll be here when you get back. So will I.": {
+  "ids": [
+   "scene.38.4"
+  ],
+  "file": "voice/dax/df9ea44c4bd4.mp3",
+  "hash": "df9ea44c4bd4",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Gate'll be here when you get back. So will I.",
+  "chars": 45,
+  "seconds": 2.8,
+  "pitchHz": 106,
+  "aligned": true,
+  "transcript": "Gate will be here when you get back. So will I",
+  "heard": 0.9,
+  "tagsReadOut": []
+ },
+ "wren|Bramble will keep the wood. (to your fox) You keep that one.": {
+  "ids": [
+   "scene.38.5"
+  ],
+  "file": "voice/wren/342a4278c986.mp3",
+  "hash": "342a4278c986",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Bramble will keep the wood. You keep that one.",
+  "chars": 46,
+  "seconds": 2.56,
+  "pitchHz": 254,
+  "aligned": true,
+  "transcript": "Bramble will keep the wood. You keep that one",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.girl|Don't let him near the bees. He talks to them. They hate it.": {
+  "ids": [
+   "memory.hall.again.0"
+  ],
+  "file": "voice/voice.girl/19ff26f65300.mp3",
+  "hash": "19ff26f65300",
+  "voiceId": "rCmVtv8cYU60uhlsOo1M",
+  "model": "eleven_v4_turbo",
+  "say": "Don't let him near the bees. He talks to them. They hate it.",
+  "chars": 60,
+  "seconds": 4.32,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "Don't let him near the bees. He talks to them. They hate it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|(from the pack) West, then. I have not been west in a thousand years. Walk smoothly.": {
+  "ids": [
+   "scene.38.6"
+  ],
+  "file": "voice/custodian/eb085df1ba10.mp3",
+  "hash": "eb085df1ba10",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "West, then. I have not been west in a thousand years. Walk smoothly.",
+  "chars": 68,
+  "seconds": 6.24,
+  "pitchHz": 124,
+  "aligned": true,
+  "transcript": "West, then. I have not been west in a thousand years. Walk smoothly",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "auren|Sit down, Nan. I'll fetch the other two.": {
+  "ids": [
+   "memory.pumphouse.again.0"
+  ],
+  "file": "voice/auren/46a0089ee298.mp3",
+  "hash": "46a0089ee298",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "Sit down, Nan. I'll fetch the other two.",
+  "chars": 40,
+  "seconds": 2.32,
+  "pitchHz": 110,
+  "aligned": true,
+  "transcript": "Sit down, Nan. I'll fetch the other two",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "auren|Somebody fill the smith's cup before he makes a speech.": {
+  "ids": [
+   "memory.lampgallery.again.0"
+  ],
+  "file": "voice/auren/c0cd4bbf5921.mp3",
+  "hash": "c0cd4bbf5921",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "Somebody fill the smith's cup before he makes a speech.",
+  "chars": 55,
+  "seconds": 3.12,
+  "pitchHz": 193,
+  "aligned": true,
+  "transcript": "Somebody fill the Smith's cup before he makes a speech",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "voice.boy|One day there'll be water on every field in this valley. Uphill too.": {
+  "ids": [
+   "memory.hall.again.1"
+  ],
+  "file": "voice/voice.boy/2ad082e85820.mp3",
+  "hash": "2ad082e85820",
+  "voiceId": "hmMWXCj9K7N5mCPcRkfC",
+  "model": "eleven_v4_turbo",
+  "say": "One day there'll be water on every field in this valley. Uphill too.",
+  "chars": 68,
+  "seconds": 4.72,
+  "pitchHz": 154,
+  "aligned": true,
+  "transcript": "One day there'll be water on every field in this valley. Uphill too",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "ilara|Put your hand flat. Flat. He isn't a dog.": {
+  "ids": [
+   "memory.seedvault.again.0"
+  ],
+  "file": "voice/ilara/037f59581da9.mp3",
+  "hash": "037f59581da9",
+  "voiceId": "rCmVtv8cYU60uhlsOo1M",
+  "model": "eleven_v4_turbo",
+  "say": "Put your hand flat. Flat. He isn't a dog.",
+  "chars": 41,
+  "seconds": 4.16,
+  "pitchHz": 296,
+  "aligned": true,
+  "transcript": "Put your hand flat. Flat. He isn't a dog",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Can't tell the salt from the sugar after dark. Somebody's getting a sweet stew.": {
+  "ids": [
+   "hobb.need.lamp.0"
+  ],
+  "file": "voice/hobb/a69bbba721ef.mp3",
+  "hash": "a69bbba721ef",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Can't tell the salt from the sugar after dark. Somebody's getting a sweet stew.",
+  "chars": 79,
+  "seconds": 5.28,
+  "pitchHz": 222,
+  "aligned": true,
+  "transcript": "Can't tell the salt from the sugar after dark. Somebody's getting a sweet stew",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Nothing in the pot tonight. First time in thirty years. I don't like it.": {
+  "ids": [
+   "hobb.need.meal.0"
+  ],
+  "file": "voice/hobb/d0328a44e743.mp3",
+  "hash": "d0328a44e743",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Nothing in the pot tonight. First time in thirty years. I don't like it.",
+  "chars": 72,
+  "seconds": 5.52,
+  "pitchHz": 222,
+  "aligned": true,
+  "transcript": "Nothing in the pot tonight. First time in 30 years. I don't like it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|I'm sleeping on a sack of flour, Button. It isn't even good flour.": {
+  "ids": [
+   "hobb.need.bed.0"
+  ],
+  "file": "voice/hobb/d06d1d389438.mp3",
+  "hash": "d06d1d389438",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "I'm sleeping on a sack of flour, Button. It isn't even good flour.",
+  "chars": 66,
+  "seconds": 4.48,
+  "pitchHz": 276,
+  "aligned": true,
+  "transcript": "I'm sleeping on a sack of flour, Button. It isn't even good flour",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Look at that. The river. Now I can watch the ferry and burn the onions.": {
+  "ids": [
+   "hobb.wish.0"
+  ],
+  "file": "voice/hobb/70185935d8a9.mp3",
+  "hash": "70185935d8a9",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Look at that. The river. Now I can watch the ferry and burn the onions.",
+  "chars": 71,
+  "seconds": 5.52,
+  "pitchHz": 258,
+  "aligned": true,
+  "transcript": "Look at that, the river. Now I can watch the ferry and burn the onions",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|You dug them out, didn't you. The ground's gone pale. Hope the copper was worth it.": {
+  "ids": [
+   "hobb.burrow.0"
+  ],
+  "file": "voice/hobb/d6a8a0353c28.mp3",
+  "hash": "d6a8a0353c28",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "You dug them out, didn't you. The ground's gone pale. Hope the copper was worth it.",
+  "chars": 83,
+  "seconds": 5.36,
+  "pitchHz": 232,
+  "aligned": true,
+  "transcript": "You dug them out, didn't you? The ground's gone pale. Hope the copper was worth it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Breakfast first. That deed's not going anywhere. Nobody else wants it.": {
+  "ids": [
+   "hobb.hall.0"
+  ],
+  "file": "voice/hobb/9c24f68196c2.mp3",
+  "hash": "9c24f68196c2",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Breakfast first. That deed's not going anywhere. Nobody else wants it.",
+  "chars": 70,
+  "seconds": 4.8,
+  "pitchHz": 188,
+  "aligned": true,
+  "transcript": "Breakfast first. That deed's not going anywhere. Nobody else wants it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Everyone on this hill ate today. Count them if you like. I did.": {
+  "ids": [
+   "hobb.chapter3.0"
+  ],
+  "file": "voice/hobb/92f2952a6c7c.mp3",
+  "hash": "92f2952a6c7c",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Everyone on this hill ate today. Count them if you like. I did.",
+  "chars": 63,
+  "seconds": 4.24,
+  "pitchHz": 267,
+  "aligned": true,
+  "transcript": "Everyone on this hill ate today. Count them if you like. I did",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Three mouths, one pot. I've fed forty wards on less. Don't make me prove it.": {
+  "ids": [
+   "hobb.chapter2.0"
+  ],
+  "file": "voice/hobb/b6f6fa718fc9.mp3",
+  "hash": "b6f6fa718fc9",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Three mouths, one pot. I've fed forty wards on less. Don't make me prove it.",
+  "chars": 76,
+  "seconds": 5.84,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "Three mouths, one pot. I've fed forty wards on less. Don't make me prove it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Packed you a hot one, wrapped twice. Eat it before you go down. Not after.": {
+  "ids": [
+   "hobb.chapter4.0"
+  ],
+  "file": "voice/hobb/4c5cfd6a2d39.mp3",
+  "hash": "4c5cfd6a2d39",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Packed you a hot one, wrapped twice. Eat it before you go down. Not after.",
+  "chars": 74,
+  "seconds": 4.8,
+  "pitchHz": 195,
+  "aligned": true,
+  "transcript": "Packed you a hot one, wrapped twice. Eat it before you go down, not after",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Ground's hard. Not complaining. Saying.": {
+  "ids": [
+   "dax.need.bed.0"
+  ],
+  "file": "voice/dax/a24f00ec5840.mp3",
+  "hash": "a24f00ec5840",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Ground's hard. Not complaining. Saying.",
+  "chars": 39,
+  "seconds": 3.52,
+  "pitchHz": 113,
+  "aligned": true,
+  "transcript": "Ground's hard. Not complaining, saying",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Can't see the road. Can't watch what I can't see.": {
+  "ids": [
+   "dax.need.lamp.0"
+  ],
+  "file": "voice/dax/bdd808cff0aa.mp3",
+  "hash": "bdd808cff0aa",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Can't see the road. Can't watch what I can't see.",
+  "chars": 49,
+  "seconds": 3.6,
+  "pitchHz": 119,
+  "aligned": true,
+  "transcript": "Can't see the road. Can't watch what I can't see",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Hobb's not cooking. Something's wrong.": {
+  "ids": [
+   "dax.need.meal.0"
+  ],
+  "file": "voice/dax/8cdbf849440a.mp3",
+  "hash": "8cdbf849440a",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Hobb's not cooking. Something's wrong.",
+  "chars": 38,
+  "seconds": 2.72,
+  "pitchHz": 132,
+  "aligned": true,
+  "transcript": "Hobbs not cooking. Something's wrong",
+  "heard": 0.8,
+  "tagsReadOut": []
+ },
+ "hobb|The Mother sent pastries. I'm not saying they're bad. I'm saying I've had them.": {
+  "ids": [
+   "hobb.fallback.0"
+  ],
+  "file": "voice/hobb/d5ef5b1f04f8.mp3",
+  "hash": "d5ef5b1f04f8",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "The Mother sent pastries. I'm not saying they're bad. I'm saying I've had them.",
+  "chars": 79,
+  "seconds": 5.36,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "The mother sent pastries. I'm not saying they're bad, I'm saying I've had them",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Good post. I can see both. Thanks.": {
+  "ids": [
+   "dax.wish.0"
+  ],
+  "file": "voice/dax/a85485c131aa.mp3",
+  "hash": "a85485c131aa",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Good post. I can see both. Thanks.",
+  "chars": 34,
+  "seconds": 3.04,
+  "pitchHz": 193,
+  "aligned": true,
+  "transcript": "Good post. I can see both. Thanks",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Fence held. Nothing came. Checked twice.": {
+  "ids": [
+   "dax.chapter2.0"
+  ],
+  "file": "voice/dax/2e12379dfe4f.mp3",
+  "hash": "2e12379dfe4f",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Fence held. Nothing came. Checked twice.",
+  "chars": 40,
+  "seconds": 3.68,
+  "pitchHz": 95,
+  "aligned": true,
+  "transcript": "Fence held. Nothing came. Checked twice",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Rack's in the yard. I'll be the crate lid.": {
+  "ids": [
+   "dax.hall.0"
+  ],
+  "file": "voice/dax/ed53816bfce0.mp3",
+  "hash": "ed53816bfce0",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Rack's in the yard. I'll be the crate lid.",
+  "chars": 42,
+  "seconds": 2.56,
+  "pitchHz": 123,
+  "aligned": true,
+  "transcript": "Racks in the yard. I'll be the crate lid",
+  "heard": 0.889,
+  "tagsReadOut": []
+ },
+ "dax|Lamps are up. I slept. First time.": {
+  "ids": [
+   "dax.chapter3.0"
+  ],
+  "file": "voice/dax/de23bb22ec66.mp3",
+  "hash": "de23bb22ec66",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Lamps are up. I slept. First time.",
+  "chars": 34,
+  "seconds": 3.36,
+  "pitchHz": 110,
+  "aligned": true,
+  "transcript": "Lamps are up. I slept. First time",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Want me down there? No? I'll be at the gate.": {
+  "ids": [
+   "dax.chapter4.0"
+  ],
+  "file": "voice/dax/3298d6cc9b50.mp3",
+  "hash": "3298d6cc9b50",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Want me down there? No? I'll be at the gate.",
+  "chars": 44,
+  "seconds": 3.04,
+  "pitchHz": 162,
+  "aligned": true,
+  "transcript": "Want me down there? No? I'll be at the gate",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "dax|Gate's mine. Go.": {
+  "ids": [
+   "dax.fallback.0"
+  ],
+  "file": "voice/dax/021f2c71f146.mp3",
+  "hash": "021f2c71f146",
+  "voiceId": "kmSVBPu7loj4ayNinwWM",
+  "model": "eleven_v4_turbo",
+  "say": "Gate's mine. Go.",
+  "chars": 16,
+  "seconds": 1.68,
+  "pitchHz": 82,
+  "aligned": true,
+  "transcript": "Gate's mine. Go",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|I slept on the map case. I've got the coast of Greenhollow printed on my face.": {
+  "ids": [
+   "mina.need.bed.0"
+  ],
+  "file": "voice/mina/1c247d7aff3a.mp3",
+  "hash": "1c247d7aff3a",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "I slept on the map case. I've got the coast of Greenhollow printed on my face.",
+  "chars": 78,
+  "seconds": 5.2,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "I slept on the map case. I've got the coast of Green Hollow printed on my face",
+  "heard": 0.938,
+  "tagsReadOut": []
+ },
+ "mina|North light, no shadow on the paper. And the table fits the whole valley. Twice.": {
+  "ids": [
+   "mina.wish.0"
+  ],
+  "file": "voice/mina/4bf11a482a0f.mp3",
+  "hash": "4bf11a482a0f",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "North light, no shadow on the paper. And the table fits the whole valley. Twice.",
+  "chars": 80,
+  "seconds": 6.8,
   "pitchHz": 250,
   "aligned": true,
-  "transcript": "So am I. Go and see him. He has seed",
+  "transcript": "North light, no shadow on the paper, and the table fits the whole valley twice",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|I forgot to eat. No, wait. There was nothing to forget. That's different.": {
+  "ids": [
+   "mina.need.meal.0"
+  ],
+  "file": "voice/mina/935fb171da4c.mp3",
+  "hash": "935fb171da4c",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "I forgot to eat. No, wait. There was nothing to forget. That's different.",
+  "chars": 73,
+  "seconds": 5.52,
+  "pitchHz": 276,
+  "aligned": true,
+  "transcript": "I forgot to eat. No, wait. There was nothing to forget. That's different",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|I can't draw in the dark. I tried. It's a very bad map.": {
+  "ids": [
+   "mina.need.lamp.0"
+  ],
+  "file": "voice/mina/c211e97b633f.mp3",
+  "hash": "c211e97b633f",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "I can't draw in the dark. I tried. It's a very bad map.",
+  "chars": 55,
+  "seconds": 4.8,
+  "pitchHz": 232,
+  "aligned": true,
+  "transcript": "I can't draw in the dark. I tried. It's a very bad map",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|Forty-one, forty-one... I've got the old survey somewhere. Don't touch the ladder.": {
+  "ids": [
+   "mina.hall.0"
+  ],
+  "file": "voice/mina/f3234e649273.mp3",
+  "hash": "f3234e649273",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Forty-one, forty-one... I've got the old survey somewhere. Don't touch the ladder.",
+  "chars": 82,
+  "seconds": 6,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "41, 41. I've got the old survey somewhere. Don't touch the ladder",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|That ruin by the mill isn't on any of the guild's maps. It's on mine now.": {
+  "ids": [
+   "mina.arrived.0"
+  ],
+  "file": "voice/mina/331180781335.mp3",
+  "hash": "331180781335",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "That ruin by the mill isn't on any of the guild's maps. It's on mine now.",
+  "chars": 73,
+  "seconds": 4.96,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "That ruin by the mill isn't on any of the guild's maps. It's on mine now",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|Every farm you've got, at its best rate. Your terrace is showing off.": {
+  "ids": [
+   "mina.chapter3.0"
+  ],
+  "file": "voice/mina/18a4489bbe8b.mp3",
+  "hash": "18a4489bbe8b",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Every farm you've got, at its best rate. Your terrace is showing off.",
+  "chars": 69,
+  "seconds": 4.88,
+  "pitchHz": 250,
+  "aligned": true,
+  "transcript": "Every farm you've got at its best rate. Your terrace is showing off",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|Today's is a sunk tower. One room. Probably. I'll know when you've been.": {
+  "ids": [
+   "mina.maproom.0"
+  ],
+  "file": "voice/mina/091f338026e9.mp3",
+  "hash": "091f338026e9",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Today's is a sunk tower. One room. Probably. I'll know when you've been.",
+  "chars": 72,
+  "seconds": 5.6,
+  "pitchHz": 229,
+  "aligned": true,
+  "transcript": "Today's is a sunk tower. One room, probably. I'll know when you've been",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|Tell me everything about the Rootworks. Count the stairs. All of them.": {
+  "ids": [
+   "mina.chapter4.0"
+  ],
+  "file": "voice/mina/c3b4fb56f82a.mp3",
+  "hash": "c3b4fb56f82a",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "Tell me everything about the Rootworks. Count the stairs. All of them.",
+  "chars": 70,
+  "seconds": 4.64,
+  "pitchHz": 219,
+  "aligned": true,
+  "transcript": "Tell me everything about the rootworks. Count the stairs, all of them",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "mina|West? Nobody's mapped the desert properly. Bring me back everything.": {
+  "ids": [
+   "mina.fallback.0"
+  ],
+  "file": "voice/mina/a694f327424f.mp3",
+  "hash": "a694f327424f",
+  "voiceId": "nDJIICjR9zfJExIFeSCN",
+  "model": "eleven_v4_turbo",
+  "say": "West? Nobody's mapped the desert properly. Bring me back everything.",
+  "chars": 68,
+  "seconds": 4.96,
+  "pitchHz": 235,
+  "aligned": true,
+  "transcript": "West? Nobody's mapped the desert properly. Bring me back everything",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|No supper. A man can farm hungry. Not well.": {
+  "ids": [
+   "gus.need.meal.0"
+  ],
+  "file": "voice/gus/7500c4eac603.mp3",
+  "hash": "7500c4eac603",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "No supper. A man can farm hungry. Not well.",
+  "chars": 43,
+  "seconds": 4.8,
+  "pitchHz": 117,
+  "aligned": true,
+  "transcript": "No supper. A man can farm hungry. Not well",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|Dark comes early here. Can't see my rows.": {
+  "ids": [
+   "gus.need.lamp.0"
+  ],
+  "file": "voice/gus/11c5968f7924.mp3",
+  "hash": "11c5968f7924",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Dark comes early here. Can't see my rows.",
+  "chars": 41,
+  "seconds": 3.84,
+  "pitchHz": 117,
+  "aligned": true,
+  "transcript": "Dark comes early here. Can't see my rose",
+  "heard": 0.875,
+  "tagsReadOut": []
+ },
+ "gus|Slept in the barn. Barn's fine. Barn's got a draught.": {
+  "ids": [
+   "gus.need.bed.0"
+  ],
+  "file": "voice/gus/179c8667483a.mp3",
+  "hash": "179c8667483a",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Slept in the barn. Barn's fine. Barn's got a draught.",
+  "chars": 53,
+  "seconds": 4.8,
+  "pitchHz": 114,
+  "aligned": true,
+  "transcript": "Slept in the barn. Barn's fine. Barn's got a draft",
+  "heard": 0.9,
+  "tagsReadOut": []
+ },
+ "gus|Row's resting. Good. Come back in two weeks. You'll see.": {
+  "ids": [
+   "gus.wish.0"
+  ],
+  "file": "voice/gus/c3f4d3ea2770.mp3",
+  "hash": "c3f4d3ea2770",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Row's resting. Good. Come back in two weeks. You'll see.",
+  "chars": 56,
+  "seconds": 4.72,
+  "pitchHz": 163,
+  "aligned": true,
+  "transcript": "Rose resting. Good. Come back in two weeks. You'll see",
+  "heard": 0.9,
+  "tagsReadOut": []
+ },
+ "gus|Machine's doing my rows. Off to town. Somebody there must want a farmer.": {
+  "ids": [
+   "gus.arm.0"
+  ],
+  "file": "voice/gus/c749c16b86bf.mp3",
+  "hash": "c749c16b86bf",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Machine's doing my rows. Off to town. Somebody there must want a farmer.",
+  "chars": 72,
+  "seconds": 5.52,
+  "pitchHz": 145,
+  "aligned": true,
+  "transcript": "Machine's doing my rows. Off to town. Somebody there must want a farmer",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|Field's grey. Pump's still humming in it. Soil's not dead. Soil's tired.": {
+  "ids": [
+   "gus.grey.0"
+  ],
+  "file": "voice/gus/b352add661d8.mp3",
+  "hash": "b352add661d8",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Field's grey. Pump's still humming in it. Soil's not dead. Soil's tired.",
+  "chars": 72,
+  "seconds": 7.04,
+  "pitchHz": 113,
+  "aligned": true,
+  "transcript": "Fields gray. Pump's still humming in it. Soil's not dead. Soil's tired",
+  "heard": 0.833,
+  "tagsReadOut": []
+ },
+ "gus|Wet it. Rest it. One row in four. Same as my father did.": {
+  "ids": [
+   "gus.chapter3.0"
+  ],
+  "file": "voice/gus/802cf4f5df74.mp3",
+  "hash": "802cf4f5df74",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Wet it. Rest it. One row in four. Same as my father did.",
+  "chars": 56,
+  "seconds": 5.84,
+  "pitchHz": 130,
+  "aligned": true,
+  "transcript": "Wet it. Rest it. One row in four. Same as my father did",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|I slept in the yard with him. He snores. It's fine. It isn't fine.": {
+  "ids": [
+   "wren.need.bed.0"
+  ],
+  "file": "voice/wren/45f4a20a877e.mp3",
+  "hash": "45f4a20a877e",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "I slept in the yard with him. He snores. It's fine. It isn't fine.",
+  "chars": 66,
+  "seconds": 5.2,
+  "pitchHz": 165,
+  "aligned": true,
+  "transcript": "I slept in the yard with him. He snores. It's fine. It isn't fine",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|No lamp by the yard. He wanders at night, and so do I, after him.": {
+  "ids": [
+   "wren.need.lamp.0"
+  ],
+  "file": "voice/wren/c6185c9dfd91.mp3",
+  "hash": "c6185c9dfd91",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "No lamp by the yard. He wanders at night, and so do I, after him.",
+  "chars": 65,
+  "seconds": 5.28,
+  "pitchHz": 195,
+  "aligned": true,
+  "transcript": "No lamp by the yard. He wanders at night, and so do I, after him",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|Bramble ate. I didn't. Get the order right next time.": {
+  "ids": [
+   "wren.need.meal.0"
+  ],
+  "file": "voice/wren/61aa8d2eb222.mp3",
+  "hash": "61aa8d2eb222",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Bramble ate. I didn't. Get the order right next time.",
+  "chars": 53,
+  "seconds": 3.92,
+  "pitchHz": 213,
+  "aligned": true,
+  "transcript": "Bramble ate. I didn't. Get the order right next time",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "gus|Forest's green. Smell that? That's soil waking up.": {
+  "ids": [
+   "gus.fallback.0"
+  ],
+  "file": "voice/gus/98f92b0d441a.mp3",
+  "hash": "98f92b0d441a",
+  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "model": "eleven_v4_turbo",
+  "say": "Forest's green. Smell that? That's soil waking up.",
+  "chars": 50,
+  "seconds": 5.28,
+  "pitchHz": 114,
+  "aligned": true,
+  "transcript": "Forests green. Smell that? That's soil waking up",
+  "heard": 0.875,
+  "tagsReadOut": []
+ },
+ "wren|(to the boar first) Quiet today. (to you) Quiet's good. Means tired, not hungry.": {
+  "ids": [
+   "wren.edge.0"
+  ],
+  "file": "voice/wren/df0680c3a918.mp3",
+  "hash": "df0680c3a918",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Quiet today. Quiet's good. Means tired, not hungry.",
+  "chars": 51,
+  "seconds": 4.24,
+  "pitchHz": 200,
+  "aligned": true,
+  "transcript": "Quiet today. Quiet's good. Means tired, not hungry.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|Don't tell me. I'll know when you're ready. So will he.": {
+  "ids": [
+   "wren.waiting.0"
+  ],
+  "file": "voice/wren/850f50da1a43.mp3",
+  "hash": "850f50da1a43",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Don't tell me. I'll know when you're ready. So will he.",
+  "chars": 55,
+  "seconds": 3.44,
+  "pitchHz": 190,
+  "aligned": true,
+  "transcript": "Don't tell me. I'll know when you're ready. So will he",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|Water right there. He's been in it since noon. Look at him.": {
+  "ids": [
+   "wren.wish.0"
+  ],
+  "file": "voice/wren/4c382b20404e.mp3",
+  "hash": "4c382b20404e",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "Water right there. He's been in it since noon. Look at him.",
+  "chars": 59,
+  "seconds": 4.08,
+  "pitchHz": 258,
+  "aligned": true,
+  "transcript": "Water right there. He's been in it since noon. Look at him",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|He ploughed half your east strip and fell asleep in it. That's a compliment.": {
+  "ids": [
+   "wren.chapter3.0"
+  ],
+  "file": "voice/wren/84efa2f8ada2.mp3",
+  "hash": "84efa2f8ada2",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "He ploughed half your east strip and fell asleep in it. That's a compliment.",
+  "chars": 76,
+  "seconds": 4.32,
+  "pitchHz": 246,
+  "aligned": true,
+  "transcript": "He plowed half your east strip and fell asleep in it. That's a compliment",
+  "heard": 0.929,
+  "tagsReadOut": []
+ },
+ "tansy|I slept with the hive. They don't mind. I do.": {
+  "ids": [
+   "tansy.need.bed.0"
+  ],
+  "file": "voice/tansy/5a36d0477d5b.mp3",
+  "hash": "5a36d0477d5b",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "I slept with the hive. They don't mind. I do.",
+  "chars": 45,
+  "seconds": 3.44,
+  "pitchHz": 176,
+  "aligned": true,
+  "transcript": "I slept with the hive. They don't mind. I do",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|The wood's loud again. I'd forgotten how loud.": {
+  "ids": [
+   "wren.fallback.0"
+  ],
+  "file": "voice/wren/e6cf5615c9dc.mp3",
+  "hash": "e6cf5615c9dc",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "The wood's loud again. I'd forgotten how loud.",
+  "chars": 46,
+  "seconds": 3.36,
+  "pitchHz": 182,
+  "aligned": true,
+  "transcript": "The wood's loud again. I'd forgotten how loud",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "wren|A chained beast fights the chain, not you. Stay out of the way of the chain.": {
+  "ids": [
+   "wren.chapter4.0"
+  ],
+  "file": "voice/wren/d1fa2a52cd6c.mp3",
+  "hash": "d1fa2a52cd6c",
+  "voiceId": "sgk995upfe3tYLvoGcBN",
+  "model": "eleven_v4_turbo",
+  "say": "A chained beast fights the chain, not you. Stay out of the way of the chain.",
+  "chars": 76,
+  "seconds": 5.52,
+  "pitchHz": 195,
+  "aligned": true,
+  "transcript": "A chained beast fights the chain, not you. Stay out of the way of the chain",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tansy|Honey's not supper. People think it is. It isn't.": {
+  "ids": [
+   "tansy.need.meal.0"
+  ],
+  "file": "voice/tansy/0b47abb81f8b.mp3",
+  "hash": "0b47abb81f8b",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "Honey's not supper. People think it is. It isn't.",
+  "chars": 49,
+  "seconds": 3.92,
+  "pitchHz": 296,
+  "aligned": true,
+  "transcript": "Honey's not supper. People think it is. It isn't",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tansy|You took. The bees knew before I did. I'll say it once.": {
+  "ids": [
+   "tansy.took.0"
+  ],
+  "file": "voice/tansy/f8173b47ecc0.mp3",
+  "hash": "f8173b47ecc0",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "You took. The bees knew before I did. I'll say it once.",
+  "chars": 55,
+  "seconds": 4.16,
+  "pitchHz": 203,
+  "aligned": true,
+  "transcript": "You took. The bees knew before I did. I'll say it once",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tansy|The far row's all flowers. Thirty-one, and two I can't name.": {
+  "ids": [
+   "tansy.wish.0"
+  ],
+  "file": "voice/tansy/1dd15bd83020.mp3",
+  "hash": "1dd15bd83020",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "The far row's all flowers. Thirty-one, and two I can't name.",
+  "chars": 60,
+  "seconds": 4.88,
+  "pitchHz": 205,
+  "aligned": true,
+  "transcript": "The far rows all flowers. Thirty-one and two I can't name",
+  "heard": 0.917,
+  "tagsReadOut": []
+ },
+ "tansy|The bees go to bed at dusk. I don't. Light, please.": {
+  "ids": [
+   "tansy.need.lamp.0"
+  ],
+  "file": "voice/tansy/645d6f5ce612.mp3",
+  "hash": "645d6f5ce612",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "The bees go to bed at dusk. I don't. Light, please.",
+  "chars": 51,
+  "seconds": 4,
+  "pitchHz": 198,
+  "aligned": true,
+  "transcript": "The bees go to bed at dusk. I don't. Light, please",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tansy|Twenty flowers and nobody taking. You know how rare that is?": {
+  "ids": [
+   "tansy.arrived.0"
+  ],
+  "file": "voice/tansy/dbd907c0e051.mp3",
+  "hash": "dbd907c0e051",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "Twenty flowers and nobody taking. You know how rare that is?",
+  "chars": 60,
+  "seconds": 4.4,
+  "pitchHz": 250,
+  "aligned": true,
+  "transcript": "20 flowers and nobody taking. You know how rare that is?",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tansy|Eleven, twelve, thirteen clover by the ditch. Up from nine. Don't mow it.": {
+  "ids": [
+   "tansy.chapter3.0"
+  ],
+  "file": "voice/tansy/a0262ffb34f8.mp3",
+  "hash": "a0262ffb34f8",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "Eleven, twelve, thirteen clover by the ditch. Up from nine. Don't mow it.",
+  "chars": 73,
+  "seconds": 5.84,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "Eleven, twelve, thirteen clover by the ditch. Up from nine. Don't mow it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|A lamplighter eats at dusk, before the round. There was nothing at dusk.": {
+  "ids": [
+   "holt.need.meal.0"
+  ],
+  "file": "voice/holt/4b1e55eb8723.mp3",
+  "hash": "4b1e55eb8723",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "A lamplighter eats at dusk, before the round. There was nothing at dusk.",
+  "chars": 72,
+  "seconds": 5.52,
+  "pitchHz": 132,
+  "aligned": true,
+  "transcript": "A lamplighter eats at dusk, before the round. There was nothing at dusk.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tansy|My hive by the wood is full. The wood's well. When it thins, you'll hear it from me first.": {
+  "ids": [
+   "tansy.fallback.0"
+  ],
+  "file": "voice/tansy/9fce8c30d2d9.mp3",
+  "hash": "9fce8c30d2d9",
+  "voiceId": "h8eW5xfRUGVJrZhAFxqK",
+  "model": "eleven_v4_turbo",
+  "say": "My hive by the wood is full. The wood's well. When it thins, you'll hear it from me first.",
+  "chars": 90,
+  "seconds": 6.24,
+  "pitchHz": 239,
+  "aligned": true,
+  "transcript": "My hive by the wood is full. The wood's well. When it thins, you'll hear it from me first",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|A lamp is a promise. Somebody walks toward it.": {
+  "ids": [
+   "holt.arrived.0"
+  ],
+  "file": "voice/holt/bbfa7a962a6e.mp3",
+  "hash": "bbfa7a962a6e",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "A lamp is a promise. Somebody walks toward it.",
+  "chars": 46,
+  "seconds": 3.92,
+  "pitchHz": 143,
+  "aligned": true,
+  "transcript": "A lamp is a promise. Somebody walks toward it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|A lamp at the landing. Now the late ferry has something to steer by.": {
+  "ids": [
+   "holt.wish.0"
+  ],
+  "file": "voice/holt/e80f9dc2ca38.mp3",
+  "hash": "e80f9dc2ca38",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "A lamp at the landing. Now the late ferry has something to steer by.",
+  "chars": 68,
+  "seconds": 4.64,
+  "pitchHz": 132,
+  "aligned": true,
+  "transcript": "A lamp at the landing. Now the late ferry has something to steer by.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|I can sleep under a lamp post. I have. I'd rather not.": {
+  "ids": [
+   "holt.need.bed.0"
+  ],
+  "file": "voice/holt/960e50c241c1.mp3",
+  "hash": "960e50c241c1",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "I can sleep under a lamp post. I have. I'd rather not.",
+  "chars": 54,
+  "seconds": 4.32,
+  "pitchHz": 132,
+  "aligned": true,
+  "transcript": "I can sleep under a lamppost. I have. I'd rather not",
+  "heard": 0.833,
+  "tagsReadOut": []
+ },
+ "holt|That one by the bait field. Leave it dark. Some things need the dark.": {
+  "ids": [
+   "holt.chapter3.0"
+  ],
+  "file": "voice/holt/8e6b64f71477.mp3",
+  "hash": "8e6b64f71477",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "That one by the bait field. Leave it dark. Some things need the dark.",
+  "chars": 69,
+  "seconds": 4.96,
+  "pitchHz": 138,
+  "aligned": true,
+  "transcript": "That one by the bait field. Leave it dark. Some things need the dark",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|(looking at the arches) No. Ask me about any other lamp.": {
+  "ids": [
+   "holt.chapter3.0.0.0"
+  ],
+  "file": "voice/holt/580cb0acb7db.mp3",
+  "hash": "580cb0acb7db",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "[quietly] No. Ask me about any other lamp.",
+  "chars": 42,
+  "seconds": 2.88,
+  "pitchHz": 116,
+  "aligned": true,
+  "transcript": "No. Ask me about any other lamp",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|A lamplighter with no lamp on his own door. People will talk.": {
+  "ids": [
+   "holt.need.lamp.0"
+  ],
+  "file": "voice/holt/abd60a3ad1a9.mp3",
+  "hash": "abd60a3ad1a9",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "A lamplighter with no lamp on his own door. People will talk.",
+  "chars": 61,
+  "seconds": 4.56,
+  "pitchHz": 127,
+  "aligned": true,
+  "transcript": "A lamplighter with no lamp on his own door. People will talk",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "holt|Every lamp on your hill lit at dusk. None of them on that road.": {
+  "ids": [
+   "holt.fallback.0"
+  ],
+  "file": "voice/holt/45ef5dc5f75b.mp3",
+  "hash": "45ef5dc5f75b",
+  "voiceId": "yvKg3CwzCYDTwyHnWQLg",
+  "model": "eleven_v4_turbo",
+  "say": "Every lamp on your hill lit at dusk. None of them on that road.",
+  "chars": 63,
+  "seconds": 4.72,
+  "pitchHz": 126,
+  "aligned": true,
+  "transcript": "Every lamp on your hill lit at dusk, none of them on that road",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Sleep. Up there, under your roof. I have slept enough for both of us.": {
+  "ids": [
+   "custodian.sleep.0"
+  ],
+  "file": "voice/custodian/7b0ce661e6e2.mp3",
+  "hash": "7b0ce661e6e2",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Sleep. Up there, under your roof. I have slept enough for both of us.",
+  "chars": 69,
+  "seconds": 6.24,
+  "pitchHz": 125,
+  "aligned": true,
+  "transcript": "Sleep up there under your roof. I have slept enough for both of us",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Now the stone. Go and touch it. It does not bite. I checked.": {
+  "ids": [
+   "custodian.heart.0"
+  ],
+  "file": "voice/custodian/68dc4d9fdaf0.mp3",
+  "hash": "68dc4d9fdaf0",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Now the stone. Go and touch it. It does not bite. I checked.",
+  "chars": 60,
+  "seconds": 4.88,
+  "pitchHz": 163,
+  "aligned": true,
+  "transcript": "Now the stone. Go and touch it. It does not bite. I checked",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|The fox, first. Hold out the hand. It remembers that mark.": {
+  "ids": [
+   "custodian.fox.0"
+  ],
+  "file": "voice/custodian/451495b1cee5.mp3",
+  "hash": "451495b1cee5",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "The fox, first. Hold out the hand. It remembers that mark.",
+  "chars": 58,
+  "seconds": 4.96,
+  "pitchHz": 140,
+  "aligned": true,
+  "transcript": "The fox first. Hold out the hand. It remembers that mark",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|It still hums. I can hear it from in here.": {
+  "ids": [
+   "custodian.pump.0"
+  ],
+  "file": "voice/custodian/1806151f1cc0.mp3",
+  "hash": "1806151f1cc0",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "It still hums. I can hear it from in here.",
+  "chars": 42,
+  "seconds": 3.36,
+  "pitchHz": 152,
+  "aligned": true,
+  "transcript": "It still hums. I can hear it from in here",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|The stone does not get brighter while you stand and look at it.": {
+  "ids": [
+   "custodian.hall.0"
+  ],
+  "file": "voice/custodian/f72ce69b0cd6.mp3",
+  "hash": "f72ce69b0cd6",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "The stone does not get brighter while you stand and look at it.",
+  "chars": 63,
+  "seconds": 4,
+  "pitchHz": 130,
+  "aligned": true,
+  "transcript": "The stone does not get brighter while you stand and look at it",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Brighter or dimmer. Those are the only two words I need from your day.": {
+  "ids": [
+   "custodian.chapter2.0"
+  ],
+  "file": "voice/custodian/8832a3c7203c.mp3",
+  "hash": "8832a3c7203c",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Brighter or dimmer. Those are the only two words I need from your day.",
+  "chars": 70,
+  "seconds": 5.12,
+  "pitchHz": 180,
+  "aligned": true,
+  "transcript": "Brighter or dimmer? Those are the only two words I need from your day",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|Three vaults. I marked them. I did not say they would be pleasant.": {
+  "ids": [
+   "custodian.chapter3.0"
+  ],
+  "file": "voice/custodian/82069fae16ff.mp3",
+  "hash": "82069fae16ff",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "Three vaults. I marked them. I did not say they would be pleasant.",
+  "chars": 66,
+  "seconds": 5.2,
+  "pitchHz": 155,
+  "aligned": true,
+  "transcript": "Three vaults. I marked them. I did not say they would be pleasant",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|There is an old friend down there. I have not decided what to say.": {
+  "ids": [
+   "custodian.chapter4.0"
+  ],
+  "file": "voice/custodian/66d562ce6d35.mp3",
+  "hash": "66d562ce6d35",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "There is an old friend down there. I have not decided what to say.",
+  "chars": 66,
+  "seconds": 4.88,
+  "pitchHz": 151,
+  "aligned": true,
+  "transcript": "There is an old friend down there. I have not decided what to say",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|No axe. I won't ask. (taking a spare off her belt) The guild sends its wardens spares.": {
+  "ids": [
+   "tamsin.axe.0"
+  ],
+  "file": "voice/tamsin/5b8ba84e158c.mp3",
+  "hash": "5b8ba84e158c",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "No axe. I won't ask. The guild sends its wardens spares.",
+  "chars": 56,
+  "seconds": 5.12,
+  "pitchHz": 200,
+  "aligned": true,
+  "transcript": "No axe. I won't ask. The guild sends its wardens spares",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Glove on. Good.": {
+  "ids": [
+   "tamsin.glove.0"
+  ],
+  "file": "voice/tamsin/e755292b02a7.mp3",
+  "hash": "e755292b02a7",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Glove on. Good.",
+  "chars": 15,
+  "seconds": 1.92,
+  "pitchHz": 219,
+  "aligned": true,
+  "transcript": "Glove on. Good",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Four. I'll count again tomorrow.": {
+  "ids": [
+   "tamsin.counted.0"
+  ],
+  "file": "voice/tamsin/2e67ea071cf7.mp3",
+  "hash": "2e67ea071cf7",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Four. I'll count again tomorrow.",
+  "chars": 32,
+  "seconds": 2.72,
+  "pitchHz": 188,
+  "aligned": true,
+  "transcript": "Four. I'll count again tomorrow",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Another door sealed. That girl was always quick with wax.": {
+  "ids": [
+   "tamsin.chapter3.0"
+  ],
+  "file": "voice/tamsin/28dbe0e13260.mp3",
+  "hash": "28dbe0e13260",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Another door sealed. That girl was always quick with wax.",
+  "chars": 57,
+  "seconds": 4.64,
+  "pitchHz": 203,
+  "aligned": true,
+  "transcript": "Another door sealed. That girl was always quick with wax",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "custodian|West. I am told there is sand. I do not care for sand.": {
+  "ids": [
+   "custodian.fallback.0"
+  ],
+  "file": "voice/custodian/3605337a539a.mp3",
+  "hash": "3605337a539a",
+  "voiceId": "htZQqY7WtacRNV7s62Iy",
+  "model": "eleven_v4_turbo",
+  "say": "West. I am told there is sand. I do not care for sand.",
+  "chars": 54,
+  "seconds": 5.44,
+  "pitchHz": 147,
+  "aligned": true,
+  "transcript": "West. I am told there is sand. I do not care for sand",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Mind the wet planks. The jetty's older than the town.": {
+  "ids": [
+   "tamsin.before.0"
+  ],
+  "file": "voice/tamsin/3cabda734aa6.mp3",
+  "hash": "3cabda734aa6",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Mind the wet planks. The jetty's older than the town.",
+  "chars": 53,
+  "seconds": 3.76,
+  "pitchHz": 213,
+  "aligned": true,
+  "transcript": "Mind the wet planks. The jetty's older than the town",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|The Mother's kind. She's always been kind. Keep the glove on anyway.": {
+  "ids": [
+   "tamsin.chapter2.0"
+  ],
+  "file": "voice/tamsin/c98180c229fc.mp3",
+  "hash": "c98180c229fc",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "The Mother's kind. She's always been kind. Keep the glove on anyway.",
+  "chars": 68,
+  "seconds": 5.12,
+  "pitchHz": 168,
+  "aligned": true,
+  "transcript": "The mother's kind. She's always been kind. Keep the glove on anyway",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "tamsin|Write to Hobb. She worries out loud. I don't.": {
+  "ids": [
+   "tamsin.fallback.0"
+  ],
+  "file": "voice/tamsin/c225ca5b02ab.mp3",
+  "hash": "c225ca5b02ab",
+  "voiceId": "lUCNYQh2kqW2wiie85Qk",
+  "model": "eleven_v4_turbo",
+  "say": "Write to Hobb. She worries out loud. I don't.",
+  "chars": 45,
+  "seconds": 4.16,
+  "pitchHz": 186,
+  "aligned": true,
+  "transcript": "Write to Hob. She worries out loud. I don't",
+  "heard": 0.889,
+  "tagsReadOut": []
+ },
+ "maren|The priests are very polite to me now. Very. I'm counting that too.": {
+  "ids": [
+   "maren.pumps.0"
+  ],
+  "file": "voice/maren/99b3ebbdff66.mp3",
+  "hash": "99b3ebbdff66",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "The priests are very polite to me now. Very. I'm counting that too.",
+  "chars": 67,
+  "seconds": 5.2,
+  "pitchHz": 216,
+  "aligned": true,
+  "transcript": "The priests are very polite to me now. Very. I'm counting that too",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "maren|Two pumps out. Granary's at forty-six. I'm writing it in ink.": {
+  "ids": [
+   "maren.ledger.0"
+  ],
+  "file": "voice/maren/112d05bf1c61.mp3",
+  "hash": "112d05bf1c61",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "Two pumps out. Granary's at forty-six. I'm writing it in ink.",
+  "chars": 61,
+  "seconds": 4.8,
+  "pitchHz": 242,
+  "aligned": true,
+  "transcript": "Two pumps out. Granary's at forty-six. I'm writing it in ink",
   "heard": 1,
   "tagsReadOut": []
  },
  "maren|They crowned me at sixteen because I could add. Nobody said the adding never stops.": {
   "ids": [
-   "maren.ask.3.2.0"
+   "maren.chapter2.0"
   ],
   "file": "voice/maren/c030b50902fe.mp3",
   "hash": "c030b50902fe",
@@ -1104,755 +3929,377 @@
   "heard": 1,
   "tagsReadOut": []
  },
- "maren|Gus has seed. Go, before I count something.": {
+ "maren|(not opening her eyes) If it's about the sacks, there are forty. Come back later.": {
   "ids": [
-   "maren.ask.3.2.1"
+   "maren.chapter3.0"
   ],
-  "file": "voice/maren/ec997f44e3dd.mp3",
-  "hash": "ec997f44e3dd",
+  "file": "voice/maren/e61679243b50.mp3",
+  "hash": "e61679243b50",
   "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
   "model": "eleven_v4_turbo",
-  "say": "Gus has seed. Go, before I count something.",
-  "chars": 43,
-  "seconds": 3.6,
-  "pitchHz": 225,
-  "aligned": true,
-  "transcript": "Gus has seed. Go, before I count something",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Dusk yet? No. Then I can sleep, or you can wait with me.": {
-  "ids": [
-   "maren.tonight.0"
-  ],
-  "file": "voice/maren/d3b057940499.mp3",
-  "hash": "d3b057940499",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Dusk yet? No. Then I can sleep, or you can wait with me.",
-  "chars": 56,
-  "seconds": 4.8,
-  "pitchHz": 235,
-  "aligned": true,
-  "transcript": "Dusk yet? No. Then I can sleep, or you can wait with me",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Then go quietly. I was nearly asleep.": {
-  "ids": [
-   "maren.tonight.0.1.0"
-  ],
-  "file": "voice/maren/421f27a37724.mp3",
-  "hash": "421f27a37724",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "[sleepily] Then go quietly. I was nearly asleep.",
-  "chars": 48,
-  "seconds": 3.68,
-  "pitchHz": 235,
-  "aligned": true,
-  "transcript": "Then go quietly. I was nearly asleep",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|(holding a heel of bread) I am not counting tonight. Ask me tomorrow how many I ate.": {
-  "ids": [
-   "maren.festival.0"
-  ],
-  "file": "voice/maren/2dcbd5a9bb60.mp3",
-  "hash": "2dcbd5a9bb60",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "I am not counting tonight. Ask me tomorrow how many I ate.",
-  "chars": 58,
-  "seconds": 4.16,
-  "pitchHz": 232,
-  "aligned": true,
-  "transcript": "I am not counting tonight. Ask me tomorrow how many I ate",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Twenty sheaves. I wrote your name in the ledger. In ink.": {
-  "ids": [
-   "maren.festival.1"
-  ],
-  "file": "voice/maren/59dc46d552b1.mp3",
-  "hash": "59dc46d552b1",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Twenty sheaves. I wrote your name in the ledger. In ink.",
-  "chars": 56,
+  "say": "[sleepily] If it's about the sacks, there are forty. Come back later.",
+  "chars": 69,
   "seconds": 4.4,
-  "pitchHz": 216,
-  "aligned": true,
-  "transcript": "Twenty sheaves. I wrote your name in the ledger in ink",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|(one eye open) It has a leaf for a tail. Wren feeds it? Good. One less to count.": {
-  "ids": [
-   "maren.pet.0"
-  ],
-  "file": "voice/maren/6e88c91e7d2c.mp3",
-  "hash": "6e88c91e7d2c",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "It has a leaf for a tail. Wren feeds it? Good. One less to count.",
-  "chars": 65,
-  "seconds": 5.36,
-  "pitchHz": 232,
-  "aligned": true,
-  "transcript": "It has a leaf for a tail. Ren feeds it? Good. One less to count",
-  "heard": 0.933,
-  "tagsReadOut": []
- },
- "maren|(not looking up) Thirty-nine sacks. A mouse got one. Do not tell Odo.": {
-  "ids": [
-   "maren.waiting.0"
-  ],
-  "file": "voice/maren/dc323b3cce30.mp3",
-  "hash": "dc323b3cce30",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Thirty-nine sacks. A mouse got one. Do not tell Odo.",
-  "chars": 52,
-  "seconds": 4.72,
-  "pitchHz": 213,
-  "aligned": true,
-  "transcript": "39 sacks. A mouse got one. Do not tell Odo",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Rain on the roof. Good. Gus will be unbearable. Good.": {
-  "ids": [
-   "maren.waiting.1"
-  ],
-  "file": "voice/maren/1426c8664fc5.mp3",
-  "hash": "1426c8664fc5",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Rain on the roof. Good. Gus will be unbearable. Good.",
-  "chars": 53,
-  "seconds": 5.28,
-  "pitchHz": 208,
-  "aligned": true,
-  "transcript": "Rain on the roof, good. Gus will be unbearable, good",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|Is it grown? No. Then I am still counting.": {
-  "ids": [
-   "maren.waiting.2"
-  ],
-  "file": "voice/maren/bd70449754cd.mp3",
-  "hash": "bd70449754cd",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "Is it grown? No. Then I am still counting.",
-  "chars": 42,
-  "seconds": 3.84,
-  "pitchHz": 229,
-  "aligned": true,
-  "transcript": "Is it grown? No. Then I am still counting",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "maren|(not opening her eyes) If it is about the sacks, there are forty. Come back later.": {
-  "ids": [
-   "maren.first.1"
-  ],
-  "file": "voice/maren/2c6d845d369f.mp3",
-  "hash": "2c6d845d369f",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
-  "model": "eleven_v4_turbo",
-  "say": "[sleepily] If it is about the sacks, there are forty. Come back later.",
-  "chars": 70,
-  "seconds": 4.64,
   "pitchHz": 242,
   "aligned": true,
-  "transcript": "If it is about the sax, there are 40. Come back later",
+  "transcript": "If it's about the sax, there are 40. Come back later",
+  "heard": 0.909,
+  "tagsReadOut": []
+ },
+ "maren|You have a valley. I have a winter's bread. Fair trade. Sit down, I'm tired.": {
+  "ids": [
+   "maren.fallback.0"
+  ],
+  "file": "voice/maren/9287eadc9a73.mp3",
+  "hash": "9287eadc9a73",
+  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "model": "eleven_v4_turbo",
+  "say": "You have a valley. I have a winter's bread. Fair trade. [sighs] Sit down, I'm tired.",
+  "chars": 84,
+  "seconds": 7.04,
+  "pitchHz": 232,
+  "aligned": true,
+  "transcript": "You have a valley. I have a winter's bread. Fair trade. [sighs] Sit down. I'm tired",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "aldric|Tonight, on the road! You will come? Do come. Bring a... bring a cloak.": {
+  "ids": [
+   "aldric.road.0"
+  ],
+  "file": "voice/aldric/a6bfd252e232.mp3",
+  "hash": "a6bfd252e232",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
+  "model": "eleven_v4_turbo",
+  "say": "Tonight, on the road! You will come? Do come. Bring a... bring a cloak.",
+  "chars": 71,
+  "seconds": 5.92,
+  "pitchHz": 208,
+  "aligned": true,
+  "transcript": "Tonight, on the road. You will come? Do come. Bring a, bring a cloak",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "aldric|Bless you. Is that... may I... no. No. Bless you.": {
+  "ids": [
+   "aldric.chapter2.0"
+  ],
+  "file": "voice/aldric/b2f4753eef57.mp3",
+  "hash": "b2f4753eef57",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
+  "model": "eleven_v4_turbo",
+  "say": "Bless you. Is that... may I... no. No. Bless you.",
+  "chars": 49,
+  "seconds": 5.04,
+  "pitchHz": 160,
+  "aligned": true,
+  "transcript": "Bless you. Is that... May I? No. No. Bless you",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "aldric|The pumps were a gift. One does not... a gift is not... Good day.": {
+  "ids": [
+   "aldric.chapter3.0"
+  ],
+  "file": "voice/aldric/d9a6593a10ca.mp3",
+  "hash": "d9a6593a10ca",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
+  "model": "eleven_v4_turbo",
+  "say": "The pumps were a gift. One does not... a gift is not... Good day.",
+  "chars": 65,
+  "seconds": 5.52,
+  "pitchHz": 148,
+  "aligned": true,
+  "transcript": "The pumps were a gift. One does not... A gift is not... Good day",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "elowen|Calla bites, a little. Somebody left her young. Be patient with her.": {
+  "ids": [
+   "elowen.chapter2.1"
+  ],
+  "file": "voice/elowen/2a8ede06e255.mp3",
+  "hash": "2a8ede06e255",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "model": "eleven_v4_turbo",
+  "say": "Calla bites, a little. Somebody left her young. Be patient with her.",
+  "chars": 68,
+  "seconds": 5.92,
+  "pitchHz": 160,
+  "aligned": true,
+  "transcript": "Caleb bites a little. Somebody left her young. Be patient with her",
   "heard": 0.917,
   "tagsReadOut": []
  },
- "maren|Your twenty are milled. I counted them once. Once was enough, for once.": {
+ "elowen|Have you eaten? You have the look of someone who forgets.": {
   "ids": [
-   "maren.after.0"
+   "elowen.chapter2.0"
   ],
-  "file": "voice/maren/6fe36060a879.mp3",
-  "hash": "6fe36060a879",
-  "voiceId": "XwYcwSl7JeQ9PUQCBnqY",
+  "file": "voice/elowen/3e339b9819fa.mp3",
+  "hash": "3e339b9819fa",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
   "model": "eleven_v4_turbo",
-  "say": "Your twenty are milled. I counted them once. Once was enough, for once.",
-  "chars": 71,
-  "seconds": 5.44,
-  "pitchHz": 232,
+  "say": "Have you eaten? You have the look of someone who forgets.",
+  "chars": 57,
+  "seconds": 3.76,
+  "pitchHz": 225,
   "aligned": true,
-  "transcript": "Your 20 are milled. I counted them once. Once was enough, for once",
+  "transcript": "Have you eaten? You have the look of someone who forgets",
   "heard": 1,
   "tagsReadOut": []
  },
- "gus|Came up short. Happens. Soil forgives it.": {
+ "elowen|Look at you. A season ago you had a tent.": {
   "ids": [
-   "gus.more.0"
+   "elowen.fallback.0"
   ],
-  "file": "voice/gus/747e1d7a1f67.mp3",
-  "hash": "747e1d7a1f67",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "file": "voice/elowen/3755a7d5b88e.mp3",
+  "hash": "3755a7d5b88e",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
   "model": "eleven_v4_turbo",
-  "say": "Came up short. Happens. Soil forgives it.",
+  "say": "Look at you. A season ago you had a tent.",
   "chars": 41,
-  "seconds": 4,
-  "pitchHz": 110,
+  "seconds": 3.6,
+  "pitchHz": 246,
   "aligned": true,
-  "transcript": "Came up short. Happens. Soil forgives it",
+  "transcript": "Look at you. A season ago you had a tent",
   "heard": 1,
   "tagsReadOut": []
  },
- "gus|Four more. Wet them this time. Or don't, and see me again.": {
+ "elowen|It is a long road. Write to your cook. Cooks worry.": {
   "ids": [
-   "gus.more.1"
+   "elowen.fallback.1"
   ],
-  "file": "voice/gus/a12b3c0974ca.mp3",
-  "hash": "a12b3c0974ca",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "file": "voice/elowen/5066a55e349f.mp3",
+  "hash": "5066a55e349f",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
   "model": "eleven_v4_turbo",
-  "say": "Four more. Wet them this time. Or don't, and see me again.",
-  "chars": 58,
-  "seconds": 5.12,
-  "pitchHz": 110,
-  "aligned": true,
-  "transcript": "Four more. Wet them this time. Or don't, and see me again",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Soil's tired. Not lazy. Tired. You'd be too.": {
-  "ids": [
-   "gus.seeds.first.1",
-   "gus.first.1"
-  ],
-  "file": "voice/gus/d2d2d77519c1.mp3",
-  "hash": "d2d2d77519c1",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Soil's tired. Not lazy. Tired. You'd be too.",
-  "chars": 44,
-  "seconds": 5.52,
-  "pitchHz": 131,
-  "aligned": true,
-  "transcript": "Soil's tired. Not lazy, tired. You'd be too",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Maren sent you. She said please? Huh. She's worried, then.": {
-  "ids": [
-   "gus.seeds.first.2"
-  ],
-  "file": "voice/gus/57de3bd1d5b3.mp3",
-  "hash": "57de3bd1d5b3",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Maren sent you. She said please? Huh. She's worried, then.",
-  "chars": 58,
-  "seconds": 5.76,
-  "pitchHz": 109,
-  "aligned": true,
-  "transcript": "Marin sent you. She said please? [chuckles] She's worried then",
-  "heard": 0.8,
-  "tagsReadOut": []
- },
- "gus|Hoe. Can. Twelve seeds. Break the ground, plant, keep it wet.": {
-  "ids": [
-   "gus.seeds.first.3",
-   "gus.seeds.1"
-  ],
-  "file": "voice/gus/c2ff8ac5abcb.mp3",
-  "hash": "c2ff8ac5abcb",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Hoe. Can. Twelve seeds. Break the ground, plant, keep it wet.",
-  "chars": 61,
-  "seconds": 7.12,
-  "pitchHz": 121,
-  "aligned": true,
-  "transcript": "Who can? Twelve seeds. Break the ground, plant, keep it wet",
-  "heard": 0.909,
-  "tagsReadOut": []
- },
- "gus|Wet soil grows. Dry soil waits. That's all I know. It's enough.": {
-  "ids": [
-   "gus.seeds.first.4",
-   "gus.seeds.2"
-  ],
-  "file": "voice/gus/54dfdc08f761.mp3",
-  "hash": "54dfdc08f761",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Wet soil grows. Dry soil waits. That's all I know. It's enough.",
-  "chars": 63,
-  "seconds": 6.96,
-  "pitchHz": 114,
-  "aligned": true,
-  "transcript": "Wet soil grows. Dry soil waits. That's all I know. It's enough",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Rain'd do it better. Rain always does it better.": {
-  "ids": [
-   "gus.seeds.first.5",
-   "gus.seeds.3"
-  ],
-  "file": "voice/gus/6c3eaf300022.mp3",
-  "hash": "6c3eaf300022",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Rain'd do it better. Rain always does it better.",
-  "chars": 48,
-  "seconds": 4.32,
-  "pitchHz": 116,
-  "aligned": true,
-  "transcript": "Rain do it better. Rain always does it better",
-  "heard": 0.889,
-  "tagsReadOut": []
- },
- "gus|You again. Maren sent you. She said please? Huh.": {
-  "ids": [
-   "gus.seeds.0"
-  ],
-  "file": "voice/gus/146d829b65b4.mp3",
-  "hash": "146d829b65b4",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "You again. Maren sent you. She said please? Huh.",
-  "chars": 48,
-  "seconds": 5.52,
-  "pitchHz": 124,
-  "aligned": true,
-  "transcript": "You again. Maren sent you. She said please? Huh.",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|You want seed, see the queen. She keeps the count. I keep the dirt.": {
-  "ids": [
-   "gus.first.2"
-  ],
-  "file": "voice/gus/85e5b6e6fbc2.mp3",
-  "hash": "85e5b6e6fbc2",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "You want seed, see the queen. She keeps the count. I keep the dirt.",
-  "chars": 67,
-  "seconds": 5.84,
-  "pitchHz": 115,
-  "aligned": true,
-  "transcript": "You want seed, see the queen. She keeps the count. I keep the dirt",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Good wheat. Short straw, heavy head. Your soil's not tired yet.": {
-  "ids": [
-   "gus.festival.0"
-  ],
-  "file": "voice/gus/fed220e9a0da.mp3",
-  "hash": "fed220e9a0da",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Good wheat. Short straw, heavy head. Your soil's not tired yet.",
-  "chars": 63,
-  "seconds": 6.4,
-  "pitchHz": 123,
-  "aligned": true,
-  "transcript": "Good wheat. Short straw, heavy head. Your soil's not tired yet",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Clear night. I'd have liked rain. Don't tell the lamp people.": {
-  "ids": [
-   "gus.festival.1"
-  ],
-  "file": "voice/gus/208247933e7d.mp3",
-  "hash": "208247933e7d",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Clear night. I'd have liked rain. Don't tell the lamp people.",
-  "chars": 61,
-  "seconds": 4.88,
-  "pitchHz": 112,
-  "aligned": true,
-  "transcript": "Clear night. I'd have liked rain. Don't tell the lamp people",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|(hat off, face up) There. Rain.": {
-  "ids": [
-   "gus.rain.0"
-  ],
-  "file": "voice/gus/e8f08c6e1326.mp3",
-  "hash": "e8f08c6e1326",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "There. Rain.",
-  "chars": 12,
-  "seconds": 2.16,
-  "pitchHz": 111,
-  "aligned": true,
-  "transcript": "There. Rain",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Go look at your field. It's doing your job for you.": {
-  "ids": [
-   "gus.rain.1"
-  ],
-  "file": "voice/gus/6b5254820687.mp3",
-  "hash": "6b5254820687",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Go look at your field. It's doing your job for you.",
+  "say": "It is a long road. Write to your cook. Cooks worry.",
   "chars": 51,
-  "seconds": 3.84,
-  "pitchHz": 143,
-  "aligned": true,
-  "transcript": "Go look at your field. It's doing your job for you",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|That leaftail digs. Good. Digging's half of farming. Other half's waiting.": {
-  "ids": [
-   "gus.pet.0"
-  ],
-  "file": "voice/gus/71ac6304c335.mp3",
-  "hash": "71ac6304c335",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "That leaftail digs. Good. Digging's half of farming. Other half's waiting.",
-  "chars": 74,
-  "seconds": 6.56,
-  "pitchHz": 111,
-  "aligned": true,
-  "transcript": "That leaf tail digs. Good. Digging's half of farming. Other half's waiting",
-  "heard": 0.909,
-  "tagsReadOut": []
- },
- "gus|Don't watch it. It knows how. Keep it wet and go do something else.": {
-  "ids": [
-   "gus.grow.0"
-  ],
-  "file": "voice/gus/fc5579daad35.mp3",
-  "hash": "fc5579daad35",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Don't watch it. It knows how. Keep it wet and go do something else.",
-  "chars": 67,
-  "seconds": 5.68,
-  "pitchHz": 118,
-  "aligned": true,
-  "transcript": "Don't watch it. It knows how. Keep it wet and go do something else",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|Sleep on it, if it's wet. Wheat does its best work when you're not looking.": {
-  "ids": [
-   "gus.grow.1"
-  ],
-  "file": "voice/gus/505c39753d9e.mp3",
-  "hash": "505c39753d9e",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "Sleep on it, if it's wet. Wheat does its best work when you're not looking.",
-  "chars": 75,
-  "seconds": 5.84,
-  "pitchHz": 106,
-  "aligned": true,
-  "transcript": "Sleep on it if it's wet. Wheat does its best work when you're not looking",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "gus|That's twenty. Don't stand here with it. The queen's the one counting.": {
-  "ids": [
-   "gus.deliver.0"
-  ],
-  "file": "voice/gus/c17997db681a.mp3",
-  "hash": "c17997db681a",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
-  "model": "eleven_v4_turbo",
-  "say": "That's twenty. Don't stand here with it. The queen's the one counting.",
-  "chars": 70,
   "seconds": 5.04,
-  "pitchHz": 154,
+  "pitchHz": 165,
   "aligned": true,
-  "transcript": "That's twenty. Don't stand here with it! The queen's the one counting",
+  "transcript": "It is a long road. Write to your cook. Cooks worry",
   "heard": 1,
   "tagsReadOut": []
  },
- "gus|Festival tonight. I'll stand at the back. Somebody has to watch the sky.": {
+ "calla|I will be near. You will not notice me. That is also in my instructions.": {
   "ids": [
-   "gus.tonight.0"
+   "calla.chapter2.0"
   ],
-  "file": "voice/gus/b7da7a1904df.mp3",
-  "hash": "b7da7a1904df",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "file": "voice/calla/4822ee469e09.mp3",
+  "hash": "4822ee469e09",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
   "model": "eleven_v4_turbo",
-  "say": "Festival tonight. I'll stand at the back. Somebody has to watch the sky.",
+  "say": "I will be near. You will not notice me. That is also in my instructions.",
   "chars": 72,
-  "seconds": 5.28,
-  "pitchHz": 106,
+  "seconds": 5.2,
+  "pitchHz": 235,
   "aligned": true,
-  "transcript": "Festival tonight. I'll stand at the back. Somebody has to watch the sky",
+  "transcript": "I will be near. You will not notice me. That is also in my instructions",
   "heard": 1,
   "tagsReadOut": []
  },
- "gus|It's the soil. Whatever it is. It's the soil.": {
+ "calla|I wrote \"found nothing\". I have read it several times since.": {
   "ids": [
-   "gus.fallback.0"
+   "calla.nothing.0"
   ],
-  "file": "voice/gus/b219e98fddba.mp3",
-  "hash": "b219e98fddba",
-  "voiceId": "VXQGRSJ6Cm10Pt4GSFeG",
+  "file": "voice/calla/53634812bbb1.mp3",
+  "hash": "53634812bbb1",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
   "model": "eleven_v4_turbo",
-  "say": "It's the soil. Whatever it is. It's the soil.",
-  "chars": 45,
-  "seconds": 4.56,
-  "pitchHz": 121,
-  "aligned": true,
-  "transcript": "It's the soil. Whatever it is, it's the soil",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|You're the new one! From the stone! Have you got any sweets?": {
-  "ids": [
-   "juniper.first.0"
-  ],
-  "file": "voice/juniper/10223bad0550.mp3",
-  "hash": "10223bad0550",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "You're the new one! From the stone! Have you got any sweets?",
+  "say": "I wrote \"found nothing\". I have read it several times since.",
   "chars": 60,
-  "seconds": 4.08,
-  "pitchHz": 302,
+  "seconds": 4.72,
+  "pitchHz": 242,
   "aligned": true,
-  "transcript": "You're the new one from the stone. Have you got any sweets?",
+  "transcript": "I wrote Found Nothing. I have read it several times since",
   "heard": 1,
   "tagsReadOut": []
  },
- "juniper|A berry's a sweet. A berry counts. I've got secrets. Good ones.": {
+ "aldric|Every bell! I rang every bell. My arms are a gift to the Ascended now.": {
   "ids": [
-   "juniper.first.1"
+   "aldric.fallback.0"
   ],
-  "file": "voice/juniper/48a86583ec28.mp3",
-  "hash": "48a86583ec28",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
+  "file": "voice/aldric/2dcec3cabaf1.mp3",
+  "hash": "2dcec3cabaf1",
+  "voiceId": "1SgtCdnh90xU4Bpehczp",
   "model": "eleven_v4_turbo",
-  "say": "A berry's a sweet. A berry counts. I've got secrets. Good ones.",
-  "chars": 63,
-  "seconds": 5.76,
-  "pitchHz": 262,
+  "say": "Every bell! I rang every bell. My arms are a gift to the Ascended now.",
+  "chars": 70,
+  "seconds": 6.08,
+  "pitchHz": 170,
   "aligned": true,
-  "transcript": "A berry's a sweet. A berry counts. I've got secrets, good ones",
+  "transcript": "Every bell. I rang every bell. My arms are a gift to the ascended now",
   "heard": 1,
   "tagsReadOut": []
  },
- "juniper|I get to push the stuck lamps off with a stick! Only the stuck ones. That's the rule.": {
+ "calla|The gate did not open for me. I have written that down. It does not need a reason.": {
   "ids": [
-   "juniper.festival.0"
+   "calla.chapter4.0"
   ],
-  "file": "voice/juniper/589de06025a4.mp3",
-  "hash": "589de06025a4",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
+  "file": "voice/calla/4d228e7fd981.mp3",
+  "hash": "4d228e7fd981",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
   "model": "eleven_v4_turbo",
-  "say": "I get to push the stuck lamps off with a stick! Only the stuck ones. That's the rule.",
-  "chars": 85,
-  "seconds": 5.6,
-  "pitchHz": 390,
-  "aligned": true,
-  "transcript": "I get to push the stuck lamps off with a stick. Only the stuck ones. That's the rule",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|It's got a LEAF for a TAIL. Does it know? Don't tell it.": {
-  "ids": [
-   "juniper.pet.0"
-  ],
-  "file": "voice/juniper/12ad6fbd8731.mp3",
-  "hash": "12ad6fbd8731",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "It's got a LEAF for a TAIL. [whispers] Does it know? Don't tell it.",
-  "chars": 67,
-  "seconds": 4.64,
-  "pitchHz": 291,
-  "aligned": true,
-  "transcript": "It's got a leaf for a tail. Does it know? Don't tell it",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|I'm not wet, I'm fast. Rain can't land on fast.": {
-  "ids": [
-   "juniper.rain.0"
-  ],
-  "file": "voice/juniper/dce6c08d06be.mp3",
-  "hash": "dce6c08d06be",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "I'm not wet, I'm fast. Rain can't land on fast.",
-  "chars": 47,
-  "seconds": 4.48,
-  "pitchHz": 267,
-  "aligned": true,
-  "transcript": "I'm not wet, I'm fast. Rain can't land on fast",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Is that a berry? That's a sweet! Swap you. One berry, one secret.": {
-  "ids": [
-   "juniper.trade.0"
-  ],
-  "file": "voice/juniper/37ecd108ed7c.mp3",
-  "hash": "37ecd108ed7c",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "[gasps] Is that a berry? That's a sweet! Swap you. One berry, one secret.",
-  "chars": 73,
-  "seconds": 6.48,
-  "pitchHz": 314,
-  "aligned": true,
-  "transcript": "[gasps] Is that a berry? That's a sweet. Swap you. One berry, one secret",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Secret. The queen sleeps on the ledger. It prints numbers on her face. Backwards.": {
-  "ids": [
-   "juniper.trade.0.0.0"
-  ],
-  "file": "voice/juniper/ac1e85647a9b.mp3",
-  "hash": "ac1e85647a9b",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "Secret. The queen sleeps on the ledger. It prints numbers on her face. Backwards.",
-  "chars": 81,
-  "seconds": 6.56,
-  "pitchHz": 258,
-  "aligned": true,
-  "transcript": "Secret: The queen sleeps on the ledger. It prints numbers on her face backwards",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Secret. Wet wheat grows two whole sizes while you sleep. Gus told the wheat, not me.": {
-  "ids": [
-   "juniper.trade.0.0.1"
-  ],
-  "file": "voice/juniper/24913e605f1a.mp3",
-  "hash": "24913e605f1a",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "Secret. Wet wheat grows two whole sizes while you sleep. Gus told the wheat, not me.",
-  "chars": 84,
-  "seconds": 6.88,
-  "pitchHz": 254,
-  "aligned": true,
-  "transcript": "Secret: wet wheat grows two whole sizes while you sleep. Gus told the wheat, not me",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Secret. Odo cried when Gertrude sold. He said onions. There weren't onions.": {
-  "ids": [
-   "juniper.trade.0.0.2"
-  ],
-  "file": "voice/juniper/02e5316e8d5e.mp3",
-  "hash": "02e5316e8d5e",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "Secret. Odo cried when Gertrude sold. He said onions. There weren't onions.",
-  "chars": 75,
-  "seconds": 6.96,
-  "pitchHz": 271,
-  "aligned": true,
-  "transcript": "Secret. Odo cried when Gertrude sold. He said onions. There weren't onions",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Secret. Tamsin's sword is under the lodge floor. She grew beans on top.": {
-  "ids": [
-   "juniper.trade.0.0.3"
-  ],
-  "file": "voice/juniper/7ece90ead463.mp3",
-  "hash": "7ece90ead463",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "Secret. Tamsin's sword is under the lodge floor. She grew beans on top.",
-  "chars": 71,
-  "seconds": 5.52,
-  "pitchHz": 267,
-  "aligned": true,
-  "transcript": "Secret. Tamsin's sword is under the lodge floor. She grew beans on top",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Then no secret. That's the rule. I made it.": {
-  "ids": [
-   "juniper.trade.0.1.0"
-  ],
-  "file": "voice/juniper/d297800c7ef6.mp3",
-  "hash": "d297800c7ef6",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "Then no secret. That's the rule. I made it.",
-  "chars": 43,
-  "seconds": 3.44,
-  "pitchHz": 308,
-  "aligned": true,
-  "transcript": "Then no secret. That's the rule. I made it",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|I'm out of secrets. I have to go and find out more. Don't follow me.": {
-  "ids": [
-   "juniper.out.0"
-  ],
-  "file": "voice/juniper/c09df1326ab2.mp3",
-  "hash": "c09df1326ab2",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "I'm out of secrets. I have to go and find out more. Don't follow me.",
-  "chars": 68,
-  "seconds": 4.88,
-  "pitchHz": 308,
-  "aligned": true,
-  "transcript": "I'm out of secrets. I have to go and find out more. Don't follow me",
-  "heard": 1,
-  "tagsReadOut": []
- },
- "juniper|Festival's tonight! Odo makes the little sweet ones. I know where he hides them.": {
-  "ids": [
-   "juniper.tonight.0"
-  ],
-  "file": "voice/juniper/69c3a609c8fb.mp3",
-  "hash": "69c3a609c8fb",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "Festival's tonight! Odo makes the little sweet ones. I know where he hides them.",
-  "chars": 80,
-  "seconds": 5.04,
-  "pitchHz": 276,
-  "aligned": true,
-  "transcript": "Festivals tonight. Odo makes the little sweet ones. I know where he hides them",
-  "heard": 0.929,
-  "tagsReadOut": []
- },
- "juniper|No sweets, no secrets. I don't make the rules. I do. I do make them.": {
-  "ids": [
-   "juniper.fallback.0"
-  ],
-  "file": "voice/juniper/237d5d50ed79.mp3",
-  "hash": "237d5d50ed79",
-  "voiceId": "piI8Kku0DcvcL6TTSeQt",
-  "model": "eleven_v4_turbo",
-  "say": "No sweets, no secrets. I don't make the rules. I do. I do make them.",
-  "chars": 68,
-  "seconds": 5.84,
+  "say": "The gate did not open for me. I have written that down. It does not need a reason.",
+  "chars": 82,
+  "seconds": 5.68,
   "pitchHz": 229,
   "aligned": true,
-  "transcript": "No sweets, no secrets. I don't make the rules. I do. I do make them",
+  "transcript": "The gate did not open for me. I have written that down. It does not need a reason",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|That door is sealed for your safety. Please do not pick at the seal.": {
+  "ids": [
+   "calla.chapter3.0"
+  ],
+  "file": "voice/calla/6e25812ca9ab.mp3",
+  "hash": "6e25812ca9ab",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "That door is sealed for your safety. Please do not pick at the seal.",
+  "chars": 68,
+  "seconds": 4.8,
+  "pitchHz": 219,
+  "aligned": true,
+  "transcript": "That door is sealed for your safety. Please do not pick at the seal",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "calla|I am to report to the Mother. I have a great deal to report.": {
+  "ids": [
+   "calla.fallback.0"
+  ],
+  "file": "voice/calla/033259b658fc.mp3",
+  "hash": "033259b658fc",
+  "voiceId": "tfvhQIydLdGEZP6h00c5",
+  "model": "eleven_v4_turbo",
+  "say": "I am to report to the Mother. I have a great deal to report.",
+  "chars": 60,
+  "seconds": 4.48,
+  "pitchHz": 198,
+  "aligned": true,
+  "transcript": "I am to report to the mother. I have a great deal to report",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "ren|Where I'm from, a cup of water is a day's pay. Here you leave it lying in ditches.": {
+  "ids": [
+   "ren.fallback.1"
+  ],
+  "file": "voice/ren/3db75382eddc.mp3",
+  "hash": "3db75382eddc",
+  "voiceId": "Os2frcqCuUz8b9F93RuI",
+  "model": "eleven_v4_turbo",
+  "say": "Where I'm from, a cup of water is a day's pay. Here you leave it lying in ditches.",
+  "chars": 82,
+  "seconds": 5.92,
+  "pitchHz": 154,
+  "aligned": true,
+  "transcript": "Where I'm from, a cup of water is a day's pay. Here, you leave it lying in ditches",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "ren|Forty days of water. Thirty-nine if you drink like the Stag.": {
+  "ids": [
+   "ren.fallback.0"
+  ],
+  "file": "voice/ren/d4cd9a61ec50.mp3",
+  "hash": "d4cd9a61ec50",
+  "voiceId": "Os2frcqCuUz8b9F93RuI",
+  "model": "eleven_v4_turbo",
+  "say": "Forty days of water. Thirty-nine if you drink like the Stag.",
+  "chars": 60,
+  "seconds": 4.16,
+  "pitchHz": 148,
+  "aligned": true,
+  "transcript": "[outro jingle]",
+  "heard": 0,
+  "tagsReadOut": []
+ },
+ "stag|Small one. Again.": {
+  "ids": [
+   "stag.chapter4.0"
+  ],
+  "file": "voice/stag/e9f5ac9ca17b.mp3",
+  "hash": "e9f5ac9ca17b",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "Small one. Again.",
+  "chars": 17,
+  "seconds": 2.32,
+  "pitchHz": 81,
+  "aligned": true,
+  "transcript": "Small one. Again",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "ren|The Mother chose me. I want you to know I asked first.": {
+  "ids": [
+   "ren.fallback.2"
+  ],
+  "file": "voice/ren/90f6a2484d76.mp3",
+  "hash": "90f6a2484d76",
+  "voiceId": "Os2frcqCuUz8b9F93RuI",
+  "model": "eleven_v4_turbo",
+  "say": "The Mother chose me. I want you to know I asked first.",
+  "chars": 54,
+  "seconds": 4.72,
+  "pitchHz": 139,
+  "aligned": true,
+  "transcript": "The mother chose me. I want you to know I asked first",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "hobb|Good. Now you'll last till noon. Dax is at the lock table.": {
+  "ids": [
+   "grantday.porridge.1"
+  ],
+  "file": "voice/hobb/8207c18d388b.mp3",
+  "hash": "8207c18d388b",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "model": "eleven_v4_turbo",
+  "say": "Good. Now you'll last till noon. Dax is at the lock table.",
+  "chars": 58,
+  "seconds": 4.08,
+  "pitchHz": 232,
+  "aligned": true,
+  "transcript": "Good. Now you'll last till noon. Dax is at the lock table",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|West. The Lion. Old. Angry.": {
+  "ids": [
+   "stag.fallback.1"
+  ],
+  "file": "voice/stag/5f454c712f1e.mp3",
+  "hash": "5f454c712f1e",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "West. The Lion. Old. Angry.",
+  "chars": 27,
+  "seconds": 4.96,
+  "pitchHz": 100,
+  "aligned": true,
+  "transcript": "West. The lion. Old. Angry",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "stag|The wood. Loud now. Good.": {
+  "ids": [
+   "stag.fallback.0"
+  ],
+  "file": "voice/stag/c47373f93601.mp3",
+  "hash": "c47373f93601",
+  "voiceId": "bFrjFL4nlpeYNwNRhXxq",
+  "model": "eleven_v4_turbo",
+  "say": "The wood. Loud now. Good.",
+  "chars": 25,
+  "seconds": 3.2,
+  "pitchHz": 110,
+  "aligned": true,
+  "transcript": "The wood. Loud now. Good",
   "heard": 1,
   "tagsReadOut": []
  }

@@ -171,12 +171,24 @@ export function facingPlayer(game: Game): number {
 }
 
 /**
+ * The quarter turns that face a placeable's front toward where the player stands, seen from the cell (x, z). In
+ * build mode the hero does not turn to the cursor, so the way they last walked says nothing about where they are:
+ * a door built off to the side faced away. On the cell itself, the way they face decides.
+ */
+export function towardPlayer(game: Game, x: number, z: number): number {
+  const dx = game.player.pos.x - (x + 0.5), dz = game.player.pos.z - (z + 0.5);
+  if (Math.abs(dx) < 0.5 && Math.abs(dz) < 0.5) return facingPlayer(game);
+  if (Math.abs(dz) >= Math.abs(dx)) return dz < 0 ? 0 : 2;
+  return dx > 0 ? 1 : 3;
+}
+
+/**
  * The quarter turns a placeable takes by itself in the cell above the ground block (x, y, z). A thing that
  * `backs` turns its back to a wall beside it and its front to open ground: toward the player when it can,
  * then to either side, then away. With no wall it faces the player.
  */
 export function snapTurns(game: Game, def: PlaceableDef, x: number, y: number, z: number): number {
-  const toward = facingPlayer(game);
+  const toward = towardPlayer(game, x, z);
   if (!def.backs) return toward;
   const { world } = game;
   const placeables = (game.systems as Partial<Systems>).placeables;

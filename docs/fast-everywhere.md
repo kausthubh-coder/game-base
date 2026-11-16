@@ -37,6 +37,34 @@ Nothing on hand can measure it. This Mac draws WebGL in software, and the Window
 - The painted look's trees use alpha-tested leaf cards drawn on both sides. Cheap GPUs pay for every
   layer of leaves they fill, so trees are the first suspect on a Chromebook.
 
+## Act 1 inside the budgets (2026-11-12)
+
+`bun tools/speed-costs.mjs` flies the bench and stands at the ten Greenhollow places, five views of Hollowmere
+(one from the rise north of it) and Saltgate's yard at each level, and keeps a picture of each in
+`.artifacts/speed/`. Every one of them is inside 80 draw calls and 150,000 triangles at low and 150 and 400,000
+at high. The worst at low is the bridge into Hollowmere (67 calls, 149,000 triangles) and the city quay (76
+calls); at high, the boar's clearing (380,000 triangles) and the view of the city across the Mere (116 calls).
+What did it:
+
+| Change | Quality row |
+|---|---|
+| The painted water is one mesh, one draw call, not one a chunk | |
+| Tree variants with the same shape and leaves share a stand; a stand off screen is not drawn | |
+| Trees stand leaf by leaf no farther than 40 blocks at low, then they are their pictures | `treeReach` |
+| Boulders and bushes stop at a reach; a bush wears full leaves only near; a boulder's shadow only within 32 blocks | `scatterReach`, `fineBushReach` |
+| The old town is four squares, whole near the hero and nearest first, far versions past that | `townTriangles`, `cityReach` |
+| The far land is a point every 14 blocks at low | `farLandCell` |
+| A little less grass and 36,000 tree triangles at low | `grassSpacing`, `treeTriangles` |
+
+At high the pictures are the same as before. At low trees fade into their pictures nearer, and bushes past 64
+blocks are gone.
+
+A building past the distance it is drawn whole is its far version (`src/features/painted/far-buildings.ts`), at
+every level: a few dozen triangles in the shape of its roofs and walls, wearing pictures of the real model taken
+from above and from each side when the game starts. So the town keeps its roof lines, timber, plaster and
+windows at any distance, where it was a plaster box under a teal lid. All of the city's far buildings are one
+draw call, the old town's another. They do not light their windows at night.
+
 ## What Roblox does, and our version
 
 | Roblox | What it does | Our version | Status |

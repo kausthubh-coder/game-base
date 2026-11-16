@@ -1,0 +1,464 @@
+{
+ "a/war": {
+  "hash": "558377d05e.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "A thousand years back, six peoples fought a war nobody could end.",
+  "chars": 65,
+  "seconds": 5.2,
+  "speech": [
+   0.03,
+   5.1
+  ],
+  "transcript": "A thousand years back, six peoples fought a war nobody could end.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/king": {
+  "hash": "abdaf32285.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "A farm boy ended it. So they made him king.",
+  "chars": 43,
+  "seconds": 4.16,
+  "speech": [
+   0.02,
+   4.16
+  ],
+  "transcript": "A farm boy ended it, so they made him king",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/friends": {
+  "hash": "266fdf6c81.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "Six friends stood with him.",
+  "chars": 27,
+  "seconds": 2.24,
+  "speech": [
+   0,
+   2.16
+  ],
+  "transcript": "Six friends stood with him",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/roads": {
+  "hash": "9a415dbee9.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "He joined every city with roads of light. Nobody went cold or hungry.",
+  "chars": 69,
+  "seconds": 6.56,
+  "speech": [
+   0.03,
+   6.56
+  ],
+  "transcript": "He joined every city with roads of light. Nobody went cold or hungry",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/sickness": {
+  "hash": "b9a724d309.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "Then came a sickness no light could cure.",
+  "chars": 41,
+  "seconds": 3.32,
+  "speech": [
+   0,
+   3.2
+  ],
+  "transcript": "Then came a sickness no light could cure",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/night": {
+  "hash": "abe9957d45.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "So he took his people up to heaven. Every one of them, in a single night.",
+  "chars": 73,
+  "seconds": 5.98,
+  "speech": [
+   0,
+   5.87
+  ],
+  "transcript": "So he took his people up to heaven, every one of them in a single night",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/gods": {
+  "hash": "11ff9cfe73.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "The old gods of the land lay down to sleep until he comes home.",
+  "chars": 63,
+  "seconds": 5.27,
+  "speech": [
+   0.03,
+   5.22
+  ],
+  "transcript": "The old gods of the land lay down to sleep until he comes home",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/mark": {
+  "hash": "5b20aaa8b8.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "And one day a hand will bear the Mark, and wake them. So the priests say.",
+  "chars": 73,
+  "seconds": 5.62,
+  "speech": [
+   0.01,
+   5.51
+  ],
+  "transcript": "And one day a hand will bear the mark and wake them, so the priests say",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/wall": {
+  "hash": "355a24325f.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "[softly] That one? Damp got at it, I expect. Bed, Button.",
+  "chars": 57,
+  "seconds": 5.14,
+  "speech": [
+   0.02,
+   5.02
+  ],
+  "transcript": "That one? Damp got at it, I expect. Bed button",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/doorstep": {
+  "hash": "eafe72c2e4.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "[softly] You came to us in the rain, with a key round your neck.",
+  "chars": 64,
+  "seconds": 4.24,
+  "speech": [
+   0.03,
+   4.22
+  ],
+  "transcript": "You came to us in the rain with a key 'round your neck",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "a/morning": {
+  "hash": "f55e03ddf5.3",
+  "voiceId": "kkPJzQOWz2Oz9cUaEaQd",
+  "say": "[softly] That was sixteen years ago.",
+  "chars": 36,
+  "seconds": 2.11,
+  "speech": [
+   0.03,
+   2.08
+  ],
+  "transcript": "That was 16 years ago",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/war": {
+  "hash": "6837b0a39d.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "A thousand years back, six peoples fought a war nobody could end.",
+  "chars": 65,
+  "seconds": 4.94,
+  "speech": [
+   0.03,
+   4.86
+  ],
+  "transcript": "A thousand years back, six peoples fought a war nobody could end.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/king": {
+  "hash": "778cefab04.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "A farm boy ended it. So they made him king.",
+  "chars": 43,
+  "seconds": 3.68,
+  "speech": [
+   0.02,
+   3.68
+  ],
+  "transcript": "A farm boy ended it, so they made him king",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/friends": {
+  "hash": "b8cde5a7be.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "Six friends stood with him.",
+  "chars": 27,
+  "seconds": 2.15,
+  "speech": [
+   0,
+   2.04
+  ],
+  "transcript": "Six friends stood with him.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/roads": {
+  "hash": "7c81873e47.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "He joined every city with roads of light. Nobody went cold or hungry.",
+  "chars": 69,
+  "seconds": 5.75,
+  "speech": [
+   0.03,
+   5.29
+  ],
+  "transcript": "He joined every city with roads of light. Nobody went cold or hungry.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/sickness": {
+  "hash": "10cbc970ba.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "Then came a sickness no light could cure.",
+  "chars": 41,
+  "seconds": 3.19,
+  "speech": [
+   0,
+   3.07
+  ],
+  "transcript": "Then came a sickness no light could cure.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/night": {
+  "hash": "d5d3cc657e.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "So he took his people up to heaven. Every one of them, in a single night.",
+  "chars": 73,
+  "seconds": 5.28,
+  "speech": [
+   0,
+   5.24
+  ],
+  "transcript": "So he took his people up to heaven, every one of them in a single night",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/gods": {
+  "hash": "9894528d47.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "The old gods of the land lay down to sleep until he comes home.",
+  "chars": 63,
+  "seconds": 4.36,
+  "speech": [
+   0,
+   4.24
+  ],
+  "transcript": "The old gods of the land lay down to sleep until he comes home",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/mark": {
+  "hash": "f62c500a9a.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "And one day a hand will bear the Mark, and wake them. So the priests say.",
+  "chars": 73,
+  "seconds": 5.02,
+  "speech": [
+   0.02,
+   4.91
+  ],
+  "transcript": "And one day a hand will bear the mark and wake them, so the priests say",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/morning": {
+  "hash": "32efa40213.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "[softly] That was sixteen years ago.",
+  "chars": 36,
+  "seconds": 2,
+  "speech": [
+   0.03,
+   1.97
+  ],
+  "transcript": "That was sixteen years ago",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "b/doorstep": {
+  "hash": "f30346f9c6.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "[softly] You came to us in the rain, with a key round your neck.",
+  "chars": 64,
+  "seconds": 3.73,
+  "speech": [
+   0.03,
+   3.64
+  ],
+  "transcript": "You came to us in the rain with a key around your neck.",
+  "heard": 0.923,
+  "tagsReadOut": []
+ },
+ "b/wall": {
+  "hash": "aa2c44ece0.3",
+  "voiceId": "Nk0iUG137ZABNEQYgAMl",
+  "say": "[softly] That one? Damp got at it, I expect. Bed, Button.",
+  "chars": 57,
+  "seconds": 4.4,
+  "speech": [
+   0.03,
+   4.29
+  ],
+  "transcript": "That one? Damp got at it, I expect. Bed button",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/friends": {
+  "hash": "b49f8e3c0f.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "Six friends stood with him.",
+  "chars": 27,
+  "seconds": 1.83,
+  "speech": [
+   0,
+   1.71
+  ],
+  "transcript": "Six friends stood with him",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/war": {
+  "hash": "3cb5c81f49.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "A thousand years back, six peoples fought a war nobody could end.",
+  "chars": 65,
+  "seconds": 4.87,
+  "speech": [
+   0.03,
+   4.75
+  ],
+  "transcript": "A thousand years back, six peoples fought a war nobody could end",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/king": {
+  "hash": "0d0a37b0fd.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "A farm boy ended it. So they made him king.",
+  "chars": 43,
+  "seconds": 3.76,
+  "speech": [
+   0,
+   3.76
+  ],
+  "transcript": "A farm boy ended it, so they made him king",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/sickness": {
+  "hash": "576284283c.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "Then came a sickness no light could cure.",
+  "chars": 41,
+  "seconds": 2.88,
+  "speech": [
+   0,
+   2.76
+  ],
+  "transcript": "Then came a sickness no light could cure",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/roads": {
+  "hash": "dcf50b0345.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "He joined every city with roads of light. Nobody went cold or hungry.",
+  "chars": 69,
+  "seconds": 5.63,
+  "speech": [
+   0.03,
+   5.51
+  ],
+  "transcript": "He joined every city with roads of light. Nobody went cold or hungry.",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/night": {
+  "hash": "ad4a9cfd2b.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "So he took his people up to heaven. Every one of them, in a single night.",
+  "chars": 73,
+  "seconds": 5.14,
+  "speech": [
+   0,
+   5.02
+  ],
+  "transcript": "So he took his people up to heaven, every one of them in a single night",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/gods": {
+  "hash": "edb0a0b987.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "The old gods of the land lay down to sleep until he comes home.",
+  "chars": 63,
+  "seconds": 4.3,
+  "speech": [
+   0.01,
+   4.18
+  ],
+  "transcript": "The old gods of the land lay down to sleep until he comes home",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/mark": {
+  "hash": "e8387f61cc.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "And one day a hand will bear the Mark, and wake them. So the priests say.",
+  "chars": 73,
+  "seconds": 5.16,
+  "speech": [
+   0.02,
+   5.04
+  ],
+  "transcript": "And one day a hand will bear the mark and wake them, so the priests say",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/wall": {
+  "hash": "eb0af081ad.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "[softly] That one? Damp got at it, I expect. Bed, Button.",
+  "chars": 57,
+  "seconds": 4.79,
+  "speech": [
+   0.03,
+   4.69
+  ],
+  "transcript": "That one? Damp got at it, I expect. Bed button",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/doorstep": {
+  "hash": "3ad9931190.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "[softly] You came to us in the rain, with a key round your neck.",
+  "chars": 64,
+  "seconds": 3.66,
+  "speech": [
+   0.03,
+   3.54
+  ],
+  "transcript": "You came to us in the rain with a key 'round your neck",
+  "heard": 1,
+  "tagsReadOut": []
+ },
+ "c/morning": {
+  "hash": "bd95e9ee2e.3",
+  "voiceId": "mFgXOmlOfXfr6suoQkRH",
+  "say": "[softly] That was sixteen years ago.",
+  "chars": 36,
+  "seconds": 1.98,
+  "speech": [
+   0.03,
+   1.92
+  ],
+  "transcript": "That was 16 years ago",
+  "heard": 1,
+  "tagsReadOut": []
+ }
+}

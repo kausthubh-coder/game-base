@@ -10,6 +10,9 @@ import { begin, runScenario } from '../play/scenario.sim.ts';
 import { stateHash } from '../play/state.sim.ts';
 import { SCENARIOS } from './all.sim.ts';
 
+/** A day is 20 minutes, so a scenario that waits out three nights steps 36,000 times. */
+const LONG = 60_000;
+
 describe('the scenarios', () => {
   test('every scenario file in this folder is in the list of all.sim.ts, under its own name', () => {
     const files = readdirSync(import.meta.dir).filter((file) => file.endsWith('.sim.ts') && file !== 'all.sim.ts').map((file) => file.replace('.sim.ts', ''));
@@ -23,14 +26,14 @@ describe('the scenarios', () => {
     const outcome = runScenario(scenario);
     expect(outcome.reason, scenario.about).toBe('');
     expect(outcome.inputs).toBe(scenario.inputs.length);
-  });
+  }, LONG);
 
   test('a scenario played twice ends in the same state', () => {
     for (const name of ['build-stroke', 'workbench-crafting', 'fell-a-tree']) {
       const scenario = SCENARIOS.find((one) => one.name === name)!;
       expect(runScenario(scenario).hash, name).toBe(runScenario(scenario).hash);
     }
-  });
+  }, LONG);
 
   test('a scenario that cannot do what it says fails with the input and the place', () => {
     const outcome = runScenario({ name: 'no-hoe', about: 'Takes a hoe the bag does not hold.', seed: 1, inputs: [{ do: 'take', item: 'hoe' }], expect: () => [] });
@@ -54,7 +57,7 @@ describe('the bot', () => {
     one.advance(500);
     six.advance(500);
     expect(stateHash(one.play)).not.toBe(stateHash(six.play));
-  });
+  }, LONG);
 
   test('a replay reaches the same state however its steps are cut up', () => {
     const whole = startBot(2), parts = startBot(2);
@@ -63,7 +66,7 @@ describe('the bot', () => {
     expect(parts.step).toBe(1500);
     expect(stateHash(parts.play)).toBe(stateHash(whole.play));
     expect(parts.last).toEqual(whole.last);
-  });
+  }, LONG);
 
   test('bots from each of the five starts play 2,000 steps and nothing breaks', () => {
     for (const seed of [0, 1, 2, 3, 4]) {
@@ -72,13 +75,13 @@ describe('the bot', () => {
       expect(bot.failure, `seed ${seed}: bun tools/sim.ts --replay ${seed} --until ${bot.failure?.step}`).toBeNull();
       expect(bot.step).toBe(2000);
     }
-  });
+  }, LONG);
 });
 
 describe('the invariants', () => {
   /** A game with a little of everything in it: a field, a workbench, the tools. */
   function game(): Play {
-    const p = begin(5, { quest: 'bread', give: { hoe: 1, wheat_seeds: 2, workbench: 1, plank: 5 } });
+    const p = begin(5, { quest: 'count', give: { hoe: 1, wheat_seeds: 2, workbench: 1, plank: 5 } });
     const c = p.sys.region.place('grant.center').at;
     const x = Math.floor(c.x), z = Math.floor(c.z);
     p.teleport({ x: c.x, z: c.z + 3 });
@@ -117,7 +120,7 @@ describe('the invariants', () => {
     expect(broken((p) => { (p.sys.inventory.slots as unknown[])[slot(p, 'hoe')] = null; })).toBe('the bag held 1 hoe and holds 0: a tool was taken away');
     expect(broken((p) => { p.game.clock.seconds -= 1; })).toStartWith('the clock went back');
     expect(broken((p) => { p.game.player.busy = true; })).toBe('the player is held and a conversation is not open');
-    expect(broken((p) => { p.game.flags.set('quest.plot.done', false); })).toBe('the quest plot went back to active');
+    expect(broken((p) => { p.game.flags.set('quest.grantday.done', false); })).toBe('the quest grantday went back to active');
     expect(broken((p) => { const crop = p.sys.crops.all()[0]; p.world.setBlock(crop.x, crop.y + 1, crop.z, blockId('oak_plank')); })).toContain('over it');
     expect(broken((p) => { const crop = p.sys.crops.all()[0]; p.world.setBlock(crop.x, crop.y, crop.z, blockId('dirt')); })).toContain('which is not tilled soil');
     expect(broken((p) => { p.sys.crops.all()[0].state.stage = 9; })).toContain('is at stage 9 of 4');
@@ -127,17 +130,13 @@ describe('the invariants', () => {
   });
 
   test('a quest that has lost what it needs is caught', () => {
-    // The roof quest asks for a bed. A bed is made at a workbench, a workbench of planks, planks of logs, and logs come from trees.
-    const p = begin(5, { quest: 'roof' });
-    const invariants = createInvariants();
-    expect(invariants.check(p)).toBeNull();
-    // Gus hands out the wheat seeds. With him gone the bread quest could not finish.
-    const later = begin(5, { quest: 'bread' });
-    expect(createInvariants().check(later)).toBeNull();
-    const people = later.sys.people;
+    // The night quest ends on a talk with Tamsin. With her gone it could not finish.
+    const p = begin(5, { quest: 'night' });
+    expect(createInvariants().check(p)).toBeNull();
+    const people = p.sys.people;
     const get = people.get;
-    people.get = (id) => (id === 'maren' ? undefined : get(id));
-    expect(createInvariants().check(later)).toBe('the quest bread can no longer finish: its step queen asks for maren, and none of them is in the world');
+    people.get = (id) => (id === 'tamsin' ? undefined : get(id));
+    expect(createInvariants().check(p)).toBe('the quest night can no longer finish: its step tamsin asks for tamsin, and none of them is in the world');
     people.get = get;
   });
 

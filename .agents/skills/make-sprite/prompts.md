@@ -6,6 +6,21 @@ tile) and `assets-src/prompts-3.json` (the townspeople, portraits, crops, icons,
 pattern for your kind, fill the slots in `<angle brackets>` and change nothing else. Each clause is there
 because of a failure it prevents.
 
+## Two references: the concept and the set
+
+Attach two images: the approved sprite nearest the subject (or `.artifacts/sprites/side-by-side-3.png`) for
+the style, and the concept sheet cropped to the subject for who it is. Add this sentence after the subject
+line, so the generator takes each thing from the right one:
+
+```
+Identity, costume, colours and silhouette from the concept painting; pixel style, outline, light, head size
+and proportions from the reference sprites. Do not copy the painting's soft shading or its lettering.
+```
+
+For a new pose of a character who already ships (an action sheet), the reference is that character's own idle
+sheet, and the subject line repeats the words of its original subject line. A generic action prompt drew the
+hero as another kid twice.
+
 ## A person or a creature, from the front, the back and the side
 
 Run three made nine characters with this text (eight people and the leaftail). All nine kept their

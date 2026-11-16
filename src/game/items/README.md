@@ -12,7 +12,7 @@ The data is `src/game/content/items.ts`, 27 items:
 
 | Group | Ids |
 |---|---|
-| Resources | `oak_log`, `plank`, `fiber`, `moss_tuft`, `berry` (a treat), `wheat`, `wheat_seeds` (seed of `wheat`), `bread` |
+| Resources | `oak_log`, `plank`, `fiber`, `moss_fiber`, `berry` (a treat), `wheat`, `wheat_seeds` (seed of `wheat`), `bread` |
 | Tools, stack of 1 | `axe`, `hoe`, `watering_can` (tool kind `can`), `pickaxe` |
 | Stations, stack of 9 | `workbench`, `bed`, `chest` |
 | Blocks | `dirt`, `stone`, `cobble`, `oak_plank`, `lamp`, `glass`, `thatch`, `plaster`, `stone_brick`, `sand` |

@@ -10,7 +10,7 @@ export const nothingSetDownOnACrop: Scenario = {
   name: 'nothing-set-down-on-a-crop',
   about: 'A fence, a workbench and a plank clicked onto planted soil are refused, in build mode too, and the wheat keeps its open cell.',
   seed: 17,
-  start: { quest: 'roof', give: { hoe: 1, wheat_seeds: 1, fence: 1, workbench: 1, plank: 1 } },
+  start: { quest: 'ground', give: { hoe: 1, wheat_seeds: 1, fence: 1, workbench: 1, plank: 1 } },
   inputs: [
     { do: 'teleport', to: { place: 'grant.center', dz: 3 } },
     { do: 'take', item: 'hoe' },

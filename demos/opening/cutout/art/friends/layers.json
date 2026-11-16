@@ -1,0 +1,177 @@
+{
+  "shot": "friends",
+  "frame": [
+    3840,
+    1080
+  ],
+  "approved": "../../../art/plates/m3-friends.jpg",
+  "layers": [
+    {
+      "id": "plaster",
+      "file": "../shared/plaster-wide.webp",
+      "x": 0,
+      "y": 0,
+      "w": 3840,
+      "h": 1080,
+      "z": 0
+    },
+    {
+      "id": "boy",
+      "file": "boy.webp",
+      "x": 1173,
+      "y": 213,
+      "w": 207,
+      "h": 640,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "friend-green",
+      "file": "friend-green.webp",
+      "x": 1374,
+      "y": 215,
+      "w": 181,
+      "h": 638,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "friend-red",
+      "file": "friend-red.webp",
+      "x": 1547,
+      "y": 216,
+      "w": 184,
+      "h": 637,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "friend-blue",
+      "file": "friend-blue.webp",
+      "x": 1724,
+      "y": 216,
+      "w": 197,
+      "h": 637,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "friend-violet",
+      "file": "friend-violet.webp",
+      "x": 1909,
+      "y": 218,
+      "w": 182,
+      "h": 635,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "friend-white",
+      "file": "friend-white.webp",
+      "x": 2082,
+      "y": 221,
+      "w": 185,
+      "h": 632,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "friend-grey",
+      "file": "friend-grey.webp",
+      "x": 2263,
+      "y": 218,
+      "w": 179,
+      "h": 635,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Approved figure with its original halo and carried object."
+    },
+    {
+      "id": "scraped-place",
+      "file": "scraped-place.webp",
+      "x": 2437,
+      "y": 224,
+      "w": 202,
+      "h": 627,
+      "z": 15,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Opaque scraped plaster silhouette and chisel marks; deliberately plaster colored."
+    },
+    {
+      "id": "fox",
+      "file": "fox.webp",
+      "x": 2557,
+      "y": 710,
+      "w": 91,
+      "h": 145,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": "Original fox paint and retraced full silhouette. Tail movement uses one smooth deformation, zero pasted pixels or rectangular splice. Head and upper torso stay fixed.",
+      "frames": [
+        "fox-2.webp"
+      ]
+    },
+    {
+      "id": "meadow",
+      "file": "meadow.webp",
+      "x": 1163,
+      "y": 741,
+      "w": 1521,
+      "h": 115,
+      "z": 10,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": ""
+    },
+    {
+      "id": "rays",
+      "file": "rays.webp",
+      "x": 1382,
+      "y": 82,
+      "w": 929,
+      "h": 158,
+      "z": 5,
+      "pivot": [
+        0.5,
+        0.95
+      ],
+      "note": ""
+    }
+  ],
+  "note": "Approved 1920px composition centered in a 3840px wall; subtract 960 from x to recover plate positions."
+}

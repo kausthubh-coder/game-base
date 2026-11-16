@@ -41,3 +41,51 @@ export const LAND_COLORS = {
   bed: '#7f9a86',
   shore: '#c9bb8c',
 } as const;
+
+/** The greens of a kind of land's grass: sunlit, the usual, deep, and dry straw. */
+export interface Greens { light: string; mid: string; deep: string; straw: string }
+
+/**
+ * How one kind of land looks (docs/greenhollow-world.md, "The kinds of land"). The land is painted in its greens,
+ * and in patches of bare ground where no grass grows: moss and leaf litter in the old forest, mud in the marsh,
+ * scree on the cave hills, carved flags on the terraces. `tall`, `thick`, `flowers` and `tufts` scale the
+ * meadow's grass. `painting` names the painting laid over its ground, in `public/assets/painted/`.
+ */
+export interface LandKind {
+  greens: Greens;
+  /** The share of the ground that is bare, from 0 to 1, and its colour. */
+  bare: number;
+  bareColor: string;
+  tall: number;
+  thick: number;
+  flowers: number;
+  tufts: number;
+  painting: 'meadow' | 'moss' | 'mud' | 'scree' | 'terrace-stone';
+}
+
+const MEADOW_KIND: LandKind = { greens: LAND_COLORS.grass, bare: 0, bareColor: LAND_COLORS.dirt, tall: 1, thick: 1, flowers: 1, tufts: 1, painting: 'meadow' };
+
+/** Every kind of land by the name `biomeAt` gives it. A name not here is drawn as the meadow. */
+export const LAND_KINDS: Readonly<Record<string, LandKind>> = {
+  meadow: MEADOW_KIND,
+  // Darker and mossier, in the shade of the old oaks. Few flowers, and moss and leaf litter between the ferns.
+  oldForest: { greens: { light: '#86b84e', mid: '#5f9c48', deep: '#3a7a46', straw: '#8e9c4c' }, bare: 0.2, bareColor: '#6b7a3e', tall: 0.75, thick: 0.42, flowers: 0.15, tufts: 0.7, painting: 'moss' },
+  // Grey-green and dry, the grass short and pale. Nothing flowers.
+  greyForest: { greens: { light: '#b9c08f', mid: '#a0aa7e', deep: '#828d6c', straw: '#c8c49a' }, bare: 0.2, bareColor: '#a89f88', tall: 0.5, thick: 0.75, flowers: 0, tufts: 0.45, painting: 'meadow' },
+  // Lush rank grass round wet mud and standing pools.
+  marsh: { greens: { light: '#9bc95a', mid: '#76ae50', deep: '#4b8d55', straw: '#a7b66a' }, bare: 0.32, bareColor: '#7e6c4f', tall: 1.3, thick: 0.9, flowers: 0.3, tufts: 1.3, painting: 'mud' },
+  // Thin turf over rock shelves and scree.
+  caveHills: { greens: { light: '#a8c56a', mid: '#88aa5c', deep: '#688b57', straw: '#bab57a' }, bare: 0.42, bareColor: '#a9a397', tall: 0.55, thick: 0.6, flowers: 0.35, tufts: 0.45, painting: 'scree' },
+  // Carved stone flags with grey moss between them.
+  terraces: { greens: { light: '#a2b67a', mid: '#86a06c', deep: '#667f60', straw: '#aaa983' }, bare: 0.5, bareColor: '#b4af9f', tall: 0.6, thick: 0.6, flowers: 0.1, tufts: 0.4, painting: 'terrace-stone' },
+  town: MEADOW_KIND,
+};
+
+/**
+ * Where the land is grey (`blightAt` 1), every colour of the ground, the grass and the trees is drained toward
+ * its own grey times this tint, by `drain` at most: a pale ash with a little green left in it.
+ */
+export const GREY = { tint: '#d2cfb9', drain: 0.62 } as const;
+
+/** Standing pools in the marsh: the share of the marsh they cover, and their colour, shallow and deep. */
+export const POOLS = { share: 0.24, shallow: '#7fae9c', deep: '#3f7a80', rim: '#5d5240' } as const;

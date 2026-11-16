@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "prompt": "Precise object edit. Reference is the approved night temple fresco. Preserve exact framing, deep lapis blue plaster texture, gold top and bottom borders and the luminous golden hemispherical dome outline in its exact position. Remove the entire city, all buildings, trees, flowers, the king, his halo and hoe, and every dotted star stream. Fill removed areas with uninterrupted deep blue plaster and faint translucent gold canopy texture INSIDE the dome only. Result: ONLY empty blue wall and the golden dome/canopy, nothing else. No objects, no figure ghosts, no stars. Preserve dome shape, size, apex position and gold fresco paint style.",
+  "use": "Dome only, blue removed into alpha."
+}

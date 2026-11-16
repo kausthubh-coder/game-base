@@ -32,6 +32,10 @@ interface Soil {
   y: number;
   z: number;
   wet: number;
+  /** How fast a crop grows in it, 0 to 1: 1 from the can, rain or a ditch, a slow sprinkler's speed from one. */
+  rate: number;
+  /** A ditch beside it or a sprinkler over it keeps it wet through the night. */
+  kept: boolean;
   crop: Planted | null;
 }
 
@@ -59,6 +63,7 @@ export function createCrops(game: Game): Crops {
   const soilList: Soil[] = [];
   const planted: Planted[] = [];
   let wired = false;
+  let check = 0;
 
   const keyOf = (x: number, y: number, z: number): string => `${x},${y},${z}`;
 
@@ -66,7 +71,7 @@ export function createCrops(game: Game): Crops {
     const key = keyOf(x, y, z);
     let soil = soils.get(key);
     if (!soil) {
-      soil = { x, y, z, wet: 0, crop: null };
+      soil = { x, y, z, wet: 0, rate: 1, kept: false, crop: null };
       soils.set(key, soil);
       soilList.push(soil);
     }
@@ -90,6 +95,7 @@ export function createCrops(game: Game): Crops {
   function wetSoil(x: number, y: number, z: number): Soil {
     const soil = soilAt(x, y, z);
     soil.wet = farming.waterSeconds;
+    soil.rate = 1;
     if (soil.crop) soil.crop.state.wet = soil.wet;
     return soil;
   }
@@ -100,6 +106,47 @@ export function createCrops(game: Game): Crops {
     crop.state.ripe = crop.state.stage === last;
     if (crop.state.ripe) crop.progress = 0;
     events.emit('crop.grew', { x: crop.x, y: crop.y, z: crop.z, crop: crop.def.id, stage: crop.state.stage });
+  }
+
+  /** A hedge that was picked, or a crop an arm cut and planted again: it starts from its first stage. */
+  function regrow(crop: Planted): void {
+    crop.state.stage = 0;
+    crop.state.ripe = crop.def.stages <= 1;
+    crop.progress = 0;
+  }
+
+  /** Grows a crop by this many seconds of wet soil. */
+  function growFor(crop: Planted, seconds: number): void {
+    if (crop.state.ripe || seconds <= 0) return;
+    crop.progress += seconds;
+    let stages = 0;
+    while (crop.progress + EPSILON >= crop.def.secondsPerStage && crop.state.stage + stages < crop.def.stages - 1) {
+      crop.progress -= crop.def.secondsPerStage;
+      stages++;
+    }
+    crop.progress = Math.max(0, crop.progress);
+    if (stages > 0) grow(crop, stages);
+  }
+
+  const WATER = blockId('water');
+  /** Soil with water beside it on the same level: a ditch, a stream, the pond. */
+  const besideWater = (x: number, y: number, z: number): boolean =>
+    world.getBlock(x + 1, y, z) === WATER || world.getBlock(x - 1, y, z) === WATER || world.getBlock(x, y, z + 1) === WATER || world.getBlock(x, y, z - 1) === WATER;
+
+  /** Keeps wet every planted block beside water or under a working sprinkler, at the sprinkler's speed. */
+  function waterFromMachines(): void {
+    const machines = game.systems.machines;
+    for (let i = 0; i < planted.length; i++) {
+      const crop = planted[i];
+      const soil = soils.get(keyOf(crop.x, crop.y, crop.z));
+      if (!soil) continue;
+      const strength = besideWater(crop.x, crop.y, crop.z) ? 1 : (machines?.sprinkled(crop.x, crop.y, crop.z) ?? 0);
+      soil.kept = strength > 0;
+      if (strength <= 0) continue;
+      soil.wet = farming.waterSeconds;
+      soil.rate = strength;
+      crop.state.wet = soil.wet;
+    }
   }
 
   /** Pulls a crop out of soil that was broken or built over. The seed goes back to the bag. */
@@ -130,6 +177,8 @@ export function createCrops(game: Game): Crops {
       if (soil.crop) return false;
       soil.crop = { x, y, z, def, progress: 0, state: { crop: def.id, stage: 0, wet: soil.wet, ripe: def.stages <= 1 } };
       planted.push(soil.crop);
+      // Seed beside a ditch or under a sprinkler is wet from the next step.
+      check = 0;
       events.emit('crop.planted', { x, y, z, crop: def.id });
       return true;
     },
@@ -170,8 +219,9 @@ export function createCrops(game: Game): Crops {
         return false;
       }
       if (game.random() < crop.def.seedChance) bag.add(crop.def.seed, 1, from);
-      unplant(soil);
-      if (soil.wet <= 0) forget(soil);
+      if (crop.def.keeps) regrow(crop);
+      else unplant(soil);
+      if (!soil.crop && soil.wet <= 0) forget(soil);
       for (const give of crop.def.gives) game.flags.add(`harvested.${give.id}`, give.count);
       events.emit('crop.harvested', { x, y, z, crop: crop.def.id });
       return true;
@@ -186,6 +236,19 @@ export function createCrops(game: Game): Crops {
       if (world.getBlock(x, y, z) !== TILLED) return false;
       wetSoil(x, y, z);
       return true;
+    },
+
+    cut(x, y, z) {
+      const soil = soils.get(keyOf(x, y, z));
+      const crop = soil?.crop;
+      if (!soil || !crop || !crop.state.ripe) return null;
+      const gave = crop.def.gives.map((give) => ({ id: give.id, count: give.count }));
+      if (game.random() < crop.def.seedChance) gave.push({ id: crop.def.seed, count: 1 });
+      for (const give of crop.def.gives) game.flags.add(`harvested.${give.id}`, give.count);
+      // The arm plants the seed again where it cut.
+      regrow(crop);
+      events.emit('crop.harvested', { x, y, z, crop: crop.def.id });
+      return gave;
     },
 
     pull(x, y, z) {
@@ -252,15 +315,17 @@ export function createCrops(game: Game): Crops {
     }
   });
 
-  // A night's sleep: every crop in wet soil gains two stages, and the soil is dry by morning.
-  events.on('slept', () => {
+  // A night's sleep: the skipped seconds run at once. Soil a ditch or a sprinkler keeps wet grows all night; soil
+  // the can or the rain wet grows for as long as its water lasted. Then the can's water is gone by morning.
+  events.on('slept', ({ skipped }) => {
+    waterFromMachines();
     for (let i = soilList.length - 1; i >= 0; i--) {
       const soil = soilList[i];
       const crop = soil.crop;
-      if (crop && soil.wet > 0 && !crop.state.ripe) grow(crop, farming.sleepStages);
-      soil.wet = 0;
-      if (crop) crop.state.wet = 0;
-      else forget(soil);
+      if (crop) growFor(crop, (soil.kept ? skipped : Math.min(soil.wet, skipped)) * soil.rate);
+      if (!soil.kept) soil.wet = 0;
+      if (crop) crop.state.wet = soil.wet;
+      else if (soil.wet <= 0) forget(soil);
     }
   });
 
@@ -270,14 +335,22 @@ export function createCrops(game: Game): Crops {
         game.systems.actions.addHandler(use);
         wired = true;
       }
+      check -= dt;
+      if (check <= 0) {
+        check = farming.waterCheck;
+        waterFromMachines();
+      }
       const raining = game.ambient.rain > farming.rainWaters;
       for (let i = soilList.length - 1; i >= 0; i--) {
         const soil = soilList[i];
-        if (raining && world.openSky(soil.x, soil.y + 1, soil.z)) soil.wet = farming.waterSeconds;
+        if (raining && world.openSky(soil.x, soil.y + 1, soil.z)) {
+          soil.wet = farming.waterSeconds;
+          soil.rate = 1;
+        }
         const crop = soil.crop;
         if (soil.wet > 0) {
           if (crop && !crop.state.ripe) {
-            crop.progress += dt;
+            crop.progress += dt * soil.rate;
             if (crop.progress + EPSILON >= crop.def.secondsPerStage) {
               crop.progress = Math.max(0, crop.progress - crop.def.secondsPerStage);
               grow(crop, 1);

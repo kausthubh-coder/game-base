@@ -19,8 +19,8 @@ import { SAMPLES, type SampleSpec } from '../src/content/sound-samples.ts';
 const MODEL = 'eleven_text_to_sound_v3';
 /** The format asked of ElevenLabs. The best mp3 the plan gives. */
 const FORMAT = 'mp3_44100_128';
-/** Sound effects cost 40 credits a second when the length is set. */
-const CREDITS_PER_SECOND = 40;
+/** What a second of sound costs when the length is set: 198 credits for an 18 second bed on 2026-11-12. */
+const CREDITS_PER_SECOND = 11;
 const LIMIT = 30000;
 const AT_ONCE = 3;
 const RATE = 44100;

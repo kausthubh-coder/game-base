@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  clearOfInterface,
   bearingTo, cameraYawOf, clampToDisc, clampToScreen, compassName, distanceTo, emptyEdgeMark, screenAngle, toMinimap,
 } from './geometry.sim.ts';
 import { MapRules, type Heading } from './map.sim.ts';
@@ -347,5 +348,21 @@ describe('the whole map saves and loads', () => {
     expect(map.marks.waypoints.length).toBe(0);
     expect(map.seen.count).toBe(0);
     expect(map.load('nope')).toBe(false);
+  });
+});
+
+describe('the distance to the waypoint', () => {
+  // The quest list in the top right of a 1366 wide screen, as left, top, right, bottom.
+  const tracker = [1100, 230, 1360, 330];
+  test('steps off the quest list to its nearer clear side', () => {
+    const x = clearOfInterface(1200, 260, true, 1366, tracker, 96, 30);
+    expect(x).toBe(1100 - 48);
+  });
+  test('stays where it is when it covers nothing', () => {
+    expect(clearOfInterface(600, 260, true, 1366, tracker, 96, 30)).toBe(600);
+    expect(clearOfInterface(1200, 400, true, 1366, tracker, 96, 30)).toBe(1200);
+  });
+  test('goes the other way when the nearer side is off the screen', () => {
+    expect(clearOfInterface(60, 100, true, 1366, [0, 90, 200, 160], 96, 30)).toBe(248);
   });
 });

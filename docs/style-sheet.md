@@ -1,6 +1,8 @@
 # Style sheet
 
-Every asset reads this file. It is the reason a new asset fits the old ones.
+The mood and the 3D rules are here. The 2D rules a tool can measure (frame and anchor by kind, pixels a block,
+outline, limits) are data in `assets-src/art-style.json`, which `tools/art` reads and `bun tools/art/check.mjs`
+enforces; where this table and that file differ, the file is right.
 
 | Rule | Value |
 |---|---|

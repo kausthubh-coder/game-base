@@ -2,12 +2,16 @@
 // starts a new game and puts the interface in one state. Nobody playing uses it.
 //
 //   ?show=hud       the HUD with things in the quick slots, a hint and a toast
-//   ?show=talk      a line from Tamsin        ?show=choice    Maren's line with three choices
+//   ?show=talk      a line from Mina          ?show=choice    Hobb's line with two choices
+//   ?show=talk&talk=<conversation>             any conversation of content/dialogue.ts, at its first line,
+//                                              or its first choice with &at=choice
 //   ?show=bag | make | almanac | quests | map | pause | settings | end
+//   &quest=<id>     with any of them: the game skipped to the start of that quest first
 //
 // When the state is up, `<html>` gets `data-show`, for `--ready "[data-show]"`. The rules are then
 // paused, and the save this visit would leave behind is removed when the page closes. With a saved game
 // in the browser it does nothing at all, so it can never write over one.
+import { isQuestId } from '../content/ids.ts';
 import { clearSave } from '../shell/save.ts';
 import type { GameView } from '../shell/view.ts';
 import { bookOf } from '../uiview/book.ts';
@@ -28,6 +32,8 @@ export function install(view: GameView): void {
   const { sys, ui } = book;
 
   function arrange(): void {
+    const quest = new URLSearchParams(location.search).get('quest');
+    if (quest && isQuestId(quest)) sys.quests?.skipTo(quest);
     const bag = sys.inventory;
     bag?.add('axe', 1);
     bag?.add('oak_log', 14);
@@ -38,11 +44,13 @@ export function install(view: GameView): void {
 
     if (show === 'hud') {
       game.events.emit('hint', { id: 'show', text: 'Hold the left button on a tree or a block to gather it.' });
-    } else if (show === 'talk') {
-      sys.talk?.start('tamsin.meet', 'tamsin');
-    } else if (show === 'choice') {
-      sys.talk?.start('maren.ask', 'maren');
-      for (let i = 0; i < 20 && sys.talk?.active && sys.talk.current()?.choices.length === 0; i++) sys.talk.advance();
+    } else if (show === 'talk' || show === 'choice') {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('talk') ?? (show === 'talk' ? 'scene.3' : 'choice.pump');
+      sys.talk?.start(id);
+      if (show === 'choice' || params.get('at') === 'choice') {
+        for (let i = 0; i < 20 && sys.talk?.active && sys.talk.current()?.choices.length === 0; i++) sys.talk.advance();
+      }
     } else if (show === 'map') {
       book.map?.open();
     } else if (show === 'settings') {

@@ -1,0 +1,116 @@
+[
+  {
+    "name": "hobb",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create a production pixel RPG sprite animation sheet for HOBB from attached concept. Image 1 identity reference; image 2 approved pixel style reference (Gus). Ignore concept's painted rendering and captions. Output transparent PNG exactly 4 columns by 7 rows equal square cells, no margins or text or grid. Rows 1-3: front, BACK (no face), RIGHT profile idle breathing two frames then two EMPTY cells. Rows 4-6: front, BACK, RIGHT profile WALK four distinct stride frames. Row 7: three chest-up portrait expressions calm, glad, troubled, then EMPTY. Entire same person in every cell, body and head size constant, centered feet same baseline. Character: short very round older woman, deep brown skin, broad face, black coiled bun silver temples cream headcloth tied at front, cream sleeves, crimson trousers, scorched wine-red apron, brass ladle at belt and food parcel. Big head small feet same chunky chibi proportions as Gus, NOT natural proportions. 1-2 pixel brown tinted outline, flat limited warm palette, upper-left cream light violet brown shadows. Silhouette 80% cell height, generous transparent padding. Keep costume accessories in all views. No ground shadows. Pixel art crisp edges, no painting gradients. Portraits SAME pixel art character large head bust, hat/hair entirely inside tile, transparent generous padding.",
+    "references": [
+      "assets-src/concept/people-home/hobb.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 1,
+    "source": "assets-src/raw/hobb-3.png",
+    "retainedSource": "assets-src/home/sources/hobb.png",
+    "processing": "Binary alpha threshold 210; RGB cleared where transparent. Generated figure pixels retained."
+  },
+  {
+    "name": "dax",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create production pixel RPG sprite animation sheet DAX from attached approved concept (image 1 identity) and Gus sprite (image 2 pixel STYLE ONLY). DAX: sixteen broad tall boy, pale rosy square face, straight flax blond crewcut, slate blue guild jacket cream rolled cuffs, charcoal trousers brown boots and satchel, reclaimed rectangular crate-lid shield strapped LEFT arm (screen right in front). Output transparent PNG regular EXACTLY 4 columns by 7 rows equal SQUARE cells, no text grid or labels. Row 1 FRONT idle 2 frames + 2 EMPTY cells; row 2 BACK idle 2 frames + 2 EMPTY; row 3 RIGHT profile idle 2 frames +2 EMPTY; row 4 FRONT walking 4 different stride frames; row 5 BACK walking 4 different stride frames; row 6 RIGHT profile walking 4 different stride frames. Row 7 three chest-up pixel portraits CALM, GLAD, TROUBLED, then EMPTY. Back shows NO FACE, side faces RIGHT. Whole same person consistent hair head size body size costume accessories every frame. Big head small feet approved chunky chibi sprite proportions as Gus, head 40% body height, NOT concept natural anatomy. World figures same height across rows, feet on consistent baseline, centered with generous transparent padding; silhouettes about 80% cell height. Portrait head/hair/hat all inside tile with padding. Sharp chunky pixel art, 1-2 pixel brown tinted outlines no black, flat limited warm palette cream upper-left highlights violet brown shadows. No floor shadow, no painted gradients, no concept background.",
+    "references": [
+      "assets-src/concept/people-home/dax.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 1,
+    "source": "assets-src/raw/dax-3.png",
+    "retainedSource": "assets-src/home/sources/dax.png",
+    "processing": "Binary alpha threshold 210; RGB cleared where transparent. Generated figure pixels retained."
+  },
+  {
+    "name": "mina",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create production pixel RPG sprite animation sheet MINA from attached approved concept (image 1 identity) and Gus sprite (image 2 pixel STYLE ONLY). MINA: petite wiry sixteen girl, golden brown skin long oval face, straight black blunt fringe long braid, round brass glasses, violet waistcoat cream shirt lilac split overskirt charcoal trousers brown boots, rigid indigo brass-ended map tube as tall as body on back, inked fingers. Output transparent PNG regular EXACTLY 4 columns by 7 rows equal SQUARE cells, no text grid or labels. Row 1 FRONT idle 2 frames + 2 EMPTY cells; row 2 BACK idle 2 frames + 2 EMPTY; row 3 RIGHT profile idle 2 frames +2 EMPTY; row 4 FRONT walking 4 different stride frames; row 5 BACK walking 4 different stride frames; row 6 RIGHT profile walking 4 different stride frames. Row 7 three chest-up pixel portraits CALM, GLAD, TROUBLED, then EMPTY. Back shows NO FACE, side faces RIGHT. Whole same person consistent hair head size body size costume accessories every frame. Big head small feet approved chunky chibi sprite proportions as Gus, head 40% body height, NOT concept natural anatomy. World figures same height across rows, feet on consistent baseline, centered with generous transparent padding; silhouettes about 80% cell height. Portrait head/hair/hat all inside tile with padding. Sharp chunky pixel art, 1-2 pixel brown tinted outlines no black, flat limited warm palette cream upper-left highlights violet brown shadows. No floor shadow, no painted gradients, no concept background.",
+    "references": [
+      "assets-src/concept/people-home/mina.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 1,
+    "source": "assets-src/raw/mina-3.png",
+    "retainedSource": "assets-src/home/sources/mina.png",
+    "processing": "Binary alpha threshold 210; RGB cleared where transparent. Generated figure pixels retained."
+  },
+  {
+    "name": "gus",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create production pixel RPG sprite animation sheet GUS from attached approved concept (image 1 identity) and Gus sprite (image 2 pixel STYLE ONLY). GUS: broad middle aged sun worn farmer, heavy dark moustache, dark hair under straw hat russet band, ochre shirt rolled cream sleeves, indigo overalls brass buckles, seed pouch brown boots. Match approved Gus identity exactly. Output transparent PNG regular EXACTLY 4 columns by 7 rows equal SQUARE cells, no text grid or labels. Row 1 FRONT idle 2 frames + 2 EMPTY cells; row 2 BACK idle 2 frames + 2 EMPTY; row 3 RIGHT profile idle 2 frames +2 EMPTY; row 4 FRONT walking 4 different stride frames; row 5 BACK walking 4 different stride frames; row 6 RIGHT profile walking 4 different stride frames. Row 7 three chest-up pixel portraits CALM, GLAD, TROUBLED, then EMPTY. Back shows NO FACE, side faces RIGHT. Whole same person consistent hair head size body size costume accessories every frame. Big head small feet approved chunky chibi sprite proportions as Gus, head 40% body height, NOT concept natural anatomy. World figures same height across rows, feet on consistent baseline, centered with generous transparent padding; silhouettes about 80% cell height. Portrait head/hair/hat all inside tile with padding. Sharp chunky pixel art, 1-2 pixel brown tinted outlines no black, flat limited warm palette cream upper-left highlights violet brown shadows. No floor shadow, no painted gradients, no concept background.",
+    "references": [
+      "assets-src/concept/people-home/gus.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 2,
+    "source": "assets-src/raw/gus-3.png",
+    "retainedSource": "assets-src/home/sources/gus.png",
+    "processing": "Binary alpha threshold 210; RGB cleared where transparent. Generated figure pixels retained.",
+    "retry": "Remove all pale white/green blurry background; preserve character pixels, poses, layout and expressions. Genuine transparent background."
+  },
+  {
+    "name": "wren",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create production pixel RPG sprite animation sheet WREN from attached approved concept (image 1 identity) and Gus sprite (image 2 pixel STYLE ONLY). WREN: tall wiry early twenties woman olive skin angular face, straight dark auburn low ponytail, forest green long pocket coat moss hood cream shirt brown trousers boots, bow and quiver on back, tiny sleeping yellow bird in chest pocket. WOMAN not boy. Output transparent PNG regular EXACTLY 4 columns by 7 rows equal SQUARE cells, no text grid or labels. Row 1 FRONT idle 2 frames + 2 EMPTY cells; row 2 BACK idle 2 frames + 2 EMPTY; row 3 RIGHT profile idle 2 frames +2 EMPTY; row 4 FRONT walking 4 different stride frames; row 5 BACK walking 4 different stride frames; row 6 RIGHT profile walking 4 different stride frames. Row 7 three chest-up pixel portraits CALM, GLAD, TROUBLED, then EMPTY. Back shows NO FACE, side faces RIGHT. Whole same person consistent hair head size body size costume accessories every frame. Big head small feet approved chunky chibi sprite proportions as Gus, head 40% body height, NOT concept natural anatomy. World figures same height across rows, feet on consistent baseline, centered with generous transparent padding; silhouettes about 80% cell height. Portrait head/hair/hat all inside tile with padding. Sharp chunky pixel art, 1-2 pixel brown tinted outlines no black, flat limited warm palette cream upper-left highlights violet brown shadows. No floor shadow, no painted gradients, no concept background.",
+    "references": [
+      "assets-src/concept/people-home/wren.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 3,
+    "source": "assets-src/raw/wren-3.png",
+    "retainedSource": "assets-src/home/sources/wren.png",
+    "processing": "Final recolor source retained as returned. Build hardens alpha, slices, scales and palette-snaps.",
+    "retry": "Remove all pale white/green blurry background; preserve character pixels, poses, layout and expressions. Genuine transparent background.",
+    "finalRetry": "Change only coat fabric to forest green in every frame and portrait; retain geometry, hair, accessories, poses and expressions. Greens #253c34 #3c5537 #516b3c #6c8043. Transparent background."
+  },
+  {
+    "name": "tansy",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create production pixel RPG sprite animation sheet TANSY from attached approved concept (image 1 identity) and Gus sprite (image 2 pixel STYLE ONLY). TANSY: short stout pear shaped late thirties woman, pale flushed freckled round face, straight copper hair two low plaits, broad straw beekeeper hat flowers pushed back cream veil, cream shirt honey yellow apron warm grey trousers russet boots, rectangular wooden portable hive on back, brass smoker at belt. Output transparent PNG regular EXACTLY 4 columns by 7 rows equal SQUARE cells, no text grid or labels. Row 1 FRONT idle 2 frames + 2 EMPTY cells; row 2 BACK idle 2 frames + 2 EMPTY; row 3 RIGHT profile idle 2 frames +2 EMPTY; row 4 FRONT walking 4 different stride frames; row 5 BACK walking 4 different stride frames; row 6 RIGHT profile walking 4 different stride frames. Row 7 three chest-up pixel portraits CALM, GLAD, TROUBLED, then EMPTY. Back shows NO FACE, side faces RIGHT. Whole same person consistent hair head size body size costume accessories every frame. Big head small feet approved chunky chibi sprite proportions as Gus, head 40% body height, NOT concept natural anatomy. World figures same height across rows, feet on consistent baseline, centered with generous transparent padding; silhouettes about 80% cell height. Portrait head/hair/hat all inside tile with padding. Sharp chunky pixel art, 1-2 pixel brown tinted outlines no black, flat limited warm palette cream upper-left highlights violet brown shadows. No floor shadow, no painted gradients, no concept background.",
+    "references": [
+      "assets-src/concept/people-home/tansy.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 1,
+    "source": "assets-src/raw/tansy-3.png",
+    "retainedSource": "assets-src/home/sources/tansy.png",
+    "processing": "Binary alpha threshold 210; RGB cleared where transparent. Generated figure pixels retained."
+  },
+  {
+    "name": "holt",
+    "tool": "image_gen.imagegen",
+    "prompt": "Create production pixel RPG sprite animation sheet HOLT from attached approved concept (image 1 identity) and Gus sprite (image 2 pixel STYLE ONLY). HOLT: stooped lean older man sixties grey shaggy hair grey moustache under patched brown flat cap, old linen shirt moss ochre scarf long weathered umber coat sooty shoulder, brown trousers boots, brass shuttered lantern at belt, long hooked lamplighter pole reaching just above cap. Keep body scale, fit pole inside cell. Output transparent PNG regular EXACTLY 4 columns by 7 rows equal SQUARE cells, no text grid or labels. Row 1 FRONT idle 2 frames + 2 EMPTY cells; row 2 BACK idle 2 frames + 2 EMPTY; row 3 RIGHT profile idle 2 frames +2 EMPTY; row 4 FRONT walking 4 different stride frames; row 5 BACK walking 4 different stride frames; row 6 RIGHT profile walking 4 different stride frames. Row 7 three chest-up pixel portraits CALM, GLAD, TROUBLED, then EMPTY. Back shows NO FACE, side faces RIGHT. Whole same person consistent hair head size body size costume accessories every frame. Big head small feet approved chunky chibi sprite proportions as Gus, head 40% body height, NOT concept natural anatomy. World figures same height across rows, feet on consistent baseline, centered with generous transparent padding; silhouettes about 80% cell height. Portrait head/hair/hat all inside tile with padding. Sharp chunky pixel art, 1-2 pixel brown tinted outlines no black, flat limited warm palette cream upper-left highlights violet brown shadows. No floor shadow, no painted gradients, no concept background.",
+    "references": [
+      "assets-src/concept/people-home/holt.webp",
+      "assets-src/home/gus-reference.png"
+    ],
+    "attempts": 1,
+    "source": "assets-src/raw/holt-3.png",
+    "retainedSource": "assets-src/home/sources/holt.png",
+    "processing": "Binary alpha threshold 210; RGB cleared where transparent. Generated figure pixels retained."
+  },
+  {
+    "name": "hero-portraits",
+    "tool": "image_gen.imagegen",
+    "prompt": "Use case: stylized-concept. Production cozy RPG PIXEL ART PORTRAIT expression row, exactly THREE equal SQUARE cells side by side, 3:1 canvas, one row only. Adapt the attached hero identity into the attached Dax portrait row's chunky pixel art style. Image 1 hero idle sprite identity and colors; image 2 hero concept crop identity; image 3 Dax portrait row STYLE ONLY. HERO is sixteen, very fair freckled skin, straight strawberry-blond wedge haircut with long diagonal fringe covering HIS RIGHT eye (viewer LEFT), one visible eye on viewer right. No curls. Navy canvas jacket with cream collar and cuffs, brass key on cord, brown diagonal satchel strap. Identical hair outline and costume across all three portraits, front-facing viewer, head and shoulders with top of chest and key visible. Left cell calm neutral closed mouth; middle glad warm smile; right troubled worried brow and mouth. Keep head size and alignment identical across expressions. Dark tinted brown closed 1-2 pixel outline, warm upper-left light, flat limited warm palette and crisp chunky pixel clusters at intended final 128x128 per cell, no gradients or smooth painting. Palette brown #302529 #493335 #65453a, hair #c48d64 #e4af7b #f7d3a1, fair cream #fff0cf with rose shadows, jacket #263441 #35506b, cream #eae6cd, brass #d4aa58. Genuine transparent background, generous transparent margin in each cell, all hair and shoulders fit fully, no text, no grids, no cast shadows, no ground. Do not copy Dax's spiky crewcut, two visible eyes or square face. Identity costume colours and silhouette from hero references; pixel style outline light from portrait reference. No orange cloak, no teal.",
+    "references": [
+      "assets-src/home/hero-idle-reference.png",
+      "assets-src/home/hero-concept-reference.png",
+      "assets-src/home/dax-portraits.png"
+    ],
+    "attempts": 1,
+    "retainedSource": "assets-src/home/hero-portraits.png",
+    "review": "Calm, glad and troubled retain the straight strawberry-blond fringe covering his right eye, fair freckles, navy jacket, cream collar, brass key and brown strap. Same hair silhouette across expressions. Kept attempt 1.",
+    "processing": "home.mjs: clean alpha threshold 210, fit each face to 118 pixels, nearest resize, locked palette snap; append row 20, bare hero selects calm.",
+    "limitations": [
+      "tools/art/check.mjs --settle portrait:hero exits 0 without removing the entry: portraitFaults returns only failing portraits, so a fixed portrait is absent from results and the settle loop never visits it. Tool changes are outside this brief.",
+      "people-world.mjs --portraits rebuilds only its original rows; run home.mjs afterwards to restore the appended hero row."
+    ],
+    "preservationCheck": "Compared all 384 x 2560 decoded RGBA bytes against commit 6aaa288d4a9cb38901fce5c08d447e746a2a4760 after both hero-only and default home rebuilds: identical. Compared parsed manifest excluding the four hero portrait names: identical.",
+    "verification": "TOTAL PASS verify-assets; verify assets/build/shots/tools passed before and after. Opened portraits-01.png and talk-01.png: calm, glad and troubled retain identity, and hair, face and collar fit the dialogue round frame. No visual defect observed. Dev server stopped. Full gameplay and cross-device checks were not run. Art check ends PASS art but retains the fixed portrait:hero line because settle cannot visit a passing portrait."
+  }
+]

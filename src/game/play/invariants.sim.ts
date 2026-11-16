@@ -32,6 +32,8 @@ import { footprint } from '../content/placeables.ts';
 import { QUESTS, WHEAT_SHORT, type Condition, type QuestDef } from '../content/quests.ts';
 import { recipes } from '../content/recipes.ts';
 import { QUICK_SLOTS, SLOTS } from '../inventory/index.sim.ts';
+
+const WATER = blockId('water');
 import { bagCount, holds, placeAt, questState, walk } from '../quests/rules.sim.ts';
 import type { Play } from './harness.sim.ts';
 
@@ -51,7 +53,7 @@ export interface Invariants {
 }
 
 /** Where the things a quest asks for come from when the bag lacks them, other than a recipe. Null when it can be had, or why not. */
-const SOURCES: Readonly<Record<ItemId, (p: Play) => string | null>> = {
+const SOURCES: Readonly<Partial<Record<ItemId, (p: Play) => string | null>>> = {
   // Trees stand on all the land outside the town, a hand fells one, and every tree gives logs and fiber.
   oak_log: () => null,
   fiber: () => null,
@@ -60,7 +62,7 @@ const SOURCES: Readonly<Record<ItemId, (p: Play) => string | null>> = {
   wheat_seeds: (p) => (p.sys.people.get('gus') ? null : 'asks for wheat seeds, and Gus is gone'),
   wheat: (p) => (!holds(p.game, WHEAT_SHORT) || p.sys.people.get('gus') ? null : 'asks for wheat, the harvest is short and Gus is gone'),
   // Mosslings leave tufts by their rocks.
-  moss_tuft: () => null,
+  moss_fiber: () => null,
 };
 
 const finite = (n: number): boolean => Number.isFinite(n);
@@ -307,7 +309,9 @@ export function createInvariants(options: InvariantOptions = {}): Invariants {
       for (let x = one.x; x < one.x + sx; x++) {
         for (let z = one.z; z < one.z + sz; z++) {
           if (!world.isLoaded(x, z)) continue;
-          if (!SOLID[world.getBlock(x, one.y - 1, z)]) return `the ${one.kind} at ${one.x}, ${one.y}, ${one.z} has no solid ground under ${x}, ${z}`;
+          // A machine part may stand on water's top: a wheel in a ditch, a shaft or a chute over it.
+          const onWater = def.drawnBy === 'machines' && world.getBlock(x, one.y - 1, z) === WATER;
+          if (!SOLID[world.getBlock(x, one.y - 1, z)] && !onWater) return `the ${one.kind} at ${one.x}, ${one.y}, ${one.z} has no solid ground under ${x}, ${z}`;
           for (let y = one.y; y < one.y + sy; y++) if (world.getBlock(x, y, z) === AIR) return `the ${one.kind} at ${one.x}, ${one.y}, ${one.z} left its cell ${x}, ${y}, ${z} empty`;
         }
       }

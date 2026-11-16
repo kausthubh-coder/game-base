@@ -1,6 +1,7 @@
 // Runs the engine in an OfflineAudioContext, faster than real time. The checks use it to render a scene
 // to a buffer and to read the conductor as it goes. It drives the engine exactly as a game would: a state
 // every step, then `update`.
+import type { Palette } from '../../content/palettes/types.ts';
 import { createAudio, type AudioDebug, type AudioSystem } from './index.ts';
 
 export interface OfflineScene {
@@ -9,6 +10,8 @@ export interface OfflineScene {
   /** Seconds between updates. A game calls every frame. The default here is 50 ms, which is coarser and so harder. */
   step?: number;
   seed?: number;
+  /** The palettes to play. The default is the engine's own: the seven lands and the town. */
+  palettes?: readonly Palette[];
   /** Called once before the music starts. Set volumes and the first state here. */
   setup?(audio: AudioSystem): void;
   /** Called every step with the time in seconds. Set the state and emit events here. */
@@ -30,7 +33,7 @@ export async function renderOffline(scene: OfflineScene): Promise<OfflineResult>
   const rate = scene.sampleRate ?? 44100;
   const step = scene.step ?? 0.05;
   const ctx = new OfflineAudioContext(2, Math.ceil(scene.seconds * rate), rate);
-  const audio = createAudio(ctx, { seed: scene.seed ?? 1 });
+  const audio = createAudio(ctx, { seed: scene.seed ?? 1, palettes: scene.palettes });
   const updateMs: number[] = [];
   let index = 0;
   const marks = (scene.marks ?? []).slice().sort((a, b) => a - b);

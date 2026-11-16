@@ -26,9 +26,8 @@ The recipes, with the item ids from `src/game/content/items.ts`:
 | `workbench` | `hand` | 4 `plank` | 1 `workbench` |
 | `bed` | `workbench` | 6 `plank`, 3 `fiber` | 1 `bed` |
 | `chest` | `workbench` | 8 `plank` | 1 `chest` |
-| `lamp` | `workbench` | 1 `plank`, 1 `moss_tuft` | 1 `lamp` |
+| `lamp` | `workbench` | 1 `plank`, 1 `moss_fiber` | 1 `lamp` |
 
-Odo gives the river lamp at the festival, so it has no recipe.
 
 ## Events it sends
 

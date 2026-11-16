@@ -8,7 +8,7 @@ To playtest, start in human mode, then loop `act` and read the block it prints. 
 
 | Command | What it does |
 |---|---|
-| `start --mode human` | Builds the game into `.artifacts/play/site`, serves it and opens Chrome. It prints the session file `.artifacts/play/session.json` (and the state, unless blind). Options: `--blind`, `--live`, `--size 1366x768` (960x540 by default), `--touch`, `--software` (software drawing), `--port 5495`. To change any of them, stop and start again. |
+| `start --mode human` | Builds the game into `.artifacts/play/site`, serves it and opens Chrome. It prints the session file `.artifacts/play/session.json` (and the state, unless blind). Options: `--blind`, `--live`, `--size 1366x768` (960x540 by default), `--touch`, `--software` (software drawing), `--port 5495`, `--query opening=deed` (more of the address: a recording keeps it as `query`). To change any of them, stop and start again. |
 | `look [name]` | Takes a picture into the journal and prints the look block (below). `--json` prints the same as JSON. `--all`, on `look`, `act` and `film`, prints every screen line where the block stops at 24. |
 | `act '<input>' [name]` | Plays the inputs, then looks. An input is one JSON input, a JSON list of them, or a bare key name (`act KeyE` presses E). If an input fails, the block's first line says which one and how many were not played, it still looks, and it exits 1. |
 | `film '<input>' [name] [--fps 10]` | Records every frame Chrome draws (about 60 a second; `--fps` is how many of them a second go on the sheet) while the inputs play and for 0.5 s after, up to 900 frames, through the screencast (screenshots if that sends nothing; the block says which). It writes a sheet of the frames, each labelled with its time, keeps the full-size frames in a folder beside it, then looks. **flickers** lists runs of 1 to 4 frames drawn unlike both the frame before and the frame after, while those two match: a sprite drawn wrong or dark for a moment, even while the camera scrolls. **jumps** lists the frames that differ from the frame before by over 5 times the film's median difference, such as a panel closing; `and back` means the next frame jumps too. Both are marked in red on the sheet, and the block prints the path of each marked frame and of the last frame at full size. Open the sheet anyway, since a flicker longer than 4 frames shows only there. |
@@ -66,7 +66,7 @@ Each session's journal is `.artifacts/play/journal/<start time>/`: numbered pict
 | `{"type":"wait","ms":200}` | Waits. |
 | `{"type":"tap","text":"New game"}` or `{"type":"tap","x":400,"y":300}` | A finger tap. Needs `start --touch`. |
 | `{"type":"swipe","x":120,"y":300,"dx":0,"dy":-60,"ms":600}` | One finger down, slid by dx, dy over half of ms, held, then lifted. Needs `--touch`. |
-| `{"type":"door","method":"skipTo","args":["festival"]}` | Door mode only: `newGame`, `teleport`, `give`, `skipTo`, `advance`, `setTime`, `setCamera`, `look`, `interact`, `talkThrough`, `manual`, `turn`. |
+| `{"type":"door","method":"skipTo","args":["kitchen"]}` | Door mode only: `newGame`, `teleport`, `give`, `skipTo`, `advance`, `setTime`, `setCamera`, `look`, `interact`, `talkThrough`, `manual`, `turn`. |
 
 With `--touch`, Chrome reports a touch screen (`pointer: coarse`), and taps press the interface's buttons. The game itself has no touch controls yet. The input feature's stick and buttons (`src/features/input/touch.ui.ts`) are not wired into it, so on a touch screen the hero cannot walk.
 

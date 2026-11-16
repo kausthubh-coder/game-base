@@ -251,6 +251,9 @@ try {
     await laptop.keyboard.press('Escape');
     await laptop.locator('[data-key="title:new"]').click();
     await wait(laptop, () => window.__game.started);
+    // Begin now plays the film. Finish its real Skip flow before trying world or menu input.
+    await laptop.locator('[data-key="opening:skip"]').click();
+    await wait(laptop, () => !document.querySelector('.st-film:not([hidden])'));
     laptopLogs = await gather(laptop, 7);
     await putDown(laptop);
     // Opening the panel writes the game and looks for a change at once, so this does not wait for the timer.

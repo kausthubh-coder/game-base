@@ -7,7 +7,7 @@ import { CELLS, CHUNK, cellIndex, computeHeights } from '../../features/world/ch
 import { initLight } from '../../features/world/light.sim.ts';
 import { World } from '../../features/world/world.sim.ts';
 import type {
-  ActionsApi, EventName, GameEvents, Interactable, InteractApi, InventoryApi, ItemsApi, RegionApi, TalkApi, UseContext,
+  ActionsApi, EventName, GameEvents, Interactable, InteractApi, InventoryApi, ItemId, ItemsApi, RegionApi, Stack, TalkApi, UseContext,
 } from '../api.sim.ts';
 import { STEP, createKernel, type Kernel } from '../kernel.sim.ts';
 
@@ -47,7 +47,7 @@ export interface Stage {
   places: Map<string, Vec3>;
   /** What the fake bag holds, and the item in the player's hand. */
   bag: Map<string, number>;
-  hand: { id: string | null };
+  hand: { id: ItemId | null };
   /** Everyone the fake talk system was asked to talk to, in order. */
   talked: string[];
   /** What was added to the fake prompt registry, by id. */
@@ -109,23 +109,23 @@ export function makeStage(options: StageOptions): Stage {
   const talk = { active: false, talkTo: (npc: string) => void talked.push(npc) } as unknown as TalkApi;
   kernel.add('talk', talk, {});
 
-  const bag = new Map<string, number>();
+  const bag = new Map<ItemId, number>();
   const hand: Stage['hand'] = { id: null };
-  const held = (): { id: string; count: number } | null => (hand.id && (bag.get(hand.id) ?? 0) > 0 ? { id: hand.id, count: bag.get(hand.id)! } : null);
+  const held = (): Stack | null => (hand.id && (bag.get(hand.id) ?? 0) > 0 ? { id: hand.id, count: bag.get(hand.id)! } : null);
   const inventory = {
     held,
     // Like the real bag: gaining an item says so, with where it came from.
-    add(id: string, count: number, at?: Vec3) {
+    add(id: ItemId, count: number, at?: Vec3) {
       bag.set(id, (bag.get(id) ?? 0) + count);
       game.events.emit('item.gained', at ? { id, count, at: { ...at } } : { id, count });
       return 0;
     },
-    remove(id: string, count: number) {
+    remove(id: ItemId, count: number) {
       if ((bag.get(id) ?? 0) < count) return false;
       bag.set(id, bag.get(id)! - count);
       return true;
     },
-    count: (id: string) => bag.get(id) ?? 0,
+    count: (id: ItemId) => bag.get(id) ?? 0,
   } as unknown as InventoryApi;
   kernel.add('inventory', inventory, {});
   kernel.add('items', { get: (id: string) => ({ id, treat: id === 'berry' }) } as unknown as ItemsApi, {});

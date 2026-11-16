@@ -76,7 +76,29 @@ export const shared = {
   uBrush: { value: null as THREE.Texture | null },
   /** x and y are the wind's direction on the ground, z is its strength. */
   uWind: { value: new THREE.Vector3(0.83, 0.55, 1) },
+  /**
+   * What grey does to a tree (`?grey=a` or `b`, GREY_LOOKS in src/content/painted.ts): the colour its leaves and
+   * its bark drain toward, how far at most, and the share of its leaves that are gone.
+   */
+  uGreyLeaf: { value: new THREE.Color(0.8, 0.82, 0.76) },
+  uGreyBark: { value: new THREE.Color(0.75, 0.74, 0.7) },
+  uGreyDrain: { value: 0.85 },
+  uGreyThin: { value: 0 },
+  /**
+   * What a material that sees through (`see` in PaintOptions) leaves out, as the camera's sight rule decides
+   * (src/features/camera/sight.sim.ts): each point kept in sight (its chest and its radius, 0 for an empty slot),
+   * the circle lifted under a roof (x, height, z, radius), the distances from the lens where leaves fade and are
+   * gone and the least width of the hole through crowns under a grove, and the rule's shape (the crown's widening,
+   * the widening toward the lens, the start, the guard below the chest).
+   */
+  uSeeAt: { value: [new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4(), new THREE.Vector4()] },
+  uSeeRoom: { value: new THREE.Vector4() },
+  uSeeNear: { value: new THREE.Vector4() },
+  uSeeShape: { value: new THREE.Vector4(2.2, 0.05, 0.9, -0.75) },
 };
+
+/** How a material takes part in the sight rule: not at all, as masonry, tree wood, or leaves. */
+export type See = 'none' | 'solid' | 'leaves' | 'wood';
 
 export interface PaintOptions extends THREE.MeshLambertMaterialParameters {
   /** How far the brush texture breaks up the edge between light and shade. */
@@ -108,6 +130,8 @@ export interface PaintOptions extends THREE.MeshLambertMaterialParameters {
   fragmentAlbedo?: string;
   /** Replaces the lighting. It must declare `vec3 outgoingLight`. */
   fragmentFinal?: string;
+  /** Cut away where it stands between the camera and what must stay in sight. The land, water and grass never are. */
+  see?: See;
 }
 
 const GUST = /* glsl */ `
@@ -133,6 +157,46 @@ vPaintWorld = paintWorldPos.xyz;
 vec4 mvPosition = viewMatrix * paintWorldPos;
 ${view}
 gl_Position = projectionMatrix * mvPosition;
+`;
+
+/**
+ * The sight rule's sums, for any fragment shader: what of a point is cut so the points kept in sight show. The
+ * block world's material takes it too (src/features/world/material.view.ts), with `shared`'s uniforms.
+ */
+export const SEE_GLSL = /* glsl */ `
+// The sight rule: how much of this fragment is cut so the points kept in sight show. The same sums as
+// SightRule.cuts in src/features/camera/sight.sim.ts. 0.0 for masonry, 1.0 for leaves, 2.0 for tree wood.
+uniform vec4 uSeeAt[4];
+uniform vec4 uSeeRoom, uSeeShape;
+uniform vec4 uSeeNear;
+float paintSeeCut(vec3 p, float kind) {
+  float leaves = step(0.5, kind) * (1.0 - step(1.5, kind));
+  float wood = step(1.5, kind);
+  float cut = 0.0;
+  for (int i = 0; i < 4; i++) {
+    vec4 f = uSeeAt[i];
+    if (f.w <= 0.0 || p.y < f.y + uSeeShape.w) continue;
+    vec3 toEye = cameraPosition - f.xyz;
+    float len = length(toEye);
+    vec3 u = toEye / max(len, 0.001), r = p - f.xyz;
+    float t = dot(r, u);
+    // A root beside the body can overlap its lower half before the chest ray starts.
+    if (wood > 0.5 && p.y < f.y + 1.0 && t >= -1.1) cut = max(cut, 1.0 - smoothstep(0.6, 1.0, length(r.xz)));
+    if (t < uSeeShape.z || t > len) continue;
+    // Under a grove, wood above the trunks' feet (uSeeNear.w over the chest) goes with the leaves.
+    float grove = uSeeNear.z * max(leaves, wood * smoothstep(uSeeNear.w, uSeeNear.w + 2.0, p.y - f.y));
+    float wide = max(f.w * mix(mix(0.65, 1.0, wood), uSeeShape.x, leaves), grove) + t * uSeeShape.y;
+    cut = max(cut, 1.0 - smoothstep(wide * 0.55, wide, length(r - u * t)));
+  }
+  // Wood by the lens is cut within a block, not dithered over the leaves' band: a pale trunk half dithered reads as glass.
+  if ((leaves > 0.5 || (wood > 0.5 && uSeeNear.z > 0.0)) && uSeeNear.y > 0.0) cut = max(cut, 1.0 - smoothstep(leaves > 0.5 ? uSeeNear.x : uSeeNear.y - 1.0, uSeeNear.y, distance(p, cameraPosition)));
+  if (uSeeRoom.w > 0.0 && p.y > uSeeRoom.y && cameraPosition.y > p.y) {
+    vec2 l = p.xz + (p.xz - cameraPosition.xz) * ((uSeeRoom.y - p.y) / (p.y - cameraPosition.y));
+    float d = min(distance(l, uSeeRoom.xz), distance(p.xz, uSeeRoom.xz));
+    cut = max(cut, 1.0 - smoothstep(uSeeRoom.w - 1.5, uSeeRoom.w, d));
+  }
+  return cut;
+}
 `;
 
 /** What a painted fragment shader declares: the shared uniforms and the painted light and air. It needs `vPaintWorld`. */
@@ -206,6 +270,10 @@ vec3 paintHazeTree(vec3 color) {
   if (paintTreeEdge() > paintDither()) discard;
   return paintAir(color);
 }
+${SEE_GLSL}
+void paintSee(float leaves) {
+  if (paintSeeCut(vPaintWorld, leaves) > paintDither()) discard;
+}
 `;
 
 const LIGHTS = (keepNormal: boolean): string => /* glsl */ `
@@ -221,6 +289,29 @@ void RE_IndirectDiffuse_Lambert(const in vec3 irradiance, const in vec3 geometry
 `;
 
 const DEFAULT_FINAL = 'vec3 outgoingLight = paintHaze(paintShade(diffuseColor.rgb, paintLit(0.0))) + totalEmissiveRadiance;';
+
+/** What the camera's sight rule hands the painted light each frame (`SightState` and `SightOptions` in src/features/camera). */
+export interface SightInput {
+  readonly points: Float32Array;
+  readonly room: { readonly x: number; readonly y: number; readonly z: number; readonly radius: number };
+  readonly near: { readonly start: number; readonly end: number };
+  readonly grove: number;
+}
+export interface SightShape { canopy: number; widen: number; start: number; guard: number; chest: number; trunkFeet: number }
+
+/** Writes the sight rule's state into the uniforms every material that sees through reads. Allocates nothing. */
+export function setSight(state: SightInput, shape: SightShape): void {
+  const at = shared.uSeeAt.value, p = state.points;
+  for (let i = 0; i < at.length; i++) at[i].set(p[i * 4] ?? 0, p[i * 4 + 1] ?? 0, p[i * 4 + 2] ?? 0, p[i * 4 + 3] ?? 0);
+  shared.uSeeRoom.value.set(state.room.x, state.room.y, state.room.z, state.room.radius);
+  shared.uSeeNear.value.set(state.near.start, state.near.end, state.grove, shape.trunkFeet);
+  shared.uSeeShape.value.set(shape.canopy, shape.widen, shape.start, shape.guard - shape.chest);
+}
+
+/** The line a fragment shader starts its colour with to take part in the sight rule. */
+export function seeCall(see: See): string {
+  return see === 'none' ? '' : `paintSee(${see === 'leaves' ? '1.0' : see === 'wood' ? '2.0' : '0.0'});\n`;
+}
 
 function replaceOnce(source: string, find: string, put: string): string {
   if (!source.includes(find)) throw new Error(`the Three.js shader has no "${find}" to replace`);
@@ -240,13 +331,15 @@ function patchVertex(shader: { vertexShader: string }, o: PaintOptions): void {
 }
 
 const hookKey = (o: PaintOptions): string =>
-  [o.keepNormal, o.vertexPars, o.vertexBegin, o.vertexNormal, o.vertexWorld, o.vertexView, o.vertexShadow, o.fragmentPars, o.fragmentAlbedo, o.fragmentFinal].join('|');
+  [o.see ?? 'none', o.keepNormal, o.vertexPars, o.vertexBegin, o.vertexNormal, o.vertexWorld, o.vertexView, o.vertexShadow, o.fragmentPars, o.fragmentAlbedo, o.fragmentFinal].join('|');
 
 /** A Lambert material lit with the painted light. */
 export function paint(options: PaintOptions = {}): THREE.MeshLambertMaterial {
   const { brush = 0.2, bands = 0.4, wrap = 0.3, brushScale = 0.09, dapple = 0, keepNormal = false, uniforms = {}, vertexPars, vertexBegin, vertexNormal,
-    vertexWorld, vertexView, vertexShadow, fragmentPars, fragmentAlbedo, fragmentFinal, ...lambert } = options;
+    vertexWorld, vertexView, vertexShadow, fragmentPars, fragmentAlbedo, fragmentFinal, see = 'none', ...lambert } = options;
   const material = new THREE.MeshLambertMaterial(lambert);
+  // A check reads it to know whether this material is cut where it hides what matters.
+  material.userData.see = see;
   const own = { uBrushAmt: { value: brush }, uBands: { value: bands }, uWrap: { value: wrap }, uBrushScale: { value: brushScale }, uDapple: { value: dapple }, ...uniforms };
   material.userData.uniforms = own;
   material.onBeforeCompile = (shader) => {
@@ -256,7 +349,7 @@ export function paint(options: PaintOptions = {}): THREE.MeshLambertMaterial {
     f = replaceOnce(f, '#include <common>', `#include <common>\n${FRAGMENT_PARS}\n${fragmentPars ?? ''}`);
     f = replaceOnce(f, '#include <lights_lambert_pars_fragment>', LIGHTS(keepNormal));
     f = replaceOnce(f, 'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;',
-      `${fragmentAlbedo ?? ''}\n${fragmentFinal ?? DEFAULT_FINAL}`);
+      `${seeCall(see)}${fragmentAlbedo ?? ''}\n${fragmentFinal ?? DEFAULT_FINAL}`);
     shader.fragmentShader = f;
   };
   material.customProgramCacheKey = () => 'paint|' + hookKey(options);

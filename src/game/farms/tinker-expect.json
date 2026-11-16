@@ -1,0 +1,1096 @@
+{
+ "pit": [
+  {
+   "name": "Nothing built",
+   "items": [],
+   "give": {
+    "tag": "0 springs a day",
+    "sub": "Power: 4 made, 0 used",
+    "symptom": "A gearling reached the wheel and jammed it. The wheel has stopped, and every pusher with it.",
+    "fix": "Dig a pit in their way, between where they come in and the wheel."
+   },
+   "take": {
+    "tag": "0 springs today",
+    "sub": "Tomorrow: 0 gearlings fewer",
+    "symptom": "A gearling reached the wheel and jammed it. The wheel has stopped, and every pusher with it.",
+    "fix": "Dig a pit in their way, between where they come in and the wheel."
+   }
+  },
+  {
+   "name": "One pit",
+   "items": [
+    [
+     2,
+     3,
+     "pit"
+    ]
+   ],
+   "give": {
+    "tag": "1 spring a day",
+    "sub": "Power: 4 made, 0 used",
+    "symptom": "A gearling reached the wheel and jammed it. The wheel has stopped, and every pusher with it.",
+    "fix": "Gearlings in other rows walk round the pit. Fences turn them toward the wheel's row, so a line of fences can send every row into one pit."
+   },
+   "take": {
+    "tag": "4 springs today",
+    "sub": "Tomorrow: 1 gearling fewer",
+    "symptom": "A gearling reached the wheel and jammed it. The wheel has stopped, and every pusher with it.",
+    "fix": "Gearlings in other rows walk round the pit. Fences turn them toward the wheel's row, so a line of fences can send every row into one pit."
+   }
+  },
+  {
+   "name": "Fenced in",
+   "items": [
+    [
+     4,
+     0,
+     "fence"
+    ],
+    [
+     4,
+     1,
+     "fence"
+    ],
+    [
+     4,
+     2,
+     "fence"
+    ],
+    [
+     4,
+     4,
+     "fence"
+    ],
+    [
+     4,
+     5,
+     "fence"
+    ],
+    [
+     3,
+     3,
+     "pit"
+    ]
+   ],
+   "give": {
+    "tag": "1 spring a day",
+    "sub": "Power: 4 made, 0 used",
+    "symptom": "The pit is full. 5 gearlings are waiting behind the one in it.",
+    "fix": "A stopped gearling stays in the pit. A pusher right beside the pit, in line with it, shoves it on so the next one can come."
+   },
+   "take": {
+    "tag": "24 springs today",
+    "sub": "Tomorrow: 6 gearlings fewer",
+    "symptom": "Every gearling is broken for its springs.",
+    "fix": "None of these come back tomorrow, and the Custodian will not speak to you today. Switch to Give to keep them coming."
+   }
+  },
+  {
+   "name": "With a pusher",
+   "items": [
+    [
+     4,
+     0,
+     "fence"
+    ],
+    [
+     4,
+     1,
+     "fence"
+    ],
+    [
+     4,
+     2,
+     "fence"
+    ],
+    [
+     4,
+     4,
+     "fence"
+    ],
+    [
+     4,
+     5,
+     "fence"
+    ],
+    [
+     3,
+     3,
+     "pit"
+    ],
+    [
+     3,
+     4,
+     "pusher"
+    ]
+   ],
+   "give": {
+    "tag": "6 springs a day",
+    "sub": "Power: 4 made, 1 used",
+    "symptom": "Every gearling goes through the pit, and walks home.",
+    "fix": "Nothing is holding it back. Six a day is all that live near this wheel. A second running machine draws more."
+   },
+   "take": {
+    "tag": "24 springs today",
+    "sub": "Tomorrow: 6 gearlings fewer",
+    "symptom": "Every gearling is broken for its springs.",
+    "fix": "None of these come back tomorrow, and the Custodian will not speak to you today. Switch to Give to keep them coming."
+   }
+  },
+  {
+   "name": "Lit for the night",
+   "items": [
+    [
+     4,
+     0,
+     "fence"
+    ],
+    [
+     4,
+     1,
+     "fence"
+    ],
+    [
+     4,
+     2,
+     "fence"
+    ],
+    [
+     4,
+     4,
+     "fence"
+    ],
+    [
+     4,
+     5,
+     "fence"
+    ],
+    [
+     3,
+     3,
+     "pit"
+    ],
+    [
+     3,
+     4,
+     "pusher"
+    ],
+    [
+     2,
+     2,
+     "lamp"
+    ]
+   ],
+   "give": {
+    "tag": "0 springs a day",
+    "sub": "Power: 4 made, 0 used",
+    "symptom": "A gearling walked straight across the pit and into the wheel. The wheel has stopped.",
+    "fix": "A gearling only stops where it is dark. Move the lamp so its light does not reach the pit."
+   },
+   "take": {
+    "tag": "0 springs today",
+    "sub": "Tomorrow: 0 gearlings fewer",
+    "symptom": "A gearling walked straight across the pit and into the wheel. The wheel has stopped.",
+    "fix": "A gearling only stops where it is dark. Move the lamp so its light does not reach the pit."
+   }
+  }
+ ],
+ "bait": [
+  {
+   "name": "By the house",
+   "items": [
+    [
+     1,
+     1,
+     "carrot"
+    ],
+    [
+     2,
+     1,
+     "carrot"
+    ],
+    [
+     3,
+     1,
+     "carrot"
+    ],
+    [
+     1,
+     2,
+     "carrot"
+    ],
+    [
+     2,
+     2,
+     "carrot"
+    ],
+    [
+     3,
+     2,
+     "carrot"
+    ]
+   ],
+   "give": {
+    "tag": "2.5 copper a day",
+    "sub": "5 burrowers on your carrots, 3 on the wild roots",
+    "symptom": "1 carrot block is in the light. Nothing comes up there.",
+    "fix": "Your window lights the blocks round it, and so does every lamp. Plant where it is dark."
+   },
+   "take": {
+    "tag": "20 copper now",
+    "sub": "Then nothing comes up here for three days",
+    "symptom": "1 carrot block is in the light. Nothing comes up there.",
+    "fix": "Your window lights the blocks round it, and so does every lamp. Plant where it is dark."
+   }
+  },
+  {
+   "name": "In the middle",
+   "items": [
+    [
+     2,
+     2,
+     "carrot"
+    ],
+    [
+     3,
+     2,
+     "carrot"
+    ],
+    [
+     4,
+     2,
+     "carrot"
+    ],
+    [
+     2,
+     3,
+     "carrot"
+    ],
+    [
+     3,
+     3,
+     "carrot"
+    ],
+    [
+     4,
+     3,
+     "carrot"
+    ]
+   ],
+   "give": {
+    "tag": "2.5 copper a day",
+    "sub": "5 burrowers on your carrots, 3 on the wild roots",
+    "symptom": "3 burrowers went to the wild roots instead.",
+    "fix": "They go to the nearest dark food. A lamp beside the wild roots puts them in the light, so the burrowers come on to yours."
+   },
+   "take": {
+    "tag": "20 copper now",
+    "sub": "Then nothing comes up here for three days",
+    "symptom": "3 burrowers went to the wild roots instead.",
+    "fix": "They go to the nearest dark food. A lamp beside the wild roots puts them in the light, so the burrowers come on to yours."
+   }
+  },
+  {
+   "name": "Lamps on the roots",
+   "items": [
+    [
+     2,
+     2,
+     "carrot"
+    ],
+    [
+     3,
+     2,
+     "carrot"
+    ],
+    [
+     4,
+     2,
+     "carrot"
+    ],
+    [
+     2,
+     3,
+     "carrot"
+    ],
+    [
+     3,
+     3,
+     "carrot"
+    ],
+    [
+     4,
+     3,
+     "carrot"
+    ],
+    [
+     7,
+     1,
+     "lamp"
+    ],
+    [
+     7,
+     4,
+     "lamp"
+    ],
+    [
+     0,
+     5,
+     "lamp"
+    ]
+   ],
+   "give": {
+    "tag": "3 copper a day",
+    "sub": "6 burrowers on your carrots, 0 on the wild roots",
+    "symptom": "2 burrowers found nothing of yours.",
+    "fix": "Eight come a night and you have 6 dark blocks. Plant 2 more, where they can reach."
+   },
+   "take": {
+    "tag": "24 copper now",
+    "sub": "Then nothing comes up here for three days",
+    "symptom": "2 burrowers found nothing of yours.",
+    "fix": "Eight come a night and you have 6 dark blocks. Plant 2 more, where they can reach."
+   }
+  },
+  {
+   "name": "Eight blocks",
+   "items": [
+    [
+     2,
+     2,
+     "carrot"
+    ],
+    [
+     3,
+     2,
+     "carrot"
+    ],
+    [
+     4,
+     2,
+     "carrot"
+    ],
+    [
+     2,
+     3,
+     "carrot"
+    ],
+    [
+     3,
+     3,
+     "carrot"
+    ],
+    [
+     4,
+     3,
+     "carrot"
+    ],
+    [
+     5,
+     2,
+     "carrot"
+    ],
+    [
+     5,
+     3,
+     "carrot"
+    ],
+    [
+     7,
+     1,
+     "lamp"
+    ],
+    [
+     7,
+     4,
+     "lamp"
+    ],
+    [
+     0,
+     5,
+     "lamp"
+    ]
+   ],
+   "give": {
+    "tag": "4 copper a day",
+    "sub": "8 burrowers on your carrots, 0 on the wild roots",
+    "symptom": "Every burrower comes up in your carrots.",
+    "fix": "Nothing is holding it back. The same lamps keep night visitors off this field, so you built the safe farm too."
+   },
+   "take": {
+    "tag": "32 copper now",
+    "sub": "Then nothing comes up here for three days",
+    "symptom": "Every burrower comes up in your carrots.",
+    "fix": "Nothing is holding it back. The same lamps keep night visitors off this field, so you built the safe farm too."
+   }
+  },
+  {
+   "name": "A lamp at the gate",
+   "items": [
+    [
+     2,
+     2,
+     "carrot"
+    ],
+    [
+     3,
+     2,
+     "carrot"
+    ],
+    [
+     4,
+     2,
+     "carrot"
+    ],
+    [
+     2,
+     3,
+     "carrot"
+    ],
+    [
+     3,
+     3,
+     "carrot"
+    ],
+    [
+     4,
+     3,
+     "carrot"
+    ],
+    [
+     5,
+     2,
+     "carrot"
+    ],
+    [
+     5,
+     3,
+     "carrot"
+    ],
+    [
+     7,
+     1,
+     "lamp"
+    ],
+    [
+     7,
+     4,
+     "lamp"
+    ],
+    [
+     0,
+     5,
+     "lamp"
+    ],
+    [
+     0,
+     3,
+     "lamp"
+    ]
+   ],
+   "give": {
+    "tag": "3 copper a day",
+    "sub": "6 burrowers on your carrots, 0 on the wild roots",
+    "symptom": "2 burrowers turned back at the fence.",
+    "fix": "A lamp that lights a gap in the fence keeps that burrower out. Lamps belong round the food you want them away from, not across their way in."
+   },
+   "take": {
+    "tag": "24 copper now",
+    "sub": "Then nothing comes up here for three days",
+    "symptom": "2 burrowers turned back at the fence.",
+    "fix": "A lamp that lights a gap in the fence keeps that burrower out. Lamps belong round the food you want them away from, not across their way in."
+   }
+  }
+ ],
+ "terrace": [
+  {
+   "name": "By hand",
+   "items": [
+    [
+     1,
+     0,
+     "field"
+    ],
+    [
+     1,
+     1,
+     "field"
+    ],
+    [
+     1,
+     2,
+     "field"
+    ],
+    [
+     1,
+     3,
+     "field"
+    ],
+    [
+     1,
+     4,
+     "field"
+    ],
+    [
+     1,
+     5,
+     "field"
+    ]
+   ],
+   "give": {
+    "tag": "12 wheat a day",
+    "sub": "No wheel yet",
+    "symptom": "Every field is on the ditch.",
+    "fix": "The ditch reaches one row. To go further: a wheel in the stream, a shaft, a sprinkler."
+   }
+  },
+  {
+   "name": "One sprinkler",
+   "items": [
+    [
+     0,
+     3,
+     "wheel"
+    ],
+    [
+     1,
+     3,
+     "shaft"
+    ],
+    [
+     2,
+     3,
+     "shaft"
+    ],
+    [
+     3,
+     3,
+     "sprinkler"
+    ],
+    [
+     1,
+     0,
+     "field"
+    ],
+    [
+     1,
+     1,
+     "field"
+    ],
+    [
+     1,
+     2,
+     "field"
+    ],
+    [
+     1,
+     4,
+     "field"
+    ],
+    [
+     1,
+     5,
+     "field"
+    ],
+    [
+     2,
+     2,
+     "field"
+    ],
+    [
+     3,
+     2,
+     "field"
+    ],
+    [
+     4,
+     2,
+     "field"
+    ],
+    [
+     4,
+     3,
+     "field"
+    ],
+    [
+     2,
+     4,
+     "field"
+    ],
+    [
+     3,
+     4,
+     "field"
+    ],
+    [
+     4,
+     4,
+     "field"
+    ]
+   ],
+   "give": {
+    "tag": "24 wheat a day",
+    "sub": "Power: 4 made, 1 used",
+    "symptom": "Every field is wet and every sprinkler turns.",
+    "fix": "The blocks under the shafts grow nothing. Where you run a shaft is where the field is not."
+   }
+  },
+  {
+   "name": "Too big for one wheel",
+   "items": [
+    [
+     0,
+     4,
+     "wheel"
+    ],
+    [
+     1,
+     1,
+     "sprinkler"
+    ],
+    [
+     2,
+     1,
+     "shaft"
+    ],
+    [
+     3,
+     1,
+     "shaft"
+    ],
+    [
+     4,
+     1,
+     "sprinkler"
+    ],
+    [
+     5,
+     1,
+     "shaft"
+    ],
+    [
+     6,
+     1,
+     "shaft"
+    ],
+    [
+     7,
+     1,
+     "sprinkler"
+    ],
+    [
+     1,
+     4,
+     "sprinkler"
+    ],
+    [
+     2,
+     4,
+     "shaft"
+    ],
+    [
+     3,
+     4,
+     "shaft"
+    ],
+    [
+     4,
+     4,
+     "sprinkler"
+    ],
+    [
+     5,
+     4,
+     "shaft"
+    ],
+    [
+     6,
+     4,
+     "shaft"
+    ],
+    [
+     7,
+     4,
+     "sprinkler"
+    ],
+    [
+     3,
+     2,
+     "shaft"
+    ],
+    [
+     3,
+     3,
+     "shaft"
+    ],
+    [
+     1,
+     0,
+     "field"
+    ],
+    [
+     2,
+     0,
+     "field"
+    ],
+    [
+     3,
+     0,
+     "field"
+    ],
+    [
+     4,
+     0,
+     "field"
+    ],
+    [
+     5,
+     0,
+     "field"
+    ],
+    [
+     6,
+     0,
+     "field"
+    ],
+    [
+     7,
+     0,
+     "field"
+    ],
+    [
+     1,
+     2,
+     "field"
+    ],
+    [
+     2,
+     2,
+     "field"
+    ],
+    [
+     4,
+     2,
+     "field"
+    ],
+    [
+     5,
+     2,
+     "field"
+    ],
+    [
+     6,
+     2,
+     "field"
+    ],
+    [
+     7,
+     2,
+     "field"
+    ],
+    [
+     1,
+     3,
+     "field"
+    ],
+    [
+     2,
+     3,
+     "field"
+    ],
+    [
+     4,
+     3,
+     "field"
+    ],
+    [
+     5,
+     3,
+     "field"
+    ],
+    [
+     6,
+     3,
+     "field"
+    ],
+    [
+     7,
+     3,
+     "field"
+    ],
+    [
+     1,
+     5,
+     "field"
+    ],
+    [
+     2,
+     5,
+     "field"
+    ],
+    [
+     3,
+     5,
+     "field"
+    ],
+    [
+     4,
+     5,
+     "field"
+    ],
+    [
+     5,
+     5,
+     "field"
+    ],
+    [
+     6,
+     5,
+     "field"
+    ],
+    [
+     7,
+     5,
+     "field"
+    ]
+   ],
+   "give": {
+    "tag": "37 wheat a day",
+    "sub": "Power: 4 made, 6 used",
+    "symptom": "Short of power: 4 made, 6 asked for. Everything runs at 67%.",
+    "fix": "Add a second wheel, or move one to the top, where the water drops and a wheel makes 6."
+   }
+  },
+  {
+   "name": "Two wheels",
+   "items": [
+    [
+     0,
+     4,
+     "wheel"
+    ],
+    [
+     0,
+     1,
+     "wheel"
+    ],
+    [
+     1,
+     1,
+     "sprinkler"
+    ],
+    [
+     2,
+     1,
+     "shaft"
+    ],
+    [
+     3,
+     1,
+     "shaft"
+    ],
+    [
+     4,
+     1,
+     "sprinkler"
+    ],
+    [
+     5,
+     1,
+     "shaft"
+    ],
+    [
+     6,
+     1,
+     "shaft"
+    ],
+    [
+     7,
+     1,
+     "sprinkler"
+    ],
+    [
+     1,
+     4,
+     "sprinkler"
+    ],
+    [
+     2,
+     4,
+     "shaft"
+    ],
+    [
+     3,
+     4,
+     "shaft"
+    ],
+    [
+     4,
+     4,
+     "sprinkler"
+    ],
+    [
+     5,
+     4,
+     "shaft"
+    ],
+    [
+     6,
+     4,
+     "shaft"
+    ],
+    [
+     7,
+     4,
+     "sprinkler"
+    ],
+    [
+     3,
+     2,
+     "shaft"
+    ],
+    [
+     3,
+     3,
+     "shaft"
+    ],
+    [
+     1,
+     0,
+     "field"
+    ],
+    [
+     2,
+     0,
+     "field"
+    ],
+    [
+     3,
+     0,
+     "field"
+    ],
+    [
+     4,
+     0,
+     "field"
+    ],
+    [
+     5,
+     0,
+     "field"
+    ],
+    [
+     6,
+     0,
+     "field"
+    ],
+    [
+     7,
+     0,
+     "field"
+    ],
+    [
+     1,
+     2,
+     "field"
+    ],
+    [
+     2,
+     2,
+     "field"
+    ],
+    [
+     4,
+     2,
+     "field"
+    ],
+    [
+     5,
+     2,
+     "field"
+    ],
+    [
+     6,
+     2,
+     "field"
+    ],
+    [
+     7,
+     2,
+     "field"
+    ],
+    [
+     1,
+     3,
+     "field"
+    ],
+    [
+     2,
+     3,
+     "field"
+    ],
+    [
+     4,
+     3,
+     "field"
+    ],
+    [
+     5,
+     3,
+     "field"
+    ],
+    [
+     6,
+     3,
+     "field"
+    ],
+    [
+     7,
+     3,
+     "field"
+    ],
+    [
+     1,
+     5,
+     "field"
+    ],
+    [
+     2,
+     5,
+     "field"
+    ],
+    [
+     3,
+     5,
+     "field"
+    ],
+    [
+     4,
+     5,
+     "field"
+    ],
+    [
+     5,
+     5,
+     "field"
+    ],
+    [
+     6,
+     5,
+     "field"
+    ],
+    [
+     7,
+     5,
+     "field"
+    ]
+   ],
+   "give": {
+    "tag": "52 wheat a day",
+    "sub": "Power: 10 made, 6 used",
+    "symptom": "Every field is wet and every sprinkler turns.",
+    "fix": "The blocks under the shafts grow nothing. Where you run a shaft is where the field is not."
+   }
+  }
+ ]
+}

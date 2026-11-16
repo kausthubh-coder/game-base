@@ -1,0 +1,18 @@
+{
+  "name": "hero-cut-back",
+  "tool": "image_gen.imagegen",
+  "references": [
+    "public/assets/sprites/hero.png",
+    "assets-src/fight-weapons/hero-cut-attempt-1.png"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt": "Use case: stylized-concept. Production pixel-art RPG weapon sprite sheet HERO-CUT-BACK. Reference hero.png is the EXACT character identity, not merely inspiration. Preserve his broad head 50 pixels wide and 42 high, broad short torso, ochre cloak, cream collar, tousled chestnut hair, belt, satchel and boots. Do NOT make him slimmer or turn front faces sideways. STRICT uniform FOUR columns THREE rows of equal SQUARE cells, landscape 4:3 sheet, transparent background, no text/grid/ground/shadow. Target final cells 128x128, standing hero 108 pixels tall, ample padding for weapons without shrinking body. Row 0 faces viewer SQUARELY with both eyes symmetric throughout; row1 BACK no face; row2 RIGHT profile. All rows show four distinct REVERSE SWORD cut poses: col0 WIND-UP blade LOW on LEFT exactly where the first cut ended; col1 STRIKE blade mid-arc moving UP from low left ACROSS body toward HIGH RIGHT with a short steel-grey smear; col2 FOLLOW-THROUGH blade HIGH on RIGHT; col3 RECOVERY sword ready IN FRONT exactly matching column3 of reference image2. Short one-handed plain steel blade wooden grip. This is the SWING BACK, not another downward cut. Side row must show rising reverse swing clearly, different from reference image2 downward swing. Same body/head dimensions in all cells, feet baseline equal. Preserve the approved pixel clusters and brown tinted 1-2px outlines, warm top-left cream highlights and brown/violet shadows. NO teal. NO bow, quiver, arrows, axe or staff. Sword only. Preserve standing idle hero head AND broad shoulders EXACTLY. Front is square, symmetric eyes and shoulders, never three-quarter. Sword fits around hero without altering torso shape. This replaces an action sheet whose hero was too slim and sideways. Whole figure visible, nothing crosses cell boundaries.\nInput image2 is the first cut, preserve EXACT character and match its recovery pose in col3. Draw the opposite swing for columns0-2. No mirrored left-facing side. Side still faces RIGHT.",
+      "source": "assets-src/fight-weapons/hero-cut-back-attempt-1.png",
+      "selected": true
+    }
+  ],
+  "raw": "assets-src/raw/hero-cut-back-3.png",
+  "processing": "bun tools/sprites/build-story.mjs, then bun assets-src/fight-weapons/match-recovery.mjs. Recovery column sliced unchanged from published hero-cut for exact pose agreement."
+}

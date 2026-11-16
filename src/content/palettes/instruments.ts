@@ -46,3 +46,19 @@ export const pickupBell: Patch = { kind: 'bell', ratio: 3, index: 0.9, decay: 0.
 export const whistle: Patch = { kind: 'wind', wave: 'soft', breath: 0.07, vibrato: 14, attack: 0.03, release: 0.12, cutoff: 4200 };
 /** A strummed lute, warmer and shorter than the harp. */
 export const strumLute: Patch = { kind: 'pluck', wave: 'lute', decay: 1.1, bright: 5, attack: 0.004, detune: 4 };
+
+// Greenhollow's regions
+/** A wooden flute, lower and breathier than the meadow's: the Old Forest and the Mere. */
+export const woodFlute: Patch = { kind: 'wind', wave: 'soft', breath: 0.16, vibrato: 6, attack: 0.12, release: 0.4, cutoff: 2200 };
+/** A low horn with a slow swell, for the long line of the High Road and the terraces. */
+export const lowHorn: Patch = { kind: 'wind', wave: 'choir', breath: 0.02, vibrato: 4, attack: 0.18, release: 0.6, cutoff: 1300 };
+/** A soft struck bell that rings a long time, like one piano note in an empty room: the grey forest. */
+export const paleBell: Patch = { kind: 'bell', ratio: 2, index: 0.5, decay: 3.2 };
+/** A deep bell that tolls: the terraces and the Stag. */
+export const templeBell: Patch = { kind: 'bell', ratio: 2.4, index: 1.1, decay: 4 };
+/** A drop of water on stone, pitched: the caves. */
+export const dripBell: Patch = { kind: 'bell', ratio: 3.9, index: 0.6, decay: 1.8 };
+/** A low choir on "oh", slow to come and go: the terraces and the caves. */
+export const lowChoir: Patch = { kind: 'pad', wave: 'choir', voices: 3, detune: 8, cutoff: 700, attack: 2.2, release: 3, formants: [400, 800] };
+/** A glassy pad that drifts in like mist off the water: Lantern Marsh. */
+export const mistPad: Patch = { kind: 'pad', wave: 'glass', voices: 3, detune: 12, cutoff: 1100, attack: 2.5, release: 3.5 };

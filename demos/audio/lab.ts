@@ -4,6 +4,11 @@
 import type { Surface } from '../../src/engine/types.ts';
 import type { AudioState, AudioSystem, Element, LayerId, PetMood } from '../../src/features/audio/index.ts';
 import { renderOffline, type OfflineScene } from '../../src/features/audio/render-offline.ts';
+import { greenhollowPalettes } from '../../src/content/palettes/index.ts';
+import { MUSIC_REGIONS } from '../../src/game/content/soundscape.ts';
+import { placeAt } from '../../src/game/region/greenhollow.sim.ts';
+import { toWorld } from '../../src/game/content/greenhollow.ts';
+import { newRegions, regionsAt, zonesAt } from '../../src/game/sound/soundscape.sim.ts';
 import { NPCS } from './cast.ts';
 import { LANDS, pointAt, regionWeights } from './world.ts';
 
@@ -42,7 +47,7 @@ export interface LabResult {
   fixedNodes: number;
 }
 
-type Scene = Pick<OfflineScene, 'seconds' | 'setup' | 'frame'> & { marks?: { t: number; label: string }[]; events?: { t: number; label: string }[]; decimate?: number; pause?: number[] };
+type Scene = Pick<OfflineScene, 'seconds' | 'setup' | 'frame' | 'palettes'> & { marks?: { t: number; label: string }[]; events?: { t: number; label: string }[]; decimate?: number; pause?: number[] };
 
 const calm: AudioState = { regions: { meadow: 1 }, town: 0, indoors: 0, danger: 0, fight: 0, boss: 0, timeOfDay: 0.5, rain: 0, wind: 0.2, nearWater: 0, trees: 0.3, stone: 0 };
 const SURFACES: Surface[] = ['grass', 'tallGrass', 'dirt', 'stone', 'wood', 'sand', 'water', 'snow', 'leaves', 'metal'];
@@ -78,7 +83,79 @@ function talk(audio: AudioSystem, who: number, index: number): void {
   audio.emit({ type: 'talk', voice: npc.voice, char: line[index % line.length] ?? 'a' });
 }
 
+/** Greenhollow's walks for `tour`: map points or place ids, walked at a run (6 blocks a second). */
+const TOURS: Record<string, (string | readonly [number, number])[]> = {
+  // From your plot north under the High Road, through the grey forest past the boar to the terraces.
+  north: ['plot', [404, 250], [404, 222], [438, 204], [455, 160], 'terraces'],
+  // From your plot west past the dead garden into the Old Forest.
+  west: ['plot', 'garden', [262, 290], [210, 300]],
+  // From your plot east over the bridge into Hollowmere, out by the quay and down into Lantern Marsh.
+  east: ['plot', [470, 312], 'bridge', [560, 340], 'town', [600, 400], [640, 410], [700, 440], 'shrine-marsh'],
+  // From the chapel north-east into the cave hills.
+  caves: ['chapel', [600, 300], [620, 250], 'caves', [690, 230]],
+  // From the bend shrine south toward Saltgate.
+  south: ['shrine-bend', [470, 470], [430, 540], [404, 596]],
+};
+const RUN = 6;
+
+/** The game's own weights along a tour: the same `regionsAt` the game calls, at the hero's position each step. */
+function tourWeights(name: string): { seconds: number; at: (t: number) => Record<string, number> } {
+  const points = (TOURS[name] ?? TOURS.north!).map((p) => (typeof p === 'string' ? placeAt(p) : toWorld(p)));
+  const legs: { a: { x: number; z: number }; b: { x: number; z: number }; from: number; length: number }[] = [];
+  let total = 0;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1]!, b = points[i]!, length = Math.hypot(b.x - a.x, b.z - a.z);
+    legs.push({ a, b, from: total, length });
+    total += length;
+  }
+  // Four seconds standing at each end, so the first and last land are heard whole.
+  const seconds = total / RUN + 8;
+  const regions = newRegions(), zones = { town: 0, square: 0, bank: 0, lane: 0 }, out: Record<string, number> = {};
+  return {
+    seconds,
+    at: (t) => {
+      const d = Math.min(total, Math.max(0, (t - 4) * RUN));
+      const leg = legs.find((l) => d <= l.from + l.length) ?? legs[legs.length - 1]!;
+      const k = leg.length ? (d - leg.from) / leg.length : 0;
+      const x = leg.a.x + (leg.b.x - leg.a.x) * k, z = leg.a.z + (leg.b.z - leg.a.z) * k;
+      regionsAt(x, z, zonesAt(x, z, zones).town, regions);
+      for (const id of MUSIC_REGIONS) out[id] = regions[id];
+      out.town = regions.town;
+      return out;
+    },
+  };
+}
+
 const scenes: Record<string, (arg: string) => Scene> = {
+  /**
+   * One region of Greenhollow alone, music only, as the game plays it. `arg` is "region:day", "region:night",
+   * or "town:market" and "town:evening" for Hollowmere in and out of market hours.
+   */
+  region: (arg) => {
+    const [region = 'meadow', mood = 'day'] = arg.split(':');
+    const town = region !== 'town' ? 0 : mood === 'market' ? 1 : 0.62;
+    return {
+      seconds: 32,
+      palettes: greenhollowPalettes,
+      setup: musicOnly,
+      frame: (_t, audio) => audio.setState({ ...calm, regions: { [region]: 1 }, town, timeOfDay: mood === 'night' ? 0 : 0.5 }),
+    };
+  },
+
+  /** A run across Greenhollow along one of TOURS, with the game's own weights: the crossfades, music only. */
+  tour: (name) => {
+    const tour = tourWeights(name);
+    return {
+      seconds: tour.seconds,
+      palettes: greenhollowPalettes,
+      setup: musicOnly,
+      frame: (t, audio) => {
+        const regions = tour.at(t);
+        audio.setState({ ...calm, regions, town: regions.town ?? 0 });
+      },
+    };
+  },
+
   /** One land alone for a minute, music only. */
   solo: (land) => ({
     seconds: 60,
@@ -345,6 +422,7 @@ export async function runScene(name: string, arg = ''): Promise<LabResult> {
     seconds: scene.seconds,
     step: STEP,
     seed: 7,
+    palettes: scene.palettes,
     setup: scene.setup,
     frame: scene.frame,
     marks: scene.pause,

@@ -253,7 +253,6 @@ export function install(view: GameView): void {
   game.events.on('flag.changed', ({ flag }) => {
     if (flag.startsWith('festival.')) sync();
   });
-  game.events.on('festival.started', sync);
 
   // ---------------------------------------------------------------- drifting, on the game's clock
   let sinceSync = 0;

@@ -72,7 +72,7 @@ export function townB(): TownPlan {
 
   // ---- the buildings. North of the main street: homes, the queen's granary-hall and the kennel keeper's cottage.
   modelAt(models, 'house.gate', 'house-c', 144, -180.5);
-  modelAt(models, 'granary', 'granary-hall', 158, -182, 0, { name: 'granary', label: 'Granary', at: 'door' });
+  // The queen's granary (B10 of the city kit) stands at (158, -182) and gives the place `granary`: town/city.ts.
   modelAt(models, 'house.north2', 'house-d', 170, -181);
   modelAt(models, 'house.north3', 'house-b', 179.5, -181);
   modelAt(models, 'wren.house', 'house-a', 188.5, -180);

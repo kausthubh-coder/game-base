@@ -9,7 +9,7 @@
 import { startBot, type BotRun, type Failure } from '../src/game/play/bot.sim.ts';
 import { describe } from '../src/game/play/inputs.sim.ts';
 import { runScenario, type Scenario } from '../src/game/play/scenario.sim.ts';
-import { STEPS } from '../src/game/play/script.ts';
+import { FIRST_NIGHT, STEPS } from '../src/game/play/script.ts';
 import { summary } from '../src/game/play/state.sim.ts';
 import { SCENARIOS } from '../src/game/scenarios/all.sim.ts';
 
@@ -18,13 +18,23 @@ const USAGE = `usage:
   bun tools/sim.ts bot --seed <n>[,<n>...] --steps <n>
   bun tools/sim.ts --replay <seed> --until <step>`;
 
-/** The first part, from a new game to its end: the steps of src/game/play/script.ts as one scenario. */
+/** Act 1, from a new game to its end, each step done by its flag: STEPS of src/game/play/script.ts as one scenario. */
 const ACT1: Scenario = {
   name: 'act1',
-  about: 'The five quests of the first part, from a new game to act.ended.',
+  about: 'The 21 quests of act 1, from a new game to act.ended, each step done by setting the flag it asks for.',
   seed: 7,
-  inputs: STEPS.map((step) => ({ do: 'run', name: `${step.quest}: ${step.name}`, run: step.run })),
-  expect: (p) => [['the first part has ended', p.game.flags.is('act1.ended')], ['every quest is done', p.sys.quests.all().every((quest) => quest.state === 'done')]],
+  inputs: STEPS.map((step) => ({ do: 'run', name: step.name, run: step.run })),
+  expect: (p) => [['act 1 has ended', p.game.flags.is('act1.ended')], ['every quest is done', p.sys.quests.all().every((quest) => quest.state === 'done')]],
+};
+
+/** The first night, played by the rules from the start of the night quest: FIRST_NIGHT of src/game/play/script.ts. */
+const FIRST: Scenario = {
+  name: 'first-night',
+  about: 'From the start of the night quest: a hut, the fox, the door, the Mark, the Custodian, the Heartstone, a sleep and Tamsin.',
+  seed: 7,
+  start: { quest: 'night' },
+  inputs: FIRST_NIGHT.map((step) => ({ do: 'run', name: step.name, run: step.run })),
+  expect: (p) => [['the night quest is done', p.game.flags.is('quest.night.done')], ['the blessing has begun', p.sys.quests.tracked()?.id === 'blessing']],
 };
 
 function fail(message: string): never {
@@ -48,7 +58,7 @@ function whole(text: string, what: string): number {
 const seconds = (ms: number): string => `${(ms / 1000).toFixed(2)} s`;
 
 function scenarios(names: string[]): number {
-  const all = [ACT1, ...SCENARIOS];
+  const all = [ACT1, FIRST, ...SCENARIOS];
   const unknown = names.filter((name) => !all.some((scenario) => scenario.name === name));
   if (unknown.length > 0) fail(`no scenario is called ${unknown.join(', ')}. There are: ${all.map((scenario) => scenario.name).join(', ')}`);
   const chosen = names.length > 0 ? all.filter((scenario) => names.includes(scenario.name)) : all;

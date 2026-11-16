@@ -191,3 +191,9 @@
 }
 .gb-beacon.is-off .gb-beacon-chip { top: 27px; }
 .gb-beacon.is-off.is-above .gb-beacon-chip { top: auto; bottom: 27px; }
+
+/* Keep the drawable chart clear of the title, tools, compass and key rail. */
+.gb-map-view .gb-map-chart { position: absolute; inset: 110px 180px 84px 16px; overflow: hidden; }
+@media (max-width: 640px) {
+  .gb-map-view .gb-map-chart { inset: 110px 108px 84px 8px; }
+}

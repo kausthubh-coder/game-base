@@ -49,9 +49,15 @@ describe('the prop library', () => {
     for (const { kind, variant, label } of each) {
       const geometry = buildProp(kind, variant);
       const box = geometry.boundingBox as THREE.Box3;
-      expect(box.min.y, `${label} bottom`).toBeGreaterThan(-0.15);
-      // A shop sign hangs from its wall. Everything else reaches the ground.
-      if (kind !== 'sign') expect(box.min.y, `${label} bottom`).toBeLessThan(0.15);
+      // Vines hang six blocks below their branch anchor; the other props stand on y = 0.
+      if (kind === 'forestVines') {
+        expect(box.min.y, `${label} hanging tip`).toBeCloseTo(-6, 4);
+        expect(box.max.y, `${label} anchor`).toBeCloseTo(0, 4);
+      } else {
+        expect(box.min.y, `${label} bottom`).toBeGreaterThan(-0.15);
+        // A shop sign hangs from its wall. Everything else reaches the ground.
+        if (kind !== 'sign') expect(box.min.y, `${label} bottom`).toBeLessThan(0.15);
+      }
       expect(Math.abs(box.min.x + box.max.x) / 2, `${label} middle`).toBeLessThan(1);
       for (const name of ['position', 'normal', 'color', 'aFx']) expect(geometry.getAttribute(name), `${label} ${name}`).toBeDefined();
       const normal = geometry.getAttribute('normal');
@@ -81,10 +87,12 @@ describe('the prop library', () => {
       const fx = geometry.getAttribute('aFx');
       let glow = 0;
       for (let i = 0; i < fx.count; i++) glow = Math.max(glow, fx.getY(i));
-      expect(glow > 0, `${label} glows`).toBe(def.light > 0);
-      expect(propExtras(geometry).lights.length > 0, `${label} lists a light`).toBe(def.light > 0);
+      // A lamp that is out is a variant its entry lists as unlit: it must not glow or list a light.
+      const lit = def.light > 0 && !def.unlit?.includes(variant);
+      expect(glow > 0, `${label} glows`).toBe(lit);
+      expect(propExtras(geometry).lights.length > 0, `${label} lists a light`).toBe(lit);
       // 2 marks a light that never goes out.
-      if (def.light > 0) expect(glow === 2, `${label} always lit`).toBe(def.alwaysLit === true);
+      if (lit) expect(glow === 2, `${label} always lit`).toBe(def.alwaysLit === true);
     }
   });
 
@@ -423,4 +431,22 @@ describe('the props system', () => {
     expect(props.stats().drawn - 4).toBeLessThan(400 * 0.6);
     props.dispose();
   });
+});
+
+test('rigid prop batches refresh bounds after refill and enable the renderer eye test', () => {
+  const ctx = headless(), props = createProps(ctx, { vary: false, thin: false, skins: null });
+  props.place('crate', 0, {x:0,y:0,z:0});
+  lookDownAt(ctx,0,0,50);props.update(0,ctx);
+  const mesh = props.group.children.find(o=>o.name==='props:crate:0') as THREE.InstancedMesh;
+  expect(mesh.frustumCulled).toBe(true);
+  const before = mesh.boundingSphere!.clone();
+  const second = props.place('crate',0,{x:5,y:0,z:0});props.update(0,ctx);
+  expect(mesh.boundingSphere!.radius).toBeGreaterThan(before.radius);
+  expect(mesh.boundingSphere!.containsPoint(new THREE.Vector3(5,0.5,0))).toBe(true);
+  props.remove(second);props.update(0,ctx);
+  expect(mesh.boundingSphere!.radius).toBeCloseTo(before.radius);
+  props.place('campfire',0,{x:0,y:0,z:0});props.update(0,ctx);
+  expect((props.group.children.find(o=>o.name==='props:campfire:0') as THREE.InstancedMesh).frustumCulled).toBe(false);
+  expect(mesh.receiveShadow).toBe(true);
+  props.dispose();
 });

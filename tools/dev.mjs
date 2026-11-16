@@ -1,0 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { spawn } from 'node:child_process';
+const root = resolve(import.meta.dirname, '..');
+const config = JSON.parse(readFileSync(resolve(root, '.artifacts/checkout.json'), 'utf8'));
+if (config.root !== root) throw new Error('run bun tools/setup.mjs in this checkout');
+const child = spawn('bun', ['x', 'vite', '--host', '127.0.0.1', '--port', String(config.port), '--strictPort', ...process.argv.slice(2)], { cwd: root, stdio: 'inherit', env: { ...process.env, PORT: String(config.port), PLAY_PORT: String(config.port) } });
+console.log(`dev pid ${child.pid}; port ${config.port}`);
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
+child.on('exit', (code) => { process.exitCode = code ?? 1; });

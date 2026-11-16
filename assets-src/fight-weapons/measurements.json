@@ -1,0 +1,923 @@
+{
+  "method": "Head: manually selected horizontal hair span near crown+24, not a full head bounding box. Shoulder: warm-colored cross-section 30 pixels below head scanline; includes arms/weapons where they occlude the cloak. Height: first warm hair-colored pixel to foot anchor inclusive; dark crown outline may add 1-2px. These are partial inspection measurements. They DO NOT establish the requested anatomical head/shoulder dimensions within two pixels. Requirement 4 fails.",
+  "frames": [
+    {
+      "name": "hero",
+      "row": 0,
+      "col": 0,
+      "headY": 35,
+      "headSpan": [
+        40,
+        88
+      ],
+      "headWidth": 49,
+      "shoulderY": 65,
+      "shoulderSpan": [
+        45,
+        83
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 110
+    },
+    {
+      "name": "hero",
+      "row": 1,
+      "col": 0,
+      "headY": 35,
+      "headSpan": [
+        40,
+        89
+      ],
+      "headWidth": 50,
+      "shoulderY": 65,
+      "shoulderSpan": [
+        46,
+        75
+      ],
+      "shoulderWidth": 30,
+      "standingHeight": 110
+    },
+    {
+      "name": "hero",
+      "row": 2,
+      "col": 0,
+      "headY": 39,
+      "headSpan": [
+        37,
+        88
+      ],
+      "headWidth": 52,
+      "shoulderY": 69,
+      "shoulderSpan": [
+        56,
+        76
+      ],
+      "shoulderWidth": 21,
+      "standingHeight": 106
+    },
+    {
+      "name": "hero-bow",
+      "row": 0,
+      "col": 0,
+      "headY": 38,
+      "headSpan": [
+        29,
+        77
+      ],
+      "headWidth": 49,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        36,
+        97
+      ],
+      "shoulderWidth": 62,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 0,
+      "col": 1,
+      "headY": 38,
+      "headSpan": [
+        27,
+        75
+      ],
+      "headWidth": 49,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        30,
+        91
+      ],
+      "shoulderWidth": 62,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 0,
+      "col": 2,
+      "headY": 38,
+      "headSpan": [
+        34,
+        82
+      ],
+      "headWidth": 49,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        35,
+        98
+      ],
+      "shoulderWidth": 64,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 0,
+      "col": 3,
+      "headY": 38,
+      "headSpan": [
+        34,
+        82
+      ],
+      "headWidth": 49,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        32,
+        93
+      ],
+      "shoulderWidth": 62,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 1,
+      "col": 0,
+      "headY": 39,
+      "headSpan": [
+        32,
+        77
+      ],
+      "headWidth": 46,
+      "shoulderY": 69,
+      "shoulderSpan": [
+        43,
+        90
+      ],
+      "shoulderWidth": 48,
+      "standingHeight": 106
+    },
+    {
+      "name": "hero-bow",
+      "row": 1,
+      "col": 1,
+      "headY": 39,
+      "headSpan": [
+        30,
+        75
+      ],
+      "headWidth": 46,
+      "shoulderY": 69,
+      "shoulderSpan": [
+        26,
+        92
+      ],
+      "shoulderWidth": 67,
+      "standingHeight": 106
+    },
+    {
+      "name": "hero-bow",
+      "row": 1,
+      "col": 2,
+      "headY": 39,
+      "headSpan": [
+        38,
+        83
+      ],
+      "headWidth": 46,
+      "shoulderY": 69,
+      "shoulderSpan": [
+        49,
+        98
+      ],
+      "shoulderWidth": 50,
+      "standingHeight": 106
+    },
+    {
+      "name": "hero-bow",
+      "row": 1,
+      "col": 3,
+      "headY": 38,
+      "headSpan": [
+        37,
+        83
+      ],
+      "headWidth": 47,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        43,
+        96
+      ],
+      "shoulderWidth": 54,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 2,
+      "col": 0,
+      "headY": 38,
+      "headSpan": [
+        30,
+        74
+      ],
+      "headWidth": 45,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        40,
+        84
+      ],
+      "shoulderWidth": 45,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 2,
+      "col": 1,
+      "headY": 38,
+      "headSpan": [
+        29,
+        74
+      ],
+      "headWidth": 46,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        32,
+        96
+      ],
+      "shoulderWidth": 65,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-bow",
+      "row": 2,
+      "col": 2,
+      "headY": 37,
+      "headSpan": [
+        34,
+        78
+      ],
+      "headWidth": 45,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        50,
+        100
+      ],
+      "shoulderWidth": 51,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-bow",
+      "row": 2,
+      "col": 3,
+      "headY": 38,
+      "headSpan": [
+        37,
+        82
+      ],
+      "headWidth": 46,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        57,
+        97
+      ],
+      "shoulderWidth": 41,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-staff",
+      "row": 0,
+      "col": 0,
+      "headY": 37,
+      "headSpan": [
+        44,
+        93
+      ],
+      "headWidth": 50,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        35,
+        86
+      ],
+      "shoulderWidth": 52,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-staff",
+      "row": 0,
+      "col": 1,
+      "headY": 38,
+      "headSpan": [
+        28,
+        77
+      ],
+      "headWidth": 50,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        30,
+        68
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-staff",
+      "row": 0,
+      "col": 2,
+      "headY": 38,
+      "headSpan": [
+        35,
+        84
+      ],
+      "headWidth": 50,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        40,
+        78
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-staff",
+      "row": 0,
+      "col": 3,
+      "headY": 36,
+      "headSpan": [
+        40,
+        88
+      ],
+      "headWidth": 49,
+      "shoulderY": 66,
+      "shoulderSpan": [
+        44,
+        82
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 109
+    },
+    {
+      "name": "hero-staff",
+      "row": 1,
+      "col": 0,
+      "headY": 39,
+      "headSpan": [
+        37,
+        83
+      ],
+      "headWidth": 47,
+      "shoulderY": 69,
+      "shoulderSpan": [
+        39,
+        92
+      ],
+      "shoulderWidth": 54,
+      "standingHeight": 106
+    },
+    {
+      "name": "hero-staff",
+      "row": 1,
+      "col": 1,
+      "headY": 39,
+      "headSpan": [
+        30,
+        76
+      ],
+      "headWidth": 47,
+      "shoulderY": 69,
+      "shoulderSpan": [
+        33,
+        81
+      ],
+      "shoulderWidth": 49,
+      "standingHeight": 106
+    },
+    {
+      "name": "hero-staff",
+      "row": 1,
+      "col": 2,
+      "headY": 38,
+      "headSpan": [
+        35,
+        82
+      ],
+      "headWidth": 48,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        39,
+        82
+      ],
+      "shoulderWidth": 44,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-staff",
+      "row": 1,
+      "col": 3,
+      "headY": 37,
+      "headSpan": [
+        40,
+        87
+      ],
+      "headWidth": 48,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        45,
+        83
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-staff",
+      "row": 2,
+      "col": 0,
+      "headY": 40,
+      "headSpan": [
+        31,
+        82
+      ],
+      "headWidth": 52,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        47,
+        85
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-staff",
+      "row": 2,
+      "col": 1,
+      "headY": 40,
+      "headSpan": [
+        23,
+        73
+      ],
+      "headWidth": 51,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        35,
+        75
+      ],
+      "shoulderWidth": 41,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-staff",
+      "row": 2,
+      "col": 2,
+      "headY": 40,
+      "headSpan": [
+        30,
+        80
+      ],
+      "headWidth": 51,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        46,
+        81
+      ],
+      "shoulderWidth": 36,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-staff",
+      "row": 2,
+      "col": 3,
+      "headY": 38,
+      "headSpan": [
+        36,
+        89
+      ],
+      "headWidth": 54,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        54,
+        67
+      ],
+      "shoulderWidth": 14,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-cut",
+      "row": 0,
+      "col": 0,
+      "headY": 40,
+      "headSpan": [
+        33,
+        80
+      ],
+      "headWidth": 48,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        37,
+        67
+      ],
+      "shoulderWidth": 31,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut",
+      "row": 0,
+      "col": 1,
+      "headY": 40,
+      "headSpan": [
+        27,
+        75
+      ],
+      "headWidth": 49,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        27,
+        71
+      ],
+      "shoulderWidth": 45,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut",
+      "row": 0,
+      "col": 2,
+      "headY": 43,
+      "headSpan": [
+        31,
+        76
+      ],
+      "headWidth": 46,
+      "shoulderY": 73,
+      "shoulderSpan": [
+        34,
+        70
+      ],
+      "shoulderWidth": 37,
+      "standingHeight": 102
+    },
+    {
+      "name": "hero-cut",
+      "row": 0,
+      "col": 3,
+      "headY": 41,
+      "headSpan": [
+        33,
+        81
+      ],
+      "headWidth": 49,
+      "shoulderY": 71,
+      "shoulderSpan": [
+        36,
+        70
+      ],
+      "shoulderWidth": 35,
+      "standingHeight": 104
+    },
+    {
+      "name": "hero-cut",
+      "row": 1,
+      "col": 0,
+      "headY": 40,
+      "headSpan": [
+        39,
+        91
+      ],
+      "headWidth": 53,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        57,
+        83
+      ],
+      "shoulderWidth": 27,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut",
+      "row": 1,
+      "col": 1,
+      "headY": 40,
+      "headSpan": [
+        30,
+        76
+      ],
+      "headWidth": 47,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        32,
+        71
+      ],
+      "shoulderWidth": 40,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut",
+      "row": 1,
+      "col": 2,
+      "headY": 42,
+      "headSpan": [
+        33,
+        78
+      ],
+      "headWidth": 46,
+      "shoulderY": 72,
+      "shoulderSpan": [
+        36,
+        70
+      ],
+      "shoulderWidth": 35,
+      "standingHeight": 103
+    },
+    {
+      "name": "hero-cut",
+      "row": 1,
+      "col": 3,
+      "headY": 40,
+      "headSpan": [
+        37,
+        83
+      ],
+      "headWidth": 47,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        39,
+        80
+      ],
+      "shoulderWidth": 42,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut",
+      "row": 2,
+      "col": 0,
+      "headY": 38,
+      "headSpan": [
+        32,
+        80
+      ],
+      "headWidth": 49,
+      "shoulderY": 68,
+      "shoulderSpan": [
+        39,
+        56
+      ],
+      "shoulderWidth": 18,
+      "standingHeight": 107
+    },
+    {
+      "name": "hero-cut",
+      "row": 2,
+      "col": 1,
+      "headY": 40,
+      "headSpan": [
+        24,
+        73
+      ],
+      "headWidth": 50,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        29,
+        79
+      ],
+      "shoulderWidth": 51,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut",
+      "row": 2,
+      "col": 2,
+      "headY": 42,
+      "headSpan": [
+        31,
+        80
+      ],
+      "headWidth": 50,
+      "shoulderY": 72,
+      "shoulderSpan": [
+        33,
+        64
+      ],
+      "shoulderWidth": 32,
+      "standingHeight": 103
+    },
+    {
+      "name": "hero-cut",
+      "row": 2,
+      "col": 3,
+      "headY": 41,
+      "headSpan": [
+        33,
+        78
+      ],
+      "headWidth": 46,
+      "shoulderY": 71,
+      "shoulderSpan": [
+        34,
+        78
+      ],
+      "shoulderWidth": 45,
+      "standingHeight": 104
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 0,
+      "col": 0,
+      "headY": 37,
+      "headSpan": [
+        41,
+        89
+      ],
+      "headWidth": 49,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        44,
+        85
+      ],
+      "shoulderWidth": 42,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 0,
+      "col": 1,
+      "headY": 37,
+      "headSpan": [
+        39,
+        87
+      ],
+      "headWidth": 49,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        42,
+        80
+      ],
+      "shoulderWidth": 39,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 0,
+      "col": 2,
+      "headY": 37,
+      "headSpan": [
+        32,
+        81
+      ],
+      "headWidth": 50,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        38,
+        74
+      ],
+      "shoulderWidth": 37,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 0,
+      "col": 3,
+      "headY": 41,
+      "headSpan": [
+        33,
+        81
+      ],
+      "headWidth": 49,
+      "shoulderY": 71,
+      "shoulderSpan": [
+        36,
+        70
+      ],
+      "shoulderWidth": 35,
+      "standingHeight": 104
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 1,
+      "col": 0,
+      "headY": 37,
+      "headSpan": [
+        33,
+        81
+      ],
+      "headWidth": 49,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        36,
+        78
+      ],
+      "shoulderWidth": 43,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 1,
+      "col": 1,
+      "headY": 37,
+      "headSpan": [
+        38,
+        85
+      ],
+      "headWidth": 48,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        41,
+        84
+      ],
+      "shoulderWidth": 44,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 1,
+      "col": 2,
+      "headY": 37,
+      "headSpan": [
+        33,
+        81
+      ],
+      "headWidth": 49,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        38,
+        81
+      ],
+      "shoulderWidth": 44,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 1,
+      "col": 3,
+      "headY": 40,
+      "headSpan": [
+        37,
+        83
+      ],
+      "headWidth": 47,
+      "shoulderY": 70,
+      "shoulderSpan": [
+        39,
+        80
+      ],
+      "shoulderWidth": 42,
+      "standingHeight": 105
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 2,
+      "col": 0,
+      "headY": 37,
+      "headSpan": [
+        40,
+        87
+      ],
+      "headWidth": 48,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        47,
+        72
+      ],
+      "shoulderWidth": 26,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 2,
+      "col": 1,
+      "headY": 37,
+      "headSpan": [
+        37,
+        84
+      ],
+      "headWidth": 48,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        42,
+        75
+      ],
+      "shoulderWidth": 34,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 2,
+      "col": 2,
+      "headY": 37,
+      "headSpan": [
+        34,
+        81
+      ],
+      "headWidth": 48,
+      "shoulderY": 67,
+      "shoulderSpan": [
+        40,
+        74
+      ],
+      "shoulderWidth": 35,
+      "standingHeight": 108
+    },
+    {
+      "name": "hero-cut-back",
+      "row": 2,
+      "col": 3,
+      "headY": 41,
+      "headSpan": [
+        33,
+        78
+      ],
+      "headWidth": 46,
+      "shoulderY": 71,
+      "shoulderSpan": [
+        34,
+        78
+      ],
+      "shoulderWidth": 45,
+      "standingHeight": 104
+    }
+  ]
+}

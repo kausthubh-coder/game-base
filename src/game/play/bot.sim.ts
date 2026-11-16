@@ -24,13 +24,13 @@ import { begin, listenForErrors } from './scenario.sim.ts';
  * What a bot that starts after the first quest carries, so that it has something to do with every rule:
  * every tool, seeds, things to build with and things to set down. No pickaxe: nothing in the game gives one.
  */
-export const BOT_KIT: Readonly<Record<ItemId, number>> = {
+export const BOT_KIT: Readonly<Partial<Record<ItemId, number>>> = {
   axe: 1, hoe: 1, watering_can: 1, wheat_seeds: 12, plank: 40, fence: 12, bed: 1, berry: 6, sprinkler: 2,
-  workbench: 1, chest: 1, lamp: 3, dirt: 10, oak_log: 10, fiber: 8, moss_tuft: 4,
+  workbench: 1, chest: 1, lamp: 3, dirt: 10, oak_log: 10, fiber: 8, moss_fiber: 4,
 };
 
 /** Where a bot starts, by its seed: a new game with an empty bag, or the start of a later quest with the kit. */
-const STARTS: readonly (QuestId | null)[] = [null, 'roof', 'leaftail', 'bread', 'festival'];
+const STARTS: readonly (QuestId | null)[] = [null, 'ground', 'night', 'kitchen', 'count'];
 
 /** Places the bot walks toward now and then, so it does not spend its life in the woods. */
 const PLACES: readonly string[] = ['grant.center', 'grant.stone', 'grant.rocks', 'dead.garden', 'town.gate', 'town.square', 'river.bank'];

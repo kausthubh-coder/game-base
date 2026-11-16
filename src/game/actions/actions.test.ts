@@ -389,7 +389,7 @@ test('a short click breaks nothing, soft blocks and growing crops included, and 
   };
   inventory.add('axe', 1);
   inventory.add('pickaxe', 1);
-  const tools = [null, { id: 'axe', count: 1 }, { id: 'pickaxe', count: 1 }];
+  const tools = [null, { id: 'axe' as const, count: 1 }, { id: 'pickaxe' as const, count: 1 }];
   let tried = 0;
   for (const block of BLOCKS) {
     if (!block.solid) continue;

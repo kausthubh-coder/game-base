@@ -20,11 +20,15 @@ Each part prints `pass`, `skip` or `FAIL`. A failed part names its log in `.arti
 |---|---|---|
 | A `.sim.ts` rule or content in `src/game/content` | `check`, `bots` | The scenario for that rule, or write one (`features/rules.md`) |
 | A view, a shader, a panel, anything drawn | `check`, `shots`, `play` | The place in a browser, and look at the screenshot (`features/browser.md`) |
+| A scene, the camera, the stage view, or a model that can stand between the camera and the hero (trees, houses, landmarks) | `check`, `sight` (`bun tools/play-sight.mjs`, `--only 12,16` for a few scenes) | Look at `.artifacts/sight/`: each scene's first line, and every line with `--shots` |
+| The fight lab: `src/game/fight`, `src/game/fightview`, `views/lab-fight.view.ts`, `content/fight.ts` | `check`, `bun tools/fight-sim.ts` | Each weapon against each beast by the bot, the companions, two beasts, the traps, the `--keys` fights and `--card` in a browser (`features/fight-lab.md`) |
 | `server/` (the Worker) or `wrangler.jsonc` | `check`, `build` | `bun run deploy --dry-run` |
 | `convex/`, `src/features/account`, or anything a system saves | `check`, `cloud` | `features/account.md`; look at `.artifacts/cloud-save/` |
 | An asset or `manifest.json` | `assets`, `build`, `shots` | The `verify-assets` skill |
 | A tool in `tools/` | `tools`, and the part that uses the tool | |
 | `package.json`, `vite.config.ts`, the build | everything, with `--full` | |
+
+For story chapters and earned progression, use `verify-chapter` before the long replay. Chapter acceptance supplements these regression checks.
 
 ## Three ways to play
 
@@ -44,7 +48,7 @@ Each part prints `pass`, `skip` or `FAIL`. A failed part names its log in `.arti
 
 ## When something looks off
 
-Run `bun tools/doctor.mjs` (the `worktree-game` skill). A port in use, a missing build or stale packages explain most odd failures.
+Run `bun tools/doctor.mjs --quick` to inspect the checkout. Run `bun tools/setup.mjs` to repair it (the `worktree-game` skill). A port in use, a missing build or stale packages explain most odd failures.
 
 ## Cleanup
 

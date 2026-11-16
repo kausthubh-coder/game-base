@@ -1,0 +1,207 @@
+{
+  "shot": "night",
+  "frame": [
+    1920,
+    1080
+  ],
+  "approved": "../../../art/plates/m6-ascent.jpg",
+  "layers": [
+    {
+      "id": "plaster-ground",
+      "file": "ground.webp",
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "z": 0,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Mirrored empty plaster patch from the approved plate; original gold edge bands."
+    },
+    {
+      "id": "dome",
+      "file": "dome.webp",
+      "x": 302,
+      "y": 276,
+      "w": 1280,
+      "h": 599,
+      "z": 10,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Regenerated canopy without city or king. Reveal with two angular wedges from bottom edges to apex [944,284]."
+    },
+    {
+      "id": "city",
+      "file": "city.webp",
+      "x": 290,
+      "y": 618,
+      "w": 1317,
+      "h": 264,
+      "z": 30,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "All open doors are preserved. Light origins are in lightPaths."
+    },
+    {
+      "id": "king",
+      "file": "king.webp",
+      "x": 798,
+      "y": 311,
+      "w": 303,
+      "h": 329,
+      "z": 40,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "King, halo and hoe, isolated from the canopy."
+    },
+    {
+      "id": "stars",
+      "file": "stars.webp",
+      "x": 302,
+      "y": 276,
+      "w": 1280,
+      "h": 599,
+      "z": 20,
+      "pivot": [
+        0.5,
+        0.9
+      ],
+      "note": "Painted points from the approved streams. Code may fade these out while emitting travelling lights."
+    }
+  ],
+  "dome": {
+    "apex": [
+      944,
+      284
+    ],
+    "center": [
+      944,
+      876
+    ],
+    "radius": [
+      638,
+      592
+    ],
+    "reveal": "two wedges from left and right spring points toward apex"
+  },
+  "lightPaths": [
+    {
+      "id": "house-1",
+      "from": [
+        365,
+        847
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-2",
+      "from": [
+        460,
+        846
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-3",
+      "from": [
+        590,
+        842
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-4",
+      "from": [
+        731,
+        847
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-5",
+      "from": [
+        817,
+        842
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-6",
+      "from": [
+        953,
+        838
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-7",
+      "from": [
+        1090,
+        844
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-8",
+      "from": [
+        1215,
+        845
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-9",
+      "from": [
+        1360,
+        842
+      ],
+      "to": [
+        957,
+        391
+      ]
+    },
+    {
+      "id": "house-10",
+      "from": [
+        1519,
+        846
+      ],
+      "to": [
+        957,
+        391
+      ]
+    }
+  ]
+}

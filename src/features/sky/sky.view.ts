@@ -220,7 +220,7 @@ export function createSky(ctx: ViewContext, options: SkyOptions = {}): Sky {
   sun.castShadow = true;
   sun.shadow.bias = -0.0003;
   sun.shadow.radius = 3;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   sun.shadow.normalBias = 0.035;
   sun.shadow.camera.layers.enable(shadowLayer);
   const fill = new THREE.HemisphereLight(0xffffff, 0x888888, 1);

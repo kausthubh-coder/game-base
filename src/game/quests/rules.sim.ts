@@ -8,7 +8,7 @@ import type { Vec3 } from '../../engine/types.ts';
 import { AIR } from '../../content/blocks.ts';
 import type { EventName, Game, GameEvents, ItemId, PetState } from '../api.sim.ts';
 import { distance2d } from '../move.sim.ts';
-import type { Condition, Effect } from '../content/quests.ts';
+import { chapterOf, type Condition, type Effect } from '../content/quests.ts';
 
 /** When a time of day counts as dusk or night. The clock's dusk begins at 0.73 and dawn at 0.23. */
 export const DUSK = 0.73;
@@ -56,7 +56,10 @@ export function questState(game: Game, quest: string): QuestState {
 export function holds(game: Game, c: Condition | undefined, seen?: (event: EventName) => boolean): boolean {
   if (!c) return true;
   const { flags, player, systems } = game;
-  if ('flag' in c) return c.is === undefined ? flags.is(c.flag) : flags.get(c.flag) === c.is;
+  if ('flag' in c) {
+    if ('atLeast' in c) return Number(flags.get(c.flag) ?? 0) >= c.atLeast;
+    return c.is === undefined ? flags.is(c.flag) : flags.get(c.flag) === c.is;
+  }
   if ('not' in c) return !holds(game, c.not, seen);
   if ('all' in c) return c.all.every((part) => holds(game, part, seen));
   if ('any' in c) return c.any.some((part) => holds(game, part, seen));
@@ -94,9 +97,15 @@ export function holds(game: Game, c: Condition | undefined, seen?: (event: Event
   if ('raining' in c) return game.ambient.rain > 0.2 || flags.is('story.raining');
   if ('dark' in c) return isDark(game.clock.timeOfDay);
   if ('npcNear' in c) return (systems.people?.all() ?? []).some((npc) => distance2d(npc.pos, player.pos) <= c.npcNear);
-  let growing = 0;
-  for (const crop of systems.crops?.all() ?? []) if (crop.state.crop === c.crop) growing++;
-  return bagCount(game, c.short) + c.perSeed * (bagCount(game, c.seed) + growing) < c.of;
+  if ('chapter' in c) return chapterOf((quest) => questState(game, quest) !== 'hidden') === c.chapter;
+  if ('short' in c) {
+    let growing = 0;
+    for (const crop of systems.crops?.all() ?? []) if (crop.state.crop === c.crop) growing++;
+    return bagCount(game, c.short) + c.perSeed * (bagCount(game, c.seed) + growing) < c.of;
+  }
+  // A kind of condition added to content/quests.ts without its branch here would otherwise be read as another kind.
+  const unknown: never = c;
+  throw new Error(`holds() does not know the condition ${JSON.stringify(unknown)}`);
 }
 
 /** Runs each part of a condition through `visit`, the condition itself first. */

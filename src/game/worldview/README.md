@@ -8,6 +8,7 @@ they share.
 |---|---|
 | `props.ts` | The one file that uses `src/features/props` and `src/content/props.ts`. `worldProps(view)` gives every view the same props, and keeps them inside 40 draw calls. |
 | `region.ts` | Everything the views ask the region. A missing region or method gives an empty answer, never a throw. |
+| `camp.ts` | `campOf(view)`: the camp's fire as a film holds it, read by the camp view |
 | `crop-mesh.ts` | The two instanced meshes of the crops view and their shaders |
 
 ## The views
@@ -17,6 +18,7 @@ they share.
 | `world-crops.view.ts` | Every crop of `crops.all()` as two crossed quads with its stage's tile from the `crops` sheet. A dark patch on wet soil. | 2 |
 | `world-stations.view.ts` | Every station of `placeables.all()` with the prop its definition names, turned by its quarter turns | counted with the props |
 | `world-dressing.view.ts` | The region's props and berry bushes, and trees, grass, flowers, rocks and reeds from the scatter rules. Leaves fall from the tree tops. | 40 at most, shadows included |
+| `world-camp.view.ts` | The fire and the tent at the place `camp`: `cold` by day, `lit` from dusk, `low` after scene 9 until `night.over`, or as a film holds it. A pool of firelight on the ground, sparks, smoke and the fire's sound. Stands in the brazier, the bed and fireflies until `campfire`, `tent` and `ember` land. | 1, and the props |
 | `world-lamps.view.ts` | The river lamps of the festival | 2 |
 
 The aim has no view here. `core-aim.view.ts` already shows a block breaking: its outline closes in and turns warm.

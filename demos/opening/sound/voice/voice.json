@@ -1,0 +1,177 @@
+{
+ "version": 1,
+ "model": "eleven_v4_turbo",
+ "takes": {
+  "a": {
+   "friends": {
+    "file": "voice/a/friends.mp3",
+    "seconds": 2.16,
+    "fileSeconds": 2.24
+   },
+   "king": {
+    "file": "voice/a/king.mp3",
+    "seconds": 4.16,
+    "fileSeconds": 4.16
+   },
+   "war": {
+    "file": "voice/a/war.mp3",
+    "seconds": 5.1,
+    "fileSeconds": 5.2
+   },
+   "sickness": {
+    "file": "voice/a/sickness.mp3",
+    "seconds": 3.2,
+    "fileSeconds": 3.32
+   },
+   "roads": {
+    "file": "voice/a/roads.mp3",
+    "seconds": 6.56,
+    "fileSeconds": 6.56
+   },
+   "night": {
+    "file": "voice/a/night.mp3",
+    "seconds": 5.87,
+    "fileSeconds": 5.98
+   },
+   "gods": {
+    "file": "voice/a/gods.mp3",
+    "seconds": 5.22,
+    "fileSeconds": 5.27
+   },
+   "mark": {
+    "file": "voice/a/mark.mp3",
+    "seconds": 5.51,
+    "fileSeconds": 5.62
+   },
+   "wall": {
+    "file": "voice/a/wall.mp3",
+    "seconds": 5.02,
+    "fileSeconds": 5.14
+   },
+   "doorstep": {
+    "file": "voice/a/doorstep.mp3",
+    "seconds": 4.22,
+    "fileSeconds": 4.24
+   },
+   "morning": {
+    "file": "voice/a/morning.mp3",
+    "seconds": 2.08,
+    "fileSeconds": 2.11
+   }
+  },
+  "b": {
+   "war": {
+    "file": "voice/b/war.mp3",
+    "seconds": 4.86,
+    "fileSeconds": 4.94
+   },
+   "friends": {
+    "file": "voice/b/friends.mp3",
+    "seconds": 2.04,
+    "fileSeconds": 2.15
+   },
+   "king": {
+    "file": "voice/b/king.mp3",
+    "seconds": 3.68,
+    "fileSeconds": 3.68
+   },
+   "roads": {
+    "file": "voice/b/roads.mp3",
+    "seconds": 5.29,
+    "fileSeconds": 5.75
+   },
+   "sickness": {
+    "file": "voice/b/sickness.mp3",
+    "seconds": 3.07,
+    "fileSeconds": 3.19
+   },
+   "gods": {
+    "file": "voice/b/gods.mp3",
+    "seconds": 4.24,
+    "fileSeconds": 4.36
+   },
+   "night": {
+    "file": "voice/b/night.mp3",
+    "seconds": 5.24,
+    "fileSeconds": 5.28
+   },
+   "wall": {
+    "file": "voice/b/wall.mp3",
+    "seconds": 4.29,
+    "fileSeconds": 4.4
+   },
+   "mark": {
+    "file": "voice/b/mark.mp3",
+    "seconds": 4.91,
+    "fileSeconds": 5.02
+   },
+   "doorstep": {
+    "file": "voice/b/doorstep.mp3",
+    "seconds": 3.64,
+    "fileSeconds": 3.73
+   },
+   "morning": {
+    "file": "voice/b/morning.mp3",
+    "seconds": 1.97,
+    "fileSeconds": 2
+   }
+  },
+  "c": {
+   "friends": {
+    "file": "voice/c/friends.mp3",
+    "seconds": 1.71,
+    "fileSeconds": 1.83
+   },
+   "king": {
+    "file": "voice/c/king.mp3",
+    "seconds": 3.76,
+    "fileSeconds": 3.76
+   },
+   "war": {
+    "file": "voice/c/war.mp3",
+    "seconds": 4.75,
+    "fileSeconds": 4.87
+   },
+   "sickness": {
+    "file": "voice/c/sickness.mp3",
+    "seconds": 2.76,
+    "fileSeconds": 2.88
+   },
+   "night": {
+    "file": "voice/c/night.mp3",
+    "seconds": 5.02,
+    "fileSeconds": 5.14
+   },
+   "gods": {
+    "file": "voice/c/gods.mp3",
+    "seconds": 4.18,
+    "fileSeconds": 4.3
+   },
+   "mark": {
+    "file": "voice/c/mark.mp3",
+    "seconds": 5.04,
+    "fileSeconds": 5.16
+   },
+   "roads": {
+    "file": "voice/c/roads.mp3",
+    "seconds": 5.51,
+    "fileSeconds": 5.63
+   },
+   "wall": {
+    "file": "voice/c/wall.mp3",
+    "seconds": 4.69,
+    "fileSeconds": 4.79
+   },
+   "morning": {
+    "file": "voice/c/morning.mp3",
+    "seconds": 1.92,
+    "fileSeconds": 1.98
+   },
+   "doorstep": {
+    "file": "voice/c/doorstep.mp3",
+    "seconds": 3.54,
+    "fileSeconds": 3.66
+   }
+  }
+ }
+}

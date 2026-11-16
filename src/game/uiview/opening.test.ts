@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import { World } from '../../features/world/world.sim.ts';
-import { OPENING } from '../content/opening.ts';
+import { RIVER } from '../content/opening.ts';
 import { createKernel } from '../kernel.sim.ts';
 import { OPENING_FLAG, createOpening, markNewGame, playsOpening, takeNewGame } from './opening.ts';
 
@@ -14,7 +14,7 @@ function store() {
   };
 }
 
-test('the opening plays on a new game chosen from the title, once, and never on Continue', () => {
+test('the opening film plays on a new game begun from the title, once, and never on Continue', () => {
   const storage = store();
   const kernel = createKernel(new World(1), 1);
   const flags = kernel.game.flags;
@@ -39,17 +39,17 @@ test('the opening plays on a new game chosen from the title, once, and never on 
   expect(playsOpening({ fresh: true, chosen: takeNewGame(storage), flags: door.game.flags })).toBe(false);
 });
 
-test('the opening shows every shot in order with a line each, starts and cuts through black, and ends on the hero', () => {
-  const opening = createOpening(OPENING);
-  expect(OPENING.length).toBeGreaterThanOrEqual(3);
-  expect(OPENING.every((shot) => shot.line.length > 0)).toBe(true);
-  expect(OPENING.filter((shot) => shot.land).map((shot) => shot.id)).toEqual([OPENING[OPENING.length - 1].id]);
+test('the day up the river shows every shot in order with a line each, starts and cuts through black, and ends on the hero', () => {
+  const opening = createOpening(RIVER);
+  expect(RIVER.length).toBeGreaterThanOrEqual(3);
+  expect(RIVER.every((shot) => shot.line.length > 0)).toBe(true);
+  expect(RIVER.filter((shot) => shot.land).map((shot) => shot.id)).toEqual([RIVER[RIVER.length - 1].id]);
   const first = opening.frame();
   expect([first.shot, first.black, first.bars, first.words]).toEqual([0, 1, 1, 0]);
 
   const seen: number[] = [];
   let start = 0, wordsShown = new Set<number>();
-  for (const [i, shot] of OPENING.entries()) {
+  for (const [i, shot] of RIVER.entries()) {
     // The middle of each shot is clear, with its line up and the bars in.
     opening.advance(start + shot.seconds / 2 - opening.time);
     const mid = opening.frame();
@@ -58,24 +58,24 @@ test('the opening shows every shot in order with a line each, starts and cuts th
     expect(mid.bars).toBe(1);
     if (mid.words === 1) wordsShown.add(i);
     // Between two shots the screen is black.
-    if (i < OPENING.length - 1) {
+    if (i < RIVER.length - 1) {
       opening.advance(start + shot.seconds - 0.001 - opening.time);
       expect(opening.frame().black).toBeGreaterThan(0.99);
     }
     start += shot.seconds;
   }
-  expect(seen).toEqual(OPENING.map((_, i) => i));
-  expect(wordsShown.size).toBe(OPENING.length);
+  expect(seen).toEqual(RIVER.map((_, i) => i));
+  expect(wordsShown.size).toBe(RIVER.length);
 
   opening.advance(opening.length);
   const last = opening.frame();
   expect(last.done).toBe(true);
-  expect([last.shot, last.move, last.black, last.bars]).toEqual([OPENING.length - 1, 1, 0, 0]);
+  expect([last.shot, last.move, last.black, last.bars]).toEqual([RIVER.length - 1, 1, 0, 0]);
 });
 
-test('skip ends the opening at any point: a short dip to black, then the hero with no bars', () => {
+test('skip ends the river at any point: a short dip to black, then the hero with no bars', () => {
   for (const at of [0, 3.2, 9, 20]) {
-    const opening = createOpening(OPENING);
+    const opening = createOpening(RIVER);
     opening.advance(at);
     opening.skip();
     expect(opening.skipped).toBe(true);
@@ -85,7 +85,7 @@ test('skip ends the opening at any point: a short dip to black, then the hero wi
     opening.advance(0.6);
     const after = opening.frame();
     expect(after.done).toBe(true);
-    expect([after.shot, after.move, after.black, after.bars, after.words]).toEqual([OPENING.length - 1, 1, 0, 0, 0]);
+    expect([after.shot, after.move, after.black, after.bars, after.words]).toEqual([RIVER.length - 1, 1, 0, 0, 0]);
     // It took under a second, wherever it was skipped.
     expect(opening.time - at).toBeLessThan(1);
   }

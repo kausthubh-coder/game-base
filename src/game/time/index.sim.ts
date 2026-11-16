@@ -1,9 +1,11 @@
-// The clock and the weather. A day is 12 minutes and starts at dawn, when the day number goes up.
+// The clock and the weather. A day is 20 minutes and starts at dawn, when the day number goes up (handbook
+// chapters 18 and 30: farms' rates are written per day, and a day is 20 minutes of play).
 // The weather is the machine in src/features/weather, driven from here: this system keeps it on the
 // game's clock, holds a kind when the story asks for one, and copies its numbers into `game.ambient`.
 import { calmNoon, type Vec3 } from '../../engine/types.ts';
 import type { WeatherKind } from '../../content/weather.ts';
 import { DAY_SECONDS, dayPartAt, daySecondAt, timeOfDayAt } from '../../features/weather/clock.sim.ts';
+import { CAMP } from '../content/region.ts';
 import { footprint } from '../content/placeables.ts';
 import { createWeather, type Weather } from '../../features/weather/weather.sim.ts';
 import type { Game, SimSystem, TimeApi } from '../api.sim.ts';
@@ -19,7 +21,7 @@ export function roofOver(world: WorldQuery, x: number, y: number, z: number): bo
 }
 
 /** Seconds of real time in one game day. */
-export const DAY_LENGTH = 720;
+export const DAY_LENGTH = 1200;
 /** The time of day the player wakes at, and the time a new game starts at. */
 export const MORNING = 0.27;
 /** Sleep is allowed from here until dawn. */
@@ -28,8 +30,8 @@ const DAWN = 0.23;
 /** A bed this many blocks away or closer counts as near. */
 export const BED_REACH = 4;
 
-// The weather feature's clock gives a day four parts of unequal length over 20 minutes. This day has
-// the same parts in the same proportions, squeezed into 12.
+// The weather feature's clock gives a day four parts of unequal length over 20 minutes. This day has the same
+// parts in the same proportions; with a day of 20 minutes the scale is 1.
 const SCALE = DAY_SECONDS / DAY_LENGTH;
 /** The time of day at a number of seconds after dawn began. */
 const dialAt = (daySecond: number): number => timeOfDayAt(daySecond * SCALE);
@@ -161,17 +163,20 @@ export function createTime(game: Game): Time {
 
   let curtain: SleepCurtain | null = null;
   let fallingAsleep = false;
+  /** Story moments that may keep the player awake. Each is asked when the player lies down. */
+  const sleepGuards: (() => string | null)[] = [];
 
   function sleepNow(): void {
     const wake = secondAt(MORNING);
-    seconds += DAY_LENGTH - daySecond + wake;
+    const skipped = DAY_LENGTH - daySecond + wake;
+    seconds += skipped;
     day += 1;
     daySecond = wake;
     // Tonight's dusk is skipped, and tomorrow's is still to come.
     nightAnnounced = day - 1;
     writeClock();
     announce();
-    events.emit('slept', { day });
+    events.emit('slept', { day, skipped });
   }
 
   const api: TimeWithCurtain = {
@@ -182,6 +187,7 @@ export function createTime(game: Game): Time {
       const time = clock.timeOfDay;
       if (time < EVENING && time >= DAWN) return false;
       const at = game.player.pos;
+      if (game.flags.is('camp.pitched') && Math.hypot(at.x - CAMP.tent.x, at.z - CAMP.tent.z) <= BED_REACH && Math.abs(at.y - CAMP.tent.y) < 2) return true;
       if (!game.systems.placeables.near('bed', at, BED_REACH)) return false;
       // A roof over the player, or over a bed in reach. A bed fills its block, so nobody can stand under
       // the one block that covers it, and that one block is all the roof quest asks for.
@@ -190,6 +196,13 @@ export function createTime(game: Game): Time {
 
     sleep() {
       if (fallingAsleep) return;
+      for (const guard of sleepGuards) {
+        const why = guard();
+        if (why) {
+          events.emit('toast', { text: why });
+          return;
+        }
+      }
       if (!curtain) return sleepNow();
       fallingAsleep = true;
       let woken = false;
@@ -203,6 +216,9 @@ export function createTime(game: Game): Time {
 
     setSleepCurtain(next) {
       curtain = next;
+    },
+    guardSleep(guard) {
+      sleepGuards.push(guard);
     },
     get fallingAsleep() { return fallingAsleep; },
 

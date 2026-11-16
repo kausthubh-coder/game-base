@@ -1,0 +1,63 @@
+{
+  "name": "boar",
+  "tool": "image_gen.imagegen",
+  "baseCommit": "0c26a77",
+  "references": [
+    "public/assets/sprites/critter.png",
+    "public/assets/sprites/leaftail.png"
+  ],
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Use case: stylized-concept. Production sprite sheet for cozy anime pixel RPG, warm top-left light, dark brown tinted outlines, chunky pixel clusters, matching the reference creatures. Transparent background, NO text, NO grids, NO cast shadows, no ground.\nSTRICT rectangular uniform grid FOUR columns SIX rows, 24 equal square cells, image ratio 2:3. Every cell contains exactly one whole creature with ample transparent padding.\nRows 1-3 idle: front, back (no face), right profile; all four columns repeat idle variations.\nRows 4-6 walk: front, back, right profile, four distinct step phases feet apart / passing / opposite apart / passing.\nSame creature, accessories and proportions throughout. Feet baseline equal in each cell. Full body visible, nothing crosses cell boundaries.\nReferences show approved style only; generate a NEW creature. Match chunky clusters and restrained detail. No teal. Brown outlines #302529 #493335 #65453a, warm cream highlights, violet/brown shadows.\nBOAR: great forest boar as big as a cart, heavy shoulders, dark chestnut brown healthy hide, bristled ridge along back, two curved cream tusks, small clear amber eyes. Thin sparse cracks in hide reveal gold. Powerful friendly wild animal, no gore, not evil. Long heavy body in right profile, about 1.42 times as long as shoulder height. Final 192-square cells, larger and more detailed than small reference creature, still chunky pixel art.",
+      "source": "assets-src/raw/boar-3.png",
+      "selected": true
+    }
+  ],
+  "fight": {
+    "references": [
+      "assets-src/raw/boar-3.png"
+    ],
+    "attempts": [
+      {
+        "number": 1,
+        "prompt": "Use case: stylized-concept. Production combat POSE sprite sheet for cozy anime pixel RPG. Create a NEW four-column THREE-row sheet of the EXACT SAME creature in attached base sheet. Reference is identity, size, proportions, palette, outline and pixel density. Transparent background, NO white matte or pale halo, NO grid, NO text, NO shadow, no ground. STRICT FOUR columns THREE rows, twelve equal square cells, 4:3 canvas aspect ratio. Every cell contains one whole creature with generous transparent padding. Row 1 FRONT, row 2 BACK with NO FACE OR EYES, row 3 RIGHT PROFILE. Four columns in EVERY row are: column 1 TELL, column 2 ATTACK, column 3 DIZZY, column 4 CALM. Preserve base body size across poses, compress/tilt for action only, do not scale character. Warm top-left light, brown outlines, chunky pixel art. No teal. The back view communicates same pose through body posture without a face.\nBOAR: great forest boar as big as a cart, heavy shoulders, dark chestnut brown healthy hide, bristled ridge along back, two curved cream tusks, small clear amber eyes. Thin sparse cracks in hide reveal gold. Powerful friendly wild animal, no gore, not evil. Long heavy body in right profile, about 1.42 times as long as shoulder height. Final 192-square cells, larger and more detailed than small reference creature, still chunky pixel art.\nTell: head lowered, one front hoof pawing. Attack: mid-charge, head DOWN, tusks thrust forward. Dizzy: front legs folded, head ON ground, swirl eyes. Calm: standing with head bowed LOW toward viewer, gentle relaxed expression. Preserve the reference long heavy chestnut body, tall shoulder bristle ridge, two cream tusks, small clear eyes and sparse GOLD cracks. Anatomical body size stays identical, pose only changes. No speed lines, no floating symbols, no stars, no outside effects.",
+        "source": "assets-src/fight-beasts/boar-fight-attempt-1.png",
+        "selected": false,
+        "defects": "Calm head stays up; charge too close to idle."
+      },
+      {
+        "number": 2,
+        "prompt": "Edit this boar fight sprite sheet. Preserve exact same cart-sized chestnut forest boar, golden cracks, tusks and pixel art, transparent background, four columns three rows front/back/right profile. Correct only columns TWO and FOUR. Column TWO ATTACK: head LOW, snout near ground, tusks pointing forward, shoulders high, powerful mid-charge with rear legs extended, absolutely distinct from idle. Column FOUR CALM: standing on all feet, bowing head LOW, snout close to ground, relaxed closed eyes. Side view bow must visibly bend the neck down, forehead beneath shoulders. Front bow shows crown/ridge of lowered head and tusks, peaceful. Back bow shows shoulders above head, no face. All other columns remain same including pawing tell and collapsed dizzy swirl eyes. Keep body scale and palette identical to original base. No effects, no stars, no text, no grid, no cast shadow. Whole animals inside cells with transparent margins.\n",
+        "source": "assets-src/fight-beasts/boar-fight-attempt-2.png",
+        "references": [
+          "assets-src/raw/boar-3.png",
+          "assets-src/fight-beasts/boar-fight-attempt-1.png"
+        ],
+        "selected": false,
+        "defects": "Improved bow but shorter torso than base."
+      },
+      {
+        "number": 3,
+        "prompt": "Create revised boar combat sprite sheet using attached BASE as strict identity and proportion reference and attached POSE sheet for pose meanings. FOUR columns THREE rows equal square cells, front/back/right profile. Genuine transparent background, no text/grid/shadow/effects. Important fix: preserve LONG CART-SIZED body from base. The previous pose sheet made boar torso SHORTER and SMALLER. In every side pose keep same long torso length and same deep chest as base, no baby boar. Keep the attack stride compact, rear feet below rump rather than stretching behind to prevent frame width inflation. Row directions front, back NO FACE, right profile. Columns: 1 tell pawing hoof head lowered; 2 charge head low tusks forward, compact feet; 3 dizzy front legs folded head on ground spiral eyes; 4 standing all feet head bowed LOW eyes closed. Front and back torso width must match base at SAME SCALE. Exact chestnut, gold cracks, cream tusks, bristle mane, warm upper-left light and brown outlines of original. Keep all twelve animals aligned baseline and generous padding, full body within each cell. The head and torso never shrink, pose bends neck/legs only. Use base chunky pixel density.\n",
+        "source": "assets-src/raw/boar-fight-3.png",
+        "references": [
+          "assets-src/raw/boar-3.png",
+          "assets-src/fight-beasts/boar-fight-attempt-2.png"
+        ],
+        "selected": true,
+        "defects": "Selected; compact charge and longer torso improve base match. Some size and mane drift remains."
+      }
+    ]
+  },
+  "defects": [
+    "Mane, tusks and golden cracks change shape and placement across views and poses.",
+    "Idle and walk have visible body-height and muzzle wobble.",
+    "Fight side torso remains slightly shorter/deeper than base; front fight head is slightly larger.",
+    "Tell head stays higher than requested, especially side view.",
+    "Dizzy front snout hovers slightly above ground rather than resting fully on it.",
+    "Side view shows mainly one tusk because the other is occluded.",
+    "Texture is busier and softer than approved critter, especially gold cracks."
+  ],
+  "processing": "Standard build-story.mjs with size 192, anchor [96,176], height 150. No tool changes or replacement pixels."
+}

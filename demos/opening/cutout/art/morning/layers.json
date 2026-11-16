@@ -1,0 +1,99 @@
+{
+  "shot": "morning",
+  "frame": [
+    1920,
+    1080
+  ],
+  "layers": [
+    {
+      "id": "harbour",
+      "file": "harbour.webp",
+      "x": -192,
+      "y": -108,
+      "w": 2304,
+      "h": 1296,
+      "z": 0,
+      "depth": 1,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Opaque painted harbour/sky continuation behind foreground architecture. 10 percent overscan."
+    },
+    {
+      "id": "street",
+      "file": "street.webp",
+      "x": -192,
+      "y": -108,
+      "w": 1241,
+      "h": 1296,
+      "z": 10,
+      "depth": 0.65,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Empty left house fronts and road. No baked rain or people. Concealed margin under near plane."
+    },
+    {
+      "id": "door-step-wisteria",
+      "file": "door-step-wisteria.webp",
+      "x": 715,
+      "y": -108,
+      "w": 1397,
+      "h": 1296,
+      "z": 30,
+      "depth": 0.25,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Shared night/day mask. Keep door frame, step and trunk on this plane."
+    },
+    {
+      "id": "flags-near",
+      "file": "flags-1.webp",
+      "x": 546,
+      "y": 311,
+      "w": 744,
+      "h": 130,
+      "z": 20,
+      "depth": 0.72,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "One long painted line. Code may wave it; keep upper-left title area clear."
+    },
+    {
+      "id": "flags-far",
+      "file": "flags-far.webp",
+      "x": 524,
+      "y": 529,
+      "w": 265,
+      "h": 33,
+      "z": 21,
+      "depth": 0.85,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Distant line. Draw at native manifest dimensions, wave with smaller amplitude."
+    },
+    {
+      "id": "flowers",
+      "file": "flowers.webp",
+      "x": 1450,
+      "y": 775,
+      "w": 662,
+      "h": 413,
+      "z": 40,
+      "depth": 0.25,
+      "pivot": [
+        0.5,
+        1
+      ],
+      "note": "Detached flowers and ground corner. Same depth as step to keep ground edges registered during camera moves. Code may wave flowers without translating the ground."
+    }
+  ]
+}

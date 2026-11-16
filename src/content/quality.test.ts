@@ -12,10 +12,10 @@ test('every feature has a value at each of the four levels', () => {
 });
 
 test('a higher level never gives less', () => {
-  const rising: QualityFeature[] = ['renderScale', 'pixelRatio', 'msaa', 'shadowMap', 'shadowReach', 'viewChunks', 'grassRings', 'plants', 'rainRings', 'particles', 'spriteLightRefresh', 'modelLightRefresh', 'buildGridReach'];
+  const rising: QualityFeature[] = ['renderScale', 'pixelRatio', 'msaa', 'shadowMap', 'shadowReach', 'viewChunks', 'grassRings', 'plants', 'rainRings', 'particles', 'wilds', 'wildsReach', 'treeTriangles', 'spriteLightRefresh', 'modelLightRefresh', 'buildGridReach', 'landmarkTriangles', 'landmarkReach', 'cityTriangles', 'cityReach', 'cityPieceReach', 'townTriangles', 'treeReach', 'scatterReach', 'fineBushReach'];
   for (const feature of rising) for (let i = 1; i < LEVELS.length; i++) expect(Number(QUALITY_ROWS[feature][i])).toBeGreaterThanOrEqual(Number(QUALITY_ROWS[feature][i - 1]));
-  // Wider spacing is thinner grass, and a shadow map drawn every second frame is the cheaper one.
-  for (const feature of ['grassSpacing', 'shadowEvery'] as QualityFeature[]) for (let i = 1; i < LEVELS.length; i++) expect(Number(QUALITY_ROWS[feature][i])).toBeLessThanOrEqual(Number(QUALITY_ROWS[feature][i - 1]));
+  // Wider spacing is thinner grass or coarser far land, and a shadow map drawn every second frame is the cheaper one.
+  for (const feature of ['grassSpacing', 'shadowEvery', 'farLandCell'] as QualityFeature[]) for (let i = 1; i < LEVELS.length; i++) expect(Number(QUALITY_ROWS[feature][i])).toBeLessThanOrEqual(Number(QUALITY_ROWS[feature][i - 1]));
   // A switch that is on at a level stays on above it.
   for (const feature of Object.keys(QUALITY_ROWS) as QualityFeature[]) {
     const row = QUALITY_ROWS[feature];
@@ -26,7 +26,7 @@ test('a higher level never gives less', () => {
 
 test('ultra is high and more', () => {
   const more = (Object.keys(QUALITY_ROWS) as QualityFeature[]).filter((feature) => QUALITY.ultra[feature] !== QUALITY.high[feature]);
-  expect(more.sort()).toEqual(['grassSpacing', 'msaa', 'pixelRatio', 'shadowMap', 'shadowReach', 'viewChunks']);
+  expect(more.sort()).toEqual(['cityPieceReach', 'cityReach', 'cityTriangles', 'fineBushReach', 'grassSpacing', 'landmarkReach', 'landmarkTriangles', 'msaa', 'pixelRatio', 'scatterReach', 'shadowMap', 'shadowReach', 'townTriangles', 'viewChunks']);
 });
 
 test('a level is read from an address or a stored setting by its name only', () => {

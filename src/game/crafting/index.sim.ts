@@ -1,5 +1,5 @@
 // Crafting: which recipes the player can reach, and making one from the bag.
-import { recipes, stationReach } from '../content/recipes.ts';
+import { LEARNED_BY, recipes, stationReach } from '../content/recipes.ts';
 import type { CraftingApi, Game, Recipe } from '../api.sim.ts';
 import type { Kernel } from '../kernel.sim.ts';
 
@@ -8,8 +8,12 @@ export function createCrafting(game: Game): CraftingApi {
   // Reused by available(), so asking every frame allocates nothing.
   const open: Recipe[] = [];
 
-  const reachable = (recipe: Recipe): boolean =>
-    recipe.station === 'hand' || game.systems.placeables.near(recipe.station, game.player.pos, stationReach);
+  /** Known, and at a station within reach. A part's family is learned in its vault. */
+  const reachable = (recipe: Recipe): boolean => {
+    const learned = LEARNED_BY[recipe.id];
+    if (learned && !game.flags.is(learned)) return false;
+    return recipe.station === 'hand' || game.systems.placeables.near(recipe.station, game.player.pos, stationReach);
+  };
 
   const api: CraftingApi = {
     recipes: () => recipes,

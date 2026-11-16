@@ -7,7 +7,7 @@
 // `window.__ui` is the interface and `window.__demo` the fake game, for scripts.
 
 import type {
-  ActionsApi, AlmanacApi, AlmanacPage, CraftingApi, Game, InteractApi, InventoryApi, ItemDef, ItemsApi, QuestView, QuestsApi, Recipe, Stack, Systems, TalkApi,
+  ActionsApi, AlmanacApi, AlmanacPage, CraftingApi, Game, InteractApi, InventoryApi, ItemDef, ItemId, ItemsApi, QuestView, QuestsApi, Recipe, Stack, Systems, TalkApi,
 } from '../../src/game/api.sim.ts';
 import { createEvents, createFlags } from '../../src/game/kernel.sim.ts';
 import { calmNoon } from '../../src/engine/types.ts';
@@ -15,19 +15,19 @@ import { createGameUi, type IconRef, type PanelName, type PictureRef } from '../
 
 // ---------------------------------------------------------------------------------------- sample data
 
-const item = (id: string, name: string, icon: string, description: string, stack = 99): ItemDef => ({ id, name, icon, stack, description });
+const item = (id: ItemId, name: string, icon: string, description: string, stack = 99): ItemDef => ({ id, name, icon, stack, description });
 const ITEMS: ItemDef[] = [
   item('axe', 'Axe', 'axe', 'Tamsin’s old axe. It cuts logs three times faster than hands do.', 1),
   item('hoe', 'Hoe', 'hoe', 'Turns grass or dirt into soil a seed can take.', 1),
-  item('can', 'Watering can', 'can', 'Wets the soil under a crop for three minutes.', 1),
+  item('watering_can', 'Watering can', 'can', 'Wets the soil under a crop for three minutes.', 1),
   item('almanac', 'The Almanac', 'book', 'Blank for forty years. It writes down what a living thing needs and what it gives.', 1),
-  item('log', 'Oak log', 'wood', 'A length of oak. One log makes four planks by hand.'),
-  item('planks', 'Planks', 'planks', 'Sawn oak. Benches, beds and chests start here.'),
+  item('oak_log', 'Oak log', 'wood', 'A length of oak. One log makes four planks by hand.'),
+  item('plank', 'Planks', 'planks', 'Sawn oak. Benches, beds and chests start here.'),
   item('fiber', 'Fiber', 'fiber', 'Tough strands from leaves and grass.'),
   item('berry', 'Berries', 'berry', 'Sweet and a little sharp. A leaftail will come a long way for one.'),
-  item('seed', 'Wheat seeds', 'seed', 'Plant them in tilled soil and keep it wet.'),
+  item('wheat_seeds', 'Wheat seeds', 'seed', 'Plant them in tilled soil and keep it wet.'),
   item('wheat', 'Wheat', 'wheat', 'A ripe sheaf. Queen Maren wants twenty by the festival.'),
-  item('moss', 'Moss tuft', 'moss', 'Left by a mossling on damp ground. Soft, and it holds a little light.'),
+  item('moss_fiber', 'Moss tuft', 'moss', 'Left by a mossling on damp ground. Soft, and it holds a little light.'),
   item('workbench', 'Workbench', 'workbench', 'Set it down and stand near it to make bigger things.', 1),
   item('bed', 'Bed', 'bed', 'Sleep in it under a roof to skip to morning.', 1),
   item('chest', 'Chest', 'chest', 'Holds what the bag cannot.', 1),
@@ -35,11 +35,11 @@ const ITEMS: ItemDef[] = [
 ];
 
 const RECIPES: Recipe[] = [
-  { id: 'planks', makes: { id: 'planks', count: 4 }, needs: [{ id: 'log', count: 1 }], station: 'hand' },
-  { id: 'workbench', makes: { id: 'workbench', count: 1 }, needs: [{ id: 'planks', count: 4 }], station: 'hand' },
-  { id: 'bed', makes: { id: 'bed', count: 1 }, needs: [{ id: 'planks', count: 6 }, { id: 'fiber', count: 3 }], station: 'workbench' },
-  { id: 'chest', makes: { id: 'chest', count: 1 }, needs: [{ id: 'planks', count: 8 }], station: 'workbench' },
-  { id: 'lamp', makes: { id: 'lamp', count: 1 }, needs: [{ id: 'planks', count: 1 }, { id: 'moss', count: 1 }], station: 'workbench' },
+  { id: 'planks', makes: { id: 'plank', count: 4 }, needs: [{ id: 'oak_log', count: 1 }], station: 'hand' },
+  { id: 'workbench', makes: { id: 'workbench', count: 1 }, needs: [{ id: 'plank', count: 4 }], station: 'hand' },
+  { id: 'bed', makes: { id: 'bed', count: 1 }, needs: [{ id: 'plank', count: 6 }, { id: 'fiber', count: 3 }], station: 'workbench' },
+  { id: 'chest', makes: { id: 'chest', count: 1 }, needs: [{ id: 'plank', count: 8 }], station: 'workbench' },
+  { id: 'lamp', makes: { id: 'lamp', count: 1 }, needs: [{ id: 'plank', count: 1 }, { id: 'moss_fiber', count: 1 }], station: 'workbench' },
 ];
 
 const PAGES: AlmanacPage[] = [
@@ -70,7 +70,7 @@ const PAGES: AlmanacPage[] = [
 
 const QUESTS: QuestView[] = [
   {
-    id: 'plot', title: 'A plot of your own', summary: 'Tamsin gave you the grant and a blank book.', state: 'done',
+    id: 'grantday', title: 'A plot of your own', summary: 'Tamsin gave you the grant and a blank book.', state: 'done',
     steps: [
       { id: 'meet', text: 'Talk to Tamsin at the grant stone', done: true },
       { id: 'watch', text: 'Watch a mossling until both columns of its page fill', done: true },
@@ -78,7 +78,7 @@ const QUESTS: QuestView[] = [
     ],
   },
   {
-    id: 'roof', title: 'A roof before dark', summary: 'Night is cold on open ground. Build somewhere to sleep.', state: 'active',
+    id: 'ground', title: 'A roof before dark', summary: 'Night is cold on open ground. Build somewhere to sleep.', state: 'active',
     steps: [
       { id: 'wood', text: 'Chop 12 wood', done: true, have: 12, need: 12 },
       { id: 'bench', text: 'Make a workbench and set it down', done: true },
@@ -87,7 +87,7 @@ const QUESTS: QuestView[] = [
     ],
   },
   {
-    id: 'bread', title: 'The queen’s bread', summary: 'Queen Maren needs twenty sheaves by the festival.', state: 'active',
+    id: 'count', title: 'The queen’s bread', summary: 'Queen Maren needs twenty sheaves by the festival.', state: 'active',
     steps: [
       { id: 'town', text: 'Walk to Hollowmere', done: true },
       { id: 'queen', text: 'Talk to Queen Maren in the granary', done: true },
@@ -96,7 +96,7 @@ const QUESTS: QuestView[] = [
       { id: 'deliver', text: 'Bring the wheat to Maren', done: false },
     ],
   },
-  { id: 'festival', title: 'The harvest festival', summary: '', state: 'hidden', steps: [] },
+  { id: 'echo', title: 'The harvest festival', summary: '', state: 'hidden', steps: [] },
 ];
 
 // ---------------------------------------------------------------------------------------- the fake game
@@ -109,9 +109,9 @@ const items: ItemsApi = {
 };
 
 const slots: (Stack | null)[] = Array.from({ length: 36 }, () => null);
-const put = (index: number, id: string, count: number): void => { slots[index] = { id, count }; };
-put(0, 'axe', 1); put(1, 'hoe', 1); put(2, 'can', 1); put(3, 'seed', 12); put(4, 'berry', 3); put(8, 'almanac', 1);
-put(9, 'log', 14); put(10, 'planks', 5); put(11, 'fiber', 2); put(12, 'wheat', 7); put(13, 'moss', 1); put(20, 'lamp', 2); put(35, 'workbench', 1);
+const put = (index: number, id: ItemId, count: number): void => { slots[index] = { id, count }; };
+put(0, 'axe', 1); put(1, 'hoe', 1); put(2, 'watering_can', 1); put(3, 'wheat_seeds', 12); put(4, 'berry', 3); put(8, 'almanac', 1);
+put(9, 'oak_log', 14); put(10, 'plank', 5); put(11, 'fiber', 2); put(12, 'wheat', 7); put(13, 'moss_fiber', 1); put(20, 'lamp', 2); put(35, 'workbench', 1);
 
 const inventory: InventoryApi = {
   slots,

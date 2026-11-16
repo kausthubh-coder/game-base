@@ -1,0 +1,298 @@
+{
+  "version": 1,
+  "sprites": {
+    "button-child": {
+      "heightMetres": 1,
+      "referenceDrawnHeight": 102,
+      "sheet": "button-child.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 1.2549019607843137,
+      "animations": {
+        "idle": {
+          "frames": 2,
+          "fps": 3,
+          "rows": {
+            "back": 0
+          }
+        },
+        "raise": {
+          "frames": 4,
+          "fps": 7,
+          "rows": {
+            "back": 1
+          }
+        },
+        "hold": {
+          "frames": 2,
+          "fps": 3,
+          "rows": {
+            "back": 2
+          }
+        },
+        "turn": {
+          "frames": 2,
+          "fps": 5,
+          "rows": {
+            "back": 3
+          }
+        }
+      },
+      "actions": {
+        "idle": {
+          "frames": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "fps": 3,
+          "loop": true
+        },
+        "raise": {
+          "frames": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "fps": 7,
+          "loop": false
+        },
+        "hold": {
+          "frames": [
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              2
+            ]
+          ],
+          "fps": 3,
+          "loop": true
+        },
+        "turn": {
+          "frames": [
+            [
+              0,
+              3
+            ],
+            [
+              1,
+              3
+            ]
+          ],
+          "fps": 5,
+          "loop": false
+        }
+      }
+    },
+    "hobb": {
+      "heightMetres": 1.6,
+      "referenceDrawnHeight": 107,
+      "sheet": "hobb.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 1.9140186915887851,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 4,
+          "rows": {
+            "front": 0
+          }
+        },
+        "bed": {
+          "frames": 3,
+          "fps": 5,
+          "rows": {
+            "front": 1
+          }
+        }
+      },
+      "actions": {
+        "idle": {
+          "frames": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ]
+          ],
+          "fps": 4,
+          "loop": true
+        },
+        "bed": {
+          "frames": [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "fps": 5,
+          "loop": false
+        }
+      }
+    },
+    "grey-coat": {
+      "heightMetres": 1.75,
+      "referenceDrawnHeight": 105,
+      "sheet": "grey-coat.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 2.1333333333333333,
+      "animations": {
+        "walk": {
+          "frames": 6,
+          "fps": 8,
+          "rows": {
+            "back": 0
+          }
+        },
+        "idle": {
+          "frames": 1,
+          "fps": 1,
+          "rows": {
+            "back": 1
+          }
+        }
+      },
+      "actions": {
+        "walk": {
+          "frames": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ],
+            [
+              2,
+              0
+            ],
+            [
+              3,
+              0
+            ],
+            [
+              4,
+              0
+            ],
+            [
+              5,
+              0
+            ]
+          ],
+          "fps": 8,
+          "loop": true
+        },
+        "idle": {
+          "frames": [
+            [
+              0,
+              1
+            ]
+          ],
+          "fps": 1,
+          "loop": true
+        }
+      }
+    },
+    "basket": {
+      "heightMetres": 0.45,
+      "referenceDrawnHeight": 64,
+      "sheet": "basket.png",
+      "frame": [
+        128,
+        128
+      ],
+      "anchor": [
+        64,
+        120
+      ],
+      "worldHeight": 0.9,
+      "animations": {
+        "breathe": {
+          "frames": 2,
+          "fps": 2,
+          "rows": {
+            "front": 0
+          }
+        }
+      },
+      "actions": {
+        "breathe": {
+          "frames": [
+            [
+              0,
+              0
+            ],
+            [
+              1,
+              0
+            ]
+          ],
+          "fps": 2,
+          "loop": true
+        }
+      }
+    }
+  }
+}
