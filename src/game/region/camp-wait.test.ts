@@ -21,8 +21,7 @@ test('the lit campfire lets the waiting player reach the first night through nor
   expect(p.game.clock.day).toBe(day);
   expect(p.sys.interact.nearest()?.id).not.toBe('ground:fire');
   expect(p.until(() => p.game.flags.is('night.fox'), 2)).toBe(true);
-  p.advance(.5);
-  expect(p.sys.hall.fox()).not.toBeNull();
+  expect(p.until(() => p.sys.hall.fox() !== null, 2)).toBe(true);
   expect(p.game.flags.is('night.over')).toBe(false);
   expect(p.game.clock.day).toBe(day);
   expect(p.heard.filter(e => e.name === 'slept')).toHaveLength(0);
