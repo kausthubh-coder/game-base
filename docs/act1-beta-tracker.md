@@ -4,13 +4,13 @@ Coordinator owns this record. Release scope: the smallest first-half Act 1 beta,
 
 ## Current release status
 
-The private playtest remains available at https://mac-mini.taile36082.ts.net:15796/ on Tailscale. It includes irrigation, mobile input, cursor cancellation and first-person visibility fixes. The newer opening-audio and Hall-threshold repairs are verified locally but are not on that preview yet.
+The private playtest remains available at https://mac-mini.taile36082.ts.net:15796/ on Tailscale. It now serves verified immutable runtime df7d393a, including irrigation, mobile input, cursor cancellation, first-person visibility, opening-audio and Hall-threshold fixes. Local and Tailscale HTTPS responses match its exact index. Browser saves were not changed. Finish post-fight conversations before reload until the save-recovery repair is verified.
 
 The final continuous replay has passed fresh Begin through the first morning. Homestead gameplay reached its completed quest and exported a new save, but that stage is not accepted yet: its Dax conversation has two hero-occlusion findings to inspect. The replay is stopped at this boundary.
 
 A release-critical save gap is confirmed in the source: winning a fight persists, but its queued conversation is lost on reload. A focused repair and normal-save browser proof are active. No public release has occurred. After these blockers, the remaining work is the continuous replay through Lamp Gallery, full release verification, deployment and live checks. There is no reliable completion time yet.
 
-The animal-frame report remains unreproduced, not fixed. Water/bridge appearance, broader placement issues and all redesign experiments remain recorded below. Historical checkpoint sections retain their original scope; this section describes the current status.
+The animal-frame report remains unreproduced, not fixed. A new helper is capturing actual walking and shovel frames, checking every player appearance and the matching GPU atlas inputs. Water/bridge appearance, broader placement issues and all redesign experiments remain recorded below. Historical checkpoint sections retain their original scope; this section describes the current status.
 
 ## Beta blockers and active fixes
 
@@ -57,7 +57,7 @@ The animal-frame report remains unreproduced, not fixed. Water/bridge appearance
 
 ## Protected state
 
-Preview: `https://mac-mini.taile36082.ts.net:15796/`, local server 5796, PID 34269, immutable `.artifacts/beta-preview-verification/sprite-only-01/new-output/dist` (source72ac28d4). Prior Gallery server was deliberately replaced after verification; its runtime and metadata remain preserved. Leave it running until a deliberate verified replacement. Save and evidence files are immutable. Helpers commit only their owned paths and report remaining gaps. Heavy jobs use live resource admission and assigned ports.
+Preview: `https://mac-mini.taile36082.ts.net:15796/`, local server 5796, PID 83802, immutable release-checkout `dist-grantday` (source df7d393a). The former PID 34269 was deliberately stopped after runtime hash verification. Handoff proof is `.artifacts/preview-handoff-df7d393a/` in the release checkout. Prior Gallery server was deliberately replaced after verification; its runtime and metadata remain preserved. Leave it running until a deliberate verified replacement. Save and evidence files are immutable. Helpers commit only their owned paths and report remaining gaps. Heavy jobs use live resource admission and assigned ports.
 
 ## Coordination and tooling queue
 
