@@ -2,6 +2,8 @@
 // recipes; and the Make panel a workbench opens.
 
 import type { Recipe } from '../api.sim.ts';
+import { FLAG } from '../content/flags.ts';
+import { GEAR_ICONS, GEAR_STEPS } from '../content/gear.ts';
 import { createSlotDrag } from './drag.ui.ts';
 import { add, fillCues, h, iconTab, keepFocus, picture } from './dom.ui.ts';
 import { half, itemUse, missingReason, slotMove } from './logic.ui.ts';
@@ -11,6 +13,17 @@ const QUICK = 9;
 
 const STATION_NAMES: Record<string, string> = { hand: 'By hand', workbench: 'Workbench' };
 const stationName = (station: string): string => STATION_NAMES[station] ?? station[0].toUpperCase() + station.slice(1);
+
+/** Combat equipment stays on the hero, beside the bag's movable stacks. */
+export function equippedWeapon(ctx: Pick<UiContext, 'game' | 'options'>): HTMLElement | null {
+  if (!ctx.game.flags.get(FLAG.choice('weapon')) || !ctx.game.systems.bench) return null;
+  const gear = ctx.game.systems.bench.gear();
+  const name = GEAR_STEPS[gear.tier - 1].weapons[gear.weapon];
+  return h('section', { class: 'gu-bag-equipment', role: 'group', 'aria-label': 'Equipped combat weapon', 'data-key': 'equipped-weapon' },
+    picture(ctx.options.icon(GEAR_ICONS[gear.weapon][gear.tier - 1]), name, 32),
+    h('div', null, h('strong', null, name), h('span', null, 'Equipped for combat')),
+  );
+}
 
 /** The list of recipes with what each needs, the have and need counts, and a Make button. */
 function recipeList(ctx: UiContext, recipes: readonly Recipe[], empty: string, rerender: () => void): HTMLElement {
@@ -351,7 +364,7 @@ export function bagPanel(ctx: UiContext, startTab: string | undefined): PanelVie
         drawCues();
         detailFor = undefined;
         if (tab === 'things') {
-          body.replaceChildren(h('div', { class: 'gu-bag-grid' }, ...drawSlots()), detail);
+          body.replaceChildren(h('div', { class: 'gu-bag-grid' }, equippedWeapon(ctx), ...drawSlots()), detail);
           showDetail(restingSlot());
         } else {
           const byHand = crafting.available().filter((recipe) => recipe.station === 'hand');

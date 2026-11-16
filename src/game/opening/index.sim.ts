@@ -7,7 +7,7 @@
 //   lock       scene.2              Dax and the last lock
 //   map        scene.3              Mina and the map wall
 //   rack       choice.weapon        the rack in the yard: sword, bow or staff
-//   spar       scene.4              the bout with Dax: three swings that land empty his guard
+//   spar       scene.4              safe weapon practice: real hits empty the crate lid's guard
 //   deed       scene.5, hero.name   the grant; the deed is signed in a panel as the scene ends
 //   quay       scene.6              Hobb and Dax at the berth
 //   river      step.grantday.river  the day up the river, which the view plays; then scene 7 at the landing
@@ -20,24 +20,23 @@
 // places, and while the director stands someone in for a scene, this system's own stands aside. It implements
 // `OpeningApi`.
 import type { Vec3 } from '../../engine/types.ts';
-import type { Actor, Game, HeroLook, Interactable, NpcId, OpeningApi, OpeningAsk, OpeningStage, SimSystem } from '../api.sim.ts';
+import type { Actor, Game, HeroLook, Interactable, NpcId, OpeningApi, OpeningAsk, OpeningStage, RunningFight, SimSystem } from '../api.sim.ts';
+import { weaponOf } from '../content/fight.ts';
+import { STARTING_GEAR } from '../content/gear.ts';
 import { FLAG } from '../content/flags.ts';
 import { PLACE_SPOTS, TALK } from '../content/opening.ts';
 import { CROWD, PEOPLE, SPOTS, type SpotId } from '../content/saltgate.ts';
 import type { Kernel } from '../kernel.sim.ts';
-import { distance2d } from '../move.sim.ts';
+import { createFight, type Target } from '../fight/fight.sim.ts';
+import { worldStage } from '../fight/world-stage.sim.ts';
 import { inSaltgate as inLand, saltgateAt } from './land.sim.ts';
 
 /** The order of grant day's steps, as quest `grantday` lists them. */
 export const STEPS = ['film', 'wake', 'breakfast', 'lock', 'map', 'rack', 'spar', 'deed', 'quay', 'river'] as const;
 export type GrantStep = (typeof STEPS)[number] | 'done';
 
-/** Swings that land before Dax's guard is empty. */
+/** Guard pips: three quick weapon hits empty the lid, or fewer stronger held moves. */
 export const GUARD = 3;
-/** How close to Dax a swing reaches, in blocks. */
-export const SWING_REACH = 2.6;
-/** Seconds of game time between two swings: one sooner is taken on the lid. */
-export const SWING_EVERY = 0.4;
 /** How close the hero must stand to a thing to be offered it, and to a person: across a table will do. */
 const REACH = 2.2, TALK_REACH = 3.2;
 /** The longest name the deed takes. */
@@ -76,7 +75,9 @@ export function createOpening(game: Game): Opening {
   const talk = () => game.systems.talk;
 
   let asking: OpeningAsk | null = null;
-  let boutOn = false, guard = GUARD, lastSwing = -Infinity;
+  let boutOn = false, guard = GUARD;
+  let practice: RunningFight | null = null, lid: Target | null = null, byView = false;
+  let introDue = false;
   let joined = false;
   let lastStage: OpeningStage | null = null;
   const actors = new Map<string, Actor>();
@@ -117,6 +118,33 @@ export function createOpening(game: Game): Opening {
     // A conversation may have opened since; leave its hold on the player alone.
     player.busy = talk()?.active ?? false;
   };
+
+  function startPractice(savedGuard?: number): void {
+    const [x, z] = PLACES.dax.spar!;
+    const at = saltgateAt(x, z);
+    const stage = worldStage({ height: (x, z) => game.world.heightAt(x, z), water: () => false }, { x: at.x, z: at.z, radius: 18, from: player.pos });
+    const gear = game.systems.bench?.gear() ?? STARTING_GEAR;
+    const fight = createFight(stage, { way: 'hero', weapon: gear.weapon, external: true, kit: [], random: () => game.random() });
+    const full = GUARD * weaponOf(gear.weapon).quick.guard;
+    const target = fight.addTarget({ x: at.x, z: at.z, radius: 0.5, guard: full, name: 'Dax\'s crate lid', high: true });
+    lid = target;
+    if (savedGuard !== undefined) target.guard = Math.max(0, Math.min(full, savedGuard));
+    guard = Math.ceil(GUARD * target.guard / full);
+    boutOn = guard > 0;
+    fight.placeHero(player.pos.x, player.pos.z);
+    practice = {
+      n: 0, practice: true, fight, stage, keeper: null, hall: null, over: -1,
+      line: `${weaponOf(gear.weapon).name}: aim at Dax's lid. Click or tap Use; hold and release for a stronger move.`,
+      step(dt) {
+        if (practice?.fight !== fight || !boutOn || player.busy) return;
+        fight.step(dt);
+        guard = Math.ceil(GUARD * target.guard / full);
+        for (const event of fight.events) if (event.type === 'targetHit') events.emit('opening.swing', { landed: true, guard });
+        // The view releases the hero before the opening starts Dax's closing conversation.
+        if (target.broken) boutOn = false;
+      },
+    };
+  }
 
   // ------------------------------------------------------------------------------------ the people
 
@@ -218,10 +246,8 @@ export function createOpening(game: Game): Opening {
       flags.set(BOUT_SEEN, true);
       talk()?.start(TALK.spar);
     } else if (conversation === TALK.spar) {
-      boutOn = true;
-      guard = GUARD;
-      lastSwing = -Infinity;
-      events.emit('hint', { id: 'opening.bout', text: 'Swing at Dax: click, or press F. Three that land empty his guard.' });
+      startPractice();
+      events.emit('hint', { id: 'opening.bout', text: 'Aim at Dax\'s crate lid. Click or tap Use to attack; hold and release for a stronger move. Shift or Dodge steps aside.' });
     } else if (conversation === 'scene.5' && !flags.get(FLAG.heroName)) {
       ask('deed');
     }
@@ -260,22 +286,12 @@ export function createOpening(game: Game): Opening {
       if (asking) close();
     },
     swing() {
-      if (!boutOn) return false;
-      const dax = actors.get(PEOPLE.dax.id);
-      if (!dax || distance2d(player.pos, dax.pos) > SWING_REACH) return false;
-      const t = game.clock.seconds;
-      // Too soon after the last: he has the lid up, and it takes the blow.
-      const landed = t - lastSwing >= SWING_EVERY;
-      lastSwing = t;
-      if (landed) guard--;
-      events.emit('opening.swing', { landed, guard });
-      if (guard <= 0) {
-        boutOn = false;
-        // The after-bout lines wait for the player to be free, which they are: a swing is not a conversation.
-        say(TALK.bout, 'dax');
-      }
-      return landed;
+      if (!boutOn || !practice || player.busy) return false;
+      practice.fight.press('attack');
+      return true;
     },
+    practice: () => boutOn ? practice : null,
+    drivePractice(on) { byView = on; },
     bout: () => ({ on: boutOn, guard }),
     ferryDone() {
       if (step() !== 'river') return;
@@ -292,7 +308,7 @@ export function createOpening(game: Game): Opening {
   // ------------------------------------------------------------------------------------ the step
 
   const system: SimSystem = {
-    step() {
+    step(dt) {
       join();
       const now = stage();
       if (now !== lastStage) {
@@ -300,15 +316,35 @@ export function createOpening(game: Game): Opening {
         lastStage = now;
       }
       placePeople();
+      if (!byView && boutOn && practice) {
+        practice.fight.placeHero(player.pos.x, player.pos.z);
+        practice.step(dt);
+        practice.fight.events.length = 0;
+      } else if (!byView && !boutOn && guard === 0 && step() === 'spar' && !player.busy && !talk()?.active) {
+        say(TALK.bout, 'dax');
+      } else if (!byView && introDue && !player.busy && !talk()?.active) {
+        introDue = false;
+        say(TALK.spar);
+      }
       if (!here(player.pos)) return;
       // Saltgate keeps its morning.
       if (game.clock.timeOfDay > MORNING_HOLD) game.systems.time?.setTimeOfDay(MORNING_HOLD);
     },
-    save: () => ({ bout: boutOn ? guard : -1 }),
+    save: () => ({ bout: boutOn || guard === 0 ? guard : -1, targetGuard: lid?.guard }),
     load(data) {
-      const saved = data as { bout?: number } | undefined;
-      boutOn = (saved?.bout ?? -1) >= 0;
-      guard = boutOn ? (saved?.bout ?? GUARD) : GUARD;
+      const saved = data as { bout?: number; targetGuard?: number } | undefined;
+      practice = null;
+      lid = null;
+      guard = GUARD;
+      boutOn = false;
+      introDue = false;
+      if (step() === 'spar') {
+        if ((saved?.bout ?? -1) > 0) {
+          const gear = game.systems.bench?.gear() ?? STARTING_GEAR;
+          startPractice(saved?.targetGuard ?? saved!.bout! * weaponOf(gear.weapon).quick.guard);
+        } else if (saved?.bout === 0) guard = 0;
+        else if (flags.is(BOUT_SEEN)) introDue = true;
+      }
       asking = null;
     },
   };

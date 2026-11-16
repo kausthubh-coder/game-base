@@ -113,7 +113,11 @@ export function install(view: GameView): void {
   for (const event of ['blur', 'orientationchange', 'pagehide']) window.addEventListener(event, cancel);
   document.addEventListener('visibilitychange', () => { if (document.hidden) cancel(); });
   let visible = false;
+  const skillButton = layer.querySelector<HTMLElement>('[data-touch="skill"]')!;
+  const calmButton = layer.querySelector<HTMLElement>('[data-touch="calm"]')!;
   view.onFrame(() => {
+    const practice = view.game.systems.opening?.bout().on ?? false;
+    skillButton.hidden = calmButton.hidden = practice;
     const show = free();
     if (show !== visible) {
       cancel(); visible = show; layer.hidden = !show; tools.hidden = true; layer.classList.remove('is-tools');

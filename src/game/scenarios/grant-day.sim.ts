@@ -4,7 +4,7 @@
 // load in the middle of the bout.
 import { FLAG } from '../content/flags.ts';
 import { PEOPLE, SPOTS, type SpotId } from '../content/saltgate.ts';
-import { GUARD, SWING_EVERY } from '../opening/index.sim.ts';
+import { GUARD } from '../opening/index.sim.ts';
 import { saltgateAt } from '../opening/land.sim.ts';
 import type { Play } from '../play/harness.sim.ts';
 import type { Input } from '../play/inputs.sim.ts';
@@ -16,6 +16,14 @@ const at = (spot: SpotId, dx = 0, dz = 0): { x: number; z: number } => {
   return { x: w.x, z: w.z };
 };
 const talking = (p: Play): boolean => p.sys.talk.active;
+/** Aim at the lid, request the selected weapon's quick move, and let its hit actually arrive. */
+function hitLid(p: Play): void {
+  const fight = p.sys.opening.practice()!.fight, lid = fight.targets[0]!;
+  fight.input.aimX = lid.x;
+  fight.input.aimZ = lid.z;
+  if (!p.sys.opening.swing()) throw new Error('practice is not ready');
+  p.advance(0.6);
+}
 /** A step west of one of the guild's people, wherever the step has put them. */
 const beside = (who: keyof typeof PEOPLE): Input => ({
   do: 'run',
@@ -80,15 +88,12 @@ export const grantDay: Scenario = {
     { do: 'talk', choice: 2 },
     { do: 'check', what: 'the bout is on', that: (p) => p.sys.opening.bout().on },
     beside('dax'),
-    { do: 'wait', seconds: SWING_EVERY + 0.1 },
-    { do: 'run', name: 'land a swing', run: (p) => { if (!p.sys.opening.swing()) throw new Error('the swing missed'); } },
+    { do: 'run', name: 'land an aimed staff bolt', run: hitLid },
     { do: 'check', what: 'scenes 1 to 3 played once each', that: once([1, 2, 3]) },
     { do: 'reload' },
     { do: 'check', what: 'the bout comes back with one pip gone', that: (p) => p.sys.opening.bout().on && p.sys.opening.bout().guard === GUARD - 1 },
-    { do: 'wait', seconds: SWING_EVERY + 0.1 },
-    { do: 'run', name: 'land a swing', run: (p) => { if (!p.sys.opening.swing()) throw new Error('the swing missed'); } },
-    { do: 'wait', seconds: SWING_EVERY + 0.1 },
-    { do: 'run', name: 'land the last swing', run: (p) => { if (!p.sys.opening.swing()) throw new Error('the swing missed'); } },
+    { do: 'run', name: 'land another aimed staff bolt', run: hitLid },
+    { do: 'run', name: 'land the last aimed staff bolt', run: hitLid },
     { do: 'wait', seconds: 0.1 },
     { do: 'talk' },
     { do: 'check', what: 'scene 4 is done by the bout', that: (p) => p.game.flags.is(FLAG.scene(4)) },

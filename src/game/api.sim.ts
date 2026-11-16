@@ -901,6 +901,8 @@ export interface FightState {
 
 /** A fight running in the world. */
 export interface RunningFight {
+  /** Safe weapon practice: no beasts, companion, kit, rewards or numbered fight progress. */
+  readonly practice?: boolean;
   /** Its number, or 0 for a night visitor. */
   readonly n: FightNumber | 0;
   readonly fight: import('./fight/fight.sim.ts').Fight;
@@ -1447,8 +1449,12 @@ export interface OpeningApi {
   sign(name: string): boolean;
   /** Closes the panel without an answer. */
   cancel(): void;
-  /** A swing at Dax in the bout. True when it emptied a pip of his guard. */
+  /** Requests a quick attack in practice. Its actual weapon hit, after startup/travel, takes guard. */
   swing(): boolean;
+  /** The opening's safe target practice, played by the same controls and view as world combat. */
+  practice(): RunningFight | null;
+  /** The combat view steps practice with the body while it owns the controls. False releases it before dialogue. */
+  drivePractice(byView: boolean): void;
   /** The bout with Dax: whether it is on, and his guard left, from 3. */
   bout(): { on: boolean; guard: number };
   /** The river is behind: the hero stands at the landing. The view has moved them there. */

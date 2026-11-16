@@ -6,8 +6,8 @@
 // (openingview/river.ts).
 // The rules are src/game/opening; this file reads `game.systems.opening` and answers it.
 //
-// The bout: while it is on, a click or F swings at Dax. Three that land empty his guard; one too soon after the
-// last is taken on his crate lid. His guard shows over his head as three diamonds.
+// The bout uses the world's combat controls and weapon picture. Its crate-lid target's guard shows over Dax
+// as three diamonds. The normal attack rules decide which aimed swings or projectiles reach it.
 //
 // `?opening=<step>` starts a new game at a step of grant day (`wake`, `breakfast`, `lock`, `map`, `rack`, `spar`,
 // `deed`, `quay` or `river`), every step before it done, the hero beside what that step needs. For testers and pictures.
@@ -141,11 +141,8 @@ export function install(view: GameView): void {
     if (landed) jolt = JOLT;
   });
   const boutOn = (): boolean => sys.opening?.bout().on ?? false;
-  view.keys.onPress((press) => {
-    if (press.kind === 'use' && press.button === 'primary' && boutOn() && !game.player.busy) sys.opening?.swing();
-  });
 
-  // Keys while a panel is open, and F in the bout. In the capture phase, so the pause menu and the game never see
+  // Keys while a panel is open. In the capture phase, so the pause menu and the game never see
   // a key a panel used. This view installs before the ui-* views.
   window.addEventListener('keydown', (event) => {
     if (event.ctrlKey || event.metaKey || event.altKey) return;
@@ -163,10 +160,6 @@ export function install(view: GameView): void {
         event.stopImmediatePropagation();
       }
       return;
-    }
-    if (event.code === 'KeyF' && !event.repeat && boutOn() && !game.player.busy) {
-      event.preventDefault();
-      sys.opening?.swing();
     }
   }, { capture: true });
 
@@ -217,7 +210,6 @@ export function install(view: GameView): void {
       weapon: (f.get(FLAG.choice('weapon')) as string | undefined) ?? null,
       grant: !f.is(FLAG.scene(5)),
     });
-    view.claim('bout', boutOn() ? ['use'] : null);
 
     // The ferry pushes off once the goodbyes are over.
     if (opening.stage() === 'ferry' && !ferrying && !river.playing && !(sys.talk?.active ?? false)) {

@@ -26,6 +26,7 @@ const STYLE = /* css */ `
 .ui-book .wf-stamina > i { background: linear-gradient(180deg, #f0d48a, #d3bc8e); }
 .ui-book .wf-num { font-size: 12px; font-weight: 800; color: var(--ui-gold); text-shadow: var(--ui-text-shadow); }
 .ui-book .wf-wells { position: absolute; right: 24px; bottom: 104px; display: flex; gap: 8px; align-items: end; }
+.ui-book .wf-wells[hidden] { display: none; }
 .ui-book .wf-well { position: relative; width: 50px; height: 50px; border-radius: var(--ui-radius);
   background: radial-gradient(90% 90% at 30% 20%, rgb(58 66 88 / 0.86), rgb(31 36 51 / 0.86));
   box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.55), inset 0 2px 6px rgb(0 0 0 / 0.3), 0 2px 6px rgb(10 12 20 / 0.3); }
@@ -124,14 +125,15 @@ export function createWorldHud(root: HTMLElement, art: UiArt | null): WorldHud {
         hud.hidden = false;
         const first = run.fight.beasts[0];
         const many = run.fight.beasts.length;
-        name.textContent = run.keeper?.name ?? (run.hall ? 'The Verdant Stag' : first ? (many > 1 ? `${COUNT[many] ?? many} ${first.def.name.replace(/x$/, 'xe')}s` : first.def.name) : '');
+        name.textContent = run.practice ? 'Dax\'s crate lid' : run.keeper?.name ?? (run.hall ? 'The Verdant Stag' : first ? (many > 1 ? `${COUNT[many] ?? many} ${first.def.name.replace(/x$/, 'xe')}s` : first.def.name) : '');
+        wells.hidden = run.practice ?? false;
         teach.textContent = run.line;
         lineLeft = 7;
         for (const b of bars.values()) b.el.remove();
         bars.clear();
       }
       lineLeft -= dt;
-      teach.style.opacity = lineLeft > 0 ? '1' : '0';
+      teach.style.opacity = run.practice || lineLeft > 0 ? '1' : '0';
       sayLeft -= dt;
       saying.style.opacity = sayLeft > 0 ? '1' : '0';
       const f = run.fight, h = f.hero;

@@ -27,6 +27,8 @@ export interface KeysHooks {
   slot?(index: number): boolean;
   /** The world's fights: C, before the companion's skill. True when it handled the press. */
   skill?(): boolean;
+  /** Safe practice has no Mark or companion to use. */
+  calm?(): boolean;
 }
 
 export interface Keys {
@@ -61,7 +63,7 @@ export function createKeys(view: GameView, fight: Fight, hooks: KeysHooks): Keys
     if (e.repeat || e.ctrlKey || e.metaKey || e.altKey || typing(e.target) || !keys.ready) return;
     down.add(e.code);
     if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') fight.press('dodge');
-    else if (e.code === 'KeyF') fight.press('use');
+    else if (e.code === 'KeyF' && (hooks.calm?.() ?? true)) fight.press('use');
     else if (e.code === 'KeyC' && !hooks.skill?.()) fight.press('skill');
   });
   // Esc with a rig in the hand puts it back and does nothing else. This view is installed before the panels'
@@ -78,6 +80,7 @@ export function createKeys(view: GameView, fight: Fight, hooks: KeysHooks): Keys
   view.keys.onPress((press) => {
     if (!keys.ready || game.player.busy || view.paused) return;
     if (press.kind === 'fight') {
+      if (press.action === 'use' && hooks.calm?.() === false) return;
       if (press.action !== 'skill' || !hooks.skill?.()) fight.press(press.action);
     } else if (press.kind === 'use' && press.button === 'primary') {
       // A click with a rig or a kit thing in the hand sets it down. Otherwise it attacks.
@@ -126,7 +129,7 @@ export function createKeys(view: GameView, fight: Fight, hooks: KeysHooks): Keys
     fight.input.moveX = length > 0.05 ? wish.moveX / length : 0;
     fight.input.moveZ = length > 0.05 ? wish.moveZ / length : 0;
     fight.input.attackHeld = view.keys.primary && fight.way === 'hero';
-    fight.input.calmHeld = down.has('KeyF') || view.keys.touch.calmHeld;
+    fight.input.calmHeld = (hooks.calm?.() ?? true) && (down.has('KeyF') || view.keys.touch.calmHeld);
     fight.input.placing = keys.held !== null;
     fight.placeHero(body.x, body.z);
     if (hooks.step) hooks.step(HERO_STEP);

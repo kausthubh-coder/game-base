@@ -207,6 +207,9 @@ export const STYLES = /* css */ `
   display: grid; grid-template-columns: minmax(0, 1fr) var(--detail-w); gap: 56px; min-height: 100%;
 }
 .gu-bag-grid { display: grid; gap: var(--gap); align-content: center; justify-content: center; }
+.gu-bag-equipment { display: flex; align-items: center; gap: 12px; color: var(--gold-bright); min-width: 0; }
+.gu-bag-equipment > div { display: grid; gap: 2px; }
+.gu-bag-equipment > div > span { font-size: 12px; color: var(--paper); }
 .gu-slots { display: grid; grid-template-columns: repeat(9, var(--card)); gap: var(--gap); }
 /* The quick row sits on a shelf of its own, each card marked with its number key. */
 .gu-slots-quick { margin: -10px; padding: 12px 10px 10px; border-radius: 18px; background: rgb(240 212 138 / 0.06); box-shadow: inset 0 0 0 1px rgb(211 188 142 / 0.25); }

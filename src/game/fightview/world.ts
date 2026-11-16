@@ -83,6 +83,7 @@ export function createWorldFights(view: GameView): void {
     // 1, 2 and 3 are the kit: a thing to set down goes in the hand, a salve is used at once.
     slot(index) {
       if (!run) return true;
+      if (run.practice) return true;
       const kind = run.fight.kitSlots()[index] ?? null;
       if (!kind) { say('That slot of your kit is empty.'); return true; }
       if (kind === 'salve') { const why = run.fight.useKit(index); if (why) say(why); return true; }
@@ -90,11 +91,13 @@ export function createWorldFights(view: GameView): void {
       return true;
     },
     // In the Wild Harvester's vault, C sends the companion to hold the arm.
-    skill() { return run?.keeper?.kind === 'harvester' ? run.keeper.hold() || true : false; },
+    skill() { return run?.practice || (run?.keeper?.kind === 'harvester' ? run.keeper.hold() || true : false); },
+    calm: () => !run?.practice,
   });
   const draw = createDraw(view, fightNow, stageNow, () => groundY(stage.center.x, stage.center.z), keys, feel, {
     label: (text, at, alpha) => hud.label(text, at, alpha),
     blighted: true,
+    companion: () => !run?.practice,
     extra(ground, _sparks, gy, _dt, clock) {
       const f = run?.fight;
       if (!f) return;
@@ -160,6 +163,7 @@ export function createWorldFights(view: GameView): void {
 
   function begin(next: RunningFight): void {
     run = next;
+    if (next.practice) sys.opening?.drivePractice(true);
     fight = next.fight;
     stage = next.stage;
     keys.use(true);
@@ -172,6 +176,7 @@ export function createWorldFights(view: GameView): void {
   }
 
   function hideCompanion(): void {
+    if (run?.practice) return;
     const kind = run?.fight.companion.def.kind;
     if (!kind) return;
     for (const [id, actor] of game.actors) {
@@ -183,6 +188,7 @@ export function createWorldFights(view: GameView): void {
   }
 
   function end(): void {
+    if (run?.practice) sys.opening?.drivePractice(false);
     run = null;
     fight = idle;
     stage = idleStage;
@@ -207,7 +213,7 @@ export function createWorldFights(view: GameView): void {
   const hear = feel.hear;
   feel.hear = (e: FightEvent) => { hear(e); hallView?.hear(e); };
   view.onFrame((dt) => {
-    const next = view.started ? api.running?.() ?? null : null;
+    const next = view.started ? api.running?.() ?? sys.opening?.practice() ?? null : null;
     if (next !== run) {
       if (run) end();
       if (next) begin(next);
@@ -237,7 +243,8 @@ export function createWorldFights(view: GameView): void {
       if (!run) return null;
       const f = run.fight, h = f.hero;
       return {
-        n: run.n, over: run.over, phase: f.phase, clock: run.keeper?.clock ?? run.hall?.clock ?? f.clock, line: run.line, companion: f.companion.def.kind, mode: f.companion.mode,
+        n: run.n, practice: run.practice ?? false, over: run.over, phase: f.phase, clock: run.keeper?.clock ?? run.hall?.clock ?? f.clock, line: run.line, companion: run.practice ? null : f.companion.def.kind, mode: f.companion.mode,
+        targets: f.targets.map(t => ({ name: t.name, x: t.x, z: t.z, guard: t.guard, full: t.full, broken: t.broken })),
         hero: { x: h.x, z: h.z, health: h.health, maxHealth: f.maxHealth, stamina: h.stamina, act: h.act, weapon: h.weapon },
         beasts: f.beasts.map((b) => ({ kind: b.def.kind, depth: b.depth, doing: b.doing, guard: b.guard, full: b.full, x: b.x, z: b.z })),
         keeper: run.keeper ? { kind: run.keeper.kind, doing: run.keeper.body.doing, heart: run.keeper.heart.guard, open: run.keeper.heart.open, won: run.keeper.won } : null,

@@ -6,7 +6,7 @@ import { CONVERSATIONS } from '../content/dialogue.ts';
 import { OPENING_TALKS, TALK } from '../content/opening.ts';
 import { BOXES, PEOPLE, SALTGATE, SPOTS } from '../content/saltgate.ts';
 import { newPlay, type Play } from '../play/harness.sim.ts';
-import { GUARD, LANDING_TIME, MORNING_HOLD, SWING_EVERY } from './index.sim.ts';
+import { GUARD, LANDING_TIME, MORNING_HOLD } from './index.sim.ts';
 import { inSaltgate, saltgateAt, saltgateHeight } from './land.sim.ts';
 
 const at = (x: number, z: number) => saltgateAt(x, z);
@@ -23,6 +23,15 @@ const goToPerson = (p: Play, who: keyof typeof PEOPLE): void => {
   p.teleport({ x: actor.pos.x - 1, z: actor.pos.z });
   p.advance(0.1);
 };
+
+/** The same aimed quick move the combat controls request, through its startup and travel. */
+function hitLid(p: Play): void {
+  const run = p.sys.opening.practice()!, target = run.fight.targets[0]!;
+  run.fight.input.aimX = target.x;
+  run.fight.input.aimZ = target.z;
+  expect(p.sys.opening.swing()).toBe(true);
+  p.advance(0.6);
+}
 
 /** A new game with the film over and the hero in the bunk room, as the opening's view leaves it. */
 function wake(): Play {
@@ -76,8 +85,7 @@ function play(p: Play, stop?: string): void {
   if (done()) return;
   goToPerson(p, 'dax');
   for (let i = 0; i < GUARD; i++) {
-    p.advance(SWING_EVERY + 0.1);
-    expect(p.sys.opening.swing()).toBe(true);
+    hitLid(p);
   }
   p.advance(0.1);
   p.talkThrough();
@@ -179,18 +187,24 @@ describe('grant day', () => {
     expect(p.game.flags.is(FLAG.scene(3))).toBe(false);
   });
 
-  test('a swing too soon after the last is taken on the lid, and a swing from across the yard reaches nothing', () => {
+  test('repeated presses cannot bypass weapon startup, and a shot outside range reaches nothing', () => {
     const p = wake();
     play(p, 'spar');
     goToPerson(p, 'dax');
     expect(p.sys.opening.bout()).toEqual({ on: true, guard: GUARD });
-    p.advance(SWING_EVERY + 0.1);
+    const fight = p.sys.opening.practice()!.fight, target = fight.targets[0]!;
+    fight.input.aimX = target.x;
+    fight.input.aimZ = target.z;
     expect(p.sys.opening.swing()).toBe(true);
-    expect(p.sys.opening.swing()).toBe(false);
+    expect(p.sys.opening.swing()).toBe(true);
+    expect(p.sys.opening.bout().guard).toBe(GUARD);
+    p.advance(0.6);
     expect(p.sys.opening.bout().guard).toBe(GUARD - 1);
-    goTo(p, SPOTS.rack.x + 1, SPOTS.rack.z);
-    p.advance(SWING_EVERY + 0.1);
-    expect(p.sys.opening.swing()).toBe(false);
+    p.teleport({ x: target.x, z: target.z + 22 });
+    p.advance(0.1);
+    expect(p.sys.opening.swing()).toBe(true);
+    p.advance(1);
+    expect(p.sys.opening.bout().guard).toBe(GUARD - 1);
     expect(p.game.flags.is(FLAG.scene(4))).toBe(false);
   });
 
@@ -208,8 +222,7 @@ describe('grant day', () => {
     const p = wake();
     play(p, 'spar');
     goToPerson(p, 'dax');
-    p.advance(SWING_EVERY + 0.1);
-    p.sys.opening.swing();
+    hitLid(p);
     const q = p.reload();
     q.advance(0.1);
     expect(q.game.flags.get(FLAG.questStep('grantday'))).toBe('spar');

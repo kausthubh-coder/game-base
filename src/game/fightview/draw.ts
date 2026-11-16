@@ -50,6 +50,8 @@ export interface Draw {
 }
 
 export interface DrawHooks {
+  /** Safe practice draws the hero and target without granting a companion. */
+  companion?(): boolean;
   /** The name of a gift over the page, or none when `at` is null. */
   label(text: string, at: ScreenPoint | null, alpha: number): void;
   /** The Stag's hall, or null in the meadow: no meadow edge is drawn, and the marks lie where the hall says. */
@@ -173,6 +175,8 @@ export function createDraw(view: GameView, fight: Fight, stage: Stage, floorAt: 
   }
 
   function drawCompanion(dt: number): void {
+    companionFigure.visible = hooks.companion?.() ?? true;
+    if (!companionFigure.visible) return;
     const c = fight.companion, j = feel.companion;
     if (c.def.kind !== companionKind) {
       companionKind = c.def.kind;
