@@ -19,6 +19,7 @@ import { mkdirSync, rmSync, writeFileSync, readFileSync, existsSync, readdirSync
 import { resolve } from 'node:path';
 import { firstnightFrame, firstnightIssues, settleDialogue } from './lib/firstnight-framing.mjs';
 import { splitCues } from '../src/game/talk/cues.sim.ts';
+import { cameraStill } from './play/wait.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 import { CONVERSATIONS } from '../src/game/content/dialogue.ts';
 import { QUESTS, satisfy } from '../src/game/content/quests.ts';
@@ -157,14 +158,15 @@ async function playLines(label, shotName, expectedScene) {
   }
   const cleanup = await page.evaluate(async()=>{
     const g=window.__game;await g.frames(30);
-    return {active:g.view.game.systems.talk.active,busy:g.view.game.player.busy,stages:[...g.view.game.actors.keys()].filter(id=>id.startsWith('stage:')),yaw:g.view.camera.yaw};
+    return {active:g.view.game.systems.talk.active,busy:g.view.game.player.busy,stages:[...g.view.game.actors.keys()].filter(id=>id.startsWith('stage:')),yaw:g.view.camera.yaw,ask:g.view.game.systems.opening.asking(),openingStage:g.view.game.systems.opening.stage(),deedVisible:!!document.querySelector('[data-key="deed:sign"]')?.checkVisibility(),riverVisible:!!document.querySelector('[data-key="river:skip"]')?.checkVisibility()};
   });
   writeFileSync(resolve(out,shotName.replace('.png','-cleanup.json')),JSON.stringify(cleanup,null,2));
   if(args.includes('--dialogue-hud')) {
     const hud=await heartstoneHUD();writeFileSync(resolve(out,shotName.replace('.png','-cleanup.hud.json')),JSON.stringify(hud,null,2));
     if(!hud.present || (hud.heartSeen && !hud.visible))problems.push('Heartstone HUD did not return after dialogue cleanup');
   }
-  if(cleanup.active || cleanup.busy || cleanup.stages.length) problems.push('scene end did not release stage and controls');
+  const handoff = (expectedScene === 5 && cleanup.ask === 'deed' && cleanup.deedVisible) || (expectedScene === 6 && cleanup.openingStage === 'ferry' && cleanup.riverVisible);
+  if(cleanup.active || (cleanup.busy && !handoff) || cleanup.stages.length) problems.push('scene end did not release stage and controls or reach its opening handoff');
   return problems;
 }
 
@@ -264,18 +266,23 @@ if (part !== 'scenes') {
   })()`));
 
   // The Hall of the Shut Door at night: through the door, across the court, to the plinth and back (hall-occlusion).
-  await place('the Hall of the Shut Door', 'place-hall.png', new Function(`return (async () => {
-    const look = ${looks};
-    const g = window.__game; g.newGame(); g.skipTo('night'); g.setTime(0.9);
-    const problems = [];
-    for (const name of ['shut.door', 'hall.door', 'hall.heart', 'hall.mural', 'hall.custodian', 'hall.door']) {
-      g.teleport(name); await g.frames(40);
-      if (g.view.game.systems.talk.active) g.view.game.systems.talk.skip();
-      await g.frames(10);
-      problems.push(...look(name));
+  await fresh();
+  await page.evaluate(() => { const g=window.__game; g.newGame(); g.skipTo('night'); g.setTime(0.9); });
+  const hallProblems = [];
+  for (const name of ['shut.door', 'hall.door', 'hall.heart', 'hall.mural', 'hall.custodian', 'hall.door']) {
+    await page.evaluate(name => window.__game.teleport(name), name);
+    await cameraStill(page);
+    await page.evaluate(() => { const t=window.__game.view.game.systems.talk; if(t.active)t.skip(); });
+    await cameraStill(page);
+    const sight = await page.evaluate(() => window.__game.sight());
+    writeFileSync(resolve(out, 'hall-'+name+'-'+hallProblems.length+'.json'), JSON.stringify(sight,null,2));
+    for (const body of sight) {
+      if(body.hiddenBy) hallProblems.push(name+': '+body.who+' is hidden by '+body.hiddenBy);
+      if(!body.inFrame) hallProblems.push(name+': '+body.who+' is out of the frame');
     }
-    return problems;
-  })()`));
+  }
+  await page.screenshot({path:resolve(out,'place-hall.png')});
+  report('the Hall of the Shut Door',hallProblems);
 
   // The gearling at the old mill: the fight starts, and the hero and the gearling stay in sight (mill-occlusion).
   await place('the gearling at the old mill', 'place-mill.png', new Function(`return (async () => {

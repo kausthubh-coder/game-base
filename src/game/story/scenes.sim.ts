@@ -62,6 +62,8 @@ export function createSceneRunner(game: Game): SceneRunner {
   const standIns: string[] = [];
   /** People of the world stepped out of sight while their stand-in plays them. */
   const away: Actor[] = [];
+  /** Originals represented by stand-ins, including people who have not arrived yet. */
+  const represented: Actor[] = [];
   /** True while a memory has the player's own actor hidden. */
   let hidHero = false;
 
@@ -191,6 +193,7 @@ export function createSceneRunner(game: Game): SceneRunner {
       const present = game.systems.people?.get(one.who);
       if (!one.exact && present && distance2d(present.pos, { x, y: centre.y, z }) <= PRESENT) continue;
       const real = game.actors.get(`npc:${one.who}`);
+      if (real) represented.push(real);
       if (real?.visible) {
         real.visible = false;
         away.push(real);
@@ -221,6 +224,7 @@ export function createSceneRunner(game: Game): SceneRunner {
     standIns.length = 0;
     for (const actor of away) actor.visible = true;
     away.length = 0;
+    represented.length = 0;
     const hero = game.actors.get('player');
     if (hidHero && hero) hero.visible = true;
     hidHero = false;
@@ -241,6 +245,11 @@ export function createSceneRunner(game: Game): SceneRunner {
   return {
     system: {
       step(dt) {
+        // Presence can reveal a newly arrived person after staging. Keep their stand-in exclusive.
+        for (const actor of represented) if (actor.visible) {
+          actor.visible = false;
+          if (!away.includes(actor)) away.push(actor);
+        }
         if (player.busy || game.systems.talk?.active) {
           free = 0;
           return;

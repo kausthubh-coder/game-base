@@ -257,3 +257,24 @@ test('revisiting the Pump memory stages Auren and restores the hero without anot
   expect(s.game.flags.get('keystone.1')).toBe(true);
   expect(s.game.flags.is('keystone.2')).toBe(false);
 });
+
+test('an arrival cannot reveal a second actor while a scene stand-in is speaking', () => {
+  const s = stage();
+  const template = s.game.actors.get('npc:tamsin')!;
+  const hobb = { ...template, id: 'npc:hobb', pos: { ...template.pos, x: 100 }, visible: false };
+  const dax = { ...template, id: 'npc:dax', pos: { ...template.pos, x: 102 }, visible: false };
+  s.game.actors.set(hobb.id, hobb);
+  s.game.actors.set(dax.id, dax);
+  s.game.systems.talk.start('scene.18');
+  expect(s.game.actors.get('stage:hobb')?.visible).toBe(true);
+  expect(s.game.actors.get('stage:dax')?.visible).toBe(true);
+  // The people system publishes a newly arrived person on its next rules tick.
+  hobb.visible = true;
+  s.run(0.05);
+  expect(hobb.visible).toBe(false);
+  expect(dax.visible).toBe(false);
+  s.through();
+  expect(hobb.visible).toBe(true);
+  expect(dax.visible).toBe(false);
+  expect(s.game.actors.has('stage:hobb')).toBe(false);
+});

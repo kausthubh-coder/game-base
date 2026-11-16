@@ -525,7 +525,7 @@ async function desktop(browser) {
     inv.selected = slot > 8 ? 8 : slot;
     const placed = g.click('secondary', x, y, z).used;
     g.advance(0.2);
-    return { placed, prompt: g.state().prompt };
+    return { placed, prompt: g.state().prompt, id: g.view.game.systems.placeables.at(x,y+1,z)?.id ?? null };
   });
   if (bench.prompt === 'Craft') await key('e');
   check('E at a workbench opens the Make panel', bench.placed && bench.prompt === 'Craft' && (await panel()) === 'make', JSON.stringify(bench));
@@ -557,6 +557,8 @@ async function desktop(browser) {
   check('Esc goes back to pause, then to the game', (await panel()) === null);
 
   // ------------------------------------------------------------------ 7. the keys the hints name
+  // Remove this test's supplied bench before testing walking through the same space.
+  if (bench.id) await game(id => window.__game.view.game.systems.placeables.remove(id), bench.id);
   await keysTheHintsName(t);
 
   // ------------------------------------------------------------------ 8. the end card
