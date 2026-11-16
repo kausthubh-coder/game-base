@@ -1,5 +1,5 @@
 import {test,expect} from 'bun:test';
-import {holdFirstnightBlock} from './firstnight-input.mjs';
+import {holdFirstnightBlock} from '../lib/firstnight-input.mjs';
 const cell=[20,22,-225];
 const target=(x=10)=>({block:19,aim:[...cell],at:{x,y:20}});
 function browser(samples) {
