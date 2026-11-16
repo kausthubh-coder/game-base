@@ -58,3 +58,36 @@ Preview: `https://mac-mini.taile36082.ts.net:15796/`, local server 5796, PID 342
 - Run `maintain-verification-skill` against `.agents/skills/verify-game` after the changed input/browser flows stabilize. Source audit and live coverage are still pending; no clean maintenance verdict claimed. Update only that skill's owned documentation and harness during its maintenance run.
 - Loading screen and startup measurements are the next independent implementation slot. Audio, NPC placement, bridge presentation and remaining player-facing issues follow the active blockers. Broader architecture experiments remain above in the deferred queue.
 - Storage follow-up: coordinator read the completed cleanup thread and `/Users/dabot/box/reports/game-storage-after-2026-11-16.json`. The prior cleanup preserved paths and used APFS copy-on-write duplicate consolidation. Fresh local samples on this pass showed about 18 GiB free and admitted two jobs. The mobile owner subsequently removed only its newly created duplicate historical-artifact snapshot and empty failed outputs. Cleanup logs remain; the correct source snapshot and runtimes remain intact. Review branches and dependencies before further cleanup; never clear `.artifacts` as cache or use folder totals as physical allocated space.
+
+
+## First-half release checkpoint
+
+Stopped at the user's budget boundary request on 16 November. The last user-provided weekly reading was 29%; the requested stop is 24% remaining. No current meter is exposed by the available tools, and the follow-up reading is unanswered. No claim that the account reached 24% is made.
+
+No public push or deployment occurred. The existing private preview remains running unchanged. Local release candidate `release/act1-first-half-beta` is in `/Users/dabot/.t3/worktrees/game-base/act1-beta-release`; the complete story history and evidence remain on `act1`.
+
+- Opening audio: immediate output gate9b0c2ff9 passes68 focused checks and four strict browser cases, including natural completion, Skip, initial load failure and delayed Skip.
+- First-half beta label:620d8323 identifies the supported story boundary as Lamp Gallery. It does not hard-lock later content; later chapters are explicitly unfinished.
+- Full verification: nine ordinary parts passed on the audio/title build; cloud, sight and slow checks failed. All six approved comparisons remained unchanged and the wrapper restored every protected output directory byte-for-byte.
+- Visitor duplication: e64f6dca keeps original NPCs hidden while their scene stand-ins speak, including arrivals during the scene. Original regression failed;13 story tests and scene18 browser checks now pass. Focused scenes5/6 pass after the checker recognizes their real deed/ferry handoffs.
+- Hall threshold: still fails body visibility. Camera settling does not fix it. The captured ray intersects the Hall frame mesh within the sight rule's0.9m guard, at body heights0.4/0.7. Model steps/ring overlap the walk height. No geometry or global cutaway change was made.
+- Cloud checker: skipping the opening film alone is insufficient; the first Hobb conversation still owns input. Preserve the failure and finish that actual conversation before retrying Account. No account implementation defect established.
+- UI movement checker: its supplied workbench obstructs a later movement probe. Owned-fixture cleanup was added in e64f6dca but has not been reverified.
+- Final end-to-end replay remains required. The old `play-act1.mjs` still assumes control at the grant immediately after the opening; do not label it as a current whole-first-half proof. Existing earned chapter evidence through Gallery remains intact.
+
+Release preparation excludes the large local artifact archive while preserving origin/main evidence and the raw test fixtures. The release marker points at a new source-identical baseline whose covered paths were compared byte-for-byte against the existing formal review. Candidate product source matches e64f6dca; formal-sync and checkout doctor pass. No release acceptance is claimed. All owned test/build/browser jobs ended; the protected private preview remains.
+
+Evidence: `.artifacts/first-half-beta-release/`, `.artifacts/opening-audio-browser/immediate-gate-final/`, `.artifacts/beta-preview-verification/first-half-release-01/`, and the release checkout's `.artifacts/cloud-save/`.
+
+
+## Release resumed, 16 November
+
+The user authorized finishing and releasing the first-half beta. Weekly usage remains user-reported; the current reading was requested again.
+
+Cloud save now passes all four actual two-browser cases after the checker finishes Hobb's wake conversation with E. Account and cloud product code did not change. Evidence is `.artifacts/cloud-save/` on act1. An attempted Bun syntax check ran the tool because Bun does not support Node's `--check`; that invocation built and ran the diagnostic, and its owned server/browser closed normally. Immutable release runtimes and the private preview were untouched.
+
+Hall repair b1b07359 removes raised stone across the flat walking entrance. The original sight checker passes all three places; the coordinator inspected the Hall image and reran the four focused geometry checks.
+
+UI movement diagnosis: the old probe crosses the pitched tent, not a missing movement binding. The actual A trace stalls near x=-15.3, z=-232.5; `clearCampTent` resolves (-16.3,22,-232.5) to (-15.3019,22,-232.6508). The supplied UI fixture now checks movement on clear ground east/north of the tent with the same distance assertions. Red traces are in the release checkout's `.artifacts/ui-movement-red/` and `ui-movement-probe.log`.
+
+A fresh title-to-Gallery chain is being connected from the existing ten earned-input runners. Every stage must consume the preceding stage's new raw save. No accepted historical checkpoint will substitute for this final chain. Full Act 1 beyond Gallery remains unfinished.

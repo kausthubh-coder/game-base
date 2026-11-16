@@ -559,6 +559,13 @@ async function desktop(browser) {
   // ------------------------------------------------------------------ 7. the keys the hints name
   // Remove this test's supplied bench before testing walking through the same space.
   if (bench.id) await game(id => window.__game.view.game.systems.placeables.remove(id), bench.id);
+  // The pitched tent now occupies the old walking probe west of the plot center.
+  // This supplied UI fixture checks key direction on clear ground, not tent collision.
+  await game(() => {
+    const g = window.__game, at = g.view.game.systems.region.place('grant.center').at;
+    g.teleport(at.x + 6, at.y, at.z - 4);
+    g.advance(0.2);
+  });
   await keysTheHintsName(t);
 
   // ------------------------------------------------------------------ 8. the end card
