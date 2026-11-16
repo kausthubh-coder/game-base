@@ -555,3 +555,30 @@ test('clear and dispose leave nothing in the scene', async () => {
   r.sprites.dispose();
   expect(r.ctx.scene.children.length).toBe(0);
 });
+
+test('painted feet keep the physical body light across slopes, stationary height changes and caves', async () => {
+  // Recorded outdoor blink: drawn feet 23.398 while the body stands at 24.
+  const world = {
+    ...flatWorld,
+    heightAt: () => 30,
+    skyLightAt: (x: number, y: number) => x < 0 ? (y >= 24 ? 15 : 0) : (y < 30 ? 2 : 15),
+    blockLightAt: (x: number, y: number) => x >= 0 && y >= 24 ? 11 : 0,
+  };
+  const r = await rig(world);
+  const hero = r.sprites.add('hero', { x: -18.5, y: 23.398, z: -214.954, lightY: 24 });
+  expect(r.slot(0).y).toBeCloseTo(23.398, 4);
+  expect(r.slot(0).sky).toBe(1);
+  hero.setPosition(-18.5, 23.398, -214.954, 23);
+  expect(r.slot(0).sky).toBe(0);
+  hero.setPosition(-18.5, 23.398, -214.954, 24);
+  expect(r.slot(0).sky).toBe(1);
+  r.step();
+  expect(r.slot(0).sky).toBe(1);
+  // A roof at 30 must not pull the sample above the cave's physical feet.
+  hero.setPosition(2, 23.398, 0, 24);
+  expect(r.slot(0).sky).toBeCloseTo(2 / 15, 6);
+  expect(r.slot(0).lamp).toBeCloseTo(11 / 15, 6);
+  hero.remove();
+  r.sprites.add('hero', { x: -18.5, y: 23.398, z: -214.954, lightY: 24 });
+  expect(r.slot(0).sky).toBe(1);
+});

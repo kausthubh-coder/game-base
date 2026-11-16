@@ -36,6 +36,8 @@ export interface Actor {
   /** A sprite name from public/assets/manifest.json. */
   sprite: string;
   pos: Vec3;
+  /** Physical feet for lighting when pos follows the painted surface. Defaults to pos.y. */
+  lightY?: number;
   /** The way it faces, in radians around the up axis. 0 faces north (-z), and it turns clockwise seen from above. */
   facing: number;
   /** An animation name from the manifest, usually `idle` or `walk`. */

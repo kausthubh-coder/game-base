@@ -64,6 +64,7 @@ interface Shown {
   sprite: string;
   /** Where it is drawn. It glides after the actor, which moves 20 times a second. */
   x: number; y: number; z: number;
+  lightY: number;
   seen: number;
 }
 
@@ -115,11 +116,12 @@ export function createActorSprites(sprites: Sprites): ActorSprites {
         // position has that in it already.
         const sitting = actor.anim === 'sit';
         const py = (actor.id === 'player' ? p.y : p.y + lift(p.x, p.y, p.z)) - (sitting ? SIT_DROP : 0);
+        const lightY = actor.lightY ?? p.y;
         const anim = sitting ? 'idle' : actor.anim;
         if (!s) {
-          const options = { x: p.x, y: py, z: p.z, facing: actor.facing, animation: anim, visible };
+          const options = { x: p.x, y: py, z: p.z, lightY, facing: actor.facing, animation: anim, visible };
           const handle = sprites.add(actor.sprite, options);
-          s = { handle, sprite: actor.sprite, x: p.x, y: py, z: p.z, seen: pass };
+          s = { handle, sprite: actor.sprite, x: p.x, y: py, z: p.z, lightY, seen: pass };
           shown.set(actor.id, s);
         }
         s.seen = pass;
@@ -128,9 +130,10 @@ export function createActorSprites(sprites: Sprites): ActorSprites {
         const k = actor.id === 'player' || far ? 1 : ease;
         const dx = (p.x - s.x) * k, dy = (py - s.y) * k, dz = (p.z - s.z) * k;
         // A sprite that stands still is not written again, so a crowd at rest costs nothing.
-        if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) > 1e-4) {
+        if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) > 1e-4 || lightY !== s.lightY) {
           s.x += dx; s.y += dy; s.z += dz;
-          s.handle.setPosition(s.x, s.y, s.z);
+          s.lightY = lightY;
+          s.handle.setPosition(s.x, s.y, s.z, lightY);
         }
         s.handle.setFacing(actor.facing);
         s.handle.play(anim);

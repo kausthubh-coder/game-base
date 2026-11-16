@@ -93,6 +93,7 @@ export function createPlayer(game: Game, world: World, keys: Keys, spawn: Vec3, 
       p.facing = body.facing;
     }
     actor.facing = body.facing;
+    actor.lightY = body.y;
     // The swing is its own sheet, in the hero's style and seen from every side. The hero sheet's tool row is
     // drawn in another style and to one side only, so it is never played.
     const swinging = breaking !== null && speed < MOVING;

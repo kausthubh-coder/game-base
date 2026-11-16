@@ -35,6 +35,8 @@ export interface AddOptions {
   x?: number;
   y?: number;
   z?: number;
+  /** Physical feet height for lighting when the drawing follows a smoothed surface. Defaults to y. */
+  lightY?: number;
   /** The way the character faces, in radians. 0 is north (-z), a quarter turn is east (+x). Default: south. */
   facing?: number;
   /** The animation to start in. Default `idle`, or the sprite's first. It starts at a random point in its loop. */
@@ -56,8 +58,8 @@ export interface PlayOptions {
 
 /** One character. After `remove` every method does nothing. */
 export interface SpriteHandle {
-  /** Where the feet are. */
-  setPosition(x: number, y: number, z: number): void;
+  /** Drawn feet and, optionally, physical feet used to sample light. */
+  setPosition(x: number, y: number, z: number, lightY?: number): void;
   /** The way the character faces, in radians. 0 is north (-z), a quarter turn is east (+x). */
   setFacing(radians: number): void;
   /**
@@ -448,7 +450,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     const o = h.index * STRIDE;
     const x = data[o + PLACE], y = data[o + PLACE + 1], z = data[o + PLACE + 2];
     // The middle of the block the feet are in.
-    const lightY = y + 0.5;
+    const lightY = h.lightY + 0.5;
     const skyLight = (splitLight ? splitLight.skyLightAt(x, lightY, z) : world.lightAt(x, lightY, z)) / 15;
     const lampLight = splitLight ? splitLight.blockLightAt(x, lightY, z) / 15 : 0;
     const top = world.heightAt(x, z);
@@ -494,13 +496,16 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     get frame(): number { return frameAt(clock.now - this.start, this.anim.frames, this.anim.fps, this.loop); }
     get finished(): boolean { return !this.loop && clock.now - this.start >= loopSeconds(this.anim.frames, this.anim.fps); }
 
-    setPosition(x: number, y: number, z: number): void {
+    lightY = 0;
+
+    setPosition(x: number, y: number, z: number, lightY = y): void {
       if (this.index < 0) return;
       const o = this.index * STRIDE;
       data[o + PLACE] = x;
       data[o + PLACE + 1] = y;
       data[o + PLACE + 2] = z;
-      const cellX = Math.floor(x), cellY = Math.floor(y + 0.5), cellZ = Math.floor(z);
+      this.lightY = lightY;
+      const cellX = Math.floor(x), cellY = Math.floor(lightY + 0.5), cellZ = Math.floor(z);
       if (cellX !== this.cellX || cellY !== this.cellY || cellZ !== this.cellZ) {
         this.cellX = cellX;
         this.cellY = cellY;
@@ -760,7 +765,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
       data[o + LIGHT + 2] = 1;
       data[o + LIGHT + 3] = 0;
       writeSprite(h);
-      h.setPosition(addOptions.x ?? 0, addOptions.y ?? 0, addOptions.z ?? 0);
+      h.setPosition(addOptions.x ?? 0, addOptions.y ?? 0, addOptions.z ?? 0, addOptions.lightY);
       return h;
     },
 
