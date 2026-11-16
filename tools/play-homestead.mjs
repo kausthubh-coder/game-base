@@ -261,7 +261,7 @@ try {
     await place('fence',10,21,-230);
     await wait(s=>s.flags['farm.moss.built']===true&&s.flags['farm.moss.living']===true,'living moss farm',5000);await shot('moss-farm');
     await save('earned-farm');
-    current='rooms';for(const [who,job,target] of [['hobb','The kitchen',[-13,-240]],['dax','The watch',[-23,-223]]]){
+    current='rooms';for(const [who,job,target] of [['hobb','The kitchen',[-13,-240]],['dax','The watch',[-19,-223]]]){
       if((await read()).flags['choice.'+who])continue;
       const at=await page.evaluate(who=>window.__game.view.game.actors.get('npc:'+who)?.pos,who);must(at,'settler actor '+who);
       await walk(at.x,at.z,.3);await wait(s=>s.prompt==='Talk to '+(who==='hobb'?'Hobb':'Dax'),'resident prompt '+who,3000);await press('KeyE');await shot(who+'-card');await click(`[data-job="${who==='hobb'?'kitchen':'watch'}"]`);
