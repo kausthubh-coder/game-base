@@ -111,6 +111,8 @@ export interface GameEvents {
   'night.started': { day: number };
   /** The player slept to the next morning. `skipped` is the seconds of game time the night skipped, for systems that catch up. */
   slept: { day: number; skipped: number };
+  /** Daylight passed at camp on the same day. Crops catch up without morning effects. */
+  waited: { skipped: number };
   'placeable.placed': { kind: string; x: number; y: number; z: number };
   // building
   /** Build mode went on or off. */
@@ -511,6 +513,8 @@ export interface TimeApi {
   canSleep(): boolean;
   /** Skips to the next morning. Crops, creatures and people catch up. */
   sleep(): void;
+  /** Passes daylight until this evening. Returns false at night or while busy. */
+  waitUntilDusk(): boolean;
   /**
    * Forces the weather for a scripted moment, or `null` to let it run. The weather comes in as a front, over
    * most of a minute. `now` settles a kind at once with no front, for a moment that skips time.

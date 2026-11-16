@@ -2,9 +2,12 @@
 import type { Vec3 } from '../../engine/types.ts';
 import type { Game } from '../api.sim.ts';
 import { BRAMBLES, CAMP } from '../content/region.ts';
+import { isDark } from '../quests/rules.sim.ts';
 
 export function joinGround(game: Game): void {
   const { flags, systems, events } = game;
+  const canWait = () => flags.is('camp.fire') && flags.is('quest.night.started') && !flags.is('quest.night.done')
+    && flags.get('quest.night.step') === 'bed' && !game.player.busy && !isDark(game.clock.timeOfDay);
   const work = () => flags.get('quest.ground.step') === 'camp';
   const have = (id: 'oak_log' | 'fiber', n: number) => systems.inventory.count(id) >= n;
   systems.interact.add({
@@ -38,10 +41,14 @@ export function joinGround(game: Game): void {
     pos: () => CAMP.fire,
     radius: 2.5,
     prompt: () =>
-      work() && flags.is('camp.pitched') && !flags.is('camp.fire')
+      canWait() ? 'Wait until dusk' : work() && flags.is('camp.pitched') && !flags.is('camp.fire')
         ? 'Light your fire (1 log)'
         : null,
     act: () => {
+      if (canWait()) {
+        if (systems.time.waitUntilDusk()) events.emit('toast', { text: 'Dusk settles over camp.' });
+        return;
+      }
       if (!work() || !flags.is('camp.pitched') || flags.is('camp.fire')) return;
       if (!have('oak_log', 1)) {
         events.emit('toast', { text: 'Gather a log for the fire.' });

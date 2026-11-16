@@ -59,6 +59,7 @@ export function makeStage(seed = 1, save?: GameSave): Stage {
   const clock: TimeApi = {
     dayLength: 1200,
     canSleep: () => time.canSleep,
+    waitUntilDusk: () => false,
     sleep: () => void time.slept++,
     setWeather: () => {},
     setTimeOfDay: () => {},

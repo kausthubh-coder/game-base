@@ -6,6 +6,7 @@ import { calmNoon, type Vec3 } from '../../engine/types.ts';
 import type { WeatherKind } from '../../content/weather.ts';
 import { DAY_SECONDS, dayPartAt, daySecondAt, timeOfDayAt } from '../../features/weather/clock.sim.ts';
 import { CAMP } from '../content/region.ts';
+import { DUSK } from '../quests/rules.sim.ts';
 import { footprint } from '../content/placeables.ts';
 import { createWeather, type Weather } from '../../features/weather/weather.sim.ts';
 import type { Game, SimSystem, TimeApi } from '../api.sim.ts';
@@ -212,6 +213,14 @@ export function createTime(game: Game): Time {
         fallingAsleep = false;
         sleepNow();
       });
+    },
+
+    waitUntilDusk() {
+      if (fallingAsleep || game.player.busy || clock.timeOfDay < DAWN || clock.timeOfDay >= DUSK) return false;
+      const before = seconds;
+      api.setTimeOfDay(DUSK);
+      events.emit('waited', { skipped: seconds - before });
+      return true;
     },
 
     setSleepCurtain(next) {

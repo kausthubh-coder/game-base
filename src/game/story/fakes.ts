@@ -224,6 +224,7 @@ export function stage(options: { story?: boolean; quests?: readonly QuestDef[] }
     time: {
       dayLength: 1200,
       canSleep: () => true,
+      waitUntilDusk: () => false,
       sleep() {
         game.clock.day += 1;
         game.clock.timeOfDay = 0.27;

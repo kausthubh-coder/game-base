@@ -366,3 +366,16 @@ test('save then load keeps a half-grown crop', () => {
   run(again.kernel, 0.2);
   expect(again.crops.at(4, Y, 4)?.stage).toBe(2);
 });
+
+test('waiting grows kept soil for the elapsed time and preserves the can water remaining', () => {
+  const t = setup();
+  sow(t, 4, 4); ditch(t, 5, 4);
+  sow(t, 8, 8); t.crops.water(8, Y, 8);
+  t.game.events.emit('waited', { skipped: 60 });
+  expect(t.crops.at(8, Y, 8)?.wet).toBeCloseTo(120, 6);
+  expect(t.crops.at(4, Y, 4)?.stage).toBe(0);
+  t.game.events.emit('waited', { skipped: 400 });
+  expect(t.crops.at(4, Y, 4)?.stage).toBe(1);
+  expect(t.crops.at(8, Y, 8)).toMatchObject({ stage: 0, wet: 0 });
+  expect(t.heard).not.toContain('slept');
+});

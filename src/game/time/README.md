@@ -19,6 +19,7 @@ The API:
 | `dayLength` | 1,200 seconds of real time: 20 minutes. |
 | `canSleep()` | True when the time of day is 0.66 or later, or before 0.23, a `bed` station stands within 4 blocks of the player, and a block is over the player or over that bed. A bed fills its block, so the player stands beside it. One block over the bed is the whole roof the quest asks for. |
 | `sleep()` | Jumps to 0.27 of the next day, then sends `day.started` and `slept`. It does not ask `canSleep()` first. The caller does. |
+| `waitUntilDusk()` | Passes daylight until 0.73 on the same day. Refuses while busy, falling asleep or already dark. The first-night campfire offers it while waiting for the visitor. Sends `waited` for crop growth, then the next normal step announces dusk. |
 | `setWeather(kind, now?)` | Holds a kind of weather until the next call. `null` hands the weather back. With `now` set to true the kind is there at once with no front, and the ground with it: soaked in rain, dry otherwise. The festival uses it after the player waits out the afternoon. `now` is new in the contract. |
 | `setTimeOfDay(t)` | Moves the dial to `t` on the same day. Use `sleep()` to reach the next morning. |
 | `onThunder(listener)` | Calls the listener with the place of each lightning strike, later for a far strike. It returns a function that stops it. This is new in the contract. |
@@ -42,6 +43,7 @@ The weather:
 |---|---|
 | `day.started { day }` | Once for each day, on the first step of the day: at dawn, or right after `sleep()`. Day 1 gets one too, on the first step of a new game. |
 | `night.started { day }` | Once for each day, when dusk begins at 0.73, or on the first step after `setTimeOfDay` jumps past it. A day that ends in `sleep()` before dusk gets none. |
+| `waited { skipped }` | After waiting at camp. Crops grow for the elapsed seconds and remaining water is retained. It does not run morning or sleep effects. |
 | `slept { day }` | After `sleep()`, with the new day, after `day.started`. Crops and creatures catch up when they hear it. |
 
 ## Wiring

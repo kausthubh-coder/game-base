@@ -5,7 +5,7 @@ import type { World } from '../../features/world/world.sim.ts';
 import type { GameEvents } from '../api.sim.ts';
 import { FLOOR, flatStage, installFakes } from '../crafting/fakes.ts';
 import { createKernel, type Kernel } from '../kernel.sim.ts';
-import { DAY_LENGTH, install } from './index.sim.ts';
+import { DAY_LENGTH, install, type TimeWithCurtain } from './index.sim.ts';
 
 function setup(world: World = flatStage(), seed = 7) {
   const kernel = createKernel(world, seed);
@@ -349,4 +349,40 @@ test('a save from a clear day 1 loads clear, and a save from day 3 keeps the wea
   second.kernel.load(late);
   expect(second.game.clock.day).toBe(3);
   expect(second.game.ambient.cloud).toBeCloseTo(weatherTable.overcast.cloud, 5);
+});
+
+test('waiting reaches this dusk once without sleeping or advancing the day', () => {
+  const t = setup();
+  t.kernel.step();
+  t.time.setTimeOfDay(.5);
+  const before = { ...t.game.clock }, waited: number[] = [];
+  t.game.events.on('waited', ({ skipped }) => waited.push(skipped));
+  expect(t.time.waitUntilDusk()).toBe(true);
+  expect(t.game.clock.timeOfDay).toBeCloseTo(.73, 9);
+  expect(t.game.clock.day).toBe(before.day);
+  expect(t.game.clock.seconds).toBeGreaterThan(before.seconds);
+  expect(waited).toEqual([t.game.clock.seconds - before.seconds]);
+  expect(t.slept).toEqual([]);
+  expect(t.nights).toEqual([]);
+  expect(t.time.waitUntilDusk()).toBe(false);
+  run(t.kernel, 1);
+  expect(t.nights).toEqual([before.day]);
+  expect(waited).toHaveLength(1);
+});
+
+test('waiting cannot skip an active interaction, a sleep curtain, or the night', () => {
+  const t = setup();
+  t.game.player.busy = true;
+  expect(t.time.waitUntilDusk()).toBe(false);
+  t.game.player.busy = false;
+  for (const hour of [.73, .9, .1]) {
+    t.time.setTimeOfDay(hour);
+    const before = { ...t.game.clock };
+    expect(t.time.waitUntilDusk()).toBe(false);
+    expect(t.game.clock).toEqual(before);
+  }
+  (t.time as TimeWithCurtain).setSleepCurtain(() => {});
+  t.time.sleep();
+  t.time.setTimeOfDay(.5);
+  expect(t.time.waitUntilDusk()).toBe(false);
 });

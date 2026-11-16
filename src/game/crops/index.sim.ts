@@ -315,19 +315,21 @@ export function createCrops(game: Game): Crops {
     }
   });
 
-  // A night's sleep: the skipped seconds run at once. Soil a ditch or a sprinkler keeps wet grows all night; soil
-  // the can or the rain wet grows for as long as its water lasted. Then the can's water is gone by morning.
-  events.on('slept', ({ skipped }) => {
+  // Skipped time grows kept soil throughout, and can-watered soil for as long as its water lasts.
+  // Sleep dries the remaining can water by morning; waiting during the day retains what is left.
+  function catchUp(skipped: number, slept: boolean): void {
     waterFromMachines();
     for (let i = soilList.length - 1; i >= 0; i--) {
       const soil = soilList[i];
       const crop = soil.crop;
       if (crop) growFor(crop, (soil.kept ? skipped : Math.min(soil.wet, skipped)) * soil.rate);
-      if (!soil.kept) soil.wet = 0;
+      if (!soil.kept) soil.wet = slept ? 0 : Math.max(0, soil.wet - skipped);
       if (crop) crop.state.wet = soil.wet;
       else if (soil.wet <= 0) forget(soil);
     }
-  });
+  }
+  events.on('slept', ({ skipped }) => catchUp(skipped, true));
+  events.on('waited', ({ skipped }) => catchUp(skipped, false));
 
   const system: SimSystem = {
     step(dt) {
