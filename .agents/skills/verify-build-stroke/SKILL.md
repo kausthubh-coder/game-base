@@ -70,7 +70,7 @@ Left out:
 - The browser's own events. The model starts at logical `use` and `letGo`, with `primary = mousePrimary || touchPrimary`. `input-contract.test.ts` checks 1,296 four-event hold sequences and targeted real-build cancellations; it does not exhaust browser event orders. `tools/play-build.mjs` checks that a right click, a lost window, the pause menu and a release over the quick slots reach the build system as the model assumes. It found one case the model could not: the pause menu took the keys before the view heard of it, and left a stroke with no button. `world-build.view.ts` now also drops, each frame, a stroke whose button is not down.
 
 
-## Scope of the latest sync
+## Earlier touch-input sync
 
 Reviewed product commit: `61d7905939fed1a1f7473d7930b19edc85402bc5`, from marker `8e7563b940d7ac962618f1126ebbaa80b912fbb0`. The only previously covered product diff is `keys.ts`. Also reviewed every change to the new `views/touch-controls.ts` and `views/ui-touch.view.ts`; coverage now tracks both paths. Details and preserved test logs are in `.artifacts/beta-input-formal/report.md`.
 
@@ -79,3 +79,14 @@ Touch adds holders upstream of the same logical press/release/cancel actions. Th
 Mixed input has deliberate limits in the mapping. A touch-first mouse press emits a second `use`; `ButtonDown` already permits repeats and `build.press()` ignores an active stroke. Direct touch cancellation preserves a mouse hold. A native touch `pointercancel` bubbles to an unfiltered window handler and can cancel that mouse hold too. This is a conservative `ButtonLost`, not preservation of independent physical holds. Likewise `freeCursor(true)` alone clears touch but leaves an unlocked mouse held; the shell's `release()` supplies the full loss. The model proves stroke safety given these logical actions, not physical device independence or one use per physical press.
 
 Story progression, navigation, combat, scene framing and inventory gains from other systems need their own checks. A build-stroke pass is never chapter acceptance.
+
+
+## Scope of the latest sync
+
+Reviewed commit `66dfb82d4edf349b591f6330f1de97f44d601655`, from marker `20881c3b1bde9ee88649feb9bddf4724a98f70bd`. The only covered change, in `335cc2c6dd383e44065805c9101e3ab1551a2ed8`, adds four lines to hide Skill and Calm during opening practice. It does not change the primary hold, release, cancellation or build calls. Any native capture loss still follows the existing conservative `ButtonLost` mapping. The model, harness, invariants and bounds are unchanged; TLC was not rerun.
+
+Evidence is retained in `.artifacts/build-stroke-66dfb82d/report.md`. The pure build/input run passed 37 tests. An isolated source copy caught all nine build mutations, and the separate adapter copy caught all four input mutations. SHA256 hashes show every covered shared file remained unchanged and the isolated sources were restored.
+
+The applicable browser checks used the immutable `dist-beta-guide-66dfb82d` runtime, verified against `.artifacts/beta-final/attempt-04/runtime-manifest.json`. `play-build.mjs --no-build` passed 38 checks. The full `play-touch.mjs` run passed 44 checks across portrait and landscape, including real touch capture loss; no `--input-only` bypass was used. The screenshots were opened and inspected. Both private browsers and the servers they started were closed. The marker names the checked source commit, not a later metadata-only commit.
+
+This sync establishes build-stroke safety under the existing assumptions. It does not verify opening combat, Skill/Calm availability during practice, all possible browser event orders, story progression or chapter acceptance.
