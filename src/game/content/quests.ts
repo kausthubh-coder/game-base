@@ -296,7 +296,7 @@ export const QUESTS: readonly QuestDef[] = [
       scene('gate', 18, 'Meet Hobb and Dax at your gate', { at: 'plot', place: 'grant.stone' }),
       kitchen('kitchen', 'do', 'Build an oven and a table: a kitchen', { at: 'plot', place: 'grant.center' }),
       kitchen('mosslings', 'watch', 'Watch the mosslings on the wet stones by your pond', { at: 'plot.pond', place: 'grant.rocks', hint: 'The field book draws their page: damp stone, shade, and they pay in moss.' }),
-      { id: 'pen', kind: 'do', text: 'Build your first farm from the page', done: { flag: FLAG.farmBuilt('moss') }, gate: true, at: 'plot', place: 'grant.rocks', hint: 'Stones in the shade, your ditch running past them. The tag over it shows its rate.' },
+      { id: 'pen', kind: 'do', text: 'Place a fence beside the shaded pond stones', done: { flag: FLAG.farmBuilt('moss') }, gate: true, at: 'plot', place: 'grant.rocks', hint: 'At your workbench, open Make and craft Fence with 2 planks and 1 fiber. Select Fence in your quick slots. Press G, or tap Build, then place it beside the shaded stones at the pond. One fence piece is enough to start. When the Mossling pen label appears, walk up and press E to check it.' },
       // The settlement's card: "E" by Hobb, pick a room, and she follows you there (src/game/settlement, `lead`).
       choice('rooms', ['hobb', 'dax'], 'Walk Hobb to her room, then Dax to his', { at: 'plot', place: 'grant.center', hint: 'Press E by Hobb for her card, pick a room, and walk her to it.' }),
       kitchen('beds', 'do', 'Stuff two more beds with moss, under a roof', { at: 'plot', place: 'grant.center' }),

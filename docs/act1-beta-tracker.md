@@ -12,6 +12,8 @@ The combined candidate now uses real weapon combat in the opening and shows equi
 
 The final continuous replay passed fresh Begin through the first morning on the previous build. Homestead gameplay completed, but its Dax approach needed a runner correction, now proven separately. These earlier records remain preserved. A new combined build and final first-half replay are still required before publication. Later chapters remain outside this release. No reliable completion time is available yet.
 
+The first-farm objective also omitted its required fence. Its text now names the fence and pond stones; its hint explains the recipe, placement and farm panel. Source verification is pending on the refreshed candidate.
+
 ## Beta blockers and active fixes
 
 | Priority | Work | Owner | Status and acceptance |
