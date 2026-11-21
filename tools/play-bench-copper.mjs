@@ -6,6 +6,8 @@ import { mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from 
 import { resolve } from 'node:path';
 import { firstnightFrame, firstnightIssues, settleDialogue } from './lib/firstnight-framing.mjs';
 import { fightPlace } from '../src/game/fights/index.sim.ts';
+import { CAMP } from '../src/game/content/region.ts';
+import { campContains, planCampRoute } from './lib/copper-camp-route.mjs';
 import { createKeyboardSteering } from './lib/keyboard-steering.mjs';
 import { launchChrome } from './lib/chrome.mjs';
 import { createHash } from 'node:crypto';
@@ -88,14 +90,27 @@ async function dialogue(name) {
  }
  throw Error(name+' never ended');
 }
+async function followCampRoute(x,z,near){
+  const goal={x,z},route=planCampRoute((await read()).player,goal,near,CAMP);
+  record({type:'camp-route',goal,near,route});
+  for(const point of route){
+    if((await read()).talk)return;
+    await straightWalk(point.x,point.z,point.near);
+  }
+  const state=await read();
+  if(!state.talk)must(Math.hypot(state.player.x-x,state.player.z-z)<near,'camp route missed original arrival');
+}
 async function walk(x,z,near=.3) {
- try { return await straightWalk(x,z,near); }
+ try { return await followCampRoute(x,z,near); }
  catch(error) {
   if(!String(error).includes('walking stuck')) throw error;
-  const path=await page.evaluate(([x,z])=>{const g=window.__game.view.game;return g.systems.nav.path(g.player.pos,{x,y:g.world.heightAt(Math.floor(x),Math.floor(z)),z},20000)},[x,z]);
+  const safe=planCampRoute((await read()).player,{x,z},near,CAMP).at(-1);
+  if(!safe)return;
+  const path=await page.evaluate(([x,z])=>{const g=window.__game.view.game;return g.systems.nav.path(g.player.pos,{x,y:g.world.heightAt(Math.floor(x),Math.floor(z)),z},20000)},[safe.x,safe.z]);
   record({type:'read-only-nav-route',goal:{x,z},path});must(path?.length,'no walkable route');
-  for(const p of path) {if((await read()).talk)return;await straightWalk(p.x,p.z,.2);}
-  return straightWalk(x,z,near);
+  // Block nav cannot see the model tent. Interior grid nodes are not player destinations.
+  for(const p of path) {if((await read()).talk)return;if(!campContains(p,CAMP))await followCampRoute(p.x,p.z,.2);}
+  return followCampRoute(x,z,near);
  }
 }
 async function straightWalk(x, z, near = 0.3) {
@@ -232,27 +247,6 @@ async function calmVisitor(){
   must(completed?.n===0&&completed.result==='won'&&completed.beasts.every(b=>b.doing==='calmed'),'ordinary visitor did not end in victory: '+JSON.stringify(completed));
   await page.waitForFunction(()=>!window.__fights.state(),null,{timeout:10000});
 }
-// Dax moves on both sides of the tent. Approach and escort him through the
-// clear outer corridors, crossing between sides north of the canvas.
-async function walkDaxRoute(x,z,near=.3){
-  const p=(await read()).player;
-  if(p.z < -227 && z > -227){
-    const side=p.x < -17 ? -22 : -10.5;
-    await walk(side,p.z,.4);
-    await walk(side,-225,.4);
-  }else if(p.z > -227 && z < -227){
-    const side=x < -17 ? -22 : -10.5;
-    await walk(side,p.z,.4);
-    await walk(side,z,.4);
-  }else if(p.z < -227 && z < -227 && (p.x < -17)!==(x < -17)){
-    const from=p.x < -17 ? -22 : -10.5,to=x < -17 ? -22 : -10.5;
-    await walk(from,p.z,.4);
-    await walk(from,-225,.4);
-    await walk(to,-225,.4);
-    await walk(to,z,.4);
-  }
-  await walk(x,z,near);
-}
 // Residents keep walking while the hero approaches. Recheck the prompt and resample after each walk.
 async function approachDax() {
   for(let i=0;i<20;i++) {
@@ -260,7 +254,7 @@ async function approachDax() {
     const at=await page.evaluate(()=>window.__game.view.game.actors.get('npc:dax').pos);
     record({type:'dax-approach',at,hero:s.player,prompt:s.prompt});
     if(s.prompt==='Talk to Dax')return;
-    await walkDaxRoute(at.x,at.z,.3);
+    await walk(at.x,at.z,.3);
   }
   throw Error('could not approach moving Dax');
 }
@@ -268,7 +262,7 @@ async function jobDax(job,target){
   await approachDax();await wait(s=>s.prompt==='Talk to Dax','Dax prompt');
   await press('KeyE');await click(`[data-job="${job}"]`);
   await page.getByRole('button',{name:/Walk Dax to/}).click();
-  record({type:'assign-job',who:'dax',job});await walkDaxRoute(...target);
+  record({type:'assign-job',who:'dax',job});await walk(...target);
   await wait(s=>s.flags['job.dax']===job,'Dax '+job);
   if((await read()).talk)await dialogue('dax-'+job);
 }
@@ -406,8 +400,7 @@ try {
   for(let i=0;i<12000;i++){const visitor=await page.evaluate(()=>window.__game.view.game.systems.fights.visitor());if(visitor){await walk(visitor.x,visitor.z,2);await calmVisitor();usedGrip=true;break;}record({type:'noninteractive-wait-advance',seconds:1,reason:'ordinary home visitor to exercise copper grip'});await page.evaluate(()=>window.__game.advance(1));await page.waitForTimeout(10);}
   must(usedGrip,'no ordinary visitor for copper grip exercise');
   await jobDax('watch',[-23,-223]);
-  // The old center route crosses the pitched tent. Return along its clear eastern side.
-  current='return-home';const home=await page.evaluate(()=>window.__game.view.game.systems.region.place('grant.center').at);await walk(home.x+5,home.z+5,.4);await walk(home.x+5,home.z,.4);await wait(s=>s.flags['farm.moss.living']===true&&s.flags['farm.quill.living']===true&&s.flags['farm.copper.living']===true,'settled home farms');await shot('16-home');const final=await save('earned-copper');
+  current='return-home';const home=await page.evaluate(()=>window.__game.view.game.systems.region.place('grant.center').at);await walk(home.x,home.z,3);await wait(s=>s.flags['farm.moss.living']===true&&s.flags['farm.quill.living']===true&&s.flags['farm.copper.living']===true,'settled home farms');await shot('16-home');const final=await save('earned-copper');
   const flags=Object.fromEntries(final.game.flags);
   must(flags['quest.bench.done']===true&&flags['quest.copper.done']===true&&flags['quest.count.started']===true&&!flags['scene.22'],'exact quest boundary');
   must(final.game.systems.bench.armor===2&&final.game.systems.bench.made.includes('quill_strip'),'gear persistence');
