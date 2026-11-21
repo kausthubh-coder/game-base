@@ -175,7 +175,7 @@ export async function main(args = process.argv.slice(2)) {
         must(!s.player.busy && !s.talkLine, 'walk blocked by dialogue/panel');
         const p = s.player;
         if (Math.hypot(p.x - goal.x, p.z - goal.z) < near) return;
-        while (at < path.length - 1 && Math.hypot(p.x - path[at].x, p.z - path[at].z) < .65) at++;
+        while (at < path.length - 1 && Math.hypot(p.x - path[at].x, p.z - path[at].z) < .28) at++;
         const t = at === path.length - 1 ? goal : path[at];
         const yaw = await page.evaluate(() => window.__game.view.camera.yaw);
         const dx = t.x - p.x, dz = t.z - p.z, len = Math.hypot(dx, dz) || 1;
@@ -186,7 +186,7 @@ export async function main(args = process.argv.slice(2)) {
         if (last && Math.hypot(p.x - last.x, p.z - last.z) < .02) stuck++; else stuck = 0;
         must(stuck < 25, 'walking stuck at ' + JSON.stringify(p));
         last = p;
-        await page.waitForTimeout(60);
+        await page.waitForTimeout(30);
       }
       throw Error('walk deadline exceeded');
     } finally { for (const key of held) await page.keyboard.up(key); }
