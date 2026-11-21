@@ -9,6 +9,7 @@ import { firstnightFrame } from './lib/firstnight-framing.mjs';
 import { openingFrame } from './lib/grantday-framing.mjs';
 import { costIssues, storyCosts } from './lib/story-cost-probe.mjs';
 import { canStartHeavy, sample } from './resource-status.mjs';
+import { weaponOf } from '../src/game/content/fight.ts';
 import { splitCues } from '../src/game/talk/cues.sim.ts';
 
 const root = resolve(import.meta.dirname, '..');
@@ -308,7 +309,32 @@ export async function main(args = process.argv.slice(2)) {
       await page.waitForTimeout(900);
       must((await read()).opening.bout.guard === 3, 'wrong aim took guard');
       await capture('wrong-aim');
-      await walk({ x: target.x, z: target.z + 22 });
+      // A fixed 22-block walk leaves this 18-block arena. Find a clear, reachable
+      // firing line beyond this weapon's quick range, using read-only world queries.
+      const quick = weaponOf(weapon).quick, outsideDistance = Math.max(quick.range, quick.reach) + 2;
+      const outside = await page.evaluate(({ target, distance }) => {
+        const v = window.__game.view, run = v.game.systems.opening.practice(), p = v.game.player.pos;
+        const candidates = [];
+        for (let i = 0; i < 32; i++) {
+          const angle = i * Math.PI / 16, x = target.x + Math.sin(angle) * distance, z = target.z + Math.cos(angle) * distance;
+          if (!run.stage.inside(x, z) || run.stage.solid(x, z)) continue;
+          let clear = true;
+          for (let step = 1; step <= Math.ceil(distance * 4); step++) {
+            const t = step / Math.ceil(distance * 4);
+            if (run.stage.solid(target.x + (x - target.x) * t, target.z + (z - target.z) * t)) { clear = false; break; }
+          }
+          if (!clear) continue;
+          const goal = { x, y: v.game.world.heightAt(Math.floor(x), Math.floor(z)), z };
+          const path = v.game.systems.nav.path(p, goal, 6000);
+          if (path?.length) candidates.push({ goal, length: path.length });
+        }
+        candidates.sort((a, b) => a.length - b.length);
+        return candidates[0]?.goal;
+      }, { target, distance: outsideDistance });
+      must(outside, 'no clear reachable out-of-range position');
+      await walk(outside, .3);
+      const outsideState = await read();
+      must(Math.hypot(outsideState.player.x - target.x, outsideState.player.z - target.z) > Math.max(quick.range, quick.reach) + 1, 'outside-range walk ended in weapon range');
       await attack(touch, cdp);
       await page.waitForTimeout(1100);
       must((await read()).opening.bout.guard === 3, 'out-of-range attack took guard');
