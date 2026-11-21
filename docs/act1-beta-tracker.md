@@ -146,3 +146,6 @@ Retry-03 starts Copper again from the accepted Greywood save using the unchanged
 
 
 Retry-03 has now accepted Copper and Gold, bringing the fresh chain to six of ten chapters. Both raw-save audits pass. Copper completed both visitor fights, restored Dax to watch and returned home; Gold completed the harvest, ledger, relit road, lynx victory, Gus return and final Continue. Echo consumes the newly earned Gold save next. Product/runtime remain unchanged; publication is still pending the remaining four chapters and full release checks.
+
+
+Retry-03 has accepted Echo, Pump House and Water uphill, reaching nine of ten chapters in the fresh chain. Their independent audits pass. Echo includes both shrine and dinner choices; Pump includes both fights, keystone, memory, Calla branches and final Continue; Water uphill includes actual machine construction, both farm choices, normal tent nights, ripe wheat harvest, delivery, Maren and Continue. Lamp Gallery now consumes the newly earned Uphill save. No product changes or public deployment occurred during this replay.
