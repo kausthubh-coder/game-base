@@ -183,7 +183,7 @@ for (const name of cast) {
   const box = new THREE.Box3().setFromObject(scene, true),
     size = box.getSize(new THREE.Vector3());
   const hero = model === 'hero',
-    painted = hero || npcNames.includes(name),
+    painted = hero || name === 'tamsin',
     divisor = painted ? 1 : 2;
   const [w, h] = source.frame.map((n) => n / divisor),
     anchor = source.anchor.map((n) => n / divisor);
@@ -241,4 +241,4 @@ for (const name of cast) {
   sprites[name] = { sheet, frame: [w, h], anchor, worldHeight: source.worldHeight, animations };
   console.log(name, Object.keys(animations).join(', '));
 }
-await writeFile(root + '/manifest.json', JSON.stringify({ version: 1, sprites, npcs: npcNames }, null, 2) + '\n');
+await writeFile(root + '/manifest.json', JSON.stringify({ version: 1, sprites }, null, 2) + '\n');

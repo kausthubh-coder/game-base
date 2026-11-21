@@ -12,13 +12,7 @@ try {
  target.searchParams.set('quality', 'low');
  if (stacked) target.searchParams.set('look', 'sprite-stack');
  const page=await browser.newPage();await page.goto(target.href);await page.waitForFunction(()=>!!window.__game);
- let names = ['hero', 'hero-swing'];
- if (stacked) {
-  const response = await page.request.get(new URL('experiments/sprite-stack/manifest.json', target).href);
-  if (!response.ok()) throw Error('Could not load the stack pack to check its sheets');
-  names = Object.keys((await response.json()).sprites);
- }
- const result=await page.evaluate(({stacked, names})=>{
+ const result=await page.evaluate(stacked=>{
   const v=window.__game.view,renderer=v.renderer,scene=v.ctx.scene,sprites=v.sprites,mesh=scene.getObjectByName('sprites');
   v.setPaused(true);sprites.clear();for(const child of scene.children)child.visible=child===mesh;
   scene.background=null;scene.fog=null;renderer.toneMapping=0;renderer.setPixelRatio(1);renderer.setClearColor(0,1);
@@ -26,6 +20,7 @@ try {
   const light=mesh.material.uniforms.uSky.value.clone().setRGB(1,1,1);sprites.setSky({light});
   const gl=renderer.getContext(),failures=[];let cases=0;
   let creature=sprites.add('frog',{visible:false});
+  const names = stacked ? ['tamsin','leaftail','mossling','critter','lanternfly','hero','hero-swing'] : ['hero','hero-swing'];
   const headings = ['back','backRight','side','frontRight','front','frontLeft','left','backLeft'];
   for(const name of names){
    const asset=v.assets.sprite(name),h=sprites.add(name,{shadow:0,tint:[1/1.06,1/1.06,1/1.06]});
@@ -74,7 +69,7 @@ try {
    h.remove();
   }
   return{cases,failures,glError:gl.getError()};
- }, {stacked, names});
+ }, stacked);
  writeFileSync(out+'/preview-rendered-frames.json',JSON.stringify({renderer:browser.gameRenderer,...result},null,2));console.log(JSON.stringify({...result,failures:result.failures.slice(0,6)}));
  if(result.failures.length||result.glError)process.exitCode=1;
 }finally{await browser.close()}

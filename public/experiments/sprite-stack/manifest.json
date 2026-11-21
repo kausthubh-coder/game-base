@@ -46,18 +46,18 @@
     "maren": {
       "sheet": "stacked/maren.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -70,8 +70,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -88,18 +88,18 @@
     "odo": {
       "sheet": "stacked/odo.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -112,8 +112,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -130,18 +130,18 @@
     "gus": {
       "sheet": "stacked/gus.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2.207792207792208,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -154,8 +154,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -172,18 +172,18 @@
     "mira": {
       "sheet": "stacked/mira.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -196,8 +196,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -214,18 +214,18 @@
     "wren": {
       "sheet": "stacked/wren.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2.2727272727272725,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -238,8 +238,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -256,18 +256,18 @@
     "juniper": {
       "sheet": "stacked/juniper.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -280,8 +280,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -298,18 +298,18 @@
     "brack": {
       "sheet": "stacked/brack.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -322,8 +322,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -340,18 +340,18 @@
     "villager-a": {
       "sheet": "stacked/villager-a.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -364,8 +364,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -382,18 +382,18 @@
     "villager-b": {
       "sheet": "stacked/villager-b.png",
       "frame": [
-        128,
-        128
+        64,
+        64
       ],
       "anchor": [
-        64,
-        120
+        32,
+        60
       ],
       "worldHeight": 2,
       "animations": {
         "idle": {
-          "frames": 2,
-          "fps": 4,
+          "frames": 4,
+          "fps": 8,
           "rows": {
             "front": 0,
             "frontRight": 1,
@@ -406,8 +406,8 @@
           }
         },
         "walk": {
-          "frames": 4,
-          "fps": 10,
+          "frames": 8,
+          "fps": 20,
           "rows": {
             "front": 8,
             "frontRight": 9,
@@ -715,17 +715,5 @@
         }
       }
     }
-  },
-  "npcs": [
-    "tamsin",
-    "maren",
-    "odo",
-    "gus",
-    "mira",
-    "wren",
-    "juniper",
-    "brack",
-    "villager-a",
-    "villager-b"
-  ]
+  }
 }

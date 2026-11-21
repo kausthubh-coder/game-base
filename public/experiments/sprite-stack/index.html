@@ -16,7 +16,7 @@ article select { font-size:13px; max-width:100%; }
 </style></head><body><main>
 <nav aria-label="Animation controls"><label for="facing">Facing</label><select id="facing">
 <option value="front">Front</option><option value="frontRight" selected>Front right</option><option value="side">Right</option><option value="backRight">Back right</option><option value="back">Back</option><option value="backLeft">Back left</option><option value="left">Left</option><option value="frontLeft">Front left</option>
-</select><button id="pause" type="button">Pause</button><button id="step" type="button">Next frame</button><a id="cast" href="?cast=npcs">All NPCs</a></nav>
+</select><button id="pause" type="button">Pause</button><button id="step" type="button">Next frame</button></nav>
 <section aria-label="Animated sprites"></section><output id="error"></output>
 </main><script type="module">
 const manifest = await (async () => {
@@ -27,11 +27,7 @@ const manifest = await (async () => {
   return response.json();
 })().catch(error => { document.querySelector('#error').textContent = error.message; });
 if (manifest) {
- const npcStudy = new URLSearchParams(location.search).get('cast') === 'npcs' && manifest.npcs;
- const castLink = document.querySelector('#cast');
- if (npcStudy) { castLink.href = '?'; castLink.textContent = 'Player and creatures'; }
- const npcLabel = id => id.split('-').map(word => word[0].toUpperCase()+word.slice(1)).join(' ');
- const actors = npcStudy ? manifest.npcs.map(id => [npcLabel(id),id]) : [['Tamsin','tamsin'],['Leaftail','leaftail'],['Mossling','mossling'],['Player','hero']];
+ const actors = [['Tamsin','tamsin'],['Leaftail','leaftail'],['Mossling','mossling'],['Player','hero']];
  let time = 0, last = 0, paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
  const facing = document.querySelector('#facing'), pause = document.querySelector('#pause');
  const figures = actors.map(([name,id]) => {
