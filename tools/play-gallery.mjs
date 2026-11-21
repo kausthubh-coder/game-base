@@ -1080,12 +1080,12 @@ export async function playGallery({run = null, args = process.argv, startingSave
         !Object.fromEntries(key.game.flags)['scene.28'],
       'keystone before memory',
     );
-    await walk(-438.5, 2403.3, 0.1);
+    await walk(-438.5, 2402.9, 0.1);
     await milestone('memory-28',async()=>{await usePrompt('Touch the stone');await dialogue('28-gallery');},state=>state.flags['scene.28']===true && !state.talk && !state.player.busy);
     await save('memory-earned');
     await branch(readFileSync(resolve(out, 'keystone-earned.save.json'), 'utf8'), 'memory-low', async () => {
       await graphics('low');
-      await walk(-438.5, 2403.3, .1);
+      await walk(-438.5, 2402.9, .1);
       await usePrompt('Touch the stone');
       await dialogue('28-gallery-low');
       await save('memory-low-earned');
@@ -1094,7 +1094,7 @@ export async function playGallery({run = null, args = process.argv, startingSave
     await walk(-441.5, 2401.6, 0.3);
     must((await read()).prompt !== 'Take the keystone', 'no repeated key');
     await press('KeyE');
-    await walk(-438.5, 2403.3, 0.1);
+    await walk(-438.5, 2402.9, 0.1);
     await graphics('low');
     await usePrompt('Touch the stone again');
     await dialogue('memory-repeat');
