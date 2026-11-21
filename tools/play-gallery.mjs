@@ -106,6 +106,19 @@ export function requireGalleryWin(end, n) {
     throw Error('fight ended without victory: ' + JSON.stringify(end));
 }
 
+// Inspect the actual arena: bolts stop at solid terrain, even with exact aim.
+export function galleryShotRay([x, z]) {
+  const running = window.__game.view.game.systems.fights.running();
+  const from = {x:running.fight.hero.x,z:running.fight.hero.z};
+  const steps = Math.ceil(Math.hypot(x-from.x,z-from.z)/.1);
+  for(let i=1;i<steps;i++) {
+    const point={x:from.x+(x-from.x)*i/steps,z:from.z+(z-from.z)*i/steps};
+    if(running.stage.solid(point.x,point.z) || !running.stage.inside(point.x,point.z))
+      return {clear:false,from,target:{x,z},blocked:point};
+  }
+  return {clear:true,from,target:{x,z},blocked:null};
+}
+
 export function galleryThreat(t, h) {
   const dx = h.x - t.x,
     dz = h.z - t.z,
@@ -715,6 +728,12 @@ export async function playGallery({run = null, args = process.argv, startingSave
       6000,
     );
   }
+  async function rootsnareShot(x, z) {
+    const ray = await page.evaluate(galleryShotRay,[x,z]);
+    record({type:'projectile-path-observation',...ray});
+    if(!ray.clear) await stepTo(x,z,120);
+    else await attack(x,z,50);
+  }
   async function combat(n) {
     return milestone('fight-'+n,()=>combatInput(n),state=>state.flags['fight.'+n+'.won']===true && !state.player.busy);
   }
@@ -825,14 +844,14 @@ export async function playGallery({run = null, args = process.argv, startingSave
           if (v) {
             if (Math.hypot(v.x - s.hero.x, v.z - s.hero.z) > 8) await stepTo(v.x, v.z, 120);
             // Quick shots return control before the next rootsnare tell lands.
-            else await attack(v.x, v.z, 50);
+            else await rootsnareShot(v.x, v.z);
             continue;
           }
         }
         const d = Math.hypot(b.x - s.hero.x, b.z - s.hero.z);
         if (d > HERO.calm.reach - .5) await stepTo(b.x, b.z, 120);
         else {
-          await attack(b.x, b.z, 50);
+          await rootsnareShot(b.x, b.z);
         }
       } else {
         const k = s.keeper,
