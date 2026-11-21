@@ -1,14 +1,14 @@
 # Sprite stacking experiment
 
-Run `bun run dev`. Open `/experiments/sprite-stack/` on that server to turn Tamsin, the Leaftail, the Mossling and the player together. Each has its own animation selector. Pause and use **Next frame** to inspect a footfall or tool strike. Open `/?look=sprite-stack` to play with the same sprites in the world.
+Open `/?scene=sprite-meadow&look=sprite-stack` to start on the grant with the Leaftail and a spade. Walk with WASD, hold two directions to walk diagonally, and hold the left mouse button over nearby soil to dig. Open `/?scene=sprite-meadow` for the game's original sprites at the same saved position. The meadow keeps its own save.
 
-The pack covers ten NPCs, the Leaftail, the Mossling, the Lanternfly and the player. They use the colours and poses of the existing cast models. The player has a diagonal walk and spade swing. The Mossling settles and the Lanternfly flutters. Story and combat sheets outside the pack use their original artwork.
+To study individual poses, open `/experiments/sprite-stack/`. Choose an animation for Tamsin, the Leaftail, the Mossling or the player. Pause and use **Next frame** to inspect a footfall or tool strike.
 
 ## How the stack works
 
-`bun tools/sprites/bake-stack.mjs` poses each rig from its animation clip, samples the painted surface into horizontal pixel slices, then draws that stack from eight headings. The feet keep the same anchor across headings and frames. The game draws each baked frame on a single quad and selects the row using the actor's facing and the camera's yaw.
+`bun tools/sprites/bake-stack.mjs` poses the cast rigs, samples each surface into horizontal pixel slices, then projects them into eight directions. The ten NPCs, the Leaftail, the Mossling and the Lanternfly take their colour from their models. The game draws each baked frame on one quad and selects the row using the actor's facing and the camera's yaw.
 
-The flat coat and simpler faces are visible at close range. The most readable changes on a diagonal are Tamsin's hat brim, the Leaftail's raised tail and the player's spade passing the shoulder. An earlier trial inferred depth from the painted front and side views. The tail and tool streaked across the diagonal frame, so the playable pack uses rigged poses for depth.
+The player uses the painted hero and swing sheets at their original frame size and timing. Cardinal views copy the original cels. On diagonals, the bake fits the posed rig's depth to each painted scanline, then projects the colours into the turned frame. This keeps the fringe, jacket, bag and both foot contacts in the walk. The diagonal views are reconstructions from the existing art. Story and combat sheets outside the pack use their original artwork.
 
 ## Check a build
 

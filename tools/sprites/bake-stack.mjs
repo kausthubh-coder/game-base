@@ -6,6 +6,8 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CAST, CAST_MODELS } from '../../src/game/content/cast-models.ts';
 
+import { loadHeroPaint } from './painted-hero.mjs';
+
 const root = 'public/experiments/sprite-stack';
 const manifest = JSON.parse(await readFile('public/assets/manifest.json', 'utf8'));
 const sprites = {};
@@ -180,15 +182,20 @@ for (const name of cast) {
     mixer = new THREE.AnimationMixer(scene);
   const box = new THREE.Box3().setFromObject(scene, true),
     size = box.getSize(new THREE.Vector3());
-  const [w, h] = source.frame.map((n) => n / 2),
-    anchor = source.anchor.map((n) => n / 2);
+  const hero = model === 'hero',
+    divisor = hero ? 1 : 2;
+  const [w, h] = source.frame.map((n) => n / divisor),
+    anchor = source.anchor.map((n) => n / divisor);
   const scale = Math.min((h * 0.8) / size.y, (w * 0.84) / Math.hypot(size.x, size.z));
-  if (model === 'hero') addSpade(scene);
+  if (hero) addSpade(scene);
+  const paint = hero ? await loadHeroPaint(source) : null;
+  const toolPaint = name === 'hero' ? await loadHeroPaint(manifest.sprites['hero-swing']) : paint;
   const animations = {},
     frames = [];
   let rows = 0,
     columns = 0;
   for (const [action, original] of Object.entries(source.animations)) {
+    const paintPose = action === 'tool' ? toolPaint : paint;
     const clipName = definition.clips[action === 'settle' ? 'special' : action];
     const clip = THREE.AnimationClip.findByName(clips, clipName);
     if (!clip) throw Error(model + ' has no ' + clipName + ' clip for ' + action);
@@ -196,7 +203,7 @@ for (const name of cast) {
       for (const part of scene.getObjectByName('handRtool').children)
         part.visible = action === 'tool';
     }
-    const count = Math.max(original.frames, action === 'idle' ? 4 : 8);
+    const count = hero ? original.frames : Math.max(original.frames, action === 'idle' ? 4 : 8);
     const fps = (count * original.fps) / original.frames;
     animations[action] = {
       frames: count,
@@ -207,11 +214,15 @@ for (const name of cast) {
     mixer.stopAllAction();
     mixer.clipAction(clip).reset().play();
     for (let i = 0; i < count; i++) {
-      mixer.setTime((i * clip.duration) / count);
+      // Start on a contact pose, then pass, lift and contact with the other boot.
+      const phase = hero && action === 'walk' ? (i / count + 0.25) % 1 : i / count;
+      mixer.setTime(phase * clip.duration);
       const layers = slicePose(scene, scale);
       for (let dir = 0; dir < headings.length; dir++)
         frames.push({
-          input: draw(layers, dir, w, h, anchor),
+          input: paintPose
+            ? paintPose(action, i, dir, layers, size.y * scale, anchor)
+            : draw(layers, dir, w, h, anchor),
           raw: { width: w, height: h, channels: 4 },
           left: i * w,
           top: (rows + dir) * h,
@@ -224,7 +235,7 @@ for (const name of cast) {
     create: { width: w * columns, height: h * rows, channels: 4, background: '#00000000' },
   })
     .composite(frames)
-    .png({ palette: true, colors: 128, dither: 0 })
+    .png(hero ? {} : { palette: true, colors: 128, dither: 0 })
     .toFile(root + '/' + sheet);
   sprites[name] = { sheet, frame: [w, h], anchor, worldHeight: source.worldHeight, animations };
   console.log(name, Object.keys(animations).join(', '));

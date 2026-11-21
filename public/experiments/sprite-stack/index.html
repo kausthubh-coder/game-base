@@ -34,7 +34,7 @@ if (manifest) {
    const box = document.createElement('article'), title = document.createElement('h2');
    const canvas = document.createElement('canvas'), select = document.createElement('select');
    title.textContent = name; select.setAttribute('aria-label', name+' animation');
-   canvas.width = 88; canvas.height = 80; canvas.setAttribute('aria-label', name);
+   canvas.width = 176; canvas.height = 160; canvas.setAttribute('aria-label', name);
    const sheet = manifest.sprites[id], image = new Image();
    image.src = sheet.sheet;
    image.onerror = () => { document.querySelector('#error').textContent = 'Could not load '+name; };
@@ -52,7 +52,9 @@ if (manifest) {
      const [w,h] = sheet.frame, anim = sheet.animations[f.select.value];
      const row = anim.rows[facing.value], frame = (Math.floor(time*anim.fps)+f.offset)%anim.frames;
      ctx.clearRect(0,0,canvas.width,canvas.height);
-     ctx.drawImage(image,frame*w,row*h,w,h,44-sheet.anchor[0],73-sheet.anchor[1],w,h);
+     const scale = sheet === manifest.sprites.hero ? 1 : 2;
+     ctx.imageSmoothingEnabled = false;
+     ctx.drawImage(image,frame*w,row*h,w,h,88-sheet.anchor[0]*scale,146-sheet.anchor[1]*scale,w*scale,h*scale);
    }
    requestAnimationFrame(draw);
  }
