@@ -232,6 +232,27 @@ async function calmVisitor(){
   must(completed?.n===0&&completed.result==='won'&&completed.beasts.every(b=>b.doing==='calmed'),'ordinary visitor did not end in victory: '+JSON.stringify(completed));
   await page.waitForFunction(()=>!window.__fights.state(),null,{timeout:10000});
 }
+// Dax moves on both sides of the tent. Approach and escort him through the
+// clear outer corridors, crossing between sides north of the canvas.
+async function walkDaxRoute(x,z,near=.3){
+  const p=(await read()).player;
+  if(p.z < -227 && z > -227){
+    const side=p.x < -17 ? -22 : -10.5;
+    await walk(side,p.z,.4);
+    await walk(side,-225,.4);
+  }else if(p.z > -227 && z < -227){
+    const side=x < -17 ? -22 : -10.5;
+    await walk(side,p.z,.4);
+    await walk(side,z,.4);
+  }else if(p.z < -227 && z < -227 && (p.x < -17)!==(x < -17)){
+    const from=p.x < -17 ? -22 : -10.5,to=x < -17 ? -22 : -10.5;
+    await walk(from,p.z,.4);
+    await walk(from,-225,.4);
+    await walk(to,-225,.4);
+    await walk(to,z,.4);
+  }
+  await walk(x,z,near);
+}
 // Residents keep walking while the hero approaches. Recheck the prompt and resample after each walk.
 async function approachDax() {
   for(let i=0;i<20;i++) {
@@ -239,7 +260,7 @@ async function approachDax() {
     const at=await page.evaluate(()=>window.__game.view.game.actors.get('npc:dax').pos);
     record({type:'dax-approach',at,hero:s.player,prompt:s.prompt});
     if(s.prompt==='Talk to Dax')return;
-    await walk(at.x,at.z,.3);
+    await walkDaxRoute(at.x,at.z,.3);
   }
   throw Error('could not approach moving Dax');
 }
@@ -247,7 +268,7 @@ async function jobDax(job,target){
   await approachDax();await wait(s=>s.prompt==='Talk to Dax','Dax prompt');
   await press('KeyE');await click(`[data-job="${job}"]`);
   await page.getByRole('button',{name:/Walk Dax to/}).click();
-  record({type:'assign-job',who:'dax',job});await walk(...target);
+  record({type:'assign-job',who:'dax',job});await walkDaxRoute(...target);
   await wait(s=>s.flags['job.dax']===job,'Dax '+job);
   if((await read()).talk)await dialogue('dax-'+job);
 }
