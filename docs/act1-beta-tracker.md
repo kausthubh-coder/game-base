@@ -118,3 +118,11 @@ Automatic-film checker repairs preserve the real scene timing and verify every c
 Runtime `dist-beta-help-58446565` includes first-farm help and all candidate repairs. Full `bun run check` passes in `.artifacts/beta-final/attempt-05/check.log`. The campfire wait has passing normal-input and Continue evidence in attempt-04/camp-dusk; later product changes only add quest instructions. The coordinator inspected its visible prompt and continued night scene.
 
 Opening combat diagnostics pass desktop sword and bow and phone sword so far. The phone practice view shows duplicate instruction text behind the readable hint bubble. This cosmetic overlap is queued for after the minimal beta; hero, target and controls remain visible. No final opening, story preflight or continuous first-half replay acceptance is claimed yet.
+
+### Resume checkpoint
+
+Current source candidate is `58446565`; later commits change tools or records only. Runtime `dist-beta-help-58446565` is protected by `.artifacts/beta-final/attempt-05/runtime-manifest.json`, SHA256 `6440e95a4ecb8e1e0e196ec4fd3bb1cef6fab5be9f9116ddae25588e6051d5e7`. Private preview is PID19523 on5796. Do not rebuild its directory.
+
+Farm, ditch labels and camp wait proof is consolidated in `.artifacts/beta-final/attempt-05/farm-guidance-review.json`. The coordinator inspected the farm Quest panel, HUD, completed pen, phone field marker, camp wait prompt and continued night, and independently recalculated guide budget checks. Opening case reports live under `.artifacts/opening-practice/`; high-attempt03 is an overall failed navigation attempt with four passing cases, high-attempt04 supplies the remaining two. Keep this distinction. Low and settled closing checks continue separately. Story preflight runs under attempt-05/scenes on5843.
+
+Next: finish and inspect the current-build scene matrix, bind the reviewed preflight to the runtime, then start `tools/play-beta.mjs` from fresh Begin through Gallery. Old df7 prefixes cannot substitute for the new source. Run the preserved-output verifier wrapper with the accepted beta report and `--full`, then push only this lean release branch to main. The original act1 branch contains extensive local history and must not be pushed. Check the live game and cloud save after deployment.
