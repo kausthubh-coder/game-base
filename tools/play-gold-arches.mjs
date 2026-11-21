@@ -220,14 +220,14 @@ async function calmVisitor(){
         const key=Math.abs(fw)>Math.abs(rt)?(fw>0?'KeyW':'KeyS'):(rt>0?'KeyD':'KeyA');
         record({type:'down',key,intent:'dodge toward arena center'});await page.keyboard.down(key);await page.waitForTimeout(50);await press('ShiftLeft');await page.keyboard.up(key);record({type:'up',key});
       }
-      const at=await page.evaluate(([x,z])=>window.__game.view.project(x,window.__game.view.game.player.pos.y+.3,z),[beast.x,beast.z]);if(at)await page.mouse.move(at.x,at.y);
+      const at=await page.evaluate(([x,z])=>window.__game.view.project(x,window.__game.view.playerPosition.y,z),[beast.x,beast.z]);if(at)await page.mouse.move(at.x,at.y);
       const distance=Math.hypot(beast.x-fight.hero.x,beast.z-fight.hero.z),held=[];
       if(distance>1.8){const yaw=await page.evaluate(()=>window.__game.view.camera.yaw),dx=beast.x-fight.hero.x,dz=beast.z-fight.hero.z;
         const forward=-dx*Math.sin(yaw)-dz*Math.cos(yaw),right=dx*Math.cos(yaw)-dz*Math.sin(yaw);
         for(const key of [forward>.5?'KeyW':forward<-.5?'KeyS':null,right>.5?'KeyD':right<-.5?'KeyA':null].filter(Boolean)){record({type:'down',key});await page.keyboard.down(key);held.push(key);}}
       if(beast.guard<=0){if(!broke){await shot('04-guard-broken');broke=true;}await page.mouse.up();await page.keyboard.down('KeyF');record({type:'down',key:'KeyF'});}
       else{await page.keyboard.up('KeyF');await page.mouse.down();record({type:'down',button:'left'});}
-      await page.waitForTimeout(100);for(const key of held){record({type:'up',key});await page.keyboard.up(key);}
+      await page.waitForTimeout(100);await page.mouse.up();record({type:'up',button:'left'});for(const key of held){record({type:'up',key});await page.keyboard.up(key);}
     }
   }finally{await page.mouse.up();for(const key of ['KeyF','KeyW','KeyA','KeyS','KeyD'])await page.keyboard.up(key);}
 
