@@ -13,9 +13,9 @@
     "seed": 7
   },
   "counters": {
-    "drawCalls": 80,
-    "triangles": 277693,
+    "drawCalls": 84,
+    "triangles": 207817,
     "quality": "medium"
   },
-  "scriptBytes": 3081224
+  "scriptBytes": 3820278
 }
