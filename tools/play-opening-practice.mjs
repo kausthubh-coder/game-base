@@ -125,12 +125,13 @@ export async function main(args = process.argv.slice(2)) {
     if (!await page.evaluate(text => [...document.querySelectorAll('.gb-dialogue-typed')].some(el => el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && el.textContent === text), text)) await press('KeyE');
     await page.waitForFunction(text => [...document.querySelectorAll('.gb-dialogue-typed')].some(el => el.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true }) && el.textContent === text), text, { timeout: 12000 });
   }
-  async function endDialogue() {
+  async function endDialogue(capturePrefix) {
     for (let i = 0; i < 12; i++) {
       const s = await read();
       if (!s.talkLine) return;
       must(!s.talkLine.choices.length, 'unexpected choice after rack');
       await reveal();
+      if (capturePrefix) await capture(capturePrefix + '-' + (i + 1));
       const text = (await read()).talkLine.text;
       await press('KeyE');
       await wait(s => !s.talkLine || s.talkLine.text !== text, 'dialogue input advances');
@@ -362,9 +363,7 @@ export async function main(args = process.argv.slice(2)) {
       if (touch) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); else await page.mouse.up();
       input({ type: touch ? 'touch-end-use' : 'mouse-up', intent: 'release charged move' });
       await wait(s => !s.opening.bout.on && s.opening.bout.guard === 0 && !s.fight && !!s.talkLine, 'actual target break releases view then dialogue');
-      await reveal();
-      await capture('closing-dialogue');
-      await endDialogue();
+      await endDialogue('closing-dialogue');
       const end = await wait(s => s.flags['scene.4'] === true && !s.player.busy && !s.talkLine, 'closing dialogue earns scene4');
       must(!end.fight && end.ordinaryHeroVisible && !end.useClaimed, 'combat view did not restore normal hero/input');
       must(JSON.stringify(end.bag) === JSON.stringify(before.bag), 'practice granted or spent bag items');
