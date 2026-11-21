@@ -1,8 +1,18 @@
 # Hero briefly appears as an animal
 
-State: the supplied video's abrupt darkening is reproduced and repaired. The hero sampled underground lighting while its drawing followed a smooth slope. An animal sheet replacing the hero was not observed. See the original-video section below for the failing and repaired real-input captures.
+The November 21 spade recording shows the player turning into a fox on two consecutive swing loops. The November 16 recording showed a separate lighting blink on a slope.
 
-The user reports an animal appearing briefly in place of the hero while walking or using the shovel. The supplied screenshot shows a large hero beside a separate green creature. It does not establish that the hero's frame changed owner.
+## Fox at the swing loop boundary, November 21
+
+Frames 87–89 and 99–101 of the new recording (counting from zero) show a fox's back and part of the row below it. This matches the 128-pixel square immediately to the right of the back row of `hero-swing` in the packed atlas. At the end of the three-frame swing, reading column 3 instead of wrapping to column 0 selects exactly that square.
+
+The sprite shader now uses unsigned integer remainder for looping frame indices. Floating-point division rounded down at an exact multiple can produce a remainder equal to the frame count. A diagnostic run that rounded the reciprocal down reproduced the wrong back-row pixels at ticks 3 and 6. The original shader passed on the Mac's normal Metal and software renderers. The recording does not identify the graphics driver.
+
+With the game running, use `bun tools/check-hero-rendered-frames.mjs --url http://127.0.0.1:<port>/`. It holds each animation through two wraps and compares the rendered pixels with the hero sheet. The repaired shader passed all 384 comparisons on both renderers. A real-input spade hold in the free camera also showed the back-facing hero swinging and returning to idle.
+
+## November 16 investigation
+
+The user reported an animal appearing briefly in place of the hero while walking or using the shovel. The supplied screenshot shows a large hero beside a separate green creature. It does not establish that the hero's frame changed owner.
 
 ## Earlier repair
 

@@ -202,12 +202,13 @@ flat varying vec3 vColor;
 
 void main() {
   // The frame: the same rule as frameAt in animation.ts.
-  float frames = abs(aRow.z);
-  float frame = floor(max(uTime - aTint.w, 0.0) * aRow.w);
-  frame = aRow.z < 0.0 ? min(frame, frames - 1.0) : mod(frame, frames);
+  uint frames = uint(abs(aRow.z));
+  uint tick = uint(max(uTime - aTint.w, 0.0) * aRow.w);
+  // An approximate float remainder at the wrap can select column 'frames' in the next sheet.
+  uint frame = aRow.z < 0.0 ? min(tick, frames - 1u) : tick % frames;
 
   // position is a corner of the quad: x 0 to 1 left to right, y 0 to 1 bottom to top.
-  vec2 origin = vec2(aRow.x + frame * aFrame.x, aRow.y);
+  vec2 origin = vec2(aRow.x + float(frame) * aFrame.x, aRow.y);
   vUv = (origin + vec2(position.x, 1.0 - position.y) * aFrame.xy) / uAtlasSize;
   // Half a pixel inside the frame, so no sample ever reaches the frame next to it.
   vRect = vec4(origin + 0.5, origin + aFrame.xy - 0.5) / uAtlasSize.xyxy;
