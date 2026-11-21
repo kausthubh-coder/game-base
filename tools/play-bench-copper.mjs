@@ -167,10 +167,15 @@ async function make(id,count=1,hand=false){
 }
 async function calmVisitor(){
   let broke=false,target=-1,stripPlaced=false,dodged=false;
+  let completed=null;
   try {
     for(let i=0;i<1800;i++){
       const fight=await page.evaluate(()=>window.__fights.state());
-      if(!fight||fight.over>=0)break;
+      if(!fight||fight.over>=0){
+        // Ordinary visitors have n=0 and do not emit the numbered fight.ended event.
+        completed=await page.evaluate(()=>{const r=window.__game.view.game.systems.fights.running();return r&&{n:r.n,result:r.result,beasts:r.fight.beasts.map(b=>({doing:b.doing,guard:b.guard}))}});
+        break;
+      }
       record({type:'combat-observation',fight});if(i%100===0)console.log('visitor combat',i,fight.beasts[0].kind,fight.beasts[0].guard,fight.record.rigsPlaced,fight.record.rigsTriggered);
       if(!dodged&&(await read()).gear.tier===2){const before={...fight.hero};await page.keyboard.down('KeyW');await press('ShiftLeft');await page.waitForTimeout(200);await page.keyboard.up('KeyW');const after=await page.evaluate(()=>window.__fights.state().hero);record({type:'copper-grip-dodge',before,after});must(Math.hypot(after.x-before.x,after.z-before.z)>.5,'copper grip dodge did not move');dodged=true;await shot('copper-grip-dodge');}
 
@@ -212,17 +217,20 @@ async function calmVisitor(){
         const key=Math.abs(fw)>Math.abs(rt)?(fw>0?'KeyW':'KeyS'):(rt>0?'KeyD':'KeyA');
         record({type:'down',key,intent:'dodge toward arena center'});await page.keyboard.down(key);await page.waitForTimeout(50);await press('ShiftLeft');await page.keyboard.up(key);record({type:'up',key});
       }
-      const at=await page.evaluate(([x,z])=>window.__game.view.project(x,window.__game.view.game.player.pos.y+.3,z),[beast.x,beast.z]);if(at)await page.mouse.move(at.x,at.y);
+      // Pointer rays intersect the hero-foot plane; the painted body height offsets the aim.
+      const at=await page.evaluate(([x,z])=>window.__game.view.project(x,window.__game.view.playerPosition.y,z),[beast.x,beast.z]);if(at)await page.mouse.move(at.x,at.y);
       const distance=Math.hypot(beast.x-fight.hero.x,beast.z-fight.hero.z),held=[];
       if(distance>1.8){const yaw=await page.evaluate(()=>window.__game.view.camera.yaw),dx=beast.x-fight.hero.x,dz=beast.z-fight.hero.z;
         const forward=-dx*Math.sin(yaw)-dz*Math.cos(yaw),right=dx*Math.cos(yaw)-dz*Math.sin(yaw);
         for(const key of [forward>.5?'KeyW':forward<-.5?'KeyS':null,right>.5?'KeyD':right<-.5?'KeyA':null].filter(Boolean)){record({type:'down',key});await page.keyboard.down(key);held.push(key);}}
       if(beast.guard<=0){if(!broke){await shot('04-guard-broken');broke=true;}await page.mouse.up();await page.keyboard.down('KeyF');record({type:'down',key:'KeyF'});}
       else{await page.keyboard.up('KeyF');await page.mouse.down();record({type:'down',button:'left'});}
-      await page.waitForTimeout(100);for(const key of held){record({type:'up',key});await page.keyboard.up(key);}
+      await page.waitForTimeout(100);await page.mouse.up();record({type:'up',button:'left'});for(const key of held){record({type:'up',key});await page.keyboard.up(key);}
     }
   }finally{await page.mouse.up();for(const key of ['KeyF','KeyW','KeyA','KeyS','KeyD'])await page.keyboard.up(key);}
-
+  record({type:'visitor-completed',result:completed});
+  must(completed?.n===0&&completed.result==='won'&&completed.beasts.every(b=>b.doing==='calmed'),'ordinary visitor did not end in victory: '+JSON.stringify(completed));
+  await page.waitForFunction(()=>!window.__fights.state(),null,{timeout:10000});
 }
 // Residents keep walking while the hero approaches. Recheck the prompt and resample after each walk.
 async function approachDax() {
@@ -377,7 +385,8 @@ try {
   for(let i=0;i<12000;i++){const visitor=await page.evaluate(()=>window.__game.view.game.systems.fights.visitor());if(visitor){await walk(visitor.x,visitor.z,2);await calmVisitor();usedGrip=true;break;}record({type:'noninteractive-wait-advance',seconds:1,reason:'ordinary home visitor to exercise copper grip'});await page.evaluate(()=>window.__game.advance(1));await page.waitForTimeout(10);}
   must(usedGrip,'no ordinary visitor for copper grip exercise');
   await jobDax('watch',[-23,-223]);
-  current='return-home';const home=await page.evaluate(()=>window.__game.view.game.systems.region.place('grant.center').at);await walk(home.x,home.z,3);await wait(s=>s.flags['farm.moss.living']===true&&s.flags['farm.quill.living']===true&&s.flags['farm.copper.living']===true,'settled home farms');await shot('16-home');const final=await save('earned-copper');
+  // The old center route crosses the pitched tent. Return along its clear eastern side.
+  current='return-home';const home=await page.evaluate(()=>window.__game.view.game.systems.region.place('grant.center').at);await walk(home.x+5,home.z+5,.4);await walk(home.x+5,home.z,.4);await wait(s=>s.flags['farm.moss.living']===true&&s.flags['farm.quill.living']===true&&s.flags['farm.copper.living']===true,'settled home farms');await shot('16-home');const final=await save('earned-copper');
   const flags=Object.fromEntries(final.game.flags);
   must(flags['quest.bench.done']===true&&flags['quest.copper.done']===true&&flags['quest.count.started']===true&&!flags['scene.22'],'exact quest boundary');
   must(final.game.systems.bench.armor===2&&final.game.systems.bench.made.includes('quill_strip'),'gear persistence');
