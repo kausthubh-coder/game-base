@@ -147,3 +147,12 @@ test('a tile or an icon outside its image fails with its name', () => {
     'manifest.json: icons.names.lantern is the cell [4, 3] of 32 pixel tiles, which is outside icons/icons.png (128 by 128).',
   );
 });
+
+test('a diagonal outside an eight-direction sheet fails the size check', () => {
+  const manifest = real();
+  manifest.sprites.hero.animations.idle.rows = {front: 0, back: 1, side: 2, left: 3,
+    frontRight: 4, frontLeft: 5, backRight: 6, backLeft: 7};
+  const hero = parseManifest(manifest).sprites.hero;
+  expect(() => checkSheetSize('hero', hero, 768, 896)).toThrow(/idle puts its backLeft view on row 7/);
+  expect(() => checkSheetSize('hero', hero, 768, 1024)).not.toThrow();
+});

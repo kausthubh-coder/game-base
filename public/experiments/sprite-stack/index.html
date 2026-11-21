@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sprite stack motion study</title>
+<style>
+:root { color-scheme:light dark; font-family:var(--font-sans, system-ui),sans-serif; color:var(--foreground,CanvasText); }
+body { margin:0 auto; max-width:850px; }
+main { padding:8px 0; }
+nav { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+select,button { background:var(--card,ButtonFace); color:inherit; border:1px solid var(--border,GrayText); border-radius:6px; font:inherit; padding:5px 8px; }
+section { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:14px; }
+article { text-align:center; min-width:0; }
+canvas { display:block; width:100%; height:auto; background:var(--secondary, #acb59e); border-radius:var(--radius,8px); image-rendering:pixelated; }
+h2 { font-size:15px; margin:8px 0 4px; }
+article select { font-size:13px; max-width:100%; }
+@media(max-width:520px){section{grid-template-columns:repeat(2,minmax(0,1fr));}}
+</style></head><body><main>
+<nav aria-label="Animation controls"><label for="facing">Facing</label><select id="facing">
+<option value="front">Front</option><option value="frontRight" selected>Front right</option><option value="side">Right</option><option value="backRight">Back right</option><option value="back">Back</option><option value="backLeft">Back left</option><option value="left">Left</option><option value="frontLeft">Front left</option>
+</select><button id="pause" type="button">Pause</button><button id="step" type="button">Next frame</button></nav>
+<section aria-label="Animated sprites"></section><output id="error"></output>
+</main><script type="module">
+const manifest = await (async () => {
+  const embedded = document.querySelector('#sheets');
+  if (embedded) return JSON.parse(embedded.textContent);
+  const response = await fetch('./manifest.json');
+  if (!response.ok) throw Error('Could not load the sprite pack');
+  return response.json();
+})().catch(error => { document.querySelector('#error').textContent = error.message; });
+if (manifest) {
+ const actors = [['Tamsin','tamsin'],['Leaftail','leaftail'],['Mossling','mossling'],['Player','hero']];
+ let time = 0, last = 0, paused = matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const facing = document.querySelector('#facing'), pause = document.querySelector('#pause');
+ const figures = actors.map(([name,id]) => {
+   const box = document.createElement('article'), title = document.createElement('h2');
+   const canvas = document.createElement('canvas'), select = document.createElement('select');
+   title.textContent = name; select.setAttribute('aria-label', name+' animation');
+   canvas.width = 88; canvas.height = 80; canvas.setAttribute('aria-label', name);
+   const sheet = manifest.sprites[id], image = new Image();
+   image.src = sheet.sheet;
+   image.onerror = () => { document.querySelector('#error').textContent = 'Could not load '+name; };
+   for (const animation of Object.keys(sheet.animations)) select.add(new Option(animation[0].toUpperCase()+animation.slice(1), animation));
+   select.value = 'walk';
+   box.append(canvas,title,select); document.querySelector('section').append(box);
+   return {canvas, image, sheet, select, offset:0};
+ });
+ function draw(now) {
+   if (!paused && last) time += Math.min(.1,(now-last)/1000);
+   last = now;
+   for (const f of figures) {
+     if (!f.image.naturalWidth) continue;
+     const {canvas, sheet, image} = f, ctx = canvas.getContext('2d');
+     const [w,h] = sheet.frame, anim = sheet.animations[f.select.value];
+     const row = anim.rows[facing.value], frame = (Math.floor(time*anim.fps)+f.offset)%anim.frames;
+     ctx.clearRect(0,0,canvas.width,canvas.height);
+     ctx.drawImage(image,frame*w,row*h,w,h,44-sheet.anchor[0],73-sheet.anchor[1],w,h);
+   }
+   requestAnimationFrame(draw);
+ }
+ function showState(){pause.textContent = paused ? 'Play' : 'Pause';}
+ pause.onclick = () => { paused = !paused; showState(); };
+ document.querySelector('#step').onclick = () => { paused = true; showState(); for(const f of figures) f.offset++; };
+ showState(); requestAnimationFrame(draw);
+}
+</script></body></html>

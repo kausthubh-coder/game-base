@@ -1,0 +1,719 @@
+{
+  "version": 1,
+  "sprites": {
+    "tamsin": {
+      "sheet": "stacked/tamsin.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "maren": {
+      "sheet": "stacked/maren.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "odo": {
+      "sheet": "stacked/odo.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "gus": {
+      "sheet": "stacked/gus.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2.207792207792208,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "mira": {
+      "sheet": "stacked/mira.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "wren": {
+      "sheet": "stacked/wren.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2.2727272727272725,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "juniper": {
+      "sheet": "stacked/juniper.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "brack": {
+      "sheet": "stacked/brack.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "villager-a": {
+      "sheet": "stacked/villager-a.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "villager-b": {
+      "sheet": "stacked/villager-b.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "leaftail": {
+      "sheet": "stacked/leaftail.png",
+      "frame": [
+        48,
+        48
+      ],
+      "anchor": [
+        24,
+        44
+      ],
+      "worldHeight": 0.85,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "pet": {
+      "sheet": "stacked/pet.png",
+      "frame": [
+        48,
+        48
+      ],
+      "anchor": [
+        24,
+        44
+      ],
+      "worldHeight": 0.85,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "mossling": {
+      "sheet": "stacked/mossling.png",
+      "frame": [
+        48,
+        48
+      ],
+      "anchor": [
+        24,
+        44
+      ],
+      "worldHeight": 0.64,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 4,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 16,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        },
+        "settle": {
+          "frames": 8,
+          "fps": 6,
+          "rows": {
+            "front": 16,
+            "frontRight": 17,
+            "side": 18,
+            "backRight": 19,
+            "back": 20,
+            "backLeft": 21,
+            "left": 22,
+            "frontLeft": 23
+          }
+        }
+      }
+    },
+    "critter": {
+      "sheet": "stacked/critter.png",
+      "frame": [
+        48,
+        48
+      ],
+      "anchor": [
+        24,
+        44
+      ],
+      "worldHeight": 0.85,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 8,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        }
+      }
+    },
+    "lanternfly": {
+      "sheet": "stacked/lanternfly.png",
+      "frame": [
+        48,
+        48
+      ],
+      "anchor": [
+        24,
+        44
+      ],
+      "worldHeight": 0.85,
+      "animations": {
+        "flutter": {
+          "frames": 8,
+          "fps": 20,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        }
+      }
+    },
+    "hero": {
+      "sheet": "stacked/hero.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "idle": {
+          "frames": 4,
+          "fps": 4,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        },
+        "walk": {
+          "frames": 8,
+          "fps": 13.333333333333334,
+          "rows": {
+            "front": 8,
+            "frontRight": 9,
+            "side": 10,
+            "backRight": 11,
+            "back": 12,
+            "backLeft": 13,
+            "left": 14,
+            "frontLeft": 15
+          }
+        },
+        "tool": {
+          "frames": 8,
+          "fps": 21.333333333333332,
+          "rows": {
+            "front": 16,
+            "frontRight": 17,
+            "side": 18,
+            "backRight": 19,
+            "back": 20,
+            "backLeft": 21,
+            "left": 22,
+            "frontLeft": 23
+          }
+        }
+      }
+    },
+    "hero-swing": {
+      "sheet": "stacked/hero-swing.png",
+      "frame": [
+        64,
+        64
+      ],
+      "anchor": [
+        32,
+        60
+      ],
+      "worldHeight": 2,
+      "animations": {
+        "tool": {
+          "frames": 8,
+          "fps": 24,
+          "rows": {
+            "front": 0,
+            "frontRight": 1,
+            "side": 2,
+            "backRight": 3,
+            "back": 4,
+            "backLeft": 5,
+            "left": 6,
+            "frontLeft": 7
+          }
+        }
+      }
+    }
+  }
+}

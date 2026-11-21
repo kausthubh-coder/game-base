@@ -7,18 +7,26 @@ const url=option('--url','http://127.0.0.1:5797/');
 const out = option('--out','.artifacts/hero-frame-repair'); mkdirSync(out,{recursive:true});
 const browser=await launchChrome();
 try {
- const page=await browser.newPage();await page.goto(url+'?quality=low');await page.waitForFunction(()=>!!window.__game);
- const result=await page.evaluate(()=>{
+ const stacked = args.includes('--sprite-stack');
+ const target = new URL(url);
+ target.searchParams.set('quality', 'low');
+ if (stacked) target.searchParams.set('look', 'sprite-stack');
+ const page=await browser.newPage();await page.goto(target.href);await page.waitForFunction(()=>!!window.__game);
+ const result=await page.evaluate(stacked=>{
   const v=window.__game.view,renderer=v.renderer,scene=v.ctx.scene,sprites=v.sprites,mesh=scene.getObjectByName('sprites');
   v.setPaused(true);sprites.clear();for(const child of scene.children)child.visible=child===mesh;
-  scene.background=null;scene.fog=null;renderer.toneMapping=0;renderer.setPixelRatio(1);renderer.setSize(128,128,false);renderer.setClearColor(0,1);
+  scene.background=null;scene.fog=null;renderer.toneMapping=0;renderer.setPixelRatio(1);renderer.setClearColor(0,1);
   const lens=v.ctx.camera.clone();lens.isPerspectiveCamera=false;lens.isOrthographicCamera=true;lens.position.set(0,0,10);lens.lookAt(0,0,0);lens.updateMatrixWorld();v.ctx.camera=lens;
   const light=mesh.material.uniforms.uSky.value.clone().setRGB(1,1,1);sprites.setSky({light});
-  const gl=renderer.getContext(),drawn=new Uint8Array(128*128*4),failures=[];let cases=0;
+  const gl=renderer.getContext(),failures=[];let cases=0;
   let creature=sprites.add('frog',{visible:false});
-  for(const name of ['hero','hero-swing']){
+  const names = stacked ? ['tamsin','leaftail','mossling','critter','lanternfly','hero','hero-swing'] : ['hero','hero-swing'];
+  const headings = ['back','backRight','side','frontRight','front','frontLeft','left','backLeft'];
+  for(const name of names){
    const asset=v.assets.sprite(name),h=sprites.add(name,{shadow:0,tint:[1/1.06,1/1.06,1/1.06]});
    const [fw,fh]=asset.frame,[ax,ay]=asset.anchor,scale=asset.worldHeight/fh;
+   renderer.setSize(fw, fh, false);
+   const drawn = new Uint8Array(fw * fh * 4);
    lens.projectionMatrix.makeOrthographic(-ax*scale,(fw-ax)*scale,ay*scale,-(fh-ay)*scale,.1,50);lens.projectionMatrixInverse.copy(lens.projectionMatrix).invert();
    for (let direction = 0; direction < 8; direction++) {
     h.setFacing(direction * Math.PI / 4);
@@ -37,6 +45,9 @@ try {
       const data = mesh.geometry.attributes.aPlace.data.array;
       const row = (data[slot + 5] - v.assets.spriteAtlas().place(name).y) / fh;
       const mirrored = data[slot + 11] < 0;
+      if (stacked && (row !== anim.rows[headings[direction]] || mirrored)) {
+       throw Error(`${name} ${animation} expected ${headings[direction]}, got row ${row}, mirrored ${mirrored}`);
+      }
       let wrong = 0, worst = 0, solid = 0;
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
        const sourceX = mirrored ? 2 * ax - 1 - x : x;
@@ -58,7 +69,7 @@ try {
    h.remove();
   }
   return{cases,failures,glError:gl.getError()};
- });
+ }, stacked);
  writeFileSync(out+'/preview-rendered-frames.json',JSON.stringify({renderer:browser.gameRenderer,...result},null,2));console.log(JSON.stringify({...result,failures:result.failures.slice(0,6)}));
  if(result.failures.length||result.glError)process.exitCode=1;
 }finally{await browser.close()}

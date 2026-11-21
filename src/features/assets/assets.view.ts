@@ -40,6 +40,8 @@ export interface AssetsOptions {
    * Either way a sprite drawn larger than its pixels shows them sharp.
    */
   spriteFilter?: 'smooth' | 'nearest';
+  /** Optional sprite pack with its own manifest and sheet files, used by look experiments. */
+  spritePackUrl?: string;
   io?: AssetIO;
 }
 
@@ -283,6 +285,14 @@ export async function loadAssets(options: AssetsOptions = {}): Promise<Assets> {
   }
   const manifest = parseManifest(json);
 
+  const packFiles = new Map<string, string>();
+  if (options.spritePackUrl) {
+    const pack = parseManifest(await io.json(options.spritePackUrl));
+    for (const [name, entry] of Object.entries(pack.sprites)) {
+      manifest.sprites[name] = entry;
+      packFiles.set(entry.sheet, new URL(entry.sheet, options.spritePackUrl).href);
+    }
+  }
   const wanted = wantedFiles(manifest);
 
   const total = wanted.size + 1;
@@ -293,7 +303,7 @@ export async function loadAssets(options: AssetsOptions = {}): Promise<Assets> {
   const problems: string[] = [];
   await Promise.all([...wanted].map(async ([file, owner]) => {
     try {
-      files.set(file, await io.image(baseUrl + file));
+      files.set(file, await io.image(packFiles.get(file) ?? baseUrl + file));
     } catch (error) {
       problems.push(`${file}, ${owner} (${reason(error)})`);
     }

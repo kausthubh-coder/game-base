@@ -1,4 +1,4 @@
-// Which drawing of a character the camera should see. A character is drawn from the front, the
+// Which drawing of a character the camera should see. Standard sheets are drawn from the front, the
 // back and one side, and the side faces right. From the way the character faces in the world and
 // the way the camera looks, this picks the row and says whether to mirror it. Plain numbers only.
 //
@@ -16,7 +16,12 @@ export const VIEW_SIDE_RIGHT = 2;
 /** The character faces the left of the screen: the side row mirrored. */
 export const VIEW_SIDE_LEFT = 3;
 
-export type SpriteView = typeof VIEW_FRONT | typeof VIEW_BACK | typeof VIEW_SIDE_RIGHT | typeof VIEW_SIDE_LEFT;
+export const VIEW_FRONT_RIGHT = 4;
+export const VIEW_FRONT_LEFT = 5;
+export const VIEW_BACK_RIGHT = 6;
+export const VIEW_BACK_LEFT = 7;
+
+export type SpriteView = typeof OCTANTS[number];
 
 /**
  * The front and the back each own a quarter of the circle, a little less than 45 degrees to either
@@ -33,7 +38,11 @@ const FRONT_ARC = Math.cos(Math.PI / 4) + 1e-4;
  */
 export const VIEW_HOLD = 0.14;
 
-function viewAt(turned: number): SpriteView {
+const OCTANTS = [VIEW_FRONT, VIEW_FRONT_LEFT, VIEW_SIDE_LEFT, VIEW_BACK_LEFT, VIEW_BACK,
+  VIEW_BACK_RIGHT, VIEW_SIDE_RIGHT, VIEW_FRONT_RIGHT] as const;
+
+function viewAt(turned: number, diagonals: boolean): SpriteView {
+  if (diagonals) return OCTANTS[Math.round(turned / (Math.PI / 4)) & 7];
   const toward = Math.cos(turned);
   if (toward > FRONT_ARC) return VIEW_FRONT;
   if (toward < -FRONT_ARC) return VIEW_BACK;
@@ -41,12 +50,12 @@ function viewAt(turned: number): SpriteView {
 }
 
 /** The drawing to show. Pass the one showing now as `current` and it holds until the turn is `VIEW_HOLD` past the edge. */
-export function pickView(facing: number, cameraYaw: number, current?: SpriteView): SpriteView {
+export function pickView(facing: number, cameraYaw: number, current?: SpriteView, diagonals = false): SpriteView {
   // 0 when the character looks straight at the camera, growing as it turns to the left of the screen.
   const turned = facing + cameraYaw - Math.PI;
-  const view = viewAt(turned);
+  const view = viewAt(turned, diagonals);
   if (current === undefined || view === current) return view;
-  return viewAt(turned - VIEW_HOLD) === current || viewAt(turned + VIEW_HOLD) === current ? current : view;
+  return viewAt(turned - VIEW_HOLD, diagonals) === current || viewAt(turned + VIEW_HOLD, diagonals) === current ? current : view;
 }
 
 /**

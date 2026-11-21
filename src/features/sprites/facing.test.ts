@@ -1,6 +1,6 @@
 import { expect, test } from 'bun:test';
 import * as THREE from 'three';
-import { VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, VIEW_SIDE_RIGHT, cameraYawOf, pickView } from './facing.ts';
+import { VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, VIEW_SIDE_RIGHT, VIEW_BACK_RIGHT, VIEW_BACK_LEFT, VIEW_FRONT_RIGHT, VIEW_FRONT_LEFT, cameraYawOf, pickView } from './facing.ts';
 
 const EIGHTH = Math.PI / 4;
 // The eight ways a character can face, as the hero's body counts them: 0 is north, then clockwise seen from above.
@@ -126,4 +126,14 @@ test('a drawing that is showing holds a little past the edge, so a swaying camer
   // And back again: the side holds a little past the edge too.
   expect(NAMES[pickView(facing, justFront, VIEW_SIDE_RIGHT)]).toBe(R);
   expect(NAMES[pickView(facing, edge + 0.3, VIEW_SIDE_RIGHT)]).toBe(F);
+});
+
+test('stacked sprites turn through eight separate views and hold a diagonal through boundary jitter', () => {
+  const views = FACINGS.map(name => pickView(facingOf(name), 0, undefined, true));
+  expect(new Set(views).size).toBe(8);
+  expect(views.slice(0, 3)).toEqual([VIEW_BACK, VIEW_BACK_RIGHT, VIEW_SIDE_RIGHT]);
+  expect(views.slice(3)).toEqual([VIEW_FRONT_RIGHT, VIEW_FRONT, VIEW_FRONT_LEFT, VIEW_SIDE_LEFT, VIEW_BACK_LEFT]);
+  const diagonal = pickView(Math.PI/4, 0, undefined, true);
+  expect(pickView(Math.PI/8 - 0.01, 0, diagonal, true)).toBe(diagonal);
+  expect(pickView(0, 0, diagonal, true)).toBe(VIEW_BACK);
 });

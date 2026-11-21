@@ -143,7 +143,7 @@ export async function createShell(options: ShellOptions): Promise<Shell> {
   const lens = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 1, 400);
   const ctx: ViewContext = { scene, camera: lens, renderer, ambient: calmNoon(), world: flatWorld, quality: startLevel, time: 0 };
 
-  const art = await loadArt(options.onProgress);
+  const art = await loadArt(options.onProgress, params.get('look') === 'sprite-stack');
 
   // ---------------------------------------------------------------- the world, the rules, the features
   // The debug overlays share one column in the top left, so any of them can be shown with the others.

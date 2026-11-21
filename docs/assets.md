@@ -147,7 +147,8 @@ The sprite pipeline writes it. The game never guesses a file name.
 - **Sprites.** A character's first sheet has its idle and walk. An action or pose sheet is `<character>-<set>`
   (`hero-swing`, `hero-camp`, `custodian-wake`), and a recolour of the same body is `<character>-<form>`
   (`fox-blighted`). Each row is one animation seen from one direction, and each column is one frame. `rows` names
-  the row for `front`, `back` and `side`. The side view faces right. An animation with one direction lists only
+  the row for `front`, `back` and `side`. The side view faces right. An eight-direction sheet also supplies `left`, `frontRight`,
+  `frontLeft`, `backRight` and `backLeft`. Each of those rows has the same frames and timing. An animation with one direction lists only
   `front`.
 - **`anchor`** is the pixel in a frame where the feet touch the ground. **`worldHeight`** is how tall one frame is
   in blocks, so a figure drawn `d` pixels tall in a frame `f` pixels high stands `d / f * worldHeight` blocks. Every

@@ -159,6 +159,7 @@ interface AnimDef {
   frames: number;
   fps: number;
   /** Sheet rows. `back` and `side` are -1 when the animation was not drawn from there. */
+  angles?: readonly number[];
   front: number;
   back: number;
   side: number;
@@ -355,7 +356,11 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
   function describe(asset: SpriteAsset): SpriteDef {
     const anims = new Map<string, AnimDef>();
     for (const [name, a] of Object.entries(asset.animations)) {
-      anims.set(name, { name, frames: a.frames, fps: a.fps, front: a.rows.front, back: a.rows.back ?? -1, side: a.rows.side ?? -1 });
+      const r = a.rows;
+      // Indexed by SpriteView. Only a complete turntable uses eight-way facing.
+      const views = [r.front, r.back, r.side, r.left, r.frontRight, r.frontLeft, r.backRight, r.backLeft];
+      const angles = views.every((row): row is number => row !== undefined) ? views : undefined;
+      anims.set(name, { name, frames: a.frames, fps: a.fps, angles, front: r.front, back: r.back ?? -1, side: r.side ?? -1 });
     }
     const scale = asset.worldHeight / asset.frame[1];
     const place = atlas.place(asset.name);
@@ -419,7 +424,9 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
   function writeRow(h: Handle): void {
     const o = h.index * STRIDE, def = h.def, anim = h.anim;
     let row = anim.front, flip = 1;
-    if (h.view === VIEW_BACK) {
+    if (anim.angles) {
+      row = anim.angles[h.view];
+    } else if (h.view === VIEW_BACK) {
       if (anim.back >= 0) row = anim.back;
     } else if (h.view !== VIEW_FRONT && anim.side >= 0) {
       row = anim.side;
@@ -521,7 +528,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     setFacing(radians: number): void {
       if (this.index < 0) return;
       this.facing = radians;
-      const view = pickView(radians, clock.yaw, this.view);
+      const view = pickView(radians, clock.yaw, this.view, !!this.anim.angles);
       if (view === this.view) return;
       this.view = view;
       writeRow(this);
@@ -541,6 +548,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
       }
       const loop = playOptions?.loop ?? true;
       if (anim === this.anim && loop === this.loop && !playOptions?.restart) return true;
+      if (!!this.anim.angles !== !!anim.angles) this.view = pickView(this.facing, clock.yaw, undefined, !!anim.angles);
       this.anim = anim;
       this.loop = loop;
       const phase = playOptions?.phase;
@@ -753,7 +761,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
       // A random point in the loop, so a crowd added in one frame does not move in step.
       h.start = startForPhase(clock.now, h.anim.frames, h.anim.fps, random());
       h.facing = addOptions.facing ?? Math.PI;
-      h.view = pickView(h.facing, clock.yaw);
+      h.view = pickView(h.facing, clock.yaw, undefined, !!h.anim.angles);
       h.visible = addOptions.visible ?? true;
       h.shadow = addOptions.shadow ?? 1;
 
@@ -801,7 +809,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
         clock.yaw = turned;
         for (let i = 0; i < count; i++) {
           const h = handles[i];
-          const view = pickView(h.facing, clock.yaw, h.view);
+          const view = pickView(h.facing, clock.yaw, h.view, !!h.anim.angles);
           if (view !== h.view) {
             h.view = view;
             writeRow(h);

@@ -8,6 +8,8 @@ generation is strong at still pictures. AI 3D is fair at things that do not move
 weakest. So every style is judged on two things at once: how it looks next to the reference, and what it costs
 to add one more character, one more action and one more prop.
 
+The [sprite stacking experiment](sprite-stack.md) tries eight animated headings for the cast in the existing world.
+
 ## The target look
 
 Read these before you start:

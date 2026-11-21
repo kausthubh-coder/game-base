@@ -1,13 +1,13 @@
 // The shape of public/assets/manifest.json (see docs/assets.md) and the check that a file has it.
 // No Three.js and no page here: plain data in, plain data out, so a test or a build script can use it.
 
-export type SpriteDirection = 'front' | 'back' | 'side';
+export type SpriteDirection = 'front' | 'back' | 'side' | 'left' | 'frontRight' | 'frontLeft' | 'backRight' | 'backLeft';
 
 export interface AnimationEntry {
   frames: number;
   fps: number;
   /** The sheet row for each direction. An animation drawn from one direction lists only `front`. */
-  rows: { front: number; back?: number; side?: number };
+  rows: { front: number } & Partial<Record<SpriteDirection, number>>;
 }
 
 export interface SpriteEntry {
@@ -132,10 +132,17 @@ function animation(value: unknown, path: string): AnimationEntry {
     fps: positive(entry.fps, `${path}.fps`),
     rows: { front: wholeAtLeast(rows.front, 0, `${path}.rows.front`) },
   };
-  if (rows.back !== undefined) result.rows.back = wholeAtLeast(rows.back, 0, `${path}.rows.back`);
-  if (rows.side !== undefined) result.rows.side = wholeAtLeast(rows.side, 0, `${path}.rows.side`);
+  const diagonals = ['left', 'frontRight', 'frontLeft', 'backRight', 'backLeft'] as const;
+  const optional = ['side', 'back', ...diagonals] as const;
+  const extended = diagonals.find(key => rows[key] !== undefined);
+  if (extended && optional.some(key => rows[key] === undefined)) {
+    fail(`${path}.rows.${extended}`, 'part of a complete eight-direction animation', rows[extended]);
+  }
   for (const key of Object.keys(rows)) {
-    if (key !== 'front' && key !== 'back' && key !== 'side') fail(`${path}.rows.${key}`, 'one of front, back or side', key);
+    if (key !== 'front' && !optional.some(direction => direction === key)) fail(`${path}.rows.${key}`, 'a sprite direction', key);
+  }
+  for (const key of optional) {
+    if (rows[key] !== undefined) result.rows[key] = wholeAtLeast(rows[key], 0, `${path}.rows.${key}`);
   }
   return result;
 }
@@ -273,8 +280,7 @@ export function wantedFiles(manifest: Manifest): Map<string, string> {
 export function checkSheetSize(name: string, entry: SpriteEntry, width: number, height: number): void {
   const [fw, fh] = entry.frame;
   for (const [animationName, anim] of Object.entries(entry.animations)) {
-    for (const direction of ['front', 'back', 'side'] as const) {
-      const row = anim.rows[direction];
+    for (const [direction, row] of Object.entries(anim.rows)) {
       if (row === undefined) continue;
       const needWidth = anim.frames * fw, needHeight = (row + 1) * fh;
       if (needWidth > width || needHeight > height) {
