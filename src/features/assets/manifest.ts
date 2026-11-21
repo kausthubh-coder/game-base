@@ -135,7 +135,9 @@ function animation(value: unknown, path: string): AnimationEntry {
   const diagonals = ['left', 'frontRight', 'frontLeft', 'backRight', 'backLeft'] as const;
   const optional = ['side', 'back', ...diagonals] as const;
   const extended = diagonals.find(key => rows[key] !== undefined);
-  if (extended && optional.some(key => rows[key] === undefined)) {
+  const mirrorLeft = rows.left === undefined && rows.frontLeft === undefined && rows.backLeft === undefined;
+  const required = mirrorLeft ? ['side', 'back', 'frontRight', 'backRight'] : optional;
+  if (extended && required.some(key => rows[key] === undefined)) {
     fail(`${path}.rows.${extended}`, 'part of a complete eight-direction animation', rows[extended]);
   }
   for (const key of Object.keys(rows)) {

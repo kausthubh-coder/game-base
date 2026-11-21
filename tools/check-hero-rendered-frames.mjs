@@ -10,7 +10,7 @@ try {
  const stacked = args.includes('--sprite-stack');
  const target = new URL(url);
  target.searchParams.set('quality', 'low');
- if (stacked) target.searchParams.set('look', 'sprite-stack');
+ if (!stacked) target.searchParams.set('look', 'painted');
  const page=await browser.newPage();await page.goto(target.href);await page.waitForFunction(()=>!!window.__game);
  const result=await page.evaluate(stacked=>{
   const v=window.__game.view,renderer=v.renderer,scene=v.ctx.scene,sprites=v.sprites,mesh=scene.getObjectByName('sprites');
@@ -20,7 +20,7 @@ try {
   const light=mesh.material.uniforms.uSky.value.clone().setRGB(1,1,1);sprites.setSky({light});
   const gl=renderer.getContext(),failures=[];let cases=0;
   let creature=sprites.add('frog',{visible:false});
-  const names = stacked ? ['tamsin','leaftail','mossling','critter','lanternfly','hero','hero-swing'] : ['hero','hero-swing'];
+  const names = stacked ? Object.keys(v.assets.manifest.sprites) : ['hero','hero-swing'];
   const headings = ['back','backRight','side','frontRight','front','frontLeft','left','backLeft'];
   for(const name of names){
    const asset=v.assets.sprite(name),h=sprites.add(name,{shadow:0,tint:[1/1.06,1/1.06,1/1.06]});
@@ -45,8 +45,10 @@ try {
       const data = mesh.geometry.attributes.aPlace.data.array;
       const row = (data[slot + 5] - v.assets.spriteAtlas().place(name).y) / fh;
       const mirrored = data[slot + 11] < 0;
-      if (stacked && (row !== anim.rows[headings[direction]] || mirrored)) {
-       throw Error(`${name} ${animation} expected ${headings[direction]}, got row ${row}, mirrored ${mirrored}`);
+      if (stacked && anim.rows.frontRight !== undefined) {
+       const key = headings[direction], other = {left:'side', frontLeft:'frontRight', backLeft:'backRight'}[key];
+       const flip = anim.rows[key] === undefined;
+       if (row !== (anim.rows[key] ?? anim.rows[other]) || mirrored !== flip) throw Error(name+' '+animation+' wrong heading '+key);
       }
       let wrong = 0, worst = 0, solid = 0;
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {

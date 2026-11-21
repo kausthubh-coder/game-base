@@ -1,14 +1,14 @@
-# Sprite stacking experiment
+# Eight-direction character sprites
 
-Open `/?scene=sprite-meadow&look=sprite-stack` to start on the grant with the Leaftail and a spade. Walk with WASD, hold two directions to walk diagonally, and hold the left mouse button over nearby soil to dig. Open `/?scene=sprite-meadow` for the game's original sprites at the same saved position. The meadow keeps its own save.
+Open `/?scene=sprite-meadow` to start on the grant with the Leaftail and a spade. Walk with WASD, hold two directions to walk diagonally, and hold the left mouse button over nearby soil to dig. Open `/?scene=sprite-meadow&look=painted` for the game's original sprites at the same saved position. The meadow keeps its own save.
 
 To study individual poses, open `/experiments/sprite-stack/`. Choose an animation for Tamsin, the Leaftail, the Mossling or the player. Pause and use **Next frame** to inspect a footfall or tool strike.
 
 ## How the stack works
 
-`bun tools/sprites/bake-stack.mjs` poses the cast rigs, samples each surface into horizontal pixel slices, then projects them into eight directions. Nine NPCs, the Leaftail, the Mossling and the Lanternfly take their colour from their models. The game draws each baked frame on one quad and selects the row using the actor's facing and the camera's yaw.
+The game uses eight-direction sprites for directional movement and action poses in the world and in fights. One-view story poses keep their authored framing. The player and townspeople retain their own painted poses and timing. The Leaftail, Mossling and Lanternfly use their rigged stack animations.
 
-Tamsin uses her painted idle and walk sheets. The player uses the painted hero and swing sheets. Both keep their original frame size and timing. Cardinal views copy the original cels. On diagonals, the bake fits the posed rig's depth to each painted scanline, then projects the colours into the turned frame. This keeps the fringe, jacket, bag and both foot contacts in the walk. The diagonal views are reconstructions from the existing art. Story and combat sheets outside the pack use their original artwork.
+`bun tools/sprites/bake-stack.mjs` rebuilds the pack. A posed rig supplies depth where available. For sheets without a rig, the painted side view supplies the depth of each horizontal slice. The bake projects that depth into the diagonal views. Characters with symmetric turns share their right-facing rows with the mirrored left views.
 
 ## Check a build
 

@@ -36,6 +36,14 @@ export function assetBuild() {
         }
       }
       await walk(base);
+      const sourceFiles = [...files.keys()];
+      const castDir = resolve(out, 'experiments/sprite-stack');
+      const cast = JSON.parse(await readFile(resolve(castDir, 'manifest.json')));
+      const gameManifest = JSON.parse(files.get('manifest.json'));
+      Object.assign(gameManifest.sprites, cast.sprites);
+      for (const entry of Object.values(cast.sprites))
+        files.set(entry.sheet, await readFile(resolve(castDir, entry.sheet)));
+      files.set('game-cast.json', Buffer.from(JSON.stringify(gameManifest)));
       const names = new Map(), active = new Set();
       const rewrite = async value => {
         if(typeof value === 'string' && files.has(value)) return pack(value);
@@ -62,12 +70,13 @@ export function assetBuild() {
         return name;
       }
       for(const file of files.keys()) await pack(file);
-      // One stable discovery URL; every URL it hands out is immutable, including the voice/sound lists.
+      // The game and the original-art comparison each discover immutable URLs in their own manifest.
       await writeFile(resolve(base,'manifest.json'),await readFile(resolve(base,names.get('manifest.json'))));
-      for(const file of files.keys()) if(file!=='manifest.json') await rm(resolve(base,file));
+      for(const file of sourceFiles) if(file!=='manifest.json') await rm(resolve(base,file));
+      await writeFile(resolve(base,'game-cast.json'),await readFile(resolve(base,names.get('game-cast.json'))));
       await writeFile(resolve(out,'_headers'),`/*\n  Cache-Control: no-cache\n\n/assets/fingerprinted/*\n  ! Cache-Control\n  Cache-Control: public, max-age=31536000, immutable\n`);
       // The files the first frame waits for start downloading with the script, not after it has run.
-      await preloadFirstFrame(out, JSON.parse(await readFile(resolve(base,'manifest.json'))));
+      await preloadFirstFrame(out, JSON.parse(await readFile(resolve(base,'game-cast.json'))));
       // A deploy changes the worker version; activate immediately and keep the shared content cache.
       const version=createHash('sha256').update(await readFile(resolve(out,'index.html'))).update([...names.values()].sort().join('\n')).digest('hex').slice(0,12);
       const worker=await readFile(resolve(config.root,'tools/asset-worker.js'),'utf8');
@@ -100,7 +109,7 @@ async function preloadFirstFrame(out, manifest) {
   const page = resolve(out, 'index.html');
   const html = await readFile(page, 'utf8').catch(() => null);
   if (html === null || !html.includes('<script type="module"')) return;
-  const fetched = ['manifest.json', ...wantedFiles(parseManifest(manifest)).keys()];
+  const fetched = ['game-cast.json', ...wantedFiles(parseManifest(manifest)).keys()];
   const links = [
     ...fetched.map((file) => `<link rel="preload" as="fetch" crossorigin href="./assets/${file}">`),
     ...Object.values(manifest.painted?.textures ?? {}).map((file) => `<link rel="preload" as="image" href="./assets/${file}">`),

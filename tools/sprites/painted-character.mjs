@@ -43,7 +43,7 @@ export async function loadCharacterPaint(source) {
         }
       if (last < first) continue;
       const layerY = Math.round(((anchor[1] - y) * scale) / (h * 0.84));
-      const slice = layers.get(layerY);
+      const slice = layers?.get(layerY);
       let minX = Infinity,
         maxX = -Infinity;
       const depths = new Map();
@@ -56,6 +56,15 @@ export async function loadCharacterPaint(source) {
           depths.set(x, Math.max(z, depths.get(x) ?? -Infinity));
         }
       const width = last - first + 1;
+      // Without a rig, the matching painted profile supplies the depth of this slice.
+      let volume = width * 0.34;
+      if (!layers && anim.rows.side !== undefined) {
+        const start = 4 * ((anim.rows.side * h + y) * info.width + frame * w);
+        let nose = w - 1, rear = 0;
+        while (rear <= nose && data[start + rear * 4 + 3] < 128) rear++;
+        while (nose >= rear && data[start + nose * 4 + 3] < 128) nose--;
+        if (nose >= rear) volume = Math.min(width * .7, (nose - rear + 1) * .4);
+      }
       for (let x = first; x <= last; x++) {
         const src = read(x, y);
         if (data[src + 3] < 128) continue;
@@ -65,7 +74,6 @@ export async function loadCharacterPaint(source) {
         const round = Math.sqrt(4 * t * (1 - t));
         // Round the painted fringe and soften hard triangle edges in the face. Boots
         // and sleeves keep more of the posed rig's travel through the step.
-        const volume = width * 0.34;
         const rigWeight = near === undefined ? 0 : y < h * 0.45 ? 0.18 : 0.55;
         relief[y * w + x] = (near ?? 0) * rigWeight + volume * round * (1 - rigWeight);
         painted[y * w + x] = 1;

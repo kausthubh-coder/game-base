@@ -14,6 +14,6 @@ export {
   createSprites,
   type AddOptions, type PlayOptions, type SpriteHandle, type SpriteStats, type Sprites, type SpritesOptions, type SpritesSky,
 } from './sprites.view.ts';
-export { VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, VIEW_SIDE_RIGHT, cameraYawOf, pickView, type SpriteView } from './facing.ts';
+export { hasDiagonals, mirrorRow, sheetRow, VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, VIEW_SIDE_RIGHT, cameraYawOf, pickView, type SpriteView } from './facing.ts';
 export { frameAt, seededRandom } from './animation.ts';
 export { dayLight, lightCurve } from './light.ts';

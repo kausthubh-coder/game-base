@@ -6,7 +6,7 @@
 // axis, with the sheet's anchor pixel on the feet, exactly as src/features/sprites draws a character.
 import * as THREE from 'three';
 import type { SpriteAsset } from '../../features/assets/index.ts';
-import { VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, pickView, type SpriteView } from '../../features/sprites/index.ts';
+import { hasDiagonals, mirrorRow, sheetRow, VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, pickView, type SpriteView } from '../../features/sprites/index.ts';
 import type { GameView } from '../shell/view.ts';
 
 export interface Figure {
@@ -256,10 +256,15 @@ export function createFigures(view: GameView): Figures {
       this.clock += dt;
       const a = this.sheet.asset, anim = a.animations[this.animation];
       if (!anim) return;
-      this.seen = pickView(this.facing, cameraYaw, this.seen);
       const rows = anim.rows;
+      const eight = hasDiagonals(rows);
+      this.seen = pickView(this.facing, cameraYaw, this.seen, eight);
       let row = rows.front, flip = 1;
-      if (this.seen === VIEW_BACK) row = rows.back ?? rows.front;
+      if (eight) {
+        row = sheetRow(rows, this.seen);
+        flip = mirrorRow(rows, this.seen) ? -1 : 1;
+      }
+      else if (this.seen === VIEW_BACK) row = rows.back ?? rows.front;
       else if (this.seen !== VIEW_FRONT && rows.side !== undefined) { row = rows.side; if (this.seen === VIEW_SIDE_LEFT) flip = -1; }
       if (this.mirror && (this.seen === VIEW_FRONT || this.seen === VIEW_BACK)) flip = -flip;
       const frame = this.frame >= 0 ? Math.min(this.frame, anim.frames - 1) : Math.floor(this.clock * anim.fps) % anim.frames;

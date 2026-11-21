@@ -156,3 +156,10 @@ test('a diagonal outside an eight-direction sheet fails the size check', () => {
   expect(() => checkSheetSize('hero', hero, 768, 896)).toThrow(/idle puts its backLeft view on row 7/);
   expect(() => checkSheetSize('hero', hero, 768, 1024)).not.toThrow();
 });
+
+test('a painted turn can store five rows and mirror the three left views', () => {
+  const manifest = real();
+  const rows = { front: 0, frontRight: 1, side: 2, backRight: 3, back: 4 };
+  manifest.sprites.hero.animations.idle.rows = rows;
+  expect(parseManifest(manifest).sprites.hero.animations.idle.rows).toEqual(rows);
+});

@@ -31,6 +31,7 @@ export interface LoadProgress {
 export interface AssetsOptions {
   /** The folder that holds manifest.json. Default: `assets/` beside the page. */
   baseUrl?: string;
+  manifestFile?: string;
   onProgress?: (progress: LoadProgress) => void;
   /** The longest side of a sprite atlas page. Default 4096, which every WebGL 2 device this game aims at can hold. */
   maxAtlasSize?: number;
@@ -277,11 +278,12 @@ export async function loadAssets(options: AssetsOptions = {}): Promise<Assets> {
   const maxAtlasSize = options.maxAtlasSize ?? 4096;
   const spriteFilter = options.spriteFilter ?? 'smooth';
 
+  const manifestUrl = baseUrl + (options.manifestFile ?? 'manifest.json');
   let json: unknown;
   try {
-    json = await io.json(baseUrl + 'manifest.json');
+    json = await io.json(manifestUrl);
   } catch (error) {
-    throw new AssetError(`The asset manifest did not load from ${baseUrl}manifest.json: ${reason(error)}.`);
+    throw new AssetError(`The asset manifest did not load from ${manifestUrl}: ${reason(error)}.`);
   }
   const manifest = parseManifest(json);
 
@@ -289,8 +291,9 @@ export async function loadAssets(options: AssetsOptions = {}): Promise<Assets> {
   if (options.spritePackUrl) {
     const pack = parseManifest(await io.json(options.spritePackUrl));
     for (const [name, entry] of Object.entries(pack.sprites)) {
-      manifest.sprites[name] = entry;
-      packFiles.set(entry.sheet, new URL(entry.sheet, options.spritePackUrl).href);
+      const url = new URL(entry.sheet, options.spritePackUrl).href;
+      manifest.sprites[name] = { ...entry, sheet: url };
+      packFiles.set(url, url);
     }
   }
   const wanted = wantedFiles(manifest);

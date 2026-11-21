@@ -21,28 +21,11 @@ const headings = [
   'left',
   'frontLeft',
 ];
-const npcNames = [
-  'tamsin',
-  'maren',
-  'odo',
-  'gus',
-  'mira',
-  'wren',
-  'juniper',
-  'brack',
-  'villager-a',
-  'villager-b',
-];
-const cast = [
-  ...npcNames,
-  'leaftail',
-  'pet',
-  'mossling',
-  'critter',
-  'lanternfly',
-  'hero',
-  'hero-swing',
-];
+// One-way story illustrations keep their authored camera. Every directional action
+// takes its poses from its own sheet, including characters without a matching cast rig.
+const cast = Object.keys(manifest.sprites).filter((name) =>
+  name === 'lanternfly' || Object.values(manifest.sprites[name].animations).some((a) => a.rows.side !== undefined),
+);
 const light = new THREE.Vector3(-0.45, 0.8, 0.6).normalize();
 
 function addSpade(scene) {
@@ -173,21 +156,22 @@ await mkdir(root + '/stacked', { recursive: true });
 for (const name of cast) {
   const model = CAST[name]?.model ?? (name === 'hero-swing' ? 'hero' : name);
   const definition = CAST_MODELS[model];
-  const bytes = await readFile('public/' + definition.file);
-  const { scene, animations: clips } = await new GLTFLoader().parseAsync(
-    bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
-    '',
-  );
-  const source = manifest.sprites[name],
+  const source = manifest.sprites[name];
+  const hero = model === 'hero';
+  const painted = !['leaftail', 'pet', 'critter', 'mossling', 'lanternfly'].includes(name);
+  const divisor = painted ? 1 : 2;
+  let scene, clips, mixer, size;
+  if (definition) {
+    const bytes = await readFile('public/' + definition.file);
+    ({ scene, animations: clips } = await new GLTFLoader().parseAsync(
+      bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength), '',
+    ));
     mixer = new THREE.AnimationMixer(scene);
-  const box = new THREE.Box3().setFromObject(scene, true),
-    size = box.getSize(new THREE.Vector3());
-  const hero = model === 'hero',
-    painted = hero || name === 'tamsin',
-    divisor = painted ? 1 : 2;
+    size = new THREE.Box3().setFromObject(scene, true).getSize(new THREE.Vector3());
+  }
   const [w, h] = source.frame.map((n) => n / divisor),
     anchor = source.anchor.map((n) => n / divisor);
-  const scale = Math.min((h * 0.8) / size.y, (w * 0.84) / Math.hypot(size.x, size.z));
+  const scale = size && Math.min((h * 0.8) / size.y, (w * 0.84) / Math.hypot(size.x, size.z));
   if (hero) addSpade(scene);
   const paint = painted ? await loadCharacterPaint(source) : null;
   const toolPaint = name === 'hero' ? await loadCharacterPaint(manifest.sprites['hero-swing']) : paint;
@@ -197,39 +181,43 @@ for (const name of cast) {
     columns = 0;
   for (const [action, original] of Object.entries(source.animations)) {
     const paintPose = action === 'tool' ? toolPaint : paint;
-    const clipName = definition.clips[action === 'settle' ? 'special' : action];
-    const clip = THREE.AnimationClip.findByName(clips, clipName);
-    if (!clip) throw Error(model + ' has no ' + clipName + ' clip for ' + action);
+    const clipName = definition?.clips[action === 'settle' ? 'special' : action];
+    const clip = clips && THREE.AnimationClip.findByName(clips, clipName);
+    if (definition && !clip) throw Error(model + ' has no ' + clipName + ' clip for ' + action);
     if (model === 'hero') {
       for (const part of scene.getObjectByName('handRtool').children)
         part.visible = action === 'tool';
     }
     const count = painted ? original.frames : Math.max(original.frames, action === 'idle' ? 4 : 8);
     const fps = (count * original.fps) / original.frames;
+    const directional = original.rows.side !== undefined || name === 'hero' || !painted;
+    // These painted turns are symmetric, so the renderer can reflect the right rows.
+    const storeMirrors = !painted || hero || name === 'tamsin';
+    const directions = directional ? headings.slice(0, storeMirrors ? 8 : 5) : ['front'];
     animations[action] = {
       frames: count,
       fps,
-      rows: Object.fromEntries(headings.map((key, i) => [key, rows + i])),
+      rows: Object.fromEntries(directions.map((key, i) => [key, rows + i])),
     };
     columns = Math.max(columns, count);
-    mixer.stopAllAction();
-    mixer.clipAction(clip).reset().play();
+    mixer?.stopAllAction();
+    mixer?.clipAction(clip).reset().play();
     for (let i = 0; i < count; i++) {
       // Start on a contact pose, then pass, lift and contact with the other boot.
       const phase = painted && action === 'walk' ? (i / count + 0.25) % 1 : i / count;
-      mixer.setTime(phase * clip.duration);
-      const layers = slicePose(scene, scale);
-      for (let dir = 0; dir < headings.length; dir++)
+      mixer?.setTime(phase * clip.duration);
+      const layers = scene && slicePose(scene, scale);
+      for (let dir = 0; dir < directions.length; dir++)
         frames.push({
           input: paintPose
-            ? paintPose(action, i, dir, layers, size.y * scale, anchor)
+            ? paintPose(action, i, dir, layers, size && size.y * scale, anchor)
             : draw(layers, dir, w, h, anchor),
           raw: { width: w, height: h, channels: 4 },
           left: i * w,
           top: (rows + dir) * h,
         });
     }
-    rows += headings.length;
+    rows += directions.length;
   }
   const sheet = 'stacked/' + name + '.png';
   await sharp({

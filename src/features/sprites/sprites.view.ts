@@ -12,7 +12,7 @@ import { QUALITY } from '../../content/quality.ts';
 import type { WorldQuery } from '../../engine/world-query.ts';
 import type { Assets, SpriteAsset, SpriteAtlas } from '../assets/index.ts';
 import { foldStart, frameAt, loopSeconds, seededRandom, startForPhase } from './animation.ts';
-import { VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, cameraYawOf, pickView, type SpriteView } from './facing.ts';
+import { hasDiagonals, mirrorRow, sheetRow, VIEW_BACK, VIEW_FRONT, VIEW_SIDE_LEFT, cameraYawOf, pickView, type SpriteView } from './facing.ts';
 import { LAMP_LIGHT, dayLight, type Rgb } from './light.ts';
 
 export interface SpritesOptions {
@@ -159,7 +159,7 @@ interface AnimDef {
   frames: number;
   fps: number;
   /** Sheet rows. `back` and `side` are -1 when the animation was not drawn from there. */
-  angles?: readonly number[];
+  angles?: SpriteAsset['animations'][string]['rows'];
   front: number;
   back: number;
   side: number;
@@ -357,9 +357,7 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     const anims = new Map<string, AnimDef>();
     for (const [name, a] of Object.entries(asset.animations)) {
       const r = a.rows;
-      // Indexed by SpriteView. Only a complete turntable uses eight-way facing.
-      const views = [r.front, r.back, r.side, r.left, r.frontRight, r.frontLeft, r.backRight, r.backLeft];
-      const angles = views.every((row): row is number => row !== undefined) ? views : undefined;
+      const angles = hasDiagonals(r) ? r : undefined;
       anims.set(name, { name, frames: a.frames, fps: a.fps, angles, front: r.front, back: r.back ?? -1, side: r.side ?? -1 });
     }
     const scale = asset.worldHeight / asset.frame[1];
@@ -425,7 +423,8 @@ export function createSprites(ctx: ViewContext, options: SpritesOptions): Sprite
     const o = h.index * STRIDE, def = h.def, anim = h.anim;
     let row = anim.front, flip = 1;
     if (anim.angles) {
-      row = anim.angles[h.view];
+      row = sheetRow(anim.angles, h.view);
+      flip = mirrorRow(anim.angles, h.view) ? -1 : 1;
     } else if (h.view === VIEW_BACK) {
       if (anim.back >= 0) row = anim.back;
     } else if (h.view !== VIEW_FRONT && anim.side >= 0) {

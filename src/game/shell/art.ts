@@ -19,10 +19,11 @@ export interface Art {
 const MATERIALS: Readonly<Record<string, string>> = { oak_plank: 'oak_boards' };
 
 /** Loads the manifest and every file it lists. `onProgress` gets 0 to 1. */
-export async function loadArt(onProgress?: (done: number) => void, stackedSprites = false): Promise<Art> {
+export async function loadArt(onProgress?: (done: number) => void, stackedSprites = true): Promise<Art> {
   const baseUrl = new URL('assets/', document.baseURI).href;
-  const spritePackUrl = stackedSprites ? new URL('experiments/sprite-stack/manifest.json', document.baseURI).href : undefined;
-  const assets = await loadAssets({ baseUrl, spritePackUrl, onProgress: (p) => onProgress?.(p.loaded / p.total) });
+  const manifestFile = stackedSprites && import.meta.env.PROD ? 'game-cast.json' : 'manifest.json';
+  const spritePackUrl = stackedSprites && !import.meta.env.PROD ? new URL('experiments/sprite-stack/manifest.json', document.baseURI).href : undefined;
+  const assets = await loadAssets({ baseUrl, manifestFile, spritePackUrl, onProgress: (p) => onProgress?.(p.loaded / p.total) });
   const blocks = assets.manifest.blocks;
   const blockAtlas = blocks ? await loadBlockAtlas(blocks, baseUrl) : undefined;
   if (blockAtlas && assets.sheetNames().includes('materials')) await paintMaterials(blockAtlas, assets.sheet('materials'));

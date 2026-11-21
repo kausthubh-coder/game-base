@@ -69,7 +69,7 @@ export function createUiArt(assets: Assets): UiArt {
       if (!entry) return null;
       const stand = entry.animations.idle ?? Object.values(entry.animations)[0];
       const [width, height] = entry.frame;
-      return { url: assetBase() + entry.sheet, x: 0, y: (stand?.rows.front ?? 0) * height, width, height };
+      return { url: new URL(entry.sheet, assetBase()).href, x: 0, y: (stand?.rows.front ?? 0) * height, width, height };
     },
 
     iconElement(name) {

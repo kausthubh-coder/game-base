@@ -22,6 +22,23 @@ export const VIEW_BACK_RIGHT = 6;
 export const VIEW_BACK_LEFT = 7;
 
 export type SpriteView = typeof OCTANTS[number];
+/** Manifest row name for each SpriteView, in index order. */
+export const VIEW_ROWS = ['front', 'back', 'side', 'left', 'frontRight', 'frontLeft', 'backRight', 'backLeft'] as const;
+
+type FacingRows = {front: number} & Partial<Record<typeof VIEW_ROWS[number], number>>;
+
+export function hasDiagonals(rows: FacingRows): boolean {
+  return rows.side !== undefined && rows.back !== undefined && rows.frontRight !== undefined && rows.backRight !== undefined;
+}
+
+/** An omitted left view uses the matching right drawing reflected about the feet. */
+export function sheetRow(rows: FacingRows, view: SpriteView): number {
+  return rows[VIEW_ROWS[view]] ?? rows[VIEW_ROWS[view - 1]] ?? rows.front;
+}
+
+export function mirrorRow(rows: FacingRows, view: SpriteView): boolean {
+  return (view === VIEW_SIDE_LEFT || view === VIEW_FRONT_LEFT || view === VIEW_BACK_LEFT) && rows[VIEW_ROWS[view]] === undefined;
+}
 
 /**
  * The front and the back each own a quarter of the circle, a little less than 45 degrees to either
