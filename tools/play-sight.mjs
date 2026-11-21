@@ -217,10 +217,14 @@ if (part !== 'places') {
       const g = window.__game;
       if (!g.started) g.newGame();
       const sys = g.view.game.systems;
+      const fixtureTiming = { startedAt: performance.now(), phase: 'before skipTo', events: [], visibility: [] };
+      const stopFixtureEvents = g.view.game.events.on('flag.changed', event => {
+        if (event.flag === 'has.almanac') fixtureTiming.events.push({ at: performance.now(), phase: fixtureTiming.phase, event, currentLine: sys.talk.current() });
+      });
       if (sys.talk.active) sys.talk.skip();
       // skipTo fills old ledger sections; its queued road-dark scene belongs to prior progression.
       g.view.game.flags.set('story.seen.scene.27.dark', true);
-      if (quest) g.skipTo(quest);
+      if (quest) { fixtureTiming.phase = 'skipTo'; g.skipTo(quest); fixtureTiming.phase = 'remaining fixture setup'; }
       for (const [flag, value] of flags) g.view.game.flags.set(flag, value);
       g.setTime(night ? 0.9 : 0.45);
       g.advance(0.2);
@@ -245,17 +249,24 @@ if (part !== 'places') {
         const started=performance.now();let quietSince=started;
         function observe(){
           const now=performance.now();
-          if(document.querySelector('.hp-banner:not([hidden])'))quietSince=now;
-          if(now-quietSince>=1000){resolve();return;}
+          const gift = document.querySelector('.st-gift'), giftVisible = !!gift && !gift.hidden;
+          const bannerVisible = !!document.querySelector('.hp-banner:not([hidden])');
+          fixtureTiming.visibility.push({ at: now, giftVisible, giftHidden: gift?.hidden ?? null, giftOpacity: gift ? getComputedStyle(gift).opacity : null, giftLeaving: gift?.classList.contains('is-leaving') ?? null, bannerVisible, currentLine: sys.talk.current() });
+          if(bannerVisible || giftVisible)quietSince=now;
+          if(now-quietSince>=1000){fixtureTiming.quietAt=now;resolve();return;}
           if(now-started>=45000){reject(Error('fixture reward banners did not finish'));return;}
           requestAnimationFrame(observe);
         }
         requestAnimationFrame(observe);
       });
       if (sys.talk.active) sys.talk.skip();
+      fixtureTiming.startConversationAt = performance.now();
       sys.talk.start(id);
-      return { at, talking: sys.talk.active, scene: sys.talk.current()?.scene ?? 0, n };
+      fixtureTiming.lineAfterStart = sys.talk.current();
+      stopFixtureEvents();
+      return { at, talking: sys.talk.active, scene: sys.talk.current()?.scene ?? 0, n, fixtureTiming };
     }, { quest: where?.quest ?? null, flags: where?.flags ?? [], place, near: NEAR_SCENE - 0.5, npc: scene.start === 'npc' ? conversation.npc : null, night, id: conversation.id, n: scene.n, vaultExit: scene.start === 'vault' });
+    writeFileSync(resolve(out, `scene-${String(scene.n).padStart(2, '0')}-setup-lifecycle.json`), JSON.stringify(setup, null, 2));
     if (setup.scene !== scene.n) { report(label, [`expected scene ${scene.n}, got ${setup.scene}`]); continue; }
     if (!setup.talking) { report(label, [`its conversation ${conversation.id} did not start`]); continue; }
     report(label, await playLines(label, `scene-${String(scene.n).padStart(2, '0')}.png`, scene.n));
