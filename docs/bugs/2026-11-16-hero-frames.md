@@ -1,10 +1,12 @@
 # Hero briefly appears as an animal
 
-The November 21 spade recording shows the player turning into a fox on two consecutive swing loops. The November 16 recording showed a separate lighting blink on a slope.
+The November 21 spade recording shows a frog replacing the walking player and a fox replacing the swinging player. The November 16 recording showed a separate lighting blink on a slope.
 
-## Fox at the swing loop boundary, November 21
+## Frog during walking and fox during tool swings, November 21
 
-Frames 87–89 and 99–101 of the new recording (counting from zero) show a fox's back and part of the row below it. This matches the 128-pixel square immediately to the right of the back row of `hero-swing` in the packed atlas. At the end of the three-frame swing, reading column 3 instead of wrapping to column 0 selects exactly that square.
+Counting from zero, frames 11–13 and 29–31 show the frog during the back-facing walk. The hero sheet starts at x=384 and is 768 pixels wide. Column 6 of its six-frame walk lands at x=1152, the start of the frog sheet. The diagnostic reproduced the bad wrap at ticks 6 and 12. A real-input walk with the repaired shader covered all six frames.
+
+Frames 87–89 and 99–101 of the same recording show a fox's back and part of the row below it. This matches the 128-pixel square immediately to the right of the back row of `hero-swing` in the packed atlas. At the end of the three-frame swing, reading column 3 instead of wrapping to column 0 selects exactly that square.
 
 The sprite shader now uses unsigned integer remainder for looping frame indices. Floating-point division rounded down at an exact multiple can produce a remainder equal to the frame count. A diagnostic run that rounded the reciprocal down reproduced the wrong back-row pixels at ticks 3 and 6. The original shader passed on the Mac's normal Metal and software renderers. The recording does not identify the graphics driver.
 
