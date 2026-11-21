@@ -1,8 +1,8 @@
-// Paint the posed stack with the hero's own animation cels. The rig supplies the depth
+// Paint the posed stack with each character's own animation cels. The rig supplies the depth
 // of the arms, boots and tool. The original drawing supplies their outline and timing.
 import sharp from 'sharp';
 
-export async function loadHeroPaint(source) {
+export async function loadCharacterPaint(source) {
   const { data, info } = await sharp('public/assets/' + source.sheet)
     .ensureAlpha()
     .raw()
