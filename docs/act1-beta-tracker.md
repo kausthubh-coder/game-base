@@ -12,7 +12,7 @@ The combined candidate now uses real weapon combat in the opening and shows equi
 
 The final continuous replay passed fresh Begin through the first morning on the previous build. Homestead gameplay completed, but its Dax approach needed a runner correction, now proven separately. These earlier records remain preserved. A new combined build and final first-half replay are still required before publication. Later chapters remain outside this release. No reliable completion time is available yet.
 
-The first-farm objective also omitted its required fence. Its text now names the fence and pond stones; its hint explains the recipe, placement and farm panel. Source verification is pending on the refreshed candidate.
+The first-farm objective also omitted its required fence. Its text now names the fence and pond stones; its hint explains the recipe, placement and farm panel. The refreshed candidate passes the full code check. Desktop and phone screenshots show the instructions; ordinary fence placement consumed one fence and created the living farm. Final combined browser acceptance remains in progress.
 
 ## Beta blockers and active fixes
 
@@ -112,3 +112,9 @@ The UI movement replay now passes all 134 checks after its fixture moved outside
 Phone scene inspection found two cosmetic issues for the post-beta queue: the first Maren film speaker name clips at the right edge in scene 27, and foreground cutaway dithering remains visible in scene 22. The captions and required characters remain readable. These do not block progression, so this minimal release does not expand into a dialogue-layout or scenery redesign.
 
 Automatic-film checker repairs preserve the real scene timing and verify every captured line against the actual dialogue log. Failed diagnostics stay separate from passing scene evidence. No final replay or public release is claimed by this checkpoint.
+
+## Current bounded checks, 21 November
+
+Runtime `dist-beta-help-58446565` includes first-farm help and all candidate repairs. Full `bun run check` passes in `.artifacts/beta-final/attempt-05/check.log`. The campfire wait has passing normal-input and Continue evidence in attempt-04/camp-dusk; later product changes only add quest instructions. The coordinator inspected its visible prompt and continued night scene.
+
+Opening combat diagnostics pass desktop sword and bow and phone sword so far. The phone practice view shows duplicate instruction text behind the readable hint bubble. This cosmetic overlap is queued for after the minimal beta; hero, target and controls remain visible. No final opening, story preflight or continuous first-half replay acceptance is claimed yet.
