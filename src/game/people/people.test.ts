@@ -361,7 +361,8 @@ test('the four townspeople and ten villagers stand where act 1 puts them', () =>
   for (const [id, place] of Object.entries(posts) as [NpcId, string][]) {
     const person = people.get(id)!;
     expect(person.place).toBe(place);
-    expect(at(person.pos, PLACES[place])).toBe(true);
+    const [x, z] = PLACES[place];
+    expect(at(person.pos, [x + (id === 'tamsin' ? 2 : 0), z])).toBe(true);
     expect(person).toMatchObject({ sprite: id, portrait: id, voice: id });
     expect(actors.get('npc:' + id)!.sprite).toBe(id);
     expect(stage.prompts.get('npc:' + id)!.prompt()).toBe('Talk to ' + person.name);
@@ -404,7 +405,8 @@ test('Tamsin waits at the grant stone until the first night is over, then keeps 
   stage.run(0.05);
   hour(stage, 23);
   stage.run(1);
-  expect(at(tamsin(), PLACES['grant.stone'])).toBe(true);
+  const [x, z] = PLACES['grant.stone'];
+  expect(at(tamsin(), [x + 2, z])).toBe(true);
 
   hour(stage, 10);
   flags.set('quest.night.done', true);

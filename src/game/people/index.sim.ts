@@ -159,10 +159,13 @@ export function createPeople(game: Game, defs: readonly PersonDef[] = PEOPLE): P
     const spread = p.def.wander && stop !== p.stay && stop !== p.sent?.stop ? p.def.wander.spread : 0;
     // Someone who wanders stands a few blocks off the place, somewhere new each time.
     const aside = (): number => (spread > 0 ? Math.round((game.random() * 2 - 1) * spread) : 0);
+    // A quest can send someone back to their usual post without specifying a position.
+    const post = p.def.stay;
+    const offset = stop.offset ?? (!stop.at && post?.place === stop.place ? post.offset : undefined);
     const base = {
-      x: Math.floor(at.x) + 0.5 + (stop.offset?.x ?? 0) + aside(),
+      x: Math.floor(at.x) + 0.5 + (offset?.x ?? 0) + aside(),
       y: at.y,
-      z: Math.floor(at.z) + 0.5 + (stop.offset?.z ?? 0) + aside(),
+      z: Math.floor(at.z) + 0.5 + (offset?.z ?? 0) + aside(),
     };
     const taken = (x: number, z: number): boolean => {
       for (const o of people) if (o !== p && Math.floor(o.target.x) === x && Math.floor(o.target.z) === z) return true;

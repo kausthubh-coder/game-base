@@ -26,7 +26,7 @@ export interface PersonDef {
   /** Stops in order of hour. Before the first hour of a day, the last stop still holds. */
   routine: RoutineStop[];
   /** Stays at this place, whatever the hour, until the flag is set. */
-  stay?: { place: string; until: string };
+  stay?: Pick<RoutineStop, 'place' | 'offset'> & { until: string };
   /** Ignores the hours and walks to another of these places every `every` seconds, give or take a quarter. */
   wander?: { places: string[]; every: number; spread: number };
   /** Not in the world until this flag is set. Someone who comes to live on the player's land is `settler.<id>`. */
@@ -59,7 +59,7 @@ export const PEOPLE: readonly PersonDef[] = [
   named('tamsin', 'Tamsin', [
     { hour: 6, place: 'lodge' },
     { hour: 20, place: 'lodge', offset: { x: 3, z: 2 } },
-  ], { stay: { place: 'grant.stone', until: 'quest.night.done' } }),
+  ], { stay: { place: 'grant.stone', offset: { x: 2, z: 0 }, until: 'quest.night.done' } }),
   // Maren sleeps on a sack in the granary, counting, until the hero meets her there (scene 22). Then she keeps
   // the Queen's Hall across Civic Street, whose porch takes the ledger's deliveries.
   named('maren', 'Maren', at('town.hall'), { stay: { place: 'granary', until: 'scene.22' } }),
