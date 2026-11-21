@@ -709,7 +709,11 @@ export async function playGallery({run = null, args = process.argv, startingSave
         'normal attack recovery',
         6000,
       );
-    else await page.waitForTimeout(180);
+    else await wait(
+      () => fightRead().then((s) => !s || s.hero.act === 'none'),
+      'normal quick attack recovery',
+      6000,
+    );
   }
   async function combat(n) {
     return milestone('fight-'+n,()=>combatInput(n),state=>state.flags['fight.'+n+'.won']===true && !state.player.busy);
