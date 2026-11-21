@@ -132,7 +132,10 @@ export async function main(args = process.argv.slice(2)) {
       if (!s.talkLine) return;
       must(!s.talkLine.choices.length, 'unexpected choice after rack');
       await reveal();
-      if (capturePrefix) await capture(capturePrefix + '-' + (i + 1));
+      if (capturePrefix) {
+        await cameraSettled();
+        await capture(capturePrefix + '-' + (i + 1));
+      }
       const text = (await read()).talkLine.text;
       await press('KeyE');
       await wait(s => !s.talkLine || s.talkLine.text !== text, 'dialogue input advances');
