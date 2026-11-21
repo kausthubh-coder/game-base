@@ -820,14 +820,15 @@ export async function playGallery({run = null, args = process.argv, startingSave
           const v = s.targets.find((t) => t.name === 'vines' && !t.broken);
           if (v) {
             if (Math.hypot(v.x - s.hero.x, v.z - s.hero.z) > 8) await stepTo(v.x, v.z, 120);
-            else await attack(v.x, v.z, 850);
+            // Quick shots return control before the next rootsnare tell lands.
+            else await attack(v.x, v.z, 50);
             continue;
           }
         }
         const d = Math.hypot(b.x - s.hero.x, b.z - s.hero.z);
         if (d > HERO.calm.reach - .5) await stepTo(b.x, b.z, 120);
         else {
-          await attack(b.x, b.z, 850);
+          await attack(b.x, b.z, 50);
         }
       } else {
         const k = s.keeper,
