@@ -17,7 +17,7 @@ const must = (ok, why) => { if (!ok) throw Error(why); };
 const viewports = { desktop: { width: 1366, height: 768 }, phone: { width: 390, height: 844 } };
 
 export function options(args) {
-  const switches = ['--views', '--weapons', '--quality', '--dist', '--runtime-manifest', '--out', '--port', '--active-heavy'];
+  const switches = ['--views', '--weapons', '--quality', '--dist', '--runtime-manifest', '--out', '--port', '--active-heavy', '--scope'];
   for (let i = 0; i < args.length; i += 2) {
     must(switches.includes(args[i]), 'unknown option: ' + args[i]);
     must(args[i + 1] && !args[i + 1].startsWith('--'), args[i] + ' needs a value');
@@ -31,7 +31,8 @@ export function options(args) {
   };
   const views = option('views', 'desktop,phone').split(',');
   const weapons = option('weapons', 'sword,bow,staff').split(',');
-  const quality = option('quality', 'high');
+  const quality = option('quality', 'high'), scope = option('scope', 'full');
+  must(['full', 'closing'].includes(scope), 'invalid --scope');
   must(views.length && views.every(v => v in viewports) && new Set(views).size === views.length, 'invalid --views');
   must(weapons.length && weapons.every(v => ['sword', 'bow', 'staff'].includes(v)) && new Set(weapons).size === weapons.length, 'invalid --weapons');
   must(['high', 'low'].includes(quality), 'invalid --quality');
@@ -40,12 +41,12 @@ export function options(args) {
   const port = Number(option('port', '5837')), active = Number(option('active-heavy', '0'));
   must(Number.isInteger(port) && port >= 5400 && port <= 5999 && port !== 5796, 'invalid or protected port');
   must([0, 1].includes(active), 'invalid --active-heavy');
-  return { views, weapons, quality, port, active, dist: resolve(root, dist), manifest: resolve(root, manifest), out: resolve(root, out) };
+  return { views, weapons, quality, scope, port, active, dist: resolve(root, dist), manifest: resolve(root, manifest), out: resolve(root, out) };
 }
 
 export async function main(args = process.argv.slice(2)) {
   if (args.includes('--help')) {
-    console.log('Diagnostic opening practice, no build or earned claim. Required: --dist DIR --runtime-manifest FILE --out EMPTYDIR. Optional: --views desktop,phone --weapons sword,bow,staff --quality high|low --port 5837 --active-heavy 0|1.');
+    console.log('Diagnostic opening practice, no build or earned claim. Required: --dist DIR --runtime-manifest FILE --out EMPTYDIR. Optional: --views desktop,phone --weapons sword,bow,staff --quality high|low --port 5837 --active-heavy 0|1 --scope full|closing.');
     return;
   }
   const opt = options(args);
@@ -301,8 +302,32 @@ export async function main(args = process.argv.slice(2)) {
         must(!await page.locator('[data-touch="skill"]').isVisible() && !await page.locator('[data-touch="calm"]').isVisible(), 'practice exposes Skill or Calm');
         must(await page.locator('[data-touch="dodge"]').isVisible() && await page.locator('[data-touch="use"]').isVisible(), 'phone combat controls absent');
       }
-      await bag(touch, weapon, 'chosen');
+      if (opt.scope === 'full') await bag(touch, weapon, 'chosen');
       const target = (await read()).fight.targets[0], near = { x: target.x, z: target.z + 1.6 };
+      if (opt.scope === 'closing') {
+        const before = await read();
+        await walk(near);
+        await attack(touch, cdp);
+        await wait(s => s.opening.bout.guard === 2, 'quick hit before focused closing check');
+        await wait(s => s.weaponState?.act === 'none', 'quick hit recovers');
+        await attack(touch, cdp, false, true);
+        await wait(s => s.weaponState?.charged, 'held weapon charges');
+        if (touch) await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); else await page.mouse.up();
+        input({ type: touch ? 'touch-end-use' : 'mouse-up', intent: 'focused closing release' });
+        await wait(s => !s.opening.bout.on && !s.fight && !!s.talkLine, 'focused closing dialogue');
+        await endDialogue('closing-dialogue');
+        const end = await wait(s => s.flags['scene.4'] && !s.player.busy && !s.talkLine, 'focused closing completes');
+        must(!end.fight && end.ordinaryHeroVisible && !end.useClaimed, 'focused closing did not release combat');
+        must(JSON.stringify(before.bag) === JSON.stringify(end.bag), 'focused closing changed items');
+        must(events.filter(e => e.name === 'scene.played' && e.data.scene === 4).length === 1, 'focused closing did not finish exactly once');
+        must(!events.some(e => ['fight.ended', 'item.gained'].includes(e.name)), 'focused closing granted rewards');
+        await capture('restored');
+        writeFileSync(resolve(caseDir, 'result.json'), JSON.stringify({ status: 'PASS', scope: 'closing only', earned: false, view, weapon, quality: opt.quality, end, events, errors, steps }, null, 2));
+        report.cases.push({ view, weapon, scope: 'closing only', result: fileEvidence(resolve(caseDir, 'result.json')), status: 'PASS' });
+        write('report.json', report);
+        await context.close(); context = null; page = null;
+        continue;
+      }
       await walk(near);
       await cameraSettled();
       await capture('practice-entry');
