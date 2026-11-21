@@ -149,3 +149,10 @@ Retry-03 has now accepted Copper and Gold, bringing the fresh chain to six of te
 
 
 Retry-03 has accepted Echo, Pump House and Water uphill, reaching nine of ten chapters in the fresh chain. Their independent audits pass. Echo includes both shrine and dinner choices; Pump includes both fights, keystone, memory, Calla branches and final Continue; Water uphill includes actual machine construction, both farm choices, normal tent nights, ripe wheat harvest, delivery, Maren and Continue. Lamp Gallery now consumes the newly earned Uphill save. No product changes or public deployment occurred during this replay.
+
+
+### Gallery replay tactics
+
+Retry-03 preserved nine accepted chapters but the Gallery runner fell in rootsnare fight 8. Its long charge/recovery windows missed short attack warnings. Tool-only repairs `f4c8ef05` and `bffcb1f8` use quick attacks and await actual recovery for this fight; keeper tactics and victory/time limits stay unchanged. Exact-checkpoint diagnostic `gallery-combat-diagnostic-02` passed a real victory and control release, reviewed by the coordinator.
+
+Retry-04 revalidated the nine-chapter prefix, then exposed a separate stationary firing stall behind a tree. The exact hero-to-vines ray intersects the fight stage's solid terrain; the runner had checked range but not a clear shot. The failed attempt and ray diagnostic are preserved. The Gallery owner is adding a line-of-fire check with ordinary movement around obstacles, without product changes or relaxed acceptance. Final Gallery acceptance and full verification remain pending.
